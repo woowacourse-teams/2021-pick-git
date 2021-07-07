@@ -26,6 +26,10 @@ const config = {
         exclude: /node_modules/,
         use: ["babel-loader", "ts-loader"],
       },
+      {
+        test: /\.svg$/,
+        loader: "svg-inline-loader",
+      },
     ],
   },
 
