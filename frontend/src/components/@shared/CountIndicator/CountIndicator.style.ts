@@ -9,6 +9,7 @@ export const Container = styled.div`
   width: fit-content;
   height: 2.6875rem;
   line-height: 0.9;
+  color: ${({ theme }) => theme.color.textColor};
 `;
 
 export const Count = styled.div`
