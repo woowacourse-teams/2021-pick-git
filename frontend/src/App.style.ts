@@ -1,4 +1,5 @@
 import { createGlobalStyle } from "styled-components";
+import normalize from "styled-normalize";
 
 export const theme = {
   color: {
@@ -13,13 +14,15 @@ export const theme = {
 };
 
 export const GlobalStyle = createGlobalStyle`
+  ${normalize}
+
   html,
   body,
   ul {
     margin: 0;
+    padding: 0;
     height: 100%;
     font-size: 16px;
-    padding: 0;
     font-family: 'Noto Sans KR', sans-serif;
   }
    
