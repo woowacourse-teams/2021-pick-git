@@ -28,7 +28,7 @@ const config = {
       },
       {
         test: /\.svg$/,
-        loader: "svg-inline-loader",
+        use: ["@svgr/webpack", "url-loader"],
       },
     ],
   },
