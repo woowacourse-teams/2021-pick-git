@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <g id="그룹_1" data-name="그룹 1" transform="translate(72 400)">
+    <rect id="사각형_1" data-name="사각형 1" width="200" height="200" transform="translate(-72 -400)" fill="#ebe5e5"/>
+    <ellipse id="타원_1" data-name="타원 1" cx="37.5" cy="39" rx="37.5" ry="39" transform="translate(-9 -366)" fill="#a39b9b"/>
+    <rect id="사각형_2" data-name="사각형 2" width="156" height="77" rx="20" transform="translate(-50 -277)" fill="#a39b9b"/>
+    <rect id="사각형_3" data-name="사각형 3" width="156" height="36" transform="translate(-50 -236)" fill="#a39b9b"/>
+  </g>
+</svg>
