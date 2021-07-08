@@ -22,7 +22,7 @@ export const CircleImage = styled.div<React.CSSProperties>`
 export const Name = styled.div<React.CSSProperties>`
   ${({ fontSize, theme }) => `
     font-size: ${fontSize ?? "1rem"};
-    color: ${theme.textColor};
+    color: ${theme.color.textColor};
   `}
 
   margin-top: 0.375rem;
