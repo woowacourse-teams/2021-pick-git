@@ -6,7 +6,7 @@ export const theme = {
     appBackgroundColor: "#ffffff",
     primaryColor: "#fc3465",
     secondaryColor: "#fff0f0",
-    teriaryColor: "#6d6d6d",
+    tertiaryColor: "#6d6d6d",
     textColor: "#3d3d3d",
     tagItemColor: "#ffc1c1",
     white: "#ffffff",
