@@ -1,5 +1,6 @@
-import { Container, HomeLink, Navigation, NavigationItem } from "./NavigationHeader.style";
+import { Container, Navigation, HomeLink, NavigationItem } from "./NavigationHeader.style";
 import { AddBoxIcon, HomeIcon, LoginIcon, PersonIcon, SearchIcon } from "../../../assets/icons";
+import { PAGE_PATH } from "../../../constants/path";
 
 export interface Props extends React.HTMLAttributes<HTMLSpanElement> {
   isLoggedIn: boolean;
@@ -8,10 +9,10 @@ export interface Props extends React.HTMLAttributes<HTMLSpanElement> {
 const NavigationHeader = ({ isLoggedIn }: Props) => {
   const unAuthenticatedNavigation = (
     <Navigation>
-      <NavigationItem>
+      <NavigationItem to={PAGE_PATH.SEARCH}>
         <SearchIcon />
       </NavigationItem>
-      <NavigationItem>
+      <NavigationItem to={PAGE_PATH.LOGIN}>
         <LoginIcon />
       </NavigationItem>
     </Navigation>
@@ -19,16 +20,16 @@ const NavigationHeader = ({ isLoggedIn }: Props) => {
 
   const authenticatedNavigation = (
     <Navigation>
-      <NavigationItem>
+      <NavigationItem to={PAGE_PATH.HOME}>
         <HomeIcon />
       </NavigationItem>
-      <NavigationItem>
+      <NavigationItem to={PAGE_PATH.PROFILE}>
         <PersonIcon />
       </NavigationItem>
-      <NavigationItem>
+      <NavigationItem to={PAGE_PATH.ADD_POST}>
         <AddBoxIcon />
       </NavigationItem>
-      <NavigationItem>
+      <NavigationItem to={PAGE_PATH.SEARCH}>
         <SearchIcon />
       </NavigationItem>
     </Navigation>
@@ -36,7 +37,7 @@ const NavigationHeader = ({ isLoggedIn }: Props) => {
 
   return (
     <Container>
-      <HomeLink>깃들다</HomeLink>
+      <HomeLink to={PAGE_PATH.HOME}>깃들다</HomeLink>
       {isLoggedIn ? authenticatedNavigation : unAuthenticatedNavigation}
     </Container>
   );

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 export const Container = styled.header<React.CSSProperties>`
@@ -7,13 +8,13 @@ export const Container = styled.header<React.CSSProperties>`
   background-color: ${({ theme }) => theme.color.white};
 `;
 
-export const HomeLink = styled.a``;
+export const HomeLink = styled(Link)``;
 
 export const Navigation = styled.nav`
   display: flex;
 `;
 
-export const NavigationItem = styled.a`
+export const NavigationItem = styled(Link)`
   transition: opacity 0.5s;
 
   :not(:last-child) {
