@@ -50,6 +50,10 @@ export const GlobalStyle = createGlobalStyle`
     appearance: none;
   }
 
+  textarea {
+    resize: none;
+  }
+
   a {
     font-weight: bold;
     font-size: 2rem;
