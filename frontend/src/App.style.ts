@@ -73,7 +73,6 @@ export const GlobalStyle = createGlobalStyle`
   }
   a:hover {
     text-decoration: none;
-    color: tomato;
     cursor: pointer;
   }
 
