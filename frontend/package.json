@@ -7,7 +7,8 @@
     "build": "NODE_ENV=production webpack",
     "start": "NODE_ENV=development webpack serve",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "mock-serve": "json-server ./src/mocks/db.json --routes ./src/mocks/routes.json --port 3001"
   },
   "dependencies": {
     "axios": "^0.21.1",
@@ -46,6 +47,7 @@
     "eslint-plugin-react": "^7.24.0",
     "eslint-plugin-react-hooks": "^4.2.0",
     "html-webpack-plugin": "^5.3.2",
+    "json-server": "^0.16.3",
     "prettier": "^2.3.2",
     "ts-loader": "^9.2.3",
     "ts-node": "^10.0.0",
