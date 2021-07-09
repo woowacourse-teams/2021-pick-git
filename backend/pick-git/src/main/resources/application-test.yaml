@@ -12,5 +12,9 @@ spring:
     generate-ddl: true
     hibernate:
       ddl-auto: create-drop
-
+github:
+  tester:
+    user-name: jipark3
+    repository-name: doms-react
+    access-token: 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
 

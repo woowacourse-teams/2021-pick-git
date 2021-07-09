@@ -1,0 +1,55 @@
+package com.woowacourse.pickgit.tag.presentation;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.woowacourse.pickgit.tag.application.TagsDto;
+import io.restassured.RestAssured;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
+import org.springframework.test.context.ActiveProfiles;
+
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
+class TagControllerTest {
+
+    @LocalServerPort
+    private int port;
+
+    @Value("${github.tester.user-name}")
+    private String userName;
+
+    @Value("${github.tester.access-token}")
+    private String accessToken;
+
+    @Value("${github.tester.repository-name}")
+    private String repositoryName;
+
+    @BeforeEach
+    void setUp() {
+        RestAssured.port = port;
+    }
+
+    @DisplayName("특정 User의 Repository에 기술된 언어 태그들을 추출한다.")
+    @Test
+    void extractLanguageTags_ValidRepository_ExtractionSuccess() {
+        String url =
+            "/api/github/" + userName + "/repositories/" + repositoryName + "/tags/languages";
+
+        TagsDto response = RestAssured.given().log().all()
+            .auth().oauth2(accessToken)
+            .when().get(url)
+            .then().log().all()
+            .statusCode(HttpStatus.OK.value())
+            .extract()
+            .body()
+            .as(TagsDto.class);
+
+        assertThat(response.getTags()).containsExactly("JavaScript", "HTML", "CSS");
+    }
+}
