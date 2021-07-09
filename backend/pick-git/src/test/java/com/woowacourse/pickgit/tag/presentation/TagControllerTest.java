@@ -52,4 +52,22 @@ class TagControllerTest {
 
         assertThat(response.getTags()).containsExactly("JavaScript", "HTML", "CSS");
     }
+
+    @DisplayName("유효하지 않은 레포지토리 태그 추출 요청시 404 예외 메시지가 반환된다.")
+    @Test
+    void extractLanguageTags_InvalidRepository_ExceptionThrown() {
+        String url =
+            "/api/github/" + userName + "/repositories/none-available-repo/tags/languages";
+
+        String response = RestAssured.given().log().all()
+            .auth().oauth2(accessToken)
+            .when().get(url)
+            .then().log().all()
+            .statusCode(HttpStatus.NOT_FOUND.value())
+            .extract()
+            .body()
+            .as(String.class);
+
+        assertThat(response).isEqualTo("외부 플랫폼 연동 요청 처리에 실패했습니다.");
+    }
 }
