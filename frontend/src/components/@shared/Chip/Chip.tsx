@@ -1,4 +1,4 @@
-import cancelIcon from "../../../assets/icons/cancel.svg";
+import { CancelIcon } from "../../../assets/icons";
 import { Container, DeleteButton, Text } from "./Chip.style";
 
 export interface Props extends React.HTMLAttributes<HTMLSpanElement> {
@@ -13,7 +13,7 @@ const Chip = ({ backgroundColor, children, onDelete }: Props) => {
       <Text>{children}</Text>
       {onDelete && (
         <DeleteButton onClick={onDelete}>
-          <img src={cancelIcon} alt="태그 삭제 아이콘" />
+          <CancelIcon />
         </DeleteButton>
       )}
     </Container>
