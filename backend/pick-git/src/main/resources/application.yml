@@ -1,3 +1,18 @@
+spring:
+  datasource:
+    url: jdbc:h2:~/test;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        dialects: org.hibernate.dialect.MySQL57Dialect
+        format_sql: true
+    generate-ddl: true
+    hibernate:
+      ddl-auto: none
+
 github:
   client:
     id: 7775859b314b6084eff0

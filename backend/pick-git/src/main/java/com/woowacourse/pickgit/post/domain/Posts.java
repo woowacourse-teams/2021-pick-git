@@ -7,6 +7,6 @@ import javax.persistence.OneToMany;
 @Embeddable
 public class Posts {
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "user")
     private List<Post> posts;
 }

@@ -1,6 +1,6 @@
 package com.woowacourse.pickgit.user.domain.follow;
 
-import com.example.demo.member.domain.Member;
+import com.woowacourse.pickgit.user.domain.User;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -16,10 +16,10 @@ public class Follow {
     private Long id;
     @ManyToOne
     @JoinColumn(name = "SOURCE_ID")
-    private Member source;
+    private User source;
     @ManyToOne
     @JoinColumn(name = "TARGET_ID")
-    private Member target;
+    private User target;
 
     protected Follow() {
     }
