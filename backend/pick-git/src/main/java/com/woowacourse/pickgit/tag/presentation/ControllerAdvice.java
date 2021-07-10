@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
 
-@RestControllerAdvice
+@RestControllerAdvice(basePackageClasses = {TagController.class})
 public class ControllerAdvice {
 
     @ExceptionHandler(HttpClientErrorException.class)
