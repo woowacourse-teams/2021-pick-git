@@ -23,21 +23,34 @@ class OAuthControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @InjectMocks
-    private OAuthController OAuthController;
-
     @MockBean
     private OAuthService oAuthService;
 
     @DisplayName("Github 로그인 요청을 하면 Github 인증 URL을 반환한다.")
     @Test
     void authorizationGithubUrl_InvalidAccount_GithubUrl() throws Exception {
+        // given
         String githubAuthorizationGithubUrl = "http://github.authorization.url";
         when(oAuthService.getGithubAuthorizationUrl()).thenReturn(githubAuthorizationGithubUrl);
 
+        // when, then
         mockMvc.perform(get("/authorization/github"))
             .andDo(print())
             .andExpect(status().isOk())
-            .andExpect(content().json(githubAuthorizationGithubUrl));
+            .andExpect(content().string(githubAuthorizationGithubUrl));
+    }
+
+    @DisplayName("Github 로그인 인증 후 토큰을 발행하여 반환한다.")
+    @Test
+    void afterAuthorizeGithubLogin_ValidAccount_JWTToken() throws Exception {
+        // given
+        String githubAuthorizationCode = "random";
+        when(oAuthService.createToken(githubAuthorizationCode)).thenReturn("jwt token");
+
+        // when, then
+        mockMvc.perform(get("/afterlogin?code=" + githubAuthorizationCode))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(content().string("jwt token"));
     }
 }
