@@ -2,6 +2,9 @@ import { addDecorator } from '@storybook/react';
 import { MemoryRouter } from 'react-router-dom';
 import { theme, GlobalStyle } from '../src/App.style';
 import { ThemeProvider } from 'styled-components';
+import { QueryClientProvider, QueryClient } from 'react-query';
+
+const queryClient = new QueryClient()
 
 export const parameters = {
   actions: { argTypesRegex: "^on[A-Z].*" },
@@ -28,7 +31,9 @@ addDecorator(Story => (
     <MemoryRouter initialEntries={['/']}>
       <ThemeProvider theme={theme}>
         <GlobalStyle />
-        <Story />
+        <QueryClientProvider client={queryClient}>
+          <Story />
+        </QueryClientProvider>
       </ThemeProvider>
     </MemoryRouter>
   )
