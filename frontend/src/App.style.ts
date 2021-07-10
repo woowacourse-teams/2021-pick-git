@@ -8,6 +8,7 @@ export const theme = {
     secondaryColor: "#fff0f0",
     tertiaryColor: "#6d6d6d",
     textColor: "#3d3d3d",
+    lighterTextColor: "#959595",
     tagItemColor: "#ffc1c1",
     white: "#ffffff",
   },
@@ -18,7 +19,8 @@ export const GlobalStyle = createGlobalStyle`
 
   html,
   body,
-  ul {
+  ul, 
+  input {
     margin: 0;
     padding: 0;
     height: 100%;
