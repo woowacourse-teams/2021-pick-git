@@ -3,7 +3,7 @@ import styled from "styled-components";
 export const Container = styled.header<React.CSSProperties>`
   display: flex;
   justify-content: space-between;
-  padding: 18px 24px;
+  padding: 1.125rem 1.5rem;
 `;
 
 export const Content = styled.div`
@@ -20,5 +20,5 @@ export const StepLink = styled.a`
 
 export const EmptySpace = styled.div`
   display: inline-block;
-  width: 22px;
+  width: 1.375rem;
 `;
