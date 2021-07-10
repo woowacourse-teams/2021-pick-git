@@ -11,7 +11,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "LIKES")
+@Table(name = "likes")
 public class Like {
 
     @Id
@@ -23,10 +23,14 @@ public class Like {
     private Post post;
 
     @ManyToOne
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "user_id")
     private User user;
 
     protected Like() {
+    }
 
+    public Like(Post post, User user) {
+        this.post = post;
+        this.user = user;
     }
 }
