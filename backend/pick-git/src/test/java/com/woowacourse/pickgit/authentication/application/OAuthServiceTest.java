@@ -3,7 +3,9 @@ package com.woowacourse.pickgit.authentication.application;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -11,20 +13,23 @@ import org.springframework.http.MediaType;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+@SpringBootTest
 class OAuthServiceTest {
 
+    @DisplayName("처음 사이트에 로그인 한 경우 유저 정보를 Github으로부터 받아와서 DB에 저장한다.")
     @Test
-    void github() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Accept", MediaType.APPLICATION_JSON_VALUE);
-        headers.add("Authorization", "Bearer " + "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");
+    void test1() {
+    }
 
-        HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity(headers);
+    @DisplayName("처음 사이트에 로그인이 아닌 경우 유저 정보를 Github로부터 받아와서 DB 정보를 최신화한다.")
+    @Test
+    void test2() {
 
-        RestTemplate restTemplate = new RestTemplate();
-        OAuthProfileResponse result = restTemplate
-            .exchange("https://api.github.com/user", HttpMethod.GET, httpEntity, OAuthProfileResponse.class)
-            .getBody();
-        System.out.println(result.toString());
+    }
+
+    @DisplayName("처음 ")
+    @Test
+    void test3() {
+
     }
 }

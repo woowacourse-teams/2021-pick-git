@@ -8,5 +8,5 @@ public interface JwtTokenProvider {
 
     boolean validateToken(String token);
 
-    String extractSubject(String token);
+    String getPayloadByKey(String token, String key);
 }
