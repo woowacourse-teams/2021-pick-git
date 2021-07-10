@@ -3,6 +3,9 @@ package com.woowacourse.pickgit.authentication.application;
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
 import com.woowacourse.pickgit.authentication.dao.OAuthAccessTokenDao;
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
+import com.woowacourse.pickgit.authentication.domain.user.Anonymous;
+import com.woowacourse.pickgit.authentication.domain.user.LoginMember;
+import com.woowacourse.pickgit.authentication.domain.user.RequestUser;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
@@ -88,5 +91,20 @@ public class OAuthService {
         return restTemplate
             .exchange("https://api.github.com/user", HttpMethod.GET, httpEntity, OAuthProfileResponse.class)
             .getBody();
+    }
+
+    public RequestUser findRequestUserByToken(String authentication) {
+        if (authentication == null) {
+            return new Anonymous();
+        }
+
+        String username = jwtTokenProvider.getPayloadByKey(authentication, "username");
+        String accessToken = authAccessTokenDao.findByKeyToken(authentication)
+            .orElseThrow(() -> new IllegalArgumentException("다시 로그인해주세요."));
+        return new LoginMember(username, accessToken);
+    }
+
+    public boolean validateToken(String authentication) {
+        return jwtTokenProvider.validateToken(authentication);
     }
 }

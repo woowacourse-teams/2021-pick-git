@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.authentication.dao;
 
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Component;
 
@@ -18,5 +19,9 @@ public class OAuthAccessTokenDao {
 
     public boolean isExistsByToken(String token) {
         return tokenDb.containsKey(token);
+    }
+
+    public Optional<String> findByKeyToken(String token) {
+        return Optional.ofNullable(tokenDb.get(token));
     }
 }
