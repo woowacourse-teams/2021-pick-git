@@ -12,12 +12,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class GithubTagExtractor implements PlatformTagExtractor {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
     private final PlatformApiRequester platformApiRequester;
+    private final ObjectMapper objectMapper;
 
-    public GithubTagExtractor(PlatformApiRequester platformApiRequester) {
+    public GithubTagExtractor(PlatformApiRequester platformApiRequester,
+        ObjectMapper objectMapper) {
         this.platformApiRequester = platformApiRequester;
+        this.objectMapper = objectMapper;
     }
 
     public List<String> extractTags(String accessToken, String userName, String repositoryName) {
@@ -32,7 +33,7 @@ public class GithubTagExtractor implements PlatformTagExtractor {
 
     private List<String> parseResponseIntoLanguageTags(String response) {
         try {
-            Set<String> tags = OBJECT_MAPPER.readValue(response, LinkedHashMap.class)
+            Set<String> tags = objectMapper.readValue(response, LinkedHashMap.class)
                 .keySet();
             return new ArrayList<>(tags);
         } catch (JsonProcessingException e) {

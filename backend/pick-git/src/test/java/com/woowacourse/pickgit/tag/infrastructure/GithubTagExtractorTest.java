@@ -3,6 +3,7 @@ package com.woowacourse.pickgit.tag.infrastructure;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woowacourse.pickgit.tag.domain.PlatformTagExtractor;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +20,8 @@ class GithubTagExtractorTest {
 
     private PlatformTagExtractor platformTagExtractor;
 
+    private ObjectMapper objectMapper = new ObjectMapper();
+
     @BeforeEach
     void setUp() {
         String validUrl =
@@ -34,7 +37,7 @@ class GithubTagExtractorTest {
             return "{\"JavaScript\": \"91949\", \"HTML\": \"13\", \"CSS\": \"9\"}";
         });
 
-        platformTagExtractor = new GithubTagExtractor(platformApiRequester);
+        platformTagExtractor = new GithubTagExtractor(platformApiRequester, objectMapper);
     }
 
     @DisplayName("명시된 User의 Repository에 기술된 Language Tags를 추출한다.")
