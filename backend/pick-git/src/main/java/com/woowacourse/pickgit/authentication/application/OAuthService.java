@@ -3,6 +3,10 @@ package com.woowacourse.pickgit.authentication.application;
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
 import com.woowacourse.pickgit.authentication.dao.OAuthAccessTokenDao;
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
+import com.woowacourse.pickgit.user.domain.User;
+import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
+import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -17,13 +21,16 @@ public class OAuthService {
     private OAuthClient githubOAuthClient;
     private JwtTokenProvider jwtTokenProvider;
     private OAuthAccessTokenDao authAccessTokenDao;
+    private UserRepository userRepository;
 
     public OAuthService(OAuthClient githubOAuthClient,
         JwtTokenProvider jwtTokenProvider,
-        OAuthAccessTokenDao authAccessTokenDao) {
+        OAuthAccessTokenDao authAccessTokenDao,
+        UserRepository userRepository) {
         this.githubOAuthClient = githubOAuthClient;
         this.jwtTokenProvider = jwtTokenProvider;
         this.authAccessTokenDao = authAccessTokenDao;
+        this.userRepository = userRepository;
     }
 
     public String getGithubAuthorizationUrl() {
@@ -35,7 +42,33 @@ public class OAuthService {
 
         OAuthProfileResponse githubProfileResponse = getGithubProfile(githubAccessToken);
 
-        return createTokenAndSave(githubAccessToken, githubProfileResponse.getUsername());
+        updateUserOrCreateUser(githubProfileResponse);
+
+        return createTokenAndSave(githubAccessToken, githubProfileResponse.getName());
+    }
+
+    private void updateUserOrCreateUser(OAuthProfileResponse githubProfileResponse) {
+        GithubProfile latestGithubProfile = new GithubProfile(
+            githubProfileResponse.getGithubUrl(),
+            githubProfileResponse.getCompany(),
+            githubProfileResponse.getLocation(),
+            githubProfileResponse.getWebsite(),
+            githubProfileResponse.getTwitter()
+        );
+
+        userRepository.findUserByBasicProfile_Name(githubProfileResponse.getName())
+            .ifPresentOrElse(user -> {
+                user.setGithubProfile(latestGithubProfile);
+                userRepository.save(user);
+            }, () -> {
+                BasicProfile basicProfile = new BasicProfile(
+                    githubProfileResponse.getName(),
+                    githubProfileResponse.getImage(),
+                    githubProfileResponse.getDescription()
+                );
+                User user = new User(basicProfile, latestGithubProfile);
+                userRepository.save(user);
+            });
     }
 
     private String createTokenAndSave(String githubAccessToken, String payload) {
