@@ -1,6 +1,8 @@
 package com.woowacourse.pickgit.authentication.application.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
+import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
 
 public class OAuthProfileResponse {
 
@@ -36,6 +38,24 @@ public class OAuthProfileResponse {
 
     public String getImage() {
         return image;
+    }
+
+    public GithubProfile toGithubProfile() {
+        return new GithubProfile(
+            githubUrl,
+            company,
+            location,
+            website,
+            twitter
+        );
+    }
+
+    public BasicProfile toBasicProfile() {
+        return new BasicProfile(
+            name,
+            image,
+            description
+        );
     }
 
     public void setImage(String image) {
