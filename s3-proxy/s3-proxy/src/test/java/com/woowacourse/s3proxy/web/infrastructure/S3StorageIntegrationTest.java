@@ -2,6 +2,7 @@ package com.woowacourse.s3proxy.web.infrastructure;
 
 import cloud.localstack.docker.LocalstackDockerExtension;
 import cloud.localstack.docker.annotation.LocalstackDockerProperties;
+import com.woowacourse.s3proxy.common.FileFactory;
 import com.woowacourse.s3proxy.config.StorageTestConfiguration;
 import com.woowacourse.s3proxy.web.domain.PickGitStorage;
 import org.apache.http.entity.ContentType;
@@ -34,13 +35,11 @@ class S3StorageIntegrationTest {
     @Autowired
     private S3Storage s3Storage;
 
-    @DisplayName("S3에 파일을 업로드 하고 결과를 확인한다.")
+    @DisplayName("S3에 파일을 업로드 하고 결과를 확인한다. - 성공")
     @Test
-    void store() {
-        final String fileName = "testFile%d.jpg";
-
-        MockMultipartFile image1 = createTestFile(String.format(fileName, 1));
-        MockMultipartFile image2 = createTestFile(String.format(fileName, 2));
+    void store_UplaodFilesToS3AndCheckReturn_Ture() {
+        MockMultipartFile image1 = FileFactory.getTestRightImage1();
+        MockMultipartFile image2 = FileFactory.getTestRightImage2();
 
         List<PickGitStorage.StoreResult> storeResults =
                 s3Storage.store(List.of(image1, image2));
@@ -54,12 +53,10 @@ class S3StorageIntegrationTest {
                 );
     }
 
-    @DisplayName("S3에 파일을 업로드 하고 실패한 파일과 성공한 파일의 결과를 확인한다.")
+    @DisplayName("S3에 파일을 업로드 하고 실패한 파일과 성공한 파일의 결과를 확인한다. - 성공")
     @Test
-    void store_ㅇ() {
-        final String fileName = "testFile%d.jpg";
-
-        MockMultipartFile image1 = createTestFile(String.format(fileName, 1));
+    void store_UploadFilesToS3AndCheckReturnThatHasFailAndSuccessResult_True() {
+        MockMultipartFile image1 = FileFactory.getTestRightImage1();
         MockMultipartFile image2 = new MockMultipartFile(
                 "files",
                 null,
@@ -76,14 +73,6 @@ class S3StorageIntegrationTest {
         assertThat(succeeds).hasSize(1);
     }
 
-    private MockMultipartFile createTestFile(String fileName) {
-        return new MockMultipartFile(
-                "files",
-                fileName,
-                ContentType.IMAGE_JPEG.toString(),
-                "TEST".getBytes(StandardCharsets.UTF_8)
-        );
-    }
 
     private PickGitStorage.StoreResult createStoreResult(String fileName) {
         return new PickGitStorage.StoreResult(

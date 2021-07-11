@@ -2,9 +2,13 @@ package com.woowacourse.s3proxy.config;
 
 import cloud.localstack.awssdkv1.TestUtils;
 import com.amazonaws.services.s3.AmazonS3;
+import com.woowacourse.s3proxy.common.fileValidator.ImageFileValidator;
+import java.awt.Image;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.test.context.ActiveProfiles;
 
 @TestConfiguration
 public class StorageTestConfiguration {

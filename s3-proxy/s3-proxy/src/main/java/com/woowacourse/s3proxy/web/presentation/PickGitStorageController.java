@@ -3,6 +3,7 @@ package com.woowacourse.s3proxy.web.presentation;
 import com.woowacourse.s3proxy.web.application.PickGitStorageService;
 import com.woowacourse.s3proxy.web.application.dto.FilesDto;
 import com.woowacourse.s3proxy.web.presentation.Dto.Files;
+import com.woowacourse.s3proxy.web.presentation.resolver.ExtensionValid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,7 +20,7 @@ public class PickGitStorageController {
     }
 
     @PostMapping
-    public ResponseEntity<Files.Response> store(Files.Request files) {
+    public ResponseEntity<Files.Response> store(@ExtensionValid Files.Request files) {
         FilesDto.Request requestDto = new FilesDto.Request(files.getUserName(), files.getFiles());
         FilesDto.Response responseDto = pickGitStorageService.store(requestDto);
 

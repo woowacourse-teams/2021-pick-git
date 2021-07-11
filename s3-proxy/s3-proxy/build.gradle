@@ -18,6 +18,7 @@ dependencies {
 	testImplementation group: 'cloud.localstack', name: 'localstack-utils', version: '0.2.13'
 
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation group: 'org.apache.tika', name: 'tika-core', version: '1.26'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
