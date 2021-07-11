@@ -17,7 +17,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-@ExtendWith(SpringExtension.class)
 @WebMvcTest(OAuthController.class)
 @ActiveProfiles("test")
 class OAuthControllerTest {
@@ -35,7 +34,7 @@ class OAuthControllerTest {
         when(oAuthService.getGithubAuthorizationUrl()).thenReturn(githubAuthorizationGithubUrl);
 
         // when, then
-        mockMvc.perform(get("/authorization/github"))
+        mockMvc.perform(get("/api/authorization/github"))
             .andDo(print())
             .andExpect(status().isOk())
             .andExpect(content().string(githubAuthorizationGithubUrl));
@@ -49,7 +48,7 @@ class OAuthControllerTest {
         when(oAuthService.createToken(githubAuthorizationCode)).thenReturn("jwt token");
 
         // when, then
-        mockMvc.perform(get("/afterlogin?code=" + githubAuthorizationCode))
+        mockMvc.perform(get("/api/afterlogin?code=" + githubAuthorizationCode))
             .andDo(print())
             .andExpect(status().isOk())
             .andExpect(content().string("jwt token"));

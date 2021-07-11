@@ -38,7 +38,8 @@ public class OAuthConfiguration implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authenticationInterceptor())
-            .excludePathPatterns("/authorization/github")
-            .excludePathPatterns("/afterlogin");
+            .addPathPatterns("/api/**")
+            .excludePathPatterns("/api/authorization/github")
+            .excludePathPatterns("/api/afterlogin");
     }
 }
