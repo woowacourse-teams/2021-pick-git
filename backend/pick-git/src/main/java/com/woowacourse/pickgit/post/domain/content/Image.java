@@ -1,7 +1,9 @@
 package com.woowacourse.pickgit.post.domain.content;
 
 import com.woowacourse.pickgit.post.domain.Post;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -9,17 +11,18 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class Picture {
+public class Image {
 
-    @ManyToOne
-    @JoinColumn(name = "POST_ID")
-    protected Post post;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    public String getUrl() {
-        return "test";
+    @Column(nullable = false)
+    private String url;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id")
+    private Post post;
+
+    protected Image() {
     }
 }

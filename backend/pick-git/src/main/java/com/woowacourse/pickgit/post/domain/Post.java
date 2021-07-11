@@ -1,25 +1,33 @@
 package com.woowacourse.pickgit.post.domain;
 
 import com.woowacourse.pickgit.post.domain.comment.Comments;
-import com.woowacourse.pickgit.post.domain.content.Pictures;
+import com.woowacourse.pickgit.post.domain.content.Images;
 import com.woowacourse.pickgit.post.domain.like.Likes;
-import com.woowacourse.pickgit.tag.domain.Tags;
 import com.woowacourse.pickgit.user.domain.User;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 
 @Entity
 public class Post {
 
-    @Embedded
-    private Pictures pictures;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Embedded
-    private PostContents contents;
+    private Images images;
+
+    @Embedded
+    private PostContent content;
 
     @Embedded
     private Likes likes;
@@ -27,13 +35,10 @@ public class Post {
     @Embedded
     private Comments comments;
 
-    @Embedded
-    private Tags tags;
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+    private List<PostTag> postTags = new ArrayList<>();
 
-    @Id
-    private Long id;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 

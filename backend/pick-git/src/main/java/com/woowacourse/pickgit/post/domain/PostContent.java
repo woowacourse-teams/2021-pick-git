@@ -1,12 +1,14 @@
 package com.woowacourse.pickgit.post.domain;
 
 import javax.persistence.Embeddable;
+import javax.persistence.Lob;
 
 @Embeddable
-public class PostContents {
+public class PostContent {
 
+    @Lob
     private String content;
 
-    protected PostContents() {
+    protected PostContent() {
     }
 }

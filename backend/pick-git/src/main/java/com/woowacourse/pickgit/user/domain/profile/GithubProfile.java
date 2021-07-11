@@ -1,21 +1,22 @@
 package com.woowacourse.pickgit.user.domain.profile;
 
-import com.woowacourse.pickgit.user.domain.Vendor;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
 
+@Embeddable
 public class GithubProfile {
 
-    private final String company;
-    private final String location;
-    private final String webSite;
-    private final String twitter;
-    private String name;
+    @Column(nullable = false, updatable = false)
+    private String githubUrl;
 
-    public GithubProfile(String company, String location, String webSite, String twitter,
-        Vendor vendor) {
-        this.company = company;
-        this.location = location;
-        this.webSite = webSite;
-        this.twitter = twitter;
+    private String company;
+
+    private String location;
+
+    private String website;
+
+    private String twitter;
+
+    protected GithubProfile() {
     }
-
 }
