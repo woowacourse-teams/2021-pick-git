@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.authentication.infrastructure;
 
+import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.infrastructure.dto.OAuthAccessTokenRequest;
 import com.woowacourse.pickgit.authentication.infrastructure.dto.OAuthAccessTokenResponse;
@@ -52,5 +53,19 @@ public class GithubOAuthClient implements OAuthClient {
             throw new IllegalArgumentException("깃헙 인증 에러");
         }
         return accessToken;
+    }
+
+    @Override
+    public OAuthProfileResponse getGithubProfile(String githubAccessToken) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Accept", MediaType.APPLICATION_JSON_VALUE);
+        headers.add("Authorization", "Bearer " + githubAccessToken);
+
+        HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity(headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+        return restTemplate
+            .exchange("https://api.github.com/user", HttpMethod.GET, httpEntity, OAuthProfileResponse.class)
+            .getBody();
     }
 }
