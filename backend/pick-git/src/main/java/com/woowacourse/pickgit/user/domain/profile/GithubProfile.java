@@ -29,11 +29,22 @@ public class GithubProfile {
         this.twitter = twitter;
     }
 
+    public String getGithubUrl() {
+        return githubUrl;
+    }
+
     public String getCompany() {
         return company;
     }
 
-    public String getGithubUrl() {
-        return githubUrl;
+    public String getLocation() {
+        return location;
+    }
+    public String getWebsite() {
+        return website;
+    }
+
+    public String getTwitter() {
+        return twitter;
     }
 }

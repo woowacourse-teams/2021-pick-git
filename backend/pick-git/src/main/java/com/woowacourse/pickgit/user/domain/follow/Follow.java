@@ -32,4 +32,21 @@ public class Follow {
 
     protected Follow() {
     }
+
+    public Follow(User source, User target) {
+        this.source = source;
+        this.target = target;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public User getSource() {
+        return source;
+    }
+
+    public User getTarget() {
+        return target;
+    }
 }

@@ -14,5 +14,9 @@ public class Followings {
 
     public Followings() {
     }
+
+    public int followingCount() {
+        return followings.size();
+    }
 }
 
