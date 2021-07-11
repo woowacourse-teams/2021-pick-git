@@ -15,8 +15,10 @@ repositories {
 dependencies {
 	implementation platform('com.amazonaws:aws-java-sdk-bom:1.11.1000')
 	implementation 'com.amazonaws:aws-java-sdk-s3'
+	testImplementation group: 'cloud.localstack', name: 'localstack-utils', version: '0.2.13'
 
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
