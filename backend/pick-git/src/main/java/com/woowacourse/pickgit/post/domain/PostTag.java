@@ -1,8 +1,6 @@
-package com.woowacourse.pickgit.post.domain.comment;
+package com.woowacourse.pickgit.post.domain;
 
-import com.woowacourse.pickgit.post.domain.Post;
-import com.woowacourse.pickgit.user.domain.User;
-import javax.persistence.Embedded;
+import com.woowacourse.pickgit.tag.domain.Tag;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -12,22 +10,19 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class Comment {
+public class PostTag {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Embedded
-    private CommentContent content;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
 
-    protected Comment() {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tag_id")
+    private Tag tag;
+
+    protected PostTag() {
     }
 }
