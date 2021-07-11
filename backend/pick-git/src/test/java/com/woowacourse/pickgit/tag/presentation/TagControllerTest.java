@@ -1,73 +1,87 @@
 package com.woowacourse.pickgit.tag.presentation;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.woowacourse.pickgit.tag.application.ExtractionRequestDto;
+import com.woowacourse.pickgit.tag.application.TagService;
 import com.woowacourse.pickgit.tag.application.TagsDto;
-import io.restassured.RestAssured;
-import org.junit.jupiter.api.BeforeEach;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.client.HttpClientErrorException;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
+@WebMvcTest(TagController.class)
 class TagControllerTest {
 
-    @LocalServerPort
-    private int port;
+    @Autowired
+    private MockMvc mockMvc;
 
-    @Value("${github.tester.user-name}")
-    private String userName;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    @Value("${github.tester.access-token}")
-    private String accessToken;
+    @MockBean
+    private TagService tagService;
 
-    @Value("${github.tester.repository-name}")
-    private String repositoryName;
-
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-    }
+    private String accessToken = "Bearer token";
+    private String userName = "abc";
+    private String repositoryName = "repo";
 
     @DisplayName("특정 User의 Repository에 기술된 언어 태그들을 추출한다.")
     @Test
-    void extractLanguageTags_ValidRepository_ExtractionSuccess() {
+    void extractLanguageTags_ValidRepository_ExtractionSuccess() throws Exception {
         String url =
             "/api/github/" + userName + "/repositories/" + repositoryName + "/tags/languages";
+        List<String> tags = Arrays.asList("Java", "Python", "HTML");
+        TagsDto tagsDto = new TagsDto(tags);
+        String expectedResponse = objectMapper.writeValueAsString(tagsDto);
 
-        TagsDto response = RestAssured.given().log().all()
-            .auth().oauth2(accessToken)
-            .when().get(url)
-            .then().log().all()
-            .statusCode(HttpStatus.OK.value())
-            .extract()
-            .body()
-            .as(TagsDto.class);
+        given(tagService.extractTags(any(ExtractionRequestDto.class)))
+            .willReturn(tagsDto);
 
-        assertThat(response.getTags()).containsExactly("JavaScript", "HTML", "CSS");
+        mockMvc.perform(get(url)
+            .header("Authorization", accessToken))
+            .andExpect(status().isOk())
+            .andExpect(content().string(expectedResponse));
     }
 
     @DisplayName("유효하지 않은 레포지토리 태그 추출 요청시 404 예외 메시지가 반환된다.")
     @Test
-    void extractLanguageTags_InvalidRepository_ExceptionThrown() {
+    void extractLanguageTags_InvalidRepository_ExceptionThrown() throws Exception {
         String url =
-            "/api/github/" + userName + "/repositories/none-available-repo/tags/languages";
+            "/api/github/" + userName + "/repositories/invalidrepo/tags/languages";
 
-        String response = RestAssured.given().log().all()
-            .auth().oauth2(accessToken)
-            .when().get(url)
-            .then().log().all()
-            .statusCode(HttpStatus.NOT_FOUND.value())
-            .extract()
-            .body()
-            .as(String.class);
+        given(tagService.extractTags(any(ExtractionRequestDto.class)))
+            .willThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
-        assertThat(response).isEqualTo("외부 플랫폼 연동 요청 처리에 실패했습니다.");
+        mockMvc.perform(get(url)
+            .header("Authorization", accessToken))
+            .andExpect(status().isNotFound())
+            .andExpect(content().string("외부 플랫폼 연동 요청 처리에 실패했습니다."));
+    }
+
+    @DisplayName("유효하지 않은 AccessToken으로 태그 추출 요청시 401 예외 메시지가 반환된다.")
+    @Test
+    void extractLanguageTags_InvalidAccessToken_ExceptionThrown() throws Exception {
+        String url =
+            "/api/github/" + userName + "/repositories/" + repositoryName + "/tags/languages";
+
+        given(tagService.extractTags(any(ExtractionRequestDto.class)))
+            .willThrow(new HttpClientErrorException(HttpStatus.UNAUTHORIZED));
+
+        mockMvc.perform(get(url)
+            .header("Authorization", "Bearer invalid"))
+            .andExpect(status().isUnauthorized())
+            .andExpect(content().string("외부 플랫폼 연동 요청 처리에 실패했습니다."));
     }
 }

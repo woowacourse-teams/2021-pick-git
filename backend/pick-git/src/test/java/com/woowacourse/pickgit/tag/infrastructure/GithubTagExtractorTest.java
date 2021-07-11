@@ -28,11 +28,11 @@ class GithubTagExtractorTest {
             "https://api.github.com/repos/" + USER_NAME + "/" + REPOSITORY_NAME + "/languages";
 
         PlatformApiRequester platformApiRequester = ((url, accessToken) -> {
-            if (!url.equals(validUrl)) {
-                throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
-            }
             if (!accessToken.equals(TESTER_ACCESS_TOKEN)) {
                 throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
+            }
+            if (!url.equals(validUrl)) {
+                throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
             }
             return "{\"JavaScript\": \"91949\", \"HTML\": \"13\", \"CSS\": \"9\"}";
         });

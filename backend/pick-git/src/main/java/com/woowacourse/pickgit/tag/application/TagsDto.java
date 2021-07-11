@@ -6,7 +6,7 @@ public class TagsDto {
 
     private List<String> tags;
 
-    public TagsDto() {
+    private TagsDto() {
     }
 
     public TagsDto(List<String> tags) {

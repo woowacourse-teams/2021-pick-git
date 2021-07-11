@@ -26,8 +26,8 @@ public class TagController {
         @PathVariable String repositoryName) {
         String token = httpServletRequest.getHeader("Authorization")
             .split(" ")[1];
-        ExtractionRequestDto extractionRequestDto = new ExtractionRequestDto(token, userName,
-            repositoryName);
+        ExtractionRequestDto extractionRequestDto =
+            new ExtractionRequestDto(token, userName, repositoryName);
         TagsDto tagsDto = tagService.extractTags(extractionRequestDto);
         return ResponseEntity.ok(tagsDto);
     }

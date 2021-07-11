@@ -2,9 +2,12 @@ package com.woowacourse.pickgit.tag.application;
 
 public class ExtractionRequestDto {
 
-    private final String accessToken;
-    private final String userName;
-    private final String repositoryName;
+    private String accessToken;
+    private String userName;
+    private String repositoryName;
+
+    private ExtractionRequestDto() {
+    }
 
     public ExtractionRequestDto(String accessToken, String userName, String repositoryName) {
         this.accessToken = accessToken;
