@@ -15,16 +15,16 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class GithubOAuthClient implements OAuthClient {
 
-    @Value("${github.client.id}")
+    @Value("${security.github.client.id}")
     private String clientId;
 
-    @Value("${github.client.secret}")
+    @Value("${security.github.client.secret}")
     private String clientSecret;
 
-    @Value("${github.url.redirect}")
+    @Value("${security.github.url.redirect}")
     private String redirectUrl;
 
-    @Value("${github.url.access-token}")
+    @Value("${security.github.url.access-token}")
     private String accessTokenUrl;
 
     @Override
