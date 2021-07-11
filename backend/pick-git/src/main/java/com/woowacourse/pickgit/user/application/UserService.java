@@ -24,7 +24,8 @@ public class UserService {
         UserProfileServiceDto userProfileDto = new UserProfileServiceDto(
             user.getName(), user.getImage(), user.getDescription(),
             user.getFollowerCount(), user.getFollowingCount(), user.getPostCount(),
-            user.getCompany(), user.getLocation(), user.getWebsite(), user.getTwitter()
+            user.getGithubUrl(), user.getCompany(), user.getLocation(),
+            user.getWebsite(), user.getTwitter()
         );
 
         return userProfileDto;

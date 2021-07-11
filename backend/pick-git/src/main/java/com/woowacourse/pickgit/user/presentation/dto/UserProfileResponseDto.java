@@ -12,9 +12,10 @@ public class UserProfileResponseDto {
     private final int followingCount;
     private final int postCount;
 
+    private final String githubUrl;
     private final String company;
     private final String location;
-    private final String webSite;
+    private final String website;
     private final String twitter;
 
     public UserProfileResponseDto(UserProfileServiceDto userProfileServiceDto) {
@@ -24,9 +25,10 @@ public class UserProfileResponseDto {
         this.followerCount = userProfileServiceDto.getFollowerCount();
         this.followingCount = userProfileServiceDto.getFollowingCount();
         this.postCount = userProfileServiceDto.getPostCount();
+        this.githubUrl = userProfileServiceDto.getGithubUrl();
         this.company = userProfileServiceDto.getCompany();
         this.location = userProfileServiceDto.getLocation();
-        this.webSite = userProfileServiceDto.getWebSite();
+        this.website = userProfileServiceDto.getWebSite();
         this.twitter = userProfileServiceDto.getTwitter();
     }
 
@@ -54,6 +56,10 @@ public class UserProfileResponseDto {
         return postCount;
     }
 
+    public String getGithubUrl() {
+        return githubUrl;
+    }
+
     public String getCompany() {
         return company;
     }
@@ -62,8 +68,8 @@ public class UserProfileResponseDto {
         return location;
     }
 
-    public String getWebSite() {
-        return webSite;
+    public String getWebsite() {
+        return website;
     }
 
     public String getTwitter() {

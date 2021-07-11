@@ -10,13 +10,14 @@ public class UserProfileServiceDto {
     private final int followingCount;
     private final int postCount;
 
+    private final String githubUrl;
     private final String company;
     private final String location;
     private final String webSite;
     private final String twitter;
 
     public UserProfileServiceDto(String name, String image, String description,
-        int followerCount, int followingCount, int postCount, String company,
+        int followerCount, int followingCount, int postCount, String githubUrl, String company,
         String location, String webSite, String twitter) {
         this.name = name;
         this.image = image;
@@ -24,6 +25,7 @@ public class UserProfileServiceDto {
         this.followerCount = followerCount;
         this.followingCount = followingCount;
         this.postCount = postCount;
+        this.githubUrl = githubUrl;
         this.company = company;
         this.location = location;
         this.webSite = webSite;
@@ -52,6 +54,10 @@ public class UserProfileServiceDto {
 
     public int getPostCount() {
         return postCount;
+    }
+
+    public String getGithubUrl() {
+        return githubUrl;
     }
 
     public String getCompany() {

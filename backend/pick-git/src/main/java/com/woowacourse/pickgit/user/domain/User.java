@@ -80,6 +80,10 @@ public class User {
         return basicProfile.getDescription();
     }
 
+    public String getGithubUrl() {
+        return githubProfile.getGithubUrl();
+    }
+
     public String getCompany() {
         return githubProfile.getCompany();
     }

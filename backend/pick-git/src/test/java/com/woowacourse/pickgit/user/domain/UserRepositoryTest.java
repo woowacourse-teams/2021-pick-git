@@ -30,7 +30,6 @@ class UserRepositoryTest {
         BasicProfile basicProfile = new BasicProfile(NAME, IMAGE, DESCRIPTION);
         GithubProfile githubProfile = new GithubProfile(GITHUB_URL, COMPANY, LOCATION, WEBSITE,
             TWITTER);
-
         User user = new User(basicProfile, githubProfile);
 
         userRepository.save(user);
@@ -40,11 +39,11 @@ class UserRepositoryTest {
     @Test
     void findUserByBasicProfile_Name_saveUser_Success() {
         User user = userRepository.findByBasicProfile_Name(NAME).get();
-
         assertThat(user.getId()).isNotNull();
         assertThat(user.getName()).isEqualTo(NAME);
         assertThat(user.getImage()).isEqualTo(IMAGE);
         assertThat(user.getDescription()).isEqualTo(DESCRIPTION);
+        assertThat(user.getGithubUrl()).isEqualTo(GITHUB_URL);
         assertThat(user.getCompany()).isEqualTo(COMPANY);
         assertThat(user.getLocation()).isEqualTo(LOCATION);
         assertThat(user.getWebsite()).isEqualTo(WEBSITE);

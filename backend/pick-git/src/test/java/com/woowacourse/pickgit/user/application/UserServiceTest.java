@@ -57,7 +57,7 @@ class UserServiceTest {
         UserProfileServiceDto expectedUserProfileDto = new UserProfileServiceDto(
             NAME, IMAGE, DESCRIPTION,
             0, 0, 0,
-            COMPANY, LOCATION, WEBSITE, TWITTER
+            GITHUB_URL, COMPANY, LOCATION, WEBSITE, TWITTER
         );
 
         //when
