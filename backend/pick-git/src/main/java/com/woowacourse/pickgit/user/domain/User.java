@@ -35,10 +35,18 @@ public class User {
     protected User() {
     }
 
+    public User(BasicProfile basicProfile,
+        GithubProfile githubProfile) {
+        this.basicProfile = basicProfile;
+        this.githubProfile = githubProfile;
+    }
+
     public void changeBasicProfile(BasicProfile basicProfile) {
+        this.basicProfile = basicProfile;
     }
 
     public void changeGithubProfile(GithubProfile githubProfile) {
+        this.githubProfile = githubProfile;
     }
 
     public void follow(User target) {
