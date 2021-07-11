@@ -1,10 +1,13 @@
 package com.woowacourse.pickgit.user.domain;
 
 import com.woowacourse.pickgit.post.domain.Posts;
+import com.woowacourse.pickgit.user.domain.follow.Follow;
 import com.woowacourse.pickgit.user.domain.follow.Followers;
 import com.woowacourse.pickgit.user.domain.follow.Followings;
 import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
 import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
+import com.woowacourse.pickgit.user.exception.DuplicatedFollowException;
+import com.woowacourse.pickgit.user.exception.InvalidFollowException;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -51,9 +54,37 @@ public class User {
     }
 
     public void follow(User target) {
+        Follow follow = new Follow(this, target);
+
+        if (this.followings.existFollow(follow)) {
+            throw new DuplicatedFollowException();
+        }
+        this.followings.add(follow);
+        target.followers.add(follow);
     }
 
+
     public void unfollow(User target) {
+        Follow follow = new Follow(this, target);
+
+        if (!this.followings.existFollow(follow)) {
+            throw new InvalidFollowException();
+        }
+
+        this.followings.remove(follow);
+        target.followers.remove(follow);
+    }
+
+    public int getFollowerCount() {
+        return followers.followerCount();
+    }
+
+    public int getFollowingCount() {
+        return followings.followingCount();
+    }
+
+    public int getPostCount() {
+        return posts.getCounts();
     }
 
     public Long getId() {
@@ -98,17 +129,5 @@ public class User {
 
     public String getTwitter() {
         return githubProfile.getTwitter();
-    }
-
-    public int getFollowerCount() {
-        return followers.followerCount();
-    }
-
-    public int getFollowingCount() {
-        return followings.followingCount();
-    }
-
-    public int getPostCount() {
-        return posts.getCounts();
     }
 }

@@ -1,35 +1,38 @@
 package com.woowacourse.pickgit.user.presentation.dto;
 
-import com.woowacourse.pickgit.user.application.dto.UserProfileServiceDto;
-
 public class UserProfileResponseDto {
 
-    private final String name;
-    private final String image;
-    private final String description;
+    private String name;
+    private String image;
+    private String description;
 
-    private final int followerCount;
-    private final int followingCount;
-    private final int postCount;
+    private int followerCount;
+    private int followingCount;
+    private int postCount;
 
-    private final String githubUrl;
-    private final String company;
-    private final String location;
-    private final String website;
-    private final String twitter;
+    private String githubUrl;
+    private String company;
+    private String location;
+    private String website;
+    private String twitter;
 
-    public UserProfileResponseDto(UserProfileServiceDto userProfileServiceDto) {
-        this.name = userProfileServiceDto.getName();
-        this.image = userProfileServiceDto.getImage();
-        this.description = userProfileServiceDto.getDescription();
-        this.followerCount = userProfileServiceDto.getFollowerCount();
-        this.followingCount = userProfileServiceDto.getFollowingCount();
-        this.postCount = userProfileServiceDto.getPostCount();
-        this.githubUrl = userProfileServiceDto.getGithubUrl();
-        this.company = userProfileServiceDto.getCompany();
-        this.location = userProfileServiceDto.getLocation();
-        this.website = userProfileServiceDto.getWebSite();
-        this.twitter = userProfileServiceDto.getTwitter();
+    private UserProfileResponseDto() {
+    }
+
+    public UserProfileResponseDto(String name, String image, String description, int followerCount,
+        int followingCount, int postCount, String githubUrl, String company, String location,
+        String website, String twitter) {
+        this.name = name;
+        this.image = image;
+        this.description = description;
+        this.followerCount = followerCount;
+        this.followingCount = followingCount;
+        this.postCount = postCount;
+        this.githubUrl = githubUrl;
+        this.company = company;
+        this.location = location;
+        this.website = website;
+        this.twitter = twitter;
     }
 
     public String getName() {

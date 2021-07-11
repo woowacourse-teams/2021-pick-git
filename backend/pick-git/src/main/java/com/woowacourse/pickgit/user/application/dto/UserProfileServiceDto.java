@@ -13,12 +13,12 @@ public class UserProfileServiceDto {
     private final String githubUrl;
     private final String company;
     private final String location;
-    private final String webSite;
+    private final String website;
     private final String twitter;
 
     public UserProfileServiceDto(String name, String image, String description,
         int followerCount, int followingCount, int postCount, String githubUrl, String company,
-        String location, String webSite, String twitter) {
+        String location, String website, String twitter) {
         this.name = name;
         this.image = image;
         this.description = description;
@@ -28,7 +28,7 @@ public class UserProfileServiceDto {
         this.githubUrl = githubUrl;
         this.company = company;
         this.location = location;
-        this.webSite = webSite;
+        this.website = website;
         this.twitter = twitter;
     }
 
@@ -68,8 +68,8 @@ public class UserProfileServiceDto {
         return location;
     }
 
-    public String getWebSite() {
-        return webSite;
+    public String getWebsite() {
+        return website;
     }
 
     public String getTwitter() {
