@@ -1,35 +1,68 @@
 package com.woowacourse.pickgit.authentication.application;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
+import com.woowacourse.pickgit.authentication.dao.CollectionOAuthAccessTokenDao;
+import com.woowacourse.pickgit.authentication.domain.OAuthClient;
+import com.woowacourse.pickgit.user.domain.User;
+import com.woowacourse.pickgit.user.domain.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
-@SpringBootTest
+@DisplayName("OAuthService 단위 테스트 - ")
+@SpringBootTest(webEnvironment = WebEnvironment.NONE)
 class OAuthServiceTest {
 
-    @DisplayName("처음 사이트에 로그인 한 경우 유저 정보를 Github으로부터 받아와서 DB에 저장한다.")
+    @Autowired
+    private OAuthService oAuthService;
+
+    @MockBean
+    private OAuthClient oAuthClient;
+
+    @MockBean
+    private UserRepository userRepository;
+
+    @MockBean
+    private CollectionOAuthAccessTokenDao oAuthAccessTokenDao;
+
+    @DisplayName("Github 로그인 URL을 반환한다.")
     @Test
-    void test1() {
+    void getGithubAuthorizationUrl_Anonymous_ReturnGithubAuthorizationUrl() {
+        // given
+        String url = "https://github.com/login..";
+
+        // mock
+        when(oAuthClient.getLoginUrl()).thenReturn(url);
+
+        // then
+        assertThat(oAuthService.getGithubAuthorizationUrl()).isEqualTo(url);
     }
 
-    @DisplayName("처음 사이트에 로그인이 아닌 경우 유저 정보를 Github로부터 받아와서 DB 정보를 최신화한다.")
+    @DisplayName("회원가입(첫 로그인)시 Github Profile을 가져와서 DB에 저장한다.")
     @Test
-    void test2() {
+    void createToken_Signup_SaveUserProfile() {
+        // given
+        String code = "oauth authorization code";
+        String oauthAccessToken = "oauth access token";
 
-    }
+        OAuthProfileResponse githubProfileResponse = new OAuthProfileResponse();
+        githubProfileResponse.setName("test");
+        githubProfileResponse.setDescription("hi~");
 
-    @DisplayName("처음 ")
-    @Test
-    void test3() {
+        User user = new User(
+            githubProfileResponse.toBasicProfile(),
+            githubProfileResponse.toGithubProfile()
+        );
+
+        // mock
+        when(oAuthClient.getAccessToken(code)).thenReturn(oauthAccessToken);
+        when(oAuthClient.getGithubProfile(oauthAccessToken)).thenReturn(githubProfileResponse);
 
     }
 }
