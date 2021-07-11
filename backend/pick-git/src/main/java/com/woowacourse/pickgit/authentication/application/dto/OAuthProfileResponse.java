@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class OAuthProfileResponse {
 
     @JsonProperty("login")
-    private String username;
+    private String name;
 
     @JsonProperty("avatar_url")
     private String image;
@@ -26,12 +26,12 @@ public class OAuthProfileResponse {
     @JsonProperty("twitter_username")
     private String twitter;
 
-    public String getUsername() {
-        return username;
+    public String getName() {
+        return name;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getImage() {

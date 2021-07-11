@@ -46,4 +46,14 @@ public class User {
 
     public void unfollow(User target) {
     }
+
+    public User(BasicProfile basicProfile,
+        GithubProfile githubProfile) {
+        this.basicProfile = basicProfile;
+        this.githubProfile = githubProfile;
+    }
+
+    public void setGithubProfile(GithubProfile githubProfile) {
+        this.githubProfile = githubProfile;
+    }
 }
