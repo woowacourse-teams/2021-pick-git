@@ -44,4 +44,14 @@ public class Post {
 
     protected Post() {
     }
+
+    public Post(Images images, PostContent content, User user) {
+        this.images = images;
+        this.content = content;
+        this.user = user;
+    }
+
+    public Long getId() {
+        return id;
+    }
 }
