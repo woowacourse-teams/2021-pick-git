@@ -28,4 +28,12 @@ public class GithubProfile {
         this.website = website;
         this.twitter = twitter;
     }
+
+    public String getCompany() {
+        return company;
+    }
+
+    public String getGithubUrl() {
+        return githubUrl;
+    }
 }
