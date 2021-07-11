@@ -15,4 +15,10 @@ public class BasicProfile {
 
     protected BasicProfile() {
     }
+
+    public BasicProfile(String name, String image, String description) {
+        this.name = name;
+        this.image = image;
+        this.description = description;
+    }
 }

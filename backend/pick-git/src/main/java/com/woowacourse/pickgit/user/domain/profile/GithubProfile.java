@@ -19,4 +19,13 @@ public class GithubProfile {
 
     protected GithubProfile() {
     }
+
+    public GithubProfile(String githubUrl, String company, String location, String website,
+        String twitter) {
+        this.githubUrl = githubUrl;
+        this.company = company;
+        this.location = location;
+        this.website = website;
+        this.twitter = twitter;
+    }
 }

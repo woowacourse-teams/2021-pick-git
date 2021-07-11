@@ -1,6 +1,5 @@
 package com.woowacourse.pickgit.authentication.presentation.interceptor;
 
-import com.woowacourse.pickgit.authentication.application.JwtTokenProvider;
 import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.infrastructure.AuthorizationExtractor;
 import java.util.Objects;

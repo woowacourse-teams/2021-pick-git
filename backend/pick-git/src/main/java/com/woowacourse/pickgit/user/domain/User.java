@@ -35,25 +35,23 @@ public class User {
     protected User() {
     }
 
-    public void changeBasicProfile(BasicProfile basicProfile) {
-    }
-
-    public void changeGithubProfile(GithubProfile githubProfile) {
-    }
-
-    public void follow(User target) {
-    }
-
-    public void unfollow(User target) {
-    }
-
     public User(BasicProfile basicProfile,
         GithubProfile githubProfile) {
         this.basicProfile = basicProfile;
         this.githubProfile = githubProfile;
     }
 
-    public void setGithubProfile(GithubProfile githubProfile) {
+    public void changeBasicProfile(BasicProfile basicProfile) {
+        this.basicProfile = basicProfile;
+    }
+
+    public void changeGithubProfile(GithubProfile githubProfile) {
         this.githubProfile = githubProfile;
+    }
+
+    public void follow(User target) {
+    }
+
+    public void unfollow(User target) {
     }
 }

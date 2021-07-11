@@ -2,7 +2,6 @@ package com.woowacourse.pickgit.authentication.presentation;
 
 import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.domain.Authenticated;
-import com.woowacourse.pickgit.authentication.domain.user.RequestUser;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
