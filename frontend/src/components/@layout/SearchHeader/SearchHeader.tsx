@@ -15,7 +15,7 @@ const SearchHeader = ({}: Props) => {
   return (
     <Container>
       <GoBackLink onClick={handleGoBack}>
-        <GoBackIcon />
+        <GoBackIcon color="#5a5a5a" />
       </GoBackLink>
       <SearchInputWrapper>
         <Input kind="rounded" />

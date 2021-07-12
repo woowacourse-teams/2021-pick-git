@@ -20,12 +20,12 @@ const StepHeader = ({ goForwardLink, children }: Props) => {
   return (
     <Container>
       <StepLink onClick={handleGoBack}>
-        <GoBackIcon />
+        <GoBackIcon color="#5a5a5a" />
       </StepLink>
       <Content>{children}</Content>
       {goForwardLink ? (
         <StepLink onClick={handleGoForward}>
-          <GoForwardIcon />
+          <GoForwardIcon color="#5a5a5a" />
         </StepLink>
       ) : (
         <EmptySpace />
