@@ -40,6 +40,9 @@ public class OAuthAcceptanceTest {
     @DisplayName("로그인 - Github OAuth 로그인 URL을 요청한다.")
     @Test
     void Authorization_Github_ReturnLoginUrl() {
+        // mock
+        when(oAuthClient.getLoginUrl()).thenReturn("https://github.com/login/oauth/authorize?");
+
         // when
         OAuthLoginUrlResponse response = RestAssured
             .given().log().all()
@@ -64,7 +67,7 @@ public class OAuthAcceptanceTest {
         String accessToken = "oauth.access.token";
 
         OAuthProfileResponse oAuthProfileResponse = new OAuthProfileResponse(
-            "pick-git", "image", "hi~", "github.com/",
+            "pick-git-login", "image", "hi~", "github.com/",
             null, null, null, null
         );
 
