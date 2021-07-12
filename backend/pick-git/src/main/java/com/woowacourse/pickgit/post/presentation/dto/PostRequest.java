@@ -15,7 +15,7 @@ public class PostRequest {
 
     private List<String> tags;
 
-    @Size(max = 500)
+    @Size(max = 500, message = "F0001")
     private String content;
 
     private PostRequest() {
