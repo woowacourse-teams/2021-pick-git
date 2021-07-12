@@ -35,11 +35,13 @@ public class Comment {
         this.content = new CommentContent(content);
     }
 
-    public void writeBy(User user) {
+    public Comment writeBy(User user) {
         this.user = user;
+        return this;
     }
 
-    public void setPost(Post post) {
+    public Comment toPost(Post post) {
         this.post = post;
+        return this;
     }
 }

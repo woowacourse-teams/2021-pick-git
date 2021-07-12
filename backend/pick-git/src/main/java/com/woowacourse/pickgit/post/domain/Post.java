@@ -2,6 +2,7 @@ package com.woowacourse.pickgit.post.domain;
 
 import static java.util.stream.Collectors.toList;
 
+import com.woowacourse.pickgit.post.domain.comment.Comment;
 import com.woowacourse.pickgit.post.domain.comment.Comments;
 import com.woowacourse.pickgit.post.domain.content.Images;
 import com.woowacourse.pickgit.post.domain.like.Likes;
@@ -10,7 +11,6 @@ import com.woowacourse.pickgit.user.domain.User;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -72,6 +72,10 @@ public class Post {
         this.user = user;
     }
 
+    public void addComment(Comment comment) {
+        comments.addComment(comment);
+    }
+
     public Long getId() {
         return id;
     }
@@ -112,5 +116,9 @@ public class Post {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    public List<Comment> getComments() {
+        return comments.getComments();
     }
 }
