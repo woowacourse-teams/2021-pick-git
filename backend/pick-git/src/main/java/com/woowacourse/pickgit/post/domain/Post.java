@@ -3,10 +3,13 @@ package com.woowacourse.pickgit.post.domain;
 import com.woowacourse.pickgit.post.domain.comment.Comments;
 import com.woowacourse.pickgit.post.domain.content.Images;
 import com.woowacourse.pickgit.post.domain.like.Likes;
+import com.woowacourse.pickgit.tag.domain.Tag;
 import com.woowacourse.pickgit.user.domain.User;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import javax.persistence.CascadeType;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -35,7 +38,7 @@ public class Post {
     @Embedded
     private Comments comments;
 
-    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private List<PostTag> postTags = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -81,5 +84,17 @@ public class Post {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    public void addTags(List<Tag> tags) {
+        tags.stream()
+            .map(tag -> new PostTag(this, tag))
+            .forEach(postTag -> postTags.add(postTag));
+    }
+
+    public List<Tag> getTags() {
+        return postTags.stream()
+            .map(PostTag::getTag)
+            .collect(Collectors.toList());
     }
 }
