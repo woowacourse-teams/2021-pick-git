@@ -6,8 +6,10 @@ import com.woowacourse.pickgit.tag.domain.TagRepository;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class TagService {
 
     private final PlatformTagExtractor platformTagExtractor;
@@ -19,6 +21,7 @@ public class TagService {
         this.tagRepository = tagRepository;
     }
 
+    @Transactional(readOnly = true)
     public TagsDto extractTags(ExtractionRequestDto extractionRequestDto) {
         String accessToken = extractionRequestDto.getAccessToken();
         String userName = extractionRequestDto.getUserName();
@@ -28,6 +31,7 @@ public class TagService {
         return new TagsDto(tags);
     }
 
+    @Transactional(readOnly = true)
     public List<Tag> findOrCreateTags(TagsDto tagsDto) {
         List<String> tagNames = tagsDto.getTags();
         List<Tag> tags = new ArrayList<>();
