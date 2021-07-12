@@ -18,6 +18,14 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
     @Value("${security.jwt.expiration-time}")
     private long expirationTimeInMilliSeconds;
 
+    public JwtTokenProviderImpl() {
+    }
+
+    public JwtTokenProviderImpl(String secretKey, long expirationTimeInMilliSeconds) {
+        this.secretKey = secretKey;
+        this.expirationTimeInMilliSeconds = expirationTimeInMilliSeconds;
+    }
+
     @Override
     public String createToken(String payload) {
         Date now = new Date();
@@ -45,5 +53,10 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
     @Override
     public String getPayloadByKey(String token, String key) {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get(key, String.class);
+    }
+
+    @Override
+    public void changeExpirationTime(long expirationTimeInMilliSeconds) {
+        this.expirationTimeInMilliSeconds = expirationTimeInMilliSeconds;
     }
 }
