@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.post.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
 import com.woowacourse.pickgit.tag.domain.Tag;
@@ -9,6 +10,19 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class PostTest {
+
+    @DisplayName("Tag를 정상적으로 Post에 등록한다.")
+    @Test
+    void addTags_ValidTags_RegistrationSuccess() {
+        Post post =
+            new Post(null, new PostContent(), null, null, null);
+        List<Tag> tags =
+            Arrays.asList(new Tag("tag1"), new Tag("tag2"), new Tag("tag3"));
+
+        post.addTags(tags);
+
+        assertThat(post.getTags()).hasSize(3);
+    }
 
     @DisplayName("중복되는 이름의 Tag가 존재하면 Post에 추가할 수 없다.")
     @Test
