@@ -25,14 +25,14 @@ public class PostController {
     }
 
     @PostMapping("/posts")
-    public ResponseEntity<Void> writePost(
+    public ResponseEntity<Void> write(
         @Authenticated AppUser user,
         @Valid @RequestBody PostRequest request) {
         if (user.isGuest()) {
             throw new IllegalArgumentException("게스트는 글을 작성할 수 없습니다!");
         }
 
-        PostResponseDto responseDto = postService.writePost(
+        PostResponseDto responseDto = postService.write(
             new PostRequestDto(user.getAccessToken(), user.getUsername(), request.getImages(),
                 request.getGithubRepoUrl(), request.getTags(), request.getContent()));
 

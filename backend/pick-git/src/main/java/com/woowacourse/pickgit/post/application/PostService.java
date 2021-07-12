@@ -23,7 +23,7 @@ public class PostService {
         this.userRepository = userRepository;
     }
 
-    public PostResponseDto writePost(PostRequestDto postRequestDto) {
+    public PostResponseDto write(PostRequestDto postRequestDto) {
         PostContent postContent = new PostContent(postRequestDto.getContent());
         User user = userRepository.findByBasicProfile_Name(postRequestDto.getUsername())
             .orElseThrow(() -> new IllegalArgumentException("해당하는 사용자가 없습니다."));
