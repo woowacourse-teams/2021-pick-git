@@ -2,13 +2,18 @@ package com.woowacourse.pickgit.tag.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.woowacourse.pickgit.tag.domain.PlatformTagExtractor;
+import com.woowacourse.pickgit.tag.domain.Tag;
+import com.woowacourse.pickgit.tag.domain.TagRepository;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,6 +31,9 @@ class TagServiceTest {
 
     @Mock
     private PlatformTagExtractor platformTagExtractor;
+
+    @Mock
+    private TagRepository tagRepository;
 
     private String accessToken = "abc";
     private String userName = "asap";
@@ -80,5 +88,27 @@ class TagServiceTest {
             .hasMessageContaining("401");
         verify(platformTagExtractor, times(1))
             .extractTags(accessToken, userName, repositoryName);
+    }
+
+    @DisplayName("태그 이름을 태그로 변환한다.")
+    @Test
+    void findOrCreateTags_ValidTag_TransformationSuccess() {
+        List<String> tagNames = Arrays.asList("tag1", "tag2", "tag3");
+        TagsDto tagsDto = new TagsDto(tagNames);
+
+        given(tagRepository.findByName("tag1"))
+            .willReturn(Optional.empty());
+        given(tagRepository.findByName("tag2"))
+            .willReturn(Optional.empty());
+        given(tagRepository.findByName("tag3"))
+            .willReturn(Optional.of(new Tag("tag3")));
+
+        List<String> tags = tagService.findOrCreateTags(tagsDto)
+            .stream()
+            .map(Tag::getName)
+            .collect(Collectors.toList());
+
+        assertThat(tags).containsAll(tagNames);
+        verify(tagRepository, times(3)).findByName(anyString());
     }
 }

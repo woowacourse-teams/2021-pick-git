@@ -1,6 +1,9 @@
 package com.woowacourse.pickgit.tag.application;
 
 import com.woowacourse.pickgit.tag.domain.PlatformTagExtractor;
+import com.woowacourse.pickgit.tag.domain.Tag;
+import com.woowacourse.pickgit.tag.domain.TagRepository;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -8,9 +11,12 @@ import org.springframework.stereotype.Service;
 public class TagService {
 
     private final PlatformTagExtractor platformTagExtractor;
+    private final TagRepository tagRepository;
 
-    public TagService(PlatformTagExtractor platformTagExtractor) {
+    public TagService(PlatformTagExtractor platformTagExtractor,
+        TagRepository tagRepository) {
         this.platformTagExtractor = platformTagExtractor;
+        this.tagRepository = tagRepository;
     }
 
     public TagsDto extractTags(ExtractionRequestDto extractionRequestDto) {
@@ -20,5 +26,15 @@ public class TagService {
         List<String> tags = platformTagExtractor
             .extractTags(accessToken, userName, repositoryName);
         return new TagsDto(tags);
+    }
+
+    public List<Tag> findOrCreateTags(TagsDto tagsDto) {
+        List<String> tagNames = tagsDto.getTags();
+        List<Tag> tags = new ArrayList<>();
+        for (String tagName : tagNames) {
+            tagRepository.findByName(tagName)
+                .ifPresentOrElse(tags::add, () -> tags.add(new Tag(tagName)));
+        }
+        return tags;
     }
 }
