@@ -2,6 +2,7 @@ package com.woowacourse.pickgit.authentication.application;
 
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
 import com.woowacourse.pickgit.authentication.dao.CollectionOAuthAccessTokenDao;
+import com.woowacourse.pickgit.authentication.dao.OAuthAccessTokenDao;
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
@@ -17,12 +18,12 @@ public class OAuthService {
 
     private OAuthClient githubOAuthClient;
     private JwtTokenProvider jwtTokenProvider;
-    private CollectionOAuthAccessTokenDao authAccessTokenDao;
+    private OAuthAccessTokenDao authAccessTokenDao;
     private UserRepository userRepository;
 
     public OAuthService(OAuthClient githubOAuthClient,
         JwtTokenProvider jwtTokenProvider,
-        CollectionOAuthAccessTokenDao authAccessTokenDao,
+        OAuthAccessTokenDao authAccessTokenDao,
         UserRepository userRepository) {
         this.githubOAuthClient = githubOAuthClient;
         this.jwtTokenProvider = jwtTokenProvider;

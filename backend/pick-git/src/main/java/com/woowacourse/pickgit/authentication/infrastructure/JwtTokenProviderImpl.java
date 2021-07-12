@@ -52,7 +52,11 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
 
     @Override
     public String getPayloadByKey(String token, String key) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get(key, String.class);
+        try {
+            return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get(key, String.class);
+        } catch (JwtException | IllegalArgumentException e) {
+            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+        }
     }
 
     @Override
