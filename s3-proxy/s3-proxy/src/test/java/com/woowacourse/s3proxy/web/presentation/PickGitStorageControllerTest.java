@@ -42,7 +42,7 @@ class PickGitStorageControllerTest {
 
     @DisplayName("Multipart 데이터의 수신을 확인한다. - 성공")
     @Test
-    void store() throws Exception {
+    void store_CheckRecivingMultipartFile_True() throws Exception {
         final List<String> result = List.of("url1", "url2");
 
         //given
