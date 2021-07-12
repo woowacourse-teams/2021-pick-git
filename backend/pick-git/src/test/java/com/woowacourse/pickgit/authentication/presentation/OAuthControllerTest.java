@@ -4,6 +4,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.woowacourse.pickgit.authentication.application.OAuthService;
@@ -37,7 +38,7 @@ class OAuthControllerTest {
         mockMvc.perform(get("/api/authorization/github"))
             .andDo(print())
             .andExpect(status().isOk())
-            .andExpect(content().string(githubAuthorizationGithubUrl));
+            .andExpect(jsonPath("url").value(githubAuthorizationGithubUrl));
     }
 
     @DisplayName("Github 로그인 인증 후 토큰을 발행하여 반환한다.")
@@ -51,6 +52,6 @@ class OAuthControllerTest {
         mockMvc.perform(get("/api/afterlogin?code=" + githubAuthorizationCode))
             .andDo(print())
             .andExpect(status().isOk())
-            .andExpect(content().string("jwt token"));
+            .andExpect(jsonPath("token").value("jwt token"));
     }
 }

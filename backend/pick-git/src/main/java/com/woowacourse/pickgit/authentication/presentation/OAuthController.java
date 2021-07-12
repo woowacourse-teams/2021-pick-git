@@ -1,6 +1,8 @@
 package com.woowacourse.pickgit.authentication.presentation;
 
 import com.woowacourse.pickgit.authentication.application.OAuthService;
+import com.woowacourse.pickgit.authentication.presentation.dto.OAuthLoginUrlResponse;
+import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,12 +20,12 @@ public class OAuthController {
     }
 
     @GetMapping("/authorization/github")
-    public ResponseEntity<String> githubAuthorizationUrl() {
-        return ResponseEntity.ok().body(oauthService.getGithubAuthorizationUrl());
+    public ResponseEntity<OAuthLoginUrlResponse> githubAuthorizationUrl() {
+        return ResponseEntity.ok().body(new OAuthLoginUrlResponse(oauthService.getGithubAuthorizationUrl()));
     }
 
     @GetMapping("/afterlogin")
-    public ResponseEntity<String> afterAuthorizeGithubLogin(@RequestParam String code) {
-        return ResponseEntity.ok().body(oauthService.createToken(code));
+    public ResponseEntity<OAuthTokenResponse> afterAuthorizeGithubLogin(@RequestParam String code) {
+        return ResponseEntity.ok().body(new OAuthTokenResponse(oauthService.createToken(code)));
     }
 }
