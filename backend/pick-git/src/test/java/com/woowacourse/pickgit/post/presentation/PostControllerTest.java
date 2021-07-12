@@ -58,9 +58,9 @@ class PostControllerTest {
         content = "pickgit";
     }
 
-    @DisplayName("사용자는 게시물을 작성할 수 있다.")
+    @DisplayName("게시물을 작성할 수 있다. - 사용자")
     @Test
-    void writePost_LoginUser_Success() throws Exception {
+    void write_LoginUser_Success() throws Exception {
         // given
         PostRequest request = new PostRequest(images, githubRepoUrl, tags, content);
 
@@ -68,7 +68,7 @@ class PostControllerTest {
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(any()))
             .willReturn(user);
-        given(postService.writePost(any(PostRequestDto.class)))
+        given(postService.write(any(PostRequestDto.class)))
             .willReturn(new PostResponseDto(1L));
 
         // then
@@ -79,9 +79,9 @@ class PostControllerTest {
             .andExpect(status().isCreated());
     }
 
-    @DisplayName("게스트는 게시물을 작성할 수 없다.")
+    @DisplayName("게시물을 작성할 수 없다. - 게스트")
     @Test
-    void writePost_GuestUser_Fail() throws Exception {
+    void write_GuestUser_Fail() throws Exception {
         // given
         given(oAuthService.validateToken(any()))
             .willReturn(true);
