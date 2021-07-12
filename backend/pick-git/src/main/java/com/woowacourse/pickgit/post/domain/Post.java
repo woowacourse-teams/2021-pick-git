@@ -87,9 +87,14 @@ public class Post {
     }
 
     public void addTags(List<Tag> tags) {
-        tags.stream()
-            .map(tag -> new PostTag(this, tag))
-            .forEach(postTag -> postTags.add(postTag));
+        List<Tag> existingTags = getTags();
+        for (Tag tag : tags) {
+            if (existingTags.contains(tag)) {
+                throw new IllegalArgumentException("중복되는 태그를 추가할 수 없습니다.");
+            }
+            PostTag postTag = new PostTag(this, tag);
+            postTags.add(postTag);
+        }
     }
 
     public List<Tag> getTags() {
