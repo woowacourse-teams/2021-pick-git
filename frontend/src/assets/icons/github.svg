@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="10.197" height="10.75" viewBox="0 0 10.197 10.75">
+  <g id="github-icon" transform="translate(0.184 0.513)">
+    <rect id="Area" width="10" height="10" fill="#fff" opacity="0"/>
+    <g id="Icon-2" data-name="Icon" transform="translate(0.617 0.156)">
+      <path id="Path" d="M4.8,8.887c-2.24.672-2.24-1.12-3.136-1.344m6.272,2.688V8.5a1.509,1.509,0,0,0-.421-1.169c1.407-.156,2.885-.69,2.885-3.136a2.436,2.436,0,0,0-.672-1.68,2.273,2.273,0,0,0-.04-1.69s-.529-.156-1.752.663a5.99,5.99,0,0,0-3.136,0C3.58.666,3.051.823,3.051.823a2.272,2.272,0,0,0-.04,1.689,2.434,2.434,0,0,0-.672,1.694c0,2.429,1.479,2.961,2.885,3.136A1.511,1.511,0,0,0,4.8,8.5v1.734" transform="translate(-1.667 -0.811)" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.32"/>
+    </g>
+  </g>
+</svg>
