@@ -20,6 +20,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation group: 'org.apache.tika', name: 'tika-core', version: '1.26'
 
+	testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '4.3.3'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 

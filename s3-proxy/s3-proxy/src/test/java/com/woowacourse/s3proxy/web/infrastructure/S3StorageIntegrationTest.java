@@ -3,6 +3,7 @@ package com.woowacourse.s3proxy.web.infrastructure;
 import cloud.localstack.docker.LocalstackDockerExtension;
 import cloud.localstack.docker.annotation.LocalstackDockerProperties;
 import com.woowacourse.s3proxy.common.FileFactory;
+import com.woowacourse.s3proxy.config.StorageConfiguration;
 import com.woowacourse.s3proxy.config.StorageTestConfiguration;
 import com.woowacourse.s3proxy.web.domain.PickGitStorage;
 import org.apache.http.entity.ContentType;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockMultipartFile;
@@ -25,8 +27,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(StorageTestConfiguration.class)
 @LocalstackDockerProperties(services = {"s3"}, platform = "linux/x86_64")
 @ExtendWith(LocalstackDockerExtension.class)
-@SpringBootTest
 @ActiveProfiles("test")
+@SpringBootTest
 class S3StorageIntegrationTest {
 
     @Value("${aws.cloud_front.file_url_format}")

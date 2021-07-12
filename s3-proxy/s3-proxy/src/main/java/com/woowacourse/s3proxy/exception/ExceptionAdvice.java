@@ -16,9 +16,12 @@ public class ExceptionAdvice {
         );
     }
 
-    private static class ExceptionDto {
+    public static class ExceptionDto {
 
-        private final String message;
+        private String message;
+
+        private ExceptionDto() {
+        }
 
         public ExceptionDto(String message) {
             this.message = message;

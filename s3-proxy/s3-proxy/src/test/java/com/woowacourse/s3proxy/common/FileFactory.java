@@ -34,11 +34,35 @@ public class FileFactory {
         return createMockMultipartFile("testRightImage2.png");
     }
 
-    private static MockMultipartFile createMockMultipartFile(String fileName) {
+    public static File getTestFailDataFile() {
+        return createFile("testFailData.sh");
+    }
+
+    public static File getTestFailImage1File() {
+        return createFile("testFailImage1.jpg");
+    }
+
+    public static File getTestFailImage2File() {
+        return createFile("testFailImage2.jpg");
+    }
+
+    public static File getTestRightImage1File() {
+        return createFile("testRightImage1.png");
+    }
+
+    public static File getTestRightImage2File() {
+        return createFile("testRightImage2.png");
+    }
+
+    private static File createFile(String fileName) {
         URL resource = classLoader.getResource(fileName);
         Objects.requireNonNull(resource);
 
-        File file = new File(resource.getFile());
+        return new File(resource.getFile());
+    }
+
+    private static MockMultipartFile createMockMultipartFile(String fileName) {
+        File file = createFile(fileName);
 
         try {
             return new MockMultipartFile(
