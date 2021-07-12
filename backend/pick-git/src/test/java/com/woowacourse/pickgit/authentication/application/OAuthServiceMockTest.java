@@ -1,6 +1,7 @@
 package com.woowacourse.pickgit.authentication.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -9,6 +10,9 @@ import static org.mockito.Mockito.when;
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
 import com.woowacourse.pickgit.authentication.dao.CollectionOAuthAccessTokenDao;
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
+import com.woowacourse.pickgit.authentication.domain.user.AppUser;
+import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
+import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import java.util.Optional;
@@ -121,5 +125,52 @@ class OAuthServiceMockTest {
         verify(userRepository, times(1)).save(user);
         verify(jwtTokenProvider, times(1)).createToken(githubProfileResponse.getName());
         verify(oAuthAccessTokenDao, times(1)).insert(jwtToken, oauthAccessToken);
+    }
+
+    @DisplayName("JWT 토큰을 통해 AccessTokenDB에서 LoginUser에 대한 정보를 가져온다.")
+    @Test
+    void findRequestUserByToken_ValidToken_ReturnAppUser() {
+        // given
+        String token = "jwt token";
+        String accessToken = "oauth access token";
+        String username = "pick-git";
+
+        // mock
+        when(jwtTokenProvider.getPayloadByKey(token, "username")).thenReturn(username);
+        when(oAuthAccessTokenDao.findByKeyToken(token)).thenReturn(Optional.ofNullable(accessToken));
+
+        // when
+        AppUser appUser = oAuthService.findRequestUserByToken(token);
+
+        // then
+        assertThat(appUser).isInstanceOf(LoginUser.class);
+        assertThat(appUser.getUsername()).isEqualTo(username);
+        assertThat(appUser.getAccessToken()).isEqualTo(accessToken);
+    }
+
+    @DisplayName("AccessTokenDB에 저장되어 있지 않은 JWT 토큰이라면 예외가 발생한다.")
+    @Test
+    void findRequestUserByToken_NotFoundToken_ThrowException() {
+        // given
+        String token = "never saved jwt token";
+        String username = "pick-git";
+
+        // mock
+        when(jwtTokenProvider.getPayloadByKey(token, "username")).thenReturn(username);
+        when(oAuthAccessTokenDao.findByKeyToken(token)).thenReturn(Optional.empty());
+
+        // then
+        assertThatThrownBy(() -> oAuthService.findRequestUserByToken(token))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("빈 JWT 토큰이면 GuestUser를 반환한다.")
+    @Test
+    void findRequestUserByToken_EmptyToken_ReturnGuest() {
+        // when
+        AppUser appUser = oAuthService.findRequestUserByToken(null);
+
+        // then
+        assertThat(appUser).isInstanceOf(GuestUser.class);
     }
 }
