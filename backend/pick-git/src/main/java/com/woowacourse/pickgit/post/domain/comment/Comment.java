@@ -44,4 +44,8 @@ public class Comment {
         this.post = post;
         return this;
     }
+
+    public User getUser() {
+        return user;
+    }
 }

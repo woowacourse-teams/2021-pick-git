@@ -2,6 +2,7 @@ package com.woowacourse.pickgit.post.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.woowacourse.pickgit.post.domain.comment.Comment;
 import com.woowacourse.pickgit.post.domain.content.Image;
 import com.woowacourse.pickgit.post.domain.content.Images;
 import com.woowacourse.pickgit.tag.domain.Tag;
@@ -13,8 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import com.woowacourse.pickgit.post.domain.comment.Comment;
-import com.woowacourse.pickgit.post.domain.comment.Comments;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
