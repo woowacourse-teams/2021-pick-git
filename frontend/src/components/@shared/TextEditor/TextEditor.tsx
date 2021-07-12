@@ -49,6 +49,7 @@ const TextEditor = ({
       value={value}
       onChange={onChange}
       onKeyUp={onKeyUp}
+      fontSize={fontSize}
     />
   );
 };
