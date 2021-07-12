@@ -1,8 +1,14 @@
 package com.woowacourse.pickgit.post.application;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.lenient;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
+import com.woowacourse.pickgit.post.application.dto.PostRequestDto;
+import com.woowacourse.pickgit.post.application.dto.PostResponseDto;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostContent;
 import com.woowacourse.pickgit.post.domain.PostRepository;
@@ -10,6 +16,7 @@ import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
 import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,15 +30,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class PostServiceTest {
 
     private static final String USERNAME = "dani";
+    private static final String ACCESS_TOKEN = "pickgit";
 
     @InjectMocks
     private PostService postService;
 
     @Mock
-    private PostRepository postRepository;
+    private UserRepository userRepository;
 
     @Mock
-    private UserRepository userRepository;
+    private PostRepository postRepository;
 
     private String image;
     private String description;
@@ -40,6 +48,9 @@ class PostServiceTest {
     private String location;
     private String website;
     private String twitter;
+    private List<String> images;
+    private String githubRepoUrl;
+    private List<String> tags;
     private String content;
 
     private BasicProfile basicProfile;
@@ -57,22 +68,38 @@ class PostServiceTest {
         location = "seoul";
         website = "https://da-nyee.github.io/";
         twitter = "dani";
+        images = List.of("image1", "imgae2");
+        githubRepoUrl = "https://github.com/woowacourse-teams/2021-pick-git/";
+        tags = List.of("java", "spring");
         content = "this is content";
 
         basicProfile = new BasicProfile(USERNAME, image, description);
         githubProfile = new GithubProfile(githubUrl, company, location, website, twitter);
         user = new User(basicProfile, githubProfile);
         postContent = new PostContent(content);
-        post = new Post(postContent, user);
+        post = new Post(1L, null, postContent, null, null, null, user);
     }
 
     @DisplayName("사용자는 글을 작성할 수 있다.")
     @Test
-    void writePost_LoginUser_Success() {
+    void write_LoginUser_Success() {
+        // given
+        given(userRepository.findByBasicProfile_Name(anyString()))
+            .willReturn(Optional.of(user));
+        given(postRepository.save(any(Post.class)))
+            .willReturn(post);
+
+        PostRequestDto requestDto = new PostRequestDto(ACCESS_TOKEN, USERNAME, images,
+            githubRepoUrl, tags, content);
+
         // when
-        lenient().when(userRepository.findByBasicProfile_Name(any(String.class)))
-            .thenReturn(Optional.ofNullable(user));
-        lenient().when(postRepository.save(any(Post.class)))
-            .thenReturn(post);
+        PostResponseDto responseDto = postService.write(requestDto);
+
+        // then
+        assertThat(responseDto.getId()).isNotNull();
+        verify(userRepository, times(1))
+            .findByBasicProfile_Name(requestDto.getUsername());
+        verify(postRepository, times(1))
+            .save(new Post(postContent, user));
     }
 }
