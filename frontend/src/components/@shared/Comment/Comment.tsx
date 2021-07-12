@@ -1,21 +1,20 @@
-import { Container, Name, Content, LikeIconWrapper } from "./Comment.style";
+import { Container, AuthorName, Content, LikeIconWrapper } from "./Comment.style";
 import { HeartIcon, HeartLineIcon } from "../../../assets/icons";
+import { CommentData } from "../../../@types";
 
-export interface Props extends React.HTMLAttributes<HTMLDivElement> {
-  name: string;
+export interface Props extends CommentData {
   link?: string;
-  content: string;
-  isLiked: boolean;
+  onCommentLike: () => void;
 }
 
-const Comment = ({ name, link, content, isLiked, ...props }: Props) => {
+const Comment = ({ authorName, link, content, isLiked, onCommentLike }: Props) => {
   return (
-    <Container {...props}>
+    <Container>
       <div>
-        <Name to={link ? link : ""}>{name}</Name>
+        <AuthorName to={link ? link : ""}>{authorName}</AuthorName>
         <Content>{content}</Content>
       </div>
-      <LikeIconWrapper>{isLiked ? <HeartIcon /> : <HeartLineIcon />}</LikeIconWrapper>
+      <LikeIconWrapper onClick={onCommentLike}>{isLiked ? <HeartIcon /> : <HeartLineIcon />}</LikeIconWrapper>
     </Container>
   );
 };

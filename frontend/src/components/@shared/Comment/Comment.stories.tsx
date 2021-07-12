@@ -11,7 +11,7 @@ const Template: Story<Props> = (args) => <Comment {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {
-  name: "Tanney",
+  authorName: "Tanney",
   content: "개발 너무 재미있어 미치겠어",
   isLiked: false,
 };
