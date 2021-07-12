@@ -9,7 +9,6 @@ import com.woowacourse.pickgit.post.presentation.dto.PostRequest;
 import java.net.URI;
 import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,7 +37,11 @@ public class PostController {
                 request.getGithubRepoUrl(), request.getTags(), request.getContent()));
 
         return ResponseEntity
-            .created(URI.create("/api/posts/" + user.getUsername() + "/" + responseDto.getId()))
+            .created(redirect(user, responseDto))
             .build();
+    }
+
+    private URI redirect(AppUser user, PostResponseDto responseDto) {
+        return URI.create("/api/posts/" + user.getUsername() + "/" + responseDto.getId());
     }
 }
