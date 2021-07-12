@@ -129,7 +129,7 @@ public class OAuthServiceTest {
     @Test
     void findRequestUserByToken_NotFoundToken_ThrowException() {
         // given
-        String username = "pick-git";
+        String username = "pick-git-test";
         String token = jwtTokenProvider.createToken(username);
 
         // when, then
