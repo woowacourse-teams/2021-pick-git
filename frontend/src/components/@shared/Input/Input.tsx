@@ -16,9 +16,7 @@ const Input = ({ kind, icon, textAlign = "left", backgroundColor, bottomBorderCo
   );
 
   const triggerInputFocus = () => {
-    if (inputRef) {
-      inputRef.current.focus();
-    }
+    inputRef.current && inputRef.current.focus();
   };
 
   if (kind === "borderBottom") {
