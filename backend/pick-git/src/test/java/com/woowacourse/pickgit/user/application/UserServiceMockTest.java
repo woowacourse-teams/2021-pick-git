@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import com.woowacourse.pickgit.user.UserFactory;
 import com.woowacourse.pickgit.user.application.dto.AuthUserServiceDto;
@@ -68,6 +70,8 @@ class UserServiceMockTest {
         assertThat(actualUserProfileDto)
             .usingRecursiveComparison()
             .isEqualTo(expectedUserProfileDto);
+
+        verify(userRepository, times(1)).findByBasicProfile_Name(anyString());
     }
 
     @DisplayName("존재하지 않는 유저 이름으로 프로필 조회시 예외가 발생한다.")
@@ -79,6 +83,8 @@ class UserServiceMockTest {
         assertThatThrownBy(
             () -> userService.getUserProfile("InvalidName")
         ).hasMessage(new InvalidUserException().getMessage());
+
+        verify(userRepository, times(1)).findByBasicProfile_Name(anyString());
     }
 
     @DisplayName("Source 유저가 Target 유저를 follow 하면 성공한다.")
@@ -102,6 +108,8 @@ class UserServiceMockTest {
         //then
         assertThat(followServiceDto.getFollowerCount()).isEqualTo(1);
         assertThat(followServiceDto.isFollowing()).isTrue();
+
+        verify(userRepository, times(2)).findByBasicProfile_Name(anyString());
     }
 
     @DisplayName("이미 존재하는 Follow 추가 시 예외가 발생한다.")
@@ -126,6 +134,8 @@ class UserServiceMockTest {
         assertThatThrownBy(
             () -> userService.followUser(authUserServiceDto, targetName)
         ).hasMessage(new DuplicatedFollowException().getMessage());
+
+        verify(userRepository, times(4)).findByBasicProfile_Name(anyString());
     }
 
     @DisplayName("Source 유저가 Target 유저를 unfollow 하면 성공한다.")
@@ -152,6 +162,8 @@ class UserServiceMockTest {
         //then
         assertThat(followServiceDto.getFollowerCount()).isEqualTo(0);
         assertThat(followServiceDto.isFollowing()).isFalse();
+
+        verify(userRepository, times(4)).findByBasicProfile_Name(anyString());
     }
 
     @DisplayName("존재하지 않는 Follow 관계를 unfollow 하면 예외가 발생한다.")
@@ -174,5 +186,7 @@ class UserServiceMockTest {
         assertThatThrownBy(
             () -> userService.unfollowUser(authUserServiceDto, targetName)
         ).hasMessage(new InvalidFollowException().getMessage());
+
+        verify(userRepository, times(2)).findByBasicProfile_Name(anyString());
     }
 }
