@@ -14,10 +14,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class OAuthConfiguration implements WebMvcConfigurer {
 
-    private OAuthService oAuthService;
+    private final OAuthService oAuthService;
 
-    public OAuthConfiguration(
-        OAuthService oAuthService) {
+    public OAuthConfiguration(OAuthService oAuthService) {
         this.oAuthService = oAuthService;
     }
 
@@ -46,6 +45,7 @@ public class OAuthConfiguration implements WebMvcConfigurer {
         registry.addInterceptor(authenticationInterceptor())
             .addPathPatterns("/api/profiles/me")
             .addPathPatterns("/api/posts/me")
+            .addPathPatterns("/api/posts")
             .excludePathPatterns("/api/authorization/github")
             .excludePathPatterns("/api/afterlogin");
 

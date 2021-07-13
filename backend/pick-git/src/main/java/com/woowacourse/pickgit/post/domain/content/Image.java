@@ -25,4 +25,8 @@ public class Image {
 
     protected Image() {
     }
+
+    public Image(String url) {
+        this.url = url;
+    }
 }
