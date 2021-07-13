@@ -24,7 +24,8 @@ export const parameters = {
         },
       }
     }
-  }
+  },
+  layout: 'fullscreen',
 }
 
 addDecorator(Story => (
