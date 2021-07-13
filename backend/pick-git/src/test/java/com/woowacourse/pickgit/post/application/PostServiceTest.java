@@ -80,7 +80,7 @@ class PostServiceTest {
         post = new Post(1L, null, postContent, null, null, null, user);
     }
 
-    @DisplayName("사용자는 글을 작성할 수 있다.")
+    @DisplayName("사용자는 게시물을 등록할 수 있다.")
     @Test
     void write_LoginUser_Success() {
         // given

@@ -32,7 +32,6 @@ class PostRepositoryTest {
     private GithubProfile githubProfile;
     private User user;
     private PostContent postContent;
-    private Post post;
 
     @BeforeEach
     void setUp() {
@@ -49,13 +48,15 @@ class PostRepositoryTest {
         githubProfile = new GithubProfile(githubUrl, company, location, website, twitter);
         user = new User(basicProfile, githubProfile);
         postContent = new PostContent(content);
-        post = new Post(postContent, user);
     }
 
     @DisplayName("게시글을 저장한다.")
     @Test
-    void save() {
+    void save_SavedPost_Success() {
         // given
+        Post post = new Post(postContent, user);
+
+        // when
         Post savedPost = postRepository.save(post);
 
         // then
