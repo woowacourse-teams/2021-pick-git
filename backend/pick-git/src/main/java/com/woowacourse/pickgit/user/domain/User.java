@@ -54,4 +54,12 @@ public class User {
 
     public void unfollow(User target) {
     }
+
+    public BasicProfile getBasicProfile() {
+        return basicProfile;
+    }
+
+    public GithubProfile getGithubProfile() {
+        return githubProfile;
+    }
 }

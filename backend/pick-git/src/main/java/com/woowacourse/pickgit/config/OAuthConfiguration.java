@@ -3,6 +3,7 @@ package com.woowacourse.pickgit.config;
 import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.presentation.AuthenticationPrincipalArgumentResolver;
 import com.woowacourse.pickgit.authentication.presentation.interceptor.AuthenticationInterceptor;
+import com.woowacourse.pickgit.authentication.presentation.interceptor.IgnoreAuthenticationInterceptor;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +27,11 @@ public class OAuthConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
+    public IgnoreAuthenticationInterceptor ignoreAuthenticationInterceptor() {
+        return new IgnoreAuthenticationInterceptor();
+    }
+
+    @Bean
     public AuthenticationPrincipalArgumentResolver authenticationPrincipalArgumentResolver() {
         return new AuthenticationPrincipalArgumentResolver(oAuthService);
     }
@@ -38,7 +44,13 @@ public class OAuthConfiguration implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authenticationInterceptor())
-            .excludePathPatterns("/authorization/github")
-            .excludePathPatterns("/afterlogin");
+            .addPathPatterns("/api/profiles/me")
+            .addPathPatterns("/api/posts/me")
+            .excludePathPatterns("/api/authorization/github")
+            .excludePathPatterns("/api/afterlogin");
+
+        registry.addInterceptor(ignoreAuthenticationInterceptor())
+            .addPathPatterns("/api/profiles/*")
+            .addPathPatterns("/api/posts/*");
     }
 }

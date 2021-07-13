@@ -21,4 +21,8 @@ public class BasicProfile {
         this.image = image;
         this.description = description;
     }
+
+    public String getName() {
+        return name;
+    }
 }

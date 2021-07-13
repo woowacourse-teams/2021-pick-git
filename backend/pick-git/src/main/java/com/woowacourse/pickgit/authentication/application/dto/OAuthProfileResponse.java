@@ -28,6 +28,21 @@ public class OAuthProfileResponse {
     @JsonProperty("twitter_username")
     private String twitter;
 
+    public OAuthProfileResponse() {
+    }
+
+    public OAuthProfileResponse(String name, String image, String description,
+        String githubUrl, String company, String location, String website, String twitter) {
+        this.name = name;
+        this.image = image;
+        this.description = description;
+        this.githubUrl = githubUrl;
+        this.company = company;
+        this.location = location;
+        this.website = website;
+        this.twitter = twitter;
+    }
+
     public String getName() {
         return name;
     }
