@@ -54,7 +54,7 @@ public class PostAcceptanceTest {
         request = new PostRequest(images, githubRepoUrl, tags, content);
     }
 
-    @DisplayName("사용자는 게시글을 등록한다.")
+    @DisplayName("사용자는 게시글을 등록한다. - 유효한 토큰이 있는 경우 (Authorization header O)")
     @Test
     void write_LoginUser_Success() {
         // given
@@ -70,6 +70,40 @@ public class PostAcceptanceTest {
             .post("/api/posts")
             .then().log().all()
             .statusCode(HttpStatus.CREATED.value())
+            .extract();
+    }
+
+    @DisplayName("게스트는 게시글을 등록할 수 없다. - 유효하지 않은 토큰이 있는 경우 (Authorization header O)")
+    @Test
+    void write_GuestUserWithToken_Fail() {
+        // given
+        String token = "Bearer guest";
+
+        // when
+        RestAssured
+            .given().log().all()
+            .auth().oauth2(token)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(request)
+            .when()
+            .post("/api/posts")
+            .then().log().all()
+            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+            .extract();
+    }
+
+    @DisplayName("게스트는 게시글을 등록할 수 없다. - 토큰이 없는 경우 (Authorization header X)")
+    @Test
+    void write_GuestUserWithoutToken_Fail() {
+        // when
+        RestAssured
+            .given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(request)
+            .when()
+            .post("/api/posts")
+            .then().log().all()
+            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
             .extract();
     }
 
