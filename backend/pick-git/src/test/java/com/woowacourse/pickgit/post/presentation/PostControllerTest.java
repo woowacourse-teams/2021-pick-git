@@ -193,19 +193,18 @@ class PostControllerTest {
     @Test
     void showRepositories_LoginUser_Success() throws Exception {
         // given
-        TokenRequestDto tokenRequestDto = new TokenRequestDto("pickgit");
+        TokenRequestDto tokenRequestDto = new TokenRequestDto(ACCESS_TOKEN);
         RepositoriesResponseDto repositories = new RepositoriesResponseDto(List.of(
             new RepositoryResponseDto("pick"),
             new RepositoryResponseDto("git")
         ));
 
-        // when
         given(postService.showRepositories(tokenRequestDto))
             .willReturn(repositories);
 
         // then
         mockMvc.perform(get("/api/github/repositories")
-            .header(HttpHeaders.AUTHORIZATION, "Bearer pickgit"))
+            .header(HttpHeaders.AUTHORIZATION, "Bearer " + ACCESS_TOKEN))
             .andExpect(status().isOk());
     }
 }
