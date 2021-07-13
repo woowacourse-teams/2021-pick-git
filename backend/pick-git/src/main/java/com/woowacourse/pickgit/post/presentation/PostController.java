@@ -34,7 +34,8 @@ public class PostController {
             new PostRequestDto(token, username, request.getImages(),
                 request.getGithubRepoUrl(), request.getTags(), request.getContent()));
 
-        return ResponseEntity.created(URI.create("/api/posts/" + username + "/" + postResponse.getId()))
+        return ResponseEntity
+            .created(URI.create("/api/posts/" + username + "/" + postResponse.getId()))
             .build();
     }
 }

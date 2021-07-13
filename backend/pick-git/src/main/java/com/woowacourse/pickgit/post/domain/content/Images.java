@@ -13,4 +13,8 @@ public class Images {
 
     protected Images() {
     }
+
+    public Images(List<Image> images) {
+        this.images = images;
+    }
 }

@@ -31,7 +31,8 @@ public class PostService {
         List<Image> requestImages = generateImages(postRequestDto);
         Images images = new Images(requestImages);
         PostContent content = new PostContent(postRequestDto.getContent());
-        User user = userRepository.findByName(postRequestDto.getUsername());
+        User user = userRepository.findByBasicProfile_Name(postRequestDto.getUsername())
+            .orElseThrow(() -> new IllegalArgumentException("해당하는 사용자가 없습니다."));
 
         Post post = postRepository.save(new Post(images, content, user));
 

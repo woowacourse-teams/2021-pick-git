@@ -11,4 +11,8 @@ public class PostContent {
 
     protected PostContent() {
     }
+
+    public PostContent(String content) {
+        this.content = content;
+    }
 }
