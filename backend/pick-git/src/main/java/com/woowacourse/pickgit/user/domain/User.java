@@ -14,7 +14,8 @@ import javax.persistence.Id;
 @Entity
 public class User {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Embedded
@@ -35,8 +36,7 @@ public class User {
     protected User() {
     }
 
-    public User(BasicProfile basicProfile,
-        GithubProfile githubProfile) {
+    public User(BasicProfile basicProfile, GithubProfile githubProfile) {
         this.basicProfile = basicProfile;
         this.githubProfile = githubProfile;
     }

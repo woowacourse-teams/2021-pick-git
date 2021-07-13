@@ -18,7 +18,9 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
+    public boolean preHandle(
+        HttpServletRequest request,
+        HttpServletResponse response,
         Object handler) throws Exception {
         if (isPreflightRequest(request)) {
             return true;
@@ -32,7 +34,9 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
     }
 
     private boolean isPreflightRequest(HttpServletRequest request) {
-        return isOptions(request) && hasAccessControlRequestHeaders(request) && hasAccessControlRequestMethod(request)
+        return isOptions(request)
+            && hasAccessControlRequestHeaders(request)
+            && hasAccessControlRequestMethod(request)
             && hasOrigin(request);
     }
 

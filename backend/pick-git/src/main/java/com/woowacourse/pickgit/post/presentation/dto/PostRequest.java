@@ -1,12 +1,16 @@
 package com.woowacourse.pickgit.post.presentation.dto;
 
 import java.util.List;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 public class PostRequest {
 
+    @NotEmpty
     private List<String> images;
 
+    @NotBlank
     private String githubRepoUrl;
 
     private List<String> tags;
@@ -17,7 +21,8 @@ public class PostRequest {
     private PostRequest() {
     }
 
-    public PostRequest(List<String> images,
+    public PostRequest(
+        List<String> images,
         String githubRepoUrl,
         List<String> tags,
         String content) {

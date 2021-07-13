@@ -45,8 +45,7 @@ public class Post {
     protected Post() {
     }
 
-    public Post(Images images, PostContent content, User user) {
-        this.images = images;
+    public Post(PostContent content, User user) {
         this.content = content;
         this.user = user;
     }
