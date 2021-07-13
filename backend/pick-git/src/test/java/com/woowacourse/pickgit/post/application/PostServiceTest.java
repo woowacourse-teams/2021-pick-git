@@ -199,20 +199,22 @@ class PostServiceTest {
     @Test
     void showRepositories_LoginUser_Success() {
         // given
-        TokenRequestDto tokenRequestDto = new TokenRequestDto("pickgit");
+        TokenRequestDto requestDto = new TokenRequestDto(ACCESS_TOKEN);
         List<RepositoryResponseDto> repositories = List.of(
             new RepositoryResponseDto("pick"),
             new RepositoryResponseDto("git")
         );
 
-        // when
-        given(platformRepositoryExtractor.extract(tokenRequestDto.getAccessToken()))
+        given(platformRepositoryExtractor.extract(requestDto.getAccessToken()))
             .willReturn(repositories);
 
+        // when
+        List<RepositoryResponseDto> responsesDto = platformRepositoryExtractor
+            .extract(requestDto.getAccessToken());
+
         // then
-        assertThat(platformRepositoryExtractor.extract(tokenRequestDto.getAccessToken()))
-            .containsAll(repositories);
+        assertThat(responsesDto).containsAll(repositories);
         verify(platformRepositoryExtractor, times(1))
-            .extract(tokenRequestDto.getAccessToken());
+            .extract(requestDto.getAccessToken());
     }
 }
