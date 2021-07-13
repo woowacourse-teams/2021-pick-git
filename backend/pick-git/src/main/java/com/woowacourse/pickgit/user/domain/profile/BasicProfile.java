@@ -4,8 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 @Embeddable
-public class
-BasicProfile {
+public class BasicProfile {
 
     @Column(nullable = false, updatable = false)
     private String name;

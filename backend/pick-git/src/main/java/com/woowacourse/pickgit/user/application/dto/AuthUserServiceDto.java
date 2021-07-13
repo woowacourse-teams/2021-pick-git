@@ -4,9 +4,6 @@ public class AuthUserServiceDto {
 
     private String githubName;
 
-    public AuthUserServiceDto() {
-    }
-
     public AuthUserServiceDto(String githubName) {
         this.githubName = githubName;
     }

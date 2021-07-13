@@ -2,12 +2,15 @@ package com.woowacourse.pickgit.user.presentation.dto;
 
 public class FollowResponseDto {
 
-    private final int followerCount;
-    private final boolean isFollowing;
+    private int followerCount;
+    private boolean following;
+
+    public FollowResponseDto() {
+    }
 
     public FollowResponseDto(int followerCount, boolean isFollowing) {
         this.followerCount = followerCount;
-        this.isFollowing = isFollowing;
+        this.following = isFollowing;
     }
 
     public int getFollowerCount() {
@@ -15,6 +18,6 @@ public class FollowResponseDto {
     }
 
     public boolean isFollowing() {
-        return isFollowing;
+        return following;
     }
 }

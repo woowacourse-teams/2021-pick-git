@@ -7,8 +7,10 @@ import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import com.woowacourse.pickgit.user.exception.InvalidUserException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class UserService {
 
     private final UserRepository userRepository;
@@ -17,10 +19,12 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    @Transactional(readOnly = true)
     public UserProfileServiceDto getAuthUserProfile(AuthUserServiceDto authUserServiceDto) {
         return getUserProfile(authUserServiceDto.getGithubName());
     }
 
+    @Transactional(readOnly = true)
     public UserProfileServiceDto getUserProfile(String username) {
         User user = findUserByName(username);
 

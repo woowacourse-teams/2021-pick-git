@@ -1,5 +1,7 @@
 package com.woowacourse.pickgit.user.presentation;
 
+import com.woowacourse.pickgit.authentication.domain.Authenticated;
+import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.AuthUserServiceDto;
 import com.woowacourse.pickgit.user.application.dto.FollowServiceDto;
@@ -7,7 +9,6 @@ import com.woowacourse.pickgit.user.application.dto.UserProfileServiceDto;
 import com.woowacourse.pickgit.user.presentation.dto.AuthUserRequestDto;
 import com.woowacourse.pickgit.user.presentation.dto.FollowResponseDto;
 import com.woowacourse.pickgit.user.presentation.dto.UserProfileResponseDto;
-import com.woowacourse.pickgit.user.presentation.resolver.Authenticated;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,9 +29,9 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<UserProfileResponseDto> getAuthenticatedUserProfile(
-        @Authenticated AuthUserRequestDto authUserRequestDto) {
+        @Authenticated LoginUser loginUser) {
         UserProfileServiceDto userProfileServiceDto = userService.getAuthUserProfile(
-            new AuthUserServiceDto(authUserRequestDto.getGithubName())
+            new AuthUserServiceDto(loginUser.getUsername())
         );
 
         return ResponseEntity.ok(getUserProfileResponseDto(userProfileServiceDto));
@@ -57,11 +58,11 @@ public class UserController {
 
     @PostMapping("/{username}/followings")
     public ResponseEntity<FollowResponseDto> followUser(
-        @Authenticated AuthUserRequestDto authUserRequestDto,
+        @Authenticated LoginUser loginUser,
         @PathVariable String username
     ) {
         AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(
-            authUserRequestDto.getGithubName());
+            loginUser.getUsername());
 
         FollowServiceDto followServiceDto = userService.followUser(authUserServiceDto, username);
 
@@ -70,11 +71,11 @@ public class UserController {
 
     @DeleteMapping("/{username}/followings")
     public ResponseEntity<FollowResponseDto> unfollowUser(
-        @Authenticated AuthUserRequestDto authUserRequestDto,
+        @Authenticated LoginUser loginUser,
         @PathVariable String username
     ) {
         AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(
-            authUserRequestDto.getGithubName());
+            loginUser.getUsername());
 
         FollowServiceDto followServiceDto = userService.unfollowUser(authUserServiceDto, username);
 
