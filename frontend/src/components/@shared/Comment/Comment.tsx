@@ -2,7 +2,10 @@ import { Container, AuthorName, Content, LikeIconWrapper } from "./Comment.style
 import { HeartIcon, HeartLineIcon } from "../../../assets/icons";
 import { CommentData } from "../../../@types";
 
-export interface Props extends CommentData {
+export interface Props {
+  authorName: string;
+  content: string;
+  isLiked: boolean;
   link?: string;
   onCommentLike: () => void;
 }

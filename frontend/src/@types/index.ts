@@ -9,9 +9,15 @@ export interface Profile {
 }
 
 export interface CommentData {
+  commentId: string;
   authorName: string;
   content: string;
   isLiked: boolean;
+}
+
+export interface CommentAddData {
+  postId: Post["postId"];
+  commentContent: CommentData["content"];
 }
 
 export interface Post {
