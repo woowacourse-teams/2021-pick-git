@@ -6,3 +6,9 @@ export const requestGetGithubAuthLink = async () => {
 
   return response.data.url;
 };
+
+export const requestGetAccessToken = async (authCode: string) => {
+  const response = await axios.get<{ username: string; token: string }>(API_URL.AFTER_LOGIN(authCode));
+
+  return response.data;
+};
