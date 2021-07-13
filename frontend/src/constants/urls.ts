@@ -8,4 +8,7 @@ export const PAGE_URL = {
 
 export const API_URL = {
   SELF_PROFILE: "/profiles/me",
+  AUTH: {
+    GITHUB: "/authorization/github",
+  },
 };
