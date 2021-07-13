@@ -2,6 +2,10 @@
 import { createContext, useState } from "react";
 import useLocalStorage from "../services/hooks/@common/useLocalStorage";
 
+interface Props {
+  children: React.ReactNode;
+}
+
 interface Value {
   isLoggedIn: boolean;
   currentUserName: string;
@@ -16,7 +20,7 @@ const UserContext = createContext<Value>({
   logout: () => {},
 });
 
-export const UserContextProvider = ({ children }: HTMLElement) => {
+export const UserContextProvider = ({ children }: Props) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUserName, setCurrentUserName] = useState("");
   const { setAccessToken } = useLocalStorage();
