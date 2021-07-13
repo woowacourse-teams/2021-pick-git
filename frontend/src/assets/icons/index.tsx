@@ -8,3 +8,7 @@ export { ReactComponent as GoBackIcon } from "./go-back.svg";
 export { ReactComponent as GoForwardIcon } from "./go-forward.svg";
 export { ReactComponent as HeartLineIcon } from "./heart-line.svg";
 export { ReactComponent as HeartIcon } from "./heart.svg";
+export { ReactComponent as PostHeartLineIcon } from "./post-heart-line.svg";
+export { ReactComponent as PostHeartIcon } from "./post-heart.svg";
+export { ReactComponent as EditIcon } from "./edit.svg";
+export { ReactComponent as GithubIcon } from "./github.svg";

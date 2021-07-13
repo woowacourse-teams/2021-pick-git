@@ -7,7 +7,7 @@ export const Container = styled.div`
   align-items: center;
 `;
 
-export const Name = styled(Link)`
+export const AuthorName = styled(Link)`
   font-weight: bold;
   font-size: 0.75rem;
   margin-right: 0.75rem;
