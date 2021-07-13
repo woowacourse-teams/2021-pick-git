@@ -1,17 +1,19 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { ThemeProvider } from "styled-components";
 
 import App from "./App";
+import { ThemeProvider } from "styled-components";
 import { theme, GlobalStyle } from "./App.style";
-import { UserContextProvider } from "./contexts/UserContext";
+import { QueryClientProvider, QueryClient } from "react-query";
+
+const queryClient = new QueryClient();
 
 ReactDOM.render(
   <ThemeProvider theme={theme}>
-    <UserContextProvider>
-      <GlobalStyle />
+    <GlobalStyle />
+    <QueryClientProvider client={queryClient}>
       <App />
-    </UserContextProvider>
+    </QueryClientProvider>
   </ThemeProvider>,
   document.querySelector("#root")
 );
