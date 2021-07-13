@@ -6,7 +6,12 @@ import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
 import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
+import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
+import com.woowacourse.pickgit.tag.domain.Tag;
+import com.woowacourse.pickgit.tag.domain.TagRepository;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +31,9 @@ class PostRepositoryTest {
 
     @Autowired
     private PostRepository postRepository;
+
+    @Autowired
+    private TagRepository tagRepository;
 
     private String image;
     private String description;
@@ -76,5 +84,27 @@ class PostRepositoryTest {
 
         // then
         assertThat(findPost.getId()).isNotNull();
+    }
+
+    @DisplayName("게시글을 저장할 때 태그도 함께 영속화된다.")
+    @Test
+    void save_WhenSavingPost_TagSavedTogether() {
+        Post post =
+            new Post(null, null, new PostContent(), null, null, new ArrayList<>(), null);
+        List<Tag> tags = Arrays.asList(new Tag("tag1"), new Tag("tag2"));
+        post.addTags(tags);
+        postRepository.save(post);
+        Tag entityTag = tagRepository.save(new Tag("33"));
+        post.addTags(Arrays.asList(entityTag));
+
+        testEntityManager.flush();
+        testEntityManager.clear();
+
+
+        Post findPost = postRepository.findAll()
+            .get(0);
+
+        assertThat(findPost.getTags()).hasSize(3);
+        assertThat(tagRepository.findAll()).hasSize(3);
     }
 }
