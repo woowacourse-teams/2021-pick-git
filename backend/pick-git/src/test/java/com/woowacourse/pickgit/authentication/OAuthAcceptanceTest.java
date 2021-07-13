@@ -8,6 +8,8 @@ import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.presentation.dto.OAuthLoginUrlResponse;
 import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
 import io.restassured.RestAssured;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -62,6 +64,19 @@ public class OAuthAcceptanceTest {
     @DisplayName("로그인 - Github 인증후 리다이렉션을 통해 요청이 오면 토큰을 생성하여 반환한다.")
     @Test
     void Authorization_Redirection_ReturnJwtToken() {
+        // then
+        String token = 로그인_되어있음().getToken();
+
+        System.out.println(token);
+    }
+
+    public OAuthTokenResponse 로그인_되어있음() {
+        OAuthTokenResponse response = 로그인_요청().as(OAuthTokenResponse.class);
+        assertThat(response.getToken()).isNotBlank();
+        return response;
+    }
+
+    public ExtractableResponse<Response> 로그인_요청() {
         // given
         String oauthCode = "1234";
         String accessToken = "oauth.access.token";
@@ -76,16 +91,13 @@ public class OAuthAcceptanceTest {
         when(oAuthClient.getGithubProfile(accessToken)).thenReturn(oAuthProfileResponse);
 
         // when
-        OAuthTokenResponse response = RestAssured
+        return RestAssured
             .given().log().all()
             .accept(MediaType.APPLICATION_JSON_VALUE)
             .when()
             .get("/api/afterlogin?code=" + oauthCode)
             .then().log().all()
             .statusCode(HttpStatus.OK.value())
-            .extract().as(OAuthTokenResponse.class);
-
-        // then
-        assertThat(response.getToken()).isNotBlank();
+            .extract();
     }
 }
