@@ -19,7 +19,7 @@ public class CommentContent {
 
     public CommentContent(String content) {
         if (isNotValidContent(content)) {
-            throw new IllegalArgumentException();
+            throw new CommentFormatException();
         }
         this.content = content;
     }

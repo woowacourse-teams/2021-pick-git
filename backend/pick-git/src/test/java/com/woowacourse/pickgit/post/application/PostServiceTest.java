@@ -158,8 +158,7 @@ class PostServiceTest {
 
         CommentResponseDto commentResponseDto = postService.addComment(commentRequestDto);
 
-        assertThat(commentResponseDto.getImage()).isEqualTo("a.jpg");
-        assertThat(commentResponseDto.getUserName()).isEqualTo("kevin");
+        assertThat(commentResponseDto.getAuthorName()).isEqualTo("kevin");
         assertThat(commentResponseDto.getContent()).isEqualTo("test comment");
         verify(postRepository, times(1)).findById(1L);
         verify(userRepository, times(1)).findByBasicProfile_Name("kevin");

@@ -30,7 +30,7 @@ class CommentTest {
         }
 
         assertThatCode(() -> new Comment(content.toString()))
-            .isInstanceOf(IllegalArgumentException.class);
+            .isInstanceOf(CommentFormatException.class);
     }
 
     @DisplayName("댓글은 null이거나 빈 문자열이어서는 안 된다.")
@@ -38,6 +38,6 @@ class CommentTest {
     @NullAndEmptySource
     void newComment_NullOrEmpty_ExceptionThrown(String content) {
         assertThatCode(() -> new Comment(content))
-            .isInstanceOf(IllegalArgumentException.class);
+            .isInstanceOf(CommentFormatException.class);
     }
 }

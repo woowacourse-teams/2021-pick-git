@@ -110,6 +110,6 @@ public class PostService {
             .orElseThrow(IllegalArgumentException::new);
         Comment comment = new Comment(commentRequestDto.getContent());
         user.addComment(post, comment);
-        return new CommentResponseDto(user.getName(), user.getImage(), comment.getContent());
+        return new CommentResponseDto(user.getName(), comment.getContent());
     }
 }

@@ -2,25 +2,33 @@ package com.woowacourse.pickgit.post.application;
 
 public class CommentResponseDto {
 
-    private String userName;
-    private String image;
+    private String authorName;
     private String content;
+    private boolean isLiked;
 
-    public CommentResponseDto(String userName, String image, String content) {
-        this.userName = userName;
-        this.image = image;
+    private CommentResponseDto() {
+    }
+
+    public CommentResponseDto(String authorName, String content) {
+        this(authorName, content, false);
+    }
+
+    public CommentResponseDto(String authorName, String content, boolean isLiked) {
+        this.authorName = authorName;
         this.content = content;
+        this.isLiked = isLiked;
     }
 
-    public String getUserName() {
-        return userName;
-    }
-
-    public String getImage() {
-        return image;
+    public String getAuthorName() {
+        return authorName;
     }
 
     public String getContent() {
         return content;
     }
+
+    public boolean liked() {
+        return isLiked;
+    }
 }
+

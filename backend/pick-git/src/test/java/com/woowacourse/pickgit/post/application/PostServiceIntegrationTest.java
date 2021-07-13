@@ -15,9 +15,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @ActiveProfiles("test")
 class PostServiceIntegrationTest {
 
@@ -52,8 +54,7 @@ class PostServiceIntegrationTest {
 
         CommentResponseDto commentResponseDto = postService.addComment(commentRequestDto);
 
-        assertThat(commentResponseDto.getImage()).isEqualTo("a.jpg");
-        assertThat(commentResponseDto.getUserName()).isEqualTo("kevin");
+        assertThat(commentResponseDto.getAuthorName()).isEqualTo("kevin");
         assertThat(commentResponseDto.getContent()).isEqualTo("test comment");
     }
 }

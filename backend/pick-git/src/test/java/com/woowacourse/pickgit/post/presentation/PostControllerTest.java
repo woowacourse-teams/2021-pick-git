@@ -5,6 +5,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,6 +27,14 @@ import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import com.woowacourse.pickgit.post.application.CommentRequestDto;
+import com.woowacourse.pickgit.post.application.CommentResponseDto;
+import com.woowacourse.pickgit.post.application.PostService;
+import com.woowacourse.pickgit.post.domain.comment.CommentFormatException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -32,6 +47,11 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.NestedServletException;
 
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+
+@ExtendWith(SpringExtension.class)
 @WebMvcTest(PostController.class)
 @ActiveProfiles("test")
 class PostControllerTest {
@@ -41,6 +61,9 @@ class PostControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @MockBean
     private PostService postService;
@@ -65,6 +88,7 @@ class PostControllerTest {
         tags = new String[]{"java", "spring"};
         content = "pickgit";
     }
+
 
     @DisplayName("게시물을 작성할 수 있다. - 사용자")
     @Test
@@ -115,6 +139,56 @@ class PostControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN))
                 .andExpect(status().is4xxClientError())
         ).isInstanceOf(NestedServletException.class);
+    }
 
+    @DisplayName("특정 Post에 댓글을 추가한다.")
+    @Test
+    void addComment_ValidContent_Success() throws Exception {
+        LoginUser loginUser = new LoginUser("kevin", "token");
+        given(oAuthService.validateToken(anyString()))
+                .willReturn(true);
+            given(oAuthService.findRequestUserByToken(anyString()))
+                .willReturn(loginUser);
+
+        String url = "/api/posts/1/comments";
+        CommentResponseDto commentResponseDto =
+            new CommentResponseDto("kevin", "test comment");
+        String requestBody = objectMapper.writeValueAsString("test comment");
+        String responseBody = objectMapper.writeValueAsString(commentResponseDto);
+        given(postService.addComment(any(CommentRequestDto.class)))
+            .willReturn(commentResponseDto);
+
+        addCommentApi(url, requestBody)
+            .andExpect(status().isOk())
+            .andExpect(content().string(responseBody));
+
+        verify(postService, times(1)).addComment(any(CommentRequestDto.class));
+    }
+
+    private ResultActions addCommentApi(String url, String requestBody) throws Exception {
+        return mockMvc.perform(post(url)
+            .header("Authorization", "Bearer test")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody));
+    }
+
+    @DisplayName("특정 Post에 댓글 등록 실패한다. - 빈 댓글인 경우.")
+    @Test
+    void addComment_InValidContent_ExceptionThrown() throws Exception {
+        LoginUser loginUser = new LoginUser("kevin", "token");
+        given(oAuthService.validateToken(anyString()))
+            .willReturn(true);
+        given(oAuthService.findRequestUserByToken(anyString()))
+            .willReturn(loginUser);
+
+        String url = "/api/posts/1/comments";
+        String requestBody = objectMapper.writeValueAsString("");
+        given(postService.addComment(any(CommentRequestDto.class)))
+            .willThrow(new CommentFormatException());
+
+        addCommentApi(url, requestBody)
+            .andExpect(status().isBadRequest());
+
+        verify(postService, times(1)).addComment(any(CommentRequestDto.class));
     }
 }
