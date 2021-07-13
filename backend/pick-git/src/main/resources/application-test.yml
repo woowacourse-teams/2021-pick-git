@@ -16,3 +16,15 @@ github:
   tester:
     user-name: jipark3
     repository-name-for-tag-test: doms-react
+security:
+  jwt:
+    secret-key: pick-git
+    expiration-time: 3600000
+  github:
+    client:
+      id: 7775859b314b6084eff0
+      secret: 33140a22f9e4c55f3695cd996baf85a5ffe2ed50
+    url:
+      redirect: http://localhost:8080/afterlogin
+      access-token: https://github.com/login/oauth/access_token
+      profile: https://api.github.com/user

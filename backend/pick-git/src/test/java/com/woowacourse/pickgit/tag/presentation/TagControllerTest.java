@@ -16,6 +16,8 @@ import com.woowacourse.pickgit.tag.application.TagService;
 import com.woowacourse.pickgit.tag.application.TagsDto;
 import java.util.Arrays;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,20 +49,32 @@ class TagControllerTest {
     private String userName = "abc";
     private String repositoryName = "repo";
 
+    @BeforeEach
+    void setUp() {
+        LoginUser loginUser = new LoginUser(userName, accessToken);
+        given(oAuthService.validateToken(any(String.class)))
+            .willReturn(true);
+        given(oAuthService.findRequestUserByToken(any(String.class)))
+            .willReturn(loginUser);
+    }
+
+    @AfterEach
+    void tearDown() {
+        verify(oAuthService, times(1))
+            .validateToken(any(String.class));
+        verify(oAuthService, times(1))
+            .findRequestUserByToken(any(String.class));
+    }
+
     @DisplayName("특정 User의 Repository에 기술된 언어 태그들을 추출한다.")
     @Test
     void extractLanguageTags_ValidRepository_ExtractionSuccess() throws Exception {
         String url =
             "/api/github/" + userName + "/repositories/" + repositoryName + "/tags/languages";
-        LoginUser loginUser = new LoginUser(userName, accessToken);
         List<String> tags = Arrays.asList("Java", "Python", "HTML");
         TagsDto tagsDto = new TagsDto(tags);
         String expectedResponse = objectMapper.writeValueAsString(tagsDto);
 
-        given(oAuthService.validateToken(any(String.class)))
-            .willReturn(true);
-        given(oAuthService.findRequestUserByToken(any(String.class)))
-            .willReturn(loginUser);
         given(tagService.extractTags(any(ExtractionRequestDto.class)))
             .willReturn(tagsDto);
 
@@ -69,10 +83,6 @@ class TagControllerTest {
             .andExpect(status().isOk())
             .andExpect(content().string(expectedResponse));
 
-        verify(oAuthService, times(1))
-            .validateToken(any(String.class));
-        verify(oAuthService, times(1))
-            .findRequestUserByToken(any(String.class));
         verify(tagService, times(1))
             .extractTags(any(ExtractionRequestDto.class));
     }
@@ -82,12 +92,7 @@ class TagControllerTest {
     void extractLanguageTags_InvalidRepository_ExceptionThrown() throws Exception {
         String url =
             "/api/github/" + userName + "/repositories/invalidrepo/tags/languages";
-        LoginUser loginUser = new LoginUser(userName, accessToken);
 
-        given(oAuthService.validateToken(any(String.class)))
-            .willReturn(true);
-        given(oAuthService.findRequestUserByToken(any(String.class)))
-            .willReturn(loginUser);
         given(tagService.extractTags(any(ExtractionRequestDto.class)))
             .willThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
@@ -96,16 +101,12 @@ class TagControllerTest {
             .andExpect(status().isNotFound())
             .andExpect(content().string("외부 플랫폼 연동 요청 처리에 실패했습니다."));
 
-        verify(oAuthService, times(1))
-            .validateToken(any(String.class));
-        verify(oAuthService, times(1))
-            .findRequestUserByToken(any(String.class));
         verify(tagService, times(1))
             .extractTags(any(ExtractionRequestDto.class));
     }
 
     /*
-    Interceptor 예외 핸들링이 구현되면 테스트도 변경되어야 합니다.
+    Login 모듈의 예외 처리가 구현되어야 한다.
      */
 //    @DisplayName("유효하지 않은 AccessToken으로 태그 추출 요청시 401 예외 메시지가 반환된다.")
 //    @Test
@@ -113,12 +114,11 @@ class TagControllerTest {
 //        String url =
 //            "/api/github/" + userName + "/repositories/" + repositoryName + "/tags/languages";
 //
-//        given(tagService.extractTags(any(ExtractionRequestDto.class)))
-//            .willThrow(new HttpClientErrorException(HttpStatus.UNAUTHORIZED));
+//        given(oAuthService.validateToken(any(String.class)))
+//            .willReturn(false);
 //
 //        mockMvc.perform(get(url)
 //            .header("Authorization", "Bearer invalid"))
-//            .andExpect(status().isUnauthorized())
-//            .andExpect(content().string("외부 플랫폼 연동 요청 처리에 실패했습니다."));
+//            .andExpect(status().is5xxServerError());
 //    }
 }

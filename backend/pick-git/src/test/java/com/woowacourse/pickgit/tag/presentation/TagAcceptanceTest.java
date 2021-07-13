@@ -1,9 +1,12 @@
-package com.woowacourse.pickgit.tag.integration;
+package com.woowacourse.pickgit.tag.presentation;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 
-import com.woowacourse.pickgit.authentication.application.JwtTokenProvider;
-import com.woowacourse.pickgit.authentication.dao.OAuthAccessTokenDao;
+import com.woowacourse.pickgit.authentication.application.OAuthService;
+import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
+import com.woowacourse.pickgit.tag.TestTagConfiguration;
 import com.woowacourse.pickgit.tag.application.TagsDto;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
@@ -16,53 +19,47 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@DirtiesContext
+@Import(TestTagConfiguration.class)
+@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @ActiveProfiles("test")
-class TagIntegrationTest {
+class TagAcceptanceTest {
 
     @LocalServerPort
     private int port;
 
-    @Value("${github.tester.user-name}")
-    private String userName;
-
-    @Value("${github.tester.access-token}")
-    private String githubAccessToken;
-
-    @Value("${github.tester.repository-name-for-tag-test}")
-    private String repositoryName;
-
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+    @MockBean
+    private OAuthService oAuthService;
 
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private OAuthAccessTokenDao oAuthAccessTokenDao;
-
-    private String userAccessToken;
+    private String accessToken = "Bearer testae";
+    private String userName = "jipark3";
+    private String repositoryName = "doms-react";
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        BasicProfile basicProfile =
-            new BasicProfile(userName, "ala", "hi");
-        GithubProfile githubProfile =
-            new GithubProfile("a", "b", "c", "d", "e");
-        User user = new User(basicProfile, githubProfile);
+        LoginUser loginUser = new LoginUser(userName, "valid-token-aaaa");
+        given(oAuthService.validateToken(anyString()))
+            .willReturn(true);
+        given(oAuthService.findRequestUserByToken(anyString()))
+            .willReturn(loginUser);
+        User user =
+            new User(new BasicProfile(userName, "a.jpg", "a"),
+                new GithubProfile("github.com", "a", "a", "a", "a"));
         userRepository.save(user);
-        userAccessToken = jwtTokenProvider.createToken(userName);
-        oAuthAccessTokenDao.insert(userAccessToken, githubAccessToken);
     }
 
     private ExtractableResponse<Response> requestTags(String accessToken, String url,
@@ -81,7 +78,7 @@ class TagIntegrationTest {
         String url =
             "/api/github/" + userName + "/repositories/" + repositoryName + "/tags/languages";
 
-        TagsDto response = requestTags(userAccessToken, url, HttpStatus.OK)
+        TagsDto response = requestTags(accessToken, url, HttpStatus.OK)
             .as(TagsDto.class);
 
         assertThat(response.getTags()).containsExactly("JavaScript", "HTML", "CSS");
@@ -93,7 +90,7 @@ class TagIntegrationTest {
         String url =
             "/api/github/" + userName + "/repositories/none-available-repo/tags/languages";
 
-        String response = requestTags(userAccessToken, url, HttpStatus.NOT_FOUND)
+        String response = requestTags(accessToken, url, HttpStatus.NOT_FOUND)
             .asString();
 
         assertThat(response).isEqualTo("외부 플랫폼 연동 요청 처리에 실패했습니다.");

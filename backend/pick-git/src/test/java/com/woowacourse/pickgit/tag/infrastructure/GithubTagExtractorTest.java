@@ -9,7 +9,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 
 class GithubTagExtractorTest {
@@ -19,24 +18,11 @@ class GithubTagExtractorTest {
     private static final String REPOSITORY_NAME = "doms-react";
 
     private PlatformTagExtractor platformTagExtractor;
-
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() {
-        String validUrl =
-            "https://api.github.com/repos/" + USER_NAME + "/" + REPOSITORY_NAME + "/languages";
-
-        PlatformApiRequester platformApiRequester = ((url, accessToken) -> {
-            if (!accessToken.equals(TESTER_ACCESS_TOKEN)) {
-                throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
-            }
-            if (!url.equals(validUrl)) {
-                throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
-            }
-            return "{\"JavaScript\": \"91949\", \"HTML\": \"13\", \"CSS\": \"9\"}";
-        });
-
+        PlatformApiRequester platformApiRequester = new MockTagApiRequester();
         platformTagExtractor = new GithubTagExtractor(platformApiRequester, objectMapper);
     }
 
