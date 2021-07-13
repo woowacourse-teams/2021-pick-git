@@ -1,8 +1,7 @@
 package com.woowacourse.pickgit.post.infrastructure;
 
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
+import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -14,8 +13,13 @@ public class GithubRepositoryApiRequester implements PlatformRepositoryApiReques
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setBearerAuth(token);
 
+        RequestEntity<Void> requestEntity = RequestEntity
+            .get(url)
+            .headers(httpHeaders)
+            .build();
+
         return new RestTemplate()
-            .exchange(url, HttpMethod.GET, new HttpEntity<>(httpHeaders), String.class)
+            .exchange(requestEntity, String.class)
             .getBody();
     }
 }
