@@ -192,7 +192,7 @@ class PostServiceTest {
 
     @DisplayName("Repository 목록을 가져온다.")
     @Test
-    void getRepositories_AuthenticatedUser_Success() {
+    void showRepositories_LoginUser_Success() {
         // given
         TokenDto tokenDto = new TokenDto("pickgit");
         List<RepositoryResponse> repositories = List.of(
@@ -201,13 +201,13 @@ class PostServiceTest {
         );
 
         // when
-        given(platformExtractor.getRepositories(tokenDto.getAccessToken()))
+        given(platformExtractor.showRepositories(tokenDto.getAccessToken()))
             .willReturn(repositories);
 
         // then
-        assertThat(platformExtractor.getRepositories(tokenDto.getAccessToken()))
+        assertThat(platformExtractor.showRepositories(tokenDto.getAccessToken()))
             .containsAll(repositories);
         verify(platformExtractor, times(1))
-            .getRepositories(tokenDto.getAccessToken());
+            .showRepositories(tokenDto.getAccessToken());
     }
 }

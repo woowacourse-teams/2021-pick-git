@@ -5,5 +5,5 @@ import java.util.List;
 
 public interface PlatformExtractor {
 
-    List<RepositoryResponse> getRepositories(String token);
+    List<RepositoryResponse> showRepositories(String token);
 }

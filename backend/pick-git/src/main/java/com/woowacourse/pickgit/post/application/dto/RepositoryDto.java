@@ -14,7 +14,7 @@ public class RepositoryDto {
         this.repositories = repositories;
     }
 
-    public List<RepositoryResponse> getRepositories() {
+    public List<RepositoryResponse> showRepositories() {
         return repositories;
     }
 }

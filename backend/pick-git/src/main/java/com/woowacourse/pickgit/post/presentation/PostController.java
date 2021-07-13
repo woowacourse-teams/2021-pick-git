@@ -82,9 +82,9 @@ public class PostController {
     }
 
     @GetMapping("/github/repositories")
-    public ResponseEntity<RepositoryDto> getRepositories(HttpServletRequest httpServletRequest) {
+    public ResponseEntity<RepositoryDto> showRepositories(HttpServletRequest httpServletRequest) {
         String token = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION).split(" ")[1];
-        RepositoryDto repositories = postService.getRepositories(new TokenDto(token));
+        RepositoryDto repositories = postService.showRepositories(new TokenDto(token));
 
         return ResponseEntity.ok(repositories);
     }

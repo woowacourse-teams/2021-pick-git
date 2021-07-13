@@ -22,7 +22,7 @@ public class GithubExtractor implements PlatformExtractor {
     }
 
     @Override
-    public List<RepositoryResponse> getRepositories(String token) {
+    public List<RepositoryResponse> showRepositories(String token) {
         String url = "https://api.github.com/user/repos";
         String response = platformApiRequester.repositories(token, url);
 

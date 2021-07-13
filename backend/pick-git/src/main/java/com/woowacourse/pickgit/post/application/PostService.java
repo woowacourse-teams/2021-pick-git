@@ -112,9 +112,9 @@ public class PostService {
         return new CommentResponseDto(user.getName(), comment.getContent());
     }
 
-    public RepositoryDto getRepositories(TokenDto tokenDto) {
+    public RepositoryDto showRepositories(TokenDto tokenDto) {
         List<RepositoryResponse> repositories = platformExtractor
-            .getRepositories(tokenDto.getAccessToken());
+            .showRepositories(tokenDto.getAccessToken());
 
         return new RepositoryDto(repositories);
     }

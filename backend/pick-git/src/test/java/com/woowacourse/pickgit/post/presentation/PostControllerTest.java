@@ -191,7 +191,7 @@ class PostControllerTest {
 
     @DisplayName("Repository 목록을 가져온다.")
     @Test
-    void getRepositories_AuthenticatedUser_Success() throws Exception {
+    void showRepositories_LoginUser_Success() throws Exception {
         // given
         TokenDto tokenDto = new TokenDto("pickgit");
         RepositoryDto repositories = new RepositoryDto(List.of(
@@ -200,7 +200,7 @@ class PostControllerTest {
         ));
 
         // when
-        given(postService.getRepositories(tokenDto))
+        given(postService.showRepositories(tokenDto))
             .willReturn(repositories);
 
         // then
