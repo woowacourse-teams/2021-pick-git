@@ -28,7 +28,7 @@ class TagServiceIntegrationTest {
     @Autowired
     private TagRepository tagRepository;
 
-    private String accessToken = "valid-token-aaaa";
+    private String accessToken = "oauth.access.token";
     private String userName = "jipark3";
     private String repositoryName = "doms-react";
     private ObjectMapper objectMapper = new ObjectMapper();

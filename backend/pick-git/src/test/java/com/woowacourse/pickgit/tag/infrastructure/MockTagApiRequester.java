@@ -5,7 +5,7 @@ import org.springframework.web.client.HttpClientErrorException;
 
 public class MockTagApiRequester implements PlatformApiRequester{
 
-    private static final String TESTER_ACCESS_TOKEN = "valid-token-aaaa";
+    private static final String TESTER_ACCESS_TOKEN = "oauth.access.token";
     private static final String USER_NAME = "jipark3";
     private static final String REPOSITORY_NAME = "doms-react";
 

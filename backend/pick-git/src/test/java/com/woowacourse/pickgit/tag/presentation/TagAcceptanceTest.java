@@ -1,30 +1,26 @@
 package com.woowacourse.pickgit.tag.presentation;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 
-import com.woowacourse.pickgit.authentication.application.OAuthService;
-import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
+import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
+import com.woowacourse.pickgit.authentication.domain.OAuthClient;
+import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
 import com.woowacourse.pickgit.tag.TestTagConfiguration;
 import com.woowacourse.pickgit.tag.application.TagsDto;
-import com.woowacourse.pickgit.user.domain.User;
-import com.woowacourse.pickgit.user.domain.UserRepository;
-import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
-import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
@@ -39,27 +35,17 @@ class TagAcceptanceTest {
     private int port;
 
     @MockBean
-    private OAuthService oAuthService;
+    private OAuthClient oAuthClient;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    private String accessToken = "Bearer testae";
+    private String accessToken;
     private String userName = "jipark3";
     private String repositoryName = "doms-react";
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        LoginUser loginUser = new LoginUser(userName, "valid-token-aaaa");
-        given(oAuthService.validateToken(anyString()))
-            .willReturn(true);
-        given(oAuthService.findRequestUserByToken(anyString()))
-            .willReturn(loginUser);
-        User user =
-            new User(new BasicProfile(userName, "a.jpg", "a"),
-                new GithubProfile("github.com", "a", "a", "a", "a"));
-        userRepository.save(user);
+        OAuthTokenResponse tokenResponse = 로그인_되어있음();
+        accessToken = tokenResponse.getToken();
     }
 
     private ExtractableResponse<Response> requestTags(String accessToken, String url,
@@ -94,6 +80,37 @@ class TagAcceptanceTest {
             .asString();
 
         assertThat(response).isEqualTo("외부 플랫폼 연동 요청 처리에 실패했습니다.");
+    }
+
+    private OAuthTokenResponse 로그인_되어있음() {
+        OAuthTokenResponse response = 로그인_요청().as(OAuthTokenResponse.class);
+        assertThat(response.getToken()).isNotBlank();
+        return response;
+    }
+
+    private ExtractableResponse<Response> 로그인_요청() {
+        // given
+        String oauthCode = "1234";
+        String accessToken = "oauth.access.token";
+
+        OAuthProfileResponse oAuthProfileResponse = new OAuthProfileResponse(
+            "jipark3", "image", "hi~", "github.com/",
+            null, null, null, null
+        );
+
+        // mock
+        when(oAuthClient.getAccessToken(oauthCode)).thenReturn(accessToken);
+        when(oAuthClient.getGithubProfile(accessToken)).thenReturn(oAuthProfileResponse);
+
+        // when
+        return RestAssured
+            .given().log().all()
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .get("/api/afterlogin?code=" + oauthCode)
+            .then().log().all()
+            .statusCode(HttpStatus.OK.value())
+            .extract();
     }
 
     /*
