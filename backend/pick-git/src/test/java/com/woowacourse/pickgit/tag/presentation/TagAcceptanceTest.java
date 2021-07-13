@@ -82,6 +82,15 @@ class TagAcceptanceTest {
         assertThat(response).isEqualTo("외부 플랫폼 연동 요청 처리에 실패했습니다.");
     }
 
+    @DisplayName("유효하지 않은 AccessToken으로 태그 추출 요청시 서버 에러가 발생한다.")
+    @Test
+    void extractLanguageTags_InvalidAccessToken_ExceptionThrown() {
+        String url =
+            "/api/github/" + userName + "/repositories/" + repositoryName + "/tags/languages";
+
+        requestTags("invalidtoken", url, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     private OAuthTokenResponse 로그인_되어있음() {
         OAuthTokenResponse response = 로그인_요청().as(OAuthTokenResponse.class);
         assertThat(response.getToken()).isNotBlank();
@@ -112,19 +121,4 @@ class TagAcceptanceTest {
             .statusCode(HttpStatus.OK.value())
             .extract();
     }
-
-    /*
-    Interceptor 예외 핸들링이 구현되면 테스트도 변경되어야 합니다.
-    */
-//    @DisplayName("유효하지 않은 AccessToken으로 태그 추출 요청시 401 예외 메시지가 반환된다.")
-//    @Test
-//    void extractLanguageTags_InvalidAccessToken_ExceptionThrown() {
-//        String url =
-//            "/api/github/" + userName + "/repositories/" + repositoryName + "/tags/languages";
-//
-//        String response = requestTags("invalidtoken", url, HttpStatus.UNAUTHORIZED)
-//            .asString();
-//
-//        assertThat(response).isEqualTo("외부 플랫폼 연동 요청 처리에 실패했습니다.");
-//    }
 }
