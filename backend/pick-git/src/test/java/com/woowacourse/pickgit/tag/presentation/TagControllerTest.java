@@ -66,7 +66,7 @@ class TagControllerTest {
             "/api/github/" + userName + "/repositories/" + repositoryName + "/tags/languages";
         List<String> tags = Arrays.asList("Java", "Python", "HTML");
         TagsDto tagsDto = new TagsDto(tags);
-        String expectedResponse = objectMapper.writeValueAsString(tagsDto);
+        String expectedResponse = objectMapper.writeValueAsString(tagsDto.getTags());
 
         given(tagService.extractTags(any(ExtractionRequestDto.class)))
             .willReturn(tagsDto);
@@ -107,8 +107,8 @@ class TagControllerTest {
 
         mockMvc.perform(get(url)
             .header("Authorization", accessToken))
-            .andExpect(status().isNotFound())
-            .andExpect(content().string("외부 플랫폼 연동 요청 처리에 실패했습니다."));
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string("P0001"));
 
         verify(tagService, times(1))
             .extractTags(any(ExtractionRequestDto.class));

@@ -7,10 +7,11 @@ import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileRespon
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
 import com.woowacourse.pickgit.tag.TestTagConfiguration;
-import com.woowacourse.pickgit.tag.application.TagsDto;
 import io.restassured.RestAssured;
+import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -64,10 +65,10 @@ class TagAcceptanceTest {
         String url =
             "/api/github/" + userName + "/repositories/" + repositoryName + "/tags/languages";
 
-        TagsDto response = requestTags(accessToken, url, HttpStatus.OK)
-            .as(TagsDto.class);
+        List<String> response = requestTags(accessToken, url, HttpStatus.OK)
+            .as(new TypeRef<List<String>>() {});
 
-        assertThat(response.getTags()).containsExactly("JavaScript", "HTML", "CSS");
+        assertThat(response).containsExactly("JavaScript", "HTML", "CSS");
     }
 
     @DisplayName("유효하지 않은 레포지토리 태그 추출 요청시 404 예외 메시지가 반환된다.")
@@ -76,10 +77,10 @@ class TagAcceptanceTest {
         String url =
             "/api/github/" + userName + "/repositories/none-available-repo/tags/languages";
 
-        String response = requestTags(accessToken, url, HttpStatus.NOT_FOUND)
+        String response = requestTags(accessToken, url, HttpStatus.BAD_REQUEST)
             .asString();
 
-        assertThat(response).isEqualTo("외부 플랫폼 연동 요청 처리에 실패했습니다.");
+        assertThat(response).isEqualTo("P0001");
     }
 
     @DisplayName("유효하지 않은 AccessToken으로 태그 추출 요청시 서버 에러가 발생한다.")

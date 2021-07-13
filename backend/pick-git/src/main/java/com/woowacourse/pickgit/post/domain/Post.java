@@ -90,7 +90,7 @@ public class Post {
         List<Tag> existingTags = getTags();
         for (Tag tag : tags) {
             if (existingTags.contains(tag)) {
-                throw new IllegalArgumentException("중복되는 태그를 추가할 수 없습니다.");
+                throw new CannotAddTagException();
             }
             PostTag postTag = new PostTag(this, tag);
             postTags.add(postTag);

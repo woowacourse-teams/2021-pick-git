@@ -37,7 +37,7 @@ class PostTest {
         List<Tag> duplicatedTags = Arrays.asList(new Tag("tag4"), new Tag("tag3"));
 
         assertThatCode(() -> post.addTags(duplicatedTags))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("중복되는 태그를 추가할 수 없습니다.");
+            .isInstanceOf(CannotAddTagException.class)
+            .hasMessage("P0001");
     }
 }
