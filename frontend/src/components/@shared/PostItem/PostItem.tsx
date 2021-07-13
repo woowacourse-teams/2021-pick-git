@@ -12,18 +12,23 @@ import {
   PostBody,
   PostContent,
   PostHeader,
+  TagListWrapper,
+  TagItemLinkButton,
   PostCreatedDateText,
+  MoreContentLinkButton,
 } from "./PostItem.style";
 import Avatar from "../Avatar/Avatar";
 import CircleIcon from "../CircleIcon/CircleIcon";
 import Comment from "../Comment/Comment";
 import ImageSlider from "../ImageSlider/ImageSlider";
+import Chip from "../Chip/Chip";
 import { CommentData } from "../../../@types";
-import { EditIcon, PostHeartIcon, PostHeartLineIcon, GithubIcon } from "../../../assets/icons";
-import { useContext } from "react";
+import { EditIcon, PostHeartIcon, PostHeartLineIcon, GithubIcon, SendIcon } from "../../../assets/icons";
+import { useContext, useState } from "react";
 import { ThemeContext } from "styled-components";
 import { PAGE_URL } from "../../../constants/urls";
 import TextEditor from "../TextEditor/TextEditor";
+import { LIMIT } from "../../../constants/limits";
 
 export interface Props {
   authorName: string;
@@ -36,9 +41,11 @@ export interface Props {
   content: string;
   comments: CommentData[];
   commenterImageUrl: string;
+  tags: string[];
   createdAt: string;
   commentValue: string;
-  onCommentValueChange: (value: string) => void;
+  onCommentValueChange: React.ChangeEventHandler<HTMLTextAreaElement>;
+  onCommentValueSave: () => void;
   onPostLike: () => void;
   onCommentLike: (commentId: string) => void;
 }
@@ -54,11 +61,15 @@ const PostItem = ({
   content,
   comments,
   commenterImageUrl,
+  tags,
   createdAt,
   commentValue,
   onCommentValueChange,
+  onCommentValueSave,
   onCommentLike,
+  onPostLike,
 }: Props) => {
+  const [shouldHideContent, setShouldHideContent] = useState(content.length > LIMIT.POST_CONTENT_HIDE_LENGTH);
   const { color } = useContext(ThemeContext);
 
   const commentList = comments.map((comment) => (
@@ -69,15 +80,19 @@ const PostItem = ({
         isLiked={comment.isLiked}
         authorName={comment.authorName}
         link={`/profile/${comment.authorName}`}
-        onCommentLike={() => onCommentLike(comment.authorName)}
+        onCommentLike={() => onCommentLike(comment.commentId)}
       />
     </CommentWrapper>
   ));
 
-  const handleCommentValueChange: React.ChangeEventHandler<HTMLTextAreaElement> = (event) => {
-    const { value } = event.target;
+  const tagList = tags.map((tag) => (
+    <TagItemLinkButton to={PAGE_URL.POSTS_WITH_TAG(tag)}>
+      <Chip>{tag}</Chip>
+    </TagItemLinkButton>
+  ));
 
-    onCommentValueChange(value);
+  const onMoreContentShow = () => {
+    setShouldHideContent(false);
   };
 
   return (
@@ -96,7 +111,7 @@ const PostItem = ({
       <ImageSlider imageUrls={imageUrls} slideButtonKind="in-box" />
       <PostBody>
         <IconLinkButtonsWrapper>
-          <IconLink>{isLiked ? <PostHeartIcon /> : <PostHeartLineIcon />}</IconLink>
+          <IconLink onClick={onPostLike}>{isLiked ? <PostHeartIcon /> : <PostHeartLineIcon />}</IconLink>
           <IconLink href={authorGithubUrl} target="_blank">
             <CircleIcon diameter="1.625rem" backgroundColor={color.tertiaryColor}>
               <GithubIcon />
@@ -106,8 +121,10 @@ const PostItem = ({
         <LikeCountText>좋아요 {likeCount}개</LikeCountText>
         <PostContent>
           <PostContentAuthorLink to={PAGE_URL.USER_PROFILE(authorName)}>{authorName}</PostContentAuthorLink>
-          {content}
+          {shouldHideContent ? content.slice(0, LIMIT.POST_CONTENT_HIDE_LENGTH).concat("...") : content}
+          {shouldHideContent && <MoreContentLinkButton onClick={onMoreContentShow}>더보기</MoreContentLinkButton>}
         </PostContent>
+        <TagListWrapper>{shouldHideContent || tagList}</TagListWrapper>
         {commentList}
       </PostBody>
       <CommentInputWrapper>
@@ -115,12 +132,15 @@ const PostItem = ({
         <TextEditor
           placeholder="댓글 달기..."
           backgroundColor="transparent"
-          onChange={handleCommentValueChange}
+          onChange={onCommentValueChange}
           value={commentValue}
           width="100%"
           height="0.8rem;"
           fontSize="0.625rem"
         />
+        <IconLink onClick={onCommentValueSave}>
+          <SendIcon />
+        </IconLink>
       </CommentInputWrapper>
       <PostCreatedDateText>{createdAt}</PostCreatedDateText>
     </Container>
