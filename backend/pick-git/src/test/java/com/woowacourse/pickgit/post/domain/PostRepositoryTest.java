@@ -6,6 +6,7 @@ import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
 import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
+import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import com.woowacourse.pickgit.tag.domain.Tag;
 import com.woowacourse.pickgit.tag.domain.TagRepository;
@@ -89,7 +90,7 @@ class PostRepositoryTest {
     @Test
     void save_WhenSavingPost_TagSavedTogether() {
         Post post =
-            new Post(null, null, new PostContent(), null, null, null, null);
+            new Post(null, null, new PostContent(), null, null, new ArrayList<>(), null);
         List<Tag> tags = Arrays.asList(new Tag("tag1"), new Tag("tag2"));
         post.addTags(tags);
         postRepository.save(post);
