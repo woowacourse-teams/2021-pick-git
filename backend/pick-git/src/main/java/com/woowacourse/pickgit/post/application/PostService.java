@@ -14,13 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class PostService {
 
-    private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final PostRepository postRepository;
 
-    public PostService(PostRepository postRepository,
-        UserRepository userRepository) {
-        this.postRepository = postRepository;
+    public PostService(UserRepository userRepository,
+        PostRepository postRepository) {
         this.userRepository = userRepository;
+        this.postRepository = postRepository;
     }
 
     public PostResponseDto write(PostRequestDto postRequestDto) {
