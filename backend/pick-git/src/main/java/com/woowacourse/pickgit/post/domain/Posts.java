@@ -12,10 +12,10 @@ public class Posts {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Post> posts = new ArrayList<>();
 
-    protected Posts() {
+    public Posts() {
     }
 
     public int getCounts() {
-        return 0;
+        return posts.size();
     }
 }

@@ -15,7 +15,7 @@ public class IgnoreAuthenticationInterceptor implements HandlerInterceptor {
         if (isPreflightRequest(request)) {
             return true;
         }
-        if (isGetRequest(request)) {
+        if (!isGetRequest(request)) {
             throw new IllegalArgumentException("get 요청일 때만 가능");
         }
 
@@ -48,6 +48,6 @@ public class IgnoreAuthenticationInterceptor implements HandlerInterceptor {
     }
 
     private boolean isGetRequest(HttpServletRequest request) {
-        return request.getMethod().equals(HttpMethod.GET.name());
+        return request.getMethod().equalsIgnoreCase(HttpMethod.GET.name());
     }
 }

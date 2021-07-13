@@ -43,6 +43,7 @@ public class OAuthConfiguration implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authenticationInterceptor())
+            .addPathPatterns("/api/profiles/*/followings")
             .addPathPatterns("/api/profiles/me")
             .addPathPatterns("/api/posts/me")
             .addPathPatterns("/api/posts")
