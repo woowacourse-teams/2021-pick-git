@@ -60,8 +60,9 @@ public class Post {
         this.user = user;
     }
 
-    public Post(PostContent content, User user) {
+    public Post(PostContent content, Images images, User user) {
         this.content = content;
+        this.images = images;
         this.user = user;
     }
 
@@ -79,6 +80,10 @@ public class Post {
         }
         Post post = (Post) o;
         return Objects.equals(id, post.id);
+    }
+
+    public List<String> getImageUrls() {
+        return images.getUrls();
     }
 
     @Override

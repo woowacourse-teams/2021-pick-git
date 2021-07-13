@@ -1,12 +1,13 @@
 package com.woowacourse.pickgit.post.application.dto;
 
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 public class PostRequestDto {
 
     private String token;
     private String username;
-    private List<String> images;
+    private List<MultipartFile> images;
     private String githubRepoUrl;
     private List<String> tags;
     private String content;
@@ -14,7 +15,7 @@ public class PostRequestDto {
     private PostRequestDto() {
     }
 
-    public PostRequestDto(String token, String username, List<String> images,
+    public PostRequestDto(String token, String username, List<MultipartFile> images,
         String githubRepoUrl, List<String> tags, String content) {
         this.token = token;
         this.username = username;
@@ -32,7 +33,7 @@ public class PostRequestDto {
         return username;
     }
 
-    public List<String> getImages() {
+    public List<MultipartFile> getImages() {
         return images;
     }
 

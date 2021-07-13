@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
+import com.woowacourse.pickgit.config.StorageConfiguration;
 import com.woowacourse.pickgit.tag.TestTagConfiguration;
 import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
@@ -26,8 +27,9 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
+
+@Import({TestTagConfiguration.class, StorageConfiguration.class})
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@Import(TestTagConfiguration.class)
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @ActiveProfiles("test")
 class TagAcceptanceTest {

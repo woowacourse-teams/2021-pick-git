@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api")
 public class PostController {
+    private static final String REDIRECT_URL = "/api/posts/%s/%d";
 
     private final PostService postService;
 
@@ -27,21 +28,37 @@ public class PostController {
     @PostMapping("/posts")
     public ResponseEntity<Void> write(
         @Authenticated AppUser user,
-        @Valid @RequestBody PostRequest request) {
-        if (user.isGuest()) {
-            throw new IllegalArgumentException("게스트는 글을 작성할 수 없습니다!");
-        }
+        @Valid PostRequest request
+    ) {
+        validateIsGuest(user);
 
         PostResponseDto responseDto = postService.write(
-            new PostRequestDto(user.getAccessToken(), user.getUsername(), request.getImages(),
-                request.getGithubRepoUrl(), request.getTags(), request.getContent()));
+            createPostRequestDto(user, request)
+        );
 
         return ResponseEntity
-            .created(redirect(user, responseDto))
+            .created(redirectUrl(user, responseDto))
             .build();
     }
 
-    private URI redirect(AppUser user, PostResponseDto responseDto) {
-        return URI.create("/api/posts/" + user.getUsername() + "/" + responseDto.getId());
+    private void validateIsGuest(AppUser user) {
+        if (user.isGuest()) {
+            throw new IllegalArgumentException("게스트는 글을 작성할 수 없습니다!");
+        }
+    }
+
+    private PostRequestDto createPostRequestDto(AppUser user, PostRequest request) {
+        return new PostRequestDto(
+            user.getAccessToken(),
+            user.getUsername(),
+            request.getImages(),
+            request.getGithubRepoUrl(),
+            request.getTags(),
+            request.getContent()
+        );
+    }
+
+    private URI redirectUrl(AppUser user, PostResponseDto responseDto) {
+        return URI.create(String.format(REDIRECT_URL, user.getUsername(), responseDto.getId()));
     }
 }
