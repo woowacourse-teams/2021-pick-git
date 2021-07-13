@@ -45,6 +45,7 @@ public class OAuthConfiguration implements WebMvcConfigurer {
         registry.addInterceptor(authenticationInterceptor())
             .addPathPatterns("/api/profiles/me")
             .addPathPatterns("/api/posts/me")
+            .addPathPatterns("/api/posts")
             .excludePathPatterns("/api/authorization/github")
             .excludePathPatterns("/api/afterlogin");
 
