@@ -15,8 +15,12 @@ repositories {
 dependencies {
 	implementation platform('com.amazonaws:aws-java-sdk-bom:1.11.1000')
 	implementation 'com.amazonaws:aws-java-sdk-s3'
+	testImplementation group: 'cloud.localstack', name: 'localstack-utils', version: '0.2.13'
 
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation group: 'org.apache.tika', name: 'tika-core', version: '1.26'
+
+	testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '4.3.3'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
