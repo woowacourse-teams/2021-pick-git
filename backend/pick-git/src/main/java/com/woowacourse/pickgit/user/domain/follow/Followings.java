@@ -10,7 +10,7 @@ import javax.persistence.OneToMany;
 @Embeddable
 public class Followings {
 
-    @OneToMany(mappedBy = "source", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "source", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Follow> followings = new ArrayList<>();
 
     public Followings() {
@@ -20,7 +20,7 @@ public class Followings {
         return this.followings.contains(follow);
     }
 
-    public int followingCount() {
+    public int count() {
         return followings.size();
     }
 

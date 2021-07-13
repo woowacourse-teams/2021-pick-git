@@ -12,6 +12,6 @@ public class UserControllerAdvice {
     public ResponseEntity<String> handleException(PickgitException exception) {
         return ResponseEntity
             .badRequest()
-            .body(exception.getMessage());
+            .body(exception.getErrorCode());
     }
 }

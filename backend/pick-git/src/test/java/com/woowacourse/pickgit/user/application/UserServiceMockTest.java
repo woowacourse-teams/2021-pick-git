@@ -88,7 +88,13 @@ class UserServiceMockTest {
         AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(NAME);
         String targetName = "target";
 
-        mockUserRepository();
+        given(
+            userRepository.findByBasicProfile_Name(NAME)
+        ).willReturn(Optional.of(userFactory.user()));
+
+        given(
+            userRepository.findByBasicProfile_Name("target")
+        ).willReturn(Optional.of(userFactory.anotherUser()));
 
         //when
         FollowServiceDto followServiceDto = userService.followUser(authUserServiceDto, targetName);
@@ -105,7 +111,14 @@ class UserServiceMockTest {
         AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(NAME);
         String targetName = "target";
 
-        mockUserRepository();
+        given(
+            userRepository.findByBasicProfile_Name(NAME)
+        ).willReturn(Optional.of(userFactory.user()));
+
+        given(
+            userRepository.findByBasicProfile_Name("target")
+        ).willReturn(Optional.of(userFactory.anotherUser()));
+
         userService.followUser(authUserServiceDto, targetName);
 
         //when
@@ -122,7 +135,14 @@ class UserServiceMockTest {
         AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(NAME);
         String targetName = "target";
 
-        mockUserRepository();
+        given(
+            userRepository.findByBasicProfile_Name(NAME)
+        ).willReturn(Optional.of(userFactory.user()));
+
+        given(
+            userRepository.findByBasicProfile_Name("target")
+        ).willReturn(Optional.of(userFactory.anotherUser()));
+
         userService.followUser(authUserServiceDto, targetName);
 
         //when
@@ -141,16 +161,6 @@ class UserServiceMockTest {
         AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(NAME);
         String targetName = "target";
 
-        mockUserRepository();
-
-        //when
-        //then
-        assertThatThrownBy(
-            () -> userService.unfollowUser(authUserServiceDto, targetName)
-        ).hasMessage(new InvalidFollowException().getMessage());
-    }
-
-    private void mockUserRepository() {
         given(
             userRepository.findByBasicProfile_Name(NAME)
         ).willReturn(Optional.of(userFactory.user()));
@@ -158,5 +168,11 @@ class UserServiceMockTest {
         given(
             userRepository.findByBasicProfile_Name("target")
         ).willReturn(Optional.of(userFactory.anotherUser()));
+
+        //when
+        //then
+        assertThatThrownBy(
+            () -> userService.unfollowUser(authUserServiceDto, targetName)
+        ).hasMessage(new InvalidFollowException().getMessage());
     }
 }

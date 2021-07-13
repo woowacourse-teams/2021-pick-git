@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 @DataJpaTest
 class UserRepositoryTest {
@@ -15,12 +16,17 @@ class UserRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private TestEntityManager testEntityManager;
+
     private UserFactory userFactory;
 
     @BeforeEach
     void setUp() {
         this.userFactory = new UserFactory();
         userRepository.save(userFactory.user());
+        testEntityManager.flush();
+        testEntityManager.clear();
     }
 
     @DisplayName("유저 이름으로 User 엔티티를 조회한다.")
@@ -35,7 +41,4 @@ class UserRepositoryTest {
             .ignoringFields("id")
             .isEqualTo(userFactory.user());
     }
-
-    //TODO follow
-    //TODO unfollow
 }

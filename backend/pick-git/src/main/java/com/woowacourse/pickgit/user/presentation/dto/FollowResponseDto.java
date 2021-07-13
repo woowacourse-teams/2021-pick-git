@@ -5,7 +5,7 @@ public class FollowResponseDto {
     private int followerCount;
     private boolean following;
 
-    public FollowResponseDto() {
+    private FollowResponseDto() {
     }
 
     public FollowResponseDto(int followerCount, boolean isFollowing) {

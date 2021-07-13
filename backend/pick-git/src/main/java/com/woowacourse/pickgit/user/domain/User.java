@@ -82,11 +82,11 @@ public class User {
     }
 
     public int getFollowerCount() {
-        return followers.followerCount();
+        return followers.count();
     }
 
     public int getFollowingCount() {
-        return followings.followingCount();
+        return followings.count();
     }
 
     public int getPostCount() {

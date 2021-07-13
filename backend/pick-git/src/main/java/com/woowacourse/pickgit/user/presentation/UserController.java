@@ -43,6 +43,32 @@ public class UserController {
         return ResponseEntity.ok(getUserProfileResponseDto(userProfileServiceDto));
     }
 
+    @PostMapping("/{username}/followings")
+    public ResponseEntity<FollowResponseDto> followUser(
+        @Authenticated AppUser appUser,
+        @PathVariable String username
+    ) {
+        AuthUserServiceDto authUserServiceDto =
+            new AuthUserServiceDto(appUser.getUsername());
+
+        FollowServiceDto followServiceDto = userService.followUser(authUserServiceDto, username);
+
+        return ResponseEntity.ok(createFollowResponseDto(followServiceDto));
+    }
+
+    @DeleteMapping("/{username}/followings")
+    public ResponseEntity<FollowResponseDto> unfollowUser(
+        @Authenticated AppUser appUser,
+        @PathVariable String username
+    ) {
+        AuthUserServiceDto authUserServiceDto =
+            new AuthUserServiceDto(appUser.getUsername());
+
+        FollowServiceDto followServiceDto = userService.unfollowUser(authUserServiceDto, username);
+
+        return ResponseEntity.ok(createFollowResponseDto(followServiceDto));
+    }
+
     private UserProfileResponseDto getUserProfileResponseDto(
         UserProfileServiceDto userProfileServiceDto) {
         return new UserProfileResponseDto(
@@ -55,33 +81,7 @@ public class UserController {
         );
     }
 
-    @PostMapping("/{username}/followings")
-    public ResponseEntity<FollowResponseDto> followUser(
-        @Authenticated AppUser appUser,
-        @PathVariable String username
-    ) {
-        AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(
-            appUser.getUsername());
-
-        FollowServiceDto followServiceDto = userService.followUser(authUserServiceDto, username);
-
-        return ResponseEntity.ok(followResponseDto(followServiceDto));
-    }
-
-    @DeleteMapping("/{username}/followings")
-    public ResponseEntity<FollowResponseDto> unfollowUser(
-        @Authenticated AppUser appUser,
-        @PathVariable String username
-    ) {
-        AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(
-            appUser.getUsername());
-
-        FollowServiceDto followServiceDto = userService.unfollowUser(authUserServiceDto, username);
-
-        return ResponseEntity.ok(followResponseDto(followServiceDto));
-    }
-
-    private FollowResponseDto followResponseDto(FollowServiceDto followServiceDto) {
+    private FollowResponseDto createFollowResponseDto(FollowServiceDto followServiceDto) {
         return new FollowResponseDto(
             followServiceDto.getFollowerCount(),
             followServiceDto.isFollowing());
