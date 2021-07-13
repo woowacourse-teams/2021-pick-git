@@ -22,6 +22,13 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import com.woowacourse.pickgit.post.domain.Post;
+import com.woowacourse.pickgit.post.domain.PostRepository;
+import com.woowacourse.pickgit.post.domain.comment.Comment;
+import com.woowacourse.pickgit.user.domain.User;
+import com.woowacourse.pickgit.user.domain.UserRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
@@ -94,5 +101,15 @@ public class PostService {
         } catch (IOException ioException) {
             throw new IllegalArgumentException("업로드에 실패했습니다");
         }
+    }
+
+    public CommentResponseDto addComment(CommentRequestDto commentRequestDto) {
+        User user = userRepository.findByBasicProfile_Name(commentRequestDto.getUserName())
+            .orElseThrow(IllegalArgumentException::new);
+        Post post = postRepository.findById(commentRequestDto.getPostId())
+            .orElseThrow(IllegalArgumentException::new);
+        Comment comment = new Comment(commentRequestDto.getContent());
+        user.addComment(post, comment);
+        return new CommentResponseDto(user.getName(), user.getImage(), comment.getContent());
     }
 }

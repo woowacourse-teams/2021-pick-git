@@ -22,7 +22,9 @@ import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
 import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
+import java.util.ArrayList;
 import java.util.List;
+import com.woowacourse.pickgit.post.domain.comment.Comments;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -68,6 +70,9 @@ class PostServiceTest {
     private PostContent postContent;
     private Post post;
 
+    private Post post2;
+    private User user2;
+
     @BeforeEach
     void setUp() {
         image = "image1";
@@ -89,6 +94,10 @@ class PostServiceTest {
 
         post = new Post(1L, images, postContent, githubRepoUrl,
             null, null, null, user);
+
+        post2 = new Post(null, null, null, null, null, new Comments(), new ArrayList<>(), null);
+        user2 =
+            new User(new BasicProfile("kevin", "a.jpg", "a"), null);
     }
 
     private List<Image> getImages() {
@@ -135,5 +144,24 @@ class PostServiceTest {
             tags,
             content
         );
+    }
+
+    @DisplayName("게시물에 댓글을 정상 등록한다.")
+    @Test
+    void addComment_ValidContent_Success() {
+        given(postRepository.findById(1L))
+            .willReturn(Optional.of(post2));
+        given(userRepository.findByBasicProfile_Name("kevin"))
+            .willReturn(Optional.of(user2));
+        CommentRequestDto commentRequestDto =
+            new CommentRequestDto("kevin", "test comment", 1L);
+
+        CommentResponseDto commentResponseDto = postService.addComment(commentRequestDto);
+
+        assertThat(commentResponseDto.getImage()).isEqualTo("a.jpg");
+        assertThat(commentResponseDto.getUserName()).isEqualTo("kevin");
+        assertThat(commentResponseDto.getContent()).isEqualTo("test comment");
+        verify(postRepository, times(1)).findById(1L);
+        verify(userRepository, times(1)).findByBasicProfile_Name("kevin");
     }
 }

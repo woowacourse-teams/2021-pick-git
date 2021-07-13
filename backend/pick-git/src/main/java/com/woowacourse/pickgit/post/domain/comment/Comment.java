@@ -48,4 +48,8 @@ public class Comment {
     public User getUser() {
         return user;
     }
+
+    public String getContent() {
+        return content.getContent();
+    }
 }

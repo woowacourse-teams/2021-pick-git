@@ -29,4 +29,8 @@ public class CommentContent {
             || content.isEmpty()
             || content.length() > MAX_COMMENT_CONTENT_LENGTH;
     }
+
+    public String getContent() {
+        return content;
+    }
 }
