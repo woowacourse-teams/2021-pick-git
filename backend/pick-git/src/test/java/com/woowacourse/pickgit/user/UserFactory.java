@@ -6,6 +6,8 @@ import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
 
 public class UserFactory {
 
+    private static final Long ID_SOURCE = 1L;
+    private static final Long ID_TARGET = 2L;
     private static final String NAME_SOURCE = "yjksw";
     private static final String NAME_TARGET = "pickgit";
     private static final String IMAGE = "http://img.com";
@@ -26,10 +28,10 @@ public class UserFactory {
         new GithubProfile(GITHUB_URL, COMPANY, LOCATION, WEBSITE, TWITTER);
 
     public User user() {
-        return new User(basicProfileSource, githubProfile_source);
+        return new User(ID_SOURCE, basicProfileSource, githubProfile_source);
     }
 
     public User anotherUser() {
-        return new User(basicProfileTarget, githubProfile_target);
+        return new User(ID_TARGET, basicProfileTarget, githubProfile_target);
     }
 }

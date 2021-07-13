@@ -23,7 +23,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class UserServiceTest {
+class UserServiceMockTest {
 
     private static final String NAME = "yjksw";
     private static final String IMAGE = "http://img.com";

@@ -8,7 +8,6 @@ import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
 import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
 import com.woowacourse.pickgit.user.exception.DuplicatedFollowException;
 import com.woowacourse.pickgit.user.exception.InvalidFollowException;
-import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -18,8 +17,7 @@ import javax.persistence.Id;
 @Entity
 public class User {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Embedded
@@ -40,7 +38,15 @@ public class User {
     protected User() {
     }
 
-    public User(BasicProfile basicProfile, GithubProfile githubProfile) {
+    public User(Long id, BasicProfile basicProfile,
+        GithubProfile githubProfile) {
+        this.id = id;
+        this.basicProfile = basicProfile;
+        this.githubProfile = githubProfile;
+    }
+
+    public User(BasicProfile basicProfile,
+        GithubProfile githubProfile) {
         this.basicProfile = basicProfile;
         this.githubProfile = githubProfile;
     }

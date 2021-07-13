@@ -1,12 +1,11 @@
 package com.woowacourse.pickgit.user.presentation;
 
 import com.woowacourse.pickgit.authentication.domain.Authenticated;
-import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
+import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.AuthUserServiceDto;
 import com.woowacourse.pickgit.user.application.dto.FollowServiceDto;
 import com.woowacourse.pickgit.user.application.dto.UserProfileServiceDto;
-import com.woowacourse.pickgit.user.presentation.dto.AuthUserRequestDto;
 import com.woowacourse.pickgit.user.presentation.dto.FollowResponseDto;
 import com.woowacourse.pickgit.user.presentation.dto.UserProfileResponseDto;
 import org.springframework.http.ResponseEntity;
@@ -29,9 +28,9 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<UserProfileResponseDto> getAuthenticatedUserProfile(
-        @Authenticated LoginUser loginUser) {
+        @Authenticated AppUser appUser) {
         UserProfileServiceDto userProfileServiceDto = userService.getAuthUserProfile(
-            new AuthUserServiceDto(loginUser.getUsername())
+            new AuthUserServiceDto(appUser.getUsername())
         );
 
         return ResponseEntity.ok(getUserProfileResponseDto(userProfileServiceDto));
@@ -58,11 +57,11 @@ public class UserController {
 
     @PostMapping("/{username}/followings")
     public ResponseEntity<FollowResponseDto> followUser(
-        @Authenticated LoginUser loginUser,
+        @Authenticated AppUser appUser,
         @PathVariable String username
     ) {
         AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(
-            loginUser.getUsername());
+            appUser.getUsername());
 
         FollowServiceDto followServiceDto = userService.followUser(authUserServiceDto, username);
 
@@ -71,11 +70,11 @@ public class UserController {
 
     @DeleteMapping("/{username}/followings")
     public ResponseEntity<FollowResponseDto> unfollowUser(
-        @Authenticated LoginUser loginUser,
+        @Authenticated AppUser appUser,
         @PathVariable String username
     ) {
         AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(
-            loginUser.getUsername());
+            appUser.getUsername());
 
         FollowServiceDto followServiceDto = userService.unfollowUser(authUserServiceDto, username);
 
