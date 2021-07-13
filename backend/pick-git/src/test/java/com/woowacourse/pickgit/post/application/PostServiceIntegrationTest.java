@@ -1,9 +1,11 @@
 package com.woowacourse.pickgit.post.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostRepository;
+import com.woowacourse.pickgit.post.domain.comment.CommentFormatException;
 import com.woowacourse.pickgit.post.domain.comment.Comments;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
@@ -13,17 +15,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-@SpringBootTest(webEnvironment = WebEnvironment.NONE)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@ActiveProfiles("test")
+@DataJpaTest
 class PostServiceIntegrationTest {
 
-    @Autowired
     private PostService postService;
 
     @Autowired
@@ -38,6 +34,7 @@ class PostServiceIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        postService = new PostService(postRepository, userRepository);
         post = new Post(null, null, null, new Comments(), null);
         user =
             new User(new BasicProfile("kevin", "a.jpg", "a"),
@@ -56,5 +53,16 @@ class PostServiceIntegrationTest {
 
         assertThat(commentResponseDto.getAuthorName()).isEqualTo("kevin");
         assertThat(commentResponseDto.getContent()).isEqualTo("test comment");
+    }
+
+    @DisplayName("게시물에 빈 댓글은 등록할 수 없다.")
+    @Test
+    void addComment_InvalidContent_ExceptionThrown() {
+        CommentRequestDto commentRequestDto =
+            new CommentRequestDto("kevin", "", post.getId());
+
+        assertThatCode(() -> postService.addComment(commentRequestDto))
+            .isInstanceOf(CommentFormatException.class)
+            .hasMessage("F0002");
     }
 }

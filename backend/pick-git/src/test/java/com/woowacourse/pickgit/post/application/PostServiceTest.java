@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -24,6 +25,7 @@ import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
 import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
 import java.util.ArrayList;
 import java.util.List;
+import com.woowacourse.pickgit.post.domain.comment.CommentFormatException;
 import com.woowacourse.pickgit.post.domain.comment.Comments;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -160,6 +162,24 @@ class PostServiceTest {
 
         assertThat(commentResponseDto.getAuthorName()).isEqualTo("kevin");
         assertThat(commentResponseDto.getContent()).isEqualTo("test comment");
+        verify(postRepository, times(1)).findById(1L);
+        verify(userRepository, times(1)).findByBasicProfile_Name("kevin");
+    }
+
+    @DisplayName("게시물에 빈 댓글을 등록할 수 없다.")
+    @Test
+    void addComment_InvalidContent_ExceptionThrown() {
+        given(postRepository.findById(1L))
+            .willReturn(Optional.of(post));
+        given(userRepository.findByBasicProfile_Name("kevin"))
+            .willReturn(Optional.of(user));
+
+        CommentRequestDto commentRequestDto =
+            new CommentRequestDto("kevin", "", 1L);
+
+        assertThatCode(() -> postService.addComment(commentRequestDto))
+            .isInstanceOf(CommentFormatException.class)
+            .hasMessage("F0002");
         verify(postRepository, times(1)).findById(1L);
         verify(userRepository, times(1)).findByBasicProfile_Name("kevin");
     }

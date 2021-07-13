@@ -30,7 +30,8 @@ class CommentTest {
         }
 
         assertThatCode(() -> new Comment(content.toString()))
-            .isInstanceOf(CommentFormatException.class);
+            .isInstanceOf(CommentFormatException.class)
+            .hasMessage("F0002");
     }
 
     @DisplayName("댓글은 null이거나 빈 문자열이어서는 안 된다.")
@@ -38,6 +39,7 @@ class CommentTest {
     @NullAndEmptySource
     void newComment_NullOrEmpty_ExceptionThrown(String content) {
         assertThatCode(() -> new Comment(content))
-            .isInstanceOf(CommentFormatException.class);
+            .isInstanceOf(CommentFormatException.class)
+            .hasMessage("F0002");
     }
 }

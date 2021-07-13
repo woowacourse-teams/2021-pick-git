@@ -102,6 +102,9 @@ class PostAcceptanceTest {
             comment.append("a");
         }
 
-        addCommentApi(url, comment.toString(), HttpStatus.BAD_REQUEST);
+        String response = addCommentApi(url, comment.toString(), HttpStatus.BAD_REQUEST)
+            .asString();
+
+        assertThat(response).isEqualTo("F0002");
     }
 }

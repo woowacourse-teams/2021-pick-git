@@ -187,7 +187,8 @@ class PostControllerTest {
             .willThrow(new CommentFormatException());
 
         addCommentApi(url, requestBody)
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string("F0002"));
 
         verify(postService, times(1)).addComment(any(CommentRequestDto.class));
     }
