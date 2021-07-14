@@ -23,8 +23,4 @@ public class Comments {
     public List<Comment> getComments() {
         return comments;
     }
-
-    public List<Comment> getComments() {
-        return comments;
-    }
 }
