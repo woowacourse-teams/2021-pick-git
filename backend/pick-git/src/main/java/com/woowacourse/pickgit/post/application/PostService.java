@@ -6,7 +6,7 @@ import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.TokenRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
-import com.woowacourse.pickgit.post.domain.PlatformExtractor;
+import com.woowacourse.pickgit.post.domain.PlatformRepositoryExtractor;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostContent;
 import com.woowacourse.pickgit.post.domain.PostRepository;
@@ -34,17 +34,17 @@ public class PostService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final PickGitStorage pickgitStorage;
-    private final PlatformExtractor platformExtractor;
+    private final PlatformRepositoryExtractor platformRepositoryExtractor;
 
     public PostService(
         UserRepository userRepository,
         PostRepository postRepository,
         PickGitStorage pickgitStorage,
-        PlatformExtractor platformExtractor) {
+        PlatformRepositoryExtractor platformRepositoryExtractor) {
         this.userRepository = userRepository;
         this.postRepository = postRepository;
         this.pickgitStorage = pickgitStorage;
-        this.platformExtractor = platformExtractor;
+        this.platformRepositoryExtractor = platformRepositoryExtractor;
     }
 
     public PostResponseDto write(PostRequestDto postRequestDto) {
@@ -113,8 +113,8 @@ public class PostService {
     }
 
     public RepositoriesResponseDto showRepositories(TokenRequestDto tokenRequestDto) {
-        List<RepositoryResponse> repositories = platformExtractor
-            .showRepositories(tokenRequestDto.getAccessToken());
+        List<RepositoryResponse> repositories =
+            platformRepositoryExtractor.extract(tokenRequestDto.getAccessToken());
 
         return new RepositoriesResponseDto(repositories);
     }

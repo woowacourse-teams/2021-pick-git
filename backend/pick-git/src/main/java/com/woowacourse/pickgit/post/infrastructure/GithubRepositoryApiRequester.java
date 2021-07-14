@@ -7,10 +7,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 @Component
-public class GithubApiRequester implements PlatformApiRequester {
+public class GithubRepositoryApiRequester implements PlatformRepositoryApiRequester {
 
     @Override
-    public String repositories(String token, String url) {
+    public String request(String token, String url) {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setBearerAuth(token);
 

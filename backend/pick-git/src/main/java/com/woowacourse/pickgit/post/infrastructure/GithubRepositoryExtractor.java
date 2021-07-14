@@ -3,28 +3,28 @@ package com.woowacourse.pickgit.post.infrastructure;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.woowacourse.pickgit.post.domain.PlatformExtractor;
+import com.woowacourse.pickgit.post.domain.PlatformRepositoryExtractor;
 import com.woowacourse.pickgit.post.infrastructure.dto.RepositoryResponse;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
 @Component
-public class GithubExtractor implements PlatformExtractor {
+public class GithubRepositoryExtractor implements PlatformRepositoryExtractor {
 
     private final ObjectMapper objectMapper;
-    private final PlatformApiRequester platformApiRequester;
+    private final PlatformRepositoryApiRequester platformRepositoryApiRequester;
 
-    public GithubExtractor(
+    public GithubRepositoryExtractor(
         ObjectMapper objectMapper,
-        PlatformApiRequester platformApiRequester) {
+        PlatformRepositoryApiRequester platformRepositoryApiRequester) {
         this.objectMapper = objectMapper;
-        this.platformApiRequester = platformApiRequester;
+        this.platformRepositoryApiRequester = platformRepositoryApiRequester;
     }
 
     @Override
-    public List<RepositoryResponse> showRepositories(String token) {
+    public List<RepositoryResponse> extract(String token) {
         String url = "https://api.github.com/user/repos";
-        String response = platformApiRequester.repositories(token, url);
+        String response = platformRepositoryApiRequester.request(token, url);
 
         return parseToRepositories(response);
     }

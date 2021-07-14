@@ -14,7 +14,7 @@ import com.woowacourse.pickgit.common.FileFactory;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.TokenRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
-import com.woowacourse.pickgit.post.domain.PlatformExtractor;
+import com.woowacourse.pickgit.post.domain.PlatformRepositoryExtractor;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostContent;
 import com.woowacourse.pickgit.post.domain.PostRepository;
@@ -58,7 +58,7 @@ class PostServiceTest {
     private PickGitStorage pickGitStorage;
 
     @Mock
-    private PlatformExtractor platformExtractor;
+    PlatformRepositoryExtractor platformRepositoryExtractor;
 
     private String image;
     private String description;
@@ -75,11 +75,14 @@ class PostServiceTest {
     private BasicProfile basicProfile;
     private GithubProfile githubProfile;
     private User user;
+
     private PostContent postContent;
     private Post post;
 
-    private Post post2;
+    private BasicProfile basicProfile2;
     private User user2;
+
+    private Post post2;
 
     @BeforeEach
     void setUp() {
@@ -98,14 +101,16 @@ class PostServiceTest {
         basicProfile = new BasicProfile(USERNAME, image, description);
         githubProfile = new GithubProfile(githubUrl, company, location, website, twitter);
         user = new User(basicProfile, githubProfile);
-        postContent = new PostContent(content);
 
+        postContent = new PostContent(content);
         post = new Post(1L, images, postContent, githubRepoUrl,
             null, null, null, user);
 
-        post2 = new Post(null, null, null, null, null, new Comments(), new ArrayList<>(), null);
-        user2 =
-            new User(new BasicProfile("kevin", "a.jpg", "a"), null);
+        basicProfile2 = new BasicProfile("kevin", "a.jpg", "a");
+        user2 = new User(basicProfile2, null);
+
+        post2 = new Post(null, null, null, null,
+            null, new Comments(), new ArrayList<>(), null);
     }
 
     private List<Image> getImages() {
@@ -201,14 +206,13 @@ class PostServiceTest {
         );
 
         // when
-        given(
-            platformExtractor.showRepositories(tokenRequestDto.getAccessToken()))
-            .willReturn(repositories)
+        given(platformRepositoryExtractor.extract(tokenRequestDto.getAccessToken()))
+            .willReturn(repositories);
 
         // then
-        assertThat(platformExtractor.showRepositories(tokenRequestDto.getAccessToken()))
+        assertThat(platformRepositoryExtractor.extract(tokenRequestDto.getAccessToken()))
             .containsAll(repositories);
-        verify(platformExtractor, times(1))
-            .showRepositories(tokenRequestDto.getAccessToken());
+        verify(platformRepositoryExtractor, times(1))
+            .extract(tokenRequestDto.getAccessToken());
     }
 }
