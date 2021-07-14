@@ -1,5 +1,7 @@
 package com.woowacourse.pickgit.post.domain;
 
+import static java.util.stream.Collectors.toList;
+
 import com.woowacourse.pickgit.post.domain.comment.Comments;
 import com.woowacourse.pickgit.post.domain.content.Images;
 import com.woowacourse.pickgit.post.domain.like.Likes;
@@ -92,7 +94,7 @@ public class Post {
     public List<Tag> getTags() {
         return postTags.stream()
             .map(PostTag::getTag)
-            .collect(Collectors.toList());
+            .collect(toList());
     }
 
     @Override

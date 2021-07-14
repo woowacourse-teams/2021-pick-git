@@ -12,7 +12,6 @@ import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javafx.geometry.Pos;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -95,9 +94,7 @@ class PostRepositoryTest {
         testEntityManager.flush();
         testEntityManager.clear();
 
-
-        Post findPost = postRepository.findAll()
-            .get(0);
+        Post findPost = postRepository.findAll().get(0);
 
         assertThat(findPost.getTags()).hasSize(3);
         assertThat(tagRepository.findAll()).hasSize(3);

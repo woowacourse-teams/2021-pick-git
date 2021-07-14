@@ -48,7 +48,8 @@ public class PostService {
             .findByBasicProfile_Name(postRequestDto.getUsername())
             .orElseThrow(() -> new IllegalArgumentException("해당하는 사용자가 없습니다."));
 
-        Post post = postRepository.save(new Post(postContent, getImages(postRequestDto),
+        Post post = postRepository.save(
+            new Post(postContent, getImages(postRequestDto),
             postRequestDto.getGithubRepoUrl(), user));
 
         return new PostResponseDto(post.getId(), post.getImageUrls());
