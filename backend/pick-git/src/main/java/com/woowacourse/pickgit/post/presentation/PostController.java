@@ -6,9 +6,9 @@ import com.woowacourse.pickgit.post.application.CommentRequestDto;
 import com.woowacourse.pickgit.post.application.CommentResponseDto;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
-import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
-import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.application.dto.request.TokenRequestDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
 import com.woowacourse.pickgit.post.presentation.dto.PostRequest;
 import java.net.URI;
 import javax.servlet.http.HttpServletRequest;
@@ -82,9 +82,11 @@ public class PostController {
     }
 
     @GetMapping("/github/repositories")
-    public ResponseEntity<RepositoryResponseDto> showRepositories(HttpServletRequest httpServletRequest) {
+    public ResponseEntity<RepositoriesResponseDto> showRepositories(
+        HttpServletRequest httpServletRequest) {
         String token = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION).split(" ")[1];
-        RepositoryResponseDto repositories = postService.showRepositories(new TokenRequestDto(token));
+        RepositoriesResponseDto repositories = postService
+            .showRepositories(new TokenRequestDto(token));
 
         return ResponseEntity.ok(repositories);
     }
