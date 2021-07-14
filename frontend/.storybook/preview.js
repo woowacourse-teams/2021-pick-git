@@ -38,4 +38,6 @@ addDecorator(Story => (
       </ThemeProvider>
     </MemoryRouter>
   )
-)
+);
+
+localStorage.setItem("accessToken", "test");
