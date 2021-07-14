@@ -20,10 +20,10 @@ import com.woowacourse.pickgit.config.StorageConfiguration;
 import com.woowacourse.pickgit.post.application.CommentRequestDto;
 import com.woowacourse.pickgit.post.application.CommentResponseDto;
 import com.woowacourse.pickgit.post.application.PostService;
-import com.woowacourse.pickgit.post.application.dto.PostRequestDto;
-import com.woowacourse.pickgit.post.application.dto.PostResponseDto;
-import com.woowacourse.pickgit.post.application.dto.RepositoryDto;
-import com.woowacourse.pickgit.post.application.dto.TokenDto;
+import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.TokenRequestDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.domain.comment.CommentFormatException;
 import com.woowacourse.pickgit.post.infrastructure.dto.RepositoryResponse;
 import java.util.List;
@@ -142,9 +142,9 @@ class PostControllerTest {
     void addComment_ValidContent_Success() throws Exception {
         LoginUser loginUser = new LoginUser("kevin", "token");
         given(oAuthService.validateToken(anyString()))
-                .willReturn(true);
-            given(oAuthService.findRequestUserByToken(anyString()))
-                .willReturn(loginUser);
+            .willReturn(true);
+        given(oAuthService.findRequestUserByToken(anyString()))
+            .willReturn(loginUser);
 
         String url = "/api/posts/1/comments";
         CommentResponseDto commentResponseDto =
@@ -193,14 +193,14 @@ class PostControllerTest {
     @Test
     void showRepositories_LoginUser_Success() throws Exception {
         // given
-        TokenDto tokenDto = new TokenDto("pickgit");
-        RepositoryDto repositories = new RepositoryDto(List.of(
+        TokenRequestDto tokenRequestDto = new TokenRequestDto("pickgit");
+        RepositoryResponseDto repositories = new RepositoryResponseDto(List.of(
             new RepositoryResponse("pick"),
             new RepositoryResponse("git")
         ));
 
         // when
-        given(postService.showRepositories(tokenDto))
+        given(postService.showRepositories(tokenRequestDto))
             .willReturn(repositories);
 
         // then

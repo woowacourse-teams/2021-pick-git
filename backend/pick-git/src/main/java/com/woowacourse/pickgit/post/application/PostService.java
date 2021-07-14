@@ -2,10 +2,10 @@ package com.woowacourse.pickgit.post.application;
 
 import static java.util.stream.Collectors.toList;
 
-import com.woowacourse.pickgit.post.application.dto.PostRequestDto;
-import com.woowacourse.pickgit.post.application.dto.PostResponseDto;
-import com.woowacourse.pickgit.post.application.dto.RepositoryDto;
-import com.woowacourse.pickgit.post.application.dto.TokenDto;
+import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.TokenRequestDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.domain.PlatformExtractor;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostContent;
@@ -112,10 +112,10 @@ public class PostService {
         return new CommentResponseDto(user.getName(), comment.getContent());
     }
 
-    public RepositoryDto showRepositories(TokenDto tokenDto) {
+    public RepositoryResponseDto showRepositories(TokenRequestDto tokenRequestDto) {
         List<RepositoryResponse> repositories = platformExtractor
-            .showRepositories(tokenDto.getAccessToken());
+            .showRepositories(tokenRequestDto.getAccessToken());
 
-        return new RepositoryDto(repositories);
+        return new RepositoryResponseDto(repositories);
     }
 }

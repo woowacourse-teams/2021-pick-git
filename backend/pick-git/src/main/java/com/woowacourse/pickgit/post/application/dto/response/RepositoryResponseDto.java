@@ -1,16 +1,16 @@
-package com.woowacourse.pickgit.post.application.dto;
+package com.woowacourse.pickgit.post.application.dto.response;
 
 import com.woowacourse.pickgit.post.infrastructure.dto.RepositoryResponse;
 import java.util.List;
 
-public class RepositoryDto {
+public class RepositoryResponseDto {
 
     private List<RepositoryResponse> repositories;
 
-    private RepositoryDto() {
+    private RepositoryResponseDto() {
     }
 
-    public RepositoryDto(List<RepositoryResponse> repositories) {
+    public RepositoryResponseDto(List<RepositoryResponse> repositories) {
         this.repositories = repositories;
     }
 

@@ -11,9 +11,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.woowacourse.pickgit.common.FileFactory;
-import com.woowacourse.pickgit.post.application.dto.PostRequestDto;
-import com.woowacourse.pickgit.post.application.dto.PostResponseDto;
-import com.woowacourse.pickgit.post.application.dto.TokenDto;
+import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.TokenRequestDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.domain.PlatformExtractor;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostContent;
@@ -194,20 +194,21 @@ class PostServiceTest {
     @Test
     void showRepositories_LoginUser_Success() {
         // given
-        TokenDto tokenDto = new TokenDto("pickgit");
+        TokenRequestDto tokenRequestDto = new TokenRequestDto("pickgit");
         List<RepositoryResponse> repositories = List.of(
             new RepositoryResponse("pick"),
             new RepositoryResponse("git")
         );
 
         // when
-        given(platformExtractor.showRepositories(tokenDto.getAccessToken()))
-            .willReturn(repositories);
+        given(
+            platformExtractor.showRepositories(tokenRequestDto.getAccessToken()))
+            .willReturn(repositories)
 
         // then
-        assertThat(platformExtractor.showRepositories(tokenDto.getAccessToken()))
+        assertThat(platformExtractor.showRepositories(tokenRequestDto.getAccessToken()))
             .containsAll(repositories);
         verify(platformExtractor, times(1))
-            .showRepositories(tokenDto.getAccessToken());
+            .showRepositories(tokenRequestDto.getAccessToken());
     }
 }
