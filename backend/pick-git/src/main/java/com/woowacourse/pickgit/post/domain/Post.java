@@ -78,10 +78,11 @@ public class Post {
     }
 
     public Post(PostContent content, Images images, String githubRepoUrl, User user) {
-         this.content = content;
-        this.images = images;;
+        this.content = content;
+        this.images = images;
         this.githubRepoUrl = githubRepoUrl;
         this.user = user;
+        images.setMapping(this);
     }
 
     public void addComment(Comment comment) {

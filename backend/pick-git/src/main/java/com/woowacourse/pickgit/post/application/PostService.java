@@ -16,6 +16,10 @@ import com.woowacourse.pickgit.post.domain.content.Image;
 import com.woowacourse.pickgit.post.domain.content.Images;
 import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.presentation.PickGitStorage;
+import com.woowacourse.pickgit.post.presentation.dto.HomeFeedRequest;
+import com.woowacourse.pickgit.tag.application.TagService;
+import com.woowacourse.pickgit.tag.application.TagsDto;
+import com.woowacourse.pickgit.tag.domain.Tag;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import java.io.File;
@@ -24,12 +28,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Function;
+import javax.persistence.EntityManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import com.woowacourse.pickgit.post.presentation.dto.HomeFeedRequest;
-import javax.persistence.EntityManager;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Service
 @Transactional
@@ -43,8 +46,10 @@ public class PostService {
     @Autowired
     private EntityManager entityManager;
 
-    public PostService(
-        UserRepository userRepository,
+    @Autowired
+    private TagService tagService;
+
+    public PostService(UserRepository userRepository,
         PostRepository postRepository,
         PickGitStorage pickgitStorage,
         PlatformRepositoryExtractor platformRepositoryExtractor) 
@@ -62,11 +67,14 @@ public class PostService {
             .findByBasicProfile_Name(postRequestDto.getUsername())
             .orElseThrow(() -> new IllegalArgumentException("해당하는 사용자가 없습니다."));
 
-        Post post = postRepository.save(
-            new Post(postContent, getImages(postRequestDto),
-                postRequestDto.getGithubRepoUrl(), user));
+        Post post =
+            new Post(postContent, getImages(postRequestDto), postRequestDto.getGithubRepoUrl(), user);
 
-        return new PostResponseDto(post.getId(), post.getImageUrls());
+        List<Tag> tags = tagService.findOrCreateTags(new TagsDto(postRequestDto.getTags()));
+        post.addTags(tags);
+
+        Post findPost = postRepository.save(post);
+        return new PostResponseDto(findPost.getId(), findPost.getImageUrls());
     }
 
     private Images getImages(PostRequestDto postRequestDto) {
@@ -132,7 +140,7 @@ public class PostService {
         int page = Math.toIntExact(homeFeedRequest.getPage());
         int limit = Math.toIntExact(homeFeedRequest.getLimit());
         List<Post> result = entityManager
-            .createQuery("select p from Post p order by p.likes.likes.size", Post.class)
+            .createQuery("select p from Post p order by p.id", Post.class)
             .setFirstResult(page * limit)
             .setMaxResults(limit)
             .getResultList();

@@ -1,6 +1,5 @@
 package com.woowacourse.pickgit.post.application;
 
-import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -12,6 +11,9 @@ import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
 import com.woowacourse.pickgit.post.domain.PlatformRepositoryExtractor;
+import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
+import com.woowacourse.pickgit.config.StorageConfiguration;
+import com.woowacourse.pickgit.post.application.dto.PostDto;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostRepository;
 import com.woowacourse.pickgit.post.domain.comment.CommentFormatException;
@@ -19,26 +21,37 @@ import com.woowacourse.pickgit.post.domain.comment.Comments;
 import com.woowacourse.pickgit.post.infrastructure.GithubRepositoryExtractor;
 import com.woowacourse.pickgit.post.infrastructure.MockRepositoryApiRequester;
 import com.woowacourse.pickgit.post.presentation.PickGitStorage;
+import com.woowacourse.pickgit.post.presentation.dto.HomeFeedRequest;
+import com.woowacourse.pickgit.tag.TestTagConfiguration;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
 import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.test.context.ActiveProfiles;
 
-@DataJpaTest
+@Import({TestTagConfiguration.class, StorageConfiguration.class})
+@SpringBootTest(webEnvironment = WebEnvironment.NONE)
+@ActiveProfiles("test")
+@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 class PostServiceIntegrationTest {
 
     private static final String USERNAME = "jipark3";
     private static final String ACCESS_TOKEN = "oauth.access.token";
 
+    @Autowired
     private PostService postService;
 
     @Autowired
@@ -46,14 +59,6 @@ class PostServiceIntegrationTest {
 
     @Autowired
     private UserRepository userRepository;
-
-    private final PickGitStorage pickGitStorage = (files, userName) -> files.stream()
-        .map(File::getName)
-        .collect(toList());
-
-    private PlatformRepositoryExtractor platformRepositoryExtractor;
-
-    private ObjectMapper objectMapper = new ObjectMapper();
 
     private String image;
     private String description;
@@ -72,12 +77,14 @@ class PostServiceIntegrationTest {
     private User user2;
     private Post post;
 
+    private User kevin;
+
     @BeforeEach
     void setUp() {
-        platformRepositoryExtractor =
-            new GithubRepositoryExtractor(objectMapper, new MockRepositoryApiRequester());
-        postService = new PostService(
-            userRepository, postRepository, pickGitStorage, platformRepositoryExtractor);
+//        platformRepositoryExtractor =
+//            new GithubRepositoryExtractor(objectMapper, new MockRepositoryApiRequester());
+//        postService = new PostService(
+//            userRepository, postRepository, pickGitStorage, platformRepositoryExtractor);
 
         image = "image1";
         description = "hello";
@@ -101,11 +108,18 @@ class PostServiceIntegrationTest {
         userRepository.save(user1);
         userRepository.save(user2);
         postRepository.save(post);
+        kevin =
+            new User(new BasicProfile("kevin", "a.jpg", "a"),
+                new GithubProfile("github.com", "a", "a", "a", "a"));
+        userRepository.save(kevin);
     }
 
     @DisplayName("게시물에 댓글을 정상 등록한다.")
     @Test
     void addComment_ValidContent_Success() {
+        post = new Post(null, null, null, null, null, new Comments(), new ArrayList<>(), null);
+        postRepository.save(post);
+
         CommentRequestDto commentRequestDto =
             new CommentRequestDto("kevin", "test comment", post.getId());
 
@@ -118,6 +132,9 @@ class PostServiceIntegrationTest {
     @DisplayName("게시물에 빈 댓글은 등록할 수 없다.")
     @Test
     void addComment_InvalidContent_ExceptionThrown() {
+        post = new Post(null, null, null, null, null, new Comments(), new ArrayList<>(), null);
+        postRepository.save(post);
+
         CommentRequestDto commentRequestDto =
             new CommentRequestDto("kevin", "", post.getId());
 
@@ -183,5 +200,39 @@ class PostServiceIntegrationTest {
             postService.showRepositories(requestDto);
         }).isInstanceOf(HttpClientErrorException.class)
             .hasMessageContaining("404");
+    }
+
+    @DisplayName("저장된 게시물 중 3, 4번째 글을 가져온다.")
+    @Test
+    void find() {
+        createMockPosts();
+
+        HomeFeedRequest homeFeedRequest =
+            new HomeFeedRequest(new LoginUser("kevin", "a"), 1L, 2L);
+        List<PostDto> postDtos = postService.readHomeFeed(homeFeedRequest);
+
+        List<String> postNames = postDtos.stream()
+            .map(PostDto::getAuthorName)
+            .collect(Collectors.toList());
+
+        List<String> repoNames = postDtos.stream()
+            .map(PostDto::getGithubRepoUrl)
+            .collect(Collectors.toList());
+
+        assertThat(postDtos).hasSize(2);
+        assertThat(postNames).containsExactly("dani", "coda");
+        assertThat(repoNames).containsExactly("java-racingcar", "junit-test");
+    }
+
+    private void createMockPosts() {
+        List<PostRequestDto> postRequestDtos = PostFactory.mockPostRequestDtos();
+        List<User> users = PostFactory.mockUsers();
+        for (int i = 0; i < postRequestDtos.size(); i++) {
+            userRepository.save(users.get(i));
+            PostResponseDto response = postService.write(postRequestDtos.get(i));
+            CommentRequestDto commentRequestDto =
+                new CommentRequestDto(users.get(i).getName(), "test comment" + i, response.getId());
+            postService.addComment(commentRequestDto);
+        }
     }
 }
