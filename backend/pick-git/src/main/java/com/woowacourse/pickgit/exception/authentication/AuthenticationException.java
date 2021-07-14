@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 
 public abstract class AuthenticationException extends ApplicationException {
 
-    public AuthenticationException(String errorCode, HttpStatus httpStatus) {
-        super(errorCode, httpStatus);
+    public AuthenticationException(String errorCode, HttpStatus httpStatus, String message) {
+        super(errorCode, httpStatus, message);
     }
 }

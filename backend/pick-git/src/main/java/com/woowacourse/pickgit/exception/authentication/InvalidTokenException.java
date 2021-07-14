@@ -7,6 +7,6 @@ public class InvalidTokenException extends AuthenticationException {
     private static final String errorCode = "A0001";
 
     public InvalidTokenException() {
-        super(errorCode, HttpStatus.UNAUTHORIZED);
+        super(errorCode, HttpStatus.UNAUTHORIZED, "토큰 인증 에러");
     }
 }

@@ -2,13 +2,11 @@ package com.woowacourse.pickgit.exception;
 
 import static java.util.Objects.requireNonNull;
 
-import com.woowacourse.pickgit.exception.authentication.AuthenticationException;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice

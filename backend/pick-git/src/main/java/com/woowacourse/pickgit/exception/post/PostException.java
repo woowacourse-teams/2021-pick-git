@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 
 public abstract class PostException extends ApplicationException {
 
-    public PostException(String errorCode, HttpStatus httpStatus) {
-        super(errorCode, httpStatus);
+    public PostException(String errorCode, HttpStatus httpStatus, String message) {
+        super(errorCode, httpStatus, message);
     }
 }
