@@ -32,6 +32,8 @@ public class Post {
     @Embedded
     private PostContent content;
 
+    private String githubRepoUrl;
+
     @Embedded
     private Likes likes;
 
@@ -48,21 +50,23 @@ public class Post {
     protected Post() {
     }
 
-    public Post(Long id, Images images, PostContent content,
+    public Post(Long id, Images images, PostContent content, String githubRepoUrl,
         Likes likes, Comments comments,
         List<PostTag> postTags, User user) {
         this.id = id;
         this.images = images;
         this.content = content;
+        this.githubRepoUrl = githubRepoUrl;
         this.likes = likes;
         this.comments = comments;
         this.postTags = postTags;
         this.user = user;
     }
 
-    public Post(PostContent content, Images images, User user) {
-        this.content = content;
-        this.images = images;
+    public Post(PostContent content, Images images, String githubRepoUrl, User user) {
+         this.content = content;
+        this.images = images;;
+        this.githubRepoUrl = githubRepoUrl;
         this.user = user;
     }
 
@@ -70,25 +74,8 @@ public class Post {
         return id;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Post post = (Post) o;
-        return Objects.equals(id, post.id);
-    }
-
     public List<String> getImageUrls() {
         return images.getUrls();
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
     }
 
     public void addTags(List<Tag> tags) {
@@ -106,5 +93,22 @@ public class Post {
         return postTags.stream()
             .map(PostTag::getTag)
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Post post = (Post) o;
+        return Objects.equals(id, post.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

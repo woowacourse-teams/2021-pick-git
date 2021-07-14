@@ -86,7 +86,9 @@ class PostServiceTest {
         githubProfile = new GithubProfile(githubUrl, company, location, website, twitter);
         user = new User(basicProfile, githubProfile);
         postContent = new PostContent(content);
-        post = new Post(1L, images, postContent, null, null, null, user);
+
+        post = new Post(1L, images, postContent, githubRepoUrl,
+            null, null, null, user);
     }
 
     private List<Image> getImages() {
@@ -116,7 +118,7 @@ class PostServiceTest {
         verify(userRepository, times(1))
             .findByBasicProfile_Name(requestDto.getUsername());
         verify(postRepository, times(1))
-            .save(new Post(postContent, any(), user));
+            .save(new Post(postContent, any(), githubRepoUrl, user));
         verify(pickGitStorage, times(1))
             .store(anyList(), anyString());
     }
