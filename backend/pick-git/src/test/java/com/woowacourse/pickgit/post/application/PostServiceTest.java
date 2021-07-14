@@ -2,10 +2,10 @@ package com.woowacourse.pickgit.post.application;
 
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -13,11 +13,16 @@ import static org.mockito.Mockito.verify;
 import com.woowacourse.pickgit.common.FileFactory;
 import com.woowacourse.pickgit.post.application.dto.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.PostResponseDto;
+import com.woowacourse.pickgit.post.application.dto.TokenDto;
+import com.woowacourse.pickgit.post.domain.PlatformExtractor;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostContent;
 import com.woowacourse.pickgit.post.domain.PostRepository;
+import com.woowacourse.pickgit.post.domain.comment.CommentFormatException;
+import com.woowacourse.pickgit.post.domain.comment.Comments;
 import com.woowacourse.pickgit.post.domain.content.Image;
 import com.woowacourse.pickgit.post.domain.content.Images;
+import com.woowacourse.pickgit.post.infrastructure.dto.RepositoryResponse;
 import com.woowacourse.pickgit.post.presentation.PickGitStorage;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
@@ -25,8 +30,6 @@ import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
 import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
 import java.util.ArrayList;
 import java.util.List;
-import com.woowacourse.pickgit.post.domain.comment.CommentFormatException;
-import com.woowacourse.pickgit.post.domain.comment.Comments;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -53,6 +56,9 @@ class PostServiceTest {
 
     @Mock
     private PickGitStorage pickGitStorage;
+
+    @Mock
+    private PlatformExtractor platformExtractor;
 
     private String image;
     private String description;
@@ -182,5 +188,26 @@ class PostServiceTest {
             .hasMessage("F0002");
         verify(postRepository, times(1)).findById(1L);
         verify(userRepository, times(1)).findByBasicProfile_Name("kevin");
+    }
+
+    @DisplayName("Repository 목록을 가져온다.")
+    @Test
+    void getRepositories_AuthenticatedUser_Success() {
+        // given
+        TokenDto tokenDto = new TokenDto("pickgit");
+        List<RepositoryResponse> repositories = List.of(
+            new RepositoryResponse("pick"),
+            new RepositoryResponse("git")
+        );
+
+        // when
+        given(platformExtractor.getRepositories(tokenDto.getAccessToken()))
+            .willReturn(repositories);
+
+        // then
+        assertThat(platformExtractor.getRepositories(tokenDto.getAccessToken()))
+            .containsAll(repositories);
+        verify(platformExtractor, times(1))
+            .getRepositories(tokenDto.getAccessToken());
     }
 }

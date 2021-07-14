@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -21,9 +22,11 @@ import com.woowacourse.pickgit.post.application.CommentResponseDto;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.PostResponseDto;
+import com.woowacourse.pickgit.post.application.dto.RepositoryDto;
+import com.woowacourse.pickgit.post.application.dto.TokenDto;
 import com.woowacourse.pickgit.post.domain.comment.CommentFormatException;
+import com.woowacourse.pickgit.post.infrastructure.dto.RepositoryResponse;
 import java.util.List;
-import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -183,5 +187,25 @@ class PostControllerTest {
             .andExpect(content().string("F0002"));
 
         verify(postService, times(1)).addComment(any(CommentRequestDto.class));
+    }
+
+    @DisplayName("Repository 목록을 가져온다.")
+    @Test
+    void getRepositories_AuthenticatedUser_Success() throws Exception {
+        // given
+        TokenDto tokenDto = new TokenDto("pickgit");
+        RepositoryDto repositories = new RepositoryDto(List.of(
+            new RepositoryResponse("pick"),
+            new RepositoryResponse("git")
+        ));
+
+        // when
+        given(postService.getRepositories(tokenDto))
+            .willReturn(repositories);
+
+        // then
+        mockMvc.perform(get("/api/github/repositories")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer pickgit"))
+            .andExpect(status().isOk());
     }
 }
