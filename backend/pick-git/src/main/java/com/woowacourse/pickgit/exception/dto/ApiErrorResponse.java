@@ -1,13 +1,13 @@
 package com.woowacourse.pickgit.exception.dto;
 
-public class PickGitExceptionResponse {
+public class ApiErrorResponse {
 
     private String errorCode;
 
-    private PickGitExceptionResponse() {
+    private ApiErrorResponse() {
     }
 
-    public PickGitExceptionResponse(String errorCode) {
+    public ApiErrorResponse(String errorCode) {
         this.errorCode = errorCode;
     }
 
