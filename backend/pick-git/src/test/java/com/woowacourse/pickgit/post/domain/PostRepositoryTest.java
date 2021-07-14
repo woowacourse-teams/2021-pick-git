@@ -2,6 +2,8 @@ package com.woowacourse.pickgit.post.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.woowacourse.pickgit.post.domain.comment.Comment;
+import com.woowacourse.pickgit.post.domain.comment.Comments;
 import com.woowacourse.pickgit.post.domain.content.Image;
 import com.woowacourse.pickgit.post.domain.content.Images;
 import com.woowacourse.pickgit.tag.domain.Tag;
@@ -84,7 +86,8 @@ class PostRepositoryTest {
     @Test
     void save_WhenSavingPost_TagSavedTogether() {
         Post post =
-            new Post(null, null, new PostContent(), githubRepoUrl, null, null, new ArrayList<>(), null);
+            new Post(null, null, new PostContent(), githubRepoUrl, null, null, new ArrayList<>(),
+                null);
         List<Tag> tags = Arrays.asList(new Tag("tag1"), new Tag("tag2"));
         post.addTags(tags);
         postRepository.save(post);
@@ -98,5 +101,26 @@ class PostRepositoryTest {
 
         assertThat(findPost.getTags()).hasSize(3);
         assertThat(tagRepository.findAll()).hasSize(3);
+    }
+
+    @DisplayName("Post에 Comment를 추가하면 Comment가 자동 영속화된다.")
+    @Test
+    void addComment_WhenSavingPost_CommentSavedTogether() {
+        Post post =
+            new Post(null, null, new PostContent(), githubRepoUrl, null, new Comments(), new ArrayList<>(),
+                null);
+        Comment comment = new Comment("test comment")
+            .toPost(post);
+        post.addComment(comment);
+
+        postRepository.save(post);
+        testEntityManager.flush();
+        testEntityManager.clear();
+
+        Post findPost = postRepository.findById(post.getId())
+            .orElseThrow(IllegalArgumentException::new);
+        List<Comment> comments = findPost.getComments();
+
+        assertThat(comments).hasSize(1);
     }
 }

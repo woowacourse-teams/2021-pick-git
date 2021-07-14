@@ -30,4 +30,26 @@ public class Comment {
 
     protected Comment() {
     }
+
+    public Comment(String content) {
+        this.content = new CommentContent(content);
+    }
+
+    public Comment writeBy(User user) {
+        this.user = user;
+        return this;
+    }
+
+    public Comment toPost(Post post) {
+        this.post = post;
+        return this;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public String getContent() {
+        return content.getContent();
+    }
 }

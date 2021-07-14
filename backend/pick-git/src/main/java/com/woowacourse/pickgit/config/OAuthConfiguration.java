@@ -47,6 +47,7 @@ public class OAuthConfiguration implements WebMvcConfigurer {
             .addPathPatterns("/api/profiles/me")
             .addPathPatterns("/api/posts/me")
             .addPathPatterns("/api/posts")
+            .addPathPatterns("/api/posts/*/comments")
             .addPathPatterns("/api/github/*/repositories/*/tags/languages")
             .excludePathPatterns("/api/authorization/github")
             .excludePathPatterns("/api/afterlogin");

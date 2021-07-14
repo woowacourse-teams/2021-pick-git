@@ -1,7 +1,9 @@
 package com.woowacourse.pickgit.user.domain;
 
+import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.Posts;
 import com.woowacourse.pickgit.user.domain.follow.Follow;
+import com.woowacourse.pickgit.post.domain.comment.Comment;
 import com.woowacourse.pickgit.user.domain.follow.Followers;
 import com.woowacourse.pickgit.user.domain.follow.Followings;
 import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
@@ -135,5 +137,11 @@ public class User {
 
     public String getTwitter() {
         return githubProfile.getTwitter();
+    }
+
+    public void addComment(Post post, Comment comment) {
+        comment.toPost(post)
+            .writeBy(this);
+        post.addComment(comment);
     }
 }
