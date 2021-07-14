@@ -6,6 +6,7 @@ import static org.mockito.BDDMockito.given;
 
 import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
+import com.woowacourse.pickgit.config.StorageConfiguration;
 import com.woowacourse.pickgit.post.application.CommentResponseDto;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostRepository;
@@ -17,6 +18,7 @@ import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,11 +27,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
+@Import({StorageConfiguration.class})
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @ActiveProfiles("test")
@@ -59,7 +63,7 @@ class PostAcceptanceTest {
         given(oAuthService.findRequestUserByToken(anyString()))
             .willReturn(loginUser);
 
-        post = new Post(null, null, null, new Comments(), null);
+        post = new Post(null, null, null, null, new Comments(), new ArrayList<>(), null);
         user =
             new User(new BasicProfile("kevin", "a.jpg", "a"),
                 new GithubProfile("github.com", "a", "a", "a", "a"));
