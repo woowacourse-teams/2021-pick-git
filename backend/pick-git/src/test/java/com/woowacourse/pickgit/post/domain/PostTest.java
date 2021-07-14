@@ -16,7 +16,7 @@ class PostTest {
     @Test
     void addTags_ValidTags_RegistrationSuccess() {
         Post post =
-            new Post(null, null, new PostContent(), null, null, new ArrayList<>(), null);
+            new Post(null, null, new PostContent(), null, null, null, new ArrayList<>(), null);
         List<Tag> tags =
             Arrays.asList(new Tag("tag1"), new Tag("tag2"), new Tag("tag3"));
 
@@ -29,7 +29,7 @@ class PostTest {
     @Test
     void addTags_DuplicatedTagName_ExceptionThrown() {
         Post post =
-            new Post(null, null, new PostContent(), null, null, new ArrayList<>(), null);
+            new Post(null, null, new PostContent(), null, null, null, new ArrayList<>(), null);
         List<Tag> tags =
             Arrays.asList(new Tag("tag1"), new Tag("tag2"), new Tag("tag3"));
         post.addTags(tags);

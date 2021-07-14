@@ -12,7 +12,11 @@ spring:
     generate-ddl: true
     hibernate:
       ddl-auto: create-drop
-github:
-  tester:
-    user-name: jipark3
-    repository-name-for-tag-test: doms-react
+logging:
+  level:
+    org:
+      hibernate:
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
