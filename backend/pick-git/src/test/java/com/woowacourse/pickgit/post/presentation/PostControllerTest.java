@@ -21,7 +21,7 @@ import com.woowacourse.pickgit.post.application.CommentRequestDto;
 import com.woowacourse.pickgit.post.application.CommentResponseDto;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
-import com.woowacourse.pickgit.post.application.dto.request.TokenRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
 import com.woowacourse.pickgit.post.domain.comment.CommentFormatException;
@@ -52,8 +52,9 @@ import org.springframework.web.util.NestedServletException;
 @ActiveProfiles("test")
 class PostControllerTest {
 
-    private static final String USERNAME = "dani";
+    private static final String USERNAME = "jipark3";
     private static final String ACCESS_TOKEN = "pickgit";
+    private static final String API_ACCESS_TOKEN = "oauth-access-token";
 
     @Autowired
     private MockMvc mockMvc;
@@ -71,7 +72,7 @@ class PostControllerTest {
     private List<MultipartFile> images;
     private String githubRepoUrl;
     private String[] tags;
-    private String content;
+    private String postContent;
 
     @BeforeEach
     void setUp() {
@@ -82,7 +83,7 @@ class PostControllerTest {
         );
         githubRepoUrl = "https://github.com/woowacourse-teams/2021-pick-git/";
         tags = new String[]{"java", "spring"};
-        content = "pickgit";
+        postContent = "pickgit";
     }
 
 
@@ -90,7 +91,6 @@ class PostControllerTest {
     @Test
     void write_LoginUser_Success() throws Exception {
         // given
-
         given(oAuthService.validateToken(any()))
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(any()))
@@ -100,7 +100,7 @@ class PostControllerTest {
 
         MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
         multiValueMap.add("githubRepoUrl", githubRepoUrl);
-        multiValueMap.add("content", content);
+        multiValueMap.add("content", postContent);
 
         // then
         mockMvc.perform(multipart("/api/posts")
@@ -123,7 +123,7 @@ class PostControllerTest {
 
         MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
         multiValueMap.add("githubRepoUrl", githubRepoUrl);
-        multiValueMap.add("content", content);
+        multiValueMap.add("content", postContent);
 
         // then
         assertThatCode(() ->
@@ -189,22 +189,30 @@ class PostControllerTest {
         verify(postService, times(1)).addComment(any(CommentRequestDto.class));
     }
 
-    @DisplayName("Repository 목록을 가져온다.")
+    @DisplayName("사용자는 Repository 목록을 가져올 수 있다.")
     @Test
     void showRepositories_LoginUser_Success() throws Exception {
         // given
-        TokenRequestDto tokenRequestDto = new TokenRequestDto(ACCESS_TOKEN);
-        RepositoriesResponseDto repositories = new RepositoriesResponseDto(List.of(
+        given(oAuthService.validateToken(any()))
+            .willReturn(true);
+        given(oAuthService.findRequestUserByToken(any()))
+            .willReturn(user);
+
+        RepositoryRequestDto requestDto =
+            new RepositoryRequestDto(API_ACCESS_TOKEN, USERNAME);
+        RepositoriesResponseDto responseDto = new RepositoriesResponseDto(List.of(
             new RepositoryResponseDto("pick"),
             new RepositoryResponseDto("git")
         ));
+        String repositories = objectMapper.writeValueAsString(responseDto.getRepositories());
 
-        given(postService.showRepositories(tokenRequestDto))
-            .willReturn(repositories);
+        given(postService.showRepositories(any(RepositoryRequestDto.class)))
+            .willReturn(responseDto);
 
         // then
-        mockMvc.perform(get("/api/github/repositories")
-            .header(HttpHeaders.AUTHORIZATION, "Bearer " + ACCESS_TOKEN))
-            .andExpect(status().isOk());
+        mockMvc.perform(get("/api/github/" + USERNAME + "/repositories")
+            .header(HttpHeaders.AUTHORIZATION, API_ACCESS_TOKEN))
+            .andExpect(status().isOk())
+            .andExpect(content().string(repositories));
     }
 }
