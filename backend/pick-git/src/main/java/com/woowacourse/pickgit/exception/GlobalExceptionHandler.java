@@ -19,12 +19,14 @@ public class GlobalExceptionHandler {
         ApiErrorResponse exceptionResponse =
             new ApiErrorResponse(requireNonNull(e.getFieldError()).getDefaultMessage());
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(exceptionResponse);
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST.value())
+            .body(exceptionResponse);
     }
 
-    @ExceptionHandler(AuthenticationException.class)
+    @ExceptionHandler(ApplicationException.class)
     public ResponseEntity<ApiErrorResponse> authenticationException(
-        AuthenticationException e) {
+        ApplicationException e) {
         return ResponseEntity
             .status(e.getHttpStatus().value())
             .body(new ApiErrorResponse(e.getErrorCode()));
