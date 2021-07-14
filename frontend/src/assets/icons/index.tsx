@@ -14,3 +14,8 @@ export { ReactComponent as EditIcon } from "./edit.svg";
 export { ReactComponent as GithubIcon } from "./github.svg";
 export { ReactComponent as GithubLargeIcon } from "./github-large.svg";
 export { ReactComponent as SendIcon } from "./send.svg";
+export { ReactComponent as CompanyIcon } from "./briefcase-solid.svg";
+export { ReactComponent as GithubDarkIcon } from "./github-brands.svg";
+export { ReactComponent as LocationIcon } from "./map-marker-alt-solid.svg";
+export { ReactComponent as WebsiteLinkIcon } from "./link-solid.svg";
+export { ReactComponent as TwitterIcon } from "./twitter-brands.svg";
