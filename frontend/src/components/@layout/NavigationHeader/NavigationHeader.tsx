@@ -23,7 +23,7 @@ const NavigationHeader = ({ isLoggedIn }: Props) => {
       <NavigationItem to={PAGE_URL.HOME}>
         <HomeIcon />
       </NavigationItem>
-      <NavigationItem to={PAGE_URL.PROFILE}>
+      <NavigationItem to={PAGE_URL.MY_PROFILE}>
         <PersonIcon />
       </NavigationItem>
       <NavigationItem to={PAGE_URL.ADD_POST}>

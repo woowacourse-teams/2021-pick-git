@@ -62,8 +62,9 @@ const PostItem = ({
   const { color } = useContext(ThemeContext);
 
   const commentList = comments.map((comment) => (
-    <CommentWrapper>
+    <CommentWrapper key={comment.commentId}>
       <Comment
+        commentId={comment.commentId}
         content={comment.content}
         isLiked={comment.isLiked}
         authorName={comment.authorName}
@@ -82,7 +83,7 @@ const PostItem = ({
   return (
     <Container>
       <PostHeader>
-        <PostAuthorInfoLink to={PAGE_URL.PROFILE}>
+        <PostAuthorInfoLink to={PAGE_URL.USER_PROFILE(authorName)}>
           <Avatar diameter="1.9375rem" imageUrl={authorImageUrl} />
           <PostAuthorName>{authorName}</PostAuthorName>
         </PostAuthorInfoLink>
@@ -104,7 +105,7 @@ const PostItem = ({
         </IconLinkButtonsWrapper>
         <LikeCountText>좋아요 {likeCount}개</LikeCountText>
         <PostContent>
-          <PostContentAuthorLink to={PAGE_URL.PROFILE}>{authorName}</PostContentAuthorLink>
+          <PostContentAuthorLink to={PAGE_URL.USER_PROFILE(authorName)}>{authorName}</PostContentAuthorLink>
           {content}
         </PostContent>
         {commentList}
