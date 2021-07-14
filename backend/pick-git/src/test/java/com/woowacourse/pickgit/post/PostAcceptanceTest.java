@@ -8,14 +8,14 @@ import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
 import com.woowacourse.pickgit.common.FileFactory;
 import com.woowacourse.pickgit.config.StorageConfiguration;
-import com.woowacourse.pickgit.post.presentation.dto.PostRequest;
+import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
 import io.restassured.RestAssured;
+import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,14 +29,15 @@ import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 
-@Import(StorageConfiguration.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@Import(PostTestConfiguration.class)
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @ActiveProfiles("test")
 public class PostAcceptanceTest {
+
+    private static final String USERNAME = "jipark3";
 
     @LocalServerPort
     int port;
@@ -126,6 +127,57 @@ public class PostAcceptanceTest {
             .post("/api/posts")
             .then().log().all()
             .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+            .extract();
+    }
+
+    @DisplayName("사용자는 Repository 목록을 가져올 수 있다.")
+    @Test
+    void showRepositories_LoginUser_Success() {
+        // given
+        String token = 로그인_되어있음().getToken();
+
+        // when
+        List<RepositoryResponseDto> response =
+            request(token, USERNAME, HttpStatus.OK.value())
+                .as(new TypeRef<List<RepositoryResponseDto>>() {
+                });
+
+        // then
+        assertThat(response).hasSize(2);
+    }
+
+    @DisplayName("토큰이 유효하지 않은 경우 예외가 발생한다. - 500 예외")
+    @Test
+    void showRepositories_InvalidAccessToken_500Exception() {
+        // given
+        String token = 로그인_되어있음().getToken();
+
+        // when
+        request(token + "hi", USERNAME, HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    @DisplayName("사용자가 유효하지 않은 경우 예외가 발생한다. - 400 예외")
+    @Test
+    void showRepositories_InvalidUsername_400Exception() {
+        // given
+        String token = 로그인_되어있음().getToken();
+
+        // when
+        String response =
+            request(token, USERNAME + "pika", HttpStatus.BAD_REQUEST.value()).asString();
+
+        // then
+        assertThat(response).isEqualTo("P0001");
+    }
+
+    private ExtractableResponse<Response> request(String token, String username, int statusCode) {
+        return RestAssured
+            .given().log().all()
+            .auth().oauth2(token)
+            .when()
+            .get("/api/github/{username}/repositories", username)
+            .then().log().all()
+            .statusCode(statusCode)
             .extract();
     }
 

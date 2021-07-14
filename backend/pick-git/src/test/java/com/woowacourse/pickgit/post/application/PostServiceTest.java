@@ -2,22 +2,27 @@ package com.woowacourse.pickgit.post.application;
 
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.woowacourse.pickgit.common.FileFactory;
-import com.woowacourse.pickgit.post.application.dto.PostRequestDto;
-import com.woowacourse.pickgit.post.application.dto.PostResponseDto;
+import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
+import com.woowacourse.pickgit.post.domain.PlatformRepositoryExtractor;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostContent;
 import com.woowacourse.pickgit.post.domain.PostRepository;
+import com.woowacourse.pickgit.post.domain.comment.CommentFormatException;
+import com.woowacourse.pickgit.post.domain.comment.Comments;
 import com.woowacourse.pickgit.post.domain.content.Image;
 import com.woowacourse.pickgit.post.domain.content.Images;
+import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.presentation.PickGitStorage;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
@@ -25,8 +30,6 @@ import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
 import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
 import java.util.ArrayList;
 import java.util.List;
-import com.woowacourse.pickgit.post.domain.comment.CommentFormatException;
-import com.woowacourse.pickgit.post.domain.comment.Comments;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -54,6 +57,9 @@ class PostServiceTest {
     @Mock
     private PickGitStorage pickGitStorage;
 
+    @Mock
+    private PlatformRepositoryExtractor platformRepositoryExtractor;
+
     private String image;
     private String description;
     private String githubUrl;
@@ -69,11 +75,14 @@ class PostServiceTest {
     private BasicProfile basicProfile;
     private GithubProfile githubProfile;
     private User user;
+
     private PostContent postContent;
     private Post post;
 
-    private Post post2;
+    private BasicProfile basicProfile2;
     private User user2;
+
+    private Post post2;
 
     @BeforeEach
     void setUp() {
@@ -92,14 +101,16 @@ class PostServiceTest {
         basicProfile = new BasicProfile(USERNAME, image, description);
         githubProfile = new GithubProfile(githubUrl, company, location, website, twitter);
         user = new User(basicProfile, githubProfile);
-        postContent = new PostContent(content);
 
+        postContent = new PostContent(content);
         post = new Post(1L, images, postContent, githubRepoUrl,
             null, null, null, user);
 
-        post2 = new Post(null, null, null, null, null, new Comments(), new ArrayList<>(), null);
-        user2 =
-            new User(new BasicProfile("kevin", "a.jpg", "a"), null);
+        basicProfile2 = new BasicProfile("kevin", "a.jpg", "a");
+        user2 = new User(basicProfile2, null);
+
+        post2 = new Post(null, null, null, null,
+            null, new Comments(), new ArrayList<>(), null);
     }
 
     private List<Image> getImages() {
@@ -182,5 +193,28 @@ class PostServiceTest {
             .hasMessage("F0002");
         verify(postRepository, times(1)).findById(1L);
         verify(userRepository, times(1)).findByBasicProfile_Name("kevin");
+    }
+
+    @DisplayName("사용자는 Repository 목록을 가져올 수 있다.")
+    @Test
+    void showRepositories_LoginUser_Success() {
+        // given
+        RepositoryRequestDto requestDto = new RepositoryRequestDto(ACCESS_TOKEN, USERNAME);
+        List<RepositoryResponseDto> repositories = List.of(
+            new RepositoryResponseDto("pick"),
+            new RepositoryResponseDto("git")
+        );
+
+        given(platformRepositoryExtractor.extract(requestDto.getToken(), requestDto.getUsername()))
+            .willReturn(repositories);
+
+        // when
+        List<RepositoryResponseDto> responsesDto =
+            platformRepositoryExtractor.extract(requestDto.getToken(), requestDto.getUsername());
+
+        // then
+        assertThat(responsesDto).containsAll(repositories);
+        verify(platformRepositoryExtractor, times(1))
+            .extract(requestDto.getToken(), requestDto.getUsername());
     }
 }

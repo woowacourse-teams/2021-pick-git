@@ -5,12 +5,17 @@ import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.post.application.CommentRequestDto;
 import com.woowacourse.pickgit.post.application.CommentResponseDto;
 import com.woowacourse.pickgit.post.application.PostService;
-import com.woowacourse.pickgit.post.application.dto.PostRequestDto;
-import com.woowacourse.pickgit.post.application.dto.PostResponseDto;
+import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
+import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.presentation.dto.PostRequest;
 import java.net.URI;
+import java.util.List;
 import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -74,5 +79,16 @@ public class PostController {
             new CommentRequestDto(appUser.getUsername(), content, postId);
         CommentResponseDto commentResponseDto = postService.addComment(commentRequestDto);
         return ResponseEntity.ok(commentResponseDto);
+    }
+
+    @GetMapping("/github/{username}/repositories")
+    public ResponseEntity<List<RepositoryResponseDto>> showRepositories(
+        @Authenticated AppUser user,
+        @PathVariable String username) {
+        String token = user.getAccessToken();
+        RepositoriesResponseDto responseDto = postService
+            .showRepositories(new RepositoryRequestDto(token, username));
+
+        return ResponseEntity.ok(responseDto.getRepositories());
     }
 }

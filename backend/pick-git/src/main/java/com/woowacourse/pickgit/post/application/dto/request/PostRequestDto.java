@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.post.application.dto;
+package com.woowacourse.pickgit.post.application.dto.request;
 
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;

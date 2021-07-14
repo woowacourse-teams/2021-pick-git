@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.post.application.dto;
+package com.woowacourse.pickgit.post.application.dto.response;
 
 import java.util.List;
 
