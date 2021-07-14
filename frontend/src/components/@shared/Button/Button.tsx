@@ -1,6 +1,6 @@
 import { RoundedBlockButton, SquareInlineButton } from "./Button.style";
 
-export interface Props extends React.HTMLAttributes<HTMLButtonElement> {
+export interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   kind?: "roundedBlock" | "inlineSquare";
 }
 

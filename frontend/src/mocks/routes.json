@@ -1,4 +1,5 @@
 {
   "/api/*": "/$1",
-  "/profiles/me": "/self-profiles"
+  "/profiles/me": "/self-profiles",
+  "/authorization/github": "/github-login"
 }

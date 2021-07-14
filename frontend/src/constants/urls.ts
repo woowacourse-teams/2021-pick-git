@@ -8,4 +8,8 @@ export const PAGE_URL = {
 
 export const API_URL = {
   SELF_PROFILE: "/profiles/me",
+  AFTER_LOGIN: (code: string) => `afterlogin?code=${code}`,
+  AUTH: {
+    GITHUB: "/authorization/github",
+  },
 };

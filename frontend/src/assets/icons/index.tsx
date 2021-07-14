@@ -12,3 +12,4 @@ export { ReactComponent as PostHeartLineIcon } from "./post-heart-line.svg";
 export { ReactComponent as PostHeartIcon } from "./post-heart.svg";
 export { ReactComponent as EditIcon } from "./edit.svg";
 export { ReactComponent as GithubIcon } from "./github.svg";
+export { ReactComponent as GithubLargeIcon } from "./github-large.svg";

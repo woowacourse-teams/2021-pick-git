@@ -5,6 +5,7 @@ export const theme = {
   color: {
     appBackgroundColor: "#ffffff",
     primaryColor: "#fc3465",
+    darkerSecondaryColor: "#ffdede",
     secondaryColor: "#fff0f0",
     tertiaryColor: "#6d6d6d",
     textColor: "#3d3d3d",
@@ -16,6 +17,9 @@ export const theme = {
 
 export const GlobalStyle = createGlobalStyle`
   ${normalize}
+
+  @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+
 
   html,
   body,
