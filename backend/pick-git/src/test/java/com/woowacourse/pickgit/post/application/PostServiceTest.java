@@ -12,7 +12,7 @@ import static org.mockito.Mockito.verify;
 
 import com.woowacourse.pickgit.common.FileFactory;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
-import com.woowacourse.pickgit.post.application.dto.request.TokenRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.domain.PlatformRepositoryExtractor;
 import com.woowacourse.pickgit.post.domain.Post;
@@ -58,7 +58,7 @@ class PostServiceTest {
     private PickGitStorage pickGitStorage;
 
     @Mock
-    PlatformRepositoryExtractor platformRepositoryExtractor;
+    private PlatformRepositoryExtractor platformRepositoryExtractor;
 
     private String image;
     private String description;
@@ -195,26 +195,26 @@ class PostServiceTest {
         verify(userRepository, times(1)).findByBasicProfile_Name("kevin");
     }
 
-    @DisplayName("Repository 목록을 가져온다.")
+    @DisplayName("사용자는 Repository 목록을 가져올 수 있다.")
     @Test
     void showRepositories_LoginUser_Success() {
         // given
-        TokenRequestDto requestDto = new TokenRequestDto(ACCESS_TOKEN);
+        RepositoryRequestDto requestDto = new RepositoryRequestDto(ACCESS_TOKEN, USERNAME);
         List<RepositoryResponseDto> repositories = List.of(
             new RepositoryResponseDto("pick"),
             new RepositoryResponseDto("git")
         );
 
-        given(platformRepositoryExtractor.extract(requestDto.getAccessToken()))
+        given(platformRepositoryExtractor.extract(requestDto.getToken(), requestDto.getUsername()))
             .willReturn(repositories);
 
         // when
-        List<RepositoryResponseDto> responsesDto = platformRepositoryExtractor
-            .extract(requestDto.getAccessToken());
+        List<RepositoryResponseDto> responsesDto =
+            platformRepositoryExtractor.extract(requestDto.getToken(), requestDto.getUsername());
 
         // then
         assertThat(responsesDto).containsAll(repositories);
         verify(platformRepositoryExtractor, times(1))
-            .extract(requestDto.getAccessToken());
+            .extract(requestDto.getToken(), requestDto.getUsername());
     }
 }
