@@ -54,7 +54,7 @@ class PostControllerTest {
 
     private static final String USERNAME = "jipark3";
     private static final String ACCESS_TOKEN = "pickgit";
-    private static final String API_ACCESS_TOKEN = "oauth-access-token";
+    private static final String API_ACCESS_TOKEN = "oauth.access.token";
 
     @Autowired
     private MockMvc mockMvc;

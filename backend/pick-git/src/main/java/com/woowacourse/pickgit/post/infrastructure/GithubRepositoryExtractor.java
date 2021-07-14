@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class GithubRepositoryExtractor implements PlatformRepositoryExtractor {
 
-    private static final String API_URL_FORMAT = "https://api.github.com/user/%s/repos";
+    private static final String API_URL_FORMAT = "https://api.github.com/users/%s/repos";
 
     private final ObjectMapper objectMapper;
     private final PlatformRepositoryApiRequester platformRepositoryApiRequester;

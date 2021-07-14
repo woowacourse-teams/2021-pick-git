@@ -14,7 +14,7 @@ import org.springframework.web.client.HttpClientErrorException;
 
 class GithubRepositoryExtractorTest {
 
-    private static final String ACCESS_TOKEN = "oauth-access-token";
+    private static final String ACCESS_TOKEN = "oauth.access.token";
     private static final String USERNAME = "jipark3";
 
     private final ObjectMapper objectMapper = new ObjectMapper();

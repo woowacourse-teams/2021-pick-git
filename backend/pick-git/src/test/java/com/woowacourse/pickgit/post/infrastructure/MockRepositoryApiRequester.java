@@ -7,7 +7,7 @@ public class MockRepositoryApiRequester implements PlatformRepositoryApiRequeste
 
     private static final String API_URL_FORMAT = "https://api.github.com/users/%s/repos";
     private static final String USERNAME = "jipark3";
-    private static final String ACCESS_TOKEN = "oauth-access-token";
+    private static final String ACCESS_TOKEN = "oauth.access.token";
 
     @Override
     public String request(String token, String url) {
