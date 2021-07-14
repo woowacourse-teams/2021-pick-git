@@ -1,7 +1,10 @@
 package com.woowacourse.pickgit.post.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
+import com.woowacourse.pickgit.common.FileFactory;
+import com.woowacourse.pickgit.config.StorageConfiguration;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.PostResponseDto;
@@ -13,6 +16,7 @@ import com.woowacourse.pickgit.user.domain.UserRepository;
 import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
 import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,9 +24,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.web.multipart.MultipartFile;
 
+@Import(StorageConfiguration.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext
 @ActiveProfiles("test")
@@ -50,7 +58,7 @@ public class PostIntegrationTest {
     private String location;
     private String website;
     private String twitter;
-    private List<String> images;
+    private List<MultipartFile> images;
     private String githubRepoUrl;
     private List<String> tags;
     private String content;
@@ -68,7 +76,10 @@ public class PostIntegrationTest {
         location = "seoul";
         website = "https://da-nyee.github.io/";
         twitter = "dani";
-        images = List.of("image1", "imgae2");
+        images = List.of(
+            FileFactory.getTestImage1(),
+            FileFactory.getTestImage2()
+        );
         githubRepoUrl = "https://github.com/woowacourse-teams/2021-pick-git/";
         tags = List.of("java", "spring");
         content = "this is content";
@@ -84,13 +95,17 @@ public class PostIntegrationTest {
     @Test
     void write_LoginUser_Success() {
         // given
-        PostRequestDto requestDto = new PostRequestDto(ACCESS_TOKEN, USERNAME, images,
-            githubRepoUrl, tags, content);
+        PostRequestDto requestDto = new PostRequestDto(
+            ACCESS_TOKEN, USERNAME, images, githubRepoUrl, tags, content
+        );
 
         // when
         PostResponseDto responseDto = postService.write(requestDto);
 
         // then
-        assertThat(responseDto.getId()).isNotNull();
+        assertAll(
+            () -> assertThat(responseDto.getImageUrls()).hasSize(2),
+            () -> assertThat(responseDto).isNotNull()
+        );
     }
 }

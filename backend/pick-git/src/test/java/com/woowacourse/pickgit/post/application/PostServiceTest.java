@@ -1,17 +1,23 @@
 package com.woowacourse.pickgit.post.application;
 
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.woowacourse.pickgit.common.FileFactory;
 import com.woowacourse.pickgit.post.application.dto.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.PostResponseDto;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostContent;
 import com.woowacourse.pickgit.post.domain.PostRepository;
+import com.woowacourse.pickgit.post.domain.content.Image;
+import com.woowacourse.pickgit.post.domain.content.Images;
+import com.woowacourse.pickgit.post.presentation.PickGitStorage;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
@@ -41,6 +47,9 @@ class PostServiceTest {
     @Mock
     private PostRepository postRepository;
 
+    @Mock
+    private PickGitStorage pickGitStorage;
+
     private String image;
     private String description;
     private String githubUrl;
@@ -48,7 +57,7 @@ class PostServiceTest {
     private String location;
     private String website;
     private String twitter;
-    private List<String> images;
+    private Images images;
     private String githubRepoUrl;
     private List<String> tags;
     private String content;
@@ -68,7 +77,7 @@ class PostServiceTest {
         location = "seoul";
         website = "https://da-nyee.github.io/";
         twitter = "dani";
-        images = List.of("image1", "imgae2");
+        images = new Images(getImages());
         githubRepoUrl = "https://github.com/woowacourse-teams/2021-pick-git/";
         tags = List.of("java", "spring");
         content = "this is content";
@@ -77,7 +86,13 @@ class PostServiceTest {
         githubProfile = new GithubProfile(githubUrl, company, location, website, twitter);
         user = new User(basicProfile, githubProfile);
         postContent = new PostContent(content);
-        post = new Post(1L, null, postContent, null, null, null, user);
+        post = new Post(1L, images, postContent, null, null, null, user);
+    }
+
+    private List<Image> getImages() {
+        return List.of("image1", "imgae2").stream()
+            .map(Image::new)
+            .collect(toList());
     }
 
     @DisplayName("사용자는 게시물을 등록할 수 있다.")
@@ -88,9 +103,10 @@ class PostServiceTest {
             .willReturn(Optional.of(user));
         given(postRepository.save(any(Post.class)))
             .willReturn(post);
+        given(pickGitStorage.store(anyList(), anyString()))
+            .willReturn(List.of("imageUrl1", "imageUrl2"));
 
-        PostRequestDto requestDto = new PostRequestDto(ACCESS_TOKEN, USERNAME, images,
-            githubRepoUrl, tags, content);
+        PostRequestDto requestDto = getRequestDto();
 
         // when
         PostResponseDto responseDto = postService.write(requestDto);
@@ -100,6 +116,22 @@ class PostServiceTest {
         verify(userRepository, times(1))
             .findByBasicProfile_Name(requestDto.getUsername());
         verify(postRepository, times(1))
-            .save(new Post(postContent, user));
+            .save(new Post(postContent, any(), user));
+        verify(pickGitStorage, times(1))
+            .store(anyList(), anyString());
+    }
+
+    private PostRequestDto getRequestDto() {
+        return new PostRequestDto(
+            ACCESS_TOKEN,
+            USERNAME,
+            List.of(
+                FileFactory.getTestImage1(),
+                FileFactory.getTestImage2()
+            ),
+            githubRepoUrl,
+            tags,
+            content
+        );
     }
 }

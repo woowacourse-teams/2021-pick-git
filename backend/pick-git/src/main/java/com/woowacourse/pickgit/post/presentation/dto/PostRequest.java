@@ -4,11 +4,12 @@ import java.util.List;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import org.springframework.web.multipart.MultipartFile;
 
 public class PostRequest {
 
     @NotEmpty
-    private List<String> images;
+    private List<MultipartFile> images;
 
     @NotBlank
     private String githubRepoUrl;
@@ -22,17 +23,18 @@ public class PostRequest {
     }
 
     public PostRequest(
-        List<String> images,
+        List<MultipartFile> images,
         String githubRepoUrl,
         List<String> tags,
-        String content) {
+        String content
+    ) {
         this.images = images;
         this.githubRepoUrl = githubRepoUrl;
         this.tags = tags;
         this.content = content;
     }
 
-    public List<String> getImages() {
+    public List<MultipartFile> getImages() {
         return images;
     }
 

@@ -1,13 +1,16 @@
 package com.woowacourse.pickgit.post.presentation;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
+import com.woowacourse.pickgit.common.FileFactory;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.PostResponseDto;
@@ -21,8 +24,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.NestedServletException;
 
 @WebMvcTest(PostController.class)
 @ActiveProfiles("test")
@@ -34,9 +42,6 @@ class PostControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     @MockBean
     private PostService postService;
 
@@ -44,17 +49,20 @@ class PostControllerTest {
     private OAuthService oAuthService;
 
     private LoginUser user;
-    private List<String> images;
+    private List<MultipartFile> images;
     private String githubRepoUrl;
-    private List<String> tags;
+    private String[] tags;
     private String content;
 
     @BeforeEach
     void setUp() {
         user = new LoginUser(USERNAME, ACCESS_TOKEN);
-        images = List.of("image1", "image2");
+        images = List.of(
+            FileFactory.getTestImage1(),
+            FileFactory.getTestImage2()
+        );
         githubRepoUrl = "https://github.com/woowacourse-teams/2021-pick-git/";
-        tags = List.of("java", "spring");
+        tags = new String[]{"java", "spring"};
         content = "pickgit";
     }
 
@@ -62,7 +70,6 @@ class PostControllerTest {
     @Test
     void write_LoginUser_Success() throws Exception {
         // given
-        PostRequest request = new PostRequest(images, githubRepoUrl, tags, content);
 
         given(oAuthService.validateToken(any()))
             .willReturn(true);
@@ -71,11 +78,17 @@ class PostControllerTest {
         given(postService.write(any(PostRequestDto.class)))
             .willReturn(new PostResponseDto(1L));
 
+        MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
+        multiValueMap.add("githubRepoUrl", githubRepoUrl);
+        multiValueMap.add("content", content);
+
         // then
-        mockMvc.perform(post("/api/posts")
-            .header(HttpHeaders.AUTHORIZATION, user.getAccessToken())
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .content(objectMapper.writeValueAsString(request)))
+        mockMvc.perform(multipart("/api/posts")
+            .file(FileFactory.getTestImage1())
+            .file(FileFactory.getTestImage2())
+            .params(multiValueMap)
+            .param("tags", tags)
+            .header(HttpHeaders.AUTHORIZATION, user.getAccessToken()))
             .andExpect(status().isCreated());
     }
 
@@ -88,9 +101,20 @@ class PostControllerTest {
         given(oAuthService.findRequestUserByToken(any()))
             .willCallRealMethod();
 
+        MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
+        multiValueMap.add("githubRepoUrl", githubRepoUrl);
+        multiValueMap.add("content", content);
+
         // then
-        mockMvc.perform(post("/api/posts")
-            .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN))
-            .andExpect(status().is4xxClientError());
+        assertThatCode(() ->
+            mockMvc.perform(multipart("/api/posts")
+                .file(FileFactory.getTestImage1())
+                .file(FileFactory.getTestImage2())
+                .params(multiValueMap)
+                .param("tags", tags)
+                .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN))
+                .andExpect(status().is4xxClientError())
+        ).isInstanceOf(NestedServletException.class);
+
     }
 }
