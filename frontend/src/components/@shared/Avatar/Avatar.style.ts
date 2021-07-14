@@ -26,4 +26,5 @@ export const Name = styled.div<React.CSSProperties>`
   `}
 
   margin-top: 0.375rem;
+  font-weight: bold;
 `;
