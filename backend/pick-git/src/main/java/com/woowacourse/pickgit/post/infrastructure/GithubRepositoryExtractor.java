@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woowacourse.pickgit.post.domain.PlatformRepositoryExtractor;
-import com.woowacourse.pickgit.post.infrastructure.dto.RepositoryResponse;
+import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -22,14 +22,14 @@ public class GithubRepositoryExtractor implements PlatformRepositoryExtractor {
     }
 
     @Override
-    public List<RepositoryResponse> extract(String token) {
+    public List<RepositoryResponseDto> extract(String token) {
         String url = "https://api.github.com/user/repos";
         String response = platformRepositoryApiRequester.request(token, url);
 
         return parseToRepositories(response);
     }
 
-    private List<RepositoryResponse> parseToRepositories(String response) {
+    private List<RepositoryResponseDto> parseToRepositories(String response) {
         try {
             return objectMapper.readValue(response, new TypeReference<>() {});
         } catch (JsonProcessingException e) {

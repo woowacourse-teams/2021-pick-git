@@ -25,7 +25,7 @@ import com.woowacourse.pickgit.post.application.dto.request.TokenRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
 import com.woowacourse.pickgit.post.domain.comment.CommentFormatException;
-import com.woowacourse.pickgit.post.infrastructure.dto.RepositoryResponse;
+import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -195,8 +195,8 @@ class PostControllerTest {
         // given
         TokenRequestDto tokenRequestDto = new TokenRequestDto("pickgit");
         RepositoriesResponseDto repositories = new RepositoriesResponseDto(List.of(
-            new RepositoryResponse("pick"),
-            new RepositoryResponse("git")
+            new RepositoryResponseDto("pick"),
+            new RepositoryResponseDto("git")
         ));
 
         // when

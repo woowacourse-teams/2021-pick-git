@@ -13,7 +13,7 @@ import com.woowacourse.pickgit.post.domain.PostRepository;
 import com.woowacourse.pickgit.post.domain.comment.Comment;
 import com.woowacourse.pickgit.post.domain.content.Image;
 import com.woowacourse.pickgit.post.domain.content.Images;
-import com.woowacourse.pickgit.post.infrastructure.dto.RepositoryResponse;
+import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.presentation.PickGitStorage;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
@@ -113,7 +113,7 @@ public class PostService {
     }
 
     public RepositoriesResponseDto showRepositories(TokenRequestDto tokenRequestDto) {
-        List<RepositoryResponse> repositories =
+        List<RepositoryResponseDto> repositories =
             platformRepositoryExtractor.extract(tokenRequestDto.getAccessToken());
 
         return new RepositoriesResponseDto(repositories);

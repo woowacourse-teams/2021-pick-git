@@ -22,7 +22,7 @@ import com.woowacourse.pickgit.post.domain.comment.CommentFormatException;
 import com.woowacourse.pickgit.post.domain.comment.Comments;
 import com.woowacourse.pickgit.post.domain.content.Image;
 import com.woowacourse.pickgit.post.domain.content.Images;
-import com.woowacourse.pickgit.post.infrastructure.dto.RepositoryResponse;
+import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.presentation.PickGitStorage;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
@@ -200,9 +200,9 @@ class PostServiceTest {
     void showRepositories_LoginUser_Success() {
         // given
         TokenRequestDto tokenRequestDto = new TokenRequestDto("pickgit");
-        List<RepositoryResponse> repositories = List.of(
-            new RepositoryResponse("pick"),
-            new RepositoryResponse("git")
+        List<RepositoryResponseDto> repositories = List.of(
+            new RepositoryResponseDto("pick"),
+            new RepositoryResponseDto("git")
         );
 
         // when
