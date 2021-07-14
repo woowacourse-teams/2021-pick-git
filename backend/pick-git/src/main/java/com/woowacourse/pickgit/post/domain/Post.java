@@ -82,7 +82,9 @@ public class Post {
         this.images = images;
         this.githubRepoUrl = githubRepoUrl;
         this.user = user;
-        images.setMapping(this);
+        if (!Objects.isNull(images)) {
+            images.setMapping(this);
+        }
     }
 
     public void addComment(Comment comment) {

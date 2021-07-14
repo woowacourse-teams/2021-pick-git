@@ -13,6 +13,7 @@ import com.woowacourse.pickgit.post.application.dto.response.RepositoriesRespons
 import com.woowacourse.pickgit.post.domain.PlatformRepositoryExtractor;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.config.StorageConfiguration;
+import com.woowacourse.pickgit.post.application.dto.CommentDto;
 import com.woowacourse.pickgit.post.application.dto.PostDto;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostRepository;
@@ -123,7 +124,7 @@ class PostServiceIntegrationTest {
         CommentRequestDto commentRequestDto =
             new CommentRequestDto("kevin", "test comment", post.getId());
 
-        CommentResponseDto commentResponseDto = postService.addComment(commentRequestDto);
+        CommentDto commentResponseDto = postService.addComment(commentRequestDto);
 
         assertThat(commentResponseDto.getAuthorName()).isEqualTo("kevin");
         assertThat(commentResponseDto.getContent()).isEqualTo("test comment");

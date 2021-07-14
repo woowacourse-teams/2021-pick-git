@@ -7,6 +7,7 @@ import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
 import com.woowacourse.pickgit.post.domain.PlatformRepositoryExtractor;
+import com.woowacourse.pickgit.post.application.dto.CommentDto;
 import com.woowacourse.pickgit.post.application.dto.PostDto;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostContent;
@@ -29,7 +30,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Function;
 import javax.persistence.EntityManager;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,22 +42,20 @@ public class PostService {
     private final PostRepository postRepository;
     private final PickGitStorage pickgitStorage;
     private final PlatformRepositoryExtractor platformRepositoryExtractor;
-
-    @Autowired
-    private EntityManager entityManager;
-
-    @Autowired
-    private TagService tagService;
+    private final TagService tagService;
+    private final EntityManager entityManager;
 
     public PostService(UserRepository userRepository,
         PostRepository postRepository,
         PickGitStorage pickgitStorage,
-        PlatformRepositoryExtractor platformRepositoryExtractor) 
-     {
+        PlatformRepositoryExtractor platformRepositoryExtractor,
+        TagService tagService, EntityManager entityManager) {
         this.userRepository = userRepository;
         this.postRepository = postRepository;
         this.pickgitStorage = pickgitStorage;
         this.platformRepositoryExtractor = platformRepositoryExtractor;
+        this.tagService = tagService;
+        this.entityManager = entityManager;
     }
 
     public PostResponseDto write(PostRequestDto postRequestDto) {
@@ -118,14 +116,15 @@ public class PostService {
         }
     }
 
-    public CommentResponseDto addComment(CommentRequestDto commentRequestDto) {
+    public CommentDto addComment(CommentRequestDto commentRequestDto) {
         User user = userRepository.findByBasicProfile_Name(commentRequestDto.getUserName())
             .orElseThrow(IllegalArgumentException::new);
         Post post = postRepository.findById(commentRequestDto.getPostId())
             .orElseThrow(IllegalArgumentException::new);
         Comment comment = new Comment(commentRequestDto.getContent());
         user.addComment(post, comment);
-        return new CommentResponseDto(user.getName(), comment.getContent());
+        entityManager.flush();
+        return CommentDto.from(comment);
     }
 
     @Transactional(readOnly = true)

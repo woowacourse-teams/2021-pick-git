@@ -7,12 +7,12 @@ public class CommentDto {
     private Long id;
     private String authorName;
     private String content;
-    private boolean isLiked;
+    private Boolean isLiked;
 
     public CommentDto() {
     }
 
-    public CommentDto(Long id, String authorName, String content, boolean isLiked) {
+    public CommentDto(Long id, String authorName, String content, Boolean isLiked) {
         this.id = id;
         this.authorName = authorName;
         this.content = content;
@@ -35,7 +35,7 @@ public class CommentDto {
         return content;
     }
 
-    public boolean isLiked() {
+    public Boolean getIsLiked() {
         return isLiked;
     }
 }

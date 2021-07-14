@@ -83,7 +83,7 @@ public class PostDto {
         return comments;
     }
 
-    public Boolean getLiked() {
+    public Boolean getIsLiked() {
         return isLiked;
     }
 }

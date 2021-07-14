@@ -15,6 +15,7 @@ import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.domain.PlatformRepositoryExtractor;
+import com.woowacourse.pickgit.post.application.dto.CommentDto;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostContent;
 import com.woowacourse.pickgit.post.domain.PostRepository;
@@ -24,6 +25,9 @@ import com.woowacourse.pickgit.post.domain.content.Image;
 import com.woowacourse.pickgit.post.domain.content.Images;
 import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.presentation.PickGitStorage;
+import com.woowacourse.pickgit.tag.application.TagService;
+import com.woowacourse.pickgit.tag.application.TagsDto;
+import com.woowacourse.pickgit.tag.domain.Tag;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
@@ -59,6 +63,9 @@ class PostServiceTest {
 
     @Mock
     private PlatformRepositoryExtractor platformRepositoryExtractor;
+
+    @Mock
+    private TagService tagService;
 
     private String image;
     private String description;
@@ -129,6 +136,8 @@ class PostServiceTest {
             .willReturn(post);
         given(pickGitStorage.store(anyList(), anyString()))
             .willReturn(List.of("imageUrl1", "imageUrl2"));
+        given(tagService.findOrCreateTags(any()))
+            .willReturn(List.of(new Tag("java"), new Tag("spring")));
 
         PostRequestDto requestDto = getRequestDto();
 
@@ -143,6 +152,8 @@ class PostServiceTest {
             .save(new Post(postContent, any(), githubRepoUrl, user));
         verify(pickGitStorage, times(1))
             .store(anyList(), anyString());
+        verify(tagService, times(1))
+            .findOrCreateTags(any(TagsDto.class));
     }
 
     private PostRequestDto getRequestDto() {
@@ -169,7 +180,7 @@ class PostServiceTest {
         CommentRequestDto commentRequestDto =
             new CommentRequestDto("kevin", "test comment", 1L);
 
-        CommentResponseDto commentResponseDto = postService.addComment(commentRequestDto);
+        CommentDto commentResponseDto = postService.addComment(commentRequestDto);
 
         assertThat(commentResponseDto.getAuthorName()).isEqualTo("kevin");
         assertThat(commentResponseDto.getContent()).isEqualTo("test comment");
