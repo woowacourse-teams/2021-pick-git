@@ -7,10 +7,15 @@ import com.woowacourse.pickgit.post.application.CommentResponseDto;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.PostResponseDto;
+import com.woowacourse.pickgit.post.application.dto.RepositoryDto;
+import com.woowacourse.pickgit.post.application.dto.TokenDto;
 import com.woowacourse.pickgit.post.presentation.dto.PostRequest;
 import java.net.URI;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -74,5 +79,13 @@ public class PostController {
             new CommentRequestDto(appUser.getUsername(), content, postId);
         CommentResponseDto commentResponseDto = postService.addComment(commentRequestDto);
         return ResponseEntity.ok(commentResponseDto);
+    }
+
+    @GetMapping("/github/repositories")
+    public ResponseEntity<RepositoryDto> getRepositories(HttpServletRequest httpServletRequest) {
+        String token = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION).split(" ")[1];
+        RepositoryDto repositories = postService.getRepositories(new TokenDto(token));
+
+        return ResponseEntity.ok(repositories);
     }
 }

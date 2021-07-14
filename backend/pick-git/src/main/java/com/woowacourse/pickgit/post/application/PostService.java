@@ -4,11 +4,16 @@ import static java.util.stream.Collectors.toList;
 
 import com.woowacourse.pickgit.post.application.dto.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.PostResponseDto;
+import com.woowacourse.pickgit.post.application.dto.RepositoryDto;
+import com.woowacourse.pickgit.post.application.dto.TokenDto;
+import com.woowacourse.pickgit.post.domain.PlatformExtractor;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostContent;
 import com.woowacourse.pickgit.post.domain.PostRepository;
+import com.woowacourse.pickgit.post.domain.comment.Comment;
 import com.woowacourse.pickgit.post.domain.content.Image;
 import com.woowacourse.pickgit.post.domain.content.Images;
+import com.woowacourse.pickgit.post.infrastructure.dto.RepositoryResponse;
 import com.woowacourse.pickgit.post.presentation.PickGitStorage;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
@@ -18,17 +23,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Function;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import com.woowacourse.pickgit.post.domain.Post;
-import com.woowacourse.pickgit.post.domain.PostRepository;
-import com.woowacourse.pickgit.post.domain.comment.Comment;
-import com.woowacourse.pickgit.user.domain.User;
-import com.woowacourse.pickgit.user.domain.UserRepository;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
@@ -37,15 +34,17 @@ public class PostService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final PickGitStorage pickgitStorage;
+    private final PlatformExtractor platformExtractor;
 
     public PostService(
         UserRepository userRepository,
         PostRepository postRepository,
-        PickGitStorage pickGitStorage
-    ) {
+        PickGitStorage pickgitStorage,
+        PlatformExtractor platformExtractor) {
         this.userRepository = userRepository;
         this.postRepository = postRepository;
-        this.pickgitStorage = pickGitStorage;
+        this.pickgitStorage = pickgitStorage;
+        this.platformExtractor = platformExtractor;
     }
 
     public PostResponseDto write(PostRequestDto postRequestDto) {
@@ -57,7 +56,7 @@ public class PostService {
 
         Post post = postRepository.save(
             new Post(postContent, getImages(postRequestDto),
-            postRequestDto.getGithubRepoUrl(), user));
+                postRequestDto.getGithubRepoUrl(), user));
 
         return new PostResponseDto(post.getId(), post.getImageUrls());
     }
@@ -111,5 +110,12 @@ public class PostService {
         Comment comment = new Comment(commentRequestDto.getContent());
         user.addComment(post, comment);
         return new CommentResponseDto(user.getName(), comment.getContent());
+    }
+
+    public RepositoryDto getRepositories(TokenDto tokenDto) {
+        List<RepositoryResponse> repositories = platformExtractor
+            .getRepositories(tokenDto.getAccessToken());
+
+        return new RepositoryDto(repositories);
     }
 }
