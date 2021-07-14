@@ -63,7 +63,7 @@ class PostAcceptanceTest {
         given(oAuthService.findRequestUserByToken(anyString()))
             .willReturn(loginUser);
 
-        post = new Post(null, null, null, null, new Comments(), new ArrayList<>(), null);
+        post = new Post(null, null, null, null, null, new Comments(), new ArrayList<>(), null);
         user =
             new User(new BasicProfile("kevin", "a.jpg", "a"),
                 new GithubProfile("github.com", "a", "a", "a", "a"));

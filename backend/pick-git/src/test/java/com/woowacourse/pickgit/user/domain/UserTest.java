@@ -15,7 +15,7 @@ class UserTest {
     @DisplayName("User가 특정 Post에 Comment를 추가한다.")
     @Test
     void addComment_Valid_RegistrationSuccess() {
-        Post post = new Post(null, null, null, null, new Comments(), new ArrayList<>(), null);
+        Post post = new Post(null, null, null, null, null, new Comments(), new ArrayList<>(), null);
         Comment comment = new Comment("test comment.");
         User user = new User();
 

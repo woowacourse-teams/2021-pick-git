@@ -3,6 +3,7 @@ package com.woowacourse.pickgit.post.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.woowacourse.pickgit.post.domain.comment.Comment;
+import com.woowacourse.pickgit.post.domain.comment.Comments;
 import com.woowacourse.pickgit.post.domain.content.Image;
 import com.woowacourse.pickgit.post.domain.content.Images;
 import com.woowacourse.pickgit.tag.domain.Tag;
@@ -106,7 +107,7 @@ class PostRepositoryTest {
     @Test
     void addComment_WhenSavingPost_CommentSavedTogether() {
         Post post =
-            new Post(null, null, new PostContent(), githubRepoUrl, null, null, new ArrayList<>(),
+            new Post(null, null, new PostContent(), githubRepoUrl, null, new Comments(), new ArrayList<>(),
                 null);
         Comment comment = new Comment("test comment")
             .toPost(post);
