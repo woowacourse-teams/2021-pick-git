@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class GithubRepositoryExtractor implements PlatformRepositoryExtractor {
 
+    private static final String API_URL_FORMAT = "https://api.github.com/user/%s/repos";
+
     private final ObjectMapper objectMapper;
     private final PlatformRepositoryApiRequester platformRepositoryApiRequester;
 
@@ -22,11 +24,15 @@ public class GithubRepositoryExtractor implements PlatformRepositoryExtractor {
     }
 
     @Override
-    public List<RepositoryResponseDto> extract(String token) {
-        String url = "https://api.github.com/user/repos";
-        String response = platformRepositoryApiRequester.request(token, url);
+    public List<RepositoryResponseDto> extract(String token, String username) {
+        String apiUrl = generateApiUrl(username);
+        String response = platformRepositoryApiRequester.request(token, apiUrl);
 
         return parseToRepositories(response);
+    }
+
+    private String generateApiUrl(String username) {
+        return String.format(API_URL_FORMAT, username);
     }
 
     private List<RepositoryResponseDto> parseToRepositories(String response) {

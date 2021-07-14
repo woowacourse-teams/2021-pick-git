@@ -5,5 +5,5 @@ import java.util.List;
 
 public interface PlatformRepositoryExtractor {
 
-    List<RepositoryResponseDto> extract(String token);
+    List<RepositoryResponseDto> extract(String token, String username);
 }
