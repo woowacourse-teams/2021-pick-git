@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.woowacourse.pickgit.common.FileFactory;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
@@ -46,11 +47,9 @@ class PostServiceIntegrationTest {
     @Autowired
     private UserRepository userRepository;
 
-    private PickGitStorage pickGitStorage = (files, userName) -> files.stream()
+    private final PickGitStorage pickGitStorage = (files, userName) -> files.stream()
         .map(File::getName)
         .collect(toList());
-
-    private Post post;
 
     private PlatformRepositoryExtractor platformRepositoryExtractor;
 
@@ -63,26 +62,45 @@ class PostServiceIntegrationTest {
     private String location;
     private String website;
     private String twitter;
-    private List<String> images;
     private String githubRepoUrl;
     private List<String> tags;
     private String content;
 
     private BasicProfile basicProfile;
     private GithubProfile githubProfile;
-    private User user;
+    private User user1;
+    private User user2;
+    private Post post;
 
     @BeforeEach
     void setUp() {
-        postService =
-            new PostService(userRepository, postRepository, pickGitStorage,
-                platformRepositoryExtractor);
+        platformRepositoryExtractor =
+            new GithubRepositoryExtractor(objectMapper, new MockRepositoryApiRequester());
+        postService = new PostService(
+            userRepository, postRepository, pickGitStorage, platformRepositoryExtractor);
+
+        image = "image1";
+        description = "hello";
+        githubUrl = "https://github.com/da-nyee";
+        company = "woowacourse";
+        location = "seoul";
+        website = "https://da-nyee.github.io/";
+        twitter = "dani";
+        githubRepoUrl = "https://github.com/woowacourse-teams/2021-pick-git/";
+        tags = List.of("java", "spring");
+        content = "this is content";
+
+        basicProfile = new BasicProfile(USERNAME, image, description);
+        githubProfile = new GithubProfile(githubUrl, company, location, website, twitter);
+        user1 = new User(basicProfile, githubProfile);
+        user2 = new User(new BasicProfile("kevin", "a.jpg", "a"),
+            new GithubProfile("github.com", "a", "a", "a", "a"));
         post = new Post(null, null, null, null,
             null, new Comments(), new ArrayList<>(), null);
-        user = new User(new BasicProfile("kevin", "a.jpg", "a"),
-            new GithubProfile("github.com", "a", "a", "a", "a"));
+
+        userRepository.save(user1);
+        userRepository.save(user2);
         postRepository.save(post);
-        userRepository.save(user);
     }
 
     @DisplayName("게시물에 댓글을 정상 등록한다.")
@@ -106,30 +124,6 @@ class PostServiceIntegrationTest {
         assertThatCode(() -> postService.addComment(commentRequestDto))
             .isInstanceOf(CommentFormatException.class)
             .hasMessage("F0002");
-
-        platformRepositoryExtractor =
-            new GithubRepositoryExtractor(objectMapper, new MockRepositoryApiRequester());
-        postService =
-            new PostService(userRepository, postRepository, pickGitStorage,
-                platformRepositoryExtractor);
-
-        image = "image1";
-        description = "hello";
-        githubUrl = "https://github.com/da-nyee";
-        company = "woowacourse";
-        location = "seoul";
-        website = "https://da-nyee.github.io/";
-        twitter = "dani";
-        images = List.of("image1", "imgae2");
-        githubRepoUrl = "https://github.com/woowacourse-teams/2021-pick-git/";
-        tags = List.of("java", "spring");
-        content = "this is content";
-
-        basicProfile = new BasicProfile(USERNAME, image, description);
-        githubProfile = new GithubProfile(githubUrl, company, location, website, twitter);
-        user = new User(basicProfile, githubProfile);
-
-        userRepository.save(user);
     }
 
     @DisplayName("사용자는 게시물을 등록할 수 있다.")
@@ -137,7 +131,11 @@ class PostServiceIntegrationTest {
     void write_LoginUser_Success() {
         // given
         PostRequestDto requestDto =
-            new PostRequestDto(ACCESS_TOKEN, USERNAME, images, githubRepoUrl, tags, content);
+            new PostRequestDto(ACCESS_TOKEN, USERNAME,
+                List.of(
+                    FileFactory.getTestImage1(),
+                    FileFactory.getTestImage2()
+                ), githubRepoUrl, tags, content);
 
         // when
         PostResponseDto responseDto = postService.write(requestDto);
