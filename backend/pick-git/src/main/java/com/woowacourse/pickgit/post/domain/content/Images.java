@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.toList;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
+import java.util.stream.Collectors;
 import javax.persistence.Embeddable;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
@@ -26,5 +27,10 @@ public class Images {
         return images.stream()
             .map(Image::getUrl)
             .collect(toList());
+    }
+    public List<String> getImageUrls() {
+        return images.stream()
+            .map(Image::getUrl)
+            .collect(Collectors.toList());
     }
 }

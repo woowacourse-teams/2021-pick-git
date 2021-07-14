@@ -49,6 +49,14 @@ public class Comment {
         return user;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public String getAuthorName() {
+        return user.getName();
+    }
+
     public String getContent() {
         return content.getContent();
     }

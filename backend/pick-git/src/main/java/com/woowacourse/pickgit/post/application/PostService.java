@@ -7,6 +7,7 @@ import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
 import com.woowacourse.pickgit.post.domain.PlatformRepositoryExtractor;
+import com.woowacourse.pickgit.post.application.dto.PostDto;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostContent;
 import com.woowacourse.pickgit.post.domain.PostRepository;
@@ -26,6 +27,9 @@ import java.util.function.Function;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import com.woowacourse.pickgit.post.presentation.dto.HomeFeedRequest;
+import javax.persistence.EntityManager;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Service
 @Transactional
@@ -36,11 +40,15 @@ public class PostService {
     private final PickGitStorage pickgitStorage;
     private final PlatformRepositoryExtractor platformRepositoryExtractor;
 
+    @Autowired
+    private EntityManager entityManager;
+
     public PostService(
         UserRepository userRepository,
         PostRepository postRepository,
         PickGitStorage pickgitStorage,
-        PlatformRepositoryExtractor platformRepositoryExtractor) {
+        PlatformRepositoryExtractor platformRepositoryExtractor) 
+     {
         this.userRepository = userRepository;
         this.postRepository = postRepository;
         this.pickgitStorage = pickgitStorage;
@@ -114,9 +122,20 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public RepositoriesResponseDto showRepositories(RepositoryRequestDto repositoryRequestDto) {
-        List<RepositoryResponseDto> repositories = platformRepositoryExtractor
-            .extract(repositoryRequestDto.getToken(), repositoryRequestDto.getUsername());
+            List<RepositoryResponseDto> repositories = platformRepositoryExtractor
+                .extract(repositoryRequestDto.getToken(), repositoryRequestDto.getUsername());
 
-        return new RepositoriesResponseDto(repositories);
+            return new RepositoriesResponseDto(repositories);
+     }
+
+    public List<PostDto> readHomeFeed(HomeFeedRequest homeFeedRequest) {
+        int page = Math.toIntExact(homeFeedRequest.getPage());
+        int limit = Math.toIntExact(homeFeedRequest.getLimit());
+        List<Post> result = entityManager
+            .createQuery("select p from Post p order by p.likes.likes.size", Post.class)
+            .setFirstResult(page * limit)
+            .setMaxResults(limit)
+            .getResultList();
+        return PostDtoAssembler.assembleFrom(homeFeedRequest.getAppUser(), result);
     }
 }

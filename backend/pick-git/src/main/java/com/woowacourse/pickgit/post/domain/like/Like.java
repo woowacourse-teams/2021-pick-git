@@ -28,4 +28,8 @@ public class Like {
 
     protected Like() {
     }
+
+    public boolean contains(String userName) {
+        return user.getName().equals(userName);
+    }
 }
