@@ -34,6 +34,6 @@ test {
 processResources.dependsOn('copySecurity')
 
 task copySecurity(type: Copy) {
-	from './2021-pick-git-security/security/application-security.yml'
+	from './security/application-security.yml'
 	into './src/main/resources'
 }
