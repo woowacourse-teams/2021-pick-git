@@ -1,0 +1,64 @@
+pipeline {
+    agent any
+
+    environment {
+       INSTANCE_PEM_PATH = credentials('instances-pem-path')
+       HOST = credentials('HOST_DEV')
+    }
+
+    stages {
+        stage('Prepare') {
+            when { changeset "backend/**" }
+            steps {
+                echo 'get submodule...'
+                dir('./backend/pick-git') {
+                  sh '''
+                      git submodule init
+                      git submodule update
+                  '''
+                }
+            }
+        }
+
+
+        stage('Build') {
+            when { changeset "backend/**" }
+            steps {
+                echo 'build backend...'
+
+                dir('./backend/pick-git') {
+                    sh '''
+                        ./gradlew -x test clean build
+                    '''
+                }
+            }
+        }
+
+        stage('Test') {
+            when { changeset "backend/**" }
+            steps {
+                echo 'test backend...'
+
+                dir('./backend/pick-git') {
+                    sh '''
+                        ./gradlew test
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy') {
+            when { changeset "backend/**" }
+            steps {
+                echo 'deploying backend...'
+
+                dir('./backend/pick-git/script') {
+                  sh '''
+                    chmod 755 ./deploy_script.sh
+                    ./deploy_script.sh -c ~/.ssh/EC2-DEV-PICK-GIT.pem -h $HOST -d prod
+                  '''
+                }
+            }
+        }
+    }
+}
