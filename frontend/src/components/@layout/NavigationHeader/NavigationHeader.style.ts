@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { Header } from "../../@styled/layout";
 
-export const Container = styled.header<React.CSSProperties>`
+export const Container = styled(Header)<React.CSSProperties>`
   display: flex;
   justify-content: space-between;
   padding: 1.0625rem 1.375rem;
-  background-color: ${({ theme }) => theme.color.white};
 `;
 
 export const HomeLink = styled(Link)``;
