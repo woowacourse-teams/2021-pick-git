@@ -1,10 +1,13 @@
-import { useContext } from "react";
-import { useState } from "react";
+import { useContext, useState } from "react";
+
 import { ThemeContext } from "styled-components";
-import { Container, TabIndicator, TabItem } from "./Tabs.style";
+import { Container, TabIndicator, TabButton, TabButtonWrapper, TabContentWrapper, TabContent } from "./Tabs.style";
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
-  tabItems: string[];
+  tabItems: {
+    name: string;
+    content: React.ReactNode;
+  }[];
   tabIndicatorColor?: string;
 }
 
@@ -17,18 +20,28 @@ const Tabs = ({ tabItems, tabIndicatorColor, ...props }: Props) => {
   };
 
   const tabButtonList = tabItems.map((tabItem, index) => (
-    <TabItem
+    <TabButton
+      key={tabItem.name}
       textColor={index === tabIndex ? color.textColor : color.lighterTextColor}
       onClick={() => handleTabIndexChange(index)}
     >
-      {tabItem}
-    </TabItem>
+      {tabItem.name}
+    </TabButton>
   ));
 
   return (
     <Container {...props}>
-      {tabButtonList}
-      <TabIndicator tabIndex={tabIndex} tabCount={tabItems.length} />
+      <TabButtonWrapper>
+        {tabButtonList}
+        <TabIndicator tabIndex={tabIndex} tabCount={tabItems.length} tabIndicatorColor={tabIndicatorColor} />
+      </TabButtonWrapper>
+      <TabContentWrapper tabIndex={tabIndex} tabCount={tabItems.length}>
+        {tabItems.map(({ name, content }) => (
+          <TabContent key={name} tabCount={tabItems.length}>
+            {content}
+          </TabContent>
+        ))}
+      </TabContentWrapper>
     </Container>
   );
 };
