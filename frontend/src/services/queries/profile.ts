@@ -31,7 +31,7 @@ const profileQueryFunction: QueryFunction<Profile> = async ({ queryKey }) => {
   }
 };
 
-export const useProfileQuery = (isMyProfile: boolean, userName: string) => {
+export const useProfileQuery = (isMyProfile: boolean, userName?: string) => {
   const { accessToken } = useLocalStorage();
 
   return useQuery<Profile, AxiosError<Profile>>(

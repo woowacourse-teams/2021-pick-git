@@ -1,22 +1,18 @@
-import { useContext } from "react";
 import { useHistory } from "react-router-dom";
 
 import { CompanyIcon, GithubDarkIcon, LocationIcon, WebsiteLinkIcon, TwitterIcon } from "../../assets/icons";
 import { PAGE_URL } from "../../constants/urls";
-import UserContext from "../../contexts/UserContext";
 import { useProfileQuery } from "../../services/queries";
 import ProfileHeader from "../@shared/ProfileHeader/ProfileHeader";
 import { Container, Description, DetailInfo } from "./Profile.style";
 
 export interface Props {
-  userName: string;
+  isMyProfile: boolean;
+  userName?: string;
 }
 
-const Profile = ({ userName }: Props) => {
+const Profile = ({ isMyProfile, userName }: Props) => {
   const history = useHistory();
-  const { currentUserName } = useContext(UserContext);
-
-  const isMyProfile = userName === currentUserName;
   const { isLoading, error, data } = useProfileQuery(isMyProfile, userName);
 
   if (error) {

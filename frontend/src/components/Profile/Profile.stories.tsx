@@ -10,27 +10,36 @@ export default {
 };
 
 const LoggedInWrapper = ({ children }: { children: React.ReactElement }) => {
-  const { login } = useContext(UserContext);
+  const Inner = () => {
+    const { login } = useContext(UserContext);
 
-  useEffect(() => login("test", "Tanney"), []);
+    useEffect(() => login("test", "Tanney"), []);
 
-  return <>{children}</>;
+    return <></>;
+  };
+
+  return (
+    <UserContextProvider>
+      <Inner />
+      {children}
+    </UserContextProvider>
+  );
 };
 
 const Template: Story<Props> = (args) => (
-  <UserContextProvider>
-    <LoggedInWrapper>
-      <Profile {...args} />
-    </LoggedInWrapper>
-  </UserContextProvider>
+  <LoggedInWrapper>
+    <Profile {...args} />
+  </LoggedInWrapper>
 );
 
 export const Default = Template.bind({});
 Default.args = {
+  isMyProfile: false,
   userName: "Chris",
 };
 
 export const ProfileMe = Template.bind({});
 ProfileMe.args = {
+  isMyProfile: true,
   userName: "Tanney",
 };
