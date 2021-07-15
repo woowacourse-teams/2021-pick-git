@@ -1,4 +1,5 @@
 import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
+import { useContext, useEffect } from "react";
 
 import { PAGE_URL } from "./constants/urls";
 import LoginPage from "./pages/LoginPage/LoginPage";
@@ -6,8 +7,15 @@ import NavigationHeader from "./components/@layout/NavigationHeader/NavigationHe
 import HomeFeedPage from "./pages/HomeFeedPage/HomeFeedPage";
 import ProfilePage from "./pages/ProfilePage/ProfilePage";
 import { Page } from "./components/@styled/layout";
+import UserContext from "./contexts/UserContext";
 
 const App = () => {
+  const { login } = useContext(UserContext);
+
+  useEffect(() => {
+    login("testToken", "tanney-102");
+  }, []);
+
   return (
     <BrowserRouter>
       <Switch>
