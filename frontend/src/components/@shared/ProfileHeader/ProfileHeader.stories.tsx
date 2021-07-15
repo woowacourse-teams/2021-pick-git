@@ -1,7 +1,6 @@
 import { Story } from "@storybook/react";
-import { useContext, useEffect } from "react";
-import UserContext, { UserContextProvider } from "../../../contexts/UserContext";
 
+import LoggedInWrapper from "../../../../.storybook/utils/LoggedInWrapper";
 import ProfileHeader, { Props } from "./ProfileHeader";
 
 export default {
@@ -25,21 +24,11 @@ const mockProfile = {
   following: false,
 };
 
-const LoggedInWrapper = ({ children }: { children: React.ReactElement }) => {
-  const { login } = useContext(UserContext);
-
-  useEffect(() => login("test", "tanney"), []);
-
-  return <>{children}</>;
-};
-
 const DefaultTemplate: Story<Props> = (args) => <ProfileHeader {...args} />;
 const LoggedInTemplate: Story<Props> = (args) => (
-  <UserContextProvider>
-    <LoggedInWrapper>
-      <ProfileHeader {...args} />
-    </LoggedInWrapper>
-  </UserContextProvider>
+  <LoggedInWrapper>
+    <ProfileHeader {...args} />
+  </LoggedInWrapper>
 );
 
 export const Default = DefaultTemplate.bind({});
