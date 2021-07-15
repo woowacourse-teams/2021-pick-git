@@ -14,4 +14,13 @@ public class Likes {
 
     protected Likes() {
     }
+
+    public int getCounts() {
+        return likes.size();
+    }
+
+    public boolean contains(String userName) {
+        return likes.stream()
+            .anyMatch(like -> like.contains(userName));
+    }
 }

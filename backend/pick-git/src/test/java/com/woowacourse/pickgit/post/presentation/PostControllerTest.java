@@ -18,12 +18,12 @@ import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.FileFactory;
 import com.woowacourse.pickgit.config.StorageConfiguration;
 import com.woowacourse.pickgit.post.application.CommentRequestDto;
-import com.woowacourse.pickgit.post.application.CommentResponseDto;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
+import com.woowacourse.pickgit.post.application.dto.CommentDto;
 import com.woowacourse.pickgit.post.domain.comment.CommentFormatException;
 import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
 import java.util.List;
@@ -147,8 +147,8 @@ class PostControllerTest {
             .willReturn(loginUser);
 
         String url = "/api/posts/1/comments";
-        CommentResponseDto commentResponseDto =
-            new CommentResponseDto("kevin", "test comment");
+        CommentDto commentResponseDto =
+            new CommentDto(1L, "kevin", "test comment", false);
         String requestBody = objectMapper.writeValueAsString("test comment");
         String responseBody = objectMapper.writeValueAsString(commentResponseDto);
         given(postService.addComment(any(CommentRequestDto.class)))

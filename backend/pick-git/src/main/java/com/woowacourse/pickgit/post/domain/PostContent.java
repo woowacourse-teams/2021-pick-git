@@ -26,4 +26,8 @@ public class PostContent {
     private boolean isOver500(String content) {
         return content.length() > 500;
     }
+
+    public String getContent() {
+        return content;
+    }
 }

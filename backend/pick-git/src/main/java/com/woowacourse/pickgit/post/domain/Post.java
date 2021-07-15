@@ -8,12 +8,14 @@ import com.woowacourse.pickgit.post.domain.content.Images;
 import com.woowacourse.pickgit.post.domain.like.Likes;
 import com.woowacourse.pickgit.tag.domain.Tag;
 import com.woowacourse.pickgit.user.domain.User;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import javax.persistence.CascadeType;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -21,8 +23,12 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 public class Post {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,6 +47,12 @@ public class Post {
 
     @Embedded
     private Comments comments;
+
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private List<PostTag> postTags = new ArrayList<>();
@@ -66,10 +78,13 @@ public class Post {
     }
 
     public Post(PostContent content, Images images, String githubRepoUrl, User user) {
-         this.content = content;
-        this.images = images;;
+        this.content = content;
+        this.images = images;
         this.githubRepoUrl = githubRepoUrl;
         this.user = user;
+        if (!Objects.isNull(images)) {
+            images.setMapping(this);
+        }
     }
 
     public void addComment(Comment comment) {
@@ -118,7 +133,39 @@ public class Post {
         return Objects.hash(id);
     }
 
+    public List<String> getImagaeUrls() {
+        return images.getImageUrls();
+    }
+
+    public String getGithubRepoUrl() {
+        return githubRepoUrl;
+    }
+
+    public int getLikeCounts() {
+        return likes.getCounts();
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public String getContent() {
+        return content.getContent();
+    }
+
+    public User getUser() {
+        return user;
+    }
+
     public List<Comment> getComments() {
         return comments.getComments();
+    }
+
+    public boolean isLikedBy(String userName) {
+        return likes.contains(userName);
     }
 }

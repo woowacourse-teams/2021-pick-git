@@ -33,4 +33,9 @@ public class Image {
     public String getUrl() {
         return url;
     }
+
+    public Image toPost(Post post) {
+        this.post = post;
+        return this;
+    }
 }

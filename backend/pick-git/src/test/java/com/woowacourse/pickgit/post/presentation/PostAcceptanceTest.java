@@ -7,7 +7,7 @@ import static org.mockito.BDDMockito.given;
 import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.config.StorageConfiguration;
-import com.woowacourse.pickgit.post.application.CommentResponseDto;
+import com.woowacourse.pickgit.post.application.dto.CommentDto;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostRepository;
 import com.woowacourse.pickgit.post.domain.comment.Comments;
@@ -76,8 +76,8 @@ class PostAcceptanceTest {
     void addComment_ValidContent_Success() {
         String url = "/api/posts/" + post.getId() + "/comments";
 
-        CommentResponseDto response = addCommentApi(url, "test comment", HttpStatus.OK)
-            .as(CommentResponseDto.class);
+        CommentDto response = addCommentApi(url, "test comment", HttpStatus.OK)
+            .as(CommentDto.class);
 
         assertThat(response.getAuthorName()).isEqualTo("kevin");
         assertThat(response.getContent()).isEqualTo("test comment");
