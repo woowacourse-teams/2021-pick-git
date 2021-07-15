@@ -13,6 +13,7 @@ import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
+import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import java.util.Optional;
@@ -161,7 +162,7 @@ class OAuthServiceMockTest {
 
         // then
         assertThatThrownBy(() -> oAuthService.findRequestUserByToken(token))
-            .isInstanceOf(IllegalArgumentException.class);
+            .isInstanceOf(InvalidTokenException.class);
     }
 
     @DisplayName("빈 JWT 토큰이면 GuestUser를 반환한다.")

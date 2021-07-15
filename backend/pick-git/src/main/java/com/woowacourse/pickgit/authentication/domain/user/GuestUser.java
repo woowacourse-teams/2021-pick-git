@@ -1,5 +1,7 @@
 package com.woowacourse.pickgit.authentication.domain.user;
 
+import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
+
 public class GuestUser extends AppUser {
 
     private static final String DUMMY_USERNAME = "anonymous";
@@ -16,11 +18,11 @@ public class GuestUser extends AppUser {
 
     @Override
     public String getUsername() {
-        throw new UnsupportedOperationException("에러!");
+        throw new UnauthorizedException();
     }
 
     @Override
     public String getAccessToken() {
-        throw new UnsupportedOperationException("에러!");
+        throw new UnauthorizedException();
     }
 }

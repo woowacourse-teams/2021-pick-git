@@ -69,8 +69,7 @@ public class OAuthAcceptanceTest {
     void Authorization_Redirection_ReturnJwtToken() {
         // then
         String token = 로그인_되어있음().getToken();
-
-        System.out.println(token);
+        assertThat(token).isNotBlank();
     }
 
     public OAuthTokenResponse 로그인_되어있음() {

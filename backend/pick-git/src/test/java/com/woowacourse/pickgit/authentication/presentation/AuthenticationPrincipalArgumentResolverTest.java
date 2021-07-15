@@ -10,6 +10,8 @@ import com.woowacourse.pickgit.authentication.dao.CollectionOAuthAccessTokenDao;
 import com.woowacourse.pickgit.authentication.dao.OAuthAccessTokenDao;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.infrastructure.JwtTokenProviderImpl;
+import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
+import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import javax.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -77,7 +79,7 @@ class AuthenticationPrincipalArgumentResolverTest {
         // then
         assertThatThrownBy(() -> {
             authenticationPrincipalArgumentResolver.resolveArgument(null, null, new ServletWebRequest(httpServletRequest), null);
-        }).isInstanceOf(IllegalArgumentException.class);
+        }).isInstanceOf(InvalidTokenException.class);
     }
 
     @DisplayName("AccessToken DB에 저장되어 있지 않은 토큰이라면 예외가 발생한다.")
@@ -91,7 +93,7 @@ class AuthenticationPrincipalArgumentResolverTest {
 
         assertThatThrownBy(() -> {
             authenticationPrincipalArgumentResolver.resolveArgument(null, null, new ServletWebRequest(httpServletRequest), null);
-        }).isInstanceOf(IllegalArgumentException.class);
+        }).isInstanceOf(InvalidTokenException.class);
     }
 
     @DisplayName("요청 헤더에 authorization을 추가해주지 않으면 Guest가 반환된다.")
@@ -106,8 +108,8 @@ class AuthenticationPrincipalArgumentResolverTest {
         // then
         assertThat(loginUser.isGuest()).isTrue();
         assertThatThrownBy(() -> loginUser.getAccessToken())
-            .isInstanceOf(UnsupportedOperationException.class);
+            .isInstanceOf(UnauthorizedException.class);
         assertThatThrownBy(() -> loginUser.getUsername())
-            .isInstanceOf(UnsupportedOperationException.class);
+            .isInstanceOf(UnauthorizedException.class);
     }
 }

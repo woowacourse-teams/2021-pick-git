@@ -2,6 +2,7 @@ package com.woowacourse.pickgit.authentication.presentation.interceptor;
 
 import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.infrastructure.AuthorizationExtractor;
+import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,7 +28,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
         }
         String authentication = AuthorizationExtractor.extract(request);
         if (!oAuthService.validateToken(authentication)) {
-            throw new IllegalArgumentException("검증되지 않는 토큰입니다.");
+            throw new InvalidTokenException();
         }
         request.setAttribute("authentication", authentication);
         return true;

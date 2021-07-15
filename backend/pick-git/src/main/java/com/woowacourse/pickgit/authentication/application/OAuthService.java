@@ -1,12 +1,12 @@
 package com.woowacourse.pickgit.authentication.application;
 
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
-import com.woowacourse.pickgit.authentication.dao.CollectionOAuthAccessTokenDao;
 import com.woowacourse.pickgit.authentication.dao.OAuthAccessTokenDao;
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
+import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
@@ -74,7 +74,7 @@ public class OAuthService {
 
         String username = jwtTokenProvider.getPayloadByKey(authentication, "username");
         String accessToken = authAccessTokenDao.findByKeyToken(authentication)
-            .orElseThrow(() -> new IllegalArgumentException("다시 로그인해주세요."));
+            .orElseThrow(() -> new InvalidTokenException());
         return new LoginUser(username, accessToken);
     }
 
