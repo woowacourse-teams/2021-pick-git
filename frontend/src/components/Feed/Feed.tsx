@@ -1,6 +1,6 @@
 import { Post } from "../../@types";
 import { LIMIT } from "../../constants/limits";
-import { SNACKBAR_MESSAGE } from "../../constants/message";
+import { FAILURE_MESSAGE } from "../../constants/message";
 import useFeed from "../../services/hooks/useFeed";
 import PostItem from "../@shared/PostItem/PostItem";
 import { Container, PostItemWrapper } from "./Feed.style";
@@ -11,7 +11,7 @@ const Feed = () => {
 
   const handleCommentValueChange: React.ChangeEventHandler<HTMLTextAreaElement> = ({ target: { value } }) => {
     if (value.length > LIMIT.COMMENT_LENGTH) {
-      alert(SNACKBAR_MESSAGE.COMMENT_CONTENT_MAX_LENGTH_EXCEEDED);
+      alert(FAILURE_MESSAGE.COMMENT_CONTENT_MAX_LENGTH_EXCEEDED);
       return;
     }
 
