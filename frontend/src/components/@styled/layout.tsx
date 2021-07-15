@@ -8,8 +8,12 @@ export const Header = styled.header`
   height: ${Layout.HEADER_HEIGHT};
   background-color: ${({ theme }) => theme.color.white};
   z-index: 100;
+  border-bottom: 1px solid #cfcfcf;
 `;
 
 export const Page = styled.main`
-  padding-top: ${Layout.HEADER_HEIGHT};
+  width: 100%;
+  max-width: 500px;
+  margin: ${Layout.PAGE_MARGIN_TOP} auto 0;
+  background-color: #ffffff;
 `;

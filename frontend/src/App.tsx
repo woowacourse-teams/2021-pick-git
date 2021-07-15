@@ -1,33 +1,34 @@
-import { BrowserRouter, Route, Switch } from "react-router-dom";
-import { Main } from "./App.style";
+import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
 
 import { PAGE_URL } from "./constants/urls";
 import LoginPage from "./pages/LoginPage/LoginPage";
 import NavigationHeader from "./components/@layout/NavigationHeader/NavigationHeader";
 import HomeFeedPage from "./pages/HomeFeedPage/HomeFeedPage";
 import ProfilePage from "./pages/ProfilePage/ProfilePage";
+import { Page } from "./components/@styled/layout";
 
 const App = () => {
   return (
     <BrowserRouter>
       <Switch>
-        <Route path={[PAGE_URL.HOME, PAGE_URL.MY_PROFILE]}>
+        <Route exact path={[PAGE_URL.HOME, PAGE_URL.PROFILE]}>
           <NavigationHeader isLoggedIn={false} />
         </Route>
       </Switch>
-      <Main>
+      <Page>
         <Switch>
-          <Route path={PAGE_URL.HOME}>
+          <Route exact path={PAGE_URL.HOME}>
             <HomeFeedPage />
           </Route>
-          <Route path={PAGE_URL.LOGIN}>
+          <Route exact path={PAGE_URL.LOGIN}>
             <LoginPage />
           </Route>
-          <Route path={PAGE_URL.PROFILE}>
+          <Route exact path={PAGE_URL.PROFILE}>
             <ProfilePage />
           </Route>
+          <Redirect to="/" />
         </Switch>
-      </Main>
+      </Page>
     </BrowserRouter>
   );
 };
