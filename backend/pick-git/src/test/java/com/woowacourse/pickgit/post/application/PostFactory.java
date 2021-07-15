@@ -1,7 +1,7 @@
 package com.woowacourse.pickgit.post.application;
 
 import com.woowacourse.pickgit.common.FileFactory;
-import com.woowacourse.pickgit.post.application.dto.PostRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
 import com.woowacourse.pickgit.user.domain.profile.GithubProfile;

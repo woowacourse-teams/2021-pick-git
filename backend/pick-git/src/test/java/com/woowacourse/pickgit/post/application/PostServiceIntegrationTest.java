@@ -4,26 +4,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.FileFactory;
+import com.woowacourse.pickgit.post.PostTestConfiguration;
+import com.woowacourse.pickgit.post.application.dto.CommentDto;
+import com.woowacourse.pickgit.post.application.dto.PostDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
-import com.woowacourse.pickgit.post.domain.PlatformRepositoryExtractor;
-import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
-import com.woowacourse.pickgit.config.StorageConfiguration;
-import com.woowacourse.pickgit.post.application.dto.CommentDto;
-import com.woowacourse.pickgit.post.application.dto.PostDto;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostRepository;
 import com.woowacourse.pickgit.post.domain.comment.CommentFormatException;
 import com.woowacourse.pickgit.post.domain.comment.Comments;
-import com.woowacourse.pickgit.post.infrastructure.GithubRepositoryExtractor;
-import com.woowacourse.pickgit.post.infrastructure.MockRepositoryApiRequester;
-import com.woowacourse.pickgit.post.presentation.PickGitStorage;
 import com.woowacourse.pickgit.post.presentation.dto.HomeFeedRequest;
-import com.woowacourse.pickgit.tag.TestTagConfiguration;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
@@ -35,15 +29,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.web.client.HttpClientErrorException;
 
-@Import({TestTagConfiguration.class, StorageConfiguration.class})
+@Import(PostTestConfiguration.class)
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @ActiveProfiles("test")
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -78,8 +72,6 @@ class PostServiceIntegrationTest {
     private User user2;
     private Post post;
 
-    private User kevin;
-
     @BeforeEach
     void setUp() {
 //        platformRepositoryExtractor =
@@ -109,10 +101,6 @@ class PostServiceIntegrationTest {
         userRepository.save(user1);
         userRepository.save(user2);
         postRepository.save(post);
-        kevin =
-            new User(new BasicProfile("kevin", "a.jpg", "a"),
-                new GithubProfile("github.com", "a", "a", "a", "a"));
-        userRepository.save(kevin);
     }
 
     @DisplayName("게시물에 댓글을 정상 등록한다.")
@@ -221,8 +209,8 @@ class PostServiceIntegrationTest {
             .collect(Collectors.toList());
 
         assertThat(postDtos).hasSize(2);
-        assertThat(postNames).containsExactly("dani", "coda");
-        assertThat(repoNames).containsExactly("java-racingcar", "junit-test");
+        assertThat(postNames).containsExactly("ginger", "dani");
+        assertThat(repoNames).containsExactly("jwp-chess", "java-racingcar");
     }
 
     private void createMockPosts() {
