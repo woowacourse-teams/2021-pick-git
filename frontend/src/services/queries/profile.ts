@@ -18,10 +18,6 @@ type ProfileQueryKey = readonly [
 const profileQueryFunction: QueryFunction<Profile> = async ({ queryKey }) => {
   const [, { isMyProfile, accessToken, userName }] = queryKey as ProfileQueryKey;
 
-  if (isMyProfile && !accessToken) {
-    throw Error("no accessToken");
-  }
-
   if (isMyProfile) {
     if (!accessToken) throw Error("no accessToken");
 

@@ -1,6 +1,5 @@
 import { Container, AuthorName, Content, LikeIconWrapper } from "./Comment.style";
 import { HeartIcon, HeartLineIcon } from "../../../assets/icons";
-import { CommentData } from "../../../@types";
 
 export interface Props {
   authorName: string;

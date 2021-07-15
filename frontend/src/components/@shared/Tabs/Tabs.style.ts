@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 export const Container = styled.section`
   width: 100%;
-  overflow-x: auto;
+  overflow: hidden;
 `;
 
 export const TabButtonWrapper = styled.div`
@@ -46,7 +46,7 @@ export const TabContentWrapper = styled.div<{ tabIndex: number; tabCount: number
   `}
 
   display: flex;
-  padding-top: 1rem;
+  padding-top: 0.3rem;
   transition: transform 0.5s;
 `;
 
