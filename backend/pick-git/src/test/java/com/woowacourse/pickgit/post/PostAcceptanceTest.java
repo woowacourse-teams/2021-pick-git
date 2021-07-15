@@ -97,41 +97,9 @@ public class PostAcceptanceTest {
     void read_LoginUser_Success() {
         String token = 로그인_되어있음().getToken();
 
-        RestAssured
-            .given().log().all()
-            .auth().oauth2(token)
-            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-            .formParams(request)
-            .multiPart("images", FileFactory.getTestImage1File())
-            .multiPart("images", FileFactory.getTestImage2File())
-            .when()
-            .post("/api/posts")
-            .then().log().all()
-            .statusCode(HttpStatus.CREATED.value());
-
-        RestAssured
-            .given().log().all()
-            .auth().oauth2(token)
-            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-            .formParams(request)
-            .multiPart("images", FileFactory.getTestImage1File())
-            .multiPart("images", FileFactory.getTestImage2File())
-            .when()
-            .post("/api/posts")
-            .then().log().all()
-            .statusCode(HttpStatus.CREATED.value());
-
-        RestAssured
-            .given().log().all()
-            .auth().oauth2(token)
-            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-            .formParams(request)
-            .multiPart("images", FileFactory.getTestImage1File())
-            .multiPart("images", FileFactory.getTestImage2File())
-            .when()
-            .post("/api/posts")
-            .then().log().all()
-            .statusCode(HttpStatus.CREATED.value());
+        requestToWritePostApi(token, HttpStatus.CREATED);
+        requestToWritePostApi(token, HttpStatus.CREATED);
+        requestToWritePostApi(token, HttpStatus.CREATED);
 
         List<PostDto> response = RestAssured
             .given().log().all()
@@ -147,14 +115,8 @@ public class PostAcceptanceTest {
         assertThat(response).hasSize(3);
     }
 
-    @DisplayName("게스트는 게시글을 등록할 수 없다. - 유효하지 않은 토큰이 있는 경우 (Authorization header O)")
-    @Test
-    void write_GuestUserWithToken_Fail() {
-        // given
-        String token = "Bearer guest";
-
-        // when
-        RestAssured
+    private ExtractableResponse<Response> requestToWritePostApi(String token, HttpStatus httpStatus) {
+        return RestAssured
             .given().log().all()
             .auth().oauth2(token)
             .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -164,8 +126,18 @@ public class PostAcceptanceTest {
             .when()
             .post("/api/posts")
             .then().log().all()
-            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+            .statusCode(httpStatus.value())
             .extract();
+    }
+
+    @DisplayName("게스트는 게시글을 등록할 수 없다. - 유효하지 않은 토큰이 있는 경우 (Authorization header O)")
+    @Test
+    void write_GuestUserWithToken_Fail() {
+        // given
+        String token = "Bearer guest";
+
+        // when
+        requestToWritePostApi(token, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @DisplayName("게스트는 게시글을 등록할 수 없다. - 토큰이 없는 경우 (Authorization header X)")

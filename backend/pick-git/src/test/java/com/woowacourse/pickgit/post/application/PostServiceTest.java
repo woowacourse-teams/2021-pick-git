@@ -35,12 +35,14 @@ import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -66,6 +68,9 @@ class PostServiceTest {
 
     @Mock
     private TagService tagService;
+
+    @Mock
+    private EntityManager entityManager;
 
     private String image;
     private String description;
@@ -177,6 +182,8 @@ class PostServiceTest {
             .willReturn(Optional.of(post2));
         given(userRepository.findByBasicProfile_Name("kevin"))
             .willReturn(Optional.of(user2));
+        Mockito.doNothing().when(entityManager).flush();
+
         CommentRequestDto commentRequestDto =
             new CommentRequestDto("kevin", "test comment", 1L);
 
