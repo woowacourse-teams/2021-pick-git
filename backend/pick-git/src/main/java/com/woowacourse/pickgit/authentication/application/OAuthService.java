@@ -12,6 +12,7 @@ import com.woowacourse.pickgit.user.domain.UserRepository;
 import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
 import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class OAuthService {
@@ -35,6 +36,7 @@ public class OAuthService {
         return githubOAuthClient.getLoginUrl();
     }
 
+    @Transactional
     public String createToken(String code) {
         String githubAccessToken = githubOAuthClient.getAccessToken(code);
 
@@ -51,7 +53,6 @@ public class OAuthService {
         userRepository.findByBasicProfile_Name(githubProfileResponse.getName())
             .ifPresentOrElse(user -> {
                 user.changeGithubProfile(latestGithubProfile);
-                userRepository.save(user);
             }, () -> {
                 BasicProfile basicProfile = githubProfileResponse.toBasicProfile();
                 User user = new User(basicProfile, latestGithubProfile);
@@ -65,6 +66,7 @@ public class OAuthService {
         return token;
     }
 
+    @Transactional(readOnly = true)
     public AppUser findRequestUserByToken(String authentication) {
         if (authentication == null) {
             return new GuestUser();

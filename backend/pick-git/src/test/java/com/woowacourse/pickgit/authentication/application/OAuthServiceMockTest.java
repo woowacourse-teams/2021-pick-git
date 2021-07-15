@@ -87,7 +87,7 @@ class OAuthServiceMockTest {
         // then
         assertThat(token).isEqualTo(jwtToken);
         verify(userRepository, times(1)).findByBasicProfile_Name(githubProfileResponse.getName());
-        verify(userRepository, never()).save(user);
+        verify(userRepository, times(1)).save(user);
         verify(jwtTokenProvider, times(1)).createToken(githubProfileResponse.getName());
         verify(oAuthAccessTokenDao, times(1)).insert(jwtToken, oauthAccessToken);
     }
@@ -122,7 +122,7 @@ class OAuthServiceMockTest {
         // then
         assertThat(token).isEqualTo(jwtToken);
         verify(userRepository, times(1)).findByBasicProfile_Name(githubProfileResponse.getName());
-        verify(userRepository, times(1)).save(user);
+        verify(userRepository, never()).save(user);
         verify(jwtTokenProvider, times(1)).createToken(githubProfileResponse.getName());
         verify(oAuthAccessTokenDao, times(1)).insert(jwtToken, oauthAccessToken);
     }

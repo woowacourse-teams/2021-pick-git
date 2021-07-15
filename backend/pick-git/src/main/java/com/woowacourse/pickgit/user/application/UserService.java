@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.user.application;
 
+import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.user.application.dto.AuthUserServiceDto;
 import com.woowacourse.pickgit.user.application.dto.FollowServiceDto;
 import com.woowacourse.pickgit.user.application.dto.UserProfileServiceDto;
@@ -22,19 +23,37 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserProfileServiceDto getAuthUserProfile(AuthUserServiceDto authUserServiceDto) {
-        return getUserProfile(authUserServiceDto.getGithubName());
-    }
-
-    @Transactional(readOnly = true)
-    public UserProfileServiceDto getUserProfile(String username) {
-        User user = findUserByName(username);
+    public UserProfileServiceDto getMyUserProfile(AuthUserServiceDto authUserServiceDto) {
+        User user = findUserByName(authUserServiceDto.getGithubName());
 
         return new UserProfileServiceDto(
             user.getName(), user.getImage(), user.getDescription(),
             user.getFollowerCount(), user.getFollowingCount(), user.getPostCount(),
             user.getGithubUrl(), user.getCompany(), user.getLocation(),
-            user.getWebsite(), user.getTwitter()
+            user.getWebsite(), user.getTwitter(), null
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public UserProfileServiceDto getUserProfile(AppUser appUser, String targetUsername) {
+        User targetUser = findUserByName(targetUsername);
+
+        if (appUser.isGuest()) {
+            return new UserProfileServiceDto(
+                targetUser.getName(), targetUser.getImage(), targetUser.getDescription(),
+                targetUser.getFollowerCount(), targetUser.getFollowingCount(), targetUser.getPostCount(),
+                targetUser.getGithubUrl(), targetUser.getCompany(), targetUser.getLocation(),
+                targetUser.getWebsite(), targetUser.getTwitter(), null
+            );
+        }
+
+        User sourceUser = findUserByName(appUser.getUsername());
+
+        return new UserProfileServiceDto(
+            targetUser.getName(), targetUser.getImage(), targetUser.getDescription(),
+            targetUser.getFollowerCount(), targetUser.getFollowingCount(), targetUser.getPostCount(),
+            targetUser.getGithubUrl(), targetUser.getCompany(), targetUser.getLocation(),
+            targetUser.getWebsite(), targetUser.getTwitter(), sourceUser.isFollowing(targetUser)
         );
     }
 

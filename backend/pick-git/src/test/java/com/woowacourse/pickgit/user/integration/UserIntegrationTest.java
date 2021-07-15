@@ -74,7 +74,7 @@ public class UserIntegrationTest {
             new UserProfileResponseDto(user.getName(), user.getImage(), user.getDescription(),
                 user.getFollowerCount(), user.getFollowingCount(), user.getPostCount(),
                 user.getGithubUrl(), user.getCompany(), user.getLocation(), user.getWebsite(),
-                user.getTwitter());
+                user.getTwitter(), null);
 
         //when
         UserProfileResponseDto actualResponseDto =
@@ -98,17 +98,44 @@ public class UserIntegrationTest {
         unauthenticatedGetRequest(requestUrl, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @DisplayName("로그인 상태에서 타인의 프로필 조회에 성공한다.")
+    @DisplayName("로그인 상태에서 팔로우하는 타인의 프로필 조회에 성공한다.")
     @Test
-    void getUserProfile_ValidLoginUser_Success() {
+    void getUserProfile_ValidLoginUserFollowing_Success() {
         //given
-        User user = userFactory.user();
+        User targetUser = userFactory.anotherUser();
+
+        String followRequestUrl = "/api/profiles/" + targetUser.getName() + "/followings";
+        String requestUrl = "/api/profiles/" + targetUser.getName();
+        UserProfileResponseDto expectedResponseDto =
+            new UserProfileResponseDto(targetUser.getName(), targetUser.getImage(), targetUser.getDescription(),
+                1, targetUser.getFollowingCount(), targetUser.getPostCount(),
+                targetUser.getGithubUrl(), targetUser.getCompany(), targetUser.getLocation(), targetUser.getWebsite(),
+                targetUser.getTwitter(), true);
+
+        authenticatedPostRequest(userAccessToken, followRequestUrl, HttpStatus.OK);
+
+        //when
+        UserProfileResponseDto actualResponseDto =
+            authenticatedGetRequest(userAccessToken, requestUrl, HttpStatus.OK)
+                .as(UserProfileResponseDto.class);
+
+        //then
+        assertThat(actualResponseDto)
+            .usingRecursiveComparison()
+            .isEqualTo(expectedResponseDto);
+    }
+
+    @DisplayName("로그인 상태에서 팔로우하지 않는 타인의 프로필 조회에 성공한다.")
+    @Test
+    void getUserProfile_ValidLoginUserUnfollowing_Success() {
+        //given
+        User user = userFactory.anotherUser();
         String requestUrl = "/api/profiles/" + user.getName();
         UserProfileResponseDto expectedResponseDto =
             new UserProfileResponseDto(user.getName(), user.getImage(), user.getDescription(),
                 user.getFollowerCount(), user.getFollowingCount(), user.getPostCount(),
                 user.getGithubUrl(), user.getCompany(), user.getLocation(), user.getWebsite(),
-                user.getTwitter());
+                user.getTwitter(), false);
 
         //when
         UserProfileResponseDto actualResponseDto =
@@ -131,7 +158,7 @@ public class UserIntegrationTest {
             new UserProfileResponseDto(user.getName(), user.getImage(), user.getDescription(),
                 user.getFollowerCount(), user.getFollowingCount(), user.getPostCount(),
                 user.getGithubUrl(), user.getCompany(), user.getLocation(), user.getWebsite(),
-                user.getTwitter());
+                user.getTwitter(), null);
 
         //when
         UserProfileResponseDto actualResponseDto =
@@ -143,8 +170,6 @@ public class UserIntegrationTest {
             .usingRecursiveComparison()
             .isEqualTo(expectedResponseDto);
     }
-
-    //TODO 내가 나를 팔로우/언팔로우 할 수 없음
 
     @DisplayName("한 로그인 유저가 다른 유저를 팔로우하는데 성공한다.")
     @Test
