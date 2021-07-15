@@ -46,7 +46,7 @@ class GithubRepositoryExtractorTest {
             platformRepositoryExtractor.extract(ACCESS_TOKEN + "hi", USERNAME);
         }).isInstanceOf(PlatformHttpErrorException.class)
             .extracting("errorCode")
-            .isEqualTo("P0001");
+            .isEqualTo("V0001");
     }
 
     @DisplayName("사용자가 유효하지 않은 경우 예외가 발생한다. - 500 예외")
@@ -57,6 +57,6 @@ class GithubRepositoryExtractorTest {
             platformRepositoryExtractor.extract(ACCESS_TOKEN, USERNAME + "hi");
         }).isInstanceOf(PlatformHttpErrorException.class)
             .extracting("errorCode")
-            .isEqualTo("P0001");
+            .isEqualTo("V0001");
     }
 }

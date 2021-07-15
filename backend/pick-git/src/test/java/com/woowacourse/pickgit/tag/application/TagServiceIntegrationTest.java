@@ -63,7 +63,7 @@ class TagServiceIntegrationTest {
         assertThatCode(() -> tagService.extractTags(extractionRequestDto))
             .isInstanceOf(PlatformHttpErrorException.class)
             .extracting("errorCode")
-            .isEqualTo("P0001");
+            .isEqualTo("V0001");
     }
 
     @DisplayName("유효하지 않은 토큰으로 태그 추출 요청시 401 예외가 발생한다.")
@@ -76,7 +76,7 @@ class TagServiceIntegrationTest {
         assertThatCode(() -> tagService.extractTags(extractionRequestDto))
             .isInstanceOf(PlatformHttpErrorException.class)
             .extracting("errorCode")
-            .isEqualTo("P0001");
+            .isEqualTo("V0001");
     }
 
     @DisplayName("태그 이름을 태그로 변환한다.")

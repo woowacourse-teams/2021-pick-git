@@ -70,7 +70,7 @@ class TagServiceTest {
         assertThatCode(() -> tagService.extractTags(extractionRequestDto))
             .isInstanceOf(PlatformHttpErrorException.class)
             .extracting("errorCode")
-            .isEqualTo("P0001");
+            .isEqualTo("V0001");
         verify(platformTagExtractor, times(1))
             .extractTags(accessToken, userName, repositoryName);
     }
@@ -88,7 +88,7 @@ class TagServiceTest {
         assertThatCode(() -> tagService.extractTags(extractionRequestDto))
             .isInstanceOf(PlatformHttpErrorException.class)
             .extracting("errorCode")
-            .isEqualTo("P0001");
+            .isEqualTo("V0001");
         verify(platformTagExtractor, times(1))
             .extractTags(accessToken, userName, repositoryName);
     }

@@ -42,7 +42,7 @@ class GithubTagExtractorTest {
             platformTagExtractor.extractTags("invalidTOken", USER_NAME, REPOSITORY_NAME);
         }).isInstanceOf(PlatformHttpErrorException.class)
             .extracting("errorCode")
-            .isEqualTo("P0001");
+            .isEqualTo("V0001");
     }
 
     @DisplayName("username/repositoryname 링크에 해당하는 경로가 존재하지 않으면 조회 예외가 발생한다.")
@@ -52,6 +52,6 @@ class GithubTagExtractorTest {
             platformTagExtractor.extractTags(TESTER_ACCESS_TOKEN, "invalidpath", REPOSITORY_NAME);
         }).isInstanceOf(PlatformHttpErrorException.class)
             .extracting("errorCode")
-            .isEqualTo("P0001");
+            .isEqualTo("V0001");
     }
 }

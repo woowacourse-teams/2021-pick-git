@@ -105,7 +105,7 @@ class TagControllerTest {
         mockMvc.perform(get(url)
             .header("Authorization", accessToken))
             .andExpect(status().isInternalServerError())
-            .andExpect(jsonPath("errorCode").value("P0001"));
+            .andExpect(jsonPath("errorCode").value("V0001"));
 
         verify(tagService, times(1))
             .extractTags(any(ExtractionRequestDto.class));

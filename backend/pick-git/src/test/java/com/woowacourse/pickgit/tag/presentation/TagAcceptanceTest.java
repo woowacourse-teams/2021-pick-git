@@ -83,7 +83,7 @@ class TagAcceptanceTest {
         ApiErrorResponse response = requestTags(accessToken, url, HttpStatus.INTERNAL_SERVER_ERROR)
             .as(ApiErrorResponse.class);
 
-        assertThat(response.getErrorCode()).isEqualTo("P0001");
+        assertThat(response.getErrorCode()).isEqualTo("V0001");
     }
 
     @DisplayName("유효하지 않은 AccessToken으로 태그 추출 요청시 서버 에러가 발생한다.")

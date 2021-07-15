@@ -196,7 +196,7 @@ public class PostAcceptanceTest {
             .as(ApiErrorResponse.class);
 
         // then
-        assertThat(response.getErrorCode()).isEqualTo("P0001");
+        assertThat(response.getErrorCode()).isEqualTo("V0001");
     }
 
     private ExtractableResponse<Response> request(String token, String username, int statusCode) {

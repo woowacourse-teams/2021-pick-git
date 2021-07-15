@@ -176,7 +176,7 @@ class PostServiceIntegrationTest {
             postService.showRepositories(requestDto);
         }).isInstanceOf(PlatformHttpErrorException.class)
             .extracting("errorCode")
-            .isEqualTo("P0001");
+            .isEqualTo("V0001");
     }
 
     @DisplayName("사용자가 유효하지 않은 경우 예외가 발생한다. - 500 예외")
@@ -191,7 +191,7 @@ class PostServiceIntegrationTest {
             postService.showRepositories(requestDto);
         }).isInstanceOf(PlatformHttpErrorException.class)
             .extracting("errorCode")
-            .isEqualTo("P0001");
+            .isEqualTo("V0001");
     }
 
     @DisplayName("저장된 게시물 중 3, 4번째 글을 가져온다.")
