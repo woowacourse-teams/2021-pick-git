@@ -3,5 +3,6 @@
   "/profiles/me": "/self-profiles",
   "/profiles/:userName": "/user-profiles",
   "/authorization/github": "/github-login",
-  "/posts?page=:page&limit=:limit": "/posts?_page=:page&_limit=:limit"
+  "/posts?page=:page&limit=:limit": "/posts?_page=:page&_limit=:limit",
+  "/posts/:userName": "/posts"
 }
