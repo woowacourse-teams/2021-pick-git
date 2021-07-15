@@ -39,3 +39,11 @@ export interface Post {
   comments: CommentData[];
   isLiked: boolean;
 }
+
+export interface GithubStats {
+  stars: string;
+  commits: string;
+  prs: string;
+  issues: string;
+  contributes: string;
+}
