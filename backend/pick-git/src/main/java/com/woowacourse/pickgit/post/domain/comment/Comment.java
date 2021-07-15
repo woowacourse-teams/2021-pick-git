@@ -2,6 +2,7 @@ package com.woowacourse.pickgit.post.domain.comment;
 
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.user.domain.User;
+import java.util.Objects;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -43,6 +44,23 @@ public class Comment {
     public Comment toPost(Post post) {
         this.post = post;
         return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Comment comment = (Comment) o;
+        return Objects.equals(id, comment.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     public User getUser() {

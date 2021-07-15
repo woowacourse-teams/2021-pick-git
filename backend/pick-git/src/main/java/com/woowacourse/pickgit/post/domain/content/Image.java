@@ -1,6 +1,7 @@
 package com.woowacourse.pickgit.post.domain.content;
 
 import com.woowacourse.pickgit.post.domain.Post;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -37,5 +38,22 @@ public class Image {
     public Image toPost(Post post) {
         this.post = post;
         return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Image image = (Image) o;
+        return Objects.equals(id, image.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
