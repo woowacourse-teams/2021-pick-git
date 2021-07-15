@@ -1,10 +1,15 @@
+export const URL_PARAMS = {
+  ME: "me",
+};
+
 export const PAGE_URL = {
   HOME: "/",
   LOGIN: "/login",
   ADD_POST: "/add-post",
   EDIT_POST: "/edit-post",
   SEARCH: "/search",
-  MY_PROFILE: "/profile/me",
+  PROFILE: "profile/:id",
+  MY_PROFILE: `/profile/${URL_PARAMS.ME}`,
   USER_PROFILE: (userName: string) => `/profile/${userName}`,
   POSTS_WITH_TAG: (tag: string) => `/posts/${tag}`,
 };
