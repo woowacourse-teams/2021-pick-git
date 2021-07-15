@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-import defaultProfile from "../../../assets/images/defaultProfile.svg";
+import defaultProfile from "../../../assets/images/default-profile.png";
 
 export const Container = styled.div`
   display: inline-flex;
