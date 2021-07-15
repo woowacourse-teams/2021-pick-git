@@ -12,7 +12,7 @@ export default {
 const LoggedInWrapper = ({ children }: { children: React.ReactElement }) => {
   const { login } = useContext(UserContext);
 
-  useEffect(() => login("test", "tanney"), []);
+  useEffect(() => login("test", "Tanney"), []);
 
   return <>{children}</>;
 };
@@ -27,5 +27,10 @@ const Template: Story<Props> = (args) => (
 
 export const Default = Template.bind({});
 Default.args = {
+  userName: "Chris",
+};
+
+export const ProfileMe = Template.bind({});
+ProfileMe.args = {
   userName: "Tanney",
 };
