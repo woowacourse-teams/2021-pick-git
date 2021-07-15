@@ -208,7 +208,8 @@ class PostServiceTest {
 
         assertThatCode(() -> postService.addComment(commentRequestDto))
             .isInstanceOf(CommentFormatException.class)
-            .hasMessage("F0002");
+            .extracting("errorCode")
+            .isEqualTo("F0002");
         verify(postRepository, times(1)).findById(1L);
         verify(userRepository, times(1)).findByBasicProfile_Name("kevin");
     }

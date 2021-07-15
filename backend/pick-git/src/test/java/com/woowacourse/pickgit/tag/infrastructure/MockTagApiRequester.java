@@ -1,8 +1,6 @@
 package com.woowacourse.pickgit.tag.infrastructure;
 
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpClientErrorException;
 
 public class MockTagApiRequester implements PlatformApiRequester{
 

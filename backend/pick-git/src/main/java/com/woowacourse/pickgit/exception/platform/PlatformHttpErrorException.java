@@ -10,4 +10,8 @@ public class PlatformHttpErrorException extends PlatformException {
     public PlatformHttpErrorException() {
         super(CODE, HttpStatus.INTERNAL_SERVER_ERROR, MESSAGE);
     }
+
+    public PlatformHttpErrorException(String message) {
+        super(CODE, HttpStatus.INTERNAL_SERVER_ERROR, message);
+    }
 }

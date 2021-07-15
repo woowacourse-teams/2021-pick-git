@@ -2,6 +2,7 @@ package com.woowacourse.pickgit.post.domain;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.woowacourse.pickgit.exception.post.PostFormatException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +16,8 @@ class PostContentTest {
 
         // then
         assertThatThrownBy(() -> { new PostContent(content); })
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("F0001");
+            .isInstanceOf(PostFormatException.class)
+            .extracting("errorCode")
+            .isEqualTo("F0001");
     }
 }

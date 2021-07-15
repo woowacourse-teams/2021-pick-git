@@ -8,7 +8,7 @@ import com.woowacourse.pickgit.user.domain.follow.Followers;
 import com.woowacourse.pickgit.user.domain.follow.Followings;
 import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
 import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
-import com.woowacourse.pickgit.exception.user.DuplicatedFollowException;
+import com.woowacourse.pickgit.exception.user.DuplicateFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidFollowException;
 import java.util.Objects;
 import javax.persistence.Embedded;
@@ -66,7 +66,7 @@ public class User {
         Follow follow = new Follow(this, target);
 
         if (this.followings.existFollow(follow)) {
-            throw new DuplicatedFollowException();
+            throw new DuplicateFollowException();
         }
         this.followings.add(follow);
         target.followers.add(follow);

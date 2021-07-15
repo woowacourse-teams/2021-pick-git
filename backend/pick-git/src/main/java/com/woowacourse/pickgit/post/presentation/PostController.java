@@ -2,6 +2,7 @@ package com.woowacourse.pickgit.post.presentation;
 
 import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
+import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.post.application.CommentRequestDto;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
@@ -64,7 +65,7 @@ public class PostController {
 
     private void validateIsGuest(AppUser user) {
         if (user.isGuest()) {
-            throw new IllegalArgumentException("게스트는 글을 작성할 수 없습니다!");
+            throw new UnauthorizedException();
         }
     }
 

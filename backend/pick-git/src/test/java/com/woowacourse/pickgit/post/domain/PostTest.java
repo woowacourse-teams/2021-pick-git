@@ -39,6 +39,7 @@ class PostTest {
 
         assertThatCode(() -> post.addTags(duplicatedTags))
             .isInstanceOf(CannotAddTagException.class)
-            .hasMessage("P0001");
+            .extracting("errorCode")
+            .isEqualTo("P0001");
     }
 }

@@ -2,13 +2,16 @@ package com.woowacourse.pickgit.post.application;
 
 import static java.util.stream.Collectors.toList;
 
+import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
+import com.woowacourse.pickgit.exception.post.PostNotFoundException;
+import com.woowacourse.pickgit.exception.user.UserNotFoundException;
+import com.woowacourse.pickgit.post.application.dto.CommentDto;
+import com.woowacourse.pickgit.post.application.dto.PostDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
 import com.woowacourse.pickgit.post.domain.PlatformRepositoryExtractor;
-import com.woowacourse.pickgit.post.application.dto.CommentDto;
-import com.woowacourse.pickgit.post.application.dto.PostDto;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostContent;
 import com.woowacourse.pickgit.post.domain.PostRepository;
@@ -30,6 +33,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Function;
 import javax.persistence.EntityManager;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -63,7 +67,10 @@ public class PostService {
 
         User user = userRepository
             .findByBasicProfile_Name(postRequestDto.getUsername())
-            .orElseThrow(() -> new IllegalArgumentException("해당하는 사용자가 없습니다."));
+            .orElseThrow(() -> new UserNotFoundException(
+                "U0001",
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "해당하는 사용자를 찾을 수 없습니다."));
 
         Post post =
             new Post(postContent, getImages(postRequestDto), postRequestDto.getGithubRepoUrl(), user);
@@ -112,15 +119,23 @@ public class PostService {
 
             return tempFile.toFile();
         } catch (IOException ioException) {
-            throw new IllegalArgumentException("업로드에 실패했습니다");
+            throw new PlatformHttpErrorException();
         }
     }
 
     public CommentDto addComment(CommentRequestDto commentRequestDto) {
         User user = userRepository.findByBasicProfile_Name(commentRequestDto.getUserName())
-            .orElseThrow(IllegalArgumentException::new);
+            .orElseThrow(() -> new UserNotFoundException(
+                "U0001",
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "해당하는 사용자를 찾을 수 없습니다."
+            ));
         Post post = postRepository.findById(commentRequestDto.getPostId())
-            .orElseThrow(IllegalArgumentException::new);
+            .orElseThrow(() -> new PostNotFoundException(
+                "U0001",
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "해당하는 사용자를 찾을 수 없습니다."
+            ));
         Comment comment = new Comment(commentRequestDto.getContent());
         user.addComment(post, comment);
         entityManager.flush();

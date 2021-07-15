@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,6 +18,7 @@ import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.FileFactory;
 import com.woowacourse.pickgit.config.StorageConfiguration;
+import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.post.application.CommentRequestDto;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
@@ -126,15 +128,15 @@ class PostControllerTest {
         multiValueMap.add("content", postContent);
 
         // then
-        assertThatCode(() ->
-            mockMvc.perform(multipart("/api/posts")
-                .file(FileFactory.getTestImage1())
-                .file(FileFactory.getTestImage2())
-                .params(multiValueMap)
-                .param("tags", tags)
-                .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN))
-                .andExpect(status().is4xxClientError())
-        ).isInstanceOf(NestedServletException.class);
+
+        mockMvc.perform(multipart("/api/posts")
+            .file(FileFactory.getTestImage1())
+            .file(FileFactory.getTestImage2())
+            .params(multiValueMap)
+            .param("tags", tags)
+            .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN))
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("errorCode").value("A0002"));
     }
 
     @DisplayName("특정 Post에 댓글을 추가한다.")
@@ -184,8 +186,7 @@ class PostControllerTest {
 
         addCommentApi(url, requestBody)
             .andExpect(status().isBadRequest())
-            .andExpect(content().string("F0002"));
-
+            .andExpect(jsonPath("errorCode").value("F0002"));
         verify(postService, times(1)).addComment(any(CommentRequestDto.class));
     }
 

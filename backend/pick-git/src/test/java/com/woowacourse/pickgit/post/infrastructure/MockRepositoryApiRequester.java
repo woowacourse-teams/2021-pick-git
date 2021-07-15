@@ -1,7 +1,6 @@
 package com.woowacourse.pickgit.post.infrastructure;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpClientErrorException;
+import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 
 public class MockRepositoryApiRequester implements PlatformRepositoryApiRequester {
 
@@ -14,10 +13,10 @@ public class MockRepositoryApiRequester implements PlatformRepositoryApiRequeste
         String apiUrl = String.format(API_URL_FORMAT, USERNAME);
 
         if (isNotValidToken(token)) {
-            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
+            throw new PlatformHttpErrorException("외부 플랫폼 토큰 인증 실패");
         }
         if (isNotValidUrl(url, apiUrl)) {
-            throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
+            throw new PlatformHttpErrorException("외부 플랫폼 URL NotFound");
         }
 
         return "[{\"name\": \"binghe-hi\" }, {\"name\": \"doms-react\" }]";

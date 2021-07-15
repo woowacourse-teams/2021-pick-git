@@ -13,7 +13,7 @@ import com.woowacourse.pickgit.user.application.dto.FollowServiceDto;
 import com.woowacourse.pickgit.user.application.dto.UserProfileServiceDto;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
-import com.woowacourse.pickgit.exception.user.DuplicatedFollowException;
+import com.woowacourse.pickgit.exception.user.DuplicateFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
 import org.junit.jupiter.api.DisplayName;
@@ -185,7 +185,7 @@ public class UserServiceIntegrationTest {
         //then
         assertThatThrownBy(
             () -> userService.followUser(authUserServiceDto, targetName)
-        ).hasMessage(new DuplicatedFollowException().getMessage());
+        ).hasMessage(new DuplicateFollowException().getMessage());
     }
 
     @DisplayName("Source 유저가 Target 유저를 unfollow 하면 성공한다.")

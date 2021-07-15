@@ -7,6 +7,7 @@ import static org.mockito.BDDMockito.given;
 import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.config.StorageConfiguration;
+import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
 import com.woowacourse.pickgit.post.application.dto.CommentDto;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostRepository;
@@ -106,9 +107,10 @@ class PostAcceptanceTest {
             comment.append("a");
         }
 
-        String response = addCommentApi(url, comment.toString(), HttpStatus.BAD_REQUEST)
-            .asString();
+        ApiErrorResponse response = addCommentApi(url, comment.toString(), HttpStatus.BAD_REQUEST)
+            .as(ApiErrorResponse.class);
 
-        assertThat(response).isEqualTo("F0002");
+
+        assertThat(response.getErrorCode()).isEqualTo("F0002");
     }
 }

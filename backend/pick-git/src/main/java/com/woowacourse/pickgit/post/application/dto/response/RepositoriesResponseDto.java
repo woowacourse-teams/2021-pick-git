@@ -10,7 +10,8 @@ public class RepositoriesResponseDto {
     private RepositoriesResponseDto() {
     }
 
-    public RepositoriesResponseDto(List<RepositoryResponseDto> repositories) {
+    public
+    RepositoriesResponseDto(List<RepositoryResponseDto> repositories) {
         this.repositories = repositories;
     }
 
