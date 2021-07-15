@@ -139,7 +139,10 @@ public class PostService {
         int page = Math.toIntExact(homeFeedRequest.getPage());
         int limit = Math.toIntExact(homeFeedRequest.getLimit());
         List<Post> result = entityManager
-            .createQuery("select p from Post p order by p.id", Post.class)
+            .createQuery("select distinct p from Post p "
+                + "left join fetch p.user "
+                + "left join fetch p.likes.likes "
+                + "order by p.id", Post.class)
             .setFirstResult(page * limit)
             .setMaxResults(limit)
             .getResultList();
