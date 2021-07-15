@@ -1,8 +1,10 @@
 import Button from "../../components/@shared/Button/Button";
 import CircleIcon from "../../components/@shared/CircleIcon/CircleIcon";
 import { GithubLargeIcon } from "../../assets/icons";
-import { Container, Heading, Inner } from "./LoginPage.style";
 import { requestGetGithubAuthLink } from "../../services/requests";
+import { PAGE_URL } from "../../constants/urls";
+import { Container, Heading, HomeLinkText, Inner } from "./LoginPage.style";
+import { Link } from "react-router-dom";
 
 const LoginPage = () => {
   const onRequestGithubLogin = async () => {
@@ -27,6 +29,9 @@ const LoginPage = () => {
         <Button type="button" kind="roundedBlock" onClick={onRequestGithubLogin}>
           깃허브 로그인
         </Button>
+        <Link to={PAGE_URL.HOME}>
+          <HomeLinkText>처음으로</HomeLinkText>
+        </Link>
       </Inner>
     </Container>
   );
