@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="18.115" height="18.115" viewBox="0 0 18.115 18.115">
+  <g id="send-icon" transform="translate(1.433 1.682)">
+    <line id="Line" x1="9.167" y2="9.167" transform="translate(6.667 -0.833)" fill="none" stroke="#5a5a5a" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2"/>
+    <path id="Path" d="M18.333,1.667,12.5,18.333l-3.333-7.5L1.667,7.5Z" transform="translate(-2.5 -2.5)" fill="none" stroke="#5a5a5a" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2"/>
+  </g>
+</svg>

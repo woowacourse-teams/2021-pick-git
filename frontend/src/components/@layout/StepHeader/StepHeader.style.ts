@@ -1,6 +1,7 @@
 import styled from "styled-components";
+import { Header } from "../../@styled/layout";
 
-export const Container = styled.header<React.CSSProperties>`
+export const Container = styled(Header)<React.CSSProperties>`
   display: flex;
   justify-content: space-between;
   padding: 1.125rem 1.5rem;

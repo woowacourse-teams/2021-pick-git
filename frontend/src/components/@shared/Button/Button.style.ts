@@ -7,8 +7,6 @@ const Button = styled.button<React.CSSProperties>`
 
   `}
 
-  padding: 0.4375rem 0.875rem;
-  font-size: 0.75rem;
   text-align: center;
   transition: opacity 0.5s;
 
@@ -17,24 +15,31 @@ const Button = styled.button<React.CSSProperties>`
   }
 `;
 
-export const SquaredInlineButton = styled(Button)`
+const InlineButton = styled(Button)`
   display: inline-block;
-  border-radius: 4px;
+  padding: 0.4375rem 0.875rem;
+  font-size: 0.75rem;
 `;
 
-export const SquaredBlockButton = styled(Button)`
+const BlockButton = styled(Button)`
   display: block;
   width: 100%;
+  padding: 0.875rem;
+  font-size: 1rem;
+`;
+
+export const SquaredInlineButton = styled(InlineButton)`
   border-radius: 4px;
 `;
 
-export const RoundedInlineButton = styled(Button)`
-  display: inline-block;
+export const SquaredBlockButton = styled(BlockButton)`
+  border-radius: 4px;
+`;
+
+export const RoundedInlineButton = styled(InlineButton)`
   border-radius: 24px;
 `;
 
-export const RoundedBlockButton = styled(Button)`
-  display: block;
-  width: 100%;
+export const RoundedBlockButton = styled(BlockButton)`
   border-radius: 24px;
 `;

@@ -65,6 +65,8 @@ export const MoreContentLinkButton = styled.a`
   font-size: 0.75rem;
   font-weight: bold;
   margin-left: 0.625rem;
+  margin-right: 0.3125rem;
+  float: right;
 `;
 
 export const PostContentAuthorLink = styled(Link)`
@@ -76,18 +78,33 @@ export const PostContentAuthorLink = styled(Link)`
 export const PostContent = styled.span`
   font-size: 0.625rem;
   line-height: 1.5rem;
-  margin-bottom: 8px;
+  margin-bottom: 1rem;
+`;
+
+export const TagListWrapper = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+`;
+
+export const TagItemLinkButton = styled(Link)`
+  margin-right: 0.625rem;
+  margin-bottom: 0.5625rem;
 `;
 
 export const CommentWrapper = styled.div`
   margin-bottom: 0.5rem;
 `;
 
-export const CommentInputWrapper = styled.div`
+export const MyComment = styled.div`
   display: flex;
   align-items: center;
   padding: 0 0.75rem;
-  margin-bottom: 0.625rem;
+`;
+
+export const CommentInputWrapper = styled.div`
+  width: 100%;
+  padding: 0 1rem;
 `;
 
 export const PostCreatedDateText = styled.span`
