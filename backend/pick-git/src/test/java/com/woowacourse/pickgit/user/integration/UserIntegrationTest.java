@@ -3,16 +3,12 @@ package com.woowacourse.pickgit.user.integration;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-import com.woowacourse.pickgit.authentication.application.JwtTokenProvider;
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
-import com.woowacourse.pickgit.authentication.dao.OAuthAccessTokenDao;
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
 import com.woowacourse.pickgit.config.StorageConfiguration;
 import com.woowacourse.pickgit.user.UserFactory;
 import com.woowacourse.pickgit.user.domain.User;
-import com.woowacourse.pickgit.user.domain.UserRepository;
-import com.woowacourse.pickgit.user.exception.DuplicatedFollowException;
 import com.woowacourse.pickgit.user.presentation.dto.FollowResponseDto;
 import com.woowacourse.pickgit.user.presentation.dto.UserProfileResponseDto;
 import io.restassured.RestAssured;
@@ -21,7 +17,6 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -32,7 +27,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 @Import(StorageConfiguration.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -95,7 +89,7 @@ public class UserIntegrationTest {
 
         //when
         //then
-        unauthenticatedGetRequest(requestUrl, HttpStatus.INTERNAL_SERVER_ERROR);
+        unauthenticatedGetRequest(requestUrl, HttpStatus.UNAUTHORIZED);
     }
 
     @DisplayName("로그인 상태에서 팔로우하는 타인의 프로필 조회에 성공한다.")

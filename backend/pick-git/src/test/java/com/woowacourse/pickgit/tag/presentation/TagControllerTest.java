@@ -1,17 +1,18 @@
 package com.woowacourse.pickgit.tag.presentation;
 
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
+import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.tag.application.ExtractionRequestDto;
 import com.woowacourse.pickgit.tag.application.TagService;
 import com.woowacourse.pickgit.tag.application.TagsDto;
@@ -24,11 +25,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.util.NestedServletException;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(TagController.class)
@@ -89,11 +87,10 @@ class TagControllerTest {
         given(oAuthService.validateToken(any(String.class)))
             .willReturn(false);
 
-        assertThatCode(() -> {
-            mockMvc.perform(get(url)
-                .header("Authorization", "Bearer invalid"));
-        }).isInstanceOfAny(NestedServletException.class)
-            .hasMessageContaining("검증되지 않는 토큰입니다.");
+        mockMvc.perform(get(url)
+            .header("Authorization", "Bearer invalid"))
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("$.errorCode").value("A0001"));
     }
 
     @DisplayName("유효하지 않은 레포지토리 태그 추출 요청시 404 예외 메시지가 반환된다.")
@@ -103,12 +100,12 @@ class TagControllerTest {
             "/api/github/" + userName + "/repositories/invalidrepo/tags/languages";
 
         given(tagService.extractTags(any(ExtractionRequestDto.class)))
-            .willThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
+            .willThrow(new PlatformHttpErrorException());
 
         mockMvc.perform(get(url)
             .header("Authorization", accessToken))
-            .andExpect(status().isBadRequest())
-            .andExpect(content().string("P0001"));
+            .andExpect(status().isInternalServerError())
+            .andExpect(jsonPath("errorCode").value("P0001"));
 
         verify(tagService, times(1))
             .extractTags(any(ExtractionRequestDto.class));

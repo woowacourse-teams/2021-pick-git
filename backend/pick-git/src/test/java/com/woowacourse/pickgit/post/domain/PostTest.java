@@ -3,6 +3,7 @@ package com.woowacourse.pickgit.post.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
+import com.woowacourse.pickgit.exception.post.CannotAddTagException;
 import com.woowacourse.pickgit.tag.domain.Tag;
 import java.util.ArrayList;
 import java.util.Arrays;

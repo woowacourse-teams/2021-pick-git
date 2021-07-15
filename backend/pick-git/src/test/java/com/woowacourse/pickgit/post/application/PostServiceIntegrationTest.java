@@ -6,6 +6,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.FileFactory;
+import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
+import com.woowacourse.pickgit.exception.post.CommentFormatException;
 import com.woowacourse.pickgit.post.PostTestConfiguration;
 import com.woowacourse.pickgit.post.application.dto.CommentDto;
 import com.woowacourse.pickgit.post.application.dto.PostDto;
@@ -15,7 +17,6 @@ import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostRepository;
-import com.woowacourse.pickgit.post.domain.comment.CommentFormatException;
 import com.woowacourse.pickgit.post.domain.comment.Comments;
 import com.woowacourse.pickgit.post.presentation.dto.HomeFeedRequest;
 import com.woowacourse.pickgit.user.domain.User;
@@ -35,7 +36,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.web.client.HttpClientErrorException;
 
 @Import(PostTestConfiguration.class)
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
@@ -173,7 +173,7 @@ class PostServiceIntegrationTest {
         // then
         assertThatThrownBy(() -> {
             postService.showRepositories(requestDto);
-        }).isInstanceOf(HttpClientErrorException.class)
+        }).isInstanceOf(PlatformHttpErrorException.class)
             .hasMessageContaining("401");
     }
 
@@ -187,7 +187,7 @@ class PostServiceIntegrationTest {
         // then
         assertThatThrownBy(() -> {
             postService.showRepositories(requestDto);
-        }).isInstanceOf(HttpClientErrorException.class)
+        }).isInstanceOf(PlatformHttpErrorException.class)
             .hasMessageContaining("404");
     }
 

@@ -7,9 +7,10 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
+import com.woowacourse.pickgit.exception.post.TagFormatException;
 import com.woowacourse.pickgit.tag.domain.PlatformTagExtractor;
 import com.woowacourse.pickgit.tag.domain.Tag;
-import com.woowacourse.pickgit.tag.domain.TagFormatException;
 import com.woowacourse.pickgit.tag.domain.TagRepository;
 import java.util.Arrays;
 import java.util.List;
@@ -22,7 +23,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpClientErrorException;
 
 @ExtendWith(MockitoExtension.class)
 class TagServiceTest {
@@ -65,11 +65,12 @@ class TagServiceTest {
             new ExtractionRequestDto(accessToken, userName, repositoryName);
 
         given(platformTagExtractor.extractTags(accessToken, userName, repositoryName))
-            .willThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
+            .willThrow(new PlatformHttpErrorException());
 
         assertThatCode(() -> tagService.extractTags(extractionRequestDto))
-            .isInstanceOf(HttpClientErrorException.class)
-            .hasMessageContaining("404");
+            .isInstanceOf(PlatformHttpErrorException.class)
+            .extracting("errorCode")
+            .isEqualTo("P0001");
         verify(platformTagExtractor, times(1))
             .extractTags(accessToken, userName, repositoryName);
     }
@@ -82,11 +83,12 @@ class TagServiceTest {
             new ExtractionRequestDto(accessToken, userName, repositoryName);
 
         given(platformTagExtractor.extractTags(accessToken, userName, repositoryName))
-            .willThrow(new HttpClientErrorException(HttpStatus.UNAUTHORIZED));
+            .willThrow(new PlatformHttpErrorException());
 
         assertThatCode(() -> tagService.extractTags(extractionRequestDto))
-            .isInstanceOf(HttpClientErrorException.class)
-            .hasMessageContaining("401");
+            .isInstanceOf(PlatformHttpErrorException.class)
+            .extracting("errorCode")
+            .isEqualTo("P0001");
         verify(platformTagExtractor, times(1))
             .extractTags(accessToken, userName, repositoryName);
     }
@@ -128,7 +130,8 @@ class TagServiceTest {
 
         assertThatCode(() -> tagService.findOrCreateTags(tagsDto))
             .isInstanceOf(TagFormatException.class)
-            .hasMessage("F0003");
+            .extracting("errorCode")
+            .isEqualTo("F0003");
         verify(tagRepository, times(3)).findByName(anyString());
     }
 }
