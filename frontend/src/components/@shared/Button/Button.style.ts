@@ -4,7 +4,6 @@ const Button = styled.button<React.CSSProperties>`
   ${({ theme, backgroundColor, color }) => `
     color: ${color ?? theme.color.white};
     background-color: ${backgroundColor ?? theme.color.primaryColor};
-
   `}
 
   text-align: center;
@@ -24,7 +23,7 @@ const InlineButton = styled(Button)`
 const BlockButton = styled(Button)`
   display: block;
   width: 100%;
-  padding: 0.875rem;
+  padding: 0.5rem;
   font-size: 1rem;
 `;
 

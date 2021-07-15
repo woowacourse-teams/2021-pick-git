@@ -13,7 +13,7 @@ export const Header = styled.header`
 
 export const Page = styled.main`
   width: 100%;
-  max-width: 500px;
+  max-width: 375px;
   margin: ${Layout.PAGE_MARGIN_TOP} auto 0;
   background-color: #ffffff;
 `;
