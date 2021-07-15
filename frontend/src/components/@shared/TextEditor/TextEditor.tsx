@@ -5,7 +5,6 @@ import TextArea from "./TextEditor.style";
 export interface Props {
   width?: string;
   height?: string;
-  backgroundColor?: string;
   fontSize?: string;
   autoGrow?: boolean;
   placeholder?: string;
@@ -15,16 +14,7 @@ export interface Props {
 
 const TEXT_EDITOR_LINE_HEIGHT = 1.2;
 
-const TextEditor = ({
-  width,
-  height,
-  backgroundColor,
-  fontSize = "1rem",
-  autoGrow = false,
-  placeholder,
-  value,
-  onChange,
-}: Props) => {
+const TextEditor = ({ width, height, fontSize = "1rem", autoGrow = false, placeholder, value, onChange }: Props) => {
   const [currentHeight, setCurrentHeight] = useState("");
 
   const onKeyUp: KeyboardEventHandler<HTMLTextAreaElement> = ({ key }) => {
@@ -44,7 +34,6 @@ const TextEditor = ({
       width={width}
       minHeight={height}
       height={currentHeight}
-      backgroundColor={backgroundColor}
       placeholder={placeholder}
       value={value}
       onChange={onChange}
