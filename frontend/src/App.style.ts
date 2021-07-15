@@ -1,4 +1,4 @@
-import { createGlobalStyle } from "styled-components";
+import styled, { createGlobalStyle } from "styled-components";
 import normalize from "styled-normalize";
 
 export const theme = {
@@ -14,6 +14,10 @@ export const theme = {
     white: "#ffffff",
   },
 };
+
+export const Main = styled.main`
+  width: 100%;
+`;
 
 export const GlobalStyle = createGlobalStyle`
   ${normalize}
