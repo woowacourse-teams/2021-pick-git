@@ -3,12 +3,16 @@ package com.woowacourse.pickgit.user.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.woowacourse.pickgit.authentication.domain.user.AppUser;
+import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
+import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.config.StorageConfiguration;
 import com.woowacourse.pickgit.tag.TestTagConfiguration;
 import com.woowacourse.pickgit.user.UserFactory;
 import com.woowacourse.pickgit.user.application.dto.AuthUserServiceDto;
 import com.woowacourse.pickgit.user.application.dto.FollowServiceDto;
 import com.woowacourse.pickgit.user.application.dto.UserProfileServiceDto;
+import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import com.woowacourse.pickgit.user.exception.DuplicatedFollowException;
 import com.woowacourse.pickgit.user.exception.InvalidFollowException;
@@ -16,6 +20,7 @@ import com.woowacourse.pickgit.user.exception.InvalidUserException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Import;
@@ -46,21 +51,92 @@ public class UserServiceIntegrationTest {
     private UserRepository userRepository;
 
     private UserFactory userFactory = new UserFactory();
-    ;
 
-    @DisplayName("유저이름으로 검색한 User 기반으로 프로필 정보를 성공적으로 가져온다.")
+    @DisplayName("개인 프로필 정보를 성공적으로 가져온다.")
     @Test
-    public void getUserProfile_FindUserInfoByName_Success() {
+    public void getMyUserProfile_FindUserInfoByName_Success() {
         //given
+        AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(NAME);
         userRepository.save(userFactory.user());
         UserProfileServiceDto expectedUserProfileDto = new UserProfileServiceDto(
             NAME, IMAGE, DESCRIPTION,
             0, 0, 0,
-            GITHUB_URL, COMPANY, LOCATION, WEBSITE, TWITTER
+            GITHUB_URL, COMPANY, LOCATION, WEBSITE, TWITTER, null
         );
 
         //when
-        UserProfileServiceDto actualUserProfileDto = userService.getUserProfile(NAME);
+        UserProfileServiceDto actualUserProfileDto = userService.getMyUserProfile(authUserServiceDto);
+
+        //then
+        assertThat(actualUserProfileDto)
+            .usingRecursiveComparison()
+            .isEqualTo(expectedUserProfileDto);
+    }
+
+    @DisplayName("게스트 유저가 프로필 조회시 프로필 정보를 성공적으로 가져온다.")
+    @Test
+    public void getUserProfile_GuestFindUserInfoByName_Success() {
+        //given
+        AppUser guestUser = new GuestUser();
+        userRepository.save(userFactory.user());
+        UserProfileServiceDto expectedUserProfileDto = new UserProfileServiceDto(
+            NAME, IMAGE, DESCRIPTION,
+            0, 0, 0,
+            GITHUB_URL, COMPANY, LOCATION, WEBSITE, TWITTER, null
+        );
+
+        //when
+        UserProfileServiceDto actualUserProfileDto = userService.getUserProfile(guestUser, NAME);
+
+        //then
+        assertThat(actualUserProfileDto)
+            .usingRecursiveComparison()
+            .isEqualTo(expectedUserProfileDto);
+    }
+
+    @DisplayName("로그인 유저가 팔로우 하는 프로필 조회시 프로필 정보를 성공적으로 가져온다.")
+    @Test
+    public void getUserProfile_FindFollowingUserInfoByName_Success() {
+        //given
+        AppUser loginUser = new LoginUser(NAME, "token");
+        User source = userRepository.save(userFactory.user());
+        User target = userRepository.save(userFactory.anotherUser());
+
+        AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(source.getName());
+        userService.followUser(authUserServiceDto, target.getName());
+
+        UserProfileServiceDto expectedUserProfileDto = new UserProfileServiceDto(
+            target.getName(), target.getImage(), target.getDescription(),
+            1, 0, 0,
+            target.getGithubUrl(), target.getCompany(), target.getLocation(),
+            target.getWebsite(), target.getTwitter(), true
+        );
+
+        //when
+        UserProfileServiceDto actualUserProfileDto = userService.getUserProfile(loginUser, target.getName());
+
+        //then
+        assertThat(actualUserProfileDto)
+            .usingRecursiveComparison()
+            .isEqualTo(expectedUserProfileDto);
+    }
+
+    @DisplayName("로그인 유저가 팔로우하고 있지 않은 프로필 조회시 프로필 정보를 성공적으로 가져온다.")
+    @Test
+    public void getUserProfile_FindUnfollowingUserInfoByName_Success() {
+        //given
+        AppUser loginUser = new LoginUser(NAME, "token");
+        userRepository.save(userFactory.user());
+        userRepository.save(userFactory.anotherUser());
+
+        UserProfileServiceDto expectedUserProfileDto = new UserProfileServiceDto(
+            NAME, IMAGE, DESCRIPTION,
+            0, 0, 0,
+            GITHUB_URL, COMPANY, LOCATION, WEBSITE, TWITTER, false
+        );
+
+        //when
+        UserProfileServiceDto actualUserProfileDto = userService.getUserProfile(loginUser, NAME);
 
         //then
         assertThat(actualUserProfileDto)
@@ -74,8 +150,9 @@ public class UserServiceIntegrationTest {
         //given
         //when
         //then
+        AppUser appUser = new GuestUser();
         assertThatThrownBy(
-            () -> userService.getUserProfile("InvalidName")
+            () -> userService.getUserProfile(appUser, "InvalidName")
         ).hasMessage(new InvalidUserException().getMessage());
     }
 

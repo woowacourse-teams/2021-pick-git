@@ -10,6 +10,7 @@ import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
 import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
 import com.woowacourse.pickgit.user.exception.DuplicatedFollowException;
 import com.woowacourse.pickgit.user.exception.InvalidFollowException;
+import java.util.Objects;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -83,6 +84,10 @@ public class User {
         target.followers.remove(follow);
     }
 
+    public Boolean isFollowing(User targetUser) {
+        return this.followings.isFollowing(targetUser);
+    }
+
     public int getFollowerCount() {
         return followers.count();
     }
@@ -143,5 +148,22 @@ public class User {
         comment.toPost(post)
             .writeBy(this);
         post.addComment(comment);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        User user = (User) o;
+        return Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

@@ -29,7 +29,7 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<UserProfileResponseDto> getAuthenticatedUserProfile(
         @Authenticated AppUser appUser) {
-        UserProfileServiceDto userProfileServiceDto = userService.getAuthUserProfile(
+        UserProfileServiceDto userProfileServiceDto = userService.getMyUserProfile(
             new AuthUserServiceDto(appUser.getUsername())
         );
 
@@ -37,8 +37,9 @@ public class UserController {
     }
 
     @GetMapping("/{username}")
-    public ResponseEntity<UserProfileResponseDto> getUserProfile(@PathVariable String username) {
-        UserProfileServiceDto userProfileServiceDto = userService.getUserProfile(username);
+    public ResponseEntity<UserProfileResponseDto> getUserProfile(
+        @Authenticated AppUser appUser, @PathVariable String username) {
+        UserProfileServiceDto userProfileServiceDto = userService.getUserProfile(appUser, username);
 
         return ResponseEntity.ok(getUserProfileResponseDto(userProfileServiceDto));
     }
@@ -77,7 +78,7 @@ public class UserController {
             userProfileServiceDto.getFollowingCount(), userProfileServiceDto.getPostCount(),
             userProfileServiceDto.getGithubUrl(), userProfileServiceDto.getCompany(),
             userProfileServiceDto.getLocation(), userProfileServiceDto.getWebsite(),
-            userProfileServiceDto.getTwitter()
+            userProfileServiceDto.getTwitter(), userProfileServiceDto.getFollowing()
         );
     }
 

@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.user.domain.follow;
 
+import com.woowacourse.pickgit.user.domain.User;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
@@ -30,6 +31,12 @@ public class Followings {
 
     public void remove(Follow follow) {
         followings.remove(follow);
+    }
+
+    public Boolean isFollowing(User targetUser) {
+        return followings.stream()
+            .filter(follow -> follow.getTarget().equals(targetUser))
+            .findAny().isPresent();
     }
 }
 

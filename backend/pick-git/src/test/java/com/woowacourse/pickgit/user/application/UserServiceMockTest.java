@@ -7,6 +7,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.woowacourse.pickgit.authentication.domain.user.AppUser;
+import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.user.UserFactory;
 import com.woowacourse.pickgit.user.application.dto.AuthUserServiceDto;
 import com.woowacourse.pickgit.user.application.dto.FollowServiceDto;
@@ -49,10 +51,17 @@ class UserServiceMockTest {
         this.userFactory = new UserFactory();
     }
 
+    @DisplayName("본인의 프로필 정보를 성공적으로 가져온다.")
+    @Test
+    void name() {
+
+    }
+
     @DisplayName("유저이름으로 검색한 User 기반으로 프로필 정보를 성공적으로 가져온다.")
     @Test
-    public void getUserProfile_FindUserInfoByName_Success() {
+    void getUserProfile_FindUserInfoByName_Success() {
         //given
+        AppUser appUser = new GuestUser();
         given(
             userRepository.findByBasicProfile_Name(anyString())
         ).willReturn(Optional.of(userFactory.user()));
@@ -60,11 +69,11 @@ class UserServiceMockTest {
         UserProfileServiceDto expectedUserProfileDto = new UserProfileServiceDto(
             NAME, IMAGE, DESCRIPTION,
             0, 0, 0,
-            GITHUB_URL, COMPANY, LOCATION, WEBSITE, TWITTER
+            GITHUB_URL, COMPANY, LOCATION, WEBSITE, TWITTER, null
         );
 
         //when
-        UserProfileServiceDto actualUserProfileDto = userService.getUserProfile(NAME);
+        UserProfileServiceDto actualUserProfileDto = userService.getUserProfile(appUser, NAME);
 
         //then
         assertThat(actualUserProfileDto)
@@ -78,10 +87,11 @@ class UserServiceMockTest {
     @Test
     void getUserProfile_FindUserInfoByInvalidName_Success() {
         //given
+        AppUser appUser = new GuestUser();
         //when
         //then
         assertThatThrownBy(
-            () -> userService.getUserProfile("InvalidName")
+            () -> userService.getUserProfile(appUser, "InvalidName")
         ).hasMessage(new InvalidUserException().getMessage());
 
         verify(userRepository, times(1)).findByBasicProfile_Name(anyString());

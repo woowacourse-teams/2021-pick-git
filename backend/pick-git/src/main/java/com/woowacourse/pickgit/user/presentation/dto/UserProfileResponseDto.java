@@ -16,12 +16,14 @@ public class UserProfileResponseDto {
     private String website;
     private String twitter;
 
+    private Boolean following;
+
     private UserProfileResponseDto() {
     }
 
     public UserProfileResponseDto(String name, String image, String description, int followerCount,
         int followingCount, int postCount, String githubUrl, String company, String location,
-        String website, String twitter) {
+        String website, String twitter, Boolean following) {
         this.name = name;
         this.image = image;
         this.description = description;
@@ -33,6 +35,7 @@ public class UserProfileResponseDto {
         this.location = location;
         this.website = website;
         this.twitter = twitter;
+        this.following = following;
     }
 
     public String getName() {
@@ -77,5 +80,9 @@ public class UserProfileResponseDto {
 
     public String getTwitter() {
         return twitter;
+    }
+
+    public Boolean getFollowing() {
+        return following;
     }
 }
