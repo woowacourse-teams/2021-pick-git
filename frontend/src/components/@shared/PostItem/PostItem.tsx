@@ -1,5 +1,6 @@
 import {
   Container,
+  MyComment,
   CommentInputWrapper,
   CommentWrapper,
   IconLinkButton,
@@ -27,8 +28,8 @@ import { EditIcon, PostHeartIcon, PostHeartLineIcon, GithubIcon, SendIcon } from
 import { useContext, useState } from "react";
 import { ThemeContext } from "styled-components";
 import { PAGE_URL } from "../../../constants/urls";
-import TextEditor from "../TextEditor/TextEditor";
 import { LIMIT } from "../../../constants/limits";
+import TextEditor from "../TextEditor/TextEditor";
 
 export interface Props {
   authorName: string;
@@ -75,7 +76,6 @@ const PostItem = ({
   const commentList = comments.map((comment) => (
     <CommentWrapper key={comment.commentId}>
       <Comment
-        commentId={comment.commentId}
         content={comment.content}
         isLiked={comment.isLiked}
         authorName={comment.authorName}
@@ -127,21 +127,22 @@ const PostItem = ({
         <TagListWrapper>{shouldHideContent || tagList}</TagListWrapper>
         {commentList}
       </PostBody>
-      <CommentInputWrapper>
+      <MyComment>
         <Avatar diameter="1.9375rem" imageUrl={commenterImageUrl} />
-        <TextEditor
-          placeholder="댓글 달기..."
-          backgroundColor="transparent"
-          onChange={onCommentValueChange}
-          value={commentValue}
-          width="100%"
-          height="0.8rem;"
-          fontSize="0.625rem"
-        />
+        <CommentInputWrapper>
+          <TextEditor
+            placeholder="댓글 달기..."
+            onChange={onCommentValueChange}
+            value={commentValue}
+            width="100%"
+            height="0.8rem;"
+            fontSize="0.625rem"
+          />
+        </CommentInputWrapper>
         <IconLink onClick={onCommentValueSave}>
           <SendIcon />
         </IconLink>
-      </CommentInputWrapper>
+      </MyComment>
       <PostCreatedDateText>{createdAt}</PostCreatedDateText>
     </Container>
   );
