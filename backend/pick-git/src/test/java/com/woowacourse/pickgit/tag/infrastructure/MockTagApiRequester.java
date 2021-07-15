@@ -1,7 +1,6 @@
 package com.woowacourse.pickgit.tag.infrastructure;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpClientErrorException;
+import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 
 public class MockTagApiRequester implements PlatformApiRequester{
 
@@ -14,10 +13,10 @@ public class MockTagApiRequester implements PlatformApiRequester{
         String validUrl =
             "https://api.github.com/repos/" + USER_NAME + "/" + REPOSITORY_NAME + "/languages";
         if (!accessToken.equals(TESTER_ACCESS_TOKEN)) {
-            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
+            throw new PlatformHttpErrorException();
         }
         if (!url.equals(validUrl)) {
-            throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
+            throw new PlatformHttpErrorException();
         }
         return "{\"JavaScript\": \"91949\", \"HTML\": \"13\", \"CSS\": \"9\"}";
     }

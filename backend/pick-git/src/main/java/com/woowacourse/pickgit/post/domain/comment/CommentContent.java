@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.post.domain.comment;
 
+import com.woowacourse.pickgit.exception.post.CommentFormatException;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;

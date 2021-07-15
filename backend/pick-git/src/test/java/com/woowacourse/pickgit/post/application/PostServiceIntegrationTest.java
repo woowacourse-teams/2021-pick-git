@@ -6,6 +6,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.FileFactory;
+import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
+import com.woowacourse.pickgit.exception.post.CommentFormatException;
 import com.woowacourse.pickgit.post.PostTestConfiguration;
 import com.woowacourse.pickgit.post.application.dto.CommentDto;
 import com.woowacourse.pickgit.post.application.dto.PostDto;
@@ -15,7 +17,6 @@ import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostRepository;
-import com.woowacourse.pickgit.post.domain.comment.CommentFormatException;
 import com.woowacourse.pickgit.post.domain.comment.Comments;
 import com.woowacourse.pickgit.post.presentation.dto.HomeFeedRequest;
 import com.woowacourse.pickgit.user.domain.User;
@@ -35,7 +36,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.web.client.HttpClientErrorException;
 
 @Import(PostTestConfiguration.class)
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
@@ -129,7 +129,8 @@ class PostServiceIntegrationTest {
 
         assertThatCode(() -> postService.addComment(commentRequestDto))
             .isInstanceOf(CommentFormatException.class)
-            .hasMessage("F0002");
+            .extracting("errorCode")
+            .isEqualTo("F0002");
     }
 
     @DisplayName("사용자는 게시물을 등록할 수 있다.")
@@ -163,7 +164,7 @@ class PostServiceIntegrationTest {
         assertThat(responseDto.getRepositories()).hasSize(2);
     }
 
-    @DisplayName("토큰이 유효하지 않은 경우 예외가 발생한다. - 401 예외")
+    @DisplayName("토큰이 유효하지 않은 경우 예외가 발생한다. - 500 예외")
     @Test
     void showRepositories_InvalidAccessToken_401Exception() {
         // given
@@ -173,11 +174,12 @@ class PostServiceIntegrationTest {
         // then
         assertThatThrownBy(() -> {
             postService.showRepositories(requestDto);
-        }).isInstanceOf(HttpClientErrorException.class)
-            .hasMessageContaining("401");
+        }).isInstanceOf(PlatformHttpErrorException.class)
+            .extracting("errorCode")
+            .isEqualTo("V0001");
     }
 
-    @DisplayName("사용자가 유효하지 않은 경우 예외가 발생한다. - 404 예외")
+    @DisplayName("사용자가 유효하지 않은 경우 예외가 발생한다. - 500 예외")
     @Test
     void showRepositories_InvalidUsername_404Exception() {
         // given
@@ -187,8 +189,9 @@ class PostServiceIntegrationTest {
         // then
         assertThatThrownBy(() -> {
             postService.showRepositories(requestDto);
-        }).isInstanceOf(HttpClientErrorException.class)
-            .hasMessageContaining("404");
+        }).isInstanceOf(PlatformHttpErrorException.class)
+            .extracting("errorCode")
+            .isEqualTo("V0001");
     }
 
     @DisplayName("저장된 게시물 중 3, 4번째 글을 가져온다.")

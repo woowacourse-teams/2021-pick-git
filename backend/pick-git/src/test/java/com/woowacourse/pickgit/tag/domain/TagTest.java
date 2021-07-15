@@ -2,6 +2,7 @@ package com.woowacourse.pickgit.tag.domain;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 
+import com.woowacourse.pickgit.exception.post.TagFormatException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,6 +25,7 @@ class TagTest {
     void newTag_InvalidName_Failure(String name) {
         assertThatCode(() -> new Tag(name))
             .isInstanceOf(TagFormatException.class)
-            .hasMessage("F0003");
+            .extracting("errorCode")
+            .isEqualTo("F0003");
     }
 }

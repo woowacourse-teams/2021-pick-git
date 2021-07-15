@@ -10,6 +10,7 @@ import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.config.StorageConfiguration;
+import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -137,6 +138,6 @@ public class OAuthServiceTest {
 
         // when, then
         assertThatThrownBy(() -> oAuthService.findRequestUserByToken(token))
-            .isInstanceOf(IllegalArgumentException.class);
+            .isInstanceOf(InvalidTokenException.class);
     }
 }

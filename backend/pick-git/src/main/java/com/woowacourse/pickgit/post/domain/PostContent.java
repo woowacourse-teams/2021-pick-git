@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.post.domain;
 
+import com.woowacourse.pickgit.exception.post.PostFormatException;
 import javax.persistence.Embeddable;
 import javax.persistence.Lob;
 
@@ -19,7 +20,7 @@ public class PostContent {
 
     private void validate(String content) {
         if (isOver500(content)) {
-            throw new IllegalArgumentException("F0001");
+            throw new PostFormatException();
         }
     }
 

@@ -11,6 +11,7 @@ import com.woowacourse.pickgit.authentication.application.JwtTokenProvider;
 import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.infrastructure.AuthorizationExtractor;
 import com.woowacourse.pickgit.authentication.infrastructure.JwtTokenProviderImpl;
+import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import java.util.Collections;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -85,7 +86,7 @@ class AuthenticationInterceptorTest {
 
         // when, then
         assertThatThrownBy(() -> authenticationInterceptor.preHandle(httpServletRequest, null, null))
-            .isInstanceOf(IllegalArgumentException.class);
+            .isInstanceOf(InvalidTokenException.class);
     }
 
     @DisplayName("유효기간이 지난 토큰의 경우 예외가 발생한다.")
@@ -102,6 +103,6 @@ class AuthenticationInterceptorTest {
 
         // when, then
         assertThatThrownBy(() -> authenticationInterceptor.preHandle(httpServletRequest, null, null))
-            .isInstanceOf(IllegalArgumentException.class);
+            .isInstanceOf(InvalidTokenException.class);
     }
 }

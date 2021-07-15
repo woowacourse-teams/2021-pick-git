@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.tag.domain;
 
+import com.woowacourse.pickgit.exception.post.TagFormatException;
 import com.woowacourse.pickgit.post.domain.PostTag;
 import java.util.ArrayList;
 import java.util.List;

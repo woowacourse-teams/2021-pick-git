@@ -2,6 +2,7 @@ package com.woowacourse.pickgit.post.domain;
 
 import static java.util.stream.Collectors.toList;
 
+import com.woowacourse.pickgit.exception.post.CannotAddTagException;
 import com.woowacourse.pickgit.post.domain.comment.Comment;
 import com.woowacourse.pickgit.post.domain.comment.Comments;
 import com.woowacourse.pickgit.post.domain.content.Images;

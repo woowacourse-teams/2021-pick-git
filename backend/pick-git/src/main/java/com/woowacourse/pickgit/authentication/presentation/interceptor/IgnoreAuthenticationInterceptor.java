@@ -1,6 +1,7 @@
 package com.woowacourse.pickgit.authentication.presentation.interceptor;
 
 import com.woowacourse.pickgit.authentication.infrastructure.AuthorizationExtractor;
+import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,7 +17,7 @@ public class IgnoreAuthenticationInterceptor implements HandlerInterceptor {
             return true;
         }
         if (!isGetRequest(request)) {
-            throw new IllegalArgumentException("get 요청일 때만 가능");
+            throw new InvalidTokenException();
         }
 
         String authentication = AuthorizationExtractor.extract(request);

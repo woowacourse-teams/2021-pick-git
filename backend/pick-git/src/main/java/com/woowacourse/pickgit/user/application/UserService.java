@@ -6,9 +6,8 @@ import com.woowacourse.pickgit.user.application.dto.FollowServiceDto;
 import com.woowacourse.pickgit.user.application.dto.UserProfileServiceDto;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
-import com.woowacourse.pickgit.user.exception.InvalidUserException;
-import com.woowacourse.pickgit.user.exception.SameSourceTargetUserException;
-import javax.security.sasl.SaslException;
+import com.woowacourse.pickgit.exception.user.InvalidUserException;
+import com.woowacourse.pickgit.exception.user.SameSourceTargetUserException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

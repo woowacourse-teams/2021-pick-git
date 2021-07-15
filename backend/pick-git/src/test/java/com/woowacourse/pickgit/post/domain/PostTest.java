@@ -3,6 +3,7 @@ package com.woowacourse.pickgit.post.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
+import com.woowacourse.pickgit.exception.post.CannotAddTagException;
 import com.woowacourse.pickgit.tag.domain.Tag;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,6 +39,7 @@ class PostTest {
 
         assertThatCode(() -> post.addTags(duplicatedTags))
             .isInstanceOf(CannotAddTagException.class)
-            .hasMessage("P0001");
+            .extracting("errorCode")
+            .isEqualTo("P0001");
     }
 }

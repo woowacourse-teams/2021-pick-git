@@ -1,6 +1,7 @@
 package com.woowacourse.pickgit.post.domain;
 
 import com.woowacourse.pickgit.tag.domain.Tag;
+import java.util.Objects;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -34,5 +35,22 @@ public class PostTag {
 
     public Tag getTag() {
         return tag;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        PostTag postTag = (PostTag) o;
+        return Objects.equals(id, postTag.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

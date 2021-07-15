@@ -14,9 +14,9 @@ import com.woowacourse.pickgit.user.application.dto.AuthUserServiceDto;
 import com.woowacourse.pickgit.user.application.dto.FollowServiceDto;
 import com.woowacourse.pickgit.user.application.dto.UserProfileServiceDto;
 import com.woowacourse.pickgit.user.domain.UserRepository;
-import com.woowacourse.pickgit.user.exception.DuplicatedFollowException;
-import com.woowacourse.pickgit.user.exception.InvalidFollowException;
-import com.woowacourse.pickgit.user.exception.InvalidUserException;
+import com.woowacourse.pickgit.exception.user.DuplicateFollowException;
+import com.woowacourse.pickgit.exception.user.InvalidFollowException;
+import com.woowacourse.pickgit.exception.user.InvalidUserException;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -143,7 +143,7 @@ class UserServiceMockTest {
         //then
         assertThatThrownBy(
             () -> userService.followUser(authUserServiceDto, targetName)
-        ).hasMessage(new DuplicatedFollowException().getMessage());
+        ).hasMessage(new DuplicateFollowException().getMessage());
 
         verify(userRepository, times(4)).findByBasicProfile_Name(anyString());
     }

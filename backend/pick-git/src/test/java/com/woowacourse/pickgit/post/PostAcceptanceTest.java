@@ -7,6 +7,7 @@ import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileRespon
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
 import com.woowacourse.pickgit.common.FileFactory;
+import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
 import com.woowacourse.pickgit.post.application.dto.PostDto;
 import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
 import io.restassured.RestAssured;
@@ -137,7 +138,7 @@ public class PostAcceptanceTest {
         String token = "Bearer guest";
 
         // when
-        requestToWritePostApi(token, HttpStatus.INTERNAL_SERVER_ERROR);
+        requestToWritePostApi(token, HttpStatus.UNAUTHORIZED);
     }
 
     @DisplayName("게스트는 게시글을 등록할 수 없다. - 토큰이 없는 경우 (Authorization header X)")
@@ -153,7 +154,7 @@ public class PostAcceptanceTest {
             .when()
             .post("/api/posts")
             .then().log().all()
-            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+            .statusCode(HttpStatus.UNAUTHORIZED.value())
             .extract();
     }
 
@@ -180,21 +181,22 @@ public class PostAcceptanceTest {
         String token = 로그인_되어있음().getToken();
 
         // when
-        request(token + "hi", USERNAME, HttpStatus.INTERNAL_SERVER_ERROR.value());
+        request(token + "hi", USERNAME, HttpStatus.UNAUTHORIZED.value());
     }
 
-    @DisplayName("사용자가 유효하지 않은 경우 예외가 발생한다. - 400 예외")
+    @DisplayName("사용자가 유효하지 않은 경우 예외가 발생한다. - 500 예외")
     @Test
     void showRepositories_InvalidUsername_400Exception() {
         // given
         String token = 로그인_되어있음().getToken();
 
         // when
-        String response =
-            request(token, USERNAME + "pika", HttpStatus.BAD_REQUEST.value()).asString();
+        ApiErrorResponse response =
+            request(token, USERNAME + "pika", HttpStatus.INTERNAL_SERVER_ERROR.value())
+            .as(ApiErrorResponse.class);
 
         // then
-        assertThat(response).isEqualTo("P0001");
+        assertThat(response.getErrorCode()).isEqualTo("V0001");
     }
 
     private ExtractableResponse<Response> request(String token, String username, int statusCode) {

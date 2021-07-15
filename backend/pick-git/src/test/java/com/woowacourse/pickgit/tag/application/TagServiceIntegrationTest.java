@@ -4,9 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
+import com.woowacourse.pickgit.exception.post.TagFormatException;
 import com.woowacourse.pickgit.tag.domain.PlatformTagExtractor;
 import com.woowacourse.pickgit.tag.domain.Tag;
-import com.woowacourse.pickgit.tag.domain.TagFormatException;
 import com.woowacourse.pickgit.tag.domain.TagRepository;
 import com.woowacourse.pickgit.tag.infrastructure.GithubTagExtractor;
 import com.woowacourse.pickgit.tag.infrastructure.MockTagApiRequester;
@@ -18,7 +19,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.web.client.HttpClientErrorException;
 
 @DataJpaTest
 class TagServiceIntegrationTest {
@@ -61,8 +61,9 @@ class TagServiceIntegrationTest {
             new ExtractionRequestDto(accessToken, userName, repositoryName);
 
         assertThatCode(() -> tagService.extractTags(extractionRequestDto))
-            .isInstanceOf(HttpClientErrorException.class)
-            .hasMessageContaining("404");
+            .isInstanceOf(PlatformHttpErrorException.class)
+            .extracting("errorCode")
+            .isEqualTo("V0001");
     }
 
     @DisplayName("유효하지 않은 토큰으로 태그 추출 요청시 401 예외가 발생한다.")
@@ -73,8 +74,9 @@ class TagServiceIntegrationTest {
             new ExtractionRequestDto(accessToken, userName, repositoryName);
 
         assertThatCode(() -> tagService.extractTags(extractionRequestDto))
-            .isInstanceOf(HttpClientErrorException.class)
-            .hasMessageContaining("401");
+            .isInstanceOf(PlatformHttpErrorException.class)
+            .extracting("errorCode")
+            .isEqualTo("V0001");
     }
 
     @DisplayName("태그 이름을 태그로 변환한다.")
@@ -100,6 +102,7 @@ class TagServiceIntegrationTest {
 
         assertThatCode(() -> tagService.findOrCreateTags(tagsDto))
             .isInstanceOf(TagFormatException.class)
-            .hasMessage("F0003");
+            .extracting("errorCode")
+            .isEqualTo("F0003");
     }
 }

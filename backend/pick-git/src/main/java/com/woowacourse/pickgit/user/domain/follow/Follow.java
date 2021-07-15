@@ -52,7 +52,7 @@ public class Follow {
     }
 
     @Override
-    public boolean equals(Object o) { //TODO 임시추가
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }

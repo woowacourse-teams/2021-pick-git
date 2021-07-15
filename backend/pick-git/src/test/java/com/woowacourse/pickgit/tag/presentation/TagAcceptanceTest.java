@@ -7,6 +7,7 @@ import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileRespon
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
 import com.woowacourse.pickgit.config.StorageConfiguration;
+import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
 import com.woowacourse.pickgit.tag.TestTagConfiguration;
 import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
@@ -73,16 +74,16 @@ class TagAcceptanceTest {
         assertThat(response).containsExactly("JavaScript", "HTML", "CSS");
     }
 
-    @DisplayName("유효하지 않은 레포지토리 태그 추출 요청시 404 예외 메시지가 반환된다.")
+    @DisplayName("유효하지 않은 레포지토리 태그 추출 요청시 500 예외 메시지가 반환된다.")
     @Test
     void extractLanguageTags_InvalidRepository_ExceptionThrown() {
         String url =
             "/api/github/" + userName + "/repositories/none-available-repo/tags/languages";
 
-        String response = requestTags(accessToken, url, HttpStatus.BAD_REQUEST)
-            .asString();
+        ApiErrorResponse response = requestTags(accessToken, url, HttpStatus.INTERNAL_SERVER_ERROR)
+            .as(ApiErrorResponse.class);
 
-        assertThat(response).isEqualTo("P0001");
+        assertThat(response.getErrorCode()).isEqualTo("V0001");
     }
 
     @DisplayName("유효하지 않은 AccessToken으로 태그 추출 요청시 서버 에러가 발생한다.")
@@ -91,7 +92,7 @@ class TagAcceptanceTest {
         String url =
             "/api/github/" + userName + "/repositories/" + repositoryName + "/tags/languages";
 
-        requestTags("invalidtoken", url, HttpStatus.INTERNAL_SERVER_ERROR);
+        requestTags("invalidtoken", url, HttpStatus.UNAUTHORIZED);
     }
 
     private OAuthTokenResponse 로그인_되어있음() {

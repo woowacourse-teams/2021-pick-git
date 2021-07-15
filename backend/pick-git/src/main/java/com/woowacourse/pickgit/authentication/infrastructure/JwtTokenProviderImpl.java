@@ -1,6 +1,7 @@
 package com.woowacourse.pickgit.authentication.infrastructure;
 
 import com.woowacourse.pickgit.authentication.application.JwtTokenProvider;
+import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
@@ -55,7 +56,7 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
         try {
             return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get(key, String.class);
         } catch (JwtException | IllegalArgumentException e) {
-            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+            throw new InvalidTokenException();
         }
     }
 

@@ -4,12 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.tag.domain.PlatformTagExtractor;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.web.client.HttpClientErrorException;
 
 class GithubTagExtractorTest {
 
@@ -40,8 +40,9 @@ class GithubTagExtractorTest {
     void extractTags_InvalidAccessToken_ExceptionThrown() {
         assertThatCode(() -> {
             platformTagExtractor.extractTags("invalidTOken", USER_NAME, REPOSITORY_NAME);
-        }).isInstanceOf(HttpClientErrorException.class)
-            .hasMessageContaining("401");
+        }).isInstanceOf(PlatformHttpErrorException.class)
+            .extracting("errorCode")
+            .isEqualTo("V0001");
     }
 
     @DisplayName("username/repositoryname 링크에 해당하는 경로가 존재하지 않으면 조회 예외가 발생한다.")
@@ -49,7 +50,8 @@ class GithubTagExtractorTest {
     void extractTags_InvalidUrl_ExceptionThrown() {
         assertThatCode(() -> {
             platformTagExtractor.extractTags(TESTER_ACCESS_TOKEN, "invalidpath", REPOSITORY_NAME);
-        }).isInstanceOf(HttpClientErrorException.class)
-            .hasMessageContaining("404");
+        }).isInstanceOf(PlatformHttpErrorException.class)
+            .extracting("errorCode")
+            .isEqualTo("V0001");
     }
 }
