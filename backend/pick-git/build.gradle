@@ -30,3 +30,10 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+processResources.dependsOn('copySecurity')
+
+task copySecurity(type: Copy) {
+	from './security/application-security.yml'
+	into './src/main/resources'
+}
