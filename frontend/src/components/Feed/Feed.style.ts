@@ -1,7 +1,9 @@
 import styled from "styled-components";
 
 export const Container = styled.div<React.CSSProperties>`
-  border: 1px solid ${({ theme }) => theme.color.darkBorderColor};
+  @media (min-width: 375px) {
+    border: 1px solid ${({ theme }) => theme.color.borderColor};
+  }
 `;
 
 export const PostItemWrapper = styled.div`
