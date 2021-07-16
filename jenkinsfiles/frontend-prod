@@ -1,0 +1,41 @@
+pipeline {
+    agent any
+
+    environment {
+       INSTANCE_PEM_PATH = credentials('instances-pem-path')
+       HOST = credentials('HOST_DEV')
+    }
+
+    stages {
+        stage('Build') {
+            when { changeset "frontend/**" }
+            steps {
+                echo 'build frontend...'
+
+                dir('./frontend') {
+                    sh '''
+                        yarn
+                        yarn build
+                    '''
+                }
+            }
+        }
+
+        stage('Test') {
+            when { changeset "frontend/**" }
+            steps {
+                echo 'Front has no test code.'
+            }
+        }
+
+        stage('Deploy') {
+            when { changeset "frontend/**" }
+            steps {
+                dir('./frontend/script') {
+                    chmod 755 ./deploy_script.sh
+                    ./deploy_script.sh -c ~/.ssh/EC2-DEV-PICK-GIT.pem -h $HOST
+                }
+            }
+        }
+    }
+}
