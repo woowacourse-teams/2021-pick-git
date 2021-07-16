@@ -28,6 +28,6 @@ public class OAuthController {
 
     @GetMapping("/afterlogin")
     public ResponseEntity<OAuthTokenResponse> afterAuthorizeGithubLogin(@RequestParam String code) {
-        return ResponseEntity.ok().body(new OAuthTokenResponse(oauthService.createToken(code)));
+        return ResponseEntity.ok().body(oauthService.createToken(code));
     }
 }

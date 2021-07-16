@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.authentication.presentation.interceptor;
 
+import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.infrastructure.AuthorizationExtractor;
 import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import java.util.Objects;
@@ -10,21 +11,30 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 public class IgnoreAuthenticationInterceptor implements HandlerInterceptor {
 
+    private OAuthService oAuthService;
+
+    public IgnoreAuthenticationInterceptor(
+        OAuthService oAuthService) {
+        this.oAuthService = oAuthService;
+    }
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
         Object handler) throws Exception {
         if (isPreflightRequest(request)) {
             return true;
         }
-        if (!isGetRequest(request)) {
-            throw new InvalidTokenException();
-        }
 
         String authentication = AuthorizationExtractor.extract(request);
-        if (authentication != null) {
-            request.setAttribute("authentication", authentication);
-        }
+        request.setAttribute("authentication", getAppropriateAuthentication(authentication));
         return true;
+    }
+
+    private String getAppropriateAuthentication(String authentication) {
+        if (!oAuthService.validateToken(authentication)) {
+            return null;
+        }
+        return authentication;
     }
 
     private boolean isPreflightRequest(HttpServletRequest request) {
@@ -48,9 +58,5 @@ public class IgnoreAuthenticationInterceptor implements HandlerInterceptor {
 
     private boolean hasOrigin(HttpServletRequest request) {
         return Objects.nonNull(request.getHeader("Origin"));
-    }
-
-    private boolean isGetRequest(HttpServletRequest request) {
-        return request.getMethod().equalsIgnoreCase(HttpMethod.GET.name());
     }
 }

@@ -6,6 +6,7 @@ import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
+import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
 import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
@@ -37,14 +38,18 @@ public class OAuthService {
     }
 
     @Transactional
-    public String createToken(String code) {
+    public OAuthTokenResponse createToken(String code) {
         String githubAccessToken = githubOAuthClient.getAccessToken(code);
 
         OAuthProfileResponse githubProfileResponse = githubOAuthClient.getGithubProfile(githubAccessToken);
 
         updateUserOrCreateUser(githubProfileResponse);
 
-        return createTokenAndSave(githubAccessToken, githubProfileResponse.getName());
+        return new OAuthTokenResponse(createTokenAndSave(
+            githubAccessToken,
+            githubProfileResponse.getName()),
+            githubProfileResponse.getName()
+        );
     }
 
     private void updateUserOrCreateUser(OAuthProfileResponse githubProfileResponse) {

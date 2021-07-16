@@ -90,7 +90,7 @@ class TagControllerTest {
         mockMvc.perform(get(url)
             .header("Authorization", "Bearer invalid"))
             .andExpect(status().isUnauthorized())
-            .andExpect(jsonPath("$.errorCode").value("A0001"));
+            .andExpect(jsonPath("errorCode").value("A0001"));
     }
 
     @DisplayName("유효하지 않은 레포지토리 태그 추출 요청시 404 예외 메시지가 반환된다.")

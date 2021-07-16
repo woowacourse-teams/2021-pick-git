@@ -4,10 +4,13 @@ import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.presentation.AuthenticationPrincipalArgumentResolver;
 import com.woowacourse.pickgit.authentication.presentation.interceptor.AuthenticationInterceptor;
 import com.woowacourse.pickgit.authentication.presentation.interceptor.IgnoreAuthenticationInterceptor;
+import com.woowacourse.pickgit.authentication.presentation.interceptor.PathMatchInterceptor;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -27,7 +30,7 @@ public class OAuthConfiguration implements WebMvcConfigurer {
 
     @Bean
     public IgnoreAuthenticationInterceptor ignoreAuthenticationInterceptor() {
-        return new IgnoreAuthenticationInterceptor();
+        return new IgnoreAuthenticationInterceptor(oAuthService);
     }
 
     @Bean
@@ -42,19 +45,27 @@ public class OAuthConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(authenticationInterceptor())
-            .addPathPatterns("/api/profiles/*/followings")
-            .addPathPatterns("/api/profiles/me")
-            .addPathPatterns("/api/posts/me")
-            .addPathPatterns("/api/posts")
-            .addPathPatterns("/api/posts/*/comments")
-            .addPathPatterns("/api/github/*/repositories/*/tags/languages")
-            .addPathPatterns("/api/github/*/repositories")
-            .excludePathPatterns("/api/authorization/github")
-            .excludePathPatterns("/api/afterlogin");
+        HandlerInterceptor authenticationInterceptor = new PathMatchInterceptor(authenticationInterceptor())
+            .addPathPatterns("/api/posts/me", HttpMethod.GET)
+            .addPathPatterns("/api/github/*/repositories", HttpMethod.GET)
+            .addPathPatterns("/api/github/*/repositories/*/tags/languages", HttpMethod.GET)
+            .addPathPatterns("/api/posts", HttpMethod.POST)
+            .addPathPatterns("/api/posts/*/likes", HttpMethod.POST, HttpMethod.DELETE)
+            .addPathPatterns("/api/posts/*/comments", HttpMethod.POST)
+            .addPathPatterns("/api/profiles/me", HttpMethod.GET)
+            .addPathPatterns("/api/profiles/*/followings", HttpMethod.POST, HttpMethod.DELETE);
 
-        registry.addInterceptor(ignoreAuthenticationInterceptor())
-            .addPathPatterns("/api/profiles/*")
-            .addPathPatterns("/api/posts/*");
+        HandlerInterceptor ignoreAuthenticationInterceptor = new PathMatchInterceptor(ignoreAuthenticationInterceptor())
+            .addPathPatterns("/api/profiles/*", HttpMethod.GET)
+            .addPathPatterns("/api/posts/*", HttpMethod.GET)
+            .excludePatterns("/api/profiles/*/followings", HttpMethod.POST, HttpMethod.DELETE)
+            .excludePatterns("/api/profiles/me", HttpMethod.GET)
+            .excludePatterns("/api/posts/me", HttpMethod.GET);
+
+        registry.addInterceptor(authenticationInterceptor)
+            .addPathPatterns("/**");
+
+        registry.addInterceptor(ignoreAuthenticationInterceptor)
+            .addPathPatterns("/**");
     }
 }

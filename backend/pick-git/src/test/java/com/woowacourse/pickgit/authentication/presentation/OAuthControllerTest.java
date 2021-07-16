@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.woowacourse.pickgit.authentication.application.OAuthService;
+import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,7 +48,7 @@ class OAuthControllerTest {
     void afterAuthorizeGithubLogin_ValidAccount_JWTToken() throws Exception {
         // given
         String githubAuthorizationCode = "random";
-        when(oAuthService.createToken(githubAuthorizationCode)).thenReturn("jwt token");
+        when(oAuthService.createToken(githubAuthorizationCode)).thenReturn(new OAuthTokenResponse("jwt token", "binghe"));
 
         // when, then
         mockMvc.perform(get("/api/afterlogin?code=" + githubAuthorizationCode))
