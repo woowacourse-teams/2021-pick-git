@@ -1,11 +1,19 @@
+import axios from "axios";
+import { useContext } from "react";
+
+import UserContext from "../../contexts/UserContext";
 import { Post } from "../../@types";
 import { LIMIT } from "../../constants/limits";
 import { FAILURE_MESSAGE } from "../../constants/message";
 import useFeed from "../../services/hooks/useFeed";
 import PostItem from "../@shared/PostItem/PostItem";
 import { Container, PostItemWrapper } from "./Feed.style";
+import { useQueryClient } from "react-query";
+import { QUERY } from "../../constants/queries";
 
 const Feed = () => {
+  const { logout } = useContext(UserContext);
+  const queryClient = useQueryClient();
   const { posts, isLoading, error, commentValue, setCommentValue, deletePostLike, addPostLike, setPosts, addComment } =
     useFeed();
 
@@ -53,6 +61,15 @@ const Feed = () => {
   };
 
   if (error) {
+    if (axios.isAxiosError(error)) {
+      const { status } = error.response ?? {};
+
+      if (status === 401) {
+        logout();
+        queryClient.refetchQueries(QUERY.GET_HOME_FEED_POSTS, { active: true });
+      }
+    }
+
     return <div>에러!!</div>;
   }
 
