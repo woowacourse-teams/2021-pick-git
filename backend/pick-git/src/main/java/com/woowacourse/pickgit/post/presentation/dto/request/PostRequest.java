@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.post.presentation.dto;
+package com.woowacourse.pickgit.post.presentation.dto.request;
 
 import java.util.List;
 import javax.validation.constraints.NotBlank;

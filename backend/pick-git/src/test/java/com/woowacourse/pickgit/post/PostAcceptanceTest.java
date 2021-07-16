@@ -1,15 +1,18 @@
 package com.woowacourse.pickgit.post;
 
+import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.given;
 
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
 import com.woowacourse.pickgit.common.FileFactory;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
+import com.woowacourse.pickgit.post.application.dto.CommentResponse;
 import com.woowacourse.pickgit.post.application.dto.PostDto;
 import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
+import com.woowacourse.pickgit.post.presentation.dto.request.ContentRequest;
 import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.ExtractableResponse;
@@ -30,7 +33,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.web.multipart.MultipartFile;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Import(PostTestConfiguration.class)
@@ -47,7 +49,6 @@ public class PostAcceptanceTest {
     @MockBean
     private OAuthClient oAuthClient;
 
-    private List<MultipartFile> images;
     private String githubRepoUrl;
     private List<String> tags;
     private String content;
@@ -58,10 +59,6 @@ public class PostAcceptanceTest {
     void setUp() {
         RestAssured.port = port;
 
-        images = List.of(
-            FileFactory.getTestImage1(),
-            FileFactory.getTestImage2()
-        );
         githubRepoUrl = "https://github.com/woowacourse-teams/2021-pick-git";
         tags = List.of("java", "spring");
         content = "this is content";
@@ -80,18 +77,7 @@ public class PostAcceptanceTest {
         String token = 로그인_되어있음(ANOTHER_USERNAME).getToken();
 
         // when
-        RestAssured
-            .given().log().all()
-            .auth().oauth2(token)
-            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-            .formParams(request)
-            .multiPart("images", FileFactory.getTestImage1File())
-            .multiPart("images", FileFactory.getTestImage2File())
-            .when()
-            .post("/api/posts")
-            .then().log().all()
-            .statusCode(HttpStatus.CREATED.value())
-            .extract();
+        requestWrite(token);
     }
 
     @DisplayName("로그인일때 게시물을 조회한다. - 댓글 및 게시글의 좋아요 여부를 확인할 수 있다.")
@@ -103,8 +89,7 @@ public class PostAcceptanceTest {
         requestToWritePostApi(token, HttpStatus.CREATED);
         requestToWritePostApi(token, HttpStatus.CREATED);
 
-        List<PostDto> response = RestAssured
-            .given().log().all()
+        List<PostDto> response = given().log().all()
             .auth().oauth2(token)
             .when()
             .get("/api/posts?page=0&limit=3")
@@ -126,8 +111,7 @@ public class PostAcceptanceTest {
         requestToWritePostApi(token, HttpStatus.CREATED);
         requestToWritePostApi(token, HttpStatus.CREATED);
 
-        List<PostDto> response = RestAssured
-            .given().log().all()
+        List<PostDto> response = given().log().all()
             .when()
             .get("/api/posts?page=0&limit=3")
             .then()
@@ -139,21 +123,6 @@ public class PostAcceptanceTest {
         assertThat(response).hasSize(3);
     }
 
-    private ExtractableResponse<Response> requestToWritePostApi(String token, HttpStatus httpStatus) {
-        return RestAssured
-            .given().log().all()
-            .auth().oauth2(token)
-            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-            .formParams(request)
-            .multiPart("images", FileFactory.getTestImage1File())
-            .multiPart("images", FileFactory.getTestImage2File())
-            .when()
-            .post("/api/posts")
-            .then().log().all()
-            .statusCode(httpStatus.value())
-            .extract();
-    }
-
     @DisplayName("로그인 상태에서 내 피드 조회가 가능하다.")
     @Test
     void readMyFeed_LoginUser_Success() {
@@ -163,8 +132,7 @@ public class PostAcceptanceTest {
         requestToWritePostApi(token, HttpStatus.CREATED);
         requestToWritePostApi(token, HttpStatus.CREATED);
 
-        List<PostDto> response = RestAssured
-            .given().log().all()
+        List<PostDto> response = given().log().all()
             .auth().oauth2(token)
             .when()
             .get("/api/posts/me?page=0&limit=3")
@@ -186,8 +154,7 @@ public class PostAcceptanceTest {
         requestToWritePostApi(token, HttpStatus.CREATED);
         requestToWritePostApi(token, HttpStatus.CREATED);
 
-         RestAssured
-            .given().log().all()
+        given().log().all()
             .when()
             .get("/api/posts/me?page=0&limit=3")
             .then()
@@ -206,11 +173,10 @@ public class PostAcceptanceTest {
         requestToWritePostApi(loginUserToken, HttpStatus.CREATED);
         requestToWritePostApi(loginUserToken, HttpStatus.CREATED);
 
-        List<PostDto> response = RestAssured
-            .given().log().all()
+        List<PostDto> response = given().log().all()
             .auth().oauth2(loginUserToken)
             .when()
-            .get("/api/posts/" + ANOTHER_USERNAME +"?page=0&limit=3")
+            .get("/api/posts/" + ANOTHER_USERNAME + "?page=0&limit=3")
             .then()
             .statusCode(HttpStatus.OK.value())
             .extract()
@@ -229,10 +195,9 @@ public class PostAcceptanceTest {
         requestToWritePostApi(targetUserToken, HttpStatus.CREATED);
         requestToWritePostApi(targetUserToken, HttpStatus.CREATED);
 
-        List<PostDto> response = RestAssured
-            .given().log().all()
+        List<PostDto> response = given().log().all()
             .when()
-            .get("/api/posts/" + ANOTHER_USERNAME +"?page=0&limit=3")
+            .get("/api/posts/" + ANOTHER_USERNAME + "?page=0&limit=3")
             .then()
             .statusCode(HttpStatus.OK.value())
             .extract()
@@ -256,8 +221,7 @@ public class PostAcceptanceTest {
     @Test
     void write_GuestUserWithoutToken_Fail() {
         // when
-        RestAssured
-            .given().log().all()
+        given().log().all()
             .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
             .formParams(request)
             .multiPart("images", FileFactory.getTestImage1File())
@@ -266,6 +230,129 @@ public class PostAcceptanceTest {
             .post("/api/posts")
             .then().log().all()
             .statusCode(HttpStatus.UNAUTHORIZED.value())
+            .extract();
+    }
+
+    private ExtractableResponse<Response> requestToWritePostApi(String token,
+        HttpStatus httpStatus) {
+        return given().log().all()
+            .auth().oauth2(token)
+            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+            .formParams(request)
+            .multiPart("images", FileFactory.getTestImage1File())
+            .multiPart("images", FileFactory.getTestImage2File())
+            .when()
+            .post("/api/posts")
+            .then().log().all()
+            .statusCode(httpStatus.value())
+            .extract();
+    }
+
+    @DisplayName("사용자는 댓글을 등록할 수 있다.")
+    @Test
+    void addComment_LoginUser_Success() {
+        // given
+        String token = 로그인_되어있음(ANOTHER_USERNAME).getToken();
+
+        requestWrite(token);
+
+        ContentRequest request = new ContentRequest("this is content");
+
+        // when
+        CommentResponse response = requestAddComment(token, request, HttpStatus.OK)
+            .as(CommentResponse.class);
+
+        // then
+        assertThat(response.getAuthorName()).isEqualTo(ANOTHER_USERNAME);
+        assertThat(response.getContent()).isEqualTo("this is content");
+    }
+
+    private void requestWrite(String token) {
+        given().log().all()
+            .auth().oauth2(token)
+            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+            .formParams(request)
+            .multiPart("images", FileFactory.getTestImage1File())
+            .multiPart("images", FileFactory.getTestImage2File())
+            .when()
+            .post("/api/posts")
+            .then().log().all()
+            .statusCode(HttpStatus.CREATED.value())
+            .extract();
+    }
+
+    @DisplayName("댓글 내용이 null인 경우 예외가 발생한다. - 400 예외")
+    @Test
+    void addComment_Null_400Exception() {
+        // given
+        String token = 로그인_되어있음(ANOTHER_USERNAME).getToken();
+        ContentRequest request = new ContentRequest(null);
+
+        // when
+        ApiErrorResponse response = requestAddComment(token, request, HttpStatus.BAD_REQUEST)
+            .as(ApiErrorResponse.class);
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("F0001");
+    }
+
+    @DisplayName("댓글 내용이 빈 칸인 경우 예외가 발생한다. - 400 예외")
+    @Test
+    void addComment_Empty_400Exception() {
+        // given
+        String token = 로그인_되어있음(ANOTHER_USERNAME).getToken();
+        ContentRequest request = new ContentRequest("");
+
+        // when
+        ApiErrorResponse response = requestAddComment(token, request, HttpStatus.BAD_REQUEST)
+            .as(ApiErrorResponse.class);
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("F0001");
+    }
+
+    @DisplayName("댓글 내용이 공백인 경우 예외가 발생한다. - 400 예외")
+    @Test
+    void addComment_Blank_400Exception() {
+        // given
+        String token = 로그인_되어있음(ANOTHER_USERNAME).getToken();
+        ContentRequest request = new ContentRequest(" ");
+
+        // when
+        ApiErrorResponse response = requestAddComment(token, request, HttpStatus.BAD_REQUEST)
+            .as(ApiErrorResponse.class);
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("F0001");
+    }
+
+    @DisplayName("댓글 내용이 100자 초과인 경우 예외가 발생한다. - 400 예외")
+    @Test
+    void addComment_Over100_400Exception() {
+        // given
+        String token = 로그인_되어있음(ANOTHER_USERNAME).getToken();
+        ContentRequest request = new ContentRequest("a".repeat(101));
+
+        // when
+        ApiErrorResponse response = requestAddComment(token, request, HttpStatus.BAD_REQUEST)
+            .as(ApiErrorResponse.class);
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("F0002");
+    }
+
+    private ExtractableResponse<Response> requestAddComment(
+        String token,
+        ContentRequest request,
+        HttpStatus httpStatus) {
+        return given().log().all()
+            .auth().oauth2(token)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(request)
+            .when()
+            .post("/api/posts/{postId}/comments", 1L)
+            .then().log().all()
+            .statusCode(httpStatus.value())
             .extract();
     }
 
@@ -304,15 +391,14 @@ public class PostAcceptanceTest {
         // when
         ApiErrorResponse response =
             request(token, USERNAME + "pika", HttpStatus.INTERNAL_SERVER_ERROR.value())
-            .as(ApiErrorResponse.class);
+                .as(ApiErrorResponse.class);
 
         // then
         assertThat(response.getErrorCode()).isEqualTo("V0001");
     }
 
     private ExtractableResponse<Response> request(String token, String username, int statusCode) {
-        return RestAssured
-            .given().log().all()
+        return given().log().all()
             .auth().oauth2(token)
             .when()
             .get("/api/github/{username}/repositories", username)
@@ -321,11 +407,12 @@ public class PostAcceptanceTest {
             .extract();
     }
 
-
-
     private OAuthTokenResponse 로그인_되어있음(String name) {
-        OAuthTokenResponse response = 로그인_요청(name).as(OAuthTokenResponse.class);
+        OAuthTokenResponse response = 로그인_요청(name)
+            .as(OAuthTokenResponse.class);
+
         assertThat(response.getToken()).isNotBlank();
+
         return response;
     }
 
@@ -339,13 +426,13 @@ public class PostAcceptanceTest {
             null, null, null, null
         );
 
-        // mock
-        when(oAuthClient.getAccessToken(oauthCode)).thenReturn(accessToken);
-        when(oAuthClient.getGithubProfile(accessToken)).thenReturn(oAuthProfileResponse);
+        given(oAuthClient.getAccessToken(oauthCode))
+            .willReturn(accessToken);
+        given(oAuthClient.getGithubProfile(accessToken))
+            .willReturn(oAuthProfileResponse);
 
         // when
-        return RestAssured
-            .given().log().all()
+        return given().log().all()
             .accept(MediaType.APPLICATION_JSON_VALUE)
             .when()
             .get("/api/afterlogin?code=" + oauthCode)

@@ -3,6 +3,7 @@ package com.woowacourse.pickgit.post.presentation;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -18,15 +19,15 @@ import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.FileFactory;
 import com.woowacourse.pickgit.post.PostTestConfiguration;
 import com.woowacourse.pickgit.exception.post.CommentFormatException;
-import com.woowacourse.pickgit.post.presentation.dto.CommentRequest;
+import com.woowacourse.pickgit.post.presentation.dto.request.CommentRequest;
 import com.woowacourse.pickgit.post.application.PostService;
-import com.woowacourse.pickgit.post.application.dto.CommentDto;
+import com.woowacourse.pickgit.post.application.dto.CommentResponse;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
 import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
-import com.woowacourse.pickgit.post.presentation.dto.HomeFeedRequest;
+import com.woowacourse.pickgit.post.presentation.dto.request.HomeFeedRequest;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -147,8 +148,8 @@ class PostControllerTest {
             .willReturn(loginUser);
 
         String url = "/api/posts/1/comments";
-        CommentDto commentResponseDto =
-            new CommentDto(1L, "kevin", "test comment", false);
+        CommentResponse commentResponseDto =
+            new CommentResponse(1L, "kevin", "test comment", false);
         String requestBody = objectMapper.writeValueAsString("test comment");
         String responseBody = objectMapper.writeValueAsString(commentResponseDto);
         given(postService.addComment(any(CommentRequest.class)))
@@ -184,8 +185,8 @@ class PostControllerTest {
 
         addCommentApi(url, requestBody)
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("errorCode").value("F0002"));
-        verify(postService, times(1)).addComment(any(CommentRequest.class));
+            .andExpect(jsonPath("errorCode").value("F0001"));
+        verify(postService, never()).addComment(any(CommentRequest.class));
     }
 
     @DisplayName("사용자는 Repository 목록을 가져올 수 있다.")

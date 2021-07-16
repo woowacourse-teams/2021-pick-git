@@ -1,7 +1,7 @@
 package com.woowacourse.pickgit.post.application;
 
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
-import com.woowacourse.pickgit.post.application.dto.CommentDto;
+import com.woowacourse.pickgit.post.application.dto.CommentResponse;
 import com.woowacourse.pickgit.post.application.dto.PostDto;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.tag.domain.Tag;
@@ -26,9 +26,9 @@ public class PostDtoAssembler {
             .stream()
             .map(Tag::getName)
             .collect(Collectors.toList());
-        List<CommentDto> comments = post.getComments()
+        List<CommentResponse> comments = post.getComments()
             .stream()
-            .map(CommentDto::from)
+            .map(CommentResponse::from)
             .collect(Collectors.toList());
 
         if (appUser.isGuest()) {

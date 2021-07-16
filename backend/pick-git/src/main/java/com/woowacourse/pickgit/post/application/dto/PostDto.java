@@ -15,7 +15,7 @@ public class PostDto {
     private List<String> tags;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private List<CommentDto> comments;
+    private List<CommentResponse> comments;
     private Boolean isLiked;
 
     private PostDto() {
@@ -24,7 +24,7 @@ public class PostDto {
     public PostDto(Long id, List<String> imageUrls, String githubRepoUrl, String content,
         String authorName, String profileImageUrl, Integer likesCount,
         List<String> tags, LocalDateTime createdAt, LocalDateTime updatedAt,
-        List<CommentDto> comments, Boolean isLiked) {
+        List<CommentResponse> comments, Boolean isLiked) {
         this.id = id;
         this.imageUrls = imageUrls;
         this.githubRepoUrl = githubRepoUrl;
@@ -79,7 +79,7 @@ public class PostDto {
         return updatedAt;
     }
 
-    public List<CommentDto> getComments() {
+    public List<CommentResponse> getComments() {
         return comments;
     }
 

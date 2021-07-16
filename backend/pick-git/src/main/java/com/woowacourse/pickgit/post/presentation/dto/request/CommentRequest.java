@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.post.presentation.dto;
+package com.woowacourse.pickgit.post.presentation.dto.request;
 
 public class CommentRequest {
 

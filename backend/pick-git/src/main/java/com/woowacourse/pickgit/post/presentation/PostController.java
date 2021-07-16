@@ -4,18 +4,20 @@ import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.post.application.PostService;
-import com.woowacourse.pickgit.post.application.dto.CommentDto;
+import com.woowacourse.pickgit.post.application.dto.CommentResponse;
 import com.woowacourse.pickgit.post.application.dto.PostDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
 import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
-import com.woowacourse.pickgit.post.presentation.dto.CommentRequest;
-import com.woowacourse.pickgit.post.presentation.dto.HomeFeedRequest;
-import com.woowacourse.pickgit.post.presentation.dto.PostRequest;
+import com.woowacourse.pickgit.post.presentation.dto.request.CommentRequest;
+import com.woowacourse.pickgit.post.presentation.dto.request.ContentRequest;
+import com.woowacourse.pickgit.post.presentation.dto.request.HomeFeedRequest;
+import com.woowacourse.pickgit.post.presentation.dto.request.PostRequest;
 import java.net.URI;
 import java.util.List;
+import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -80,6 +82,20 @@ public class PostController {
             .build();
     }
 
+    @PostMapping("/posts/{postId}/comments")
+    public ResponseEntity<CommentResponse> addComment(
+        @Authenticated AppUser user,
+        @PathVariable Long postId,
+        @Valid @RequestBody ContentRequest request) {
+        validateIsGuest(user);
+
+        CommentRequest commentRequest =
+            new CommentRequest(user.getUsername(), request.getContent(), postId);
+        CommentResponse response = postService.addComment(commentRequest);
+
+        return ResponseEntity.ok(response);
+    }
+
     private void validateIsGuest(AppUser user) {
         if (user.isGuest()) {
             throw new UnauthorizedException();
@@ -99,17 +115,6 @@ public class PostController {
 
     private URI redirectUrl(AppUser user, PostResponseDto responseDto) {
         return URI.create(String.format(REDIRECT_URL, user.getUsername(), responseDto.getId()));
-    }
-
-    @PostMapping("/posts/{postId}/comments")
-    public ResponseEntity<CommentDto> addComment(
-        @Authenticated AppUser appUser,
-        @PathVariable Long postId,
-        @RequestBody String content) {
-        CommentRequest commentRequest =
-            new CommentRequest(appUser.getUsername(), content, postId);
-        CommentDto commentDto = postService.addComment(commentRequest);
-        return ResponseEntity.ok(commentDto);
     }
 
     @GetMapping("/github/{username}/repositories")

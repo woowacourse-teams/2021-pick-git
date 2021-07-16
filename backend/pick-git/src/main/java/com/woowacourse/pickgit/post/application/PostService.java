@@ -6,7 +6,7 @@ import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
-import com.woowacourse.pickgit.post.application.dto.CommentDto;
+import com.woowacourse.pickgit.post.application.dto.CommentResponse;
 import com.woowacourse.pickgit.post.application.dto.PostDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
@@ -21,8 +21,8 @@ import com.woowacourse.pickgit.post.domain.content.Image;
 import com.woowacourse.pickgit.post.domain.content.Images;
 import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.presentation.PickGitStorage;
-import com.woowacourse.pickgit.post.presentation.dto.CommentRequest;
-import com.woowacourse.pickgit.post.presentation.dto.HomeFeedRequest;
+import com.woowacourse.pickgit.post.presentation.dto.request.CommentRequest;
+import com.woowacourse.pickgit.post.presentation.dto.request.HomeFeedRequest;
 import com.woowacourse.pickgit.tag.application.TagService;
 import com.woowacourse.pickgit.tag.application.TagsDto;
 import com.woowacourse.pickgit.tag.domain.Tag;
@@ -35,8 +35,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Function;
 import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -73,9 +71,8 @@ public class PostService {
 
         User user = findUserByName(postRequestDto.getUsername());
 
-        Post post =
-            new Post(postContent, getImages(postRequestDto), postRequestDto.getGithubRepoUrl(),
-                user);
+        Post post = new Post(postContent, getImages(postRequestDto),
+            postRequestDto.getGithubRepoUrl(), user);
 
         List<Tag> tags = tagService.findOrCreateTags(new TagsDto(postRequestDto.getTags()));
         post.addTags(tags);
@@ -134,7 +131,7 @@ public class PostService {
         }
     }
 
-    public CommentDto addComment(CommentRequest commentRequest) {
+    public CommentResponse addComment(CommentRequest commentRequest) {
         User user = userRepository.findByBasicProfile_Name(commentRequest.getUserName())
             .orElseThrow(() -> new UserNotFoundException(
                 "U0001",
@@ -143,14 +140,14 @@ public class PostService {
             ));
         Post post = postRepository.findById(commentRequest.getPostId())
             .orElseThrow(() -> new PostNotFoundException(
-                "U0001",
+                "P0002",
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "해당하는 사용자를 찾을 수 없습니다."
             ));
         Comment comment = new Comment(commentRequest.getContent());
         user.addComment(post, comment);
         entityManager.flush();
-        return CommentDto.from(comment);
+        return CommentResponse.from(comment);
     }
 
     @Transactional(readOnly = true)

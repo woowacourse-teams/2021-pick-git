@@ -15,7 +15,7 @@ import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.domain.PlatformRepositoryExtractor;
-import com.woowacourse.pickgit.post.application.dto.CommentDto;
+import com.woowacourse.pickgit.post.application.dto.CommentResponse;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostContent;
 import com.woowacourse.pickgit.post.domain.PostRepository;
@@ -25,7 +25,7 @@ import com.woowacourse.pickgit.post.domain.content.Image;
 import com.woowacourse.pickgit.post.domain.content.Images;
 import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.presentation.PickGitStorage;
-import com.woowacourse.pickgit.post.presentation.dto.CommentRequest;
+import com.woowacourse.pickgit.post.presentation.dto.request.CommentRequest;
 import com.woowacourse.pickgit.tag.application.TagService;
 import com.woowacourse.pickgit.tag.application.TagsDto;
 import com.woowacourse.pickgit.tag.domain.Tag;
@@ -188,7 +188,7 @@ class PostServiceTest {
         CommentRequest commentRequest =
             new CommentRequest("kevin", "test comment", 1L);
 
-        CommentDto commentResponseDto = postService.addComment(commentRequest);
+        CommentResponse commentResponseDto = postService.addComment(commentRequest);
 
         assertThat(commentResponseDto.getAuthorName()).isEqualTo("kevin");
         assertThat(commentResponseDto.getContent()).isEqualTo("test comment");
