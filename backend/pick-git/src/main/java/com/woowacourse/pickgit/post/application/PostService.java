@@ -35,6 +35,9 @@ import java.util.List;
 import java.util.function.Function;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -153,31 +156,26 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public List<PostDto> readHomeFeed(HomeFeedRequest homeFeedRequest) {
-        String query = "select distinct p from Post p left join fetch p.user order by p.id";
-        List<Post> result = findPosts(homeFeedRequest, query)
-            .getResultList();
+        Pageable pageable = PageRequest.of(homeFeedRequest.getPage(), homeFeedRequest.getLimit());
+        List<Post> result = postRepository.findAllPosts(pageable);
         return PostDtoAssembler.assembleFrom(homeFeedRequest.getAppUser(), result);
-    }
-
-    private TypedQuery<Post> findPosts(HomeFeedRequest homeFeedRequest, String query) {
-        int page = Math.toIntExact(homeFeedRequest.getPage());
-        int limit = Math.toIntExact(homeFeedRequest.getLimit());
-        return entityManager.createQuery(query, Post.class)
-            .setFirstResult(page * limit)
-            .setMaxResults(limit);
     }
 
     @Transactional(readOnly = true)
     public List<PostDto> readMyFeed(HomeFeedRequest homeFeedRequest) {
+        return readFeed(homeFeedRequest, homeFeedRequest.getAppUser().getUsername());
+    }
+
+    @Transactional(readOnly = true)
+    public List<PostDto> readUserFeed(HomeFeedRequest homeFeedRequest, String username) {
+        return readFeed(homeFeedRequest, username);
+    }
+
+    private List<PostDto> readFeed(HomeFeedRequest homeFeedRequest, String username) {
         AppUser appUser = homeFeedRequest.getAppUser();
-        User user = findUserByName(appUser.getUsername());
-
-        String query = "select distinct p from Post p where p.user = :user "
-            + "order by p.createdAt desc";
-        List<Post> result = findPosts(homeFeedRequest, query)
-            .setParameter("user", user)
-            .getResultList();
-
+        User target = findUserByName(username);
+        Pageable pageable = PageRequest.of(homeFeedRequest.getPage(), homeFeedRequest.getLimit());
+        List<Post> result = postRepository.findAllPostsByUser(target, pageable);
         return PostDtoAssembler.assembleFrom(appUser, result);
     }
 }

@@ -38,6 +38,7 @@ import org.springframework.web.multipart.MultipartFile;
 @ActiveProfiles("test")
 public class PostAcceptanceTest {
 
+    private static final String ANOTHER_USERNAME = "pick-git-login";
     private static final String USERNAME = "jipark3";
 
     @LocalServerPort
@@ -76,7 +77,7 @@ public class PostAcceptanceTest {
     @Test
     void write_LoginUser_Success() {
         // given
-        String token = 로그인_되어있음().getToken();
+        String token = 로그인_되어있음(ANOTHER_USERNAME).getToken();
 
         // when
         RestAssured
@@ -96,7 +97,7 @@ public class PostAcceptanceTest {
     @DisplayName("로그인일때 게시물을 조회한다. - 댓글 및 게시글의 좋아요 여부를 확인할 수 있다.")
     @Test
     void read_LoginUser_Success() {
-        String token = 로그인_되어있음().getToken();
+        String token = 로그인_되어있음(ANOTHER_USERNAME).getToken();
 
         requestToWritePostApi(token, HttpStatus.CREATED);
         requestToWritePostApi(token, HttpStatus.CREATED);
@@ -119,7 +120,7 @@ public class PostAcceptanceTest {
     @DisplayName("비 로그인이어도 게시글 조회가 가능하다. - 댓글 및 게시물 좋아요 여부는 항상 false")
     @Test
     void read_GuestUser_Success() {
-        String token = 로그인_되어있음().getToken();
+        String token = 로그인_되어있음(ANOTHER_USERNAME).getToken();
 
         requestToWritePostApi(token, HttpStatus.CREATED);
         requestToWritePostApi(token, HttpStatus.CREATED);
@@ -156,7 +157,7 @@ public class PostAcceptanceTest {
     @DisplayName("로그인 상태에서 내 피드 조회가 가능하다.")
     @Test
     void readMyFeed_LoginUser_Success() {
-        String token = 로그인_되어있음().getToken();
+        String token = 로그인_되어있음(ANOTHER_USERNAME).getToken();
 
         requestToWritePostApi(token, HttpStatus.CREATED);
         requestToWritePostApi(token, HttpStatus.CREATED);
@@ -176,11 +177,10 @@ public class PostAcceptanceTest {
         assertThat(response).hasSize(3);
     }
 
-
     @DisplayName("비로그인 상태에서는 내 피드 조회가 불가능하다.")
     @Test
     void readMyFeed_GuestUser_Success() {
-        String token = 로그인_되어있음().getToken();
+        String token = 로그인_되어있음(ANOTHER_USERNAME).getToken();
 
         requestToWritePostApi(token, HttpStatus.CREATED);
         requestToWritePostApi(token, HttpStatus.CREATED);
@@ -192,6 +192,54 @@ public class PostAcceptanceTest {
             .get("/api/posts/me?page=0&limit=3")
             .then()
             .statusCode(HttpStatus.UNAUTHORIZED.value());
+    }
+
+    @DisplayName("로그인 상태에서 다른 유저 피드 조회가 가능하다.")
+    @Test
+    void readUserFeed_LoginUser_Success() {
+        String loginUserToken = 로그인_되어있음(USERNAME).getToken();
+        String targetUserToken = 로그인_되어있음(ANOTHER_USERNAME).getToken();
+
+        requestToWritePostApi(targetUserToken, HttpStatus.CREATED);
+        requestToWritePostApi(targetUserToken, HttpStatus.CREATED);
+        requestToWritePostApi(targetUserToken, HttpStatus.CREATED);
+        requestToWritePostApi(loginUserToken, HttpStatus.CREATED);
+        requestToWritePostApi(loginUserToken, HttpStatus.CREATED);
+
+        List<PostDto> response = RestAssured
+            .given().log().all()
+            .auth().oauth2(loginUserToken)
+            .when()
+            .get("/api/posts/" + ANOTHER_USERNAME +"?page=0&limit=3")
+            .then()
+            .statusCode(HttpStatus.OK.value())
+            .extract()
+            .as(new TypeRef<List<PostDto>>() {
+            });
+
+        assertThat(response).hasSize(3);
+    }
+
+    @DisplayName("로그인 상태에서 다른 유저 피드 조회가 가능하다.")
+    @Test
+    void readUserFeed_GuestUser_Success() {
+        String targetUserToken = 로그인_되어있음(ANOTHER_USERNAME).getToken();
+
+        requestToWritePostApi(targetUserToken, HttpStatus.CREATED);
+        requestToWritePostApi(targetUserToken, HttpStatus.CREATED);
+        requestToWritePostApi(targetUserToken, HttpStatus.CREATED);
+
+        List<PostDto> response = RestAssured
+            .given().log().all()
+            .when()
+            .get("/api/posts/" + ANOTHER_USERNAME +"?page=0&limit=3")
+            .then()
+            .statusCode(HttpStatus.OK.value())
+            .extract()
+            .as(new TypeRef<List<PostDto>>() {
+            });
+
+        assertThat(response).hasSize(3);
     }
 
     @DisplayName("게스트는 게시글을 등록할 수 없다. - 유효하지 않은 토큰이 있는 경우 (Authorization header O)")
@@ -225,7 +273,7 @@ public class PostAcceptanceTest {
     @Test
     void showRepositories_LoginUser_Success() {
         // given
-        String token = 로그인_되어있음().getToken();
+        String token = 로그인_되어있음(ANOTHER_USERNAME).getToken();
 
         // when
         List<RepositoryResponseDto> response =
@@ -241,7 +289,7 @@ public class PostAcceptanceTest {
     @Test
     void showRepositories_InvalidAccessToken_500Exception() {
         // given
-        String token = 로그인_되어있음().getToken();
+        String token = 로그인_되어있음(ANOTHER_USERNAME).getToken();
 
         // when
         request(token + "hi", USERNAME, HttpStatus.UNAUTHORIZED.value());
@@ -251,7 +299,7 @@ public class PostAcceptanceTest {
     @Test
     void showRepositories_InvalidUsername_400Exception() {
         // given
-        String token = 로그인_되어있음().getToken();
+        String token = 로그인_되어있음(ANOTHER_USERNAME).getToken();
 
         // when
         ApiErrorResponse response =
@@ -273,19 +321,21 @@ public class PostAcceptanceTest {
             .extract();
     }
 
-    private OAuthTokenResponse 로그인_되어있음() {
-        OAuthTokenResponse response = 로그인_요청().as(OAuthTokenResponse.class);
+
+
+    private OAuthTokenResponse 로그인_되어있음(String name) {
+        OAuthTokenResponse response = 로그인_요청(name).as(OAuthTokenResponse.class);
         assertThat(response.getToken()).isNotBlank();
         return response;
     }
 
-    private ExtractableResponse<Response> 로그인_요청() {
+    private ExtractableResponse<Response> 로그인_요청(String name) {
         // given
         String oauthCode = "1234";
         String accessToken = "oauth.access.token";
 
         OAuthProfileResponse oAuthProfileResponse = new OAuthProfileResponse(
-            "pick-git-login", "image", "hi~", "github.com/",
+            name, "image", "hi~", "github.com/",
             null, null, null, null
         );
 
