@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import useLocalStorage from "../services/hooks/@common/useLocalStorage";
 
 interface Props {
@@ -22,21 +22,31 @@ const UserContext = createContext<Value>({
 
 export const UserContextProvider = ({ children }: Props) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentUserName, setCurrentUserName] = useState("");
-  const { setAccessToken } = useLocalStorage();
+  const { accessToken, userName, setAccessToken, setUserName } = useLocalStorage();
 
   const login = (accessToken: string, userName: string) => {
     setAccessToken(accessToken);
+    setUserName(userName);
     setIsLoggedIn(true);
-    setCurrentUserName(userName);
   };
 
   const logout = () => {
     setAccessToken("");
+    setUserName("");
     setIsLoggedIn(false);
   };
 
-  return <UserContext.Provider value={{ currentUserName, isLoggedIn, login, logout }}>{children}</UserContext.Provider>;
+  useEffect(() => {
+    if (accessToken) {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
+  return (
+    <UserContext.Provider value={{ currentUserName: userName ?? "", isLoggedIn, login, logout }}>
+      {children}
+    </UserContext.Provider>
+  );
 };
 
 export default UserContext;

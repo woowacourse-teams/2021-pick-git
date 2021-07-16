@@ -25,3 +25,23 @@ export const requestGetUserProfile = async (userName: string, accessToken: strin
 
   return response.data;
 };
+
+export const requestAddFollow = async (userName: string, accessToken: string) => {
+  const response = await axios.post(API_URL.USER_PROFILE_FOLLOW(userName), null, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  return response.data;
+};
+
+export const requestDeleteFollow = async (userName: string, accessToken: string) => {
+  const response = await axios.delete(API_URL.USER_PROFILE_FOLLOW(userName), {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  return response.data;
+};
