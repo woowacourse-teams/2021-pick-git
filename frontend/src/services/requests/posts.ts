@@ -11,13 +11,13 @@ export const requestGetHomeFeedPosts = async (accessToken: string | null) => {
         },
       }
     : {};
-  const response = await axios.get<Post[]>(API_URL.POSTS, config);
+  const response = await axios.get<Post[]>(API_URL.POSTS(0, 20), config);
 
   return response.data;
 };
 
 export const requestGetMyFeedPosts = async (accessToken: string) => {
-  const response = await axios.get<Post[]>(API_URL.MY_POSTS, {
+  const response = await axios.get<Post[]>(API_URL.MY_POSTS(0, 20), {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -34,7 +34,7 @@ export const requestGetUserFeedPosts = async (userName: string, accessToken: str
         },
       }
     : {};
-  const response = await axios.get<Post[]>(API_URL.USER_POSTS(userName), config);
+  const response = await axios.get<Post[]>(API_URL.USER_POSTS(userName, 0, 20), config);
 
   return response.data;
 };

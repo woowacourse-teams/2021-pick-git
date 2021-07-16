@@ -7,7 +7,7 @@ export const PAGE_URL = {
   SEARCH: "/search",
   PROFILE: "/profile",
   MY_PROFILE: "/profile/me",
-  USER_PROFILE: (userName: string) => `/profile?userName=${userName}`,
+  USER_PROFILE: (userName: string) => `/profile?userName${userName}`,
   POSTS_WITH_TAG: (tag: string) => `/posts/${tag}`,
 };
 
@@ -18,9 +18,10 @@ export const API_URL = {
   },
   SELF_PROFILE: "/profiles/me",
   USER_PROFILE: (userName: string) => `/profiles/${userName}`,
-  POSTS: "/posts",
-  MY_POSTS: "/posts/me",
-  USER_POSTS: (userName: string) => `/posts/${userName}`,
+  USER_PROFILE_FOLLOW: (userName: string) => `/profiles/${userName}/followings`,
+  POSTS: (page: number, limit: number) => `/posts?page=${page}&limit=${limit}`,
+  MY_POSTS: (page: number, limit: number) => `/posts/me?page=${page}&limit=${limit}`,
+  USER_POSTS: (userName: string, page: number, limit: number) => `/posts/${userName}?page=${page}&limit=${limit}`,
   POSTS_LIKES: (postId: string) => `/posts/${postId}/likes`,
   POSTS_COMMENTS: (postId: string) => `/posts/${postId}/comments`,
 };
