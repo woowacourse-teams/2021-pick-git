@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
@@ -16,5 +17,5 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query("select p from Post p where p.user = :user "
         + "order by p.createdAt desc")
-    List<Post> findAllPostsByUser(User user, Pageable pageable);
+    List<Post> findAllPostsByUser(@Param("user") User user, Pageable pageable);
 }
