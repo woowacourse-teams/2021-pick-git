@@ -3,7 +3,7 @@ package com.woowacourse.pickgit.post.presentation;
 import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
-import com.woowacourse.pickgit.post.application.CommentRequestDto;
+import com.woowacourse.pickgit.post.presentation.dto.CommentRequest;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.CommentDto;
 import com.woowacourse.pickgit.post.application.dto.PostDto;
@@ -41,8 +41,10 @@ public class PostController {
     }
 
     @GetMapping("/posts")
-    public ResponseEntity<List<PostDto>> readHomeFeed(@Authenticated AppUser appUser,
-        @RequestParam Long page, @RequestParam Long limit) {
+    public ResponseEntity<List<PostDto>> readHomeFeed(
+        @Authenticated AppUser appUser,
+        @RequestParam Long page,
+        @RequestParam Long limit) {
         HomeFeedRequest homeFeedRequest = new HomeFeedRequest(appUser, page, limit);
         List<PostDto> postDtos = postService.readHomeFeed(homeFeedRequest);
         return ResponseEntity.ok(postDtos);
@@ -67,8 +69,7 @@ public class PostController {
     @PostMapping("/posts")
     public ResponseEntity<Void> write(
         @Authenticated AppUser user,
-        @Valid PostRequest request
-    ) {
+        @Valid PostRequest request) {
         validateIsGuest(user);
 
         PostResponseDto responseDto = postService.write(
@@ -102,11 +103,13 @@ public class PostController {
     }
 
     @PostMapping("/posts/{postId}/comments")
-    public ResponseEntity<CommentDto> addComment(@Authenticated AppUser appUser,
-        @PathVariable Long postId, @RequestBody String content) {
-        CommentRequestDto commentRequestDto =
-            new CommentRequestDto(appUser.getUsername(), content, postId);
-        CommentDto commentDto = postService.addComment(commentRequestDto);
+    public ResponseEntity<CommentDto> addComment(
+        @Authenticated AppUser appUser,
+        @PathVariable Long postId,
+        @RequestBody String content) {
+        CommentRequest commentRequest =
+            new CommentRequest(appUser.getUsername(), content, postId);
+        CommentDto commentDto = postService.addComment(commentRequest);
         return ResponseEntity.ok(commentDto);
     }
 
