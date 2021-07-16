@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.FileFactory;
-import com.woowacourse.pickgit.config.StorageConfiguration;
+import com.woowacourse.pickgit.post.PostTestConfiguration;
 import com.woowacourse.pickgit.exception.post.CommentFormatException;
 import com.woowacourse.pickgit.post.application.CommentRequestDto;
 import com.woowacourse.pickgit.post.application.PostService;
@@ -46,7 +46,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 
-@Import({StorageConfiguration.class})
+@Import({PostTestConfiguration.class})
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(PostController.class)
 @ActiveProfiles("test")
