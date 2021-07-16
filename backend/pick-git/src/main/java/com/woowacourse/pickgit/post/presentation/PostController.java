@@ -3,7 +3,6 @@ package com.woowacourse.pickgit.post.presentation;
 import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
-import com.woowacourse.pickgit.post.presentation.dto.CommentRequest;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.CommentDto;
 import com.woowacourse.pickgit.post.application.dto.PostDto;
@@ -12,11 +11,11 @@ import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
 import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
+import com.woowacourse.pickgit.post.presentation.dto.CommentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.HomeFeedRequest;
 import com.woowacourse.pickgit.post.presentation.dto.PostRequest;
 import java.net.URI;
 import java.util.List;
-import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -69,7 +68,7 @@ public class PostController {
     @PostMapping("/posts")
     public ResponseEntity<Void> write(
         @Authenticated AppUser user,
-        @Valid PostRequest request) {
+        PostRequest request) {
         validateIsGuest(user);
 
         PostResponseDto responseDto = postService.write(
