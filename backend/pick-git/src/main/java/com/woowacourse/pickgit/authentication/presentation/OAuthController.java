@@ -23,11 +23,15 @@ public class OAuthController {
 
     @GetMapping("/authorization/github")
     public ResponseEntity<OAuthLoginUrlResponse> githubAuthorizationUrl() {
-        return ResponseEntity.ok().body(new OAuthLoginUrlResponse(oauthService.getGithubAuthorizationUrl()));
+        return ResponseEntity
+            .ok()
+            .body(new OAuthLoginUrlResponse(oauthService.getGithubAuthorizationUrl()));
     }
 
     @GetMapping("/afterlogin")
     public ResponseEntity<OAuthTokenResponse> afterAuthorizeGithubLogin(@RequestParam String code) {
-        return ResponseEntity.ok().body(oauthService.createToken(code));
+        return ResponseEntity
+            .ok()
+            .body(oauthService.createToken(code));
     }
 }
