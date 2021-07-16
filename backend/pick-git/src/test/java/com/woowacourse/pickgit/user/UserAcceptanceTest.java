@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.user.integration;
+package com.woowacourse.pickgit.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -32,7 +32,7 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @ActiveProfiles("test")
-public class UserIntegrationTest {
+public class UserAcceptanceTest {
 
     private static final String SOURCE_USER_NAME = "yjksw";
     private static final String TARGET_USER_NAME = "pickgit";
