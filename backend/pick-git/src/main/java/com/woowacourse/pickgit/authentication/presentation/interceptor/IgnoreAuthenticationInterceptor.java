@@ -28,7 +28,9 @@ public class IgnoreAuthenticationInterceptor implements HandlerInterceptor {
     }
 
     private boolean isPreflightRequest(HttpServletRequest request) {
-        return isOptions(request) && hasAccessControlRequestHeaders(request) && hasAccessControlRequestMethod(request)
+        return isOptions(request)
+            && hasAccessControlRequestHeaders(request)
+            && hasAccessControlRequestMethod(request)
             && hasOrigin(request);
     }
 
