@@ -18,7 +18,7 @@ public class PostDto {
     private List<CommentDto> comments;
     private Boolean isLiked;
 
-    public PostDto() {
+    private PostDto() {
     }
 
     public PostDto(Long id, List<String> imageUrls, String githubRepoUrl, String content,

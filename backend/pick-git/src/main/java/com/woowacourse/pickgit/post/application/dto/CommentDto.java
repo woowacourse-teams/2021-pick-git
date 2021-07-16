@@ -9,7 +9,7 @@ public class CommentDto {
     private String content;
     private Boolean isLiked;
 
-    public CommentDto() {
+    private CommentDto() {
     }
 
     public CommentDto(Long id, String authorName, String content, Boolean isLiked) {
