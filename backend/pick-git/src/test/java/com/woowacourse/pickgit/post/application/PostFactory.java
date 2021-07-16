@@ -36,6 +36,29 @@ public class PostFactory {
         );
     }
 
+    public static List<PostRequestDto> mockPostRequestForAssertingMyFeed() {
+        List<MultipartFile> images =
+            List.of(FileFactory.getTestImage1(), FileFactory.getTestImage2());
+
+        return List.of(
+            new PostRequestDto("a", "kevin", images,
+                "atdd-subway-fare", List.of("Java", "Python", "C++"),
+                "woowacourse mission"),
+            new PostRequestDto("a", "kevin", images,
+                "jwp-chess", List.of("Javascirpt", "C", "HTML"),
+                "it's so easy!"),
+            new PostRequestDto("a", "kevin", images,
+                "java-racingcar", List.of("Go", "Objective-C"),
+                "I love TDD"),
+            new PostRequestDto("a", "ala", images,
+                "junit-test", List.of("Java", "CSS", "HTML"),
+                "hi there!"),
+            new PostRequestDto("a", "dave", images,
+                "jpa-learning-teest", List.of("Java", "CSS", "HTML"),
+                "jpa is so fun!")
+        );
+    }
+
     public static List<User> mockUsers() {
         return List.of(
             new User(new BasicProfile("sean", "a.jpg", "a"),
@@ -48,6 +71,15 @@ public class PostFactory {
                 new GithubProfile("coda.com", "a", "a", "a", "a")),
             new User(new BasicProfile("dave", "a.jpg", "a"),
                 new GithubProfile("dave.com", "a", "a", "a", "a"))
+        );
+    }
+
+    public static List<User> mockUsers2() {
+        return List.of(
+            new User(new BasicProfile("ala", "a.jpg", "a"),
+                new GithubProfile("github1.com", "a", "a", "a", "a")),
+            new User(new BasicProfile("dave", "a.jpg", "a"),
+                new GithubProfile("github2.com", "a", "a", "a", "a"))
         );
     }
 }

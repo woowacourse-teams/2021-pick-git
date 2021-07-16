@@ -153,6 +153,47 @@ public class PostAcceptanceTest {
             .extract();
     }
 
+    @DisplayName("로그인 상태에서 내 피드 조회가 가능하다.")
+    @Test
+    void readMyFeed_LoginUser_Success() {
+        String token = 로그인_되어있음().getToken();
+
+        requestToWritePostApi(token, HttpStatus.CREATED);
+        requestToWritePostApi(token, HttpStatus.CREATED);
+        requestToWritePostApi(token, HttpStatus.CREATED);
+
+        List<PostDto> response = RestAssured
+            .given().log().all()
+            .auth().oauth2(token)
+            .when()
+            .get("/api/posts/me?page=0&limit=3")
+            .then()
+            .statusCode(HttpStatus.OK.value())
+            .extract()
+            .as(new TypeRef<List<PostDto>>() {
+            });
+
+        assertThat(response).hasSize(3);
+    }
+
+
+    @DisplayName("비로그인 상태에서는 내 피드 조회가 불가능하다.")
+    @Test
+    void readMyFeed_GuestUser_Success() {
+        String token = 로그인_되어있음().getToken();
+
+        requestToWritePostApi(token, HttpStatus.CREATED);
+        requestToWritePostApi(token, HttpStatus.CREATED);
+        requestToWritePostApi(token, HttpStatus.CREATED);
+
+         RestAssured
+            .given().log().all()
+            .when()
+            .get("/api/posts/me?page=0&limit=3")
+            .then()
+            .statusCode(HttpStatus.UNAUTHORIZED.value());
+    }
+
     @DisplayName("게스트는 게시글을 등록할 수 없다. - 유효하지 않은 토큰이 있는 경우 (Authorization header O)")
     @Test
     void write_GuestUserWithToken_Fail() {
