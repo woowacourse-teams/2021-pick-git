@@ -6,8 +6,8 @@ import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.AuthUserServiceDto;
 import com.woowacourse.pickgit.user.application.dto.FollowServiceDto;
 import com.woowacourse.pickgit.user.application.dto.UserProfileServiceDto;
-import com.woowacourse.pickgit.user.presentation.dto.FollowResponseDto;
-import com.woowacourse.pickgit.user.presentation.dto.UserProfileResponseDto;
+import com.woowacourse.pickgit.user.presentation.dto.FollowResponse;
+import com.woowacourse.pickgit.user.presentation.dto.UserProfileResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,7 +29,7 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserProfileResponseDto> getAuthenticatedUserProfile(
+    public ResponseEntity<UserProfileResponse> getAuthenticatedUserProfile(
         @Authenticated AppUser appUser) {
         UserProfileServiceDto userProfileServiceDto = userService.getMyUserProfile(
             new AuthUserServiceDto(appUser.getUsername())
@@ -39,7 +39,7 @@ public class UserController {
     }
 
     @GetMapping("/{username}")
-    public ResponseEntity<UserProfileResponseDto> getUserProfile(
+    public ResponseEntity<UserProfileResponse> getUserProfile(
         @Authenticated AppUser appUser, @PathVariable String username) {
         UserProfileServiceDto userProfileServiceDto = userService.getUserProfile(appUser, username);
 
@@ -47,7 +47,7 @@ public class UserController {
     }
 
     @PostMapping("/{username}/followings")
-    public ResponseEntity<FollowResponseDto> followUser(
+    public ResponseEntity<FollowResponse> followUser(
         @Authenticated AppUser appUser,
         @PathVariable String username
     ) {
@@ -60,7 +60,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{username}/followings")
-    public ResponseEntity<FollowResponseDto> unfollowUser(
+    public ResponseEntity<FollowResponse> unfollowUser(
         @Authenticated AppUser appUser,
         @PathVariable String username
     ) {
@@ -72,9 +72,9 @@ public class UserController {
         return ResponseEntity.ok(createFollowResponseDto(followServiceDto));
     }
 
-    private UserProfileResponseDto getUserProfileResponseDto(
+    private UserProfileResponse getUserProfileResponseDto(
         UserProfileServiceDto userProfileServiceDto) {
-        return new UserProfileResponseDto(
+        return new UserProfileResponse(
             userProfileServiceDto.getName(), userProfileServiceDto.getImage(),
             userProfileServiceDto.getDescription(), userProfileServiceDto.getFollowerCount(),
             userProfileServiceDto.getFollowingCount(), userProfileServiceDto.getPostCount(),
@@ -84,8 +84,8 @@ public class UserController {
         );
     }
 
-    private FollowResponseDto createFollowResponseDto(FollowServiceDto followServiceDto) {
-        return new FollowResponseDto(
+    private FollowResponse createFollowResponseDto(FollowServiceDto followServiceDto) {
+        return new FollowResponse(
             followServiceDto.getFollowerCount(),
             followServiceDto.isFollowing());
     }

@@ -9,8 +9,8 @@ import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenRespons
 import com.woowacourse.pickgit.post.PostTestConfiguration;
 import com.woowacourse.pickgit.user.UserFactory;
 import com.woowacourse.pickgit.user.domain.User;
-import com.woowacourse.pickgit.user.presentation.dto.FollowResponseDto;
-import com.woowacourse.pickgit.user.presentation.dto.UserProfileResponseDto;
+import com.woowacourse.pickgit.user.presentation.dto.FollowResponse;
+import com.woowacourse.pickgit.user.presentation.dto.UserProfileResponse;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -64,16 +64,16 @@ public class UserIntegrationTest {
         //given
         User user = userFactory.user();
         String requestUrl = "/api/profiles/me";
-        UserProfileResponseDto expectedResponseDto =
-            new UserProfileResponseDto(user.getName(), user.getImage(), user.getDescription(),
+        UserProfileResponse expectedResponseDto =
+            new UserProfileResponse(user.getName(), user.getImage(), user.getDescription(),
                 user.getFollowerCount(), user.getFollowingCount(), user.getPostCount(),
                 user.getGithubUrl(), user.getCompany(), user.getLocation(), user.getWebsite(),
                 user.getTwitter(), null);
 
         //when
-        UserProfileResponseDto actualResponseDto =
+        UserProfileResponse actualResponseDto =
             authenticatedGetRequest(userAccessToken, requestUrl, HttpStatus.OK)
-                .as(UserProfileResponseDto.class);
+                .as(UserProfileResponse.class);
 
         //then
         assertThat(actualResponseDto)
@@ -100,8 +100,8 @@ public class UserIntegrationTest {
 
         String followRequestUrl = "/api/profiles/" + targetUser.getName() + "/followings";
         String requestUrl = "/api/profiles/" + targetUser.getName();
-        UserProfileResponseDto expectedResponseDto =
-            new UserProfileResponseDto(targetUser.getName(), targetUser.getImage(), targetUser.getDescription(),
+        UserProfileResponse expectedResponseDto =
+            new UserProfileResponse(targetUser.getName(), targetUser.getImage(), targetUser.getDescription(),
                 1, targetUser.getFollowingCount(), targetUser.getPostCount(),
                 targetUser.getGithubUrl(), targetUser.getCompany(), targetUser.getLocation(), targetUser.getWebsite(),
                 targetUser.getTwitter(), true);
@@ -109,9 +109,9 @@ public class UserIntegrationTest {
         authenticatedPostRequest(userAccessToken, followRequestUrl, HttpStatus.OK);
 
         //when
-        UserProfileResponseDto actualResponseDto =
+        UserProfileResponse actualResponseDto =
             authenticatedGetRequest(userAccessToken, requestUrl, HttpStatus.OK)
-                .as(UserProfileResponseDto.class);
+                .as(UserProfileResponse.class);
 
         //then
         assertThat(actualResponseDto)
@@ -125,16 +125,16 @@ public class UserIntegrationTest {
         //given
         User user = userFactory.anotherUser();
         String requestUrl = "/api/profiles/" + user.getName();
-        UserProfileResponseDto expectedResponseDto =
-            new UserProfileResponseDto(user.getName(), user.getImage(), user.getDescription(),
+        UserProfileResponse expectedResponseDto =
+            new UserProfileResponse(user.getName(), user.getImage(), user.getDescription(),
                 user.getFollowerCount(), user.getFollowingCount(), user.getPostCount(),
                 user.getGithubUrl(), user.getCompany(), user.getLocation(), user.getWebsite(),
                 user.getTwitter(), false);
 
         //when
-        UserProfileResponseDto actualResponseDto =
+        UserProfileResponse actualResponseDto =
             authenticatedGetRequest(userAccessToken, requestUrl, HttpStatus.OK)
-                .as(UserProfileResponseDto.class);
+                .as(UserProfileResponse.class);
 
         //then
         assertThat(actualResponseDto)
@@ -148,16 +148,16 @@ public class UserIntegrationTest {
         //given
         User user = userFactory.anotherUser();
         String requestUrl = "/api/profiles/" + user.getName();
-        UserProfileResponseDto expectedResponseDto =
-            new UserProfileResponseDto(user.getName(), user.getImage(), user.getDescription(),
+        UserProfileResponse expectedResponseDto =
+            new UserProfileResponse(user.getName(), user.getImage(), user.getDescription(),
                 user.getFollowerCount(), user.getFollowingCount(), user.getPostCount(),
                 user.getGithubUrl(), user.getCompany(), user.getLocation(), user.getWebsite(),
                 user.getTwitter(), null);
 
         //when
-        UserProfileResponseDto actualResponseDto =
+        UserProfileResponse actualResponseDto =
             unauthenticatedGetRequest(requestUrl, HttpStatus.OK)
-                .as(UserProfileResponseDto.class);
+                .as(UserProfileResponse.class);
 
         //then
         assertThat(actualResponseDto)
@@ -171,12 +171,12 @@ public class UserIntegrationTest {
         //given
         User user = userFactory.anotherUser();
         String requestUrl = "/api/profiles/" + user.getName() + "/followings";
-        FollowResponseDto expectedResponseDto = new FollowResponseDto(1, true);
+        FollowResponse expectedResponseDto = new FollowResponse(1, true);
 
         //when
-        FollowResponseDto actualResponseDto =
+        FollowResponse actualResponseDto =
             authenticatedPostRequest(userAccessToken, requestUrl, HttpStatus.OK)
-                .as(FollowResponseDto.class);
+                .as(FollowResponse.class);
 
         //then
         assertThat(actualResponseDto)
@@ -212,11 +212,11 @@ public class UserIntegrationTest {
         //given
         User user = userFactory.anotherUser();
         String requestUrl = "/api/profiles/" + user.getName() + "/followings";
-        FollowResponseDto followResponse = authenticatedPostRequest(
+        FollowResponse followResponse = authenticatedPostRequest(
             userAccessToken, requestUrl, HttpStatus.OK)
-            .as(FollowResponseDto.class);
+            .as(FollowResponse.class);
 
-        FollowResponseDto followExpectedResponseDto = new FollowResponseDto(1, true);
+        FollowResponse followExpectedResponseDto = new FollowResponse(1, true);
 
         assertThat(followResponse)
             .usingRecursiveComparison()
@@ -233,21 +233,21 @@ public class UserIntegrationTest {
         //given
         User user = userFactory.anotherUser();
         String requestUrl = "/api/profiles/" + user.getName() + "/followings";
-        FollowResponseDto followResponse = authenticatedPostRequest(
+        FollowResponse followResponse = authenticatedPostRequest(
             userAccessToken, requestUrl, HttpStatus.OK)
-            .as(FollowResponseDto.class);
+            .as(FollowResponse.class);
 
-        FollowResponseDto followExpectedResponseDto = new FollowResponseDto(1, true);
-        FollowResponseDto unfollowExpectedResponseDto = new FollowResponseDto(0, false);
+        FollowResponse followExpectedResponseDto = new FollowResponse(1, true);
+        FollowResponse unfollowExpectedResponseDto = new FollowResponse(0, false);
 
         assertThat(followResponse)
             .usingRecursiveComparison()
             .isEqualTo(followExpectedResponseDto);
 
         //when
-        FollowResponseDto actualResponseDto =
+        FollowResponse actualResponseDto =
             authenticatedDeleteRequest(userAccessToken, requestUrl, HttpStatus.OK)
-                .as(FollowResponseDto.class);
+                .as(FollowResponse.class);
 
         //then
         assertThat(actualResponseDto)

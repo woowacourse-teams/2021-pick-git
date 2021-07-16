@@ -21,6 +21,7 @@ import com.woowacourse.pickgit.post.domain.content.Image;
 import com.woowacourse.pickgit.post.domain.content.Images;
 import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.presentation.PickGitStorage;
+import com.woowacourse.pickgit.post.presentation.dto.CommentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.HomeFeedRequest;
 import com.woowacourse.pickgit.tag.application.TagService;
 import com.woowacourse.pickgit.tag.application.TagsDto;
@@ -73,7 +74,8 @@ public class PostService {
         User user = findUserByName(postRequestDto.getUsername());
 
         Post post =
-            new Post(postContent, getImages(postRequestDto), postRequestDto.getGithubRepoUrl(), user);
+            new Post(postContent, getImages(postRequestDto), postRequestDto.getGithubRepoUrl(),
+                user);
 
         List<Tag> tags = tagService.findOrCreateTags(new TagsDto(postRequestDto.getTags()));
         post.addTags(tags);
@@ -132,15 +134,20 @@ public class PostService {
         }
     }
 
-    public CommentDto addComment(CommentRequestDto commentRequestDto) {
-        User user = findUserByName(commentRequestDto.getUserName());
-        Post post = postRepository.findById(commentRequestDto.getPostId())
+    public CommentDto addComment(CommentRequest commentRequest) {
+        User user = userRepository.findByBasicProfile_Name(commentRequest.getUserName())
+            .orElseThrow(() -> new UserNotFoundException(
+                "U0001",
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "해당하는 사용자를 찾을 수 없습니다."
+            ));
+        Post post = postRepository.findById(commentRequest.getPostId())
             .orElseThrow(() -> new PostNotFoundException(
                 "U0001",
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "해당하는 사용자를 찾을 수 없습니다."
             ));
-        Comment comment = new Comment(commentRequestDto.getContent());
+        Comment comment = new Comment(commentRequest.getContent());
         user.addComment(post, comment);
         entityManager.flush();
         return CommentDto.from(comment);
@@ -148,11 +155,11 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public RepositoriesResponseDto showRepositories(RepositoryRequestDto repositoryRequestDto) {
-            List<RepositoryResponseDto> repositories = platformRepositoryExtractor
-                .extract(repositoryRequestDto.getToken(), repositoryRequestDto.getUsername());
+        List<RepositoryResponseDto> repositories = platformRepositoryExtractor
+            .extract(repositoryRequestDto.getToken(), repositoryRequestDto.getUsername());
 
-            return new RepositoriesResponseDto(repositories);
-     }
+        return new RepositoriesResponseDto(repositories);
+    }
 
     @Transactional(readOnly = true)
     public List<PostDto> readHomeFeed(HomeFeedRequest homeFeedRequest) {

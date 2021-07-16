@@ -1,6 +1,6 @@
 package com.woowacourse.pickgit.user.presentation.dto;
 
-public class UserProfileResponseDto {
+public class UserProfileResponse {
 
     private String name;
     private String image;
@@ -18,10 +18,10 @@ public class UserProfileResponseDto {
 
     private Boolean following;
 
-    private UserProfileResponseDto() {
+    private UserProfileResponse() {
     }
 
-    public UserProfileResponseDto(String name, String image, String description, int followerCount,
+    public UserProfileResponse(String name, String image, String description, int followerCount,
         int followingCount, int postCount, String githubUrl, String company, String location,
         String website, String twitter, Boolean following) {
         this.name = name;

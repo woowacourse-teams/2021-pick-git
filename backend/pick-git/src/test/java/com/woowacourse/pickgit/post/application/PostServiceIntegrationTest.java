@@ -21,6 +21,7 @@ import com.woowacourse.pickgit.post.application.dto.response.RepositoriesRespons
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostRepository;
 import com.woowacourse.pickgit.post.domain.comment.Comments;
+import com.woowacourse.pickgit.post.presentation.dto.CommentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.HomeFeedRequest;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
@@ -112,10 +113,10 @@ class PostServiceIntegrationTest {
         post = new Post(null, null, null, null, null, new Comments(), new ArrayList<>(), null);
         postRepository.save(post);
 
-        CommentRequestDto commentRequestDto =
-            new CommentRequestDto("kevin", "test comment", post.getId());
+        CommentRequest commentRequest =
+            new CommentRequest("kevin", "test comment", post.getId());
 
-        CommentDto commentResponseDto = postService.addComment(commentRequestDto);
+        CommentDto commentResponseDto = postService.addComment(commentRequest);
 
         assertThat(commentResponseDto.getAuthorName()).isEqualTo("kevin");
         assertThat(commentResponseDto.getContent()).isEqualTo("test comment");
@@ -127,10 +128,10 @@ class PostServiceIntegrationTest {
         post = new Post(null, null, null, null, null, new Comments(), new ArrayList<>(), null);
         postRepository.save(post);
 
-        CommentRequestDto commentRequestDto =
-            new CommentRequestDto("kevin", "", post.getId());
+        CommentRequest commentRequest =
+            new CommentRequest("kevin", "", post.getId());
 
-        assertThatCode(() -> postService.addComment(commentRequestDto))
+        assertThatCode(() -> postService.addComment(commentRequest))
             .isInstanceOf(CommentFormatException.class)
             .extracting("errorCode")
             .isEqualTo("F0002");
@@ -225,9 +226,9 @@ class PostServiceIntegrationTest {
         for (int i = 0; i < postRequestDtos.size(); i++) {
             userRepository.save(users.get(i));
             PostResponseDto response = postService.write(postRequestDtos.get(i));
-            CommentRequestDto commentRequestDto =
-                new CommentRequestDto(users.get(i).getName(), "test comment" + i, response.getId());
-            postService.addComment(commentRequestDto);
+            CommentRequest commentRequest =
+                new CommentRequest(users.get(i).getName(), "test comment" + i, response.getId());
+            postService.addComment(commentRequest);
         }
     }
 

@@ -18,7 +18,7 @@ import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.FileFactory;
 import com.woowacourse.pickgit.post.PostTestConfiguration;
 import com.woowacourse.pickgit.exception.post.CommentFormatException;
-import com.woowacourse.pickgit.post.application.CommentRequestDto;
+import com.woowacourse.pickgit.post.presentation.dto.CommentRequest;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.CommentDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
@@ -151,14 +151,14 @@ class PostControllerTest {
             new CommentDto(1L, "kevin", "test comment", false);
         String requestBody = objectMapper.writeValueAsString("test comment");
         String responseBody = objectMapper.writeValueAsString(commentResponseDto);
-        given(postService.addComment(any(CommentRequestDto.class)))
+        given(postService.addComment(any(CommentRequest.class)))
             .willReturn(commentResponseDto);
 
         addCommentApi(url, requestBody)
             .andExpect(status().isOk())
             .andExpect(content().string(responseBody));
 
-        verify(postService, times(1)).addComment(any(CommentRequestDto.class));
+        verify(postService, times(1)).addComment(any(CommentRequest.class));
     }
 
     private ResultActions addCommentApi(String url, String requestBody) throws Exception {
@@ -179,13 +179,13 @@ class PostControllerTest {
 
         String url = "/api/posts/1/comments";
         String requestBody = objectMapper.writeValueAsString("");
-        given(postService.addComment(any(CommentRequestDto.class)))
+        given(postService.addComment(any(CommentRequest.class)))
             .willThrow(new CommentFormatException());
 
         addCommentApi(url, requestBody)
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("errorCode").value("F0002"));
-        verify(postService, times(1)).addComment(any(CommentRequestDto.class));
+        verify(postService, times(1)).addComment(any(CommentRequest.class));
     }
 
     @DisplayName("사용자는 Repository 목록을 가져올 수 있다.")
