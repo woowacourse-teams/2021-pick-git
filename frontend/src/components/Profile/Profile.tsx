@@ -8,7 +8,7 @@ import { Container, Description, DetailInfo } from "./Profile.style";
 
 export interface Props {
   isMyProfile: boolean;
-  userName?: string;
+  userName: string | null;
 }
 
 const Profile = ({ isMyProfile, userName }: Props) => {

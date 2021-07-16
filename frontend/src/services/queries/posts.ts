@@ -17,7 +17,7 @@ type UserPostsQueryKey = readonly [
   {
     isMyFeed: boolean;
     accessToken: string | null;
-    userName?: string;
+    userName: string | null;
   }
 ];
 
@@ -39,7 +39,7 @@ export const useHomeFeedPostsQuery = () => {
   return useQuery<Post[], AxiosError<Post[]>>(QUERY.GET_HOME_FEED_POSTS, () => requestGetHomeFeedPosts(accessToken));
 };
 
-export const useUserPostsQuery = (isMyFeed: boolean, userName?: string) => {
+export const useUserPostsQuery = (isMyFeed: boolean, userName: string | null) => {
   const { accessToken } = useLocalStorage();
 
   return useQuery<Post[], AxiosError<Post[]>>(
