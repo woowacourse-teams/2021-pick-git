@@ -6,8 +6,8 @@ import static org.mockito.Mockito.when;
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
-import com.woowacourse.pickgit.config.StorageConfiguration;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
+import com.woowacourse.pickgit.post.PostTestConfiguration;
 import com.woowacourse.pickgit.tag.TestTagConfiguration;
 import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
@@ -29,7 +29,7 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
 
-@Import({TestTagConfiguration.class, StorageConfiguration.class})
+@Import({TestTagConfiguration.class, PostTestConfiguration.class})
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @ActiveProfiles("test")

@@ -1,12 +1,12 @@
 package com.woowacourse.pickgit;
 
-import com.woowacourse.pickgit.config.StorageConfiguration;
+import com.woowacourse.pickgit.post.PostTestConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-@Import(StorageConfiguration.class)
+@Import(PostTestConfiguration.class)
 @SpringBootTest
 @ActiveProfiles("test")
 class PickGitApplicationTests {
