@@ -159,14 +159,6 @@ public class PostService {
         return PostDtoAssembler.assembleFrom(homeFeedRequest.getAppUser(), result);
     }
 
-    private TypedQuery<Post> findPosts(HomeFeedRequest homeFeedRequest, String query) {
-        int page = Math.toIntExact(homeFeedRequest.getPage());
-        int limit = Math.toIntExact(homeFeedRequest.getLimit());
-        return entityManager.createQuery(query, Post.class)
-            .setFirstResult(page * limit)
-            .setMaxResults(limit);
-    }
-
     @Transactional(readOnly = true)
     public List<PostDto> readMyFeed(HomeFeedRequest homeFeedRequest) {
         AppUser appUser = homeFeedRequest.getAppUser();
@@ -179,5 +171,28 @@ public class PostService {
             .getResultList();
 
         return PostDtoAssembler.assembleFrom(appUser, result);
+    }
+
+    @Transactional(readOnly = true)
+    public List<PostDto> readUserFeed(HomeFeedRequest homeFeedRequest, String username) {
+        AppUser appUser = homeFeedRequest.getAppUser();
+
+        User target = findUserByName(username);
+
+        String query = "select distinct p from Post p where p.user = :user "
+            + "order by p.createdAt desc";
+        List<Post> result = findPosts(homeFeedRequest, query)
+            .setParameter("user", target)
+            .getResultList();
+
+        return PostDtoAssembler.assembleFrom(appUser, result);
+    }
+
+    private TypedQuery<Post> findPosts(HomeFeedRequest homeFeedRequest, String query) {
+        int page = Math.toIntExact(homeFeedRequest.getPage());
+        int limit = Math.toIntExact(homeFeedRequest.getLimit());
+        return entityManager.createQuery(query, Post.class)
+            .setFirstResult(page * limit)
+            .setMaxResults(limit);
     }
 }

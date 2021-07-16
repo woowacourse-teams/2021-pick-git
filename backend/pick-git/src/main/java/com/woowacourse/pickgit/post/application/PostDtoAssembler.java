@@ -35,7 +35,7 @@ public class PostDtoAssembler {
             return new PostDto(post.getId(), post.getImagaeUrls(), post.getGithubRepoUrl(),
                 post.getContent(), postWriter.getName(), postWriter.getBasicProfile().getImage(),
                 post.getLikeCounts(),
-                tags, post.getCreatedAt(), post.getUpdatedAt(), comments, false);
+                tags, post.getCreatedAt(), post.getUpdatedAt(), comments, null);
         }
 
         return new PostDto(post.getId(), post.getImagaeUrls(), post.getGithubRepoUrl(),

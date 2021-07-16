@@ -1,10 +1,12 @@
 package com.woowacourse.pickgit.post.application;
 
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.FileFactory;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
@@ -206,11 +208,11 @@ class PostServiceIntegrationTest {
 
         List<String> postNames = postDtos.stream()
             .map(PostDto::getAuthorName)
-            .collect(Collectors.toList());
+            .collect(toList());
 
         List<String> repoNames = postDtos.stream()
             .map(PostDto::getGithubRepoUrl)
-            .collect(Collectors.toList());
+            .collect(toList());
 
         assertThat(postDtos).hasSize(2);
         assertThat(postNames).containsExactly("ginger", "dani");
@@ -249,10 +251,74 @@ class PostServiceIntegrationTest {
         List<PostDto> postDtos = postService.readMyFeed(homeFeedRequest);
         List<String> repoNames = postDtos.stream()
             .map(PostDto::getGithubRepoUrl)
-            .collect(Collectors.toList());
+            .collect(toList());
 
         //then
         assertThat(postDtos).hasSize(3);
         assertThat(repoNames).containsExactly("java-racingcar", "jwp-chess", "atdd-subway-fare");
+    }
+
+    @DisplayName("로그인 사용자가 다른 사용자의 피드 게시물을 조회한다.")
+    @Test
+    void readUserFeed_LoginUser_Success() {
+        //given
+        List<PostRequestDto> postRequestDtos = PostFactory.mockPostRequestForAssertingMyFeed();
+        List<User> users = PostFactory.mockUsers2();
+
+        for (User user : users) {
+            userRepository.save(user);
+        }
+
+        for (PostRequestDto postRequestDto : postRequestDtos) {
+            postService.write(postRequestDto);
+        }
+
+        //when
+        HomeFeedRequest homeFeedRequest =
+            new HomeFeedRequest(new LoginUser("ala", "a"), 0L, 3L);
+        List<PostDto> postDtos = postService.readUserFeed(homeFeedRequest, "kevin");
+        List<String> repoNames = postDtos.stream()
+            .map(PostDto::getGithubRepoUrl)
+            .collect(toList());
+        List<Boolean> likes = postDtos.stream()
+            .map(PostDto::getIsLiked)
+            .collect(toList());
+
+        //then
+        assertThat(postDtos).hasSize(3);
+        assertThat(repoNames).containsExactly("java-racingcar", "jwp-chess", "atdd-subway-fare");
+        assertThat(likes).containsExactly(Boolean.FALSE, Boolean.FALSE, Boolean.FALSE);
+    }
+
+    @DisplayName("비로그인 사용자가 다른 사용자의 피드 게시물을 조회한다.")
+    @Test
+    void readUserFeed_GuestUser_Success() {
+        //given
+        List<PostRequestDto> postRequestDtos = PostFactory.mockPostRequestForAssertingMyFeed();
+        List<User> users = PostFactory.mockUsers2();
+
+        for (User user : users) {
+            userRepository.save(user);
+        }
+
+        for (PostRequestDto postRequestDto : postRequestDtos) {
+            postService.write(postRequestDto);
+        }
+
+        //when
+        HomeFeedRequest homeFeedRequest =
+            new HomeFeedRequest(new GuestUser(), 0L, 3L);
+        List<PostDto> postDtos = postService.readUserFeed(homeFeedRequest, "kevin");
+        List<String> repoNames = postDtos.stream()
+            .map(PostDto::getGithubRepoUrl)
+            .collect(toList());
+        List<Boolean> likes = postDtos.stream()
+            .map(PostDto::getIsLiked)
+            .collect(toList());
+
+        //then
+        assertThat(postDtos).hasSize(3);
+        assertThat(repoNames).containsExactly("java-racingcar", "jwp-chess", "atdd-subway-fare");
+        assertThat(likes).containsExactly(null, null, null);
     }
 }
