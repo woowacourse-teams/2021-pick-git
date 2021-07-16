@@ -17,9 +17,9 @@ const ProfileHeader = ({ profile, isMyProfile }: Props) => {
   const { isLoggedIn } = useContext(UserContext);
   const theme = useContext(ThemeContext);
 
-  const getButton = () => {
+  const ProfileButton = () => {
     if (!isLoggedIn) {
-      return;
+      return <></>;
     }
 
     if (isMyProfile) {
@@ -54,7 +54,7 @@ const ProfileHeader = ({ profile, isMyProfile }: Props) => {
           <CountIndicator name="팔로워" count={profile?.followerCount ?? 0} />
           <CountIndicator name="팔로잉" count={profile?.followingCount ?? 0} />
         </Indicators>
-        {getButton()}
+        <ProfileButton />
       </div>
     </Container>
   );
