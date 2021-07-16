@@ -1,12 +1,12 @@
 import { Container, Navigation, HomeLink, NavigationItem } from "./NavigationHeader.style";
 import { AddBoxIcon, HomeIcon, LoginIcon, PersonIcon, SearchIcon } from "../../../assets/icons";
 import { PAGE_URL } from "../../../constants/urls";
+import { useContext } from "react";
+import UserContext from "../../../contexts/UserContext";
 
-export interface Props extends React.HTMLAttributes<HTMLSpanElement> {
-  isLoggedIn: boolean;
-}
+const NavigationHeader = () => {
+  const { isLoggedIn } = useContext(UserContext);
 
-const NavigationHeader = ({ isLoggedIn }: Props) => {
   const unAuthenticatedNavigation = (
     <Navigation>
       <NavigationItem to={PAGE_URL.SEARCH}>
