@@ -28,25 +28,31 @@ const GithubStatistics = ({ userName }: Props) => {
     return <div>loading</div>;
   }
 
+  const GithubStats = () => {
+    if (error) {
+      return <div>Github Stats을 표시할 수 없습니다.</div>;
+    }
+
+    return (
+      <>
+        <h2>Github Stats</h2>
+        <GithubStatsWrapper>
+          {Object.entries(stats).map(([key, content]) => (
+            <Stat key={key}>
+              <CircleIcon diameter="2.375rem" fontSize="0.625rem" name={content.name}>
+                {content.icon}
+              </CircleIcon>
+              <span>{data?.[key as keyof GithubStats] ?? 0}</span>
+            </Stat>
+          ))}
+        </GithubStatsWrapper>
+      </>
+    );
+  };
+
   return (
     <Container>
-      {error ? (
-        <div>Github Stats을 표시할 수 없습니다.</div>
-      ) : (
-        <>
-          <h2>Github Stats</h2>
-          <GithubStatsWrapper>
-            {Object.entries(stats).map(([key, content]) => (
-              <Stat key={key}>
-                <CircleIcon diameter="2.375rem" fontSize="0.625rem" name={content.name}>
-                  {content.icon}
-                </CircleIcon>
-                <span>{data?.[key as keyof GithubStats] ?? 0}</span>
-              </Stat>
-            ))}
-          </GithubStatsWrapper>
-        </>
-      )}
+      <GithubStats />
       <h2>Contribution Graph</h2>
       <ContributionGraphWrapper>
         <img
