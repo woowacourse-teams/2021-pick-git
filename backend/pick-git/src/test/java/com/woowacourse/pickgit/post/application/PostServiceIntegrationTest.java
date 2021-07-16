@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.FileFactory;
@@ -29,7 +28,6 @@ import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
 import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -78,11 +76,6 @@ class PostServiceIntegrationTest {
 
     @BeforeEach
     void setUp() {
-//        platformRepositoryExtractor =
-//            new GithubRepositoryExtractor(objectMapper, new MockRepositoryApiRequester());
-//        postService = new PostService(
-//            userRepository, postRepository, pickGitStorage, platformRepositoryExtractor);
-
         image = "image1";
         description = "hello";
         githubUrl = "https://github.com/da-nyee";
