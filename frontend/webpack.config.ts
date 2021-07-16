@@ -47,6 +47,13 @@ const config = {
     port: 3000,
     historyApiFallback: true,
     hot: true,
+    proxy: {
+      "/api": {
+        target: "http://devapi.pickgit.p-e.kr:8080",
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
 
   plugins: [
@@ -54,8 +61,9 @@ const config = {
     new webpack.ProvidePlugin({
       React: "react",
     }),
+    new webpack.DefinePlugin({}),
     new HTMLWebpackPlugin({
-      template: "./public/index.html", // 아까는 ./src/index.html 이었음
+      template: "./public/index.html",
     }),
   ],
 };
