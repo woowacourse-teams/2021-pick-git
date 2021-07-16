@@ -18,11 +18,11 @@ public class HomeFeedRequest {
         return appUser;
     }
 
-    public Long getPage() {
-        return page;
+    public int getPage() {
+        return Math.toIntExact(page);
     }
 
-    public Long getLimit() {
-        return limit;
+    public int getLimit() {
+        return Math.toIntExact(limit);
     }
 }
