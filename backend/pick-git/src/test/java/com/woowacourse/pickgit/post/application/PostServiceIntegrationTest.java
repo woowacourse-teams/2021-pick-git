@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.FileFactory;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
@@ -196,7 +197,7 @@ class PostServiceIntegrationTest {
 
     @DisplayName("저장된 게시물 중 3, 4번째 글을 가져온다.")
     @Test
-    void find() {
+    void readHomeFeed_Success() {
         createMockPosts();
 
         HomeFeedRequest homeFeedRequest =
@@ -226,5 +227,32 @@ class PostServiceIntegrationTest {
                 new CommentRequestDto(users.get(i).getName(), "test comment" + i, response.getId());
             postService.addComment(commentRequestDto);
         }
+    }
+
+    @DisplayName("내 피드 게시물들만 조회한다.")
+    @Test
+    void readMyFeed_Success() {
+        //given
+        List<PostRequestDto> postRequestDtos = PostFactory.mockPostRequestForAssertingMyFeed();
+
+        List<User> users = PostFactory.mockUsers2();
+        for (User user : users) {
+            userRepository.save(user);
+        }
+        for (PostRequestDto postRequestDto : postRequestDtos) {
+            postService.write(postRequestDto);
+        }
+
+        //when
+        HomeFeedRequest homeFeedRequest =
+            new HomeFeedRequest(new LoginUser("kevin", "a"), 0L, 3L);
+        List<PostDto> postDtos = postService.readMyFeed(homeFeedRequest);
+        List<String> repoNames = postDtos.stream()
+            .map(PostDto::getGithubRepoUrl)
+            .collect(Collectors.toList());
+
+        //then
+        assertThat(postDtos).hasSize(3);
+        assertThat(repoNames).containsExactly("java-racingcar", "jwp-chess", "atdd-subway-fare");
     }
 }

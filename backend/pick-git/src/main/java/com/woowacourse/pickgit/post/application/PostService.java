@@ -2,6 +2,7 @@ package com.woowacourse.pickgit.post.application;
 
 import static java.util.stream.Collectors.toList;
 
+import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
@@ -33,6 +34,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Function;
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,12 +67,7 @@ public class PostService {
     public PostResponseDto write(PostRequestDto postRequestDto) {
         PostContent postContent = new PostContent(postRequestDto.getContent());
 
-        User user = userRepository
-            .findByBasicProfile_Name(postRequestDto.getUsername())
-            .orElseThrow(() -> new UserNotFoundException(
-                "U0001",
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "해당하는 사용자를 찾을 수 없습니다."));
+        User user = findUserByName(postRequestDto.getUsername());
 
         Post post =
             new Post(postContent, getImages(postRequestDto), postRequestDto.getGithubRepoUrl(), user);
@@ -80,6 +77,15 @@ public class PostService {
 
         Post findPost = postRepository.save(post);
         return new PostResponseDto(findPost.getId(), findPost.getImageUrls());
+    }
+
+    private User findUserByName(String username) {
+        return userRepository
+            .findByBasicProfile_Name(username)
+            .orElseThrow(() -> new UserNotFoundException(
+                "U0001",
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "해당하는 사용자를 찾을 수 없습니다."));
     }
 
     private Images getImages(PostRequestDto postRequestDto) {
@@ -124,12 +130,7 @@ public class PostService {
     }
 
     public CommentDto addComment(CommentRequestDto commentRequestDto) {
-        User user = userRepository.findByBasicProfile_Name(commentRequestDto.getUserName())
-            .orElseThrow(() -> new UserNotFoundException(
-                "U0001",
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "해당하는 사용자를 찾을 수 없습니다."
-            ));
+        User user = findUserByName(commentRequestDto.getUserName());
         Post post = postRepository.findById(commentRequestDto.getPostId())
             .orElseThrow(() -> new PostNotFoundException(
                 "U0001",
@@ -150,17 +151,33 @@ public class PostService {
             return new RepositoriesResponseDto(repositories);
      }
 
+    @Transactional(readOnly = true)
     public List<PostDto> readHomeFeed(HomeFeedRequest homeFeedRequest) {
-        int page = Math.toIntExact(homeFeedRequest.getPage());
-        int limit = Math.toIntExact(homeFeedRequest.getLimit());
-        List<Post> result = entityManager
-            .createQuery("select distinct p from Post p "
-                + "left join fetch p.user "
-                + "left join fetch p.likes.likes "
-                + "order by p.id", Post.class)
-            .setFirstResult(page * limit)
-            .setMaxResults(limit)
+        String query = "select distinct p from Post p left join fetch p.user order by p.id";
+        List<Post> result = findPosts(homeFeedRequest, query)
             .getResultList();
         return PostDtoAssembler.assembleFrom(homeFeedRequest.getAppUser(), result);
+    }
+
+    private TypedQuery<Post> findPosts(HomeFeedRequest homeFeedRequest, String query) {
+        int page = Math.toIntExact(homeFeedRequest.getPage());
+        int limit = Math.toIntExact(homeFeedRequest.getLimit());
+        return entityManager.createQuery(query, Post.class)
+            .setFirstResult(page * limit)
+            .setMaxResults(limit);
+    }
+
+    @Transactional(readOnly = true)
+    public List<PostDto> readMyFeed(HomeFeedRequest homeFeedRequest) {
+        AppUser appUser = homeFeedRequest.getAppUser();
+        User user = findUserByName(appUser.getUsername());
+
+        String query = "select distinct p from Post p where p.user = :user "
+            + "order by p.createdAt desc";
+        List<Post> result = findPosts(homeFeedRequest, query)
+            .setParameter("user", user)
+            .getResultList();
+
+        return PostDtoAssembler.assembleFrom(appUser, result);
     }
 }

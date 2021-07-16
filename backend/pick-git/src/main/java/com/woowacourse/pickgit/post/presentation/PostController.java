@@ -46,6 +46,14 @@ public class PostController {
         return ResponseEntity.ok(postDtos);
     }
 
+    @GetMapping("/posts/me")
+    public ResponseEntity<List<PostDto>> readMyFeed(@Authenticated AppUser appUser,
+        @RequestParam Long page, @RequestParam Long limit) {
+        HomeFeedRequest homeFeedRequest = new HomeFeedRequest(appUser, page, limit);
+        List<PostDto> postDtos = postService.readMyFeed(homeFeedRequest);
+        return ResponseEntity.ok(postDtos);
+    }
+
     @PostMapping("/posts")
     public ResponseEntity<Void> write(
         @Authenticated AppUser user,
