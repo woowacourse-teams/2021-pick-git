@@ -5,3 +5,4 @@ axios.defaults.baseURL = "http://localhost:3001/api";
 export * from "./profile";
 export * from "./account";
 export * from "./posts";
+export * from "./githubStats";

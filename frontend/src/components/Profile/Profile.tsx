@@ -1,22 +1,57 @@
-import { useSelfProfileQuery } from "../../services/queries";
+import { useHistory } from "react-router-dom";
 
-const Profile = () => {
-  const { isLoading, error, data } = useSelfProfileQuery();
+import { CompanyIcon, GithubDarkIcon, LocationIcon, WebsiteLinkIcon, TwitterIcon } from "../../assets/icons";
+import { PAGE_URL } from "../../constants/urls";
+import { useProfileQuery } from "../../services/queries";
+import ProfileHeader from "../@shared/ProfileHeader/ProfileHeader";
+import { Container, Description, DetailInfo } from "./Profile.style";
+
+export interface Props {
+  isMyProfile: boolean;
+  userName?: string;
+}
+
+const Profile = ({ isMyProfile, userName }: Props) => {
+  const history = useHistory();
+  const { isLoading, error, data } = useProfileQuery(isMyProfile, userName);
 
   if (error) {
-    alert("프로필 데이터를 가져오는데 실패하였습니다!");
+    console.error(error);
+    alert("프로필을 확인할 수 없습니다.");
 
-    if (data) {
-      data.userName = "이용자";
-      data.tmi = "프로필 데이터를 가져오는데 실패하였습니다";
-    }
+    history.push(PAGE_URL.HOME);
   }
 
   if (isLoading) {
     return <div>loading</div>;
   }
 
-  return <div>{JSON.stringify(data)}</div>;
+  return (
+    <Container>
+      <ProfileHeader profile={data} isMyProfile={isMyProfile} />
+      <Description>{data?.description}</Description>
+      <DetailInfo>
+        <CompanyIcon />
+        {data?.company ? data?.company : "-"}
+      </DetailInfo>
+      <DetailInfo>
+        <LocationIcon />
+        {data?.location ? data?.location : "-"}
+      </DetailInfo>
+      <DetailInfo>
+        <GithubDarkIcon />
+        <a href={data?.githubUrl ?? ""}>{data?.githubUrl ? data?.githubUrl : "-"}</a>
+      </DetailInfo>
+      <DetailInfo>
+        <WebsiteLinkIcon />
+        <a href={data?.website ?? ""}>{data?.website ? data?.website : "-"}</a>
+      </DetailInfo>
+      <DetailInfo>
+        <TwitterIcon />
+        {data?.twitter ? data?.twitter : "-"}
+      </DetailInfo>
+    </Container>
+  );
 };
 
 export default Profile;

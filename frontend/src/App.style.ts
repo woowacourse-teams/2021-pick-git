@@ -10,6 +10,8 @@ export const theme = {
     tertiaryColor: "#6d6d6d",
     textColor: "#3d3d3d",
     lighterTextColor: "#959595",
+    borderColor: "#cfcfcf",
+    darkBorderColor: "#9f9f9f",
     tagItemColor: "#ffc1c1",
     white: "#ffffff",
   },
@@ -20,7 +22,6 @@ export const GlobalStyle = createGlobalStyle`
 
   @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
 
-
   html,
   body,
   ul, 
@@ -30,6 +31,10 @@ export const GlobalStyle = createGlobalStyle`
     height: 100%;
     font-size: 16px;
     font-family: 'Noto Sans KR', sans-serif;
+  }
+
+  body {
+    background-color: #efefef;
   }
    
   svg {

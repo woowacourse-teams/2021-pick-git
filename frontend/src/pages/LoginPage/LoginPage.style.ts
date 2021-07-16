@@ -5,7 +5,13 @@ export const Container = styled.div`
   justify-content: center;
   align-items: center;
 
-  width: 100vw;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  width: 100%;
   min-height: 100vh;
   background-color: ${({ theme }) => theme.color.darkerSecondaryColor};
 `;
@@ -29,4 +35,9 @@ export const Inner = styled.div`
   background-color: ${({ theme }) => theme.color.white};
   border-radius: 4px;
   box-shadow: 6px 7px 20px 5px rgba(0, 0, 0, 0.1);
+`;
+
+export const HomeLinkText = styled.span`
+  font-size: 0.9rem;
+  color: ${({ theme }) => theme.color.darkBorderColor};
 `;

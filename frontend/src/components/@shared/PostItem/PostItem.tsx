@@ -86,7 +86,7 @@ const PostItem = ({
   ));
 
   const tagList = tags.map((tag) => (
-    <TagItemLinkButton to={PAGE_URL.POSTS_WITH_TAG(tag)}>
+    <TagItemLinkButton key={tag} to={PAGE_URL.POSTS_WITH_TAG(tag)}>
       <Chip>{tag}</Chip>
     </TagItemLinkButton>
   ));

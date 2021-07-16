@@ -1,11 +1,16 @@
 export interface Profile {
-  userImageUrl: string;
-  userName: string;
-  followCount: number;
+  name: string;
+  image: string;
+  description: string;
   followerCount: number;
+  followingCount: number;
   postCount: number;
-  tmi: string;
   githubUrl: string;
+  company: string;
+  location: string;
+  website: string;
+  twitter: string;
+  following?: boolean;
 }
 
 export interface CommentData {
@@ -33,4 +38,12 @@ export interface Post {
   updatedAt: string;
   comments: CommentData[];
   isLiked: boolean;
+}
+
+export interface GithubStats {
+  stars: string;
+  commits: string;
+  prs: string;
+  issues: string;
+  contributes: string;
 }

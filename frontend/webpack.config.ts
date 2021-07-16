@@ -32,7 +32,13 @@ const config = {
       },
       {
         test: /\.(png|jpg|jpeg|gif)$/i,
-        use: ["url-loader"],
+        use: {
+          loader: "url-loader",
+          options: {
+            publicPath: "./dist/",
+            name: "[name].[ext]?[hash]",
+          },
+        },
       },
     ],
   },
