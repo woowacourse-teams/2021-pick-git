@@ -1,6 +1,5 @@
 package com.woowacourse.pickgit.post.presentation;
 
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -18,16 +17,16 @@ import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.FileFactory;
 import com.woowacourse.pickgit.config.StorageConfiguration;
-import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
+import com.woowacourse.pickgit.exception.post.CommentFormatException;
 import com.woowacourse.pickgit.post.application.CommentRequestDto;
 import com.woowacourse.pickgit.post.application.PostService;
+import com.woowacourse.pickgit.post.application.dto.CommentDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
-import com.woowacourse.pickgit.post.application.dto.CommentDto;
-import com.woowacourse.pickgit.exception.post.CommentFormatException;
 import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
+import com.woowacourse.pickgit.post.presentation.dto.HomeFeedRequest;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -46,7 +45,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.util.NestedServletException;
 
 @Import({StorageConfiguration.class})
 @ExtendWith(SpringExtension.class)
@@ -215,5 +213,35 @@ class PostControllerTest {
             .header(HttpHeaders.AUTHORIZATION, API_ACCESS_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().string(repositories));
+    }
+
+    @DisplayName("비로그인 유저는 홈피드를 조회할 수 있다.")
+    @Test
+    void readHomeFeed_GuestUser_Success() throws Exception {
+        given(postService.readHomeFeed(any(HomeFeedRequest.class)))
+            .willReturn(any());
+
+        mockMvc.perform(get("/api/posts")
+            .param("page", "0")
+            .param("limit", "3"))
+            .andExpect(status().isOk());
+    }
+
+
+    @DisplayName("로그인 유저는 홈피드를 조회할 수 있다.")
+    @Test
+    void readHomeFeed_LoginUser_Success() throws Exception {
+        given(oAuthService.validateToken(any()))
+            .willReturn(true);
+        given(oAuthService.findRequestUserByToken(any()))
+            .willReturn(user);
+        given(postService.readHomeFeed(any(HomeFeedRequest.class)))
+            .willReturn(any());
+
+        mockMvc.perform(get("/api/posts")
+            .param("page", "0")
+            .param("limit", "3")
+            .header(HttpHeaders.AUTHORIZATION, API_ACCESS_TOKEN))
+            .andExpect(status().isOk());
     }
 }

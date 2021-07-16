@@ -27,11 +27,20 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
             return true;
         }
         String authentication = AuthorizationExtractor.extract(request);
+        if (isGuestRequestForReadingHomeFeed(request, authentication)) {
+            return true;
+        }
         if (!oAuthService.validateToken(authentication)) {
             throw new InvalidTokenException();
         }
         request.setAttribute("authentication", authentication);
         return true;
+    }
+
+    private boolean isGuestRequestForReadingHomeFeed(HttpServletRequest request, String authentication) {
+        return "/api/posts".equals(request.getRequestURI())
+            && request.getMethod().equalsIgnoreCase(HttpMethod.GET.toString())
+            && Objects.isNull(authentication);
     }
 
     private boolean isPreflightRequest(HttpServletRequest request) {
