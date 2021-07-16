@@ -93,7 +93,7 @@ public class PostAcceptanceTest {
             .extract();
     }
 
-    @DisplayName("게시물을 조회한다. - 로그인일 때는 게시물 좋아요 여부가 확인된다.")
+    @DisplayName("로그인일때 게시물을 조회한다. - 댓글 및 게시글의 좋아요 여부를 확인할 수 있다.")
     @Test
     void read_LoginUser_Success() {
         String token = 로그인_되어있음().getToken();
@@ -105,6 +105,28 @@ public class PostAcceptanceTest {
         List<PostDto> response = RestAssured
             .given().log().all()
             .auth().oauth2(token)
+            .when()
+            .get("/api/posts?page=0&limit=3")
+            .then()
+            .statusCode(HttpStatus.OK.value())
+            .extract()
+            .as(new TypeRef<List<PostDto>>() {
+            });
+
+        assertThat(response).hasSize(3);
+    }
+
+    @DisplayName("비 로그인이어도 게시글 조회가 가능하다. - 댓글 및 게시물 좋아요 여부는 항상 false")
+    @Test
+    void read_GuestUser_Success() {
+        String token = 로그인_되어있음().getToken();
+
+        requestToWritePostApi(token, HttpStatus.CREATED);
+        requestToWritePostApi(token, HttpStatus.CREATED);
+        requestToWritePostApi(token, HttpStatus.CREATED);
+
+        List<PostDto> response = RestAssured
+            .given().log().all()
             .when()
             .get("/api/posts?page=0&limit=3")
             .then()

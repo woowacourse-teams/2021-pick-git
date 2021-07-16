@@ -40,8 +40,7 @@ public class PostController {
 
     @GetMapping("/posts")
     public ResponseEntity<List<PostDto>> readHomeFeed(@Authenticated AppUser appUser,
-        @RequestParam Long page, @RequestParam Long limit)
-    {
+        @RequestParam Long page, @RequestParam Long limit) {
         HomeFeedRequest homeFeedRequest = new HomeFeedRequest(appUser, page, limit);
         List<PostDto> postDtos = postService.readHomeFeed(homeFeedRequest);
         return ResponseEntity.ok(postDtos);
@@ -86,8 +85,7 @@ public class PostController {
 
     @PostMapping("/posts/{postId}/comments")
     public ResponseEntity<CommentDto> addComment(@Authenticated AppUser appUser,
-        @PathVariable Long postId, @RequestBody String content)
-    {
+        @PathVariable Long postId, @RequestBody String content) {
         CommentRequestDto commentRequestDto =
             new CommentRequestDto(appUser.getUsername(), content, postId);
         CommentDto commentDto = postService.addComment(commentRequestDto);
