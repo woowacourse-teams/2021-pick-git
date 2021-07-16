@@ -1,14 +1,20 @@
 import { Story } from "@storybook/react";
-import { MemoryRouter, Route } from "react-router-dom";
 
-import ProfilePage from "./ProfilePage";
+import ProfilePage, { Props } from "./ProfilePage";
 
 export default {
   title: "Pages/ProfilePage",
   component: ProfilePage,
 };
 
-const Template: Story = () => <ProfilePage />;
+const Template: Story<Props> = (args) => <ProfilePage {...args} />;
 
-export const Default = Template.bind({});
-Default.args = {};
+export const MyProfile = Template.bind({});
+MyProfile.args = {
+  isMyProfile: true,
+};
+
+export const UserProfile = Template.bind({});
+UserProfile.args = {
+  isMyProfile: false,
+};

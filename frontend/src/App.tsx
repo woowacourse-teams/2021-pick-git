@@ -8,6 +8,7 @@ import HomeFeedPage from "./pages/HomeFeedPage/HomeFeedPage";
 import ProfilePage from "./pages/ProfilePage/ProfilePage";
 import { Page } from "./components/@styled/layout";
 import UserContext from "./contexts/UserContext";
+import AuthLoginProcessingPage from "./pages/AuthLoginProcessingPage/AuthLoginProcessingPage";
 
 const App = () => {
   const { login } = useContext(UserContext);
@@ -31,8 +32,14 @@ const App = () => {
           <Route exact path={PAGE_URL.LOGIN}>
             <LoginPage />
           </Route>
-          <Route exact path={PAGE_URL.PROFILE}>
-            <ProfilePage />
+          <Route exact path={PAGE_URL.AUTH_PROCESSING}>
+            <AuthLoginProcessingPage />
+          </Route>
+          <Route path={PAGE_URL.MY_PROFILE}>
+            <ProfilePage isMyProfile={true} />
+          </Route>
+          <Route path={PAGE_URL.PROFILE}>
+            <ProfilePage isMyProfile={false} />
           </Route>
           <Redirect to="/" />
         </Switch>
