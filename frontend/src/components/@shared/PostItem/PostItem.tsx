@@ -85,7 +85,7 @@ const PostItem = ({
     </CommentWrapper>
   ));
 
-  const tagList = tags.map((tag) => (
+  const tagList = JSON.parse(tags.join(",")).map((tag: string) => (
     <TagItemLinkButton key={tag} to={PAGE_URL.POSTS_WITH_TAG(tag)}>
       <Chip>{tag}</Chip>
     </TagItemLinkButton>
