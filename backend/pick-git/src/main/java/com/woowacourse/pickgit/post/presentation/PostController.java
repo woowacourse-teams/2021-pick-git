@@ -5,10 +5,10 @@ import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
-import com.woowacourse.pickgit.post.application.dto.PostDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
-import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
 import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.presentation.dto.request.CommentRequest;
@@ -42,29 +42,29 @@ public class PostController {
     }
 
     @GetMapping("/posts")
-    public ResponseEntity<List<PostDto>> readHomeFeed(
+    public ResponseEntity<List<PostResponseDto>> readHomeFeed(
         @Authenticated AppUser appUser,
         @RequestParam Long page,
         @RequestParam Long limit) {
         HomeFeedRequest homeFeedRequest = new HomeFeedRequest(appUser, page, limit);
-        List<PostDto> postDtos = postService.readHomeFeed(homeFeedRequest);
-        return ResponseEntity.ok(postDtos);
+        List<PostResponseDto> postResponseDtos = postService.readHomeFeed(homeFeedRequest);
+        return ResponseEntity.ok(postResponseDtos);
     }
 
     @GetMapping("/posts/me")
-    public ResponseEntity<List<PostDto>> readMyFeed(@Authenticated AppUser appUser,
+    public ResponseEntity<List<PostResponseDto>> readMyFeed(@Authenticated AppUser appUser,
         @RequestParam Long page, @RequestParam Long limit) {
         HomeFeedRequest homeFeedRequest = new HomeFeedRequest(appUser, page, limit);
-        List<PostDto> postDtos = postService.readMyFeed(homeFeedRequest);
-        return ResponseEntity.ok(postDtos);
+        List<PostResponseDto> postResponseDtos = postService.readMyFeed(homeFeedRequest);
+        return ResponseEntity.ok(postResponseDtos);
     }
 
     @GetMapping("/posts/{username}")
-    public ResponseEntity<List<PostDto>> readUserFeed(@Authenticated AppUser appUser,
+    public ResponseEntity<List<PostResponseDto>> readUserFeed(@Authenticated AppUser appUser,
         @PathVariable String username, @RequestParam Long page, @RequestParam Long limit) {
         HomeFeedRequest homeFeedRequest = new HomeFeedRequest(appUser, page, limit);
-        List<PostDto> postDtos = postService.readUserFeed(homeFeedRequest, username);
-        return ResponseEntity.ok(postDtos);
+        List<PostResponseDto> postResponseDtos = postService.readUserFeed(homeFeedRequest, username);
+        return ResponseEntity.ok(postResponseDtos);
     }
 
     @PostMapping("/posts")
@@ -73,7 +73,7 @@ public class PostController {
         PostRequest request) {
         validateIsGuest(user);
 
-        PostResponseDto responseDto = postService.write(
+        PostImageUrlResponseDto responseDto = postService.write(
             createPostRequestDto(user, request)
         );
 
@@ -113,7 +113,7 @@ public class PostController {
         );
     }
 
-    private URI redirectUrl(AppUser user, PostResponseDto responseDto) {
+    private URI redirectUrl(AppUser user, PostImageUrlResponseDto responseDto) {
         return URI.create(String.format(REDIRECT_URL, user.getUsername(), responseDto.getId()));
     }
 

@@ -24,7 +24,7 @@ import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
-import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
 import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.presentation.dto.request.HomeFeedRequest;
@@ -97,7 +97,7 @@ class PostControllerTest {
         given(oAuthService.findRequestUserByToken(any()))
             .willReturn(user);
         given(postService.write(any(PostRequestDto.class)))
-            .willReturn(new PostResponseDto(1L));
+            .willReturn(new PostImageUrlResponseDto(1L));
 
         MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
         multiValueMap.add("githubRepoUrl", githubRepoUrl);

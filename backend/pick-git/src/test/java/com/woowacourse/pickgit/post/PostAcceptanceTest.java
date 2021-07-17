@@ -10,7 +10,7 @@ import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenRespons
 import com.woowacourse.pickgit.common.FileFactory;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
-import com.woowacourse.pickgit.post.application.dto.PostDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.presentation.dto.request.ContentRequest;
 import io.restassured.RestAssured;
@@ -89,14 +89,14 @@ public class PostAcceptanceTest {
         requestToWritePostApi(token, HttpStatus.CREATED);
         requestToWritePostApi(token, HttpStatus.CREATED);
 
-        List<PostDto> response = given().log().all()
+        List<PostResponseDto> response = given().log().all()
             .auth().oauth2(token)
             .when()
             .get("/api/posts?page=0&limit=3")
             .then()
             .statusCode(HttpStatus.OK.value())
             .extract()
-            .as(new TypeRef<List<PostDto>>() {
+            .as(new TypeRef<List<PostResponseDto>>() {
             });
 
         assertThat(response).hasSize(3);
@@ -111,13 +111,13 @@ public class PostAcceptanceTest {
         requestToWritePostApi(token, HttpStatus.CREATED);
         requestToWritePostApi(token, HttpStatus.CREATED);
 
-        List<PostDto> response = given().log().all()
+        List<PostResponseDto> response = given().log().all()
             .when()
             .get("/api/posts?page=0&limit=3")
             .then()
             .statusCode(HttpStatus.OK.value())
             .extract()
-            .as(new TypeRef<List<PostDto>>() {
+            .as(new TypeRef<List<PostResponseDto>>() {
             });
 
         assertThat(response).hasSize(3);
@@ -132,14 +132,14 @@ public class PostAcceptanceTest {
         requestToWritePostApi(token, HttpStatus.CREATED);
         requestToWritePostApi(token, HttpStatus.CREATED);
 
-        List<PostDto> response = given().log().all()
+        List<PostResponseDto> response = given().log().all()
             .auth().oauth2(token)
             .when()
             .get("/api/posts/me?page=0&limit=3")
             .then()
             .statusCode(HttpStatus.OK.value())
             .extract()
-            .as(new TypeRef<List<PostDto>>() {
+            .as(new TypeRef<List<PostResponseDto>>() {
             });
 
         assertThat(response).hasSize(3);
@@ -173,14 +173,14 @@ public class PostAcceptanceTest {
         requestToWritePostApi(loginUserToken, HttpStatus.CREATED);
         requestToWritePostApi(loginUserToken, HttpStatus.CREATED);
 
-        List<PostDto> response = given().log().all()
+        List<PostResponseDto> response = given().log().all()
             .auth().oauth2(loginUserToken)
             .when()
             .get("/api/posts/" + ANOTHER_USERNAME + "?page=0&limit=3")
             .then()
             .statusCode(HttpStatus.OK.value())
             .extract()
-            .as(new TypeRef<List<PostDto>>() {
+            .as(new TypeRef<List<PostResponseDto>>() {
             });
 
         assertThat(response).hasSize(3);
@@ -195,13 +195,13 @@ public class PostAcceptanceTest {
         requestToWritePostApi(targetUserToken, HttpStatus.CREATED);
         requestToWritePostApi(targetUserToken, HttpStatus.CREATED);
 
-        List<PostDto> response = given().log().all()
+        List<PostResponseDto> response = given().log().all()
             .when()
             .get("/api/posts/" + ANOTHER_USERNAME + "?page=0&limit=3")
             .then()
             .statusCode(HttpStatus.OK.value())
             .extract()
-            .as(new TypeRef<List<PostDto>>() {
+            .as(new TypeRef<List<PostResponseDto>>() {
             });
 
         assertThat(response).hasSize(3);

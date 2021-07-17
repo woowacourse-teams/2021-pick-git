@@ -7,10 +7,10 @@ import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
-import com.woowacourse.pickgit.post.application.dto.PostDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
-import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
 import com.woowacourse.pickgit.post.domain.PlatformRepositoryExtractor;
 import com.woowacourse.pickgit.post.domain.Post;
@@ -66,7 +66,7 @@ public class PostService {
         this.entityManager = entityManager;
     }
 
-    public PostResponseDto write(PostRequestDto postRequestDto) {
+    public PostImageUrlResponseDto write(PostRequestDto postRequestDto) {
         PostContent postContent = new PostContent(postRequestDto.getContent());
 
         User user = findUserByName(postRequestDto.getUsername());
@@ -78,7 +78,7 @@ public class PostService {
         post.addTags(tags);
 
         Post findPost = postRepository.save(post);
-        return new PostResponseDto(findPost.getId(), findPost.getImageUrls());
+        return new PostImageUrlResponseDto(findPost.getId(), findPost.getImageUrls());
     }
 
     private User findUserByName(String username) {
@@ -159,23 +159,23 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public List<PostDto> readHomeFeed(HomeFeedRequest homeFeedRequest) {
+    public List<PostResponseDto> readHomeFeed(HomeFeedRequest homeFeedRequest) {
         Pageable pageable = PageRequest.of(homeFeedRequest.getPage(), homeFeedRequest.getLimit());
         List<Post> result = postRepository.findAllPosts(pageable);
         return PostDtoAssembler.assembleFrom(homeFeedRequest.getAppUser(), result);
     }
 
     @Transactional(readOnly = true)
-    public List<PostDto> readMyFeed(HomeFeedRequest homeFeedRequest) {
+    public List<PostResponseDto> readMyFeed(HomeFeedRequest homeFeedRequest) {
         return readFeed(homeFeedRequest, homeFeedRequest.getAppUser().getUsername());
     }
 
     @Transactional(readOnly = true)
-    public List<PostDto> readUserFeed(HomeFeedRequest homeFeedRequest, String username) {
+    public List<PostResponseDto> readUserFeed(HomeFeedRequest homeFeedRequest, String username) {
         return readFeed(homeFeedRequest, username);
     }
 
-    private List<PostDto> readFeed(HomeFeedRequest homeFeedRequest, String username) {
+    private List<PostResponseDto> readFeed(HomeFeedRequest homeFeedRequest, String username) {
         AppUser appUser = homeFeedRequest.getAppUser();
         User target = findUserByName(username);
         Pageable pageable = PageRequest.of(homeFeedRequest.getPage(), homeFeedRequest.getLimit());

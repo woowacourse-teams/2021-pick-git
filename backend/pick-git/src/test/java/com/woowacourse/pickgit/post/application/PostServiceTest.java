@@ -13,7 +13,7 @@ import static org.mockito.Mockito.verify;
 import com.woowacourse.pickgit.common.FileFactory;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
-import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.domain.PlatformRepositoryExtractor;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
 import com.woowacourse.pickgit.post.domain.Post;
@@ -148,7 +148,7 @@ class PostServiceTest {
         PostRequestDto requestDto = getRequestDto();
 
         // when
-        PostResponseDto responseDto = postService.write(requestDto);
+        PostImageUrlResponseDto responseDto = postService.write(requestDto);
 
         // then
         assertThat(responseDto.getId()).isNotNull();
