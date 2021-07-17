@@ -8,9 +8,12 @@ import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.post.presentation.PickGitStorage;
 import java.io.File;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoProperties.Storage;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
@@ -21,33 +24,25 @@ import org.springframework.web.client.RestTemplate;
 @Repository
 @Profile("!test")
 public class S3Storage implements PickGitStorage {
+
     private static final String MULTIPART_KEY = "files";
 
-    private final ObjectMapper objectMapper;
-
-    public S3Storage(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
+    private final RestClient restClient;
 
     @Value("${storage.pickgit.s3proxy}")
     private String s3ProxyUrl;
 
+    public S3Storage(RestClient restClient) {
+        this.restClient = restClient;
+    }
+
     @Override
-    @SuppressWarnings({"rawtypes", "unchecked"})
     public List<String> store(List<File> files, String userName) {
-        RestTemplate restTemplate = new RestTemplate();
+        StorageDto response = restClient
+            .postForEntity(s3ProxyUrl, createBody(files, userName), StorageDto.class)
+            .getBody();
 
-        ResponseEntity<String> stringResponseEntity = restTemplate
-            .postForEntity(s3ProxyUrl, createBody(files, userName), String.class);
-
-        String body = stringResponseEntity.getBody();
-
-        try {
-            return objectMapper.readValue(body, new TypeReference<>() {
-            });
-        } catch (JsonProcessingException e) {
-            throw new PlatformHttpErrorException();
-        }
+        return response.getUrls();
     }
 
     private MultiValueMap<String, Object> createBody(
@@ -65,5 +60,21 @@ public class S3Storage implements PickGitStorage {
         files.forEach(file -> body.add(MULTIPART_KEY, new FileSystemResource(file)));
 
         return body;
+    }
+
+    public static class StorageDto {
+
+        private List<String> urls;
+
+        private StorageDto() {
+        }
+
+        public StorageDto(List<String> urls) {
+            this.urls = urls;
+        }
+
+        public List<String> getUrls() {
+            return urls;
+        }
     }
 }
