@@ -12,7 +12,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     Optional<Post> findByUser(User user);
 
-    @Query("select p from Post p left join fetch p.user order by p.id")
+    @Query("select p from Post p left join fetch p.user order by p.createdAt desc")
     List<Post> findAllPosts(Pageable pageable);
 
     @Query("select p from Post p where p.user = :user "
