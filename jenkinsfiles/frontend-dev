@@ -8,7 +8,6 @@ pipeline {
 
     stages {
         stage('Build') {
-            when { changeset "frontend/**" }
             steps {
                 echo 'build frontend...'
 
@@ -22,14 +21,12 @@ pipeline {
         }
 
         stage('Test') {
-            when { changeset "frontend/**" }
             steps {
                 echo 'Front has no test code.'
             }
         }
 
         stage('Deploy') {
-            when { changeset "frontend/**" }
             steps {
                 dir('./frontend/script') {
                     sh '''
