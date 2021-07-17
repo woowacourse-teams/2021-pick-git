@@ -68,8 +68,9 @@ public class OAuthAcceptanceTest {
     @Test
     void Authorization_Redirection_ReturnJwtToken() {
         // then
-        String token = 로그인_되어있음().getToken();
-        assertThat(token).isNotBlank();
+        OAuthTokenResponse tokenResponse = 로그인_되어있음();
+        assertThat(tokenResponse.getToken()).isNotBlank();
+        assertThat(tokenResponse.getUsername()).isEqualTo("pick-git-login");
     }
 
     public OAuthTokenResponse 로그인_되어있음() {
