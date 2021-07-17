@@ -50,7 +50,7 @@ export const UserContextProvider = ({ children }: Props) => {
         console.error(error);
       }
     })();
-  }, [accessToken, userName]);
+  }, []);
 
   return (
     <UserContext.Provider value={{ currentUserName: userName ?? "", isLoggedIn, login, logout }}>
