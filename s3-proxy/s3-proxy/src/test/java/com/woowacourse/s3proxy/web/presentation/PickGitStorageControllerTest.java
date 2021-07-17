@@ -2,22 +2,18 @@ package com.woowacourse.s3proxy.web.presentation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.amazonaws.services.s3.transfer.Upload;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woowacourse.s3proxy.common.FileFactory;
 import com.woowacourse.s3proxy.exception.UploadFailException;
 import com.woowacourse.s3proxy.web.application.PickGitStorageService;
 import com.woowacourse.s3proxy.web.application.dto.FilesDto;
 import com.woowacourse.s3proxy.web.presentation.Dto.Files;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
-import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

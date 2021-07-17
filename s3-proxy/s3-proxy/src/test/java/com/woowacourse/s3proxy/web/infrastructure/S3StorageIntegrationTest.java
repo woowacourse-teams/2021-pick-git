@@ -1,29 +1,23 @@
 package com.woowacourse.s3proxy.web.infrastructure;
 
+import static java.util.stream.Collectors.toList;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import cloud.localstack.docker.LocalstackDockerExtension;
 import cloud.localstack.docker.annotation.LocalstackDockerProperties;
 import com.woowacourse.s3proxy.common.FileFactory;
-import com.woowacourse.s3proxy.config.StorageConfiguration;
 import com.woowacourse.s3proxy.config.StorageTestConfiguration;
 import com.woowacourse.s3proxy.web.domain.PickGitStorage;
-import org.apache.http.entity.ContentType;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
-
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-
-import static java.util.stream.Collectors.teeing;
-import static java.util.stream.Collectors.toList;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @Import(StorageTestConfiguration.class)
 @LocalstackDockerProperties(services = {"s3"}, platform = "linux/x86_64")
