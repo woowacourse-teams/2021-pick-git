@@ -61,7 +61,7 @@ class TagControllerTest {
     @Test
     void extractLanguageTags_ValidRepository_ExtractionSuccess() throws Exception {
         String url =
-            "/api/github/" + userName + "/repositories/" + repositoryName + "/tags/languages";
+            "/api/github/repositories/" + repositoryName + "/tags/languages";
         List<String> tags = Arrays.asList("Java", "Python", "HTML");
         TagsDto tagsDto = new TagsDto(tags);
         String expectedResponse = objectMapper.writeValueAsString(tagsDto.getTags());
@@ -82,7 +82,7 @@ class TagControllerTest {
     @Test
     void extractLanguageTags_InvalidAccessToken_ExceptionThrown() throws Exception {
         String url =
-            "/api/github/" + userName + "/repositories/" + repositoryName + "/tags/languages";
+            "/api/github/repositories/" + repositoryName + "/tags/languages";
 
         given(oAuthService.validateToken(any(String.class)))
             .willReturn(false);
@@ -97,7 +97,7 @@ class TagControllerTest {
     @Test
     void extractLanguageTags_InvalidRepository_ExceptionThrown() throws Exception {
         String url =
-            "/api/github/" + userName + "/repositories/invalidrepo/tags/languages";
+            "/api/github/repositories/invalidrepo/tags/languages";
 
         given(tagService.extractTags(any(ExtractionRequestDto.class)))
             .willThrow(new PlatformHttpErrorException());

@@ -24,13 +24,12 @@ public class TagController {
         this.tagService = tagService;
     }
 
-    @GetMapping("/github/{userName}/repositories/{repositoryName}/tags/languages")
+    @GetMapping("/github/repositories/{repositoryName}/tags/languages")
     public ResponseEntity<List<String>> extractLanguageTags(@Authenticated AppUser appUser,
-        @PathVariable String userName,
         @PathVariable String repositoryName) {
         String accessToken = appUser.getAccessToken();
         ExtractionRequestDto extractionRequestDto =
-            new ExtractionRequestDto(accessToken, userName, repositoryName);
+            new ExtractionRequestDto(accessToken, appUser.getUsername(), repositoryName);
         TagsDto tagsDto = tagService.extractTags(extractionRequestDto);
         return ResponseEntity.ok(tagsDto.getTags());
     }
