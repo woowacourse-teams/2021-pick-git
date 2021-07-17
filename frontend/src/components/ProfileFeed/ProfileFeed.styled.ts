@@ -31,3 +31,13 @@ export const GridItem = styled.div<{ imageUrl: string }>`
     background: url(${({ imageUrl }) => imageUrl}) center/cover;
   }
 `;
+
+export const Empty = styled.div`
+  width: 100%;
+  height: 23.5625rem;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;

@@ -17,7 +17,7 @@ export const API_URL = {
     GITHUB: "/authorization/github",
   },
   SELF_PROFILE: "/profiles/me",
-  USER_PROFILE: (userName: string) => `/profiles/${userName}`,
+  USER_PROFILE: (userName: string) => `/profiles?userName=${userName}`,
   USER_PROFILE_FOLLOW: (userName: string) => `/profiles/${userName}/followings`,
   POSTS: (page: number, limit: number) => `/posts?page=${page}&limit=${limit}`,
   MY_POSTS: (page: number, limit: number) => `/posts/me?page=${page}&limit=${limit}`,

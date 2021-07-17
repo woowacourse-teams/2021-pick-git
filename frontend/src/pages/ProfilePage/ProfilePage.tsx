@@ -19,6 +19,8 @@ const ProfilePage = ({ isMyProfile }: Props) => {
 
   if (!isMyProfile && !userName) return <Redirect to={PAGE_URL.HOME} />;
 
+  if (userName && userName === currentUserName) return <Redirect to={PAGE_URL.MY_PROFILE} />
+
   const tabItems = [
     {
       name: "게시물",

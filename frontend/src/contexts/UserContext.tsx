@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { createContext, useEffect, useState } from "react";
 import useLocalStorage from "../services/hooks/@common/useLocalStorage";
+import { requestGetSelfProfile } from "../services/requests";
 
 interface Props {
   children: React.ReactNode;
@@ -37,10 +38,19 @@ export const UserContextProvider = ({ children }: Props) => {
   };
 
   useEffect(() => {
-    if (accessToken) {
-      setIsLoggedIn(true);
-    }
-  }, []);
+    if (!accessToken || !userName) return;
+
+    (async () => {
+      try {
+        const { name } = await requestGetSelfProfile(accessToken);
+
+        setIsLoggedIn(true);
+        setUserName(name);
+      } catch (error) {
+        console.error(error);
+      }
+    })();
+  }, [accessToken, userName]);
 
   return (
     <UserContext.Provider value={{ currentUserName: userName ?? "", isLoggedIn, login, logout }}>
