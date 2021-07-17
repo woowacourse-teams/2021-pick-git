@@ -1,12 +1,10 @@
 package com.woowacourse.s3proxy.web.infrastructure;
 
 import com.woowacourse.s3proxy.exception.PickGitStorageException;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import org.apache.commons.codec.binary.Hex;
-import org.apache.tika.Tika;
 import org.apache.tika.mime.MimeType;
 import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.mime.MimeTypes;
@@ -15,8 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Component
 public class FileNameGenerator {
-    private static final Tika tika = new Tika();
-
 
     public String generate(MultipartFile multipartFile, String userName) {
         return md5(multipartFile, userName) + extension(multipartFile);
@@ -25,11 +21,9 @@ public class FileNameGenerator {
     private String extension(MultipartFile multipartFile) {
         MimeTypes defaultMimeTypes = MimeTypes.getDefaultMimeTypes();
         try {
-            MimeType mimeType = defaultMimeTypes.forName(
-                tika.detect(multipartFile.getBytes())
-            );
+            MimeType mimeType = defaultMimeTypes.forName(multipartFile.getContentType());
             return mimeType.getExtension();
-        } catch (MimeTypeException | IOException e) {
+        } catch (MimeTypeException e) {
             throw new PickGitStorageException("확장자 추출 실패");
         }
     }

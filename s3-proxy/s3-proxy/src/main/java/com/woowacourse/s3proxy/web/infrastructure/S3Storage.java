@@ -34,34 +34,32 @@ public class S3Storage implements PickGitStorage {
     @Override
     public List<StoreResult> store(List<MultipartFile> multipartFiles, String userName) {
         return multipartFiles.stream()
-            .map(multipartFile -> upload(
-                multipartFile,
-                fileNameGenerator.generate(multipartFile, userName)
-            )).collect(toList());
+            .map(multipartFile -> upload(multipartFile, userName))
+            .collect(toList());
     }
 
-    private StoreResult upload(MultipartFile multipartFile, String originalFileName) {
+    private StoreResult upload(MultipartFile multipartFile, String userName) {
         try {
             ObjectMetadata objectMetadata = createObjectMetadata(multipartFile);
-            putObjectToS3(multipartFile, originalFileName, objectMetadata);
+            putObjectToS3(multipartFile, userName, objectMetadata);
 
             return new PickGitStorage.StoreResult(
-                originalFileName,
-                String.format(fileUrlFormat, originalFileName)
+                multipartFile.getOriginalFilename(),
+                String.format(fileUrlFormat, multipartFile.getOriginalFilename())
             );
         } catch (Exception e) {
             return new PickGitStorage.StoreResult(
-                originalFileName,
+                multipartFile.getOriginalFilename(),
                 new UploadFailException(e)
             );
         }
     }
 
-    private void putObjectToS3(MultipartFile multipartFile, String originalFileName, ObjectMetadata objectMetadata)
+    private void putObjectToS3(MultipartFile multipartFile, String userName, ObjectMetadata objectMetadata)
         throws IOException {
         s3Client.putObject(
             bucket,
-            originalFileName,
+            fileNameGenerator.generate(multipartFile, userName),
             multipartFile.getInputStream(),
             objectMetadata
         );
