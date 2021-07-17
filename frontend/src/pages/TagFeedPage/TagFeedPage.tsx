@@ -1,8 +1,8 @@
-import { Container } from "./HomeFeedPage.style";
+import { Container } from "./TagFeedPage.style";
 import Feed from "../../components/Feed/Feed";
 import { useHomeFeedPostsQuery } from "../../services/queries";
 
-const HomeFeedPage = () => {
+const TagFeedPage = () => {
   const queryResult = useHomeFeedPostsQuery();
 
   return (
@@ -12,4 +12,4 @@ const HomeFeedPage = () => {
   );
 };
 
-export default HomeFeedPage;
+export default TagFeedPage;

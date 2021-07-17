@@ -1,13 +1,13 @@
 import { Story } from "@storybook/react";
 
-import AddPostPage, { Props } from "./AddPostPage";
+import AddPostPage from "./AddPostPage";
 
 export default {
   title: "Pages/AddPostPage",
   component: AddPostPage,
 };
 
-const Template: Story<Props> = (args) => <AddPostPage {...args} />;
+const Template: Story = (args) => <AddPostPage {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {};

@@ -4,7 +4,7 @@ import { Post, PostAddFormData } from "../../@types";
 import { LIMIT } from "../../constants/limits";
 import { API_URL } from "../../constants/urls";
 
-export const requestGetHomeFeedPosts = async (pageIndex: number, accessToken: string | null) => {
+export const requestGetHomeFeedPosts = async (pageParam: number, accessToken: string | null) => {
   const config = accessToken
     ? {
         headers: {
@@ -12,14 +12,13 @@ export const requestGetHomeFeedPosts = async (pageIndex: number, accessToken: st
         },
       }
     : {};
-
-  const response = await axios.get<Post[]>(API_URL.POSTS(pageIndex, LIMIT.FEED_COUNT_PER_FETCH), config);
+  const response = await axios.get<Post[]>(API_URL.POSTS(pageParam, LIMIT.FEED_COUNT_PER_FETCH), config);
 
   return response.data;
 };
 
-export const requestGetMyFeedPosts = async (accessToken: string) => {
-  const response = await axios.get<Post[]>(API_URL.MY_POSTS(0, 20), {
+export const requestGetMyFeedPosts = async (pageParam: number, accessToken: string) => {
+  const response = await axios.get<Post[]>(API_URL.MY_POSTS(pageParam, LIMIT.FEED_COUNT_PER_FETCH), {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -28,7 +27,7 @@ export const requestGetMyFeedPosts = async (accessToken: string) => {
   return response.data;
 };
 
-export const requestGetUserFeedPosts = async (userName: string, accessToken: string | null) => {
+export const requestGetUserFeedPosts = async (userName: string, pageParam: number, accessToken: string | null) => {
   const config = accessToken
     ? {
         headers: {
@@ -36,7 +35,7 @@ export const requestGetUserFeedPosts = async (userName: string, accessToken: str
         },
       }
     : {};
-  const response = await axios.get<Post[]>(API_URL.USER_POSTS(userName, 0, 20), config);
+  const response = await axios.get<Post[]>(API_URL.USER_POSTS(userName, pageParam, LIMIT.FEED_COUNT_PER_FETCH), config);
 
   return response.data;
 };
@@ -70,6 +69,7 @@ export const requestDeletePostLike = async (postId: string, accessToken: string 
 };
 
 export const requestAddPost = async (
+  userName: string,
   { files, githubRepositoryName, tags, content }: PostAddFormData,
   accessToken: string | null
 ) => {
@@ -79,7 +79,7 @@ export const requestAddPost = async (
 
   const formData = new FormData();
   files.forEach((file) => formData.append("images", file));
-  formData.append("githubRepoUrl", `https://github.com/swon3210/${githubRepositoryName}`);
+  formData.append("githubRepoUrl", `https://github.com/${userName}/${githubRepositoryName}`);
   formData.append("tags", JSON.stringify(tags));
   formData.append("content", content);
 

@@ -9,9 +9,7 @@ import useStep from "../../services/hooks/@common/useStep";
 import { PAGE_URL } from "../../constants/urls";
 import usePostUpload from "../../services/hooks/usePostUpload";
 
-export interface Props extends React.HTMLAttributes<HTMLSpanElement> {}
-
-const AddPostPage = ({}: Props) => {
+const AddPostPage = () => {
   const { stepIndex, goNextStep, setStepMoveEventHandler, removeStepMoveEventHandler, completeStep } = useStep(
     STEPS,
     PAGE_URL.HOME

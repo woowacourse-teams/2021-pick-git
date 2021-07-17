@@ -24,7 +24,13 @@ const App = () => {
       </Switch>
       <Page>
         <Switch>
-          <Route exact path={PAGE_URL.HOME}>
+          <Route exact path={[PAGE_URL.HOME, PAGE_URL.HOME_FEED]}>
+            <HomeFeedPage />
+          </Route>
+          <Route exact path={PAGE_URL.USER_FEED("swon3210")}>
+            <HomeFeedPage />
+          </Route>
+          <Route exact path={PAGE_URL.TAG_FEED("Javascript")}>
             <HomeFeedPage />
           </Route>
           <Route exact path={PAGE_URL.LOGIN}>

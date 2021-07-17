@@ -4,7 +4,6 @@ import { QueryFunction, useInfiniteQuery, useMutation, useQuery } from "react-qu
 import { Post } from "../../@types";
 import { QUERY } from "../../constants/queries";
 import useLocalStorage from "../hooks/@common/useLocalStorage";
-import useFeed from "../hooks/useFeed";
 import {
   requestAddPostLike,
   requestGetHomeFeedPosts,
@@ -28,16 +27,27 @@ const userPostsQueryFunction: QueryFunction<Post[]> = async ({ queryKey }) => {
   if (isMyFeed) {
     if (!accessToken) throw Error("no accessToken");
 
-    return await requestGetMyFeedPosts(accessToken);
+    return await requestGetMyFeedPosts(0, accessToken);
   } else {
-    return await requestGetUserFeedPosts(userName as string, accessToken);
+    return await requestGetUserFeedPosts(userName as string, 0, accessToken);
   }
 };
 
 export const useHomeFeedPostsQuery = () => {
   const { accessToken } = useLocalStorage();
 
-  return useQuery<Post[], AxiosError<Post[]>>(QUERY.GET_HOME_FEED_POSTS, () => requestGetHomeFeedPosts(0, accessToken));
+  return useInfiniteQuery(
+    QUERY.GET_HOME_FEED_POSTS,
+    async ({ pageParam = 0 }) => {
+      return await requestGetHomeFeedPosts(pageParam, accessToken);
+    },
+    {
+      getNextPageParam: (_, pages) => {
+        console.log("work!!!");
+        return pages.length;
+      },
+    }
+  );
 };
 
 export const useUserPostsQuery = (isMyFeed: boolean, userName: string | null) => {
