@@ -45,5 +45,4 @@ class S3StorageTest {
             .usingRecursiveComparison()
             .isEqualTo(actual);
     }
-
 }
