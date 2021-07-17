@@ -29,7 +29,6 @@ public class PickGitStorageService {
 
     private List<String> getUrlsFrom(List<PickGitStorage.StoreResult> storeResults) {
         return storeResults.stream()
-            .filter(PickGitStorage.StoreResult::isSucceed)
             .map(StoreResult::getFileUrl)
             .collect(toList());
     }

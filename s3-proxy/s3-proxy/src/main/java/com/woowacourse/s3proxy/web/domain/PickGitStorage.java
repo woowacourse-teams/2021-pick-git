@@ -12,24 +12,10 @@ public interface PickGitStorage {
 
         private final String originalFileName;
         private final String fileUrl;
-        private final Exception exception;
 
         public StoreResult(String originalFileName, String fileUrl) {
-            this(originalFileName, fileUrl, null);
-        }
-
-        public StoreResult(String originalFileName, Exception exception) {
-            this(originalFileName, null, exception);
-        }
-
-        private StoreResult(String originalFileName, String fileUrl, Exception exception) {
             this.originalFileName = originalFileName;
             this.fileUrl = fileUrl;
-            this.exception = exception;
-        }
-
-        public boolean isSucceed() {
-            return !Objects.isNull(fileUrl);
         }
 
         public String getOriginalFileName() {
@@ -37,17 +23,7 @@ public interface PickGitStorage {
         }
 
         public String getFileUrl() {
-            if (!isSucceed()) {
-                throw new UnsupportedOperationException();
-            }
             return fileUrl;
-        }
-
-        public Exception getException() {
-            if (isSucceed()) {
-                throw new UnsupportedOperationException();
-            }
-            return this.exception;
         }
     }
 }

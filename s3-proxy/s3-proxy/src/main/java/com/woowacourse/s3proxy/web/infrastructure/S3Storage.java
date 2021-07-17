@@ -4,10 +4,13 @@ import static java.util.stream.Collectors.toList;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.woowacourse.s3proxy.exception.PickGitStorageException;
 import com.woowacourse.s3proxy.exception.UploadFailException;
 import com.woowacourse.s3proxy.web.domain.PickGitStorage;
 import java.io.IOException;
+import java.io.ObjectStreamClass;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,12 +39,13 @@ public class S3Storage implements PickGitStorage {
         return multipartFiles.stream()
             .map(multipartFile -> upload(
                 multipartFile,
-                fileNameGenerator.generate(multipartFile, userName)
+                userName
             )).collect(toList());
     }
 
-    private StoreResult upload(MultipartFile multipartFile, String originalFileName) {
+    private StoreResult upload(MultipartFile multipartFile, String userName) {
         try {
+            String originalFileName = fileNameGenerator.generate(multipartFile, userName);
             ObjectMetadata objectMetadata = createObjectMetadata(multipartFile);
             putObjectToS3(multipartFile, originalFileName, objectMetadata);
 
@@ -50,10 +54,7 @@ public class S3Storage implements PickGitStorage {
                 String.format(fileUrlFormat, originalFileName)
             );
         } catch (Exception e) {
-            return new PickGitStorage.StoreResult(
-                originalFileName,
-                new UploadFailException(e)
-            );
+            throw new PickGitStorageException("파일에 문제가 있습니다.");
         }
     }
 

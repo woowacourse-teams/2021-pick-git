@@ -2,12 +2,15 @@ package com.woowacourse.s3proxy.web.infrastructure;
 
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 import cloud.localstack.docker.LocalstackDockerExtension;
 import cloud.localstack.docker.annotation.LocalstackDockerProperties;
 import com.woowacourse.s3proxy.common.FileFactory;
 import com.woowacourse.s3proxy.config.StorageTestConfiguration;
+import com.woowacourse.s3proxy.exception.PickGitStorageException;
 import com.woowacourse.s3proxy.web.domain.PickGitStorage;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -53,19 +56,14 @@ class S3StorageIntegrationTest {
 
     }
 
-    @DisplayName("S3에 파일을 업로드 하고 실패한 파일과 성공한 파일의 결과를 확인한다. - 성공")
+    @DisplayName("S3에 파일을 업로드 하고 실패한 파일이 있다면 에러 반환 - 실패")
     @Test
     void store_UploadFilesToS3AndCheckReturnThatHasFailAndSuccessResult_True() {
-        MockMultipartFile image1 = FileFactory.getTestRightImage1();
         MockMultipartFile image2 = FileFactory.getTestRightImage2();
         String userName = "testUser";
 
-        List<Boolean> succeeds = s3Storage.store(List.of(image1, image2), userName).stream()
-            .map(PickGitStorage.StoreResult::isSucceed)
-            .filter(b -> b)
-            .collect(toList());
-
-        assertThat(succeeds).hasSize(2);
+        assertThatThrownBy(() -> s3Storage.store(Arrays.asList(null, image2), userName))
+            .isInstanceOf(PickGitStorageException.class);
     }
 
 
