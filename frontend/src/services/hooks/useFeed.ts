@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { useQueryClient } from "react-query";
+import { UseInfiniteQueryResult, useQueryClient } from "react-query";
 import { CommentData, Post } from "../../@types";
 import { QUERY } from "../../constants/queries";
 
 import {
   useAddPostLikeMutation,
   useDeletePostLikeMutation,
-  useHomeFeedPostsQuery,
   useAddPostCommentMutation,
   useDeletePostCommentMutation,
 } from "../queries";
@@ -14,7 +13,6 @@ import {
 const useFeed = () => {
   const queryClient = useQueryClient();
   const [commentValue, setCommentValue] = useState("");
-  const { data: posts, isLoading, error } = useHomeFeedPostsQuery();
   const { mutateAsync: mutateDeletePostLike } = useDeletePostLikeMutation();
   const { mutateAsync: mutateAddPostLike } = useAddPostLikeMutation();
   const { mutateAsync: mutateAddComment } = useAddPostCommentMutation();
@@ -57,9 +55,12 @@ const useFeed = () => {
   };
 
   return {
-    posts,
-    isLoading,
-    error,
+    // postsPages: data?.pages,
+    // isLoading,
+    // error,
+    // isFetchingNextPage,
+    // hasNextPage,
+    // fetchNextPage,
     commentValue,
     setCommentValue,
     deletePostLike,
