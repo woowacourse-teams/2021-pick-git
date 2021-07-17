@@ -1,6 +1,5 @@
 package com.woowacourse.s3proxy;
 
-import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import cloud.localstack.docker.LocalstackDockerExtension;
@@ -8,6 +7,7 @@ import cloud.localstack.docker.annotation.LocalstackDockerProperties;
 import com.woowacourse.s3proxy.common.FileFactory;
 import com.woowacourse.s3proxy.config.StorageTestConfiguration;
 import com.woowacourse.s3proxy.exception.ExceptionAdvice.ExceptionDto;
+import com.woowacourse.s3proxy.web.infrastructure.FileNameGenerator;
 import com.woowacourse.s3proxy.web.presentation.Dto.Files;
 import com.woowacourse.s3proxy.web.presentation.Dto.Files.Response;
 import io.restassured.RestAssured;
@@ -33,6 +33,7 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 public class S3ProxyAcceptanceTest {
+    private static final FileNameGenerator fileNameGenerator = new FileNameGenerator();
 
     @Value("${aws.cloud_front.file_url_format}")
     private String fileUrlFormat;
@@ -56,7 +57,13 @@ public class S3ProxyAcceptanceTest {
         assertThat(result)
             .usingRecursiveComparison()
             .isEqualTo(new Files.Response(
-                List.of(String.format(fileUrlFormat, file.getName()))
+                List.of(String.format(
+                        fileUrlFormat,
+                        fileNameGenerator.generate(
+                            FileFactory.getTestRightImage1(), null
+                        )
+                    )
+                )
             ));
     }
 
@@ -87,10 +94,17 @@ public class S3ProxyAcceptanceTest {
             Request.sendWithFiles("files", files, Response.class);
 
         //then
-        List<String> fileNames =
-            files.stream()
-                .map(file -> String.format(fileUrlFormat, file.getName()))
-                .collect(toList());
+
+        List<String> fileNames = List.of(
+            String.format(
+                fileUrlFormat,
+                fileNameGenerator.generate(FileFactory.getTestRightImage1(), null)
+            ),
+            String.format(
+                fileUrlFormat,
+                fileNameGenerator.generate(FileFactory.getTestRightImage2(), null)
+            )
+        );
 
         assertThat(result)
             .usingRecursiveComparison()

@@ -25,6 +25,7 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 @SpringBootTest
 class S3StorageIntegrationTest {
+    private static final FileNameGenerator fileNameGenerator = new FileNameGenerator();
 
     @Value("${aws.cloud_front.file_url_format}")
     private String fileUrlFormat;
@@ -40,15 +41,16 @@ class S3StorageIntegrationTest {
         String userName = "testUser";
 
         List<PickGitStorage.StoreResult> storeResults =
-                s3Storage.store(List.of(image1, image2), userName);
+            s3Storage.store(List.of(image1, image2), userName);
 
         assertThat(storeResults)
-                .usingRecursiveComparison()
-                .isEqualTo(List.of(
-                        createStoreResult(image1.getOriginalFilename()),
-                        createStoreResult(image2.getOriginalFilename())
-                        )
-                );
+            .usingRecursiveComparison()
+            .isEqualTo(List.of(
+                createStoreResult(fileNameGenerator.generate(image1, userName)),
+                createStoreResult(fileNameGenerator.generate(image2, userName))
+                )
+            );
+
     }
 
     @DisplayName("S3에 파일을 업로드 하고 실패한 파일과 성공한 파일의 결과를 확인한다. - 성공")
@@ -59,9 +61,9 @@ class S3StorageIntegrationTest {
         String userName = "testUser";
 
         List<Boolean> succeeds = s3Storage.store(List.of(image1, image2), userName).stream()
-                .map(PickGitStorage.StoreResult::isSucceed)
-                .filter(b -> b)
-                .collect(toList());
+            .map(PickGitStorage.StoreResult::isSucceed)
+            .filter(b -> b)
+            .collect(toList());
 
         assertThat(succeeds).hasSize(2);
     }
@@ -69,8 +71,8 @@ class S3StorageIntegrationTest {
 
     private PickGitStorage.StoreResult createStoreResult(String fileName) {
         return new PickGitStorage.StoreResult(
-                fileName,
-                String.format(fileUrlFormat, fileName)
+            fileName,
+            String.format(fileUrlFormat, fileName)
         );
     }
 }
