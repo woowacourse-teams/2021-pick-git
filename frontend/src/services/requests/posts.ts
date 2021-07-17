@@ -69,6 +69,7 @@ export const requestDeletePostLike = async (postId: string, accessToken: string 
 };
 
 export const requestAddPost = async (
+  userName: string,
   { files, githubRepositoryName, tags, content }: PostAddFormData,
   accessToken: string | null
 ) => {
@@ -78,7 +79,7 @@ export const requestAddPost = async (
 
   const formData = new FormData();
   files.forEach((file) => formData.append("images", file));
-  formData.append("githubRepoUrl", `https://github.com/swon3210/${githubRepositoryName}`);
+  formData.append("githubRepoUrl", `https://github.com/${userName}/${githubRepositoryName}`);
   formData.append("tags", JSON.stringify(tags));
   formData.append("content", content);
 
