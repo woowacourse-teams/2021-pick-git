@@ -30,6 +30,7 @@ import { ThemeContext } from "styled-components";
 import { PAGE_URL } from "../../../constants/urls";
 import { LIMIT } from "../../../constants/limits";
 import TextEditor from "../TextEditor/TextEditor";
+import { getTimeDiffFromCurrent } from "../../../utils/date";
 
 export interface Props {
   authorName: string;
@@ -50,6 +51,13 @@ export interface Props {
   onPostLike: () => void;
   onCommentLike: (commentId: string) => void;
 }
+
+const timeDiffTextTable = {
+  sec: () => "방금 전",
+  min: (time: number) => `${time}분 전`,
+  hour: (time: number) => `${time}시간 전`,
+  day: (time: number) => `${time}일 전`,
+};
 
 const PostItem = ({
   authorName,
@@ -72,6 +80,15 @@ const PostItem = ({
 }: Props) => {
   const [shouldHideContent, setShouldHideContent] = useState(content.length > LIMIT.POST_CONTENT_HIDE_LENGTH);
   const { color } = useContext(ThemeContext);
+
+  const { min, hour, day } = getTimeDiffFromCurrent(createdAt);
+  const currentTimeDiffText = day
+    ? timeDiffTextTable.day(day)
+    : hour
+    ? timeDiffTextTable.hour(hour)
+    : min
+    ? timeDiffTextTable.min(min)
+    : timeDiffTextTable.sec();
 
   const commentList = comments.map((comment) => (
     <CommentWrapper key={comment.commentId}>
@@ -143,7 +160,7 @@ const PostItem = ({
           <SendIcon />
         </IconLink>
       </MyComment>
-      <PostCreatedDateText>{createdAt}</PostCreatedDateText>
+      <PostCreatedDateText>{currentTimeDiffText}</PostCreatedDateText>
     </Container>
   );
 };
