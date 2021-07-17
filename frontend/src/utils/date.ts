@@ -1,6 +1,5 @@
 export const getTimeDiffFromCurrent = (dateString: string) => {
-  const formattedDateString = dateString + (dateString.slice(-1) === "Z" ? "" : "Z");
-  const gap = Number(new Date()) - Number(new Date(formattedDateString));
+  const gap = Number(new Date()) - Number(new Date(dateString));
 
   if (gap < 0) {
     return {
