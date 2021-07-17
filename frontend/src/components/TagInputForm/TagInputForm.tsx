@@ -1,13 +1,15 @@
 import { useContext, useEffect } from "react";
 import PostAddDataContext from "../../contexts/PostAddDataContext";
+import UserContext from "../../contexts/UserContext";
 import { useGithubTagsQuery } from "../../services/queries";
 import Chip from "../@shared/Chip/Chip";
 import Input from "../@shared/Input/Input";
 import { Container, Form, TagList, TagListItem } from "./TagInputForm.style";
 
 const TagInputForm = () => {
+  const { currentUserName } = useContext(UserContext);
   const { githubRepositoryName, tags, setTags } = useContext(PostAddDataContext);
-  const { data: defaultTags, isLoading, error } = useGithubTagsQuery(githubRepositoryName);
+  const { data: defaultTags, isLoading, error } = useGithubTagsQuery(currentUserName, githubRepositoryName);
 
   useEffect(() => {
     defaultTags && setTags((state) => [...defaultTags, ...state]);
