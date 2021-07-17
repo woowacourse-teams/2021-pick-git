@@ -21,8 +21,9 @@ public class PickGitStorageService {
 
     public FilesDto.Response store(FilesDto.Request request) {
         List<MultipartFile> files = request.getFiles();
+        String userName = request.getUserName();
 
-        List<PickGitStorage.StoreResult> storeResults = pickGitStorage.store(files);
+        List<PickGitStorage.StoreResult> storeResults = pickGitStorage.store(files, userName);
 
         return new FilesDto.Response(getUrlsFrom(storeResults));
     }

@@ -21,6 +21,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import static java.util.stream.Collectors.teeing;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,9 +43,10 @@ class S3StorageIntegrationTest {
     void store_UplaodFilesToS3AndCheckReturn_Ture() {
         MockMultipartFile image1 = FileFactory.getTestRightImage1();
         MockMultipartFile image2 = FileFactory.getTestRightImage2();
+        String userName = "testUser";
 
         List<PickGitStorage.StoreResult> storeResults =
-                s3Storage.store(List.of(image1, image2));
+                s3Storage.store(List.of(image1, image2), userName);
 
         assertThat(storeResults)
                 .usingRecursiveComparison()
@@ -59,20 +61,15 @@ class S3StorageIntegrationTest {
     @Test
     void store_UploadFilesToS3AndCheckReturnThatHasFailAndSuccessResult_True() {
         MockMultipartFile image1 = FileFactory.getTestRightImage1();
-        MockMultipartFile image2 = new MockMultipartFile(
-                "files",
-                null,
-                ContentType.IMAGE_JPEG.toString(),
-                "TEST".getBytes(StandardCharsets.UTF_8)
-        );
+        MockMultipartFile image2 = FileFactory.getTestRightImage2();
+        String userName = "testUser";
 
-
-        List<Boolean> succeeds = s3Storage.store(List.of(image1, image2)).stream()
+        List<Boolean> succeeds = s3Storage.store(List.of(image1, image2), userName).stream()
                 .map(PickGitStorage.StoreResult::isSucceed)
                 .filter(b -> b)
                 .collect(toList());
 
-        assertThat(succeeds).hasSize(1);
+        assertThat(succeeds).hasSize(2);
     }
 
 

@@ -7,7 +7,7 @@ import java.util.Objects;
 
 public interface PickGitStorage {
 
-    List<StoreResult> store(List<MultipartFile> multipartFiles);
+    List<StoreResult> store(List<MultipartFile> multipartFiles, String userName);
 
     class StoreResult {
 

@@ -2,6 +2,7 @@ package com.woowacourse.s3proxy.web.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
 import com.woowacourse.s3proxy.common.FileFactory;
@@ -35,7 +36,7 @@ class PickGitStorageServiceTest {
         MockMultipartFile testRightImage2 = FileFactory.getTestRightImage2();
         final String testUrl = "testUrl";
 
-        given(pickGitStorage.store(anyList()))
+        given(pickGitStorage.store(anyList(), anyString()))
             .willReturn(List.of(
                 new PickGitStorage.StoreResult(testRightImage1.getOriginalFilename(), testUrl),
                 new PickGitStorage.StoreResult(testRightImage2.getOriginalFilename(), testUrl)
