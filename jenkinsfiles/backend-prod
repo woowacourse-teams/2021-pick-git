@@ -8,7 +8,6 @@ pipeline {
 
     stages {
         stage('Build') {
-            when { changeset "backend/**" }
             steps {
                 echo 'build backend...'
 
@@ -21,7 +20,6 @@ pipeline {
         }
 
         stage('Test') {
-            when { changeset "backend/**" }
             steps {
                 echo 'test backend...'
 
@@ -34,7 +32,6 @@ pipeline {
         }
 
         stage('Deploy') {
-            when { changeset "backend/**" }
             steps {
                 echo 'deploying backend...'
 
