@@ -2,7 +2,7 @@ package com.woowacourse.pickgit.authentication.presentation.interceptor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -52,12 +52,12 @@ class IgnoreAuthenticationInterceptorTest {
 
         // mock
         given(request.getMethod()).willReturn(HttpMethod.GET.toString());
-        given(request.getHeaders(AuthorizationExtractor.AUTHORIZATION)).willReturn(
-            Collections.enumeration(List.of(validToken)));
+        given(request.getHeaders(AuthorizationExtractor.AUTHORIZATION))
+            .willReturn(Collections.enumeration(List.of(validToken)));
 
         // when, then
         assertThat(ignoreAuthenticationInterceptor.preHandle(request, null, null)).isTrue();
-        verify(request, times(2)).setAttribute(any(String.class), any(String.class));
+        verify(request, times(2)).setAttribute(anyString(), anyString());
     }
 
     @DisplayName("토큰이 아예 없으면 true를 반환한다. (GuestUser)")
@@ -65,7 +65,8 @@ class IgnoreAuthenticationInterceptorTest {
     void preHandle_WithOutToken_ReturnTrue() throws Exception {
         // mock
         given(request.getMethod()).willReturn(HttpMethod.GET.toString());
-        given(request.getHeaders(AuthorizationExtractor.AUTHORIZATION)).willReturn(Collections.emptyEnumeration());
+        given(request.getHeaders(AuthorizationExtractor.AUTHORIZATION))
+            .willReturn(Collections.emptyEnumeration());
 
         // when, then
         assertThat(ignoreAuthenticationInterceptor.preHandle(request, null, null)).isTrue();
@@ -79,11 +80,13 @@ class IgnoreAuthenticationInterceptorTest {
 
         // mock
         given(request.getMethod()).willReturn(HttpMethod.GET.toString());
-        given(request.getHeaders(AuthorizationExtractor.AUTHORIZATION)).willReturn(
-            Collections.enumeration(List.of(invalidToken)));
+        given(request.getHeaders(AuthorizationExtractor.AUTHORIZATION))
+            .willReturn(Collections.enumeration(List.of(invalidToken)));
 
         // when, then
         assertThatThrownBy(() -> ignoreAuthenticationInterceptor.preHandle(request, null, null))
-            .isInstanceOf(InvalidTokenException.class);
+            .isInstanceOf(InvalidTokenException.class)
+            .extracting("errorCode")
+            .isEqualTo("A0001");
     }
 }

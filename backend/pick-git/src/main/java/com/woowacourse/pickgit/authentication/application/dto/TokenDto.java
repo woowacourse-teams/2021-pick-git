@@ -5,7 +5,7 @@ public class TokenDto {
     private String token;
     private String username;
 
-    public TokenDto() {
+    private TokenDto() {
     }
 
     public TokenDto(String token, String username) {
