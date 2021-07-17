@@ -3,29 +3,21 @@ import { GoBackIcon, GoForwardIcon } from "../../../assets/icons";
 import { useHistory } from "react-router-dom";
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
-  goForwardLink?: string;
+  isNextStepExist: boolean;
+  onNextStepClick?: () => void;
+  onGoBack: () => void;
 }
 
-const StepHeader = ({ goForwardLink, children }: Props) => {
-  const history = useHistory();
-
-  const handleGoBack = () => {
-    history.goBack();
-  };
-
-  const handleGoForward = () => {
-    goForwardLink && history.push(goForwardLink);
-  };
-
+const StepHeader = ({ isNextStepExist, children, onGoBack, onNextStepClick }: Props) => {
   return (
     <Container>
-      <StepLink onClick={handleGoBack}>
-        <GoBackIcon color="#5a5a5a" />
+      <StepLink onClick={onGoBack}>
+        <GoBackIcon />
       </StepLink>
       <Content>{children}</Content>
-      {goForwardLink ? (
-        <StepLink onClick={handleGoForward}>
-          <GoForwardIcon color="#5a5a5a" />
+      {isNextStepExist ? (
+        <StepLink onClick={onNextStepClick}>
+          <GoForwardIcon />
         </StepLink>
       ) : (
         <EmptySpace />

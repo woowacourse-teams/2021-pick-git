@@ -11,8 +11,8 @@ const Template: Story<Props> = (args) => <ImageUploader {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {
-  onFileSave: (files: FileList) => {
-    const message = Array.from(files)
+  onFileListSave: (fileList: FileList) => {
+    const message = Array.from(fileList)
       .map((file) => file.name)
       .join(",")
       .concat(" 이미지를 저장했습니다.");

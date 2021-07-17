@@ -40,6 +40,13 @@ export interface Post {
   isLiked: boolean;
 }
 
+export interface PostAddFormData {
+  files: File[];
+  githubRepositoryName: string;
+  tags: string[];
+  content: string;
+}
+
 export interface GithubStats {
   stars: string;
   commits: string;
@@ -47,3 +54,10 @@ export interface GithubStats {
   issues: string;
   contributes: string;
 }
+
+export interface GithubRepository {
+  url: string;
+  name: string;
+}
+
+export type Tags = string[];
