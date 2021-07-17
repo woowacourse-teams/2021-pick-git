@@ -6,20 +6,20 @@ import { requestGetRepositories, requestGetTags } from "../requests/github";
 
 export const useGithubRepositoriesQuery = (userName: string) => {
   const { accessToken } = useLocalStorage();
-  const isUserNameEmpty = false;
+  const isUserNotNameEmpty = userName !== "";
 
   return useQuery<GithubRepository[]>(
     QUERY.GET_GITHUB_REPOSITORIES,
     () => requestGetRepositories(userName, accessToken),
-    { enabled: true }
+    { enabled: isUserNotNameEmpty }
   );
 };
 
-export const useGithubTagsQuery = (repositoryName: string) => {
+export const useGithubTagsQuery = (userName: string, repositoryName: string) => {
   const { accessToken } = useLocalStorage();
-  const isRepositoryNameEmpty = repositoryName !== "";
+  const isRepositoryNameNotEmpty = repositoryName !== "";
 
-  return useQuery<Tags>(QUERY.GET_GITHUB_TAGS, () => requestGetTags(repositoryName, accessToken), {
-    enabled: true,
+  return useQuery<Tags>(QUERY.GET_GITHUB_TAGS, () => requestGetTags(userName, repositoryName, accessToken), {
+    enabled: isRepositoryNameNotEmpty,
   });
 };

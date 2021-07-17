@@ -16,12 +16,12 @@ export const requestGetRepositories = async (userName: string, accessToken: stri
   return response.data;
 };
 
-export const requestGetTags = async (repositoryName: string, accessToken: string | null) => {
+export const requestGetTags = async (userName: string, repositoryName: string, accessToken: string | null) => {
   if (!accessToken) {
     throw Error("no accessToken");
   }
 
-  const response = await axios.get<Tags>(API_URL.GITHUB_TAGS(repositoryName), {
+  const response = await axios.get<Tags>(API_URL.GITHUB_TAGS(userName, repositoryName), {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
