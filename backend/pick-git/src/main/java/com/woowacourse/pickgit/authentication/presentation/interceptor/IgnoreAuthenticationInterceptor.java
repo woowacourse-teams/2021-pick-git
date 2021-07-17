@@ -6,6 +6,7 @@ import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -26,10 +27,10 @@ public class IgnoreAuthenticationInterceptor implements HandlerInterceptor {
         }
 
         String authentication = AuthorizationExtractor.extract(request);
-        if (authentication != null && !oAuthService.validateToken(authentication)) {
+        if (Objects.nonNull(authentication) && !oAuthService.validateToken(authentication)) {
             throw new InvalidTokenException();
         }
-        request.setAttribute("authentication", authentication);
+        request.setAttribute(AuthHeader.AUTHENTICATION, authentication);
         return true;
     }
 
@@ -45,14 +46,14 @@ public class IgnoreAuthenticationInterceptor implements HandlerInterceptor {
     }
 
     private boolean hasAccessControlRequestHeaders(HttpServletRequest request) {
-        return Objects.nonNull(request.getHeader("Access-Control-Request-Headers"));
+        return Objects.nonNull(request.getHeader(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS));
     }
 
     private boolean hasAccessControlRequestMethod(HttpServletRequest request) {
-        return Objects.nonNull(request.getHeader("Access-Control-Request-Method"));
+        return Objects.nonNull(request.getHeader(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD));
     }
 
     private boolean hasOrigin(HttpServletRequest request) {
-        return Objects.nonNull(request.getHeader("Origin"));
+        return Objects.nonNull(request.getHeader(HttpHeaders.ORIGIN));
     }
 }
