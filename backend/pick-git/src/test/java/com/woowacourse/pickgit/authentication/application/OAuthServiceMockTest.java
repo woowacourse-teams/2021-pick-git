@@ -7,13 +7,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.woowacourse.pickgit.authentication.application.dto.TokenDto;
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
 import com.woowacourse.pickgit.authentication.dao.CollectionOAuthAccessTokenDao;
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
-import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
 import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
@@ -84,7 +84,7 @@ class OAuthServiceMockTest {
         when(jwtTokenProvider.createToken(githubProfileResponse.getName())).thenReturn(jwtToken);
 
         // when
-        OAuthTokenResponse token = oAuthService.createToken(code);
+        TokenDto token = oAuthService.createToken(code);
 
         // then
         assertThat(token.getToken()).isEqualTo(jwtToken);
@@ -119,7 +119,7 @@ class OAuthServiceMockTest {
         when(jwtTokenProvider.createToken(githubProfileResponse.getName())).thenReturn(jwtToken);
 
         // when
-        OAuthTokenResponse token = oAuthService.createToken(code);
+        TokenDto token = oAuthService.createToken(code);
 
         // then
         assertThat(token.getToken()).isEqualTo(jwtToken);
