@@ -66,7 +66,7 @@ class TagAcceptanceTest {
     @Test
     void extractLanguageTags_ValidRepository_ExtractionSuccess() {
         String url =
-            "/api/github/" + userName + "/repositories/" + repositoryName + "/tags/languages";
+            "/api/github/repositories/" + repositoryName + "/tags/languages";
 
         List<String> response = requestTags(accessToken, url, HttpStatus.OK)
             .as(new TypeRef<List<String>>() {});
@@ -78,7 +78,7 @@ class TagAcceptanceTest {
     @Test
     void extractLanguageTags_InvalidRepository_ExceptionThrown() {
         String url =
-            "/api/github/" + userName + "/repositories/none-available-repo/tags/languages";
+            "/api/github/repositories/none-available-repo/tags/languages";
 
         ApiErrorResponse response = requestTags(accessToken, url, HttpStatus.INTERNAL_SERVER_ERROR)
             .as(ApiErrorResponse.class);
@@ -90,7 +90,7 @@ class TagAcceptanceTest {
     @Test
     void extractLanguageTags_InvalidAccessToken_ExceptionThrown() {
         String url =
-            "/api/github/" + userName + "/repositories/" + repositoryName + "/tags/languages";
+            "/api/github/repositories/" + repositoryName + "/tags/languages";
 
         requestTags("invalidtoken", url, HttpStatus.UNAUTHORIZED);
     }
