@@ -1,8 +1,7 @@
 package com.woowacourse.s3proxy.web.presentation.Dto;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface Files {
 

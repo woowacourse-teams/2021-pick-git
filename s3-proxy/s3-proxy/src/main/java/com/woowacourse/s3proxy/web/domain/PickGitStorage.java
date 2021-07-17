@@ -1,9 +1,8 @@
 package com.woowacourse.s3proxy.web.domain;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import java.util.List;
 import java.util.Objects;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface PickGitStorage {
 

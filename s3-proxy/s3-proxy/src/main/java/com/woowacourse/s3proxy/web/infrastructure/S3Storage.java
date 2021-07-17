@@ -1,17 +1,16 @@
 package com.woowacourse.s3proxy.web.infrastructure;
 
+import static java.util.stream.Collectors.toList;
+
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.woowacourse.s3proxy.exception.UploadFailException;
 import com.woowacourse.s3proxy.web.domain.PickGitStorage;
+import java.io.IOException;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.util.List;
-
-import static java.util.stream.Collectors.toList;
 
 @Repository
 public class S3Storage implements PickGitStorage {
