@@ -142,7 +142,7 @@ public class PostService {
             .orElseThrow(() -> new PostNotFoundException(
                 "P0002",
                 HttpStatus.INTERNAL_SERVER_ERROR,
-                "해당하는 사용자를 찾을 수 없습니다."
+                "해당하는 게시물을 찾을 수 없습니다."
             ));
         Comment comment = new Comment(commentRequest.getContent());
         user.addComment(post, comment);
