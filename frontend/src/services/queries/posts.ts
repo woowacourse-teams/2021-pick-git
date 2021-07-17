@@ -43,7 +43,6 @@ export const useHomeFeedPostsQuery = () => {
     },
     {
       getNextPageParam: (_, pages) => {
-        console.log("work!!!");
         return pages.length;
       },
     }
