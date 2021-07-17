@@ -11,8 +11,6 @@ import com.woowacourse.s3proxy.exception.ExceptionAdvice.ExceptionDto;
 import com.woowacourse.s3proxy.web.presentation.Dto.Files;
 import com.woowacourse.s3proxy.web.presentation.Dto.Files.Response;
 import io.restassured.RestAssured;
-import io.restassured.specification.MultiPartSpecification;
-import io.restassured.specification.RequestSender;
 import io.restassured.specification.RequestSpecification;
 import java.io.File;
 import java.io.IOException;
@@ -22,14 +20,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.parsing.FailFastProblemReporter;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.web.multipart.MultipartFile;
 
 @Import(StorageTestConfiguration.class)
 @LocalstackDockerProperties(services = {"s3"}, platform = "linux/x86_64")

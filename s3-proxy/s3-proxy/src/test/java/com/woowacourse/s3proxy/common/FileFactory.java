@@ -6,7 +6,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.util.Objects;
 import org.apache.tika.Tika;
-
 import org.springframework.mock.web.MockMultipartFile;
 
 public class FileFactory {
