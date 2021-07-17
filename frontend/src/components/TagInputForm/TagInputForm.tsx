@@ -18,6 +18,7 @@ const TagInputForm = () => {
     const newTag = event.currentTarget["tag-input"].value;
 
     setTags((state) => [...state, newTag]);
+    event.currentTarget["tag-input"].value = "";
   };
 
   const tagListItems = tags?.map((tag) => (
