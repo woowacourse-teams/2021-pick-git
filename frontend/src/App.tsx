@@ -7,6 +7,9 @@ import HomeFeedPage from "./pages/HomeFeedPage/HomeFeedPage";
 import ProfilePage from "./pages/ProfilePage/ProfilePage";
 import { Page } from "./components/@styled/layout";
 import AuthLoginProcessingPage from "./pages/AuthLoginProcessingPage/AuthLoginProcessingPage";
+import PostAddStepHeader from "./components/PostAddStepHeader/PostAddStepHeader";
+import AddPostPage from "./pages/AddPostPage/AddPostPage";
+import { PostAddDataContextProvider } from "./contexts/PostAddDataContext";
 
 const App = () => {
   return (
@@ -14,6 +17,9 @@ const App = () => {
       <Switch>
         <Route exact path={[PAGE_URL.HOME, PAGE_URL.PROFILE, PAGE_URL.MY_PROFILE]}>
           <NavigationHeader />
+        </Route>
+        <Route path={PAGE_URL.ADD_POST}>
+          <PostAddStepHeader />
         </Route>
       </Switch>
       <Page>
@@ -32,6 +38,11 @@ const App = () => {
           </Route>
           <Route path={PAGE_URL.PROFILE}>
             <ProfilePage isMyProfile={false} />
+          </Route>
+          <Route path={PAGE_URL.ADD_POST}>
+            <PostAddDataContextProvider>
+              <AddPostPage />
+            </PostAddDataContextProvider>
           </Route>
           <Redirect to="/" />
         </Switch>

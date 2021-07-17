@@ -13,6 +13,7 @@ export const theme = {
     borderColor: "#cfcfcf",
     darkBorderColor: "#9f9f9f",
     tagItemColor: "#ffc1c1",
+    separatorColor: "#a4a4a45b",
     white: "#ffffff",
   },
 };
@@ -22,13 +23,12 @@ export const GlobalStyle = createGlobalStyle`
 
   html,
   body,
-  ul, 
-  input {
+  #root {
     margin: 0;
     padding: 0;
     height: 100%;
     font-size: 16px;
-    font-family: 'Noto Sans KR', sans-serif;
+    font-family: 'Noto Sans KR', sans-serif;  
   }
 
   body {

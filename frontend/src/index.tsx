@@ -6,6 +6,7 @@ import { ThemeProvider } from "styled-components";
 import App from "./App";
 import { theme, GlobalStyle } from "./App.style";
 import { UserContextProvider } from "./contexts/UserContext";
+import { PostAddStepContextProvider } from "./contexts/PostAddStepContext";
 
 const queryClient = new QueryClient();
 
@@ -13,8 +14,10 @@ ReactDOM.render(
   <ThemeProvider theme={theme}>
     <QueryClientProvider client={queryClient}>
       <UserContextProvider>
-        <GlobalStyle />
-        <App />
+        <PostAddStepContextProvider>
+          <GlobalStyle />
+          <App />
+        </PostAddStepContextProvider>
       </UserContextProvider>
     </QueryClientProvider>
   </ThemeProvider>,

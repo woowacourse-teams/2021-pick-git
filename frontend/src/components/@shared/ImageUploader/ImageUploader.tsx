@@ -4,10 +4,10 @@ import { Container, Image } from "./ImageUploader.style";
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   defaultImageSrc?: string;
-  onFileSave: (files: FileList) => void;
+  onFileListSave: (fileList: FileList) => void;
 }
 
-const ImageUploader = ({ defaultImageSrc = defaultImage, onFileSave, ...props }: Props) => {
+const ImageUploader = ({ defaultImageSrc = defaultImage, onFileListSave, ...props }: Props) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageUpload = () => {
@@ -19,7 +19,7 @@ const ImageUploader = ({ defaultImageSrc = defaultImage, onFileSave, ...props }:
       return;
     }
 
-    onFileSave(event.currentTarget.files);
+    onFileListSave(event.currentTarget.files);
   };
 
   return (

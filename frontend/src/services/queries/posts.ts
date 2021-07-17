@@ -1,9 +1,10 @@
 import { AxiosError } from "axios";
-import { QueryFunction, useMutation, useQuery } from "react-query";
+import { QueryFunction, useInfiniteQuery, useMutation, useQuery } from "react-query";
 
 import { Post } from "../../@types";
 import { QUERY } from "../../constants/queries";
 import useLocalStorage from "../hooks/@common/useLocalStorage";
+import useFeed from "../hooks/useFeed";
 import {
   requestAddPostLike,
   requestGetHomeFeedPosts,
@@ -36,7 +37,7 @@ const userPostsQueryFunction: QueryFunction<Post[]> = async ({ queryKey }) => {
 export const useHomeFeedPostsQuery = () => {
   const { accessToken } = useLocalStorage();
 
-  return useQuery<Post[], AxiosError<Post[]>>(QUERY.GET_HOME_FEED_POSTS, () => requestGetHomeFeedPosts(accessToken));
+  return useQuery<Post[], AxiosError<Post[]>>(QUERY.GET_HOME_FEED_POSTS, () => requestGetHomeFeedPosts(0, accessToken));
 };
 
 export const useUserPostsQuery = (isMyFeed: boolean, userName: string | null) => {

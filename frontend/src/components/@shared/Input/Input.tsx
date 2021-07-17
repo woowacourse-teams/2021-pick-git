@@ -4,14 +4,21 @@ import { Input as StyledInput, BottomBorderInputContainer, RoundedInputContainer
 export interface Props extends React.HTMLAttributes<HTMLInputElement>, StyleProps {
   kind?: "borderBottom" | "rounded";
   icon?: React.ReactNode;
+  name?: string;
 }
 
-const Input = ({ kind, icon, textAlign = "left", backgroundColor, bottomBorderColor, ...props }: Props) => {
+const Input = ({ kind, icon, textAlign = "left", backgroundColor, bottomBorderColor, name, ...props }: Props) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const input = (
     <>
       {icon}
-      <StyledInput ref={inputRef} textAlign={textAlign} {...props} style={icon ? { marginLeft: "0.9375rem" } : {}} />
+      <StyledInput
+        name={name}
+        ref={inputRef}
+        textAlign={textAlign}
+        {...props}
+        style={icon ? { marginLeft: "0.9375rem" } : {}}
+      />
     </>
   );
 

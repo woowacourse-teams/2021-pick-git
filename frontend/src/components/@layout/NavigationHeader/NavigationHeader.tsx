@@ -26,7 +26,7 @@ const NavigationHeader = () => {
       <NavigationItem to={PAGE_URL.MY_PROFILE}>
         <PersonIcon />
       </NavigationItem>
-      <NavigationItem to={PAGE_URL.ADD_POST}>
+      <NavigationItem to={PAGE_URL.ADD_POST_FIRST_STEP}>
         <AddBoxIcon />
       </NavigationItem>
       <NavigationItem to={PAGE_URL.SEARCH}>
