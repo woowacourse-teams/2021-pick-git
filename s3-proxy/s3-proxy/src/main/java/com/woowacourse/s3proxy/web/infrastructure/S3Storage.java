@@ -16,29 +16,33 @@ import static java.util.stream.Collectors.toList;
 @Repository
 public class S3Storage implements PickGitStorage {
 
+
     @Value("${aws.s3.bucket_name}")
     private String bucket;
 
     @Value("${aws.cloud_front.file_url_format}")
     private String fileUrlFormat;
 
+    private final FileNameGenerator fileNameGenerator;
+
     private final AmazonS3 s3Client;
 
-    public S3Storage(AmazonS3 s3Client) {
+    public S3Storage(FileNameGenerator fileNameGenerator, AmazonS3 s3Client) {
+        this.fileNameGenerator = fileNameGenerator;
         this.s3Client = s3Client;
     }
 
     @Override
-    public List<StoreResult> store(List<MultipartFile> multipartFiles) {
+    public List<StoreResult> store(List<MultipartFile> multipartFiles, String userName) {
         return multipartFiles.stream()
-            .map(this::upload)
+            .map(multipartFile -> upload(multipartFile, userName))
             .collect(toList());
     }
 
-    private StoreResult upload(MultipartFile multipartFile) {
+    private StoreResult upload(MultipartFile multipartFile, String userName) {
         try {
             ObjectMetadata objectMetadata = createObjectMetadata(multipartFile);
-            putObjectToS3(multipartFile, objectMetadata);
+            putObjectToS3(multipartFile, userName, objectMetadata);
 
             return new PickGitStorage.StoreResult(
                 multipartFile.getOriginalFilename(),
@@ -52,11 +56,11 @@ public class S3Storage implements PickGitStorage {
         }
     }
 
-    private void putObjectToS3(MultipartFile multipartFile, ObjectMetadata objectMetadata)
+    private void putObjectToS3(MultipartFile multipartFile, String userName, ObjectMetadata objectMetadata)
         throws IOException {
         s3Client.putObject(
             bucket,
-            multipartFile.getOriginalFilename(),
+            fileNameGenerator.generate(multipartFile, userName),
             multipartFile.getInputStream(),
             objectMetadata
         );
