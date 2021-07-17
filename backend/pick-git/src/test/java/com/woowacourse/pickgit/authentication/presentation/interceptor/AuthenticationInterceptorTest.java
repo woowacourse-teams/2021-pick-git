@@ -97,7 +97,7 @@ class AuthenticationInterceptorTest {
         String bearerToken = "Bearer " + jwtTokenProvider.createToken("pick-git");
 
         // mock
-        when(httpServletRequest.getMethod()).thenReturn(HttpMethod.OPTIONS.toString());
+        when(httpServletRequest.getMethod()).thenReturn(HttpMethod.GET.toString());
         when(httpServletRequest.getHeaders(AuthorizationExtractor.AUTHORIZATION)).thenReturn(Collections.enumeration(
             List.of(bearerToken)));
 

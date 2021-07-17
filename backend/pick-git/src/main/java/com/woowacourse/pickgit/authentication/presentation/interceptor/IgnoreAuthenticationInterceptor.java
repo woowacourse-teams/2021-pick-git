@@ -26,15 +26,11 @@ public class IgnoreAuthenticationInterceptor implements HandlerInterceptor {
         }
 
         String authentication = AuthorizationExtractor.extract(request);
-        request.setAttribute("authentication", getAppropriateAuthentication(authentication));
-        return true;
-    }
-
-    private String getAppropriateAuthentication(String authentication) {
-        if (!oAuthService.validateToken(authentication)) {
-            return null;
+        if (authentication != null && !oAuthService.validateToken(authentication)) {
+            throw new InvalidTokenException();
         }
-        return authentication;
+        request.setAttribute("authentication", authentication);
+        return true;
     }
 
     private boolean isPreflightRequest(HttpServletRequest request) {
