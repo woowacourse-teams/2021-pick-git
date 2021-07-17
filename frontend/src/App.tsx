@@ -9,6 +9,7 @@ import { Page } from "./components/@styled/layout";
 import AuthLoginProcessingPage from "./pages/AuthLoginProcessingPage/AuthLoginProcessingPage";
 import PostAddStepHeader from "./components/PostAddStepHeader/PostAddStepHeader";
 import AddPostPage from "./pages/AddPostPage/AddPostPage";
+import { PostAddDataContextProvider } from "./contexts/PostAddDataContext";
 
 const App = () => {
   return (
@@ -39,7 +40,9 @@ const App = () => {
             <ProfilePage isMyProfile={false} />
           </Route>
           <Route path={PAGE_URL.ADD_POST}>
-            <AddPostPage />
+            <PostAddDataContextProvider>
+              <AddPostPage />
+            </PostAddDataContextProvider>
           </Route>
           <Redirect to="/" />
         </Switch>
