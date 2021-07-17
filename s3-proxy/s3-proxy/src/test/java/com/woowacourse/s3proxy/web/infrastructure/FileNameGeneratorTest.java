@@ -22,7 +22,6 @@ class FileNameGeneratorTest {
     void generate(MultipartFile multipartFile, String extension) {
         String generatedFileName = generateFileName(multipartFile);
 
-        System.out.println(generatedFileName);
         assertThat(generatedFileName).endsWith(extension);
     }
 

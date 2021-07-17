@@ -1,6 +1,5 @@
 package com.woowacourse.s3proxy;
 
-import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import cloud.localstack.docker.LocalstackDockerExtension;
@@ -26,9 +25,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.web.multipart.MultipartFile;
 
 @Import(StorageTestConfiguration.class)
 @LocalstackDockerProperties(services = {"s3"}, platform = "linux/x86_64")
