@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.post.presentation.dto;
+package com.woowacourse.pickgit.post.presentation.dto.request;
 
 import java.util.List;
 import javax.validation.constraints.NotBlank;
@@ -8,15 +8,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class PostRequest {
 
-    @NotEmpty
     private List<MultipartFile> images;
 
-    @NotBlank
     private String githubRepoUrl;
 
     private List<String> tags;
 
-    @Size(max = 500, message = "F0001")
     private String content;
 
     private PostRequest() {

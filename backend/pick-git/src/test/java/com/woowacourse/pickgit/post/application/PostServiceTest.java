@@ -13,9 +13,9 @@ import static org.mockito.Mockito.verify;
 import com.woowacourse.pickgit.common.FileFactory;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
-import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.domain.PlatformRepositoryExtractor;
-import com.woowacourse.pickgit.post.application.dto.CommentDto;
+import com.woowacourse.pickgit.post.application.dto.CommentResponse;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostContent;
 import com.woowacourse.pickgit.post.domain.PostRepository;
@@ -25,6 +25,7 @@ import com.woowacourse.pickgit.post.domain.content.Image;
 import com.woowacourse.pickgit.post.domain.content.Images;
 import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.presentation.PickGitStorage;
+import com.woowacourse.pickgit.post.presentation.dto.request.CommentRequest;
 import com.woowacourse.pickgit.tag.application.TagService;
 import com.woowacourse.pickgit.tag.application.TagsDto;
 import com.woowacourse.pickgit.tag.domain.Tag;
@@ -147,7 +148,7 @@ class PostServiceTest {
         PostRequestDto requestDto = getRequestDto();
 
         // when
-        PostResponseDto responseDto = postService.write(requestDto);
+        PostImageUrlResponseDto responseDto = postService.write(requestDto);
 
         // then
         assertThat(responseDto.getId()).isNotNull();
@@ -184,10 +185,10 @@ class PostServiceTest {
             .willReturn(Optional.of(user2));
         Mockito.doNothing().when(entityManager).flush();
 
-        CommentRequestDto commentRequestDto =
-            new CommentRequestDto("kevin", "test comment", 1L);
+        CommentRequest commentRequest =
+            new CommentRequest("kevin", "test comment", 1L);
 
-        CommentDto commentResponseDto = postService.addComment(commentRequestDto);
+        CommentResponse commentResponseDto = postService.addComment(commentRequest);
 
         assertThat(commentResponseDto.getAuthorName()).isEqualTo("kevin");
         assertThat(commentResponseDto.getContent()).isEqualTo("test comment");
@@ -203,10 +204,10 @@ class PostServiceTest {
         given(userRepository.findByBasicProfile_Name("kevin"))
             .willReturn(Optional.of(user));
 
-        CommentRequestDto commentRequestDto =
-            new CommentRequestDto("kevin", "", 1L);
+        CommentRequest commentRequest =
+            new CommentRequest("kevin", "", 1L);
 
-        assertThatCode(() -> postService.addComment(commentRequestDto))
+        assertThatCode(() -> postService.addComment(commentRequest))
             .isInstanceOf(CommentFormatException.class)
             .extracting("errorCode")
             .isEqualTo("F0002");

@@ -5,30 +5,29 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.FileFactory;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.post.CommentFormatException;
 import com.woowacourse.pickgit.post.PostTestConfiguration;
-import com.woowacourse.pickgit.post.application.dto.CommentDto;
-import com.woowacourse.pickgit.post.application.dto.PostDto;
+import com.woowacourse.pickgit.post.application.dto.CommentResponse;
+import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
-import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostRepository;
 import com.woowacourse.pickgit.post.domain.comment.Comments;
-import com.woowacourse.pickgit.post.presentation.dto.HomeFeedRequest;
+import com.woowacourse.pickgit.post.presentation.dto.request.CommentRequest;
+import com.woowacourse.pickgit.post.presentation.dto.request.HomeFeedRequest;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
 import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -77,11 +76,6 @@ class PostServiceIntegrationTest {
 
     @BeforeEach
     void setUp() {
-//        platformRepositoryExtractor =
-//            new GithubRepositoryExtractor(objectMapper, new MockRepositoryApiRequester());
-//        postService = new PostService(
-//            userRepository, postRepository, pickGitStorage, platformRepositoryExtractor);
-
         image = "image1";
         description = "hello";
         githubUrl = "https://github.com/da-nyee";
@@ -112,10 +106,10 @@ class PostServiceIntegrationTest {
         post = new Post(null, null, null, null, null, new Comments(), new ArrayList<>(), null);
         postRepository.save(post);
 
-        CommentRequestDto commentRequestDto =
-            new CommentRequestDto("kevin", "test comment", post.getId());
+        CommentRequest commentRequest =
+            new CommentRequest("kevin", "test comment", post.getId());
 
-        CommentDto commentResponseDto = postService.addComment(commentRequestDto);
+        CommentResponse commentResponseDto = postService.addComment(commentRequest);
 
         assertThat(commentResponseDto.getAuthorName()).isEqualTo("kevin");
         assertThat(commentResponseDto.getContent()).isEqualTo("test comment");
@@ -127,10 +121,10 @@ class PostServiceIntegrationTest {
         post = new Post(null, null, null, null, null, new Comments(), new ArrayList<>(), null);
         postRepository.save(post);
 
-        CommentRequestDto commentRequestDto =
-            new CommentRequestDto("kevin", "", post.getId());
+        CommentRequest commentRequest =
+            new CommentRequest("kevin", "", post.getId());
 
-        assertThatCode(() -> postService.addComment(commentRequestDto))
+        assertThatCode(() -> postService.addComment(commentRequest))
             .isInstanceOf(CommentFormatException.class)
             .extracting("errorCode")
             .isEqualTo("F0002");
@@ -148,7 +142,7 @@ class PostServiceIntegrationTest {
                 ), githubRepoUrl, tags, content);
 
         // when
-        PostResponseDto responseDto = postService.write(requestDto);
+        PostImageUrlResponseDto responseDto = postService.write(requestDto);
 
         // then
         assertThat(responseDto.getId()).isNotNull();
@@ -204,17 +198,17 @@ class PostServiceIntegrationTest {
 
         HomeFeedRequest homeFeedRequest =
             new HomeFeedRequest(new LoginUser("kevin", "a"), 1L, 2L);
-        List<PostDto> postDtos = postService.readHomeFeed(homeFeedRequest);
+        List<PostResponseDto> postResponseDtos = postService.readHomeFeed(homeFeedRequest);
 
-        List<String> postNames = postDtos.stream()
-            .map(PostDto::getAuthorName)
+        List<String> postNames = postResponseDtos.stream()
+            .map(PostResponseDto::getAuthorName)
             .collect(toList());
 
-        List<String> repoNames = postDtos.stream()
-            .map(PostDto::getGithubRepoUrl)
+        List<String> repoNames = postResponseDtos.stream()
+            .map(PostResponseDto::getGithubRepoUrl)
             .collect(toList());
 
-        assertThat(postDtos).hasSize(2);
+        assertThat(postResponseDtos).hasSize(2);
         assertThat(postNames).containsExactly("ginger", "dani");
         assertThat(repoNames).containsExactly("jwp-chess", "java-racingcar");
     }
@@ -224,10 +218,10 @@ class PostServiceIntegrationTest {
         List<User> users = PostFactory.mockUsers();
         for (int i = 0; i < postRequestDtos.size(); i++) {
             userRepository.save(users.get(i));
-            PostResponseDto response = postService.write(postRequestDtos.get(i));
-            CommentRequestDto commentRequestDto =
-                new CommentRequestDto(users.get(i).getName(), "test comment" + i, response.getId());
-            postService.addComment(commentRequestDto);
+            PostImageUrlResponseDto response = postService.write(postRequestDtos.get(i));
+            CommentRequest commentRequest =
+                new CommentRequest(users.get(i).getName(), "test comment" + i, response.getId());
+            postService.addComment(commentRequest);
         }
     }
 
@@ -248,13 +242,13 @@ class PostServiceIntegrationTest {
         //when
         HomeFeedRequest homeFeedRequest =
             new HomeFeedRequest(new LoginUser("kevin", "a"), 0L, 3L);
-        List<PostDto> postDtos = postService.readMyFeed(homeFeedRequest);
-        List<String> repoNames = postDtos.stream()
-            .map(PostDto::getGithubRepoUrl)
+        List<PostResponseDto> postResponseDtos = postService.readMyFeed(homeFeedRequest);
+        List<String> repoNames = postResponseDtos.stream()
+            .map(PostResponseDto::getGithubRepoUrl)
             .collect(toList());
 
         //then
-        assertThat(postDtos).hasSize(3);
+        assertThat(postResponseDtos).hasSize(3);
         assertThat(repoNames).containsExactly("java-racingcar", "jwp-chess", "atdd-subway-fare");
     }
 
@@ -276,16 +270,16 @@ class PostServiceIntegrationTest {
         //when
         HomeFeedRequest homeFeedRequest =
             new HomeFeedRequest(new LoginUser("ala", "a"), 0L, 3L);
-        List<PostDto> postDtos = postService.readUserFeed(homeFeedRequest, "kevin");
-        List<String> repoNames = postDtos.stream()
-            .map(PostDto::getGithubRepoUrl)
+        List<PostResponseDto> postResponseDtos = postService.readUserFeed(homeFeedRequest, "kevin");
+        List<String> repoNames = postResponseDtos.stream()
+            .map(PostResponseDto::getGithubRepoUrl)
             .collect(toList());
-        List<Boolean> likes = postDtos.stream()
-            .map(PostDto::getIsLiked)
+        List<Boolean> likes = postResponseDtos.stream()
+            .map(PostResponseDto::getIsLiked)
             .collect(toList());
 
         //then
-        assertThat(postDtos).hasSize(3);
+        assertThat(postResponseDtos).hasSize(3);
         assertThat(repoNames).containsExactly("java-racingcar", "jwp-chess", "atdd-subway-fare");
         assertThat(likes).containsExactly(Boolean.FALSE, Boolean.FALSE, Boolean.FALSE);
     }
@@ -308,16 +302,16 @@ class PostServiceIntegrationTest {
         //when
         HomeFeedRequest homeFeedRequest =
             new HomeFeedRequest(new GuestUser(), 0L, 3L);
-        List<PostDto> postDtos = postService.readUserFeed(homeFeedRequest, "kevin");
-        List<String> repoNames = postDtos.stream()
-            .map(PostDto::getGithubRepoUrl)
+        List<PostResponseDto> postResponseDtos = postService.readUserFeed(homeFeedRequest, "kevin");
+        List<String> repoNames = postResponseDtos.stream()
+            .map(PostResponseDto::getGithubRepoUrl)
             .collect(toList());
-        List<Boolean> likes = postDtos.stream()
-            .map(PostDto::getIsLiked)
+        List<Boolean> likes = postResponseDtos.stream()
+            .map(PostResponseDto::getIsLiked)
             .collect(toList());
 
         //then
-        assertThat(postDtos).hasSize(3);
+        assertThat(postResponseDtos).hasSize(3);
         assertThat(repoNames).containsExactly("java-racingcar", "jwp-chess", "atdd-subway-fare");
         assertThat(likes).containsExactly(null, null, null);
     }

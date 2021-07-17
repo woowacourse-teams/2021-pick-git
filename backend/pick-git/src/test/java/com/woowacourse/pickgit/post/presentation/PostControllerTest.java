@@ -3,6 +3,7 @@ package com.woowacourse.pickgit.post.presentation;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -18,15 +19,15 @@ import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.FileFactory;
 import com.woowacourse.pickgit.post.PostTestConfiguration;
 import com.woowacourse.pickgit.exception.post.CommentFormatException;
-import com.woowacourse.pickgit.post.application.CommentRequestDto;
+import com.woowacourse.pickgit.post.presentation.dto.request.CommentRequest;
 import com.woowacourse.pickgit.post.application.PostService;
-import com.woowacourse.pickgit.post.application.dto.CommentDto;
+import com.woowacourse.pickgit.post.application.dto.CommentResponse;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
-import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
 import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
-import com.woowacourse.pickgit.post.presentation.dto.HomeFeedRequest;
+import com.woowacourse.pickgit.post.presentation.dto.request.HomeFeedRequest;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -96,7 +97,7 @@ class PostControllerTest {
         given(oAuthService.findRequestUserByToken(any()))
             .willReturn(user);
         given(postService.write(any(PostRequestDto.class)))
-            .willReturn(new PostResponseDto(1L));
+            .willReturn(new PostImageUrlResponseDto(1L));
 
         MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
         multiValueMap.add("githubRepoUrl", githubRepoUrl);
@@ -147,18 +148,18 @@ class PostControllerTest {
             .willReturn(loginUser);
 
         String url = "/api/posts/1/comments";
-        CommentDto commentResponseDto =
-            new CommentDto(1L, "kevin", "test comment", false);
+        CommentResponse commentResponseDto =
+            new CommentResponse(1L, "kevin", "test comment", false);
         String requestBody = objectMapper.writeValueAsString("test comment");
         String responseBody = objectMapper.writeValueAsString(commentResponseDto);
-        given(postService.addComment(any(CommentRequestDto.class)))
+        given(postService.addComment(any(CommentRequest.class)))
             .willReturn(commentResponseDto);
 
         addCommentApi(url, requestBody)
             .andExpect(status().isOk())
             .andExpect(content().string(responseBody));
 
-        verify(postService, times(1)).addComment(any(CommentRequestDto.class));
+        verify(postService, times(1)).addComment(any(CommentRequest.class));
     }
 
     private ResultActions addCommentApi(String url, String requestBody) throws Exception {
@@ -179,13 +180,13 @@ class PostControllerTest {
 
         String url = "/api/posts/1/comments";
         String requestBody = objectMapper.writeValueAsString("");
-        given(postService.addComment(any(CommentRequestDto.class)))
+        given(postService.addComment(any(CommentRequest.class)))
             .willThrow(new CommentFormatException());
 
         addCommentApi(url, requestBody)
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("errorCode").value("F0002"));
-        verify(postService, times(1)).addComment(any(CommentRequestDto.class));
+            .andExpect(jsonPath("errorCode").value("F0001"));
+        verify(postService, never()).addComment(any(CommentRequest.class));
     }
 
     @DisplayName("사용자는 Repository 목록을 가져올 수 있다.")

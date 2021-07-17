@@ -1,15 +1,15 @@
-package com.woowacourse.pickgit.post.application;
+package com.woowacourse.pickgit.post.presentation.dto.request;
 
-public class CommentRequestDto {
+public class CommentRequest {
 
     private String userName;
     private String content;
     private Long postId;
 
-    private CommentRequestDto() {
+    private CommentRequest() {
     }
 
-    public CommentRequestDto(String userName, String content, Long postId) {
+    public CommentRequest(String userName, String content, Long postId) {
         this.userName = userName;
         this.content = content;
         this.postId = postId;

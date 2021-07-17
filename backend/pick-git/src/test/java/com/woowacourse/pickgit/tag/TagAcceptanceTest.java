@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.tag.presentation;
+package com.woowacourse.pickgit.tag;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;

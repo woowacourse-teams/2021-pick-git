@@ -6,11 +6,11 @@ import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
-import com.woowacourse.pickgit.post.application.dto.CommentDto;
-import com.woowacourse.pickgit.post.application.dto.PostDto;
+import com.woowacourse.pickgit.post.application.dto.CommentResponse;
+import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
-import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
 import com.woowacourse.pickgit.post.domain.PlatformRepositoryExtractor;
 import com.woowacourse.pickgit.post.domain.Post;
@@ -21,7 +21,8 @@ import com.woowacourse.pickgit.post.domain.content.Image;
 import com.woowacourse.pickgit.post.domain.content.Images;
 import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.presentation.PickGitStorage;
-import com.woowacourse.pickgit.post.presentation.dto.HomeFeedRequest;
+import com.woowacourse.pickgit.post.presentation.dto.request.CommentRequest;
+import com.woowacourse.pickgit.post.presentation.dto.request.HomeFeedRequest;
 import com.woowacourse.pickgit.tag.application.TagService;
 import com.woowacourse.pickgit.tag.application.TagsDto;
 import com.woowacourse.pickgit.tag.domain.Tag;
@@ -34,8 +35,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Function;
 import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -67,19 +66,19 @@ public class PostService {
         this.entityManager = entityManager;
     }
 
-    public PostResponseDto write(PostRequestDto postRequestDto) {
+    public PostImageUrlResponseDto write(PostRequestDto postRequestDto) {
         PostContent postContent = new PostContent(postRequestDto.getContent());
 
         User user = findUserByName(postRequestDto.getUsername());
 
-        Post post =
-            new Post(postContent, getImages(postRequestDto), postRequestDto.getGithubRepoUrl(), user);
+        Post post = new Post(postContent, getImages(postRequestDto),
+            postRequestDto.getGithubRepoUrl(), user);
 
         List<Tag> tags = tagService.findOrCreateTags(new TagsDto(postRequestDto.getTags()));
         post.addTags(tags);
 
         Post findPost = postRepository.save(post);
-        return new PostResponseDto(findPost.getId(), findPost.getImageUrls());
+        return new PostImageUrlResponseDto(findPost.getId(), findPost.getImageUrls());
     }
 
     private User findUserByName(String username) {
@@ -132,46 +131,51 @@ public class PostService {
         }
     }
 
-    public CommentDto addComment(CommentRequestDto commentRequestDto) {
-        User user = findUserByName(commentRequestDto.getUserName());
-        Post post = postRepository.findById(commentRequestDto.getPostId())
-            .orElseThrow(() -> new PostNotFoundException(
+    public CommentResponse addComment(CommentRequest commentRequest) {
+        User user = userRepository.findByBasicProfile_Name(commentRequest.getUserName())
+            .orElseThrow(() -> new UserNotFoundException(
                 "U0001",
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "해당하는 사용자를 찾을 수 없습니다."
             ));
-        Comment comment = new Comment(commentRequestDto.getContent());
+        Post post = postRepository.findById(commentRequest.getPostId())
+            .orElseThrow(() -> new PostNotFoundException(
+                "P0002",
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "해당하는 게시물을 찾을 수 없습니다."
+            ));
+        Comment comment = new Comment(commentRequest.getContent());
         user.addComment(post, comment);
         entityManager.flush();
-        return CommentDto.from(comment);
+        return CommentResponse.from(comment);
     }
 
     @Transactional(readOnly = true)
     public RepositoriesResponseDto showRepositories(RepositoryRequestDto repositoryRequestDto) {
-            List<RepositoryResponseDto> repositories = platformRepositoryExtractor
-                .extract(repositoryRequestDto.getToken(), repositoryRequestDto.getUsername());
+        List<RepositoryResponseDto> repositories = platformRepositoryExtractor
+            .extract(repositoryRequestDto.getToken(), repositoryRequestDto.getUsername());
 
-            return new RepositoriesResponseDto(repositories);
-     }
+        return new RepositoriesResponseDto(repositories);
+    }
 
     @Transactional(readOnly = true)
-    public List<PostDto> readHomeFeed(HomeFeedRequest homeFeedRequest) {
+    public List<PostResponseDto> readHomeFeed(HomeFeedRequest homeFeedRequest) {
         Pageable pageable = PageRequest.of(homeFeedRequest.getPage(), homeFeedRequest.getLimit());
         List<Post> result = postRepository.findAllPosts(pageable);
         return PostDtoAssembler.assembleFrom(homeFeedRequest.getAppUser(), result);
     }
 
     @Transactional(readOnly = true)
-    public List<PostDto> readMyFeed(HomeFeedRequest homeFeedRequest) {
+    public List<PostResponseDto> readMyFeed(HomeFeedRequest homeFeedRequest) {
         return readFeed(homeFeedRequest, homeFeedRequest.getAppUser().getUsername());
     }
 
     @Transactional(readOnly = true)
-    public List<PostDto> readUserFeed(HomeFeedRequest homeFeedRequest, String username) {
+    public List<PostResponseDto> readUserFeed(HomeFeedRequest homeFeedRequest, String username) {
         return readFeed(homeFeedRequest, username);
     }
 
-    private List<PostDto> readFeed(HomeFeedRequest homeFeedRequest, String username) {
+    private List<PostResponseDto> readFeed(HomeFeedRequest homeFeedRequest, String username) {
         AppUser appUser = homeFeedRequest.getAppUser();
         User target = findUserByName(username);
         Pageable pageable = PageRequest.of(homeFeedRequest.getPage(), homeFeedRequest.getLimit());
