@@ -191,7 +191,7 @@ class PostServiceIntegrationTest {
             .isEqualTo("V0001");
     }
 
-    @DisplayName("저장된 게시물 중 3, 4번째 글을 가져온다.")
+    @DisplayName("저장된 게시물 중 3, 4번째 글을 최신날짜순으로 가져온다.")
     @Test
     void readHomeFeed_Success() {
         createMockPosts();
@@ -209,8 +209,8 @@ class PostServiceIntegrationTest {
             .collect(toList());
 
         assertThat(postResponseDtos).hasSize(2);
-        assertThat(postNames).containsExactly("ginger", "dani");
-        assertThat(repoNames).containsExactly("jwp-chess", "java-racingcar");
+        assertThat(postNames).containsExactly("dani", "ginger");
+        assertThat(repoNames).containsExactly("java-racingcar", "jwp-chess");
     }
 
     private void createMockPosts() {
