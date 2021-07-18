@@ -7,9 +7,9 @@ import Input from "../@shared/Input/Input";
 import { Container, Form, TagList, TagListItem } from "./TagInputForm.style";
 
 const TagInputForm = () => {
-  const { currentUserName } = useContext(UserContext);
+  const { currentUsername } = useContext(UserContext);
   const { githubRepositoryName, tags, setTags } = useContext(PostAddDataContext);
-  const { data: defaultTags, isLoading, error } = useGithubTagsQuery(currentUserName, githubRepositoryName);
+  const { data: defaultTags, isLoading, error } = useGithubTagsQuery(currentUsername, githubRepositoryName);
 
   useEffect(() => {
     defaultTags && setTags((state) => [...defaultTags, ...state]);
@@ -24,8 +24,8 @@ const TagInputForm = () => {
   };
 
   const tagListItems = tags?.map((tag) => (
-    <TagListItem>
-      <Chip key={tag}>{tag}</Chip>
+    <TagListItem key={tag}>
+      <Chip>{tag}</Chip>
     </TagListItem>
   ));
 

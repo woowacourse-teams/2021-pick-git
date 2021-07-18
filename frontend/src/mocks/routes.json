@@ -1,8 +1,8 @@
 {
   "/api/*": "/$1",
   "/profiles/me": "/self-profiles",
-  "/profiles/:userName": "/user-profiles",
+  "/profiles/:username": "/user-profiles",
   "/authorization/github": "/github-login",
   "/posts?page=:page&limit=:limit": "/posts?_page=:page&_limit=:limit",
-  "/posts/:userName": "/posts"
+  "/posts/:username": "/posts"
 }

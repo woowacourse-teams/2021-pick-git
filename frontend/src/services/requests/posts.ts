@@ -27,7 +27,7 @@ export const requestGetMyFeedPosts = async (pageParam: number, accessToken: stri
   return response.data;
 };
 
-export const requestGetUserFeedPosts = async (userName: string, pageParam: number, accessToken: string | null) => {
+export const requestGetUserFeedPosts = async (username: string, pageParam: number, accessToken: string | null) => {
   const config = accessToken
     ? {
         headers: {
@@ -35,7 +35,7 @@ export const requestGetUserFeedPosts = async (userName: string, pageParam: numbe
         },
       }
     : {};
-  const response = await axios.get<Post[]>(API_URL.USER_POSTS(userName, pageParam, LIMIT.FEED_COUNT_PER_FETCH), config);
+  const response = await axios.get<Post[]>(API_URL.USER_POSTS(username, pageParam, LIMIT.FEED_COUNT_PER_FETCH), config);
 
   return response.data;
 };
@@ -69,7 +69,7 @@ export const requestDeletePostLike = async (postId: string, accessToken: string 
 };
 
 export const requestAddPost = async (
-  userName: string,
+  username: string,
   { files, githubRepositoryName, tags, content }: PostAddFormData,
   accessToken: string | null
 ) => {
@@ -79,7 +79,7 @@ export const requestAddPost = async (
 
   const formData = new FormData();
   files.forEach((file) => formData.append("images", file));
-  formData.append("githubRepoUrl", `https://github.com/${userName}/${githubRepositoryName}`);
+  formData.append("githubRepoUrl", `https://github.com/${username}/${githubRepositoryName}`);
   formData.append("tags", JSON.stringify(tags));
   formData.append("content", content);
 

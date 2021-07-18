@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { createContext, useEffect, useState } from "react";
-import useLocalStorage from "../services/hooks/@common/useLocalStorage";
 import { requestGetSelfProfile } from "../services/requests";
+import { getAccessToken, getUsername, setAccessToken, setUsername } from "../storage/storage";
 
 interface Props {
   children: React.ReactNode;
@@ -9,13 +9,13 @@ interface Props {
 
 interface Value {
   isLoggedIn: boolean;
-  currentUserName: string;
-  login: (accessToken: string, userName: string) => void;
+  currentUsername: string;
+  login: (accessToken: string, username: string) => void;
   logout: () => void;
 }
 
 const UserContext = createContext<Value>({
-  currentUserName: "",
+  currentUsername: "",
   isLoggedIn: false,
   login: () => {},
   logout: () => {},
@@ -23,29 +23,30 @@ const UserContext = createContext<Value>({
 
 export const UserContextProvider = ({ children }: Props) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const { accessToken, userName, setAccessToken, setUserName } = useLocalStorage();
+  const accessToken = getAccessToken();
+  const username = getUsername();
 
-  const login = (accessToken: string, userName: string) => {
+  const login = (accessToken: string, username: string) => {
     setAccessToken(accessToken);
-    setUserName(userName);
+    setUsername(username);
     setIsLoggedIn(true);
   };
 
   const logout = () => {
     setAccessToken("");
-    setUserName("");
+    setUsername("");
     setIsLoggedIn(false);
   };
 
   useEffect(() => {
-    if (!accessToken || !userName) return;
+    if (!accessToken || !username) return;
 
     (async () => {
       try {
         const { name } = await requestGetSelfProfile(accessToken);
 
         setIsLoggedIn(true);
-        setUserName(name);
+        setUsername(name);
       } catch (error) {
         console.error(error);
       }
@@ -53,7 +54,7 @@ export const UserContextProvider = ({ children }: Props) => {
   }, []);
 
   return (
-    <UserContext.Provider value={{ currentUserName: userName ?? "", isLoggedIn, login, logout }}>
+    <UserContext.Provider value={{ currentUsername: username ?? "", isLoggedIn, login, logout }}>
       {children}
     </UserContext.Provider>
   );

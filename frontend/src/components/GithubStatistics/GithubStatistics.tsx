@@ -8,7 +8,7 @@ import CircleIcon from "../@shared/CircleIcon/CircleIcon";
 import { Container, ContributionGraphWrapper, GithubStatsWrapper, Stat } from "./GithubStatistics.style";
 
 export interface Props {
-  userName: string;
+  username: string;
 }
 
 // TODO: typing
@@ -20,9 +20,9 @@ const stats = {
   contributes: { name: "Contributes", icon: <BookIcon /> },
 };
 
-const GithubStatistics = ({ userName }: Props) => {
+const GithubStatistics = ({ username }: Props) => {
   const { color } = useContext(ThemeContext);
-  const { data, isLoading, error } = useGithubStatsQuery(userName);
+  const { data, isLoading, error } = useGithubStatsQuery(username);
 
   if (isLoading) {
     return <div>loading</div>;
@@ -56,8 +56,8 @@ const GithubStatistics = ({ userName }: Props) => {
       <h2>Contribution Graph</h2>
       <ContributionGraphWrapper>
         <img
-          src={`https://ghchart.rshah.org/${color.primaryColor.slice(1)}/${userName}`}
-          alt={`${userName}의 contribution`}
+          src={`https://ghchart.rshah.org/${color.primaryColor.slice(1)}/${username}`}
+          alt={`${username}의 contribution`}
         />
       </ContributionGraphWrapper>
     </Container>

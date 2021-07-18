@@ -3,7 +3,7 @@ import { QueryFunction, useInfiniteQuery, useMutation, useQuery } from "react-qu
 
 import { Post } from "../../@types";
 import { QUERY } from "../../constants/queries";
-import useLocalStorage from "../hooks/@common/useLocalStorage";
+import { getAccessToken } from "../../storage/storage";
 import {
   requestAddPostLike,
   requestGetHomeFeedPosts,
@@ -16,30 +16,28 @@ type UserPostsQueryKey = readonly [
   typeof QUERY.GET_USER_FEED_POSTS,
   {
     isMyFeed: boolean;
-    accessToken: string | null;
-    userName: string | null;
+    username: string | null;
   }
 ];
 
 const userPostsQueryFunction: QueryFunction<Post[]> = async ({ queryKey }) => {
-  const [, { isMyFeed, accessToken, userName }] = queryKey as UserPostsQueryKey;
+  const [, { isMyFeed, username }] = queryKey as UserPostsQueryKey;
+  const accessToken = getAccessToken();
 
   if (isMyFeed) {
     if (!accessToken) throw Error("no accessToken");
 
     return await requestGetMyFeedPosts(0, accessToken);
   } else {
-    return await requestGetUserFeedPosts(userName as string, 0, accessToken);
+    return await requestGetUserFeedPosts(username as string, 0, accessToken);
   }
 };
 
 export const useHomeFeedPostsQuery = () => {
-  const { accessToken } = useLocalStorage();
-
   return useInfiniteQuery(
     QUERY.GET_HOME_FEED_POSTS,
     async ({ pageParam = 0 }) => {
-      return await requestGetHomeFeedPosts(pageParam, accessToken);
+      return await requestGetHomeFeedPosts(pageParam, getAccessToken());
     },
     {
       getNextPageParam: (_, pages) => {
@@ -49,23 +47,17 @@ export const useHomeFeedPostsQuery = () => {
   );
 };
 
-export const useUserPostsQuery = (isMyFeed: boolean, userName: string | null) => {
-  const { accessToken } = useLocalStorage();
-
+export const useUserPostsQuery = (isMyFeed: boolean, username: string | null) => {
   return useQuery<Post[], AxiosError<Post[]>>(
-    [QUERY.GET_USER_FEED_POSTS, { isMyFeed, accessToken, userName }],
+    [QUERY.GET_USER_FEED_POSTS, { isMyFeed, username }],
     userPostsQueryFunction
   );
 };
 
 export const useAddPostLikeMutation = () => {
-  const { accessToken } = useLocalStorage();
-
-  return useMutation((postId: Post["postId"]) => requestAddPostLike(postId, accessToken));
+  return useMutation((postId: Post["postId"]) => requestAddPostLike(postId, getAccessToken()));
 };
 
 export const useDeletePostLikeMutation = () => {
-  const { accessToken } = useLocalStorage();
-
-  return useMutation((postId: Post["postId"]) => requestDeletePostLike(postId, accessToken));
+  return useMutation((postId: Post["postId"]) => requestDeletePostLike(postId, getAccessToken()));
 };

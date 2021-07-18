@@ -14,27 +14,27 @@ export interface Props {
 }
 
 const ProfilePage = ({ isMyProfile }: Props) => {
-  const userName = new URLSearchParams(useLocation().search).get("userName");
-  const { currentUserName } = useContext(UserContext);
+  const username = new URLSearchParams(useLocation().search).get("username");
+  const { currentUsername } = useContext(UserContext);
 
-  if (!isMyProfile && !userName) return <Redirect to={PAGE_URL.HOME} />;
+  if (!isMyProfile && !username) return <Redirect to={PAGE_URL.HOME} />;
 
-  if (userName && userName === currentUserName) return <Redirect to={PAGE_URL.MY_PROFILE} />
+  if (username && username === currentUsername) return <Redirect to={PAGE_URL.MY_PROFILE} />;
 
   const tabItems = [
     {
       name: "게시물",
-      content: <ProfileFeed isMyFeed={isMyProfile} userName={userName} />,
+      content: <ProfileFeed isMyFeed={isMyProfile} username={username} />,
     },
     {
       name: "활동통계",
-      content: <GithubStatistics userName={isMyProfile ? currentUserName : (userName as string)} />,
+      content: <GithubStatistics username={isMyProfile ? currentUsername : (username as string)} />,
     },
   ];
 
   return (
     <Container>
-      <Profile isMyProfile={isMyProfile} userName={userName} />
+      <Profile isMyProfile={isMyProfile} username={username} />
       <Tabs tabItems={tabItems} />
     </Container>
   );

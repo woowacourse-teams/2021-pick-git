@@ -1,16 +1,12 @@
 import { useMutation } from "react-query";
 import { CommentAddData, CommentData } from "../../@types";
-import useLocalStorage from "../hooks/@common/useLocalStorage";
+import { getAccessToken } from "../../storage/storage";
 import { requestAddPostComment, requestDeletePostComment } from "../requests/comments";
 
 export const useAddPostCommentMutation = () => {
-  const { accessToken } = useLocalStorage();
-
-  return useMutation((commentAddData: CommentAddData) => requestAddPostComment(commentAddData, accessToken));
+  return useMutation((commentAddData: CommentAddData) => requestAddPostComment(commentAddData, getAccessToken()));
 };
 
 export const useDeletePostCommentMutation = () => {
-  const { accessToken } = useLocalStorage();
-
-  return useMutation((commentId: CommentData["commentId"]) => requestDeletePostComment(commentId, accessToken));
+  return useMutation((commentId: CommentData["commentId"]) => requestDeletePostComment(commentId, getAccessToken()));
 };

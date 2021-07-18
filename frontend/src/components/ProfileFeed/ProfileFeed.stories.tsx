@@ -12,5 +12,5 @@ const Template: Story<Props> = (args) => <ProfileFeed {...args} />;
 export const Default = Template.bind({});
 Default.args = {
   isMyFeed: false,
-  userName: "Chris",
+  username: "Chris",
 };
