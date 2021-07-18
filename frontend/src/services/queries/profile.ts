@@ -26,7 +26,9 @@ export const useProfileQuery = (isMyProfile: boolean, username: string | null) =
 
       return await requestGetSelfProfile(accessToken);
     } else {
-      return await requestGetUserProfile(username as string, accessToken);
+      if (!username) throw Error("no username");
+
+      return await requestGetUserProfile(username, accessToken);
     }
   };
 
