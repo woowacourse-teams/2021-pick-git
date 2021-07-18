@@ -7,25 +7,13 @@ pipeline {
     }
 
     stages {
-        stage('Build') {
+        stage('Test and Build') {
             steps {
                 echo 'build backend...'
 
                 dir('./s3-proxy/s3-proxy') {
                     sh '''
-                        ./gradlew -x test clean build
-                    '''
-                }
-            }
-        }
-
-        stage('Test') {
-            steps {
-                echo 'test backend...'
-
-                dir('./s3-proxy/s3-proxy') {
-                    sh '''
-                        ./gradlew test
+                        ./gradlew clean build
                     '''
                 }
             }
