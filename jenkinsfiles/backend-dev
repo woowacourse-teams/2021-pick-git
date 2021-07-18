@@ -7,25 +7,13 @@ pipeline {
     }
 
     stages {
-        stage('Build') {
+        stage('Test and Build') {
             steps {
-                echo 'build backend...'
+                echo 'Test and build backend...'
 
                 dir('./backend/pick-git') {
                     sh '''
-                        ./gradlew -x test clean build
-                    '''
-                }
-            }
-        }
-
-        stage('Test') {
-            steps {
-                echo 'test backend...'
-
-                dir('./backend/pick-git') {
-                    sh '''
-                        ./gradlew test
+                        ./gradlew clean build
                     '''
                 }
             }

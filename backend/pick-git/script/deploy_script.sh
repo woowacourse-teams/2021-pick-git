@@ -85,7 +85,7 @@ scp -i $CERTIFICATE_PATH $JAR_PATH $USER@$HOST:$LOCATION
 
 JAR_NAME=${JAR_PATH##*/}
 
-ssh -i $CERTIFICATE_PATH -l $USER $HOST "PID=\$(ps -p \$(lsof -ti tcp:8080) o pid=); kill -15 \$PID; sleep 10; nohup java -Dspring.profiles.active=$DEPLOY -jar $LOCATION/$JAR_NAME > pickgit.out 2> pickgit.err < /dev/null &"
+ssh -i $CERTIFICATE_PATH -l $USER $HOST "PID=\$(ps -p \$(lsof -ti tcp:8080) o pid=); kill -9 \$PID; sleep 5; nohup java -Dspring.profiles.active=$DEPLOY -jar $LOCATION/$JAR_NAME > pickgit.out 2> pickgit.err < /dev/null &"
 
 
 
