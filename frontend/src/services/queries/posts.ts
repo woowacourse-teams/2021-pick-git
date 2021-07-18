@@ -3,7 +3,7 @@ import { QueryFunction, useInfiniteQuery, useMutation, useQuery } from "react-qu
 
 import { Post } from "../../@types";
 import { QUERY } from "../../constants/queries";
-import storage from "../../storage/storage";
+import { getAccessToken } from "../../storage/storage";
 import {
   requestAddPostLike,
   requestGetHomeFeedPosts,
@@ -16,13 +16,13 @@ type UserPostsQueryKey = readonly [
   typeof QUERY.GET_USER_FEED_POSTS,
   {
     isMyFeed: boolean;
-    accessToken: string | null;
     username: string | null;
   }
 ];
 
 const userPostsQueryFunction: QueryFunction<Post[]> = async ({ queryKey }) => {
-  const [, { isMyFeed, accessToken, username }] = queryKey as UserPostsQueryKey;
+  const [, { isMyFeed, username }] = queryKey as UserPostsQueryKey;
+  const accessToken = getAccessToken();
 
   if (isMyFeed) {
     if (!accessToken) throw Error("no accessToken");
@@ -34,8 +34,6 @@ const userPostsQueryFunction: QueryFunction<Post[]> = async ({ queryKey }) => {
 };
 
 export const useHomeFeedPostsQuery = () => {
-  const { getAccessToken } = storage();
-
   return useInfiniteQuery(
     QUERY.GET_HOME_FEED_POSTS,
     async ({ pageParam = 0 }) => {
@@ -50,22 +48,16 @@ export const useHomeFeedPostsQuery = () => {
 };
 
 export const useUserPostsQuery = (isMyFeed: boolean, username: string | null) => {
-  const { getAccessToken } = storage();
-
   return useQuery<Post[], AxiosError<Post[]>>(
-    [QUERY.GET_USER_FEED_POSTS, { isMyFeed, accessToken: getAccessToken(), username }],
+    [QUERY.GET_USER_FEED_POSTS, { isMyFeed, username }],
     userPostsQueryFunction
   );
 };
 
 export const useAddPostLikeMutation = () => {
-  const { getAccessToken } = storage();
-
   return useMutation((postId: Post["postId"]) => requestAddPostLike(postId, getAccessToken()));
 };
 
 export const useDeletePostLikeMutation = () => {
-  const { getAccessToken } = storage();
-
   return useMutation((postId: Post["postId"]) => requestDeletePostLike(postId, getAccessToken()));
 };
