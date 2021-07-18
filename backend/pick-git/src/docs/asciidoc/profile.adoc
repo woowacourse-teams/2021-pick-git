@@ -1,0 +1,27 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+
+== Profile
+=== 내 프로필 조회
+==== Request
+include::{snippets}/profilesMe/http-request.adoc[]
+==== Response
+include::{snippets}/profilesMe/http-response.adoc[]
+
+=== 다른 사용자 프로필 조회 - 로그인
+==== Request
+include::{snippets}/profiles-LoggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/profiles-LoggedIn/http-response.adoc[]
+
+=== 다른 사용자 프로필 조회 - 비 로그인
+==== Request
+include::{snippets}/profiles-unLoggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/profiles-unLoggedIn/http-response.adoc[]

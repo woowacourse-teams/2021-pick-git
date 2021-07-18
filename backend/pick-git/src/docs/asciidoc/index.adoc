@@ -1,0 +1,17 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+
+include::authorization.adoc[]
+include::comment.adoc[]
+include::following.adoc[]
+include::post.adoc[]
+include::profile.adoc[]
+include::tag.adoc[]
+
+PickGit API

@@ -1,4 +1,5 @@
 plugins {
+	id "org.asciidoctor.convert" version "1.5.9.2"
     id 'org.springframework.boot' version '2.5.2'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
@@ -24,12 +25,11 @@ dependencies {
 	runtimeOnly 'com.h2database:h2'
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 
+	asciidoctor 'org.springframework.restdocs:spring-restdocs-asciidoctor:1.2.6.RELEASE'
+
+	testImplementation('org.springframework.restdocs:spring-restdocs-mockmvc')
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '4.4.0'
-}
-
-test {
-    useJUnitPlatform()
 }
 
 processResources.dependsOn('copySecurity')
@@ -43,4 +43,29 @@ task copySecurity(type: Copy) {
 task copyProd(type: Copy) {
 	from './security/application-prod.yml'
 	into './src/main/resources'
+}
+
+//restDocs setting
+ext {
+	snippetsDir = file('build/generated-snippets')
+}
+
+asciidoctor {
+	inputs.dir snippetsDir
+	dependsOn test
+}
+
+task copyDocuments(type: Copy) {
+	dependsOn asciidoctor
+
+	from file("build/asciidoc/html5/index.html")
+	into file("src/main/resources/static/docs")
+}
+
+bootJar {
+	dependsOn copyDocuments
+}
+
+test {
+	useJUnitPlatform()
 }

@@ -1,8 +1,10 @@
 package com.woowacourse.pickgit.user;
 
+import com.woowacourse.pickgit.user.application.dto.UserProfileServiceDto;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
 import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
+import com.woowacourse.pickgit.user.presentation.dto.UserProfileResponse;
 
 public class UserFactory {
 
@@ -34,4 +36,16 @@ public class UserFactory {
     public User anotherUser() {
         return new User(ID_TARGET, basicProfileTarget, githubProfile_target);
     }
+
+    public UserProfileServiceDto mockLoginUserProfileServiceDto() {
+        return new UserProfileServiceDto(
+            NAME_SOURCE, IMAGE, DESCRIPTION, 0, 11,
+            1, GITHUB_URL, COMPANY, LOCATION, WEBSITE, TWITTER, false);
+    }
+    public UserProfileServiceDto mockUnLoginUserProfileServiceDto() {
+        return new UserProfileServiceDto(
+            NAME_SOURCE, IMAGE, DESCRIPTION, 0, 11,
+            1, GITHUB_URL, COMPANY, LOCATION, WEBSITE, TWITTER, null);
+    }
+
 }

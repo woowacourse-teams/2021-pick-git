@@ -1,10 +1,13 @@
 package com.woowacourse.pickgit.post.application;
 
 import com.woowacourse.pickgit.common.FileFactory;
+import com.woowacourse.pickgit.post.application.dto.CommentResponse;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
 import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -80,6 +83,16 @@ public class PostFactory {
                 new GithubProfile("github1.com", "a", "a", "a", "a")),
             new User(new BasicProfile("dave", "a.jpg", "a"),
                 new GithubProfile("github2.com", "a", "a", "a", "a"))
+        );
+    }
+
+    public static List<PostResponseDto> mockPostResponseDtos() {
+        return List.of(
+            new PostResponseDto(1L, List.of("iamge1Url", "image2Url"), "githubRepoUrl", "content",
+                "authorName", "profileImageUrl", 1, List.of("tag1", "tag2"), LocalDateTime.now(),
+                LocalDateTime.now(),
+                List.of(new CommentResponse(1L, "commentAuthorName", "commentContent", false)),
+                false)
         );
     }
 }
