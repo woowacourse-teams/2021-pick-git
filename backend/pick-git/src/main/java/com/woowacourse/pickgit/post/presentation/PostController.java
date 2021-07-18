@@ -63,14 +63,16 @@ public class PostController {
     public ResponseEntity<List<PostResponseDto>> readUserFeed(@Authenticated AppUser appUser,
         @PathVariable String username, @RequestParam Long page, @RequestParam Long limit) {
         HomeFeedRequest homeFeedRequest = new HomeFeedRequest(appUser, page, limit);
-        List<PostResponseDto> postResponseDtos = postService.readUserFeed(homeFeedRequest, username);
+        List<PostResponseDto> postResponseDtos = postService
+            .readUserFeed(homeFeedRequest, username);
         return ResponseEntity.ok(postResponseDtos);
     }
 
     @PostMapping("/posts")
     public ResponseEntity<Void> write(
         @Authenticated AppUser user,
-        PostRequest request) {
+        PostRequest request
+    ) {
         validateIsGuest(user);
 
         PostImageUrlResponseDto responseDto = postService.write(
@@ -86,7 +88,8 @@ public class PostController {
     public ResponseEntity<CommentResponse> addComment(
         @Authenticated AppUser user,
         @PathVariable Long postId,
-        @Valid @RequestBody ContentRequest request) {
+        @Valid @RequestBody ContentRequest request
+    ) {
         validateIsGuest(user);
 
         CommentRequest commentRequest =
@@ -120,7 +123,8 @@ public class PostController {
     @GetMapping("/github/{username}/repositories")
     public ResponseEntity<List<RepositoryResponseDto>> showRepositories(
         @Authenticated AppUser user,
-        @PathVariable String username) {
+        @PathVariable String username
+    ) {
         String token = user.getAccessToken();
         RepositoriesResponseDto responseDto = postService
             .showRepositories(new RepositoryRequestDto(token, username));
