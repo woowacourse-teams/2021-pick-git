@@ -221,8 +221,8 @@ class PostServiceTest {
         // given
         RepositoryRequestDto requestDto = new RepositoryRequestDto(ACCESS_TOKEN, USERNAME);
         List<RepositoryResponseDto> repositories = List.of(
-            new RepositoryResponseDto("pick"),
-            new RepositoryResponseDto("git")
+            new RepositoryResponseDto("pick", "https://github.com/jipark3/pick"),
+            new RepositoryResponseDto("git", "https://github.com/jipark3/git")
         );
 
         given(platformRepositoryExtractor.extract(requestDto.getToken(), requestDto.getUsername()))
