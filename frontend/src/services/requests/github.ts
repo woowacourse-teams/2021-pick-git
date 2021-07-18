@@ -21,7 +21,7 @@ export const requestGetTags = async (username: string, repositoryName: string, a
     throw Error("no accessToken");
   }
 
-  const response = await axios.get<Tags>(API_URL.GITHUB_TAGS(username, repositoryName), {
+  const response = await axios.get<Tags>(API_URL.GITHUB_TAGS(repositoryName), {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
