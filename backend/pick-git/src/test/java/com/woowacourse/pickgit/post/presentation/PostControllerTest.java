@@ -17,9 +17,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.FileFactory;
-import com.woowacourse.pickgit.post.PostTestConfiguration;
 import com.woowacourse.pickgit.exception.post.CommentFormatException;
-import com.woowacourse.pickgit.post.presentation.dto.request.CommentRequest;
+import com.woowacourse.pickgit.post.PostTestConfiguration;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
@@ -27,6 +26,7 @@ import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
 import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
+import com.woowacourse.pickgit.post.presentation.dto.request.CommentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.HomeFeedRequest;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -127,7 +127,6 @@ class PostControllerTest {
         multiValueMap.add("content", postContent);
 
         // then
-
         mockMvc.perform(multipart("/api/posts")
             .file(FileFactory.getTestImage1())
             .file(FileFactory.getTestImage2())
@@ -198,11 +197,9 @@ class PostControllerTest {
         given(oAuthService.findRequestUserByToken(any()))
             .willReturn(user);
 
-        RepositoryRequestDto requestDto =
-            new RepositoryRequestDto(API_ACCESS_TOKEN, USERNAME);
         RepositoriesResponseDto responseDto = new RepositoriesResponseDto(List.of(
-            new RepositoryResponseDto("pick"),
-            new RepositoryResponseDto("git")
+            new RepositoryResponseDto("pick", "https://github.com/jipark3/pick"),
+            new RepositoryResponseDto("git", "https://github.com/jipark3/git")
         ));
         String repositories = objectMapper.writeValueAsString(responseDto.getRepositories());
 
