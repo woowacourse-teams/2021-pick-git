@@ -7,6 +7,7 @@ import { requestAddFollow, requestDeleteFollow, requestGetSelfProfile, requestGe
 import UserContext from "../../contexts/UserContext";
 import { useContext } from "react";
 import { getAccessToken } from "../../storage/storage";
+import SnackBarContext from "../../contexts/SnackbarContext";
 
 type ProfileQueryKey = readonly [
   typeof QUERY.GET_PROFILE,
@@ -46,6 +47,7 @@ const useFollowMutation = (
   const currentProfileQueryKey = [QUERY.GET_PROFILE, { isMyProfile: false, username }];
   const currentProfileQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
   const { logout } = useContext(UserContext);
+  const { pushMessage } = useContext(SnackBarContext);
 
   return useMutation(() => callback(username, getAccessToken()), {
     onSuccess: ({ followerCount, following }) => {
@@ -63,13 +65,13 @@ const useFollowMutation = (
         const { status } = error.response ?? {};
 
         if (status === 401) {
-          alert("로그인한 사용자만 이용할 수 있는 기능입니다.");
+          pushMessage("로그인한 사용자만 이용할 수 있는 기능입니다.");
           logout();
         }
 
         return;
       }
-      alert("요청하신 작업을 수행할 수 없습니다.");
+      pushMessage("요청하신 작업을 수행할 수 없습니다.");
     },
   });
 };

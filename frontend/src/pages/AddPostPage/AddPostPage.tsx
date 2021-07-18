@@ -16,7 +16,11 @@ const AddPostPage = () => {
   );
   const { uploadPost, resetUploadData } = usePostUpload();
 
-  const stepComponents = [<RepositorySelector />, <PostContentUploader />, <TagInputForm />];
+  const stepComponents = [
+    <RepositorySelector key="repository-selector" />,
+    <PostContentUploader key="post-content-uploader" />,
+    <TagInputForm key="tag-input-form" />,
+  ];
 
   useEffect(() => {
     setStepMoveEventHandler();

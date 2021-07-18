@@ -5,8 +5,12 @@ import { requestGetGithubAuthLink } from "../../services/requests";
 import { PAGE_URL } from "../../constants/urls";
 import { Container, Heading, HomeLinkText, Inner } from "./LoginPage.style";
 import { Link } from "react-router-dom";
+import { useContext } from "react";
+import SnackBarContext from "../../contexts/SnackbarContext";
 
 const LoginPage = () => {
+  const { pushMessage } = useContext(SnackBarContext);
+
   const onRequestGithubLogin = async () => {
     try {
       const githubLoginUrl = await requestGetGithubAuthLink();
@@ -15,7 +19,7 @@ const LoginPage = () => {
     } catch (error) {
       console.error(error);
 
-      alert("요청하신 작업을 수행할 수 없습니다.");
+      pushMessage("요청하신 작업을 수행할 수 없습니다.");
     }
   };
 

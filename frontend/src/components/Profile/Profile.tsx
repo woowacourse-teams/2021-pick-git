@@ -4,6 +4,7 @@ import { useHistory } from "react-router-dom";
 
 import { CompanyIcon, GithubDarkIcon, LocationIcon, WebsiteLinkIcon, TwitterIcon } from "../../assets/icons";
 import { PAGE_URL } from "../../constants/urls";
+import SnackBarContext from "../../contexts/SnackbarContext";
 import UserContext from "../../contexts/UserContext";
 import { useProfileQuery } from "../../services/queries";
 import PageLoading from "../@layout/PageLoading/PageLoading";
@@ -18,6 +19,7 @@ export interface Props {
 const Profile = ({ isMyProfile, username }: Props) => {
   const history = useHistory();
   const { isLoggedIn, logout } = useContext(UserContext);
+  const { pushMessage } = useContext(SnackBarContext);
   const { isLoading, error, data, refetch } = useProfileQuery(isMyProfile, username);
 
   const handleAxiosError = (error: AxiosError) => {
@@ -25,11 +27,11 @@ const Profile = ({ isMyProfile, username }: Props) => {
 
     if (status === 401) {
       if (isMyProfile) {
-        alert("로그인한 사용자만 사용할 수 있는 서비스입니다.");
+        pushMessage("로그인한 사용자만 사용할 수 있는 서비스입니다.");
 
         history.push(PAGE_URL.HOME);
       } else {
-        isLoggedIn && alert("사용자 정보가 유효하지 않아 자동으로 로그아웃합니다.");
+        isLoggedIn && pushMessage("사용자 정보가 유효하지 않아 자동으로 로그아웃합니다.");
         logout();
         refetch();
       }
@@ -42,7 +44,7 @@ const Profile = ({ isMyProfile, username }: Props) => {
     if (axios.isAxiosError(error)) {
       handleAxiosError(error);
     } else {
-      alert("프로필을 확인할 수 없습니다.");
+      pushMessage("프로필을 확인할 수 없습니다.");
       history.push(PAGE_URL.HOME);
     }
   }

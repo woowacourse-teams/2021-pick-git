@@ -2,6 +2,7 @@ import { useContext } from "react";
 import { ThemeContext } from "styled-components";
 
 import { ProfileData } from "../../../@types";
+import SnackBarContext from "../../../contexts/SnackbarContext";
 import UserContext from "../../../contexts/UserContext";
 import { useFollowingMutation, useUnfollowingMutation } from "../../../services/queries";
 import Avatar from "../Avatar/Avatar";
@@ -15,8 +16,9 @@ export interface Props {
 }
 
 const ProfileHeader = ({ profile, isMyProfile }: Props) => {
-  const { isLoggedIn } = useContext(UserContext);
   const theme = useContext(ThemeContext);
+  const { isLoggedIn } = useContext(UserContext);
+  const { pushMessage } = useContext(SnackBarContext);
 
   const { mutate: follow, isLoading: isFollowLoading } = useFollowingMutation(profile?.name);
   const { mutate: unFollow, isLoading: isUnfollowLoading } = useUnfollowingMutation(profile?.name);
@@ -42,7 +44,7 @@ const ProfileHeader = ({ profile, isMyProfile }: Props) => {
 
     if (isMyProfile) {
       return (
-        <Button type="button" kind="squaredBlock" onClick={() => alert("아직 지원하지 않는 기능입니다")}>
+        <Button type="button" kind="squaredBlock" onClick={() => pushMessage("아직 지원하지 않는 기능입니다")}>
           프로필 수정
         </Button>
       );
