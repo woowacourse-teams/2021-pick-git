@@ -7,11 +7,11 @@ import { requestGetGithubStats } from "../requests";
 type GithubStatsQueryKey = readonly [typeof QUERY.GET_GITHUB_STATS, string];
 
 const githubStatsQueryFunction: QueryFunction<GithubStats> = async ({ queryKey }) => {
-  const [, userName] = queryKey as GithubStatsQueryKey;
+  const [, username] = queryKey as GithubStatsQueryKey;
 
-  return await requestGetGithubStats(userName);
+  return await requestGetGithubStats(username);
 };
 
-export const useGithubStatsQuery = (userName: string) => {
-  return useQuery<GithubStats, AxiosError<GithubStats>>([QUERY.GET_GITHUB_STATS, userName], githubStatsQueryFunction);
+export const useGithubStatsQuery = (username: string) => {
+  return useQuery<GithubStats, AxiosError<GithubStats>>([QUERY.GET_GITHUB_STATS, username], githubStatsQueryFunction);
 };

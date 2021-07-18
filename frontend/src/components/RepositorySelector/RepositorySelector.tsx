@@ -19,10 +19,10 @@ import {
 } from "./RepositorySelector.style";
 
 const RepositorySelector = () => {
-  const { currentUserName } = useContext(UserContext);
+  const { currentUsername } = useContext(UserContext);
   const { setGithubRepositoryName } = useContext(PostAddDataContext);
   const { goNextStep } = useStep(STEPS, PAGE_URL.HOME);
-  const { data: repositories, isLoading, error } = useGithubRepositoriesQuery(currentUserName);
+  const { data: repositories, isLoading, error } = useGithubRepositoriesQuery(currentUsername);
   const { color } = useContext(ThemeContext);
 
   const handleRepositorySelect = (repositoryName: string) => {

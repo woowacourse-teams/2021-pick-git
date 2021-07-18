@@ -4,11 +4,11 @@ import { Empty, GridContainer, GridItem } from "./ProfileFeed.styled";
 
 export interface Props {
   isMyFeed: boolean;
-  userName: string | null;
+  username: string | null;
 }
 
-const ProfileFeed = ({ isMyFeed, userName }: Props) => {
-  const { data, isLoading, error } = useUserPostsQuery(isMyFeed, userName);
+const ProfileFeed = ({ isMyFeed, username }: Props) => {
+  const { data, isLoading, error } = useUserPostsQuery(isMyFeed, username);
 
   if (isLoading) {
     return <div>loading</div>;

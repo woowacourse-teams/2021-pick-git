@@ -11,5 +11,5 @@ const Template: Story<Props> = (args) => <GithubStatistics {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {
-  userName: "tanney-102",
+  username: "tanney-102",
 };

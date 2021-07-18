@@ -17,19 +17,19 @@ type UserPostsQueryKey = readonly [
   {
     isMyFeed: boolean;
     accessToken: string | null;
-    userName: string | null;
+    username: string | null;
   }
 ];
 
 const userPostsQueryFunction: QueryFunction<Post[]> = async ({ queryKey }) => {
-  const [, { isMyFeed, accessToken, userName }] = queryKey as UserPostsQueryKey;
+  const [, { isMyFeed, accessToken, username }] = queryKey as UserPostsQueryKey;
 
   if (isMyFeed) {
     if (!accessToken) throw Error("no accessToken");
 
     return await requestGetMyFeedPosts(0, accessToken);
   } else {
-    return await requestGetUserFeedPosts(userName as string, 0, accessToken);
+    return await requestGetUserFeedPosts(username as string, 0, accessToken);
   }
 };
 
@@ -49,11 +49,11 @@ export const useHomeFeedPostsQuery = () => {
   );
 };
 
-export const useUserPostsQuery = (isMyFeed: boolean, userName: string | null) => {
+export const useUserPostsQuery = (isMyFeed: boolean, username: string | null) => {
   const { accessToken } = useLocalStorage();
 
   return useQuery<Post[], AxiosError<Post[]>>(
-    [QUERY.GET_USER_FEED_POSTS, { isMyFeed, accessToken, userName }],
+    [QUERY.GET_USER_FEED_POSTS, { isMyFeed, accessToken, username }],
     userPostsQueryFunction
   );
 };

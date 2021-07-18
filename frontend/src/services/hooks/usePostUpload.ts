@@ -8,10 +8,10 @@ const usePostUpload = () => {
   const { accessToken } = useLocalStorage();
   const { content, files, tags, githubRepositoryName, setContent, setFiles, setGithubRepositoryName, setTags } =
     useContext(PostAddDataContext);
-  const { currentUserName } = useContext(UserContext);
+  const { currentUsername } = useContext(UserContext);
 
   const uploadPost = async () => {
-    await requestAddPost(currentUserName, { content, files, tags, githubRepositoryName }, accessToken);
+    await requestAddPost(currentUsername, { content, files, tags, githubRepositoryName }, accessToken);
   };
 
   const resetUploadData = () => {
