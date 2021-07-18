@@ -1,11 +1,10 @@
 import { useQuery } from "react-query";
 import { GithubRepository, Tags } from "../../@types";
 import { QUERY } from "../../constants/queries";
-import storage from "../../storage/storage";
+import { getAccessToken } from "../../storage/storage";
 import { requestGetRepositories, requestGetTags } from "../requests/github";
 
 export const useGithubRepositoriesQuery = (username: string) => {
-  const { getAccessToken } = storage();
   const isUserNotNameEmpty = username !== "";
 
   return useQuery<GithubRepository[]>(
@@ -16,7 +15,6 @@ export const useGithubRepositoriesQuery = (username: string) => {
 };
 
 export const useGithubTagsQuery = (username: string, repositoryName: string) => {
-  const { getAccessToken } = storage();
   const isRepositoryNameNotEmpty = repositoryName !== "";
 
   return useQuery<Tags>(QUERY.GET_GITHUB_TAGS, () => requestGetTags(username, repositoryName, getAccessToken()), {

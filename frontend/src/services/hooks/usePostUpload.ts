@@ -1,11 +1,10 @@
 import { useContext } from "react";
 import PostAddDataContext from "../../contexts/PostAddDataContext";
 import UserContext from "../../contexts/UserContext";
+import { getAccessToken } from "../../storage/storage";
 import { requestAddPost } from "../requests";
-import storage from "../../storage/storage";
 
 const usePostUpload = () => {
-  const { getAccessToken } = storage();
   const { content, files, tags, githubRepositoryName, setContent, setFiles, setGithubRepositoryName, setTags } =
     useContext(PostAddDataContext);
   const { currentUsername } = useContext(UserContext);

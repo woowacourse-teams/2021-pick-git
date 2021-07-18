@@ -3,10 +3,10 @@ import axios, { AxiosError } from "axios";
 
 import { Profile } from "../../@types";
 import { QUERY } from "../../constants/queries";
-import storage from "../../storage/storage";
 import { requestAddFollow, requestDeleteFollow, requestGetSelfProfile, requestGetUserProfile } from "../requests";
 import UserContext from "../../contexts/UserContext";
 import { useContext } from "react";
+import { getAccessToken } from "../../storage/storage";
 
 type ProfileQueryKey = readonly [
   typeof QUERY.GET_PROFILE,
@@ -17,8 +17,6 @@ type ProfileQueryKey = readonly [
 ];
 
 export const useProfileQuery = (isMyProfile: boolean, username: string | null) => {
-  const { getAccessToken } = storage();
-
   const profileQueryFunction: QueryFunction<Profile> = async ({ queryKey }) => {
     const [, { isMyProfile, username }] = queryKey as ProfileQueryKey;
     const accessToken = getAccessToken();
@@ -37,11 +35,10 @@ export const useProfileQuery = (isMyProfile: boolean, username: string | null) =
 
 const useFollowMutation = (
   username: string | undefined,
-  callback: (username: string | undefined, accessToken: string | null) => Promise<any>
+  callback: (userName: string | undefined, accessToken: string | null) => Promise<any>
 ) => {
-  const { getAccessToken } = storage();
   const queryClient = useQueryClient();
-  const currentProfileQueryKey = [QUERY.GET_PROFILE, { isMyProfile: false, accessToken: getAccessToken(), username }];
+  const currentProfileQueryKey = [QUERY.GET_PROFILE, { isMyProfile: false, username }];
   const currentProfileQueryData = queryClient.getQueryData<Profile>(currentProfileQueryKey);
   const { logout } = useContext(UserContext);
 
@@ -72,7 +69,7 @@ const useFollowMutation = (
   });
 };
 
-export const useFollowingMutation = (username: string | undefined) => useFollowMutation(username, requestAddFollow);
+export const useFollowingMutation = (userName: string | undefined) => useFollowMutation(userName, requestAddFollow);
 
-export const useUnfollowingMutation = (username: string | undefined) =>
-  useFollowMutation(username, requestDeleteFollow);
+export const useUnfollowingMutation = (userName: string | undefined) =>
+  useFollowMutation(userName, requestDeleteFollow);

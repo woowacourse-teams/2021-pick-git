@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { createContext, useEffect, useState } from "react";
-import storage from "../storage/storage";
 import { requestGetSelfProfile } from "../services/requests";
+import { getAccessToken, getUsername, setAccessToken, setUsername } from "../storage/storage";
 
 interface Props {
   children: React.ReactNode;
@@ -23,7 +23,6 @@ const UserContext = createContext<Value>({
 
 export const UserContextProvider = ({ children }: Props) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const { getAccessToken, getUsername, setAccessToken, setUsername } = storage();
   const accessToken = getAccessToken();
   const username = getUsername();
 
