@@ -2,11 +2,12 @@ import { useContext } from "react";
 import { ThemeContext } from "styled-components";
 import { RepositoryIcon, SearchIcon } from "../../assets/icons";
 import { STEPS } from "../../constants/steps";
-import { GITHUB_URL, PAGE_URL } from "../../constants/urls";
+import { PAGE_URL } from "../../constants/urls";
 import PostAddDataContext from "../../contexts/PostAddDataContext";
 import UserContext from "../../contexts/UserContext";
 import useStep from "../../services/hooks/@common/useStep";
 import { useGithubRepositoriesQuery } from "../../services/queries";
+import PageLoading from "../@layout/PageLoading/PageLoading";
 import CircleIcon from "../@shared/CircleIcon/CircleIcon";
 import Input from "../@shared/Input/Input";
 import {
@@ -46,7 +47,7 @@ const RepositorySelector = () => {
   }
 
   if (isLoading) {
-    return <div>로딩중!!</div>;
+    return <PageLoading />;
   }
 
   return (
