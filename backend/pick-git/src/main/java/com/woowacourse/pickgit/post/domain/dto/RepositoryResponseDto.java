@@ -7,21 +7,21 @@ public class RepositoryResponseDto {
     private String name;
 
     @JsonProperty("html_url")
-    private String htmlUrl;
+    private String url;
 
     private RepositoryResponseDto() {
     }
 
-    public RepositoryResponseDto(String name, String htmlUrl) {
+    public RepositoryResponseDto(String name, String url) {
         this.name = name;
-        this.htmlUrl = htmlUrl;
+        this.url = url;
     }
 
     public String getName() {
         return name;
     }
 
-    public String getHtmlUrl() {
-        return htmlUrl;
+    public String getUrl() {
+        return url;
     }
 }
