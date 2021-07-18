@@ -13,7 +13,7 @@ pipeline {
 
                 dir('./backend/pick-git') {
                     sh '''
-                        ./gradlew build
+                        ./gradlew clean build
                     '''
                 }
             }

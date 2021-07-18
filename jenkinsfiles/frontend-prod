@@ -29,8 +29,10 @@ pipeline {
         stage('Deploy') {
             steps {
                 dir('./frontend/script') {
-                    chmod 755 ./deploy_script.sh
-                    ./deploy_script.sh -c ~/.ssh/EC2-DEV-PICK-GIT.pem -h $HOST
+                    sh '''
+                        chmod 755 ./deploy_script.sh
+                        ./deploy_script.sh -c ~/.ssh/EC2-DEV-PICK-GIT.pem -h $HOST
+                    '''
                 }
             }
         }
