@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { ThemeContext } from "styled-components";
 
-import { Profile } from "../../../@types";
+import { ProfileData } from "../../../@types";
 import UserContext from "../../../contexts/UserContext";
 import { useFollowingMutation, useUnfollowingMutation } from "../../../services/queries";
 import Avatar from "../Avatar/Avatar";
@@ -10,7 +10,7 @@ import CountIndicator from "../CountIndicator/CountIndicator";
 import { Container, Indicators } from "./ProfileHeader.style";
 
 export interface Props {
-  profile?: Profile;
+  profile?: ProfileData;
   isMyProfile: boolean;
 }
 

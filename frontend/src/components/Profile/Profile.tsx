@@ -1,7 +1,6 @@
 import axios, { AxiosError } from "axios";
 import { useContext } from "react";
 import { useHistory } from "react-router-dom";
-import { Profile } from "../../@types";
 
 import { CompanyIcon, GithubDarkIcon, LocationIcon, WebsiteLinkIcon, TwitterIcon } from "../../assets/icons";
 import { PAGE_URL } from "../../constants/urls";
