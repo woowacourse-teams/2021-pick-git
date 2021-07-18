@@ -1,7 +1,9 @@
 import styled from "styled-components";
 
 export const Container = styled.div<React.CSSProperties>`
-  @media (min-width: 375px) {
+  background-color: ${({ theme }) => theme.color.white};
+
+  @media (min-width: 425px) {
     border: 1px solid ${({ theme }) => theme.color.borderColor};
   }
 `;
