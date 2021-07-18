@@ -1,6 +1,7 @@
 import styled from "styled-components";
+import { Page } from "../../components/@styled/layout";
 
-export const Container = styled.div`
+export const Container = styled(Page)`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -11,7 +12,6 @@ export const Container = styled.div`
   bottom: 0;
   left: 0;
 
-  width: 100%;
   min-height: 100vh;
   background-color: ${({ theme }) => theme.color.darkerSecondaryColor};
 `;
