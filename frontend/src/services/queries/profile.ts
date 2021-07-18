@@ -3,7 +3,7 @@ import axios, { AxiosError } from "axios";
 
 import { Profile } from "../../@types";
 import { QUERY } from "../../constants/queries";
-import useLocalStorage from "../hooks/@common/useLocalStorage";
+import storage from "../../storage/storage";
 import { requestAddFollow, requestDeleteFollow, requestGetSelfProfile, requestGetUserProfile } from "../requests";
 import UserContext from "../../contexts/UserContext";
 import { useContext } from "react";
@@ -12,47 +12,40 @@ type ProfileQueryKey = readonly [
   typeof QUERY.GET_PROFILE,
   {
     isMyProfile: boolean;
-    accessToken: string | null;
-    userName: string | null;
+    username: string | null;
   }
 ];
 
-const profileQueryFunction: QueryFunction<Profile> = async ({ queryKey }) => {
-  const [, { isMyProfile, accessToken, userName }] = queryKey as ProfileQueryKey;
+export const useProfileQuery = (isMyProfile: boolean, username: string | null) => {
+  const { getAccessToken } = storage();
 
-  if (isMyProfile) {
-    if (!accessToken) throw Error("no accessToken");
+  const profileQueryFunction: QueryFunction<Profile> = async ({ queryKey }) => {
+    const [, { isMyProfile, username }] = queryKey as ProfileQueryKey;
+    const accessToken = getAccessToken();
 
-    return await requestGetSelfProfile(accessToken);
-  } else {
-    return await requestGetUserProfile(userName as string, accessToken);
-  }
-};
+    if (isMyProfile) {
+      if (!accessToken) throw Error("no accessToken");
 
-export const useProfileQuery = (isMyProfile: boolean, userName: string | null) => {
-  const { accessToken } = useLocalStorage();
+      return await requestGetSelfProfile(accessToken);
+    } else {
+      return await requestGetUserProfile(username as string, accessToken);
+    }
+  };
 
-  return useQuery<Profile, AxiosError<Profile>>(
-    [QUERY.GET_PROFILE, { isMyProfile, accessToken, userName }],
-    profileQueryFunction
-  );
+  return useQuery<Profile, AxiosError<Profile>>([QUERY.GET_PROFILE, { isMyProfile, username }], profileQueryFunction);
 };
 
 const useFollowMutation = (
-  userName: string | undefined,
-  callback: (userName: string, accessToken: string) => Promise<any>
+  username: string | undefined,
+  callback: (username: string | undefined, accessToken: string | null) => Promise<any>
 ) => {
-  const { accessToken } = useLocalStorage();
+  const { getAccessToken } = storage();
   const queryClient = useQueryClient();
-  const currentProfileQueryKey = [QUERY.GET_PROFILE, { isMyProfile: false, accessToken, userName }];
+  const currentProfileQueryKey = [QUERY.GET_PROFILE, { isMyProfile: false, accessToken: getAccessToken(), username }];
   const currentProfileQueryData = queryClient.getQueryData<Profile>(currentProfileQueryKey);
   const { logout } = useContext(UserContext);
 
-  if (!accessToken || !userName) {
-    throw Error("Invalid Request");
-  }
-
-  return useMutation(() => callback(userName, accessToken), {
+  return useMutation(() => callback(username, getAccessToken()), {
     onSuccess: ({ followerCount, following }) => {
       if (!currentProfileQueryData) return;
 
@@ -79,7 +72,7 @@ const useFollowMutation = (
   });
 };
 
-export const useFollowingMutation = (userName: string | undefined) => useFollowMutation(userName, requestAddFollow);
+export const useFollowingMutation = (username: string | undefined) => useFollowMutation(username, requestAddFollow);
 
-export const useUnfollowingMutation = (userName: string | undefined) =>
-  useFollowMutation(userName, requestDeleteFollow);
+export const useUnfollowingMutation = (username: string | undefined) =>
+  useFollowMutation(username, requestDeleteFollow);
