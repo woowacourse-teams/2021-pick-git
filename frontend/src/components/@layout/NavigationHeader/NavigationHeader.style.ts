@@ -25,3 +25,11 @@ export const NavigationItem = styled(Link)`
     opacity: 0.5;
   }
 `;
+
+export const FlexWrapper = styled.div`
+  display: flex;
+
+  button {
+    margin-left: 1.5rem;
+  }
+`;
