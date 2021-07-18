@@ -1,25 +1,25 @@
 import { useQuery } from "react-query";
 import { GithubRepository, Tags } from "../../@types";
 import { QUERY } from "../../constants/queries";
-import useLocalStorage from "../hooks/@common/useLocalStorage";
+import storage from "../../storage/storage";
 import { requestGetRepositories, requestGetTags } from "../requests/github";
 
 export const useGithubRepositoriesQuery = (username: string) => {
-  const { accessToken } = useLocalStorage();
+  const { getAccessToken } = storage();
   const isUserNotNameEmpty = username !== "";
 
   return useQuery<GithubRepository[]>(
     QUERY.GET_GITHUB_REPOSITORIES,
-    () => requestGetRepositories(username, accessToken),
+    () => requestGetRepositories(username, getAccessToken()),
     { enabled: isUserNotNameEmpty }
   );
 };
 
 export const useGithubTagsQuery = (username: string, repositoryName: string) => {
-  const { accessToken } = useLocalStorage();
+  const { getAccessToken } = storage();
   const isRepositoryNameNotEmpty = repositoryName !== "";
 
-  return useQuery<Tags>(QUERY.GET_GITHUB_TAGS, () => requestGetTags(username, repositoryName, accessToken), {
+  return useQuery<Tags>(QUERY.GET_GITHUB_TAGS, () => requestGetTags(username, repositoryName, getAccessToken()), {
     enabled: isRepositoryNameNotEmpty,
   });
 };

@@ -3,7 +3,7 @@ import { QueryFunction, useInfiniteQuery, useMutation, useQuery } from "react-qu
 
 import { Post } from "../../@types";
 import { QUERY } from "../../constants/queries";
-import useLocalStorage from "../hooks/@common/useLocalStorage";
+import storage from "../../storage/storage";
 import {
   requestAddPostLike,
   requestGetHomeFeedPosts,
@@ -34,12 +34,12 @@ const userPostsQueryFunction: QueryFunction<Post[]> = async ({ queryKey }) => {
 };
 
 export const useHomeFeedPostsQuery = () => {
-  const { accessToken } = useLocalStorage();
+  const { getAccessToken } = storage();
 
   return useInfiniteQuery(
     QUERY.GET_HOME_FEED_POSTS,
     async ({ pageParam = 0 }) => {
-      return await requestGetHomeFeedPosts(pageParam, accessToken);
+      return await requestGetHomeFeedPosts(pageParam, getAccessToken());
     },
     {
       getNextPageParam: (_, pages) => {
@@ -50,22 +50,22 @@ export const useHomeFeedPostsQuery = () => {
 };
 
 export const useUserPostsQuery = (isMyFeed: boolean, username: string | null) => {
-  const { accessToken } = useLocalStorage();
+  const { getAccessToken } = storage();
 
   return useQuery<Post[], AxiosError<Post[]>>(
-    [QUERY.GET_USER_FEED_POSTS, { isMyFeed, accessToken, username }],
+    [QUERY.GET_USER_FEED_POSTS, { isMyFeed, accessToken: getAccessToken(), username }],
     userPostsQueryFunction
   );
 };
 
 export const useAddPostLikeMutation = () => {
-  const { accessToken } = useLocalStorage();
+  const { getAccessToken } = storage();
 
-  return useMutation((postId: Post["postId"]) => requestAddPostLike(postId, accessToken));
+  return useMutation((postId: Post["postId"]) => requestAddPostLike(postId, getAccessToken()));
 };
 
 export const useDeletePostLikeMutation = () => {
-  const { accessToken } = useLocalStorage();
+  const { getAccessToken } = storage();
 
-  return useMutation((postId: Post["postId"]) => requestDeletePostLike(postId, accessToken));
+  return useMutation((postId: Post["postId"]) => requestDeletePostLike(postId, getAccessToken()));
 };

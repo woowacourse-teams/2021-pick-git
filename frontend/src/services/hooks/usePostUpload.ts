@@ -2,13 +2,15 @@ import { useContext } from "react";
 import PostAddDataContext from "../../contexts/PostAddDataContext";
 import UserContext from "../../contexts/UserContext";
 import { requestAddPost } from "../requests";
-import useLocalStorage from "./@common/useLocalStorage";
+import storage from "../../storage/storage";
 
 const usePostUpload = () => {
-  const { accessToken } = useLocalStorage();
+  const { getAccessToken } = storage();
   const { content, files, tags, githubRepositoryName, setContent, setFiles, setGithubRepositoryName, setTags } =
     useContext(PostAddDataContext);
   const { currentUsername } = useContext(UserContext);
+
+  const accessToken = getAccessToken();
 
   const uploadPost = async () => {
     await requestAddPost(currentUsername, { content, files, tags, githubRepositoryName }, accessToken);
