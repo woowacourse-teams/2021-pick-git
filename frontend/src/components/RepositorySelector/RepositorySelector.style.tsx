@@ -1,6 +1,9 @@
 import styled from "styled-components";
 
 export const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   padding: 3.125rem 2.0625rem;
 `;
 
@@ -8,7 +11,10 @@ export const SearchInputWrapper = styled.div`
   margin-bottom: 2.0625rem;
 `;
 
-export const RepositoryList = styled.ul``;
+export const RepositoryList = styled.ul`
+  height: 400px;
+  overflow-y: auto;
+`;
 
 export const RepositoryListItem = styled.li`
   padding: 0.5625rem 0.25rem;

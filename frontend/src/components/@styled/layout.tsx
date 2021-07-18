@@ -9,18 +9,19 @@ export const Header = styled.header`
   background-color: ${({ theme }) => theme.color.white};
   z-index: 100;
 
-  @media (min-width: 375px) {
+  @media (min-width: 425px) {
     border-bottom: 1px solid ${({ theme }) => theme.color.borderColor};
   }
 `;
 
 export const Page = styled.main`
   width: 100%;
+  height: 100%;
   max-width: 375px;
-  background-color: ${({ theme }) => theme.color.white};
-  margin: ${Layout.HEADER_HEIGHT} auto 0;
+  padding-top: ${Layout.HEADER_HEIGHT};
+  margin: 0 auto;
 
-  @media (min-width: 375px) {
-    margin: ${Layout.PAGE_MARGIN_TOP} auto 0;
+  @media (min-width: 425px) {
+    padding-top: ${Layout.PAGE_MARGIN_TOP};
   }
 `;

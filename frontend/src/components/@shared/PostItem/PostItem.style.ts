@@ -7,7 +7,7 @@ export const PostHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.4375rem 0.75rem;
+  padding: 0.75rem;
 `;
 
 export const PostAuthorInfoLink = styled(Link)`

@@ -3,10 +3,11 @@ import Loader from "../Loader/Loader";
 import { Container, LoaderWrapper, ContentWrapper } from "./InfiniteScrollContainer.style";
 
 export interface Props extends React.HTMLAttributes<HTMLSpanElement> {
+  isLoaderShown: boolean;
   onIntersect: () => void;
 }
 
-const InfiniteScrollContainer = ({ children, onIntersect }: Props) => {
+const InfiniteScrollContainer = ({ isLoaderShown, onIntersect, children }: Props) => {
   const loaderRef = useRef<HTMLDivElement>(null);
 
   const observer = new IntersectionObserver((entries) => {
@@ -26,9 +27,7 @@ const InfiniteScrollContainer = ({ children, onIntersect }: Props) => {
   return (
     <Container>
       <ContentWrapper>{children}</ContentWrapper>
-      <LoaderWrapper ref={loaderRef}>
-        <Loader kind="dots" size="1rem" />
-      </LoaderWrapper>
+      <LoaderWrapper ref={loaderRef}>{isLoaderShown && <Loader kind="dots" size="1rem" />}</LoaderWrapper>
     </Container>
   );
 };

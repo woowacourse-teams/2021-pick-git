@@ -1,11 +1,13 @@
 import axios, { AxiosError } from "axios";
 import { useContext } from "react";
 import { useHistory } from "react-router-dom";
+import { Profile } from "../../@types";
 
 import { CompanyIcon, GithubDarkIcon, LocationIcon, WebsiteLinkIcon, TwitterIcon } from "../../assets/icons";
 import { PAGE_URL } from "../../constants/urls";
 import UserContext from "../../contexts/UserContext";
 import { useProfileQuery } from "../../services/queries";
+import PageLoading from "../@layout/PageLoading/PageLoading";
 import ProfileHeader from "../@shared/ProfileHeader/ProfileHeader";
 import { Container, Description, DetailInfo } from "./Profile.style";
 
@@ -47,7 +49,7 @@ const Profile = ({ isMyProfile, username }: Props) => {
   }
 
   if (isLoading) {
-    return <div>loading</div>;
+    return <PageLoading />;
   }
 
   return (

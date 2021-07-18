@@ -6,13 +6,14 @@ export const Container = styled(Page)<React.CSSProperties>`
   flex-direction: column;
   justify-content: space-between;
   overflow-x: hidden;
-  height: 100%;
+  background-color: ${({ theme }) => theme.color.white};
 `;
 
 export const StepSlider = styled.div<{ stepIndex: number; stepCount: number }>`
   display: flex;
   flex-grow: 1;
   transition: transform 0.5s;
+  height: 100%;
 
   ${({ stepCount, stepIndex }) => `
     width: ${stepCount * 100}%;
@@ -31,5 +32,5 @@ export const StepContainer = styled.div<{ stepCount: number; isShown: boolean }>
 
 export const NextStepButtonWrapper = styled.div`
   padding: 0 3rem;
-  margin-bottom: 2.5rem;
+  margin: 2.5rem 0;
 `;

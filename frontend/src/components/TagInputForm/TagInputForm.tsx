@@ -2,6 +2,7 @@ import { useContext, useEffect } from "react";
 import PostAddDataContext from "../../contexts/PostAddDataContext";
 import UserContext from "../../contexts/UserContext";
 import { useGithubTagsQuery } from "../../services/queries";
+import PageLoading from "../@layout/PageLoading/PageLoading";
 import Chip from "../@shared/Chip/Chip";
 import Input from "../@shared/Input/Input";
 import { Container, Form, TagList, TagListItem } from "./TagInputForm.style";
@@ -34,7 +35,7 @@ const TagInputForm = () => {
   }
 
   if (isLoading) {
-    return <div>로딩중!!</div>;
+    return <PageLoading />;
   }
 
   return (

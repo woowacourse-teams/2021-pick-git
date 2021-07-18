@@ -1,11 +1,11 @@
 import styled from "styled-components";
+import { Page } from "../../components/@styled/layout";
 
-export const Container = styled.div`
+export const Container = styled(Page)`
   display: flex;
   justify-content: center;
   align-items: center;
 
-  width: 100%;
   min-height: 100vh;
 `;
 
