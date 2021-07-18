@@ -177,7 +177,7 @@ class UserControllerTest {
 
         assertThat(body).isEqualTo(objectMapper.writeValueAsString(userProfileServiceDto));
 
-        perform.andDo(document("profiles-LoggedIn",
+        perform.andDo(document("profiles-unLoggedIn",
             getDocumentRequest(),
             getDocumentResponse(),
             pathParameters(
@@ -260,7 +260,7 @@ class UserControllerTest {
 
         assertThat(body).isEqualTo(objectMapper.writeValueAsString(followServiceDto));
 
-        perform.andDo(document("following-LoggedIn",
+        perform.andDo(document("unfollowing-LoggedIn",
             getDocumentRequest(),
             getDocumentResponse(),
             requestHeaders(
@@ -297,7 +297,7 @@ class UserControllerTest {
 
         perform.andExpect(jsonPath("errorCode").value("A0001"));
 
-        perform.andDo(document("following-LoggedIn",
+        perform.andDo(document("following-unLoggedIn",
             getDocumentRequest(),
             getDocumentResponse(),
             pathParameters(
@@ -327,7 +327,7 @@ class UserControllerTest {
 
         perform.andExpect(jsonPath("errorCode").value("A0001"));
 
-        perform.andDo(document("following-LoggedIn",
+        perform.andDo(document("unfollowing-unLoggedIn",
             getDocumentRequest(),
             getDocumentResponse(),
             pathParameters(

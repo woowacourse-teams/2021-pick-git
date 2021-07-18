@@ -154,7 +154,7 @@ class TagControllerTest {
         verify(tagService, times(1))
             .extractTags(any(ExtractionRequestDto.class));
 
-        perform.andDo(document("tags-invalidToken",
+        perform.andDo(document("tags-invalidRepository",
             getDocumentRequest(),
             getDocumentResponse(),
             requestHeaders(

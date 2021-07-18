@@ -1,0 +1,27 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+
+== Tag
+=== 특정 유저의 태그 목록 요청
+==== Request
+include::{snippets}/tag-extractTagFromRepositoryOfSpecificUser/http-request.adoc[]
+==== Response
+include::{snippets}/tag-extractTagFromRepositoryOfSpecificUser/http-response.adoc[]
+
+=== 유효하지 않은 AccessToken으로 태그 추출 요청
+==== Request
+include::{snippets}/tags-invalidToken/http-request.adoc[]
+==== Response
+include::{snippets}/tags-invalidToken/http-response.adoc[]
+
+=== 유효하지 않은 레포지토리 태그 추출 요청
+==== Request
+include::{snippets}/tags-invalidRepository/http-request.adoc[]
+==== Response
+include::{snippets}/tags-invalidRepository/http-response.adoc[]

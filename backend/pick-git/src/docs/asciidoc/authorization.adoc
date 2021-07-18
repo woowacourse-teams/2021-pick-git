@@ -1,0 +1,21 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+
+== Authorization
+=== 깃허브 로그인 url 받기
+==== Request
+include::{snippets}/authorization - githubLogin/http-request.adoc[]
+==== Response
+include::{snippets}/authorization - githubLogin/http-response.adoc[]
+
+=== 깃허브 로그인 후
+==== Request
+include::{snippets}/authorization - afterlogin/http-request.adoc[]
+==== Response
+include::{snippets}/authorization - afterlogin/http-response.adoc[]

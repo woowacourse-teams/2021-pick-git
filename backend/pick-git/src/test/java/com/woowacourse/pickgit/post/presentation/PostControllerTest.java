@@ -327,7 +327,7 @@ class PostControllerTest {
             .param("limit", "3"))
             .andExpect(status().isOk());
 
-        perform.andDo(document("home feed-unLoggedI",
+        perform.andDo(document("post-homefeed-unLoggedIn",
             getDocumentRequest(),
             getDocumentResponse(),
             requestParameters(
@@ -373,7 +373,7 @@ class PostControllerTest {
             .header(HttpHeaders.AUTHORIZATION, API_ACCESS_TOKEN))
             .andExpect(status().isOk());
 
-        perform.andDo(document("home feed-unLoggedI",
+        perform.andDo(document("post-homefeed-LoggedIn",
             getDocumentRequest(),
             getDocumentResponse(),
             requestParameters(

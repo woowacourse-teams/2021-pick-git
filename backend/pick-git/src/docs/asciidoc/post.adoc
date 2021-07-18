@@ -1,0 +1,39 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+
+== Post
+=== 게시물 작성 - 로그인
+==== Request
+include::{snippets}/posts-post-user/http-request.adoc[]
+==== Response
+include::{snippets}/posts-post-user/http-response.adoc[]
+
+=== 게시물 작성 - 비 로그인
+==== Request
+include::{snippets}/posts-post-guest/http-request.adoc[]
+==== Response
+include::{snippets}/posts-post-guest/http-response.adoc[]
+
+=== 홈 피드 요청 - 로그인
+==== Request
+include::{snippets}/post-homefeed-LoggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/post-homefeed-LoggedIn/http-response.adoc[]
+
+=== 홈 피드 요청 - 비 로그인
+==== Request
+include::{snippets}/post-homefeed-unLoggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/post-homefeed-unLoggedIn/http-response.adoc[]
+
+=== 레포지토리 요청 - 로그인
+==== Request
+include::{snippets}/repositories-loggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/repositories-loggedIn/http-response.adoc[]

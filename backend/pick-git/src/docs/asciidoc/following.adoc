@@ -1,0 +1,33 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+
+== Authorization
+=== 팔로잉 요청 - 로그인
+==== Request
+include::{snippets}/following-LoggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/following-LoggedIn/http-response.adoc[]
+
+=== 언팔로우 요청 - 로그인
+==== Request
+include::{snippets}/unfollowing-LoggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/unfollowing-LoggedIn/http-response.adoc[]
+
+=== 팔로잉 요청 - 비 로그인
+==== Request
+include::{snippets}/following-unLoggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/following-unLoggedIn/http-response.adoc[]
+
+=== 언팔로우 요청 - 비 로그인
+==== Request
+include::{snippets}/unfollowing-unLoggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/unfollowing-unLoggedIn/http-response.adoc[]

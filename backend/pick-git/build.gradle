@@ -25,15 +25,11 @@ dependencies {
 	runtimeOnly 'com.h2database:h2'
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 
-	asciidoctor 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+	asciidoctor 'org.springframework.restdocs:spring-restdocs-asciidoctor:1.2.6.RELEASE'
 
 	testImplementation('org.springframework.restdocs:spring-restdocs-mockmvc')
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '4.4.0'
-}
-
-test {
-    useJUnitPlatform()
 }
 
 processResources.dependsOn('copySecurity')
@@ -59,13 +55,17 @@ asciidoctor {
 	dependsOn test
 }
 
-task createDocument(type: Copy) {
+task copyDocuments(type: Copy) {
 	dependsOn asciidoctor
 
 	from file("build/asciidoc/html5/index.html")
 	into file("src/main/resources/static/docs")
 }
 
-build {
-	dependsOn createDocument
+bootJar {
+	dependsOn copyDocuments
+}
+
+test {
+	useJUnitPlatform()
 }

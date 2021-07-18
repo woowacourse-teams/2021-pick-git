@@ -51,7 +51,7 @@ class OAuthControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("url").value(githubAuthorizationGithubUrl));
 
-        perform.andDo(document("authorization/github",
+        perform.andDo(document("authorization - githubLogin",
             getDocumentRequest(),
             getDocumentResponse(),
             responseFields(
@@ -75,7 +75,7 @@ class OAuthControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("token").value("jwt token"));
 
-        perform.andDo(document("afterlogin",
+        perform.andDo(document("authorization - afterlogin",
             getDocumentRequest(),
             getDocumentResponse(),
             responseFields(
