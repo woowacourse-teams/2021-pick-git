@@ -14,7 +14,7 @@ pipeline {
                 dir('./frontend') {
                     sh '''
                         yarn
-                        yarn build
+                        yarn build-dev
                     '''
                 }
             }
