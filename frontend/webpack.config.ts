@@ -61,7 +61,10 @@ const config = {
     new webpack.ProvidePlugin({
       React: "react",
     }),
-    new webpack.DefinePlugin({}),
+    new webpack.DefinePlugin({
+      "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
+      "process.env.DEPLOY": JSON.stringify(process.env.DEPLOY),
+    }),
     new HTMLWebpackPlugin({
       template: "./public/index.html",
     }),
