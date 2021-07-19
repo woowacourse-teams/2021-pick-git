@@ -1,6 +1,8 @@
+import { useContext } from "react";
 import { Post } from "../../@types";
 import { LIMIT } from "../../constants/limits";
 import { FAILURE_MESSAGE } from "../../constants/message";
+import SnackBarContext from "../../contexts/SnackbarContext";
 import useFeed from "../../services/hooks/useFeed";
 import PostItem from "../@shared/PostItem/PostItem";
 import { Container, PostItemWrapper } from "./Feed.style";
@@ -10,11 +12,12 @@ interface Props {
 }
 
 const Feed = ({ posts }: Props) => {
+  const { pushMessage } = useContext(SnackBarContext);
   const { commentValue, setCommentValue, deletePostLike, addPostLike, setPosts, addComment } = useFeed();
 
   const handleCommentValueChange: React.ChangeEventHandler<HTMLTextAreaElement> = ({ target: { value } }) => {
     if (value.length > LIMIT.COMMENT_LENGTH) {
-      alert(FAILURE_MESSAGE.COMMENT_CONTENT_MAX_LENGTH_EXCEEDED);
+      pushMessage(FAILURE_MESSAGE.COMMENT_CONTENT_MAX_LENGTH_EXCEEDED);
       return;
     }
 
@@ -26,7 +29,7 @@ const Feed = ({ posts }: Props) => {
   };
 
   const handleCommentLike = (commentId: string) => {
-    alert("아직 구현되지 않은 기능입니다.");
+    pushMessage("아직 구현되지 않은 기능입니다.");
   };
 
   const handlePostLike = (postId: string) => {

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import { Profile } from "../../@types";
+import { ProfileData } from "../../@types";
 import { API_URL } from "../../constants/urls";
 
 export const requestGetSelfProfile = async (accessToken: string | null) => {
@@ -8,7 +8,7 @@ export const requestGetSelfProfile = async (accessToken: string | null) => {
     throw Error("no accessToken");
   }
 
-  const response = await axios.get<Profile>(API_URL.SELF_PROFILE, {
+  const response = await axios.get<ProfileData>(API_URL.SELF_PROFILE, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -25,7 +25,7 @@ export const requestGetUserProfile = async (username: string, accessToken: strin
         },
       }
     : {};
-  const response = await axios.get<Profile>(API_URL.USER_PROFILE(username), config);
+  const response = await axios.get<ProfileData>(API_URL.USER_PROFILE(username), config);
 
   return response.data;
 };

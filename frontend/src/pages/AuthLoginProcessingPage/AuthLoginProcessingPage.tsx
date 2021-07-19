@@ -3,6 +3,7 @@ import { useHistory } from "react-router-dom";
 
 import { GithubLargeIcon } from "../../assets/icons";
 import { PAGE_URL } from "../../constants/urls";
+import SnackBarContext from "../../contexts/SnackbarContext";
 import UserContext from "../../contexts/UserContext";
 import { requestGetAccessToken } from "../../services/requests";
 import { Container, Dot, DotWrapper, Text } from "./AuthLoginProcessingPage.style";
@@ -15,6 +16,7 @@ const AuthLoginProcessingPage = () => {
 
   const [dotCount, setDotCount] = useState(0);
   const { login } = useContext(UserContext);
+  const { pushMessage } = useContext(SnackBarContext);
   const history = useHistory();
 
   useEffect(() => {
@@ -35,10 +37,11 @@ const AuthLoginProcessingPage = () => {
         const { token, username } = await requestGetAccessToken(authCode);
 
         login(token, username);
+        pushMessage("로그인에 성공했습니다.");
       } catch (error) {
         console.error(error);
 
-        alert("로그인에 실패했습니다.");
+        pushMessage("로그인에 실패했습니다.");
       } finally {
         history.push(PAGE_URL.HOME);
       }
