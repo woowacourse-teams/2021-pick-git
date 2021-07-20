@@ -10,7 +10,7 @@ export const useGithubRepositoriesQuery = (username: string) => {
   return useQuery<GithubRepository[]>(
     QUERY.GET_GITHUB_REPOSITORIES,
     () => requestGetRepositories(username, getAccessToken()),
-    { enabled: isUserNotNameEmpty }
+    { enabled: isUserNotNameEmpty, cacheTime: 0 }
   );
 };
 
@@ -19,5 +19,6 @@ export const useGithubTagsQuery = (username: string, repositoryName: string) => 
 
   return useQuery<Tags>(QUERY.GET_GITHUB_TAGS, () => requestGetTags(username, repositoryName, getAccessToken()), {
     enabled: isRepositoryNameNotEmpty,
+    cacheTime: 0,
   });
 };
