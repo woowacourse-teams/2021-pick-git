@@ -30,6 +30,7 @@ import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
 import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -243,22 +244,23 @@ class PostServiceIntegrationTest {
 
         //when
         HomeFeedRequest homeFeedRequest =
-            new HomeFeedRequest(new LoginUser("kevin", "a"), 0L, 3L);
+            new HomeFeedRequest(new LoginUser("kevin", "a"), 0L, (long) postRequestDtos.size());
         List<PostResponseDto> postResponseDtos = postService.readMyFeed(homeFeedRequest);
         List<String> repoNames = postResponseDtos.stream()
             .map(PostResponseDto::getGithubRepoUrl)
             .collect(toList());
 
         //then
-        assertThat(postResponseDtos).hasSize(3);
-        assertThat(repoNames).containsExactly("java-racingcar", "jwp-chess", "atdd-subway-fare");
+        assertThat(postResponseDtos).hasSize(postRequestDtos.size());
+        assertThat(repoNames).containsAll(extractGithubRepoUrls(postRequestDtos));
     }
 
     @DisplayName("로그인 사용자가 다른 사용자의 피드 게시물을 조회한다.")
     @Test
     void readUserFeed_LoginUser_Success() {
         //given
-        List<PostRequestDto> postRequestDtos = PostFactory.mockPostRequestForAssertingMyFeed();
+        List<PostRequestDto> postRequestDtos =
+            PostFactory.mockPostRequestForAssertingMyFeed();
         List<User> users = PostFactory.mockUsers2();
 
         for (User user : users) {
@@ -271,19 +273,22 @@ class PostServiceIntegrationTest {
 
         //when
         HomeFeedRequest homeFeedRequest =
-            new HomeFeedRequest(new LoginUser("ala", "a"), 0L, 3L);
-        List<PostResponseDto> postResponseDtos = postService.readUserFeed(homeFeedRequest, "kevin");
+            new HomeFeedRequest(
+                new LoginUser("ala", "a"),
+                0L,
+                (long) postRequestDtos.size()
+            );
+        List<PostResponseDto> postResponseDtos =
+            postService.readUserFeed(homeFeedRequest, "kevin");
         List<String> repoNames = postResponseDtos.stream()
             .map(PostResponseDto::getGithubRepoUrl)
             .collect(toList());
-        List<Boolean> likes = postResponseDtos.stream()
-            .map(PostResponseDto::getIsLiked)
-            .collect(toList());
+        List<Boolean> likes = extractLikes(postResponseDtos);
 
         //then
-        assertThat(postResponseDtos).hasSize(3);
-        assertThat(repoNames).containsExactly("java-racingcar", "jwp-chess", "atdd-subway-fare");
-        assertThat(likes).containsExactly(Boolean.FALSE, Boolean.FALSE, Boolean.FALSE);
+        assertThat(postResponseDtos).hasSize(postRequestDtos.size());
+        assertThat(repoNames).containsAll(extractGithubRepoUrls(postRequestDtos));
+        assertThat(likes).containsAll(extractLikes(postResponseDtos));
     }
 
     @DisplayName("비로그인 사용자가 다른 사용자의 피드 게시물을 조회한다.")
@@ -303,18 +308,37 @@ class PostServiceIntegrationTest {
 
         //when
         HomeFeedRequest homeFeedRequest =
-            new HomeFeedRequest(new GuestUser(), 0L, 3L);
+            new HomeFeedRequest(new GuestUser(), 0L, (long) postRequestDtos.size());
         List<PostResponseDto> postResponseDtos = postService.readUserFeed(homeFeedRequest, "kevin");
-        List<String> repoNames = postResponseDtos.stream()
-            .map(PostResponseDto::getGithubRepoUrl)
-            .collect(toList());
-        List<Boolean> likes = postResponseDtos.stream()
-            .map(PostResponseDto::getIsLiked)
-            .collect(toList());
+        List<String> repoNames = extractGithubRepoUrls(postResponseDtos);
+        List<Boolean> likes = extractLikes(postResponseDtos);
 
         //then
-        assertThat(postResponseDtos).hasSize(3);
-        assertThat(repoNames).containsExactly("java-racingcar", "jwp-chess", "atdd-subway-fare");
-        assertThat(likes).containsExactly(null, null, null);
+        assertThat(postResponseDtos).hasSize(postRequestDtos.size());
+        assertThat(repoNames).containsAll(extractGithubRepoUrls(postRequestDtos));
+        assertThat(likes).allMatch(Objects::isNull);
+    }
+
+    private List<Boolean> extractLikes(List<PostResponseDto> postResponseDtos) {
+        return postResponseDtos.stream()
+            .map(PostResponseDto::getIsLiked)
+            .collect(toList());
+    }
+
+    private List<String> extractGithubRepoUrls(List<?> dtos) {
+        Objects.requireNonNull(dtos);
+
+        return dtos.stream()
+            .map(dto -> {
+                if (dto instanceof PostResponseDto) {
+                    return ((PostResponseDto) dto).getGithubRepoUrl();
+                }
+
+                if (dto instanceof PostRequestDto) {
+                    return ((PostRequestDto) dto).getGithubRepoUrl();
+                }
+
+                throw new IllegalArgumentException();
+            }).collect(toList());
     }
 }
