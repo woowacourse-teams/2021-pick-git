@@ -50,7 +50,8 @@ class AuthenticationInterceptorTest {
     void preHandle_CORS_True() throws Exception {
         // mock
         when(httpServletRequest.getMethod()).thenReturn(HttpMethod.OPTIONS.toString());
-        when(httpServletRequest.getHeader("Access-Control-Request-Headers")).thenReturn("X-PINGOTHER, Content-Type");
+        when(httpServletRequest.getHeader("Access-Control-Request-Headers"))
+            .thenReturn("X-PINGOTHER, Content-Type");
         when(httpServletRequest.getHeader("Access-Control-Request-Method")).thenReturn("POST");
         when(httpServletRequest.getHeader("Origin")).thenReturn("http://pick-git.example");
 
@@ -66,8 +67,9 @@ class AuthenticationInterceptorTest {
 
         // mock, when
         when(httpServletRequest.getMethod()).thenReturn(HttpMethod.OPTIONS.toString());
-        when(httpServletRequest.getHeaders(AuthorizationExtractor.AUTHORIZATION)).thenReturn(Collections.enumeration(
-            List.of(validToken)));
+        when(httpServletRequest.getHeaders(AuthorizationExtractor.AUTHORIZATION))
+            .thenReturn(Collections.enumeration(
+                List.of(validToken)));
 
         // then
         assertThat(authenticationInterceptor.preHandle(httpServletRequest, null, null)).isTrue();
@@ -82,11 +84,13 @@ class AuthenticationInterceptorTest {
 
         // mock
         when(httpServletRequest.getMethod()).thenReturn(HttpMethod.OPTIONS.toString());
-        when(httpServletRequest.getHeaders(AuthorizationExtractor.AUTHORIZATION)).thenReturn(Collections.enumeration(
-            List.of(bearerToken)));
+        when(httpServletRequest.getHeaders(AuthorizationExtractor.AUTHORIZATION))
+            .thenReturn(Collections.enumeration(
+                List.of(bearerToken)));
 
         // when, then
-        assertThatThrownBy(() -> authenticationInterceptor.preHandle(httpServletRequest, null, null))
+        assertThatThrownBy(
+            () -> authenticationInterceptor.preHandle(httpServletRequest, null, null))
             .isInstanceOf(InvalidTokenException.class);
     }
 
@@ -99,11 +103,13 @@ class AuthenticationInterceptorTest {
 
         // mock
         when(httpServletRequest.getMethod()).thenReturn(HttpMethod.GET.toString());
-        when(httpServletRequest.getHeaders(AuthorizationExtractor.AUTHORIZATION)).thenReturn(Collections.enumeration(
-            List.of(bearerToken)));
+        when(httpServletRequest.getHeaders(AuthorizationExtractor.AUTHORIZATION))
+            .thenReturn(Collections.enumeration(
+                List.of(bearerToken)));
 
         // when, then
-        assertThatThrownBy(() -> authenticationInterceptor.preHandle(httpServletRequest, null, null))
+        assertThatThrownBy(
+            () -> authenticationInterceptor.preHandle(httpServletRequest, null, null))
             .isInstanceOf(InvalidTokenException.class);
     }
 }
