@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 @Component
-public class GithubApiRequester implements PlatformApiRequester {
+public class GithubTagApiRequester implements PlatformTagApiRequester {
 
     @Override
     public String requestTags(String url, String accessToken) {

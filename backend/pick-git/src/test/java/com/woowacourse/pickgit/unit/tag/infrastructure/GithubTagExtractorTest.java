@@ -8,7 +8,7 @@ import com.woowacourse.pickgit.common.mockapi.MockTagApiRequester;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.tag.domain.PlatformTagExtractor;
 import com.woowacourse.pickgit.tag.infrastructure.GithubTagExtractor;
-import com.woowacourse.pickgit.tag.infrastructure.PlatformApiRequester;
+import com.woowacourse.pickgit.tag.infrastructure.PlatformTagApiRequester;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,8 +25,8 @@ class GithubTagExtractorTest {
 
     @BeforeEach
     void setUp() {
-        PlatformApiRequester platformApiRequester = new MockTagApiRequester();
-        platformTagExtractor = new GithubTagExtractor(platformApiRequester, objectMapper);
+        PlatformTagApiRequester platformTagApiRequester = new MockTagApiRequester();
+        platformTagExtractor = new GithubTagExtractor(platformTagApiRequester, objectMapper);
     }
 
     @DisplayName("명시된 User의 Repository에 기술된 Language Tags를 추출한다.")

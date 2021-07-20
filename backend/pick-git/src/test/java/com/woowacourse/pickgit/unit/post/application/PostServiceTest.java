@@ -18,7 +18,7 @@ import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlRespons
 import com.woowacourse.pickgit.post.domain.PlatformRepositoryExtractor;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
 import com.woowacourse.pickgit.post.domain.Post;
-import com.woowacourse.pickgit.post.domain.PostContent;
+import com.woowacourse.pickgit.post.domain.content.PostContent;
 import com.woowacourse.pickgit.post.domain.PostRepository;
 import com.woowacourse.pickgit.exception.post.CommentFormatException;
 import com.woowacourse.pickgit.post.domain.comment.Comments;

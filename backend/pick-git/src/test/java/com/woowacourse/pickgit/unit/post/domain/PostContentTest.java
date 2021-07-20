@@ -3,7 +3,7 @@ package com.woowacourse.pickgit.unit.post.domain;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.woowacourse.pickgit.exception.post.PostFormatException;
-import com.woowacourse.pickgit.post.domain.PostContent;
+import com.woowacourse.pickgit.post.domain.content.PostContent;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

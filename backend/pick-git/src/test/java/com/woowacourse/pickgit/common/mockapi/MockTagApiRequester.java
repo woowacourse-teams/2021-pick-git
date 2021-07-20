@@ -1,9 +1,9 @@
 package com.woowacourse.pickgit.common.mockapi;
 
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
-import com.woowacourse.pickgit.tag.infrastructure.PlatformApiRequester;
+import com.woowacourse.pickgit.tag.infrastructure.PlatformTagApiRequester;
 
-public class MockTagApiRequester implements PlatformApiRequester {
+public class MockTagApiRequester implements PlatformTagApiRequester {
 
     private static final String TESTER_ACCESS_TOKEN = "oauth.access.token";
     private static final String USER_NAME = "jipark3";

@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.post.domain;
+package com.woowacourse.pickgit.post.domain.content;
 
 import com.woowacourse.pickgit.exception.post.PostFormatException;
 import javax.persistence.Embeddable;
