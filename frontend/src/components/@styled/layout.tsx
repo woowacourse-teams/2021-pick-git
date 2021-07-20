@@ -17,7 +17,7 @@ export const Header = styled.header`
 export const Page = styled.main`
   width: 100%;
   height: 100%;
-  max-width: 375px;
+  max-width: 425px;
   padding-top: ${Layout.HEADER_HEIGHT};
   margin: 0 auto;
 
