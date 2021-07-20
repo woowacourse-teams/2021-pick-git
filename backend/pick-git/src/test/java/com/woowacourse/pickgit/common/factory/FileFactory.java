@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.common;
+package com.woowacourse.pickgit.common.factory;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.util.Objects;
 import org.apache.http.entity.ContentType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 
 public class FileFactory {
     private static final ClassLoader CLASS_LOADER = FileFactory.class.getClassLoader();

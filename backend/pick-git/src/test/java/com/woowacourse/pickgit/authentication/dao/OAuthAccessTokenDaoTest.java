@@ -2,21 +2,11 @@ package com.woowacourse.pickgit.authentication.dao;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.woowacourse.pickgit.post.PostTestConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
 
-@Import(PostTestConfiguration.class)
-@SpringBootTest(webEnvironment = WebEnvironment.NONE)
-@ActiveProfiles("test")
 class OAuthAccessTokenDaoTest {
 
-    @Autowired
     private OAuthAccessTokenDao oAuthAccessTokenDao;
 
     private String token;
@@ -25,6 +15,7 @@ class OAuthAccessTokenDaoTest {
     @BeforeEach
     void setUp() {
         // given
+        oAuthAccessTokenDao = new CollectionOAuthAccessTokenDao();
         token = "jwt token";
         oauthAccessToken = "oauth access token";
     }

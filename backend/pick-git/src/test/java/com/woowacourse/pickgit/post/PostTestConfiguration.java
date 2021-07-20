@@ -1,6 +1,6 @@
 package com.woowacourse.pickgit.post;
 
-import com.woowacourse.pickgit.post.infrastructure.MockRepositoryApiRequester;
+import com.woowacourse.pickgit.common.mockapi.MockRepositoryApiRequester;
 import com.woowacourse.pickgit.post.infrastructure.PlatformRepositoryApiRequester;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;

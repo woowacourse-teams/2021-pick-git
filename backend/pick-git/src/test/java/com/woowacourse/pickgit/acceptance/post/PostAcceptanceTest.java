@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.post;
+package com.woowacourse.pickgit.acceptance.post;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -7,8 +7,9 @@ import static org.mockito.BDDMockito.given;
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
-import com.woowacourse.pickgit.common.FileFactory;
+import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
+import com.woowacourse.pickgit.post.PostTestConfiguration;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
@@ -38,7 +39,7 @@ import org.springframework.test.context.ActiveProfiles;
 @Import(PostTestConfiguration.class)
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @ActiveProfiles("test")
-public class PostAcceptanceTest {
+class PostAcceptanceTest {
 
     private static final String ANOTHER_USERNAME = "pick-git-login";
     private static final String USERNAME = "jipark3";

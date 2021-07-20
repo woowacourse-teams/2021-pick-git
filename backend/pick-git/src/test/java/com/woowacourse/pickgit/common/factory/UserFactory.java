@@ -1,10 +1,9 @@
-package com.woowacourse.pickgit.user;
+package com.woowacourse.pickgit.common.factory;
 
 import com.woowacourse.pickgit.user.application.dto.UserProfileServiceDto;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
 import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
-import com.woowacourse.pickgit.user.presentation.dto.UserProfileResponse;
 
 public class UserFactory {
 

@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.user.application;
+package com.woowacourse.pickgit.integration.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -10,7 +10,8 @@ import com.woowacourse.pickgit.exception.user.DuplicateFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
 import com.woowacourse.pickgit.post.PostTestConfiguration;
-import com.woowacourse.pickgit.user.UserFactory;
+import com.woowacourse.pickgit.common.factory.UserFactory;
+import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.AuthUserServiceDto;
 import com.woowacourse.pickgit.user.application.dto.FollowServiceDto;
 import com.woowacourse.pickgit.user.application.dto.UserProfileServiceDto;
@@ -30,7 +31,7 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @ActiveProfiles("test")
-public class UserServiceIntegrationTest {
+class UserServiceIntegrationTest {
 
     private static final String NAME = "yjksw";
     private static final String IMAGE = "http://img.com";

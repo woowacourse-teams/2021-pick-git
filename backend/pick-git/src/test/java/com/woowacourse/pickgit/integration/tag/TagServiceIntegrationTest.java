@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.tag.application;
+package com.woowacourse.pickgit.integration.tag;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -6,11 +6,14 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.post.TagFormatException;
+import com.woowacourse.pickgit.tag.application.ExtractionRequestDto;
+import com.woowacourse.pickgit.tag.application.TagService;
+import com.woowacourse.pickgit.tag.application.TagsDto;
 import com.woowacourse.pickgit.tag.domain.PlatformTagExtractor;
 import com.woowacourse.pickgit.tag.domain.Tag;
 import com.woowacourse.pickgit.tag.domain.TagRepository;
 import com.woowacourse.pickgit.tag.infrastructure.GithubTagExtractor;
-import com.woowacourse.pickgit.tag.infrastructure.MockTagApiRequester;
+import com.woowacourse.pickgit.common.mockapi.MockTagApiRequester;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;

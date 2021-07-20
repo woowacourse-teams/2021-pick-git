@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.user;
+package com.woowacourse.pickgit.acceptance.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -7,7 +7,7 @@ import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileRespon
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
 import com.woowacourse.pickgit.post.PostTestConfiguration;
-import com.woowacourse.pickgit.user.UserFactory;
+import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.presentation.dto.FollowResponse;
 import com.woowacourse.pickgit.user.presentation.dto.UserProfileResponse;
@@ -32,7 +32,7 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @ActiveProfiles("test")
-public class UserAcceptanceTest {
+class UserAcceptanceTest {
 
     private static final String SOURCE_USER_NAME = "yjksw";
     private static final String TARGET_USER_NAME = "pickgit";

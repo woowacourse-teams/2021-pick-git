@@ -1,6 +1,5 @@
-package com.woowacourse.pickgit.post.application;
+package com.woowacourse.pickgit.common.factory;
 
-import com.woowacourse.pickgit.common.FileFactory;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;

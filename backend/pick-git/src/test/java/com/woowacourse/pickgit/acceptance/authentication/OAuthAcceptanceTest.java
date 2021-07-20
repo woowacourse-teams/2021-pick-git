@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.authentication;
+package com.woowacourse.pickgit.acceptance.authentication;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -29,7 +29,7 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @ActiveProfiles("test")
-public class OAuthAcceptanceTest {
+class OAuthAcceptanceTest {
 
     @LocalServerPort
     int port;
