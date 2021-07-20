@@ -1,0 +1,4 @@
+[submodule "backend/pick-git/security"]
+	path = backend/pick-git/security
+	url = https://github.com/2021-pick-git/security.git
+	branch = main

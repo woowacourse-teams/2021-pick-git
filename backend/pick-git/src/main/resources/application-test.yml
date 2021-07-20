@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: jdbc:h2:~/test;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        dialects: org.hibernate.dialect.MySQL57Dialect
+        format_sql: true
+        default_batch_fetch_size: 1000
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create-drop
+
+logging:
+  level:
+    org:
+      hibernate:
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE

@@ -1,0 +1,71 @@
+plugins {
+	id "org.asciidoctor.convert" version "1.5.9.2"
+    id 'org.springframework.boot' version '2.5.2'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
+}
+
+group = 'com.woowacourse'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+	implementation 'io.jsonwebtoken:jjwt:0.9.1'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.apache.httpcomponents:httpclient:4.5'
+
+	compileOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.4'
+
+	runtimeOnly 'com.h2database:h2'
+	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+
+	asciidoctor 'org.springframework.restdocs:spring-restdocs-asciidoctor:1.2.6.RELEASE'
+
+	testImplementation('org.springframework.restdocs:spring-restdocs-mockmvc')
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '4.4.0'
+}
+
+processResources.dependsOn('copySecurity')
+processResources.dependsOn('copyProd')
+
+task copySecurity(type: Copy) {
+	from './security/application-security.yml'
+	into './src/main/resources'
+}
+
+task copyProd(type: Copy) {
+	from './security/application-prod.yml'
+	into './src/main/resources'
+}
+
+//restDocs setting
+ext {
+	snippetsDir = file('build/generated-snippets')
+}
+
+asciidoctor {
+	inputs.dir snippetsDir
+	dependsOn test
+}
+
+task copyDocuments(type: Copy) {
+	dependsOn asciidoctor
+
+	from file("build/asciidoc/html5/index.html")
+	into file("src/main/resources/static/docs")
+}
+
+bootJar {
+	dependsOn copyDocuments
+}
+
+test {
+	useJUnitPlatform()
+}
