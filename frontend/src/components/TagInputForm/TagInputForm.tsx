@@ -31,9 +31,14 @@ const TagInputForm = () => {
     event.currentTarget["tag-input"].value = "";
   };
 
+  const handleTagDelete = (targetTag: string) => {
+    const newTags = tags.filter((tag) => tag !== targetTag);
+    setTags(newTags);
+  };
+
   const tagListItems = tags?.map((tag) => (
     <TagListItem key={tag}>
-      <Chip>{tag}</Chip>
+      <Chip onDelete={() => handleTagDelete(tag)}>{tag}</Chip>
     </TagListItem>
   ));
 
