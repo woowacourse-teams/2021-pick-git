@@ -35,7 +35,7 @@ import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.PostFactory;
-import com.woowacourse.pickgit.config.TestApiConfiguration;
+import com.woowacourse.pickgit.config.TestInfrastructureConfiguration;
 import com.woowacourse.pickgit.exception.post.CommentFormatException;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
@@ -71,7 +71,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 
 @AutoConfigureRestDocs
-@Import(TestApiConfiguration.class)
+@Import(TestInfrastructureConfiguration.class)
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(PostController.class)
 @ActiveProfiles("test")

@@ -7,7 +7,7 @@ import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileRespon
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
 import com.woowacourse.pickgit.common.factory.UserFactory;
-import com.woowacourse.pickgit.config.TestApiConfiguration;
+import com.woowacourse.pickgit.config.TestInfrastructureConfiguration;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.presentation.dto.FollowResponse;
 import com.woowacourse.pickgit.user.presentation.dto.UserProfileResponse;
@@ -28,7 +28,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
-@Import(TestApiConfiguration.class)
+@Import(TestInfrastructureConfiguration.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @ActiveProfiles("test")
