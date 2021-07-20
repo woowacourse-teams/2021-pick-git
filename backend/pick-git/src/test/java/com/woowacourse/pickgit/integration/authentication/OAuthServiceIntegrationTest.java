@@ -11,8 +11,8 @@ import com.woowacourse.pickgit.authentication.dao.OAuthAccessTokenDao;
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
+import com.woowacourse.pickgit.config.TestApiConfiguration;
 import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
-import com.woowacourse.pickgit.unit.post.PostTestConfiguration;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -24,7 +24,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-@Import(PostTestConfiguration.class)@DisplayName("OAuthService 통합 테스트 (UserRepository 사용)")
+@Import(TestApiConfiguration.class)
+@DisplayName("OAuthService 통합 테스트 (UserRepository 사용)")
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @ActiveProfiles("test")
 class OAuthServiceIntegrationTest {

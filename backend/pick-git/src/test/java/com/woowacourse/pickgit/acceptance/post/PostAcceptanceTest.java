@@ -8,8 +8,8 @@ import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileRespon
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
 import com.woowacourse.pickgit.common.factory.FileFactory;
+import com.woowacourse.pickgit.config.TestApiConfiguration;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
-import com.woowacourse.pickgit.unit.post.PostTestConfiguration;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
@@ -36,7 +36,7 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@Import(PostTestConfiguration.class)
+@Import(TestApiConfiguration.class)
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @ActiveProfiles("test")
 class PostAcceptanceTest {

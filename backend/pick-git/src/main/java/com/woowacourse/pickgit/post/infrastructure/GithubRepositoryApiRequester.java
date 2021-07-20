@@ -1,11 +1,13 @@
 package com.woowacourse.pickgit.post.infrastructure;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 @Component
+@Profile("!test")
 public class GithubRepositoryApiRequester implements PlatformRepositoryApiRequester {
 
     @Override

@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.post.presentation;
+package com.woowacourse.pickgit.post.domain;
 
 import java.io.File;
 import java.util.List;
