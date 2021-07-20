@@ -7,8 +7,8 @@ import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileRespon
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
-import com.woowacourse.pickgit.post.PostTestConfiguration;
-import com.woowacourse.pickgit.tag.TestTagConfiguration;
+import com.woowacourse.pickgit.unit.post.PostTestConfiguration;
+import com.woowacourse.pickgit.unit.tag.TestTagConfiguration;
 import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.ExtractableResponse;
