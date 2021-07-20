@@ -10,13 +10,20 @@ import { Container, Form, TagList, TagListItem } from "./TagInputForm.style";
 const TagInputForm = () => {
   const { currentUsername } = useContext(UserContext);
   const { githubRepositoryName, tags, setTags } = useContext(PostAddDataContext);
-  const { data: defaultTags, isLoading, error } = useGithubTagsQuery(currentUsername, githubRepositoryName);
+  const { data: defaultTags, isLoading, error, refetch } = useGithubTagsQuery(currentUsername, githubRepositoryName);
 
   useEffect(() => {
     defaultTags && setTags((state) => [...defaultTags, ...state]);
   }, [defaultTags]);
 
-  const onTagSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
+  useEffect(() => {
+    if (githubRepositoryName !== "") {
+      refetch();
+      setTags([]);
+    }
+  }, [githubRepositoryName]);
+
+  const handleTagSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
     const newTag = event.currentTarget["tag-input"].value;
 
@@ -40,7 +47,7 @@ const TagInputForm = () => {
 
   return (
     <Container>
-      <Form onSubmit={onTagSubmit}>
+      <Form onSubmit={handleTagSubmit}>
         <Input kind="borderBottom" textAlign="center" placeholder="태그 입력..." name="tag-input" />
       </Form>
       <TagList>{tagListItems}</TagList>
