@@ -13,12 +13,3 @@ spring:
     generate-ddl: true
     hibernate:
       ddl-auto: create-drop
-
-logging:
-  level:
-    org:
-      hibernate:
-        type:
-          descriptor:
-            sql:
-              BasicBinder: TRACE

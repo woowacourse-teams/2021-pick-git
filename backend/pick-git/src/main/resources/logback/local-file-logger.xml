@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<included>
+  <property name="home" value="logs/local/local"/>
+  <appender name="local-file-logger" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${home}-file.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${home}-file-%d{yyyyMMdd}-%i.log</fileNamePattern>
+      <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <maxFileSize>15MB</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
+    </rollingPolicy>
+    <encoder>
+      <charset>utf8</charset>
+      <Pattern>
+        %d{yyyy-MM-dd HH:mm:ss.SSS} %boldGreen(%-5level) %boldMagenta(${PID:-}) %boldCyan(%t) %boldYellow(%class{36}_%M) %boldWhite(L:%L) %gray(%logger{36}) %n %boldRed(     >) %m%n
+      </Pattern>
+    </encoder>
+  </appender>
+</included>
