@@ -16,18 +16,18 @@ public class GithubTagExtractor implements PlatformTagExtractor {
     private static final String GITHUB_TAG_API_FORMAT
         = "https://api.github.com/repos/%s/%s/languages";
 
-    private final PlatformApiRequester platformApiRequester;
+    private final PlatformTagApiRequester platformTagApiRequester;
     private final ObjectMapper objectMapper;
 
-    public GithubTagExtractor(PlatformApiRequester platformApiRequester,
+    public GithubTagExtractor(PlatformTagApiRequester platformTagApiRequester,
         ObjectMapper objectMapper) {
-        this.platformApiRequester = platformApiRequester;
+        this.platformTagApiRequester = platformTagApiRequester;
         this.objectMapper = objectMapper;
     }
 
     public List<String> extractTags(String accessToken, String userName, String repositoryName) {
         String url = generateApiUrl(userName, repositoryName);
-        String response = platformApiRequester.requestTags(url, accessToken);
+        String response = platformTagApiRequester.requestTags(url, accessToken);
         return parseResponseIntoLanguageTags(response);
     }
 
