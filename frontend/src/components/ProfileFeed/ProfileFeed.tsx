@@ -50,8 +50,8 @@ const ProfileFeed = ({ isMyFeed, username }: Props) => {
     if (data?.length) {
       return (
         <GridContainer>
-          {data?.map(({ postId, imageUrls, authorName, content }) => (
-            <Link to="" key={postId}>
+          {data?.map(({ id, imageUrls, authorName, content }) => (
+            <Link to="" key={id}>
               <GridItem imageUrl={imageUrls[0]} aria-label={`${authorName}님의 게시물. ${content}`} />
             </Link>
           ))}

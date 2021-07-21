@@ -10,7 +10,7 @@ export const requestAddPostComment = async ({ postId, commentContent }: CommentA
   });
 };
 
-export const requestDeletePostComment = async (postId: Post["postId"], accessToken: string | null) => {
+export const requestDeletePostComment = async (postId: Post["id"], accessToken: string | null) => {
   await axios.delete(API_URL.POSTS_COMMENTS(postId), {
     headers: {
       Authorization: `Bearer ${accessToken}`,

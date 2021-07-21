@@ -24,7 +24,7 @@ const Feed = ({ posts }: Props) => {
     setCommentValue(value);
   };
 
-  const handleCommentValueSave = (postId: Post["postId"]) => {
+  const handleCommentValueSave = (postId: Post["id"]) => {
     addComment(postId, commentValue);
   };
 
@@ -34,7 +34,7 @@ const Feed = ({ posts }: Props) => {
 
   const handlePostLike = (postId: string) => {
     const newPosts = [...posts];
-    const targetPost = newPosts.find((post) => post.postId === postId);
+    const targetPost = newPosts.find((post) => post.id === postId);
 
     if (!targetPost) {
       return;
@@ -57,7 +57,7 @@ const Feed = ({ posts }: Props) => {
   return (
     <Container>
       {posts?.map((post) => (
-        <PostItemWrapper key={post.postId}>
+        <PostItemWrapper key={post.id}>
           <PostItem
             authorName={post.authorName}
             authorGithubUrl={post.githubRepoUrl}
@@ -75,9 +75,9 @@ const Feed = ({ posts }: Props) => {
             tags={post.tags}
             commentValue={commentValue}
             onCommentValueChange={handleCommentValueChange}
-            onCommentValueSave={() => handleCommentValueSave(post.postId)}
+            onCommentValueSave={() => handleCommentValueSave(post.id)}
             onCommentLike={handleCommentLike}
-            onPostLike={() => handlePostLike(post.postId)}
+            onPostLike={() => handlePostLike(post.id)}
           />
         </PostItemWrapper>
       ))}
