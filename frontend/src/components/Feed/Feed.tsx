@@ -12,12 +12,12 @@ interface Props {
 }
 
 const Feed = ({ posts }: Props) => {
-  const { pushMessage } = useContext(SnackBarContext);
+  const { pushSnackbarMessage } = useContext(SnackBarContext);
   const { commentValue, setCommentValue, deletePostLike, addPostLike, setPosts, addComment } = useFeed();
 
   const handleCommentValueChange: React.ChangeEventHandler<HTMLTextAreaElement> = ({ target: { value } }) => {
     if (value.length > LIMIT.COMMENT_LENGTH) {
-      pushMessage(FAILURE_MESSAGE.COMMENT_CONTENT_MAX_LENGTH_EXCEEDED);
+      pushSnackbarMessage(FAILURE_MESSAGE.COMMENT_CONTENT_MAX_LENGTH_EXCEEDED);
       return;
     }
 
@@ -29,7 +29,7 @@ const Feed = ({ posts }: Props) => {
   };
 
   const handleCommentLike = (commentId: string) => {
-    pushMessage("아직 구현되지 않은 기능입니다.");
+    pushSnackbarMessage("아직 구현되지 않은 기능입니다.");
   };
 
   const handlePostLike = (postId: string) => {
