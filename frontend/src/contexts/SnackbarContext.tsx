@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { createContext, ReactNode, useEffect, useState } from "react";
 
-import SnackBar from "../components/@shared/Snackbar/Snackbar";
+import SnackBar from "../components/@layout/Snackbar/Snackbar";
 import { MAX_STACK_NUM, SNACKBAR_DURATION } from "../constants/snackbar";
 
 interface Props {
