@@ -9,11 +9,11 @@ interface Props {
 }
 
 interface Value {
-  pushMessage: (message: string) => void;
+  pushSnackbarMessage: (message: string) => void;
 }
 
 const SnackBarContext = createContext<Value>({
-  pushMessage: () => {},
+  pushSnackbarMessage: () => {},
 });
 
 const keyGenerator = (() => {
@@ -26,7 +26,7 @@ export const SnackBarContextProvider = ({ children }: Props) => {
   const [messages, setMessages] = useState<{ id: number; text: string }[]>([]);
   const messageIds = messages.join();
 
-  const pushMessage = (message: string): void =>
+  const pushSnackbarMessage = (message: string): void =>
     setMessages((messages) => {
       const newMessages = [...messages, { id: keyGenerator(), text: message }];
 
@@ -48,7 +48,7 @@ export const SnackBarContextProvider = ({ children }: Props) => {
   }, [messageIds]);
 
   return (
-    <SnackBarContext.Provider value={{ pushMessage }}>
+    <SnackBarContext.Provider value={{ pushSnackbarMessage }}>
       {children}
       {messages.map((message, index, arr) => (
         <SnackBar key={message.id} order={arr.length - index}>

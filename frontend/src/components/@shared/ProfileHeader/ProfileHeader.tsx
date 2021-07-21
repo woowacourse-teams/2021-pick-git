@@ -18,7 +18,7 @@ export interface Props {
 const ProfileHeader = ({ profile, isMyProfile }: Props) => {
   const theme = useContext(ThemeContext);
   const { isLoggedIn } = useContext(UserContext);
-  const { pushMessage } = useContext(SnackBarContext);
+  const { pushSnackbarMessage } = useContext(SnackBarContext);
 
   const { mutate: follow, isLoading: isFollowLoading } = useFollowingMutation(profile?.name);
   const { mutate: unFollow, isLoading: isUnfollowLoading } = useUnfollowingMutation(profile?.name);
@@ -44,7 +44,7 @@ const ProfileHeader = ({ profile, isMyProfile }: Props) => {
 
     if (isMyProfile) {
       return (
-        <Button type="button" kind="squaredBlock" onClick={() => pushMessage("아직 지원하지 않는 기능입니다")}>
+        <Button type="button" kind="squaredBlock" onClick={() => pushSnackbarMessage("아직 지원하지 않는 기능입니다")}>
           프로필 수정
         </Button>
       );

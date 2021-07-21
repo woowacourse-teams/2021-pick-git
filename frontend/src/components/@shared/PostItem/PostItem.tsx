@@ -102,8 +102,9 @@ const PostItem = ({
     </CommentWrapper>
   ));
 
-  const tagList = JSON.parse(tags.join(",")).map((tag: string) => (
-    <TagItemLinkButton key={tag} to={PAGE_URL.POSTS_WITH_TAG(tag)}>
+  const tagList = JSON.parse(tags.join(",")).map((tag: string, index: number) => (
+    // TODO: key prop 수정 => tag가 unique임이 보장된 후에!
+    <TagItemLinkButton key={index} to={PAGE_URL.POSTS_WITH_TAG(tag)}>
       <Chip>{tag}</Chip>
     </TagItemLinkButton>
   ));
