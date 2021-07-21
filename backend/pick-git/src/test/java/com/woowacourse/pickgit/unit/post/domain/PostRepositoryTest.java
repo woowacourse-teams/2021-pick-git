@@ -2,7 +2,7 @@ package com.woowacourse.pickgit.unit.post.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.woowacourse.pickgit.config.TestJpaConfiguration;
+import com.woowacourse.pickgit.config.JpaTestConfiguration;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.content.PostContent;
 import com.woowacourse.pickgit.post.domain.PostRepository;
@@ -27,7 +27,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 
-@Import(TestJpaConfiguration.class)
+@Import(JpaTestConfiguration.class)
 @DataJpaTest
 class PostRepositoryTest {
 
