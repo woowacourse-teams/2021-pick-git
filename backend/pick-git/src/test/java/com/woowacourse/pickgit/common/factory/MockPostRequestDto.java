@@ -4,14 +4,12 @@ import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
-public class MockPostRequestDto extends PostRequestDto {
+class MockPostRequestDto {
 
-    public MockPostRequestDto(String token, String username,
-        List<MultipartFile> images, String githubRepoUrl, List<String> tags, String content) {
-        super(token, username, images, githubRepoUrl, tags, content);
+    private MockPostRequestDto() {
     }
 
-    public static Builder Builder() {
+    public static Builder builder() {
         return new Builder();
     }
 
@@ -64,9 +62,8 @@ public class MockPostRequestDto extends PostRequestDto {
             return this;
         }
 
-        public MockPostRequestDto build() {
-            return new MockPostRequestDto(token, username, images, githubRepoUrl, tags,
-                content);
+        public PostRequestDto build() {
+            return new PostRequestDto(token, username, images, githubRepoUrl, tags, content);
         }
     }
 }

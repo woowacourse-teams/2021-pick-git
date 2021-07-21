@@ -43,18 +43,19 @@ class UserAcceptanceTest {
     @MockBean
     private OAuthClient oAuthClient;
 
-    private UserFactory userFactory = new UserFactory();
+    private String sourceUserAccessToken;
 
-    private String userAccessToken;
+    private String targetUserAccessToken;
 
-    private String anotherAccessToken;
+    private User sourceUser = UserFactory.user("sourceUser");
+    private User targetUser = UserFactory.user("targetUser");
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
 
-        userAccessToken = 로그인_되어있음(userFactory.user()).getToken();
-        anotherAccessToken = 로그인_되어있음(userFactory.anotherUser()).getToken();
+        sourceUserAccessToken = 로그인_되어있음(sourceUser).getToken();
+        targetUserAccessToken = 로그인_되어있음(targetUser).getToken();
     }
 
 
@@ -62,7 +63,7 @@ class UserAcceptanceTest {
     @Test
     void getAuthenticatedUserProfile_ValidUser_Success() {
         //given
-        User user = userFactory.user();
+        User user = sourceUser;
         String requestUrl = "/api/profiles/me";
         UserProfileResponse expectedResponseDto =
             new UserProfileResponse(user.getName(), user.getImage(), user.getDescription(),
@@ -72,7 +73,7 @@ class UserAcceptanceTest {
 
         //when
         UserProfileResponse actualResponseDto =
-            authenticatedGetRequest(userAccessToken, requestUrl, HttpStatus.OK)
+            authenticatedGetRequest(sourceUserAccessToken, requestUrl, HttpStatus.OK)
                 .as(UserProfileResponse.class);
 
         //then
@@ -96,8 +97,6 @@ class UserAcceptanceTest {
     @Test
     void getUserProfile_ValidLoginUserFollowing_Success() {
         //given
-        User targetUser = userFactory.anotherUser();
-
         String followRequestUrl = "/api/profiles/" + targetUser.getName() + "/followings";
         String requestUrl = "/api/profiles/" + targetUser.getName();
         UserProfileResponse expectedResponseDto =
@@ -106,11 +105,11 @@ class UserAcceptanceTest {
                 targetUser.getGithubUrl(), targetUser.getCompany(), targetUser.getLocation(), targetUser.getWebsite(),
                 targetUser.getTwitter(), true);
 
-        authenticatedPostRequest(userAccessToken, followRequestUrl, HttpStatus.OK);
+        authenticatedPostRequest(sourceUserAccessToken, followRequestUrl, HttpStatus.OK);
 
         //when
         UserProfileResponse actualResponseDto =
-            authenticatedGetRequest(userAccessToken, requestUrl, HttpStatus.OK)
+            authenticatedGetRequest(sourceUserAccessToken, requestUrl, HttpStatus.OK)
                 .as(UserProfileResponse.class);
 
         //then
@@ -123,7 +122,7 @@ class UserAcceptanceTest {
     @Test
     void getUserProfile_ValidLoginUserUnfollowing_Success() {
         //given
-        User user = userFactory.anotherUser();
+        User user = sourceUser;
         String requestUrl = "/api/profiles/" + user.getName();
         UserProfileResponse expectedResponseDto =
             new UserProfileResponse(user.getName(), user.getImage(), user.getDescription(),
@@ -133,7 +132,7 @@ class UserAcceptanceTest {
 
         //when
         UserProfileResponse actualResponseDto =
-            authenticatedGetRequest(userAccessToken, requestUrl, HttpStatus.OK)
+            authenticatedGetRequest(sourceUserAccessToken, requestUrl, HttpStatus.OK)
                 .as(UserProfileResponse.class);
 
         //then
@@ -146,7 +145,7 @@ class UserAcceptanceTest {
     @Test
     void getUserProfile_ValidGuestUser_Success() {
         //given
-        User user = userFactory.anotherUser();
+        User user = sourceUser;
         String requestUrl = "/api/profiles/" + user.getName();
         UserProfileResponse expectedResponseDto =
             new UserProfileResponse(user.getName(), user.getImage(), user.getDescription(),
@@ -169,13 +168,13 @@ class UserAcceptanceTest {
     @Test
     void followUser_ValidUser_Success() {
         //given
-        User user = userFactory.anotherUser();
+        User user = targetUser;
         String requestUrl = "/api/profiles/" + user.getName() + "/followings";
         FollowResponse expectedResponseDto = new FollowResponse(1, true);
 
         //when
         FollowResponse actualResponseDto =
-            authenticatedPostRequest(userAccessToken, requestUrl, HttpStatus.OK)
+            authenticatedPostRequest(sourceUserAccessToken, requestUrl, HttpStatus.OK)
                 .as(FollowResponse.class);
 
         //then
@@ -192,7 +191,7 @@ class UserAcceptanceTest {
 
         //when
         //then
-        authenticatedPostRequest(userAccessToken, requestUrl, HttpStatus.BAD_REQUEST);
+        authenticatedPostRequest(sourceUserAccessToken, requestUrl, HttpStatus.BAD_REQUEST);
     }
 
     @DisplayName("한 로그인 유저가 없는 유저를 팔로우하면 예외가 발생한다.")
@@ -203,17 +202,17 @@ class UserAcceptanceTest {
 
         //when
         //then
-        authenticatedPostRequest(userAccessToken, requestUrl, HttpStatus.BAD_REQUEST);
+        authenticatedPostRequest(sourceUserAccessToken, requestUrl, HttpStatus.BAD_REQUEST);
     }
 
     @DisplayName("이미 존재하는 팔로우 요청 시 예외가 발생한다.")
     @Test
     void followUser_ExistingFollow_ExceptionThrown() {
         //given
-        User user = userFactory.anotherUser();
+        User user = targetUser;
         String requestUrl = "/api/profiles/" + user.getName() + "/followings";
         FollowResponse followResponse = authenticatedPostRequest(
-            userAccessToken, requestUrl, HttpStatus.OK)
+            sourceUserAccessToken, requestUrl, HttpStatus.OK)
             .as(FollowResponse.class);
 
         FollowResponse followExpectedResponseDto = new FollowResponse(1, true);
@@ -224,17 +223,17 @@ class UserAcceptanceTest {
 
         //when
         //then
-        authenticatedPostRequest(userAccessToken, requestUrl, HttpStatus.BAD_REQUEST);
+        authenticatedPostRequest(sourceUserAccessToken, requestUrl, HttpStatus.BAD_REQUEST);
     }
 
     @DisplayName("한 로그인 유저가 다른 유저를 언팔로우하는데 성공한다.")
     @Test
     void unfollowUser_ValidUser_Success() {
         //given
-        User user = userFactory.anotherUser();
+        User user = targetUser;
         String requestUrl = "/api/profiles/" + user.getName() + "/followings";
         FollowResponse followResponse = authenticatedPostRequest(
-            userAccessToken, requestUrl, HttpStatus.OK)
+            sourceUserAccessToken, requestUrl, HttpStatus.OK)
             .as(FollowResponse.class);
 
         FollowResponse followExpectedResponseDto = new FollowResponse(1, true);
@@ -246,7 +245,7 @@ class UserAcceptanceTest {
 
         //when
         FollowResponse actualResponseDto =
-            authenticatedDeleteRequest(userAccessToken, requestUrl, HttpStatus.OK)
+            authenticatedDeleteRequest(sourceUserAccessToken, requestUrl, HttpStatus.OK)
                 .as(FollowResponse.class);
 
         //then
@@ -263,7 +262,7 @@ class UserAcceptanceTest {
 
         //when
         //then
-        authenticatedDeleteRequest(userAccessToken, requestUrl, HttpStatus.BAD_REQUEST);
+        authenticatedDeleteRequest(sourceUserAccessToken, requestUrl, HttpStatus.BAD_REQUEST);
     }
 
     @DisplayName("한 로그인 유저가 없는 유저를 언팔로우하면 예외가 발생한다.")
@@ -274,19 +273,19 @@ class UserAcceptanceTest {
 
         //when
         //then
-        authenticatedDeleteRequest(userAccessToken, requestUrl, HttpStatus.BAD_REQUEST);
+        authenticatedDeleteRequest(sourceUserAccessToken, requestUrl, HttpStatus.BAD_REQUEST);
     }
 
     @DisplayName("존재하지 않는 팔로우 관계에 대한 언팔로우 요청 시 예외가 발생한다.")
     @Test
     void unfollowUser_NotExistingFollow_ExceptionThrown() {
         //given
-        User user = userFactory.anotherUser();
+        User user = targetUser;
         String requestUrl = "/api/profiles/" + user.getName() + "/followings";
 
         //when
         //then
-        authenticatedDeleteRequest(userAccessToken, requestUrl, HttpStatus.BAD_REQUEST);
+        authenticatedDeleteRequest(sourceUserAccessToken, requestUrl, HttpStatus.BAD_REQUEST);
     }
 
     private ExtractableResponse<Response> authenticatedGetRequest(String accessToken, String url,

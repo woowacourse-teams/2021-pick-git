@@ -45,13 +45,6 @@ class UserServiceMockTest {
     @Mock
     private UserRepository userRepository;
 
-    private UserFactory userFactory;
-
-    @BeforeEach
-    void setUp() {
-        this.userFactory = new UserFactory();
-    }
-
     @DisplayName("본인의 프로필 정보를 성공적으로 가져온다.")
     @Test
     void name() {
@@ -65,7 +58,7 @@ class UserServiceMockTest {
         AppUser appUser = new GuestUser();
         given(
             userRepository.findByBasicProfile_Name(anyString())
-        ).willReturn(Optional.of(userFactory.user()));
+        ).willReturn(Optional.of(UserFactory.user(NAME)));
 
         UserProfileServiceDto expectedUserProfileDto = new UserProfileServiceDto(
             NAME, IMAGE, DESCRIPTION,
@@ -107,11 +100,11 @@ class UserServiceMockTest {
 
         given(
             userRepository.findByBasicProfile_Name(NAME)
-        ).willReturn(Optional.of(userFactory.user()));
+        ).willReturn(Optional.of(UserFactory.user(1L, "testUser1")));
 
         given(
             userRepository.findByBasicProfile_Name("target")
-        ).willReturn(Optional.of(userFactory.anotherUser()));
+        ).willReturn(Optional.of(UserFactory.user(2L, "testUser2")));
 
         //when
         FollowServiceDto followServiceDto = userService.followUser(authUserServiceDto, targetName);
@@ -130,13 +123,11 @@ class UserServiceMockTest {
         AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(NAME);
         String targetName = "target";
 
-        given(
-            userRepository.findByBasicProfile_Name(NAME)
-        ).willReturn(Optional.of(userFactory.user()));
+        given(userRepository.findByBasicProfile_Name(NAME))
+            .willReturn(Optional.of(UserFactory.user(1L,"testUser1")));
 
-        given(
-            userRepository.findByBasicProfile_Name("target")
-        ).willReturn(Optional.of(userFactory.anotherUser()));
+        given(userRepository.findByBasicProfile_Name("target"))
+            .willReturn(Optional.of(UserFactory.user(2L,"testUser2")));
 
         userService.followUser(authUserServiceDto, targetName);
 
@@ -158,11 +149,11 @@ class UserServiceMockTest {
 
         given(
             userRepository.findByBasicProfile_Name(NAME)
-        ).willReturn(Optional.of(userFactory.user()));
+        ).willReturn(Optional.of(UserFactory.user(1L,"testUser1")));
 
         given(
             userRepository.findByBasicProfile_Name("target")
-        ).willReturn(Optional.of(userFactory.anotherUser()));
+        ).willReturn(Optional.of(UserFactory.user(2L,"testUser1")));
 
         userService.followUser(authUserServiceDto, targetName);
 
@@ -186,11 +177,11 @@ class UserServiceMockTest {
 
         given(
             userRepository.findByBasicProfile_Name(NAME)
-        ).willReturn(Optional.of(userFactory.user()));
+        ).willReturn(Optional.of(UserFactory.user(1L, "testUser1")));
 
         given(
             userRepository.findByBasicProfile_Name("target")
-        ).willReturn(Optional.of(userFactory.anotherUser()));
+        ).willReturn(Optional.of(UserFactory.user(2L,"testUser2")));
 
         //when
         //then

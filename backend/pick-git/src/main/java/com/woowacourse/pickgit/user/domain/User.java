@@ -41,15 +41,20 @@ public class User {
     protected User() {
     }
 
-    public User(Long id, BasicProfile basicProfile,
-        GithubProfile githubProfile) {
+    public User(
+        Long id,
+        BasicProfile basicProfile,
+        GithubProfile githubProfile
+    ) {
         this.id = id;
         this.basicProfile = basicProfile;
         this.githubProfile = githubProfile;
     }
 
-    public User(BasicProfile basicProfile,
-        GithubProfile githubProfile) {
+    public User(
+        BasicProfile basicProfile,
+        GithubProfile githubProfile
+    ) {
         this.basicProfile = basicProfile;
         this.githubProfile = githubProfile;
     }

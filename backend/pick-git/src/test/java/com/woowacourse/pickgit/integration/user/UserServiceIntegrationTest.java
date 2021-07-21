@@ -48,14 +48,12 @@ class UserServiceIntegrationTest {
     @Autowired
     private UserRepository userRepository;
 
-    private UserFactory userFactory = new UserFactory();
-
     @DisplayName("개인 프로필 정보를 성공적으로 가져온다.")
     @Test
     public void getMyUserProfile_FindUserInfoByName_Success() {
         //given
         AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(NAME);
-        userRepository.save(userFactory.user());
+        userRepository.save(UserFactory.user());
         UserProfileServiceDto expectedUserProfileDto = new UserProfileServiceDto(
             NAME, IMAGE, DESCRIPTION,
             0, 0, 0,
@@ -63,7 +61,8 @@ class UserServiceIntegrationTest {
         );
 
         //when
-        UserProfileServiceDto actualUserProfileDto = userService.getMyUserProfile(authUserServiceDto);
+        UserProfileServiceDto actualUserProfileDto = userService
+            .getMyUserProfile(authUserServiceDto);
 
         //then
         assertThat(actualUserProfileDto)
@@ -76,7 +75,7 @@ class UserServiceIntegrationTest {
     public void getUserProfile_GuestFindUserInfoByName_Success() {
         //given
         AppUser guestUser = new GuestUser();
-        userRepository.save(userFactory.user());
+        userRepository.save(UserFactory.user());
         UserProfileServiceDto expectedUserProfileDto = new UserProfileServiceDto(
             NAME, IMAGE, DESCRIPTION,
             0, 0, 0,
@@ -97,8 +96,8 @@ class UserServiceIntegrationTest {
     public void getUserProfile_FindFollowingUserInfoByName_Success() {
         //given
         AppUser loginUser = new LoginUser(NAME, "token");
-        User source = userRepository.save(userFactory.user());
-        User target = userRepository.save(userFactory.anotherUser());
+        User source = userRepository.save(UserFactory.user(NAME));
+        User target = userRepository.save(UserFactory.user("testUser2"));
 
         AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(source.getName());
         userService.followUser(authUserServiceDto, target.getName());
@@ -111,7 +110,8 @@ class UserServiceIntegrationTest {
         );
 
         //when
-        UserProfileServiceDto actualUserProfileDto = userService.getUserProfile(loginUser, target.getName());
+        UserProfileServiceDto actualUserProfileDto = userService
+            .getUserProfile(loginUser, target.getName());
 
         //then
         assertThat(actualUserProfileDto)
@@ -124,8 +124,8 @@ class UserServiceIntegrationTest {
     public void getUserProfile_FindUnfollowingUserInfoByName_Success() {
         //given
         AppUser loginUser = new LoginUser(NAME, "token");
-        userRepository.save(userFactory.user());
-        userRepository.save(userFactory.anotherUser());
+        userRepository.save(UserFactory.user(1L, NAME));
+        userRepository.save(UserFactory.user(2L, "testUser2"));
 
         UserProfileServiceDto expectedUserProfileDto = new UserProfileServiceDto(
             NAME, IMAGE, DESCRIPTION,
@@ -158,10 +158,10 @@ class UserServiceIntegrationTest {
     @Test
     void followUser_ValidUser_Success() {
         //given
-        userRepository.save(userFactory.user());
-        userRepository.save(userFactory.anotherUser());
-        AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(NAME);
         String targetName = "pickgit";
+        userRepository.save(UserFactory.user(NAME));
+        userRepository.save(UserFactory.user(targetName));
+        AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(NAME);
 
         //when
         FollowServiceDto followServiceDto = userService.followUser(authUserServiceDto, targetName);
@@ -175,10 +175,10 @@ class UserServiceIntegrationTest {
     @Test
     void followUser_ExistingFollow_ExceptionThrown() {
         //given
-        userRepository.save(userFactory.user());
-        userRepository.save(userFactory.anotherUser());
-        AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(NAME);
         String targetName = "pickgit";
+        userRepository.save(UserFactory.user(NAME));
+        userRepository.save(UserFactory.user(targetName));
+        AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(NAME);
 
         userService.followUser(authUserServiceDto, targetName);
 
@@ -193,10 +193,10 @@ class UserServiceIntegrationTest {
     @Test
     void unfollowUser_ValidUser_Success() {
         //given
-        userRepository.save(userFactory.user());
-        userRepository.save(userFactory.anotherUser());
-        AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(NAME);
         String targetName = "pickgit";
+        userRepository.save(UserFactory.user(NAME));
+        userRepository.save(UserFactory.user(targetName));
+        AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(NAME);
 
         userService.followUser(authUserServiceDto, targetName);
 
@@ -213,10 +213,10 @@ class UserServiceIntegrationTest {
     @Test
     void unfollowUser_NotExistingFollow_ExceptionThrown() {
         //given
-        userRepository.save(userFactory.user());
-        userRepository.save(userFactory.anotherUser());
-        AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(NAME);
         String targetName = "pickgit";
+        userRepository.save(UserFactory.user( NAME));
+        userRepository.save(UserFactory.user(targetName));
+        AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(NAME);
 
         //when
         //then

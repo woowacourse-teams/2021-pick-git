@@ -64,8 +64,7 @@ class UserControllerTest {
     @DisplayName("인증된 사용자의 프로필을 가져온다.")
     @Test
     void getAuthenticatedUserProfile() throws Exception {
-        UserProfileServiceDto userProfileServiceDto = new UserFactory()
-            .mockLoginUserProfileServiceDto();
+        UserProfileServiceDto userProfileServiceDto = UserFactory.mockLoginUserProfileServiceDto();
 
         given(userService.getMyUserProfile(any(AuthUserServiceDto.class)))
             .willReturn(userProfileServiceDto);
@@ -110,8 +109,7 @@ class UserControllerTest {
     @DisplayName("다른 사용자의 프로필을 가져온다. - 로그인")
     @Test
     void getUserProfile_loggedIn() throws Exception {
-        UserProfileServiceDto userProfileServiceDto = new UserFactory()
-            .mockLoginUserProfileServiceDto();
+        UserProfileServiceDto userProfileServiceDto = UserFactory.mockLoginUserProfileServiceDto();
 
         given(userService.getUserProfile(any(AppUser.class), anyString()))
             .willReturn(userProfileServiceDto);
@@ -159,8 +157,7 @@ class UserControllerTest {
     @DisplayName("다른 사용자의 프로필을 가져온다. - 비 로그인")
     @Test
     void getUserProfile_unLoggedIn() throws Exception {
-        UserProfileServiceDto userProfileServiceDto = new UserFactory()
-            .mockUnLoginUserProfileServiceDto();
+        UserProfileServiceDto userProfileServiceDto = UserFactory.mockUnLoginUserProfileServiceDto();
 
         given(userService.getUserProfile(any(AppUser.class), anyString()))
             .willReturn(userProfileServiceDto);

@@ -2,49 +2,62 @@ package com.woowacourse.pickgit.common.factory;
 
 import com.woowacourse.pickgit.user.application.dto.UserProfileServiceDto;
 import com.woowacourse.pickgit.user.domain.User;
-import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
-import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
 
 public class UserFactory {
 
-    private static final Long ID_SOURCE = 1L;
-    private static final Long ID_TARGET = 2L;
-    private static final String NAME_SOURCE = "yjksw";
-    private static final String NAME_TARGET = "pickgit";
-    private static final String IMAGE = "http://img.com";
-    private static final String DESCRIPTION = "The Best";
-    private static final String GITHUB_URL = "https://github.com/yjksw";
-    private static final String COMPANY = "woowacourse";
-    private static final String LOCATION = "Seoul";
-    private static final String WEBSITE = "www.pick-git.com";
-    private static final String TWITTER = "pick-git twitter";
-
-    private BasicProfile basicProfileSource =
-        new BasicProfile(NAME_SOURCE, IMAGE, DESCRIPTION);
-    private BasicProfile basicProfileTarget =
-        new BasicProfile(NAME_TARGET, IMAGE, DESCRIPTION);
-    private GithubProfile githubProfile_source =
-        new GithubProfile(GITHUB_URL, COMPANY, LOCATION, WEBSITE, TWITTER);
-    private GithubProfile githubProfile_target =
-        new GithubProfile(GITHUB_URL, COMPANY, LOCATION, WEBSITE, TWITTER);
-
-    public User user() {
-        return new User(ID_SOURCE, basicProfileSource, githubProfile_source);
+    private UserFactory() {
     }
 
-    public User anotherUser() {
-        return new User(ID_TARGET, basicProfileTarget, githubProfile_target);
+    public static User user(String name) {
+        return createUser(null, name);
     }
 
-    public UserProfileServiceDto mockLoginUserProfileServiceDto() {
-        return new UserProfileServiceDto(
-            NAME_SOURCE, IMAGE, DESCRIPTION, 0, 11,
-            1, GITHUB_URL, COMPANY, LOCATION, WEBSITE, TWITTER, false);
-    }
-    public UserProfileServiceDto mockUnLoginUserProfileServiceDto() {
-        return new UserProfileServiceDto(
-            NAME_SOURCE, IMAGE, DESCRIPTION, 0, 11,
-            1, GITHUB_URL, COMPANY, LOCATION, WEBSITE, TWITTER, null);
+    public static User user(Long id, String name) {
+        return createUser(id, name);
     }
 
+    public static User user() {
+        return createUser(null,"yjksw");
+    }
+
+    public static User createUser(Long id, String name) {
+        return MockUser.builder()
+            .id(id)
+            .name(name)
+            .build();
+    }
+
+    public static UserProfileServiceDto mockLoginUserProfileServiceDto() {
+        return MockUserProfileServiceDto.builder()
+            .name("yjksw")
+            .image("http://img.com")
+            .description("The Best")
+            .followerCount(0)
+            .followingCount(11)
+            .postCount(1)
+            .githubUrl("https://github.com/yjksw")
+            .company("woowacourse")
+            .location("Seoul")
+            .website("www.pick-git.com")
+            .twitter("pick-git twitter")
+            .following(false)
+            .build();
+    }
+
+    public static UserProfileServiceDto mockUnLoginUserProfileServiceDto() {
+        return MockUserProfileServiceDto.builder()
+            .name("yjksw")
+            .image("http://img.com")
+            .description("The Best")
+            .followerCount(0)
+            .followingCount(11)
+            .postCount(1)
+            .githubUrl("https://github.com/yjksw")
+            .company("woowacourse")
+            .location("Seoul")
+            .website("www.pick-git.com")
+            .twitter("pick-git twitter")
+            .following(null)
+            .build();
+    }
 }

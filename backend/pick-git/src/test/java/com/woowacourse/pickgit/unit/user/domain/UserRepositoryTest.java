@@ -21,12 +21,9 @@ class UserRepositoryTest {
     @Autowired
     private TestEntityManager testEntityManager;
 
-    private UserFactory userFactory;
-
     @BeforeEach
     void setUp() {
-        this.userFactory = new UserFactory();
-        userRepository.save(userFactory.user());
+        userRepository.save(UserFactory.user());
         testEntityManager.flush();
         testEntityManager.clear();
     }
@@ -41,6 +38,6 @@ class UserRepositoryTest {
         assertThat(actualUser)
             .usingRecursiveComparison()
             .ignoringFields("id")
-            .isEqualTo(userFactory.user());
+            .isEqualTo(UserFactory.user());
     }
 }

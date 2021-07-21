@@ -3,15 +3,11 @@ package com.woowacourse.pickgit.common.factory;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
-import com.woowacourse.pickgit.post.presentation.dto.request.PostRequest;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
 import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
-import java.io.File;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import org.mockito.Mock;
 import org.springframework.web.multipart.MultipartFile;
 
 public class PostFactory {
@@ -23,7 +19,7 @@ public class PostFactory {
         List<MultipartFile> images =
             List.of(FileFactory.getTestImage1(), FileFactory.getTestImage2());
 
-        PostRequestDto fixture1 = MockPostRequestDto.Builder()
+        PostRequestDto fixture1 = MockPostRequestDto.builder()
             .token("a")
             .userName("sean")
             .images(images)
@@ -32,7 +28,7 @@ public class PostFactory {
             .content("woowacourse mission")
             .build();
 
-        PostRequestDto fixture2 = MockPostRequestDto.Builder()
+        PostRequestDto fixture2 = MockPostRequestDto.builder()
             .token("a")
             .userName("ginger")
             .images(images)
@@ -41,7 +37,7 @@ public class PostFactory {
             .content("it's so easy!")
             .build();
 
-        PostRequestDto fixture3 = MockPostRequestDto.Builder()
+        PostRequestDto fixture3 = MockPostRequestDto.builder()
             .token("a")
             .userName("dani")
             .images(images)
@@ -50,7 +46,7 @@ public class PostFactory {
             .content("I love TDD")
             .build();
 
-        PostRequestDto fixture4 = MockPostRequestDto.Builder()
+        PostRequestDto fixture4 = MockPostRequestDto.builder()
             .token("a")
             .userName("coda")
             .images(images)
@@ -59,7 +55,7 @@ public class PostFactory {
             .content("hi there!")
             .build();
 
-        PostRequestDto fixture5 = MockPostRequestDto.Builder()
+        PostRequestDto fixture5 = MockPostRequestDto.builder()
             .token("a")
             .userName("dave")
             .images(images)
@@ -75,7 +71,7 @@ public class PostFactory {
         List<MultipartFile> images =
             List.of(FileFactory.getTestImage1(), FileFactory.getTestImage2());
 
-        PostRequestDto fixture1 = MockPostRequestDto.Builder()
+        PostRequestDto fixture1 = MockPostRequestDto.builder()
             .token("a")
             .userName("kevin")
             .images(images)
@@ -84,7 +80,7 @@ public class PostFactory {
             .content("woowacourse mission")
             .build();
 
-        PostRequestDto fixture2 = MockPostRequestDto.Builder()
+        PostRequestDto fixture2 = MockPostRequestDto.builder()
             .token("a")
             .userName("kevin")
             .images(images)
@@ -93,7 +89,7 @@ public class PostFactory {
             .content("it's so easy!")
             .build();
 
-        PostRequestDto fixture3 = MockPostRequestDto.Builder()
+        PostRequestDto fixture3 = MockPostRequestDto.builder()
             .token("a")
             .userName("kevin")
             .images(images)
@@ -102,7 +98,7 @@ public class PostFactory {
             .content("I love TDD")
             .build();
 
-        PostRequestDto fixture4 = MockPostRequestDto.Builder()
+        PostRequestDto fixture4 = MockPostRequestDto.builder()
             .token("a")
             .userName("kevin")
             .images(images)
@@ -111,7 +107,7 @@ public class PostFactory {
             .content("hi there!")
             .build();
 
-        PostRequestDto fixture5 = MockPostRequestDto.Builder()
+        PostRequestDto fixture5 = MockPostRequestDto.builder()
             .token("a")
             .userName("kevin")
             .images(images)
@@ -164,21 +160,21 @@ public class PostFactory {
     private static long autoIncrement = 1;
 
     public static List<PostResponseDto> mockPostResponseDtos() {
-        CommentResponse commentFixture1 = MockCommentResponse.Builder()
+        CommentResponse commentFixture1 = MockCommentResponse.builder()
             .id(1L)
             .authorName("commentAuthorName1")
             .content("commentContent1")
             .isLiked(false)
             .build();
 
-        CommentResponse commentFixture2 = MockCommentResponse.Builder()
+        CommentResponse commentFixture2 = MockCommentResponse.builder()
             .id(2L)
             .authorName("commentAuthorName2")
             .content("commentContent2")
             .isLiked(false)
             .build();
 
-        PostResponseDto fixture1 = MockPostResponseDto.Builder()
+        PostResponseDto fixture1 = MockPostResponseDto.builder()
             .id(1L)
             .imageUrls("image1Url", "image2Url")
             .githubRepoUrl("githubRepoUrl")

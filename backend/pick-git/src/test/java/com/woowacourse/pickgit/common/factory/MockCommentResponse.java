@@ -2,13 +2,9 @@ package com.woowacourse.pickgit.common.factory;
 
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
 
-public class MockCommentResponse extends CommentResponse {
+class MockCommentResponse {
 
-    public MockCommentResponse(Long id, String authorName, String content, Boolean isLiked) {
-        super(id, authorName, content, isLiked);
-    }
-
-    public static Builder Builder() {
+    public static Builder builder() {
         return new Builder();
     }
 
@@ -39,9 +35,8 @@ public class MockCommentResponse extends CommentResponse {
             return this;
         }
 
-        public MockCommentResponse build() {
-            return new MockCommentResponse(id, authorName, content, isLiked);
+        public CommentResponse build() {
+            return new CommentResponse(id, authorName, content, isLiked);
         }
     }
-
 }

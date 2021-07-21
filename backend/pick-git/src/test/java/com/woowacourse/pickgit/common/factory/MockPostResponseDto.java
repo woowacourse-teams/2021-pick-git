@@ -5,19 +5,12 @@ import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class MockPostResponseDto extends PostResponseDto {
+class MockPostResponseDto {
 
-    public MockPostResponseDto(
-        Long id, List<String> imageUrls, String githubRepoUrl,
-        String content, String authorName, String profileImageUrl, Integer likesCount,
-        List<String> tags, LocalDateTime createdAt, LocalDateTime updatedAt,
-        List<CommentResponse> comments, Boolean isLiked
-    ) {
-        super(id, imageUrls, githubRepoUrl, content, authorName, profileImageUrl, likesCount, tags,
-            createdAt, updatedAt, comments, isLiked);
+    private MockPostResponseDto() {
     }
 
-    public static Builder Builder() {
+    public static Builder builder() {
         return new Builder();
     }
 
@@ -111,8 +104,8 @@ public class MockPostResponseDto extends PostResponseDto {
             return this;
         }
 
-        public MockPostResponseDto build() {
-            return new MockPostResponseDto(
+        public PostResponseDto build() {
+            return new PostResponseDto(
                 id, imageUrls, githubRepoUrl, content,
                 authorName, profileImageUrl, likesCount, tags,
                 createdAt, updatedAt, comments, isLiked
