@@ -1,6 +1,6 @@
 export interface ProfileData {
   name: string;
-  image: string;
+  imageUrl: string;
   description: string;
   followerCount: number;
   followingCount: number;

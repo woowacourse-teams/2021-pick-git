@@ -72,7 +72,7 @@ const ProfileHeader = ({ profile, isMyProfile }: Props) => {
 
   return (
     <Container>
-      <Avatar diameter="3.75rem" fontSize="0.875rem" imageUrl={profile?.image} name={profile?.name} />
+      <Avatar diameter="3.75rem" fontSize="0.875rem" imageUrl={profile?.imageUrl} name={profile?.name} />
       <div>
         <Indicators>
           <CountIndicator name="게시물" count={profile?.postCount ?? 0} />
