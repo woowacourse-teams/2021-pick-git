@@ -5,20 +5,38 @@ import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollCont
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import axios from "axios";
 import { useQueryClient } from "react-query";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import UserContext from "../../contexts/UserContext";
 import { QUERY } from "../../constants/queries";
+import { Post } from "../../@types";
 
 const HomeFeedPage = () => {
-  const { data, isLoading, error, isFetching, fetchNextPage } = useHomeFeedPostsQuery();
-  const queryClient = useQueryClient();
   const { logout } = useContext(UserContext);
 
-  const allPosts = data?.pages?.reduce((acc, postPage) => acc.concat(postPage), []);
+  const { data, isLoading, error, isFetching, fetchNextPage } = useHomeFeedPostsQuery();
+  const queryClient = useQueryClient();
+
+  const [allPosts, setAllPosts] = useState<Post[]>([]);
 
   const handlePostsEndIntersect = () => {
     fetchNextPage();
   };
+
+  useEffect(() => {
+    const fetchedPosts = data?.pages?.reduce((acc, postPage) => acc.concat(postPage), []) ?? [];
+    const postIdSet = new Set();
+    const filteredPosts = fetchedPosts.filter((post) => {
+      const isNewPost = !postIdSet.has(post.postId);
+
+      if (isNewPost) {
+        postIdSet.add(post.postId);
+      }
+
+      return isNewPost;
+    });
+
+    setAllPosts(filteredPosts);
+  }, [data]);
 
   if (error) {
     if (axios.isAxiosError(error)) {
