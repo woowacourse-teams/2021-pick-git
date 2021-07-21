@@ -47,12 +47,15 @@ class UserAcceptanceTest {
 
     private String targetUserAccessToken;
 
-    private User sourceUser = UserFactory.user("sourceUser");
-    private User targetUser = UserFactory.user("targetUser");
+    private User sourceUser;
+    private User targetUser;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
+
+        sourceUser = UserFactory.user("sourceUser");
+        targetUser = UserFactory.user("targetUser");
 
         sourceUserAccessToken = 로그인_되어있음(sourceUser).getToken();
         targetUserAccessToken = 로그인_되어있음(targetUser).getToken();
@@ -100,9 +103,11 @@ class UserAcceptanceTest {
         String followRequestUrl = "/api/profiles/" + targetUser.getName() + "/followings";
         String requestUrl = "/api/profiles/" + targetUser.getName();
         UserProfileResponse expectedResponseDto =
-            new UserProfileResponse(targetUser.getName(), targetUser.getImage(), targetUser.getDescription(),
+            new UserProfileResponse(targetUser.getName(), targetUser.getImage(),
+                targetUser.getDescription(),
                 1, targetUser.getFollowingCount(), targetUser.getPostCount(),
-                targetUser.getGithubUrl(), targetUser.getCompany(), targetUser.getLocation(), targetUser.getWebsite(),
+                targetUser.getGithubUrl(), targetUser.getCompany(), targetUser.getLocation(),
+                targetUser.getWebsite(),
                 targetUser.getTwitter(), true);
 
         authenticatedPostRequest(sourceUserAccessToken, followRequestUrl, HttpStatus.OK);
