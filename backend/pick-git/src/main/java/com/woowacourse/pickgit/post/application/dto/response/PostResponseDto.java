@@ -3,7 +3,9 @@ package com.woowacourse.pickgit.post.application.dto.response;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.Builder;
 
+@Builder
 public class PostResponseDto {
 
     private Long id;

@@ -19,48 +19,48 @@ public class PostFactory {
         List<MultipartFile> images =
             List.of(FileFactory.getTestImage1(), FileFactory.getTestImage2());
 
-        PostRequestDto fixture1 = MockPostRequestDto.builder()
+        PostRequestDto fixture1 = PostRequestDto.builder()
             .token("a")
-            .userName("sean")
+            .username("sean")
             .images(images)
             .githubRepoUrl("atdd-subway-fare")
-            .tags("Java", "Python", "C++")
+            .tags(List.of("Java", "Python", "C++"))
             .content("woowacourse mission")
             .build();
 
-        PostRequestDto fixture2 = MockPostRequestDto.builder()
+        PostRequestDto fixture2 = PostRequestDto.builder()
             .token("a")
-            .userName("ginger")
+            .username("ginger")
             .images(images)
             .githubRepoUrl("jwp-chess")
-            .tags("Javascirpt", "C", "HTML")
+            .tags(List.of("Javascirpt", "C", "HTML"))
             .content("it's so easy!")
             .build();
 
-        PostRequestDto fixture3 = MockPostRequestDto.builder()
+        PostRequestDto fixture3 = PostRequestDto.builder()
             .token("a")
-            .userName("dani")
+            .username("dani")
             .images(images)
             .githubRepoUrl("java-racingcar")
-            .tags("Go", "Objective-C")
+            .tags(List.of("Go", "Objective-C"))
             .content("I love TDD")
             .build();
 
-        PostRequestDto fixture4 = MockPostRequestDto.builder()
+        PostRequestDto fixture4 = PostRequestDto.builder()
             .token("a")
-            .userName("coda")
+            .username("coda")
             .images(images)
             .githubRepoUrl("junit-test")
-            .tags("Java", "CSS", "HTML")
+            .tags(List.of("Java", "CSS", "HTML"))
             .content("hi there!")
             .build();
 
-        PostRequestDto fixture5 = MockPostRequestDto.builder()
+        PostRequestDto fixture5 = PostRequestDto.builder()
             .token("a")
-            .userName("dave")
+            .username("dave")
             .images(images)
             .githubRepoUrl("jpa-learning-test")
-            .tags("Java", "CSS", "HTML")
+            .tags(List.of("Java", "CSS", "HTML"))
             .content("jpa is so fun!")
             .build();
 
@@ -71,48 +71,48 @@ public class PostFactory {
         List<MultipartFile> images =
             List.of(FileFactory.getTestImage1(), FileFactory.getTestImage2());
 
-        PostRequestDto fixture1 = MockPostRequestDto.builder()
+        PostRequestDto fixture1 = PostRequestDto.builder()
             .token("a")
-            .userName("kevin")
+            .username("kevin")
             .images(images)
             .githubRepoUrl("atdd-subway-fare")
-            .tags("Java", "Python", "C++")
+            .tags(List.of("Java", "Python", "C++"))
             .content("woowacourse mission")
             .build();
 
-        PostRequestDto fixture2 = MockPostRequestDto.builder()
+        PostRequestDto fixture2 = PostRequestDto.builder()
             .token("a")
-            .userName("kevin")
+            .username("kevin")
             .images(images)
             .githubRepoUrl("jwp-chess")
-            .tags("Javascirpt", "C", "HTML")
+            .tags(List.of("Javascirpt", "C", "HTML"))
             .content("it's so easy!")
             .build();
 
-        PostRequestDto fixture3 = MockPostRequestDto.builder()
+        PostRequestDto fixture3 = PostRequestDto.builder()
             .token("a")
-            .userName("kevin")
+            .username("kevin")
             .images(images)
             .githubRepoUrl("java-racingcar")
-            .tags("Go", "Objective-C")
+            .tags(List.of("Go", "Objective-C"))
             .content("I love TDD")
             .build();
 
-        PostRequestDto fixture4 = MockPostRequestDto.builder()
+        PostRequestDto fixture4 = PostRequestDto.builder()
             .token("a")
-            .userName("kevin")
+            .username("kevin")
             .images(images)
             .githubRepoUrl("junit-test")
-            .tags("Java", "CSS", "HTML")
+            .tags(List.of("Java", "CSS", "HTML"))
             .content("hi there!")
             .build();
 
-        PostRequestDto fixture5 = MockPostRequestDto.builder()
+        PostRequestDto fixture5 = PostRequestDto.builder()
             .token("a")
-            .userName("kevin")
+            .username("kevin")
             .images(images)
             .githubRepoUrl("jpa-learning-test")
-            .tags("Java", "CSS", "HTML")
+            .tags(List.of("Java", "CSS", "HTML"))
             .content("jpa is so fun!")
             .build();
 
@@ -120,32 +120,32 @@ public class PostFactory {
     }
 
     public static List<PostResponseDto> mockPostResponseDtos() {
-        CommentResponse commentFixture1 = MockCommentResponse.builder()
+        CommentResponse commentFixture1 = CommentResponse.builder()
             .id(1L)
             .authorName("commentAuthorName1")
             .content("commentContent1")
             .isLiked(false)
             .build();
 
-        CommentResponse commentFixture2 = MockCommentResponse.builder()
+        CommentResponse commentFixture2 = CommentResponse.builder()
             .id(2L)
             .authorName("commentAuthorName2")
             .content("commentContent2")
             .isLiked(false)
             .build();
 
-        PostResponseDto fixture1 = MockPostResponseDto.builder()
+        PostResponseDto fixture1 = PostResponseDto.builder()
             .id(1L)
-            .imageUrls("image1Url", "image2Url")
+            .imageUrls(List.of("image1Url", "image2Url"))
             .githubRepoUrl("githubRepoUrl")
             .content("content")
             .authorName("authorName")
             .profileImageUrl("profileImageUrl")
             .likesCount(1)
-            .tags("tag1", "tag2")
+            .tags(List.of("tag1", "tag2"))
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
-            .comments(commentFixture1, commentFixture2)
+            .comments(List.of(commentFixture1, commentFixture2))
             .isLiked(false)
             .build();
 

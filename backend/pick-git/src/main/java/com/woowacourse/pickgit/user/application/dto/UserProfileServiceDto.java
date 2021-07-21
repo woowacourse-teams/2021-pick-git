@@ -1,5 +1,8 @@
 package com.woowacourse.pickgit.user.application.dto;
 
+import lombok.Builder;
+
+@Builder
 public class UserProfileServiceDto {
 
     private final String name;

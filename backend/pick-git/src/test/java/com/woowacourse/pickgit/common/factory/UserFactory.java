@@ -28,7 +28,7 @@ public class UserFactory {
     }
 
     public static UserProfileServiceDto mockLoginUserProfileServiceDto() {
-        return MockUserProfileServiceDto.builder()
+        return UserProfileServiceDto.builder()
             .name("yjksw")
             .image("http://img.com")
             .description("The Best")
@@ -45,7 +45,7 @@ public class UserFactory {
     }
 
     public static UserProfileServiceDto mockUnLoginUserProfileServiceDto() {
-        return MockUserProfileServiceDto.builder()
+        return UserProfileServiceDto.builder()
             .name("yjksw")
             .image("http://img.com")
             .description("The Best")
