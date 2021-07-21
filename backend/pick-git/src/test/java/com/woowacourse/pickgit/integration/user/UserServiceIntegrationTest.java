@@ -214,7 +214,7 @@ class UserServiceIntegrationTest {
     void unfollowUser_NotExistingFollow_ExceptionThrown() {
         //given
         String targetName = "pickgit";
-        userRepository.save(UserFactory.user( NAME));
+        userRepository.save(UserFactory.user(NAME));
         userRepository.save(UserFactory.user(targetName));
         AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(NAME);
 
