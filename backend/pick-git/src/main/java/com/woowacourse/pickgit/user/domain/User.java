@@ -1,15 +1,15 @@
 package com.woowacourse.pickgit.user.domain;
 
+import com.woowacourse.pickgit.exception.user.DuplicateFollowException;
+import com.woowacourse.pickgit.exception.user.InvalidFollowException;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.Posts;
-import com.woowacourse.pickgit.user.domain.follow.Follow;
 import com.woowacourse.pickgit.post.domain.comment.Comment;
+import com.woowacourse.pickgit.user.domain.follow.Follow;
 import com.woowacourse.pickgit.user.domain.follow.Followers;
 import com.woowacourse.pickgit.user.domain.follow.Followings;
 import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
 import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
-import com.woowacourse.pickgit.exception.user.DuplicateFollowException;
-import com.woowacourse.pickgit.exception.user.InvalidFollowException;
 import java.util.Objects;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;

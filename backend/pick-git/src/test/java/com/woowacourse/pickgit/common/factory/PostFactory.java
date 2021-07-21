@@ -119,46 +119,6 @@ public class PostFactory {
         return List.of(fixture1, fixture2, fixture3, fixture4, fixture5);
     }
 
-    public static List<User> mockUsers() {
-        return List.of(
-            new User(
-                new BasicProfile("sean", "a.jpg", "a"),
-                new GithubProfile("github1.com", "a", "a", "a", "a")
-            ),
-            new User(
-                new BasicProfile("ginger", "a.jpg", "a"),
-                new GithubProfile("github2.com", "a", "a", "a", "a")
-            ),
-            new User(
-                new BasicProfile("dani", "a.jpg", "a"),
-                new GithubProfile("dani.com", "a", "a", "a", "a")
-            ),
-            new User(
-                new BasicProfile("coda", "a.jpg", "a"),
-                new GithubProfile("coda.com", "a", "a", "a", "a")
-            ),
-            new User(
-                new BasicProfile("dave", "a.jpg", "a"),
-                new GithubProfile("dave.com", "a", "a", "a", "a")
-            )
-        );
-    }
-
-    public static List<User> mockUsers2() {
-        return List.of(
-            new User(
-                new BasicProfile("ala", "a.jpg", "a"),
-                new GithubProfile("github1.com", "a", "a", "a", "a")
-            ),
-            new User(
-                new BasicProfile("dave", "a.jpg", "a"),
-                new GithubProfile("github2.com", "a", "a", "a", "a")
-            )
-        );
-    }
-
-    private static long autoIncrement = 1;
-
     public static List<PostResponseDto> mockPostResponseDtos() {
         CommentResponse commentFixture1 = MockCommentResponse.builder()
             .id(1L)

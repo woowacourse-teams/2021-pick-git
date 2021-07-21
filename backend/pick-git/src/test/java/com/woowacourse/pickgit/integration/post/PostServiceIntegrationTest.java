@@ -9,6 +9,7 @@ import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.PostFactory;
+import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.config.TestInfrastructureConfiguration;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.post.CommentFormatException;
@@ -24,6 +25,7 @@ import com.woowacourse.pickgit.post.domain.PostRepository;
 import com.woowacourse.pickgit.post.domain.comment.Comments;
 import com.woowacourse.pickgit.post.presentation.dto.request.CommentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.HomeFeedRequest;
+import com.woowacourse.pickgit.post.presentation.dto.request.PostRequest;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
@@ -31,6 +33,7 @@ import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -218,14 +221,23 @@ class PostServiceIntegrationTest {
 
     private void createMockPosts() {
         List<PostRequestDto> postRequestDtos = PostFactory.mockPostRequestDtos();
-        List<User> users = PostFactory.mockUsers();
-        for (int i = 0; i < postRequestDtos.size(); i++) {
-            userRepository.save(users.get(i));
-            PostImageUrlResponseDto response = postService.write(postRequestDtos.get(i));
-            CommentRequest commentRequest =
-                new CommentRequest(users.get(i).getName(), "test comment" + i, response.getId());
-            postService.addComment(commentRequest);
-        }
+        List<User> users = postRequestDtos.stream()
+            .map(PostRequestDto::getUsername)
+            .map(UserFactory::user)
+            .collect(toList());
+
+        IntStream.range(0, users.size())
+            .forEach(index -> {
+                User user = users.get(index);
+                PostRequestDto newPost = postRequestDtos.get(index);
+
+                userRepository.save(user);
+                Long postId = postService.write(newPost).getId();
+
+                CommentRequest commentRequest =
+                    new CommentRequest(user.getName(), "test comment" + index, postId);
+                postService.addComment(commentRequest);
+            });
     }
 
     @DisplayName("내 피드 게시물들만 조회한다.")
@@ -234,10 +246,6 @@ class PostServiceIntegrationTest {
         //given
         List<PostRequestDto> postRequestDtos = PostFactory.mockPostRequestForAssertingMyFeed();
 
-        List<User> users = PostFactory.mockUsers2();
-        for (User user : users) {
-            userRepository.save(user);
-        }
         for (PostRequestDto postRequestDto : postRequestDtos) {
             postService.write(postRequestDto);
         }
@@ -261,11 +269,6 @@ class PostServiceIntegrationTest {
         //given
         List<PostRequestDto> postRequestDtos =
             PostFactory.mockPostRequestForAssertingMyFeed();
-        List<User> users = PostFactory.mockUsers2();
-
-        for (User user : users) {
-            userRepository.save(user);
-        }
 
         for (PostRequestDto postRequestDto : postRequestDtos) {
             postService.write(postRequestDto);
@@ -296,11 +299,6 @@ class PostServiceIntegrationTest {
     void readUserFeed_GuestUser_Success() {
         //given
         List<PostRequestDto> postRequestDtos = PostFactory.mockPostRequestForAssertingMyFeed();
-        List<User> users = PostFactory.mockUsers2();
-
-        for (User user : users) {
-            userRepository.save(user);
-        }
 
         for (PostRequestDto postRequestDto : postRequestDtos) {
             postService.write(postRequestDto);
