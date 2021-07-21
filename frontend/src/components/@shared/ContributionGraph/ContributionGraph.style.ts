@@ -1,4 +1,3 @@
-import defaultImage from "../../../assets/images/default-image.png";
 import styled from "styled-components";
 
 export const Container = styled.div<{ columnCount: number; rowCount: number }>`
