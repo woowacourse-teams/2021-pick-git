@@ -1,7 +1,9 @@
 package com.woowacourse.pickgit.post.application.dto;
 
 import com.woowacourse.pickgit.post.domain.comment.Comment;
+import lombok.Builder;
 
+@Builder
 public class CommentResponse {
 
     private Long id;
