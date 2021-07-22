@@ -33,7 +33,7 @@ public class TagService {
 
     @Transactional(readOnly = true)
     public List<Tag> findOrCreateTags(TagsDto tagsDto) {
-        List<String> tagNames = tagsDto.getTags();
+        List<String> tagNames = tagsDto.getTagNames();
         List<Tag> tags = new ArrayList<>();
         for (String tagName : tagNames) {
             tagRepository.findByName(tagName)

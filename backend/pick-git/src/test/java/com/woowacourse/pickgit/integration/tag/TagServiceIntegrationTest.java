@@ -52,7 +52,7 @@ class TagServiceIntegrationTest {
 
         TagsDto tagsDto = tagService.extractTags(extractionRequestDto);
 
-        assertThat(tagsDto.getTags()).containsAll(tags);
+        assertThat(tagsDto.getTagNames()).containsAll(tags);
     }
 
     @DisplayName("잘못된 경로로 태그 추출 요청시 404 예외가 발생한다.")
