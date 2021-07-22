@@ -31,10 +31,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ApplicationException.class)
-    public ResponseEntity<ApiErrorResponse> authenticationException(
+    public ResponseEntity<ApiErrorResponse> applicationException(
         ApplicationException e) {
         String errorCode = e.getErrorCode();
-        log.error("로그인 실패 " + errorCode);
+        log.error(errorCode);
 
         return ResponseEntity
             .status(e.getHttpStatus().value())
