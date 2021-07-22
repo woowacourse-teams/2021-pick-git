@@ -63,34 +63,66 @@ class TagAcceptanceTest {
     @DisplayName("특정 User의 Repository에 기술된 언어 태그들을 추출한다.")
     @Test
     void extractLanguageTags_ValidRepository_ExtractionSuccess() {
+        // given
         String url =
             "/api/github/repositories/" + repositoryName + "/tags/languages";
 
+        // when
         List<String> response = requestTags(accessToken, url, HttpStatus.OK)
             .as(new TypeRef<List<String>>() {});
 
+        // then
         assertThat(response).containsExactly("JavaScript", "HTML", "CSS");
     }
 
     @DisplayName("유효하지 않은 레포지토리 태그 추출 요청시 500 예외 메시지가 반환된다.")
     @Test
     void extractLanguageTags_InvalidRepository_ExceptionThrown() {
+        // given
         String url =
             "/api/github/repositories/none-available-repo/tags/languages";
 
+        // when
         ApiErrorResponse response = requestTags(accessToken, url, HttpStatus.INTERNAL_SERVER_ERROR)
             .as(ApiErrorResponse.class);
 
+        // then
         assertThat(response.getErrorCode()).isEqualTo("V0001");
     }
 
-    @DisplayName("유효하지 않은 AccessToken으로 태그 추출 요청시 서버 에러가 발생한다.")
+    @DisplayName("유효하지 않은 AccessToken으로 태그 추출 요청시 401 예외가 발생한다.")
     @Test
     void extractLanguageTags_InvalidAccessToken_ExceptionThrown() {
+        // given
         String url =
             "/api/github/repositories/" + repositoryName + "/tags/languages";
 
-        requestTags("invalidtoken", url, HttpStatus.UNAUTHORIZED);
+        // when
+        ApiErrorResponse response =
+            requestTags("invalidtoken", url, HttpStatus.UNAUTHORIZED)
+            .as(ApiErrorResponse.class);
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("A0001");
+    }
+
+    @DisplayName("토큰을 포함하지 않고 태그 추출 요청시 401 예외가 발생한다.")
+    @Test
+    void extractLanguageTags_EmptyToken_ExceptionThrown() {
+        // given
+        String url =
+            "/api/github/repositories/" + repositoryName + "/tags/languages";
+
+        // when
+        ApiErrorResponse response = RestAssured.given().log().all()
+            .when().get(url)
+            .then().log().all()
+            .statusCode(HttpStatus.UNAUTHORIZED.value())
+            .extract()
+            .as(ApiErrorResponse.class);
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("A0001");
     }
 
     private OAuthTokenResponse 로그인_되어있음() {
@@ -104,10 +136,13 @@ class TagAcceptanceTest {
         String oauthCode = "1234";
         String accessToken = "oauth.access.token";
 
-        OAuthProfileResponse oAuthProfileResponse = new OAuthProfileResponse(
-            "jipark3", "image", "hi~", "github.com/",
-            null, null, null, null
-        );
+        OAuthProfileResponse oAuthProfileResponse = OAuthProfileResponse
+            .builder()
+            .name("jipark3")
+            .image("image")
+            .description("hi~")
+            .githubUrl("htts://www.github.com/")
+            .build();
 
         // mock
         when(oAuthClient.getAccessToken(oauthCode)).thenReturn(accessToken);
