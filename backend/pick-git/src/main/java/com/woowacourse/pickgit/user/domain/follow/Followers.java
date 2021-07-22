@@ -10,7 +10,12 @@ import javax.persistence.OneToMany;
 @Embeddable
 public class Followers {
 
-    @OneToMany(mappedBy = "target", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @OneToMany(
+        mappedBy = "target",
+        fetch = FetchType.LAZY,
+        cascade = CascadeType.PERSIST,
+        orphanRemoval = true
+    )
     private List<Follow> followers = new ArrayList<>();
 
     public Followers() {

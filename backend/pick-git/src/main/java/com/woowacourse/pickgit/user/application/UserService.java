@@ -85,7 +85,7 @@ public class UserService {
     }
 
     private void validateDifferentSourceTarget(User source, User target) {
-        if (source.getId() == target.getId()) {
+        if (source.getId().equals(target.getId())) {
             throw new SameSourceTargetUserException();
         }
     }

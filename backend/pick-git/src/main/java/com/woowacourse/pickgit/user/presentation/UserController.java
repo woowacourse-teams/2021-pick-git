@@ -47,6 +47,18 @@ public class UserController {
         return ResponseEntity.ok(getUserProfileResponseDto(userProfileServiceDto));
     }
 
+    private UserProfileResponse getUserProfileResponseDto(
+        UserProfileServiceDto userProfileServiceDto) {
+        return new UserProfileResponse(
+            userProfileServiceDto.getName(), userProfileServiceDto.getImage(),
+            userProfileServiceDto.getDescription(), userProfileServiceDto.getFollowerCount(),
+            userProfileServiceDto.getFollowingCount(), userProfileServiceDto.getPostCount(),
+            userProfileServiceDto.getGithubUrl(), userProfileServiceDto.getCompany(),
+            userProfileServiceDto.getLocation(), userProfileServiceDto.getWebsite(),
+            userProfileServiceDto.getTwitter(), userProfileServiceDto.getFollowing()
+        );
+    }
+
     @PostMapping("/{username}/followings")
     public ResponseEntity<FollowResponse> followUser(
         @Authenticated AppUser appUser,
@@ -71,18 +83,6 @@ public class UserController {
         FollowServiceDto followServiceDto = userService.unfollowUser(authUserServiceDto, username);
 
         return ResponseEntity.ok(createFollowResponseDto(followServiceDto));
-    }
-
-    private UserProfileResponse getUserProfileResponseDto(
-        UserProfileServiceDto userProfileServiceDto) {
-        return new UserProfileResponse(
-            userProfileServiceDto.getName(), userProfileServiceDto.getImage(),
-            userProfileServiceDto.getDescription(), userProfileServiceDto.getFollowerCount(),
-            userProfileServiceDto.getFollowingCount(), userProfileServiceDto.getPostCount(),
-            userProfileServiceDto.getGithubUrl(), userProfileServiceDto.getCompany(),
-            userProfileServiceDto.getLocation(), userProfileServiceDto.getWebsite(),
-            userProfileServiceDto.getTwitter(), userProfileServiceDto.getFollowing()
-        );
     }
 
     private FollowResponse createFollowResponseDto(FollowServiceDto followServiceDto) {

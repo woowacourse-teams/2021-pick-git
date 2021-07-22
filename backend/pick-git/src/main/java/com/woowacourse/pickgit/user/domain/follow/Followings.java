@@ -11,7 +11,12 @@ import javax.persistence.OneToMany;
 @Embeddable
 public class Followings {
 
-    @OneToMany(mappedBy = "source", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @OneToMany(
+        mappedBy = "source",
+        fetch = FetchType.LAZY,
+        cascade = CascadeType.PERSIST,
+        orphanRemoval = true
+    )
     private List<Follow> followings = new ArrayList<>();
 
     public Followings() {
@@ -35,8 +40,6 @@ public class Followings {
 
     public Boolean isFollowing(User targetUser) {
         return followings.stream()
-            .filter(follow -> follow.getTarget().equals(targetUser))
-            .findAny().isPresent();
+            .anyMatch(follow -> follow.getTarget().equals(targetUser));
     }
 }
-

@@ -59,10 +59,6 @@ public class User {
         this.githubProfile = githubProfile;
     }
 
-    public void changeBasicProfile(BasicProfile basicProfile) {
-        this.basicProfile = basicProfile;
-    }
-
     public void changeGithubProfile(GithubProfile githubProfile) {
         this.githubProfile = githubProfile;
     }
@@ -77,16 +73,20 @@ public class User {
         target.followers.add(follow);
     }
 
-
     public void unfollow(User target) {
         Follow follow = new Follow(this, target);
 
         if (!this.followings.existFollow(follow)) {
             throw new InvalidFollowException();
         }
-
         this.followings.remove(follow);
         target.followers.remove(follow);
+    }
+
+    public void addComment(Post post, Comment comment) {
+        comment.toPost(post)
+            .writeBy(this);
+        post.addComment(comment);
     }
 
     public Boolean isFollowing(User targetUser) {
@@ -147,12 +147,6 @@ public class User {
 
     public String getTwitter() {
         return githubProfile.getTwitter();
-    }
-
-    public void addComment(Post post, Comment comment) {
-        comment.toPost(post)
-            .writeBy(this);
-        post.addComment(comment);
     }
 
     @Override
