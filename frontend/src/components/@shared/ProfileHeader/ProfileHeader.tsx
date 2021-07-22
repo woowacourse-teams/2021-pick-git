@@ -8,7 +8,7 @@ import { useFollowingMutation, useUnfollowingMutation } from "../../../services/
 import Avatar from "../Avatar/Avatar";
 import Button from "../Button/Button";
 import CountIndicator from "../CountIndicator/CountIndicator";
-import { Container, Indicators } from "./ProfileHeader.style";
+import { ButtonLoader, ButtonSpinner, Container, Indicators } from "./ProfileHeader.style";
 
 const ProfileHeader = () => {
   const theme = useContext(ThemeContext);
@@ -37,7 +37,12 @@ const ProfileHeader = () => {
     }
 
     if (isFollowLoading || isUnfollowLoading) {
-      return <div>loading</div>;
+      return (
+        <ButtonLoader type="button" kind="squaredBlock" backgroundColor={theme.color.tertiaryColor}>
+          {isFollowLoading ? "팔로우" : "팔로우 취소"}
+          <ButtonSpinner size="1rem" />
+        </ButtonLoader>
+      );
     }
 
     if (isMyProfile) {
