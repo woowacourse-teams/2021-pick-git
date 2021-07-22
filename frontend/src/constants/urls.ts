@@ -13,7 +13,7 @@ export const PAGE_URL = {
   LOGIN: "/login",
   AUTH_PROCESSING: "/auth",
   ADD_POST: "/add-post",
-  ADD_POST_FIRST_STEP: `/add-post/${STEPS[0]}`,
+  ADD_POST_FIRST_STEP: `/add-post/${STEPS[0].path}`,
   EDIT_POST: "/edit-post",
   SEARCH: "/search",
   PROFILE: "/profile",
@@ -36,7 +36,7 @@ export const API_URL = {
   AFTER_LOGIN: (code: string) => `afterlogin?code=${code}`,
   POSTS_LIKES: (postId: string) => `/posts/${postId}/likes`,
   POSTS_COMMENTS: (postId: string) => `/posts/${postId}/comments`,
-  GITHUB_REPOSITORIES: "/github/repositories",
+  GITHUB_REPOSITORIES: "/github/swon3210/repositories",
   GITHUB_TAGS: (repositoryName: string) => `/github/repositories/${repositoryName}/tags/languages`,
 };
 
