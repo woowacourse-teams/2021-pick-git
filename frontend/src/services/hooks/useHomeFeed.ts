@@ -6,6 +6,7 @@ import { Post } from "../../@types";
 import { QUERY } from "../../constants/queries";
 import UserContext from "../../contexts/UserContext";
 import { handleHTTPError } from "../../utils/api";
+import { removeDuplicatedData } from "../../utils/data";
 import { useHomeFeedPostsQuery } from "../queries";
 
 const useHomeFeed = () => {
@@ -37,16 +38,7 @@ const useHomeFeed = () => {
 
   const handleDataFetch = () => {
     const fetchedPosts = data?.pages?.reduce((acc, postPage) => acc.concat(postPage), []) ?? [];
-    const postIdSet = new Set();
-    const filteredPosts = fetchedPosts.filter((post) => {
-      const isNewPost = !postIdSet.has(post.id);
-
-      if (isNewPost) {
-        postIdSet.add(post.id);
-      }
-
-      return isNewPost;
-    });
+    const filteredPosts = removeDuplicatedData<Post>(fetchedPosts, (post) => post.id);
 
     setAllPosts(filteredPosts);
   };
