@@ -40,7 +40,7 @@ export interface Post {
   isLiked: boolean;
 }
 
-export interface PostAddFormData {
+export interface PostUploadData {
   files: File[];
   githubRepositoryName: string;
   tags: string[];
@@ -66,3 +66,8 @@ export interface TabItem {
 }
 
 export type Tags = string[];
+
+export type Step = {
+  title: string;
+  path: string;
+};

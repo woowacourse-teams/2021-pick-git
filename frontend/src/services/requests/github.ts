@@ -2,7 +2,7 @@ import axios from "axios";
 import { GithubRepository, Tags } from "../../@types";
 import { API_URL } from "../../constants/urls";
 
-export const requestGetRepositories = async (username: string, accessToken: string | null) => {
+export const requestGetRepositories = async (accessToken: string | null) => {
   if (!accessToken) {
     throw Error("no accessToken");
   }
@@ -16,7 +16,7 @@ export const requestGetRepositories = async (username: string, accessToken: stri
   return response.data;
 };
 
-export const requestGetTags = async (username: string, repositoryName: string, accessToken: string | null) => {
+export const requestGetTags = async (repositoryName: string, accessToken: string | null) => {
   if (!accessToken) {
     throw Error("no accessToken");
   }

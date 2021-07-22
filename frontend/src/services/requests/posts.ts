@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import { Post, PostAddFormData } from "../../@types";
+import { Post, PostUploadData } from "../../@types";
 import { LIMIT } from "../../constants/limits";
 import { API_URL } from "../../constants/urls";
 
@@ -70,7 +70,7 @@ export const requestDeletePostLike = async (postId: Post["id"], accessToken: str
 
 export const requestAddPost = async (
   username: string,
-  { files, githubRepositoryName, tags, content }: PostAddFormData,
+  { files, githubRepositoryName, tags, content }: PostUploadData,
   accessToken: string | null
 ) => {
   if (!accessToken) {
