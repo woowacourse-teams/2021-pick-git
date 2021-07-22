@@ -21,7 +21,7 @@ public class Tag {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 20)
+    @Column(nullable = false, unique = true, length = MAX_TAG_LENGTH)
     private String name;
 
     @OneToMany(mappedBy = "tag")
@@ -43,6 +43,10 @@ public class Tag {
             || name.length() > MAX_TAG_LENGTH;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public String getName() {
         return name;
     }
@@ -56,11 +60,11 @@ public class Tag {
             return false;
         }
         Tag tag = (Tag) o;
-        return Objects.equals(getName(), tag.getName());
+        return Objects.equals(id, tag.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName());
+        return Objects.hash(getId());
     }
 }

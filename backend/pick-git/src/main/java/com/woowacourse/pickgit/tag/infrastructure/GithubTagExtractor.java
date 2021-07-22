@@ -3,6 +3,7 @@ package com.woowacourse.pickgit.tag.infrastructure;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.tag.domain.PlatformTagExtractor;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -43,7 +44,7 @@ public class GithubTagExtractor implements PlatformTagExtractor {
                 .keySet();
             return new ArrayList<>(tags);
         } catch (JsonProcessingException e) {
-            throw new IllegalStateException();
+            throw new PlatformHttpErrorException();
         }
     }
 }

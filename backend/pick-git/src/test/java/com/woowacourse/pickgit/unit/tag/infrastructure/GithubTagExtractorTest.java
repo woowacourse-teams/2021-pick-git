@@ -48,7 +48,7 @@ class GithubTagExtractorTest {
             .isEqualTo("V0001");
     }
 
-    @DisplayName("username/repositoryname 링크에 해당하는 경로가 존재하지 않으면 조회 예외가 발생한다.")
+    @DisplayName("요청 URL 링크(username/repositoryname)에 해당하는 경로가 존재하지 않으면 조회 예외가 발생한다.")
     @Test
     void extractTags_InvalidUrl_ExceptionThrown() {
         assertThatCode(() -> {
