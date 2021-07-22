@@ -15,7 +15,7 @@ export interface Props {
 const ProfileFeed = ({ isMyFeed, username }: Props) => {
   const history = useHistory();
   const { isLoggedIn, logout } = useContext(UserContext);
-  const { pushMessage } = useContext(SnackBarContext);
+  const { pushSnackbarMessage } = useContext(SnackBarContext);
   const { data, isLoading, error, refetch } = useUserPostsQuery(isMyFeed, username);
 
   const handleAxiosError = (error: AxiosError) => {
@@ -23,11 +23,11 @@ const ProfileFeed = ({ isMyFeed, username }: Props) => {
 
     if (status === 401) {
       if (isMyFeed) {
-        pushMessage("로그인한 사용자만 사용할 수 있는 서비스입니다.");
+        pushSnackbarMessage("로그인한 사용자만 사용할 수 있는 서비스입니다.");
 
         history.push(PAGE_URL.HOME);
       } else {
-        isLoggedIn && pushMessage("사용자 정보가 유효하지 않아 자동으로 로그아웃합니다.");
+        isLoggedIn && pushSnackbarMessage("사용자 정보가 유효하지 않아 자동으로 로그아웃합니다.");
         logout();
         refetch();
       }
@@ -50,8 +50,8 @@ const ProfileFeed = ({ isMyFeed, username }: Props) => {
     if (data?.length) {
       return (
         <GridContainer>
-          {data?.map(({ postId, imageUrls, authorName, content }) => (
-            <Link to="" key={postId}>
+          {data?.map(({ id, imageUrls, authorName, content }) => (
+            <Link to="" key={id}>
               <GridItem imageUrl={imageUrls[0]} aria-label={`${authorName}님의 게시물. ${content}`} />
             </Link>
           ))}

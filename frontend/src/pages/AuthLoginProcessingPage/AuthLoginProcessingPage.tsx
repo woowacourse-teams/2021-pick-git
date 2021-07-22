@@ -16,7 +16,7 @@ const AuthLoginProcessingPage = () => {
 
   const [dotCount, setDotCount] = useState(0);
   const { login } = useContext(UserContext);
-  const { pushMessage } = useContext(SnackBarContext);
+  const { pushSnackbarMessage } = useContext(SnackBarContext);
   const history = useHistory();
 
   useEffect(() => {
@@ -37,11 +37,11 @@ const AuthLoginProcessingPage = () => {
         const { token, username } = await requestGetAccessToken(authCode);
 
         login(token, username);
-        pushMessage("로그인에 성공했습니다.");
+        pushSnackbarMessage("로그인에 성공했습니다.");
       } catch (error) {
         console.error(error);
 
-        pushMessage("로그인에 실패했습니다.");
+        pushSnackbarMessage("로그인에 실패했습니다.");
       } finally {
         history.push(PAGE_URL.HOME);
       }

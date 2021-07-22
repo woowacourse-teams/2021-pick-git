@@ -55,9 +55,9 @@ export const useUserPostsQuery = (isMyFeed: boolean, username: string | null) =>
 };
 
 export const useAddPostLikeMutation = () => {
-  return useMutation((postId: Post["postId"]) => requestAddPostLike(postId, getAccessToken()));
+  return useMutation((postId: Post["id"]) => requestAddPostLike(postId, getAccessToken()));
 };
 
 export const useDeletePostLikeMutation = () => {
-  return useMutation((postId: Post["postId"]) => requestDeletePostLike(postId, getAccessToken()));
+  return useMutation((postId: Post["id"]) => requestDeletePostLike(postId, getAccessToken()));
 };

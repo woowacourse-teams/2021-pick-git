@@ -20,7 +20,7 @@ const useFeed = () => {
 
   const deletePostLike = async (post: Post) => {
     try {
-      await mutateDeletePostLike(post.postId);
+      await mutateDeletePostLike(post.id);
     } catch (error) {
       alert(error.message);
     }
@@ -28,13 +28,13 @@ const useFeed = () => {
 
   const addPostLike = async (post: Post) => {
     try {
-      await mutateAddPostLike(post.postId);
+      await mutateAddPostLike(post.id);
     } catch (error) {
       alert(error.message);
     }
   };
 
-  const addComment = async (postId: Post["postId"], commentContent: CommentData["content"]) => {
+  const addComment = async (postId: Post["id"], commentContent: CommentData["content"]) => {
     try {
       await mutateAddComment({ postId, commentContent });
     } catch (error) {
@@ -42,7 +42,7 @@ const useFeed = () => {
     }
   };
 
-  const deleteComment = async (postId: Post["postId"]) => {
+  const deleteComment = async (postId: Post["id"]) => {
     try {
       await mutateDeleteComment(postId);
     } catch (error) {
