@@ -9,10 +9,11 @@ export const Container = styled.div`
 `;
 
 export const ImageUploaderWrapper = styled.div`
-  margin: 1.5625rem 0 1.5625rem 0;
+  margin-top: 1.5625rem;
 `;
 
 export const TextEditorWrapper = styled.div`
   width: 100%;
   flex-grow: 1;
+  margin-top: 1.5625rem;
 `;
