@@ -7,7 +7,7 @@ export const requestGetRepositories = async (username: string, accessToken: stri
     throw Error("no accessToken");
   }
 
-  const response = await axios.get<GithubRepository[]>(API_URL.GITHUB_REPOSITORIES(username), {
+  const response = await axios.get<GithubRepository[]>(API_URL.GITHUB_REPOSITORIES, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },

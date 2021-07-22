@@ -1,6 +1,6 @@
 export interface ProfileData {
   name: string;
-  image: string;
+  imageUrl: string;
   description: string;
   followerCount: number;
   followingCount: number;
@@ -21,12 +21,12 @@ export interface CommentData {
 }
 
 export interface CommentAddData {
-  postId: Post["postId"];
+  postId: Post["id"];
   commentContent: CommentData["content"];
 }
 
 export interface Post {
-  postId: string;
+  id: string;
   imageUrls: string[];
   githubRepoUrl: string;
   content: string;

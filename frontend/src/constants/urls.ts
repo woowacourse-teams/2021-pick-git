@@ -36,7 +36,7 @@ export const API_URL = {
   AFTER_LOGIN: (code: string) => `afterlogin?code=${code}`,
   POSTS_LIKES: (postId: string) => `/posts/${postId}/likes`,
   POSTS_COMMENTS: (postId: string) => `/posts/${postId}/comments`,
-  GITHUB_REPOSITORIES: (userName: string) => `/github/${userName}/repositories`,
+  GITHUB_REPOSITORIES: "/github/repositories",
   GITHUB_TAGS: (repositoryName: string) => `/github/repositories/${repositoryName}/tags/languages`,
 };
 

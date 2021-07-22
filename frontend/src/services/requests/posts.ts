@@ -40,7 +40,7 @@ export const requestGetUserFeedPosts = async (username: string, pageParam: numbe
   return response.data;
 };
 
-export const requestAddPostLike = async (postId: string, accessToken: string | null) => {
+export const requestAddPostLike = async (postId: Post["id"], accessToken: string | null) => {
   if (!accessToken) {
     throw Error("no accessToken");
   }
@@ -54,7 +54,7 @@ export const requestAddPostLike = async (postId: string, accessToken: string | n
   return response.data;
 };
 
-export const requestDeletePostLike = async (postId: string, accessToken: string | null) => {
+export const requestDeletePostLike = async (postId: Post["id"], accessToken: string | null) => {
   if (!accessToken) {
     throw Error("no accessToken");
   }

@@ -47,7 +47,7 @@ const useFollowMutation = (
   const currentProfileQueryKey = [QUERY.GET_PROFILE, { isMyProfile: false, username }];
   const currentProfileQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
   const { logout } = useContext(UserContext);
-  const { pushMessage } = useContext(SnackBarContext);
+  const { pushSnackbarMessage } = useContext(SnackBarContext);
 
   return useMutation(() => callback(username, getAccessToken()), {
     onSuccess: ({ followerCount, following }) => {
@@ -65,13 +65,13 @@ const useFollowMutation = (
         const { status } = error.response ?? {};
 
         if (status === 401) {
-          pushMessage("로그인한 사용자만 이용할 수 있는 기능입니다.");
+          pushSnackbarMessage("로그인한 사용자만 이용할 수 있는 기능입니다.");
           logout();
         }
 
         return;
       }
-      pushMessage("요청하신 작업을 수행할 수 없습니다.");
+      pushSnackbarMessage("요청하신 작업을 수행할 수 없습니다.");
     },
   });
 };

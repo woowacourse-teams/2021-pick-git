@@ -9,7 +9,7 @@ import { useContext } from "react";
 import SnackBarContext from "../../contexts/SnackbarContext";
 
 const LoginPage = () => {
-  const { pushMessage } = useContext(SnackBarContext);
+  const { pushSnackbarMessage } = useContext(SnackBarContext);
 
   const onRequestGithubLogin = async () => {
     try {
@@ -19,7 +19,7 @@ const LoginPage = () => {
     } catch (error) {
       console.error(error);
 
-      pushMessage("요청하신 작업을 수행할 수 없습니다.");
+      pushSnackbarMessage("요청하신 작업을 수행할 수 없습니다.");
     }
   };
 
