@@ -1,14 +1,14 @@
 import { Story } from "@storybook/react";
 
 import LoggedInWrapper from "../../../.storybook/utils/LoggedInWrapper";
-import Profile, { Props } from "./Profile";
+import Profile from "./Profile";
 
 export default {
   title: "Components/Profile",
   component: Profile,
 };
 
-const Template: Story<Props> = (args) => (
+const Template: Story = (args) => (
   <LoggedInWrapper>
     <Profile {...args} />
   </LoggedInWrapper>
@@ -17,11 +17,9 @@ const Template: Story<Props> = (args) => (
 export const Default = Template.bind({});
 Default.args = {
   isMyProfile: false,
-  username: "Chris",
 };
 
 export const ProfileMe = Template.bind({});
 ProfileMe.args = {
   isMyProfile: true,
-  username: "Tanney",
 };

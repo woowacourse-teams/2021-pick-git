@@ -1,16 +1,14 @@
+import { useContext } from "react";
 import { Link } from "react-router-dom";
-import useUserFeed from "../../services/hooks/useUserFeed";
+
+import ProfileContext from "../../contexts/ProfileContext";
 import PageLoading from "../@layout/PageLoading/PageLoading";
 import InfiniteScrollContainer from "../@shared/InfiniteScrollContainer/InfiniteScrollContainer";
 import { Container, Empty, Grid, GridItem } from "./ProfileFeed.styled";
 
-export interface Props {
-  isMyFeed: boolean;
-  username: string | null;
-}
-
-const ProfileFeed = ({ isMyFeed, username }: Props) => {
-  const { allPosts, isLoading, isError, isFetchingNextPage, handleIntersect } = useUserFeed(isMyFeed, username);
+const ProfileFeed = () => {
+  const { userFeedProps } = useContext(ProfileContext) ?? {};
+  const { allPosts, isLoading, isError, isFetchingNextPage, handleIntersect } = userFeedProps ?? {};
 
   if (isLoading) {
     return (
@@ -28,7 +26,10 @@ const ProfileFeed = ({ isMyFeed, username }: Props) => {
     if (allPosts?.length) {
       return (
         <Container>
-          <InfiniteScrollContainer isLoaderShown={isFetchingNextPage} onIntersect={handleIntersect}>
+          <InfiniteScrollContainer
+            isLoaderShown={isFetchingNextPage ?? false}
+            onIntersect={handleIntersect ?? (() => {})}
+          >
             <Grid>
               {allPosts?.map(({ id, imageUrls, authorName, content }) => (
                 <Link to="" key={id}>

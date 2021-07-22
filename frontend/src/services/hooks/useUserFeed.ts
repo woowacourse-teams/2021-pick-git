@@ -6,7 +6,7 @@ import { Post } from "../../@types";
 import { PAGE_URL } from "../../constants/urls";
 import SnackBarContext from "../../contexts/SnackbarContext";
 import UserContext from "../../contexts/UserContext";
-import { handleHTTPError } from "../../utils/api";
+import { handleHTTPError, HTTPErrorHandler } from "../../utils/api";
 import { removeDuplicatedData } from "../../utils/data";
 import { useUserPostsQuery } from "../queries";
 
@@ -51,8 +51,7 @@ const useUserFeed = (isMyFeed: boolean, username: string | null) => {
 
     if (axios.isAxiosError(error)) {
       const { status } = error.response ?? {};
-
-      const errorHandler = {
+      const errorHandler: HTTPErrorHandler = {
         unauthorized: () => {
           if (isMyFeed) {
             pushSnackbarMessage("로그인한 사용자만 사용할 수 있는 서비스입니다.");

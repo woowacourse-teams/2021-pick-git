@@ -3,13 +3,10 @@ import { ThemeContext } from "styled-components";
 
 import { GithubStats } from "../../@types";
 import { BookIcon, ClockIcon, IssueIcon, PrIcon, StarIcon } from "../../assets/icons";
-import { useGithubStatsQuery } from "../../services/queries/githubStats";
+import ProfileContext from "../../contexts/ProfileContext";
+import PageLoading from "../@layout/PageLoading/PageLoading";
 import CircleIcon from "../@shared/CircleIcon/CircleIcon";
 import { Container, ContributionGraphWrapper, GithubStatsWrapper, Stat } from "./GithubStatistics.style";
-
-export interface Props {
-  username: string;
-}
 
 // TODO: typing
 const stats = {
@@ -20,12 +17,17 @@ const stats = {
   contributes: { name: "Contributes", icon: <BookIcon /> },
 };
 
-const GithubStatistics = ({ username }: Props) => {
+const GithubStatistics = () => {
   const { color } = useContext(ThemeContext);
-  const { data, isLoading, error } = useGithubStatsQuery(username);
+  const { username, githubStatisticsProps } = useContext(ProfileContext) ?? {};
+  const { data, isLoading, error } = githubStatisticsProps ?? {};
 
   if (isLoading) {
-    return <div>loading</div>;
+    return (
+      <div>
+        <PageLoading />
+      </div>
+    );
   }
 
   const GithubStats = () => {

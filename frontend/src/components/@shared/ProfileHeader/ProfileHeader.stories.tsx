@@ -1,7 +1,7 @@
 import { Story } from "@storybook/react";
 
 import LoggedInWrapper from "../../../../.storybook/utils/LoggedInWrapper";
-import ProfileHeader, { Props } from "./ProfileHeader";
+import ProfileHeader from "./ProfileHeader";
 
 export default {
   title: "Components/Shared/ProfileHeader",
@@ -24,8 +24,8 @@ const mockProfile = {
   following: false,
 };
 
-const DefaultTemplate: Story<Props> = (args) => <ProfileHeader {...args} />;
-const LoggedInTemplate: Story<Props> = (args) => (
+const DefaultTemplate: Story = (args) => <ProfileHeader {...args} />;
+const LoggedInTemplate: Story = (args) => (
   <LoggedInWrapper>
     <ProfileHeader {...args} />
   </LoggedInWrapper>

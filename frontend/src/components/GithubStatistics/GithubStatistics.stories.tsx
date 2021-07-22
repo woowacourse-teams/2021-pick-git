@@ -1,13 +1,13 @@
 import { Story } from "@storybook/react";
 
-import GithubStatistics, { Props } from "./GithubStatistics";
+import GithubStatistics from "./GithubStatistics";
 
 export default {
   title: "Components/GithubStatistics",
   component: GithubStatistics,
 };
 
-const Template: Story<Props> = (args) => <GithubStatistics {...args} />;
+const Template: Story = (args) => <GithubStatistics {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {

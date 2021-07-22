@@ -4,7 +4,7 @@ import { GithubStats } from "../../@types";
 import { QUERY } from "../../constants/queries";
 import { requestGetGithubStats } from "../requests";
 
-type GithubStatsQueryKey = readonly [typeof QUERY.GET_GITHUB_STATS, string];
+type GithubStatsQueryKey = readonly [typeof QUERY.GET_GITHUB_STATS, string | null];
 
 const githubStatsQueryFunction: QueryFunction<GithubStats> = async ({ queryKey }) => {
   const [, username] = queryKey as GithubStatsQueryKey;
@@ -12,6 +12,9 @@ const githubStatsQueryFunction: QueryFunction<GithubStats> = async ({ queryKey }
   return await requestGetGithubStats(username);
 };
 
-export const useGithubStatsQuery = (username: string) => {
-  return useQuery<GithubStats, AxiosError<GithubStats>>([QUERY.GET_GITHUB_STATS, username], githubStatsQueryFunction);
+export const useGithubStatsQuery = (username: string | null) => {
+  return useQuery<GithubStats, AxiosError<GithubStats> | Error>(
+    [QUERY.GET_GITHUB_STATS, username],
+    githubStatsQueryFunction
+  );
 };

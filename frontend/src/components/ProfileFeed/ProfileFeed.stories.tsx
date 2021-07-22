@@ -1,13 +1,13 @@
 import { Story } from "@storybook/react";
 
-import ProfileFeed, { Props } from "./ProfileFeed";
+import ProfileFeed from "./ProfileFeed";
 
 export default {
   title: "Components/ProfileFeed",
   component: ProfileFeed,
 };
 
-const Template: Story<Props> = (args) => <ProfileFeed {...args} />;
+const Template: Story = (args) => <ProfileFeed {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {

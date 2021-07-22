@@ -11,7 +11,7 @@ const httpErrorStatus = {
 
 const httpErrorStatusNames = Object.values(httpErrorStatus);
 
-type HTTPErrorHandler = {
+export type HTTPErrorHandler = {
   [V in typeof httpErrorStatusNames[number]]?: () => void;
 };
 

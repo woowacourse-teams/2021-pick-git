@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { ThemeContext } from "styled-components";
 
-import { ProfileData } from "../../../@types";
+import ProfileContext from "../../../contexts/ProfileContext";
 import SnackBarContext from "../../../contexts/SnackbarContext";
 import UserContext from "../../../contexts/UserContext";
 import { useFollowingMutation, useUnfollowingMutation } from "../../../services/queries";
@@ -10,23 +10,21 @@ import Button from "../Button/Button";
 import CountIndicator from "../CountIndicator/CountIndicator";
 import { Container, Indicators } from "./ProfileHeader.style";
 
-export interface Props {
-  profile?: ProfileData;
-  isMyProfile: boolean;
-}
-
-const ProfileHeader = ({ profile, isMyProfile }: Props) => {
+const ProfileHeader = () => {
   const theme = useContext(ThemeContext);
   const { isLoggedIn } = useContext(UserContext);
   const { pushSnackbarMessage } = useContext(SnackBarContext);
+  const { isMyProfile, profileProps } = useContext(ProfileContext) ?? {};
 
-  const { mutate: follow, isLoading: isFollowLoading } = useFollowingMutation(profile?.name);
-  const { mutate: unFollow, isLoading: isUnfollowLoading } = useUnfollowingMutation(profile?.name);
+  const { data } = profileProps ?? {};
+
+  const { mutate: follow, isLoading: isFollowLoading } = useFollowingMutation(data?.name);
+  const { mutate: unFollow, isLoading: isUnfollowLoading } = useUnfollowingMutation(data?.name);
 
   const onFollowButtonClick = () => {
-    if (profile?.following === null) return;
+    if (data?.following === null) return;
 
-    if (profile?.following) {
+    if (data?.following) {
       unFollow();
     } else {
       follow();
@@ -50,7 +48,7 @@ const ProfileHeader = ({ profile, isMyProfile }: Props) => {
       );
     }
 
-    if (profile?.following) {
+    if (data?.following) {
       return (
         <Button
           type="button"
@@ -72,12 +70,12 @@ const ProfileHeader = ({ profile, isMyProfile }: Props) => {
 
   return (
     <Container>
-      <Avatar diameter="3.75rem" fontSize="0.875rem" imageUrl={profile?.imageUrl} name={profile?.name} />
+      <Avatar diameter="3.75rem" fontSize="0.875rem" imageUrl={data?.imageUrl} name={data?.name} />
       <div>
         <Indicators>
-          <CountIndicator name="게시물" count={profile?.postCount ?? 0} />
-          <CountIndicator name="팔로워" count={profile?.followerCount ?? 0} />
-          <CountIndicator name="팔로잉" count={profile?.followingCount ?? 0} />
+          <CountIndicator name="게시물" count={data?.postCount ?? 0} />
+          <CountIndicator name="팔로워" count={data?.followerCount ?? 0} />
+          <CountIndicator name="팔로잉" count={data?.followingCount ?? 0} />
         </Indicators>
         <ProfileButton />
       </div>

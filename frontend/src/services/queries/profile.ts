@@ -76,7 +76,7 @@ const useFollowMutation = (
   });
 };
 
-export const useFollowingMutation = (userName: string | undefined) => useFollowMutation(userName, requestAddFollow);
+export const useFollowingMutation = (username: string | undefined) => useFollowMutation(username, requestAddFollow);
 
-export const useUnfollowingMutation = (userName: string | undefined) =>
-  useFollowMutation(userName, requestDeleteFollow);
+export const useUnfollowingMutation = (username: string | undefined) =>
+  useFollowMutation(username, requestDeleteFollow);
