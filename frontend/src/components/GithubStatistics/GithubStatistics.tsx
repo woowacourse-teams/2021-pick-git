@@ -23,11 +23,7 @@ const GithubStatistics = () => {
   const { data, isLoading, error } = githubStatisticsProps ?? {};
 
   if (isLoading) {
-    return (
-      <div>
-        <PageLoading />
-      </div>
-    );
+    return <PageLoading />;
   }
 
   const GithubStats = () => {
