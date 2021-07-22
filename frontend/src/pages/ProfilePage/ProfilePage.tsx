@@ -1,5 +1,6 @@
-import { useContext } from "react";
-import { Redirect, useLocation, useParams } from "react-router-dom";
+import { useContext, useState } from "react";
+import { Redirect, useLocation } from "react-router-dom";
+import { TabItem } from "../../@types";
 
 import Tabs from "../../components/@shared/Tabs/Tabs";
 import GithubStatistics from "../../components/GithubStatistics/GithubStatistics";
@@ -13,29 +14,28 @@ export interface Props {
   isMyProfile: boolean;
 }
 
+const tabNames = ["게시물", "활동통계"];
+
 const ProfilePage = ({ isMyProfile }: Props) => {
   const username = new URLSearchParams(useLocation().search).get("username");
   const { currentUsername } = useContext(UserContext);
+  const [tabIndex, setTabIndex] = useState(0);
+
+  const tabItems: TabItem[] = tabNames.map((name, index) => ({ name, onTabChange: () => setTabIndex(index) }));
+  const tabContents = [
+    <ProfileFeed key="profile-feed" isMyFeed={isMyProfile} username={username} />,
+    <GithubStatistics key="github-stats" username={isMyProfile ? currentUsername : username ?? ""} />,
+  ];
 
   if (!isMyProfile && !username) return <Redirect to={PAGE_URL.HOME} />;
 
   if (username && username === currentUsername) return <Redirect to={PAGE_URL.MY_PROFILE} />;
 
-  const tabItems = [
-    {
-      name: "게시물",
-      content: <ProfileFeed isMyFeed={isMyProfile} username={username} />,
-    },
-    {
-      name: "활동통계",
-      content: <GithubStatistics username={isMyProfile ? currentUsername : (username as string)} />,
-    },
-  ];
-
   return (
     <Container>
       <Profile isMyProfile={isMyProfile} username={username} />
       <Tabs tabItems={tabItems} />
+      {tabContents[tabIndex]}
     </Container>
   );
 };
