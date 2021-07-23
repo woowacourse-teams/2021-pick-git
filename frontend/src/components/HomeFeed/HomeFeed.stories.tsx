@@ -1,12 +1,12 @@
 import { Story } from "@storybook/react";
 
-import Feed from "./Feed";
+import HomeFeed from "./HomeFeed";
 import { useHomeFeedPostsQuery } from "../../services/queries";
 import PageLoading from "../@layout/PageLoading/PageLoading";
 
 export default {
-  title: "Components/Feed",
-  component: Feed,
+  title: "Components/HomeFeed",
+  component: HomeFeed,
 };
 
 const Template: Story = (args) => {
@@ -18,7 +18,7 @@ const Template: Story = (args) => {
     return <PageLoading />;
   }
 
-  return <Feed {...args} posts={allPosts} />;
+  return <HomeFeed {...args} posts={allPosts} />;
 };
 
 export const Default = Template.bind({});

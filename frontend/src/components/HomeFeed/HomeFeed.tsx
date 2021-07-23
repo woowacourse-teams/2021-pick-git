@@ -5,13 +5,13 @@ import { FAILURE_MESSAGE } from "../../constants/messages";
 import SnackBarContext from "../../contexts/SnackbarContext";
 import useFeed from "../../services/hooks/useFeed";
 import PostItem from "../@shared/PostItem/PostItem";
-import { Container, PostItemWrapper } from "./Feed.style";
+import { Container, PostItemWrapper } from "./HomeFeed.style";
 
 interface Props {
   posts: Post[];
 }
 
-const Feed = ({ posts }: Props) => {
+const HomeFeed = ({ posts }: Props) => {
   const { pushSnackbarMessage } = useContext(SnackBarContext);
   const { commentValue, setCommentValue, deletePostLike, addPostLike, setPosts, addComment } = useFeed();
 
@@ -85,4 +85,4 @@ const Feed = ({ posts }: Props) => {
   );
 };
 
-export default Feed;
+export default HomeFeed;
