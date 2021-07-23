@@ -4,6 +4,7 @@ export { ReactComponent as AddBoxIcon } from "./add-box.svg";
 export { ReactComponent as SearchIcon } from "./search.svg";
 export { ReactComponent as LoginIcon } from "./login.svg";
 export { ReactComponent as CancelIcon } from "./cancel.svg";
+export { ReactComponent as CancelNoCircleIcon } from "./cancel-no-circle.svg";
 export { ReactComponent as GoBackIcon } from "./go-back.svg";
 export { ReactComponent as GoForwardIcon } from "./go-forward.svg";
 export { ReactComponent as HeartLineIcon } from "./heart-line.svg";
