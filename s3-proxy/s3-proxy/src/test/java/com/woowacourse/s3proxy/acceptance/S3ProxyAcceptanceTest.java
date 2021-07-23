@@ -1,4 +1,4 @@
-package com.woowacourse.s3proxy;
+package com.woowacourse.s3proxy.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -32,7 +32,7 @@ import org.springframework.test.context.ActiveProfiles;
 @ExtendWith(LocalstackDockerExtension.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-public class S3ProxyAcceptanceTest {
+class S3ProxyAcceptanceTest {
     private static final FileNameGenerator fileNameGenerator = new FileNameGenerator();
 
     @Value("${aws.cloud_front.file_url_format}")

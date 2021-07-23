@@ -1,4 +1,4 @@
-package com.woowacourse.s3proxy.web.infrastructure;
+package com.woowacourse.s3proxy.integration;
 
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -8,6 +8,8 @@ import cloud.localstack.docker.annotation.LocalstackDockerProperties;
 import com.woowacourse.s3proxy.common.FileFactory;
 import com.woowacourse.s3proxy.config.StorageTestConfiguration;
 import com.woowacourse.s3proxy.web.domain.PickGitStorage;
+import com.woowacourse.s3proxy.web.infrastructure.FileNameGenerator;
+import com.woowacourse.s3proxy.web.infrastructure.S3Storage;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
