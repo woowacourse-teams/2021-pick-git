@@ -62,10 +62,6 @@ class PickGitStorageControllerTest {
     @DisplayName("정상 이미지와 비정상 이미지를 전송한다 - 실패.")
     @Test
     void store_SendRightImageAndFailData_False() throws Exception {
-        //given
-        given(pickGitStorageService.store(any()))
-            .willReturn(new FilesDto.Response(List.of()));
-
         //when
         ResultActions resultActions = mockMvc.perform(
             multipart("/api/storage")
@@ -82,10 +78,6 @@ class PickGitStorageControllerTest {
     @DisplayName("비정상 이미지를 전송한다 - 실패.")
     @Test
     void store_SendRFailDatas_False() throws Exception {
-        //given
-        given(pickGitStorageService.store(any()))
-            .willReturn(new FilesDto.Response(List.of()));
-
         //when
         ResultActions resultActions = mockMvc.perform(
             multipart("/api/storage")
