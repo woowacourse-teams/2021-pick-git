@@ -1,15 +1,13 @@
-import { useContext } from "react";
 import { Link } from "react-router-dom";
+import useUserFeed from "../../services/hooks/useUserFeed";
 
-import ProfileContext from "../../contexts/ProfileContext";
 import PageLoading from "../@layout/PageLoading/PageLoading";
 import InfiniteScrollContainer from "../@shared/InfiniteScrollContainer/InfiniteScrollContainer";
 import { Container, Empty, Grid, GridItem } from "./ProfileFeed.styled";
 
-const ProfileFeed = () => {
-  const { userFeedProps } = useContext(ProfileContext) ?? {};
-  const { allPosts, isLoading, isError, isFetchingNextPage, handleIntersect } = userFeedProps ?? {};
+export interface Props extends ReturnType<typeof useUserFeed> {}
 
+const ProfileFeed = ({ allPosts, isLoading, isError, isFetchingNextPage, handleIntersect }: Props) => {
   if (isLoading) {
     return (
       <Empty>

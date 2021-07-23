@@ -11,7 +11,6 @@ import AddPostPage from "./pages/AddPostPage/AddPostPage";
 import { PostAddDataContextProvider } from "./contexts/PostAddDataContext";
 import UserFeedPage from "./pages/UserFeedPage/UserFeedPage";
 import TagFeedPage from "./pages/TagFeedPage/TagFeedPage";
-import { ProfileContextProvider } from "./contexts/ProfileContext";
 
 const App = () => {
   return (
@@ -41,14 +40,10 @@ const App = () => {
           <AuthLoginProcessingPage />
         </Route>
         <Route path={PAGE_URL.MY_PROFILE}>
-          <ProfileContextProvider isMyProfile={true}>
-            <ProfilePage />
-          </ProfileContextProvider>
+          <ProfilePage isMyProfile={true} />
         </Route>
         <Route path={PAGE_URL.PROFILE}>
-          <ProfileContextProvider isMyProfile={false}>
-            <ProfilePage />
-          </ProfileContextProvider>
+          <ProfilePage isMyProfile={false} />
         </Route>
         <Route path={PAGE_URL.ADD_POST}>
           <PostAddDataContextProvider>

@@ -1,18 +1,13 @@
 import { Story } from "@storybook/react";
-import { ProfileContextProvider } from "../../contexts/ProfileContext";
 
-import ProfilePage from "./ProfilePage";
+import ProfilePage, { Props } from "./ProfilePage";
 
 export default {
   title: "Pages/ProfilePage",
   component: ProfilePage,
 };
 
-const Template: Story<{ children: React.ReactNode; isMyProfile: boolean }> = (args) => (
-  <ProfileContextProvider {...args}>
-    <ProfilePage />
-  </ProfileContextProvider>
-);
+const Template: Story<Props> = (args) => <ProfilePage {...args} />;
 
 export const MyProfile = Template.bind({});
 MyProfile.args = {

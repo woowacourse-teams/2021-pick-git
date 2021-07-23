@@ -1,14 +1,14 @@
 import { Story } from "@storybook/react";
 
 import LoggedInWrapper from "../../../.storybook/utils/LoggedInWrapper";
-import Profile from "./Profile";
+import Profile, { Props } from "./Profile";
 
 export default {
   title: "Components/Profile",
   component: Profile,
 };
 
-const Template: Story = (args) => (
+const Template: Story<Props> = (args) => (
   <LoggedInWrapper>
     <Profile {...args} />
   </LoggedInWrapper>

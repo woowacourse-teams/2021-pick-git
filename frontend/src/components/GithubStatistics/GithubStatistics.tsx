@@ -1,9 +1,10 @@
+import { AxiosError } from "axios";
 import { useContext } from "react";
+import { UseQueryResult } from "react-query";
 import { ThemeContext } from "styled-components";
 
 import { GithubStats } from "../../@types";
 import { BookIcon, ClockIcon, IssueIcon, PrIcon, StarIcon } from "../../assets/icons";
-import ProfileContext from "../../contexts/ProfileContext";
 import PageLoading from "../@layout/PageLoading/PageLoading";
 import CircleIcon from "../@shared/CircleIcon/CircleIcon";
 import { Container, ContributionGraphWrapper, GithubStatsWrapper, Stat } from "./GithubStatistics.style";
@@ -17,10 +18,14 @@ const stats = {
   contributes: { name: "Contributes", icon: <BookIcon /> },
 };
 
-const GithubStatistics = () => {
+export interface Props {
+  username: string | null;
+  githubStatisticQueryResult: UseQueryResult<GithubStats, AxiosError<GithubStats> | Error>;
+}
+
+const GithubStatistics = ({ username, githubStatisticQueryResult }: Props) => {
   const { color } = useContext(ThemeContext);
-  const { username, githubStatisticsProps } = useContext(ProfileContext) ?? {};
-  const { data, isLoading, error } = githubStatisticsProps ?? {};
+  const { data, isLoading, error } = githubStatisticQueryResult;
 
   if (isLoading) {
     return <PageLoading />;

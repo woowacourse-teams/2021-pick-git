@@ -1,14 +1,16 @@
-import { useContext } from "react";
-
 import { CompanyIcon, GithubDarkIcon, LocationIcon, WebsiteLinkIcon, TwitterIcon } from "../../assets/icons";
-import ProfileContext from "../../contexts/ProfileContext";
+import useProfile from "../../services/hooks/useProfile";
 import PageLoading from "../@layout/PageLoading/PageLoading";
 import ProfileHeader from "../@shared/ProfileHeader/ProfileHeader";
 import { Container, Description, DetailInfo } from "./Profile.style";
 
-const Profile = () => {
-  const { profileProps } = useContext(ProfileContext) ?? {};
-  const { data, isLoading } = profileProps ?? {};
+export interface Props {
+  isMyProfile: boolean;
+  username: string | null;
+}
+
+const Profile = ({ isMyProfile, username }: Props) => {
+  const { data, isLoading } = useProfile(isMyProfile, username);
 
   if (isLoading) {
     return <PageLoading />;
@@ -16,7 +18,7 @@ const Profile = () => {
 
   return (
     <Container>
-      <ProfileHeader />
+      <ProfileHeader isMyProfile={isMyProfile} profile={data ?? null} />
       <Description>{data?.description}</Description>
       <DetailInfo>
         <CompanyIcon />
