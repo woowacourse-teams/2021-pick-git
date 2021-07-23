@@ -48,7 +48,7 @@ class S3ProxyAcceptanceTest {
 
     @DisplayName("정상 이미지를 저장하고 주소를 반환받는다.- 성공")
     @Test
-    void StoreRightImageAndReturnRrl_True() throws IOException {
+    void StoreRightImageAndReturnRrl_True() {
         File file = FileFactory.getTestRightImage1File();
 
         Response result =
@@ -69,7 +69,7 @@ class S3ProxyAcceptanceTest {
 
     @DisplayName("비정상 이미지를 차단하고 에러를 반환받는다.")
     @Test
-    void StoreAbnormalImageAndReturnRrl_ExceptionThrown() throws IOException {
+    void StoreAbnormalImageAndReturnRrl_ExceptionThrown() {
         File file = FileFactory.getTestFailImage1File();
 
         ExceptionDto result =
@@ -82,7 +82,7 @@ class S3ProxyAcceptanceTest {
 
     @DisplayName("정상 이미지들을 저장하고 주소를 반환받는다. - 성공")
     @Test
-    void StoreNormalImagesAndReturnRrl_True() throws IOException {
+    void StoreNormalImagesAndReturnRrl_True() {
         //given
         List<File> files = List.of(
             FileFactory.getTestRightImage1File(),
@@ -113,7 +113,7 @@ class S3ProxyAcceptanceTest {
 
     @DisplayName("비정상 이미지들을 저장하고 에러를 반환받는다. - 실패")
     @Test
-    void StoreAbnormalImagesAndReturnRrl_ExceptionThrown() throws IOException {
+    void StoreAbnormalImagesAndReturnRrl_ExceptionThrown() {
         List<File> files = List.of(
             FileFactory.getTestFailDataFile(),
             FileFactory.getTestFailImage1File()
@@ -129,7 +129,7 @@ class S3ProxyAcceptanceTest {
 
     @DisplayName("비정상 이미지와 정상 이미지를 함게 저장하고 에러를 반환받는다. - 실패")
     @Test
-    void StoreAbnormalAndNormalImagesAndReturnError_ExceptionThrown() throws IOException {
+    void StoreAbnormalAndNormalImagesAndReturnError_ExceptionThrown() {
         List<File> files = List.of(
             FileFactory.getTestRightImage1File(),
             FileFactory.getTestRightImage2File(),
