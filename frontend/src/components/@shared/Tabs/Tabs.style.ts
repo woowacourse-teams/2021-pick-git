@@ -2,7 +2,8 @@ import styled from "styled-components";
 
 export const Container = styled.section`
   width: 100%;
-  overflow: hidden;
+  height: fit-content;
+  overflow-x: hidden;
 `;
 
 export const TabButtonWrapper = styled.div`
@@ -11,7 +12,7 @@ export const TabButtonWrapper = styled.div`
   justify-content: space-between;
 `;
 
-export const TabButton = styled.a<{ textColor?: string }>`
+export const TabButton = styled.button<{ textColor?: string }>`
   width: 100%;
   flex-grow: 1;
   padding: 0.625rem;
@@ -37,19 +38,4 @@ export const TabIndicator = styled.div<{ tabIndex: number; tabCount: number; tab
     transform: translateX(${100 * tabIndex}%);
     width: ${100 / tabCount}%;
   `};
-`;
-
-export const TabContentWrapper = styled.div<{ tabIndex: number; tabCount: number }>`
-  ${({ tabCount, tabIndex }) => `
-    width: ${tabCount * 100}%;
-    transform: translateX(-${(100 / tabCount) * tabIndex}%);
-  `}
-
-  display: flex;
-  padding-top: 0.3rem;
-  transition: transform 0.5s;
-`;
-
-export const TabContent = styled.div<{ tabCount: number }>`
-  width: ${({ tabCount }) => 100 / tabCount}%;
 `;

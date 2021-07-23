@@ -1,21 +1,21 @@
 import { useContext } from "react";
 import { ThemeContext } from "styled-components";
-
 import { ProfileData } from "../../../@types";
+
 import SnackBarContext from "../../../contexts/SnackbarContext";
 import UserContext from "../../../contexts/UserContext";
 import { useFollowingMutation, useUnfollowingMutation } from "../../../services/queries";
 import Avatar from "../Avatar/Avatar";
 import Button from "../Button/Button";
 import CountIndicator from "../CountIndicator/CountIndicator";
-import { Container, Indicators } from "./ProfileHeader.style";
+import { ButtonLoader, ButtonSpinner, Container, Indicators } from "./ProfileHeader.style";
 
 export interface Props {
-  profile?: ProfileData;
   isMyProfile: boolean;
+  profile: ProfileData | null;
 }
 
-const ProfileHeader = ({ profile, isMyProfile }: Props) => {
+const ProfileHeader = ({ isMyProfile, profile }: Props) => {
   const theme = useContext(ThemeContext);
   const { isLoggedIn } = useContext(UserContext);
   const { pushSnackbarMessage } = useContext(SnackBarContext);
@@ -39,7 +39,12 @@ const ProfileHeader = ({ profile, isMyProfile }: Props) => {
     }
 
     if (isFollowLoading || isUnfollowLoading) {
-      return <div>loading</div>;
+      return (
+        <ButtonLoader type="button" kind="squaredBlock" backgroundColor={theme.color.tertiaryColor}>
+          {isFollowLoading ? "팔로우" : "팔로우 취소"}
+          <ButtonSpinner size="1rem" />
+        </ButtonLoader>
+      );
     }
 
     if (isMyProfile) {

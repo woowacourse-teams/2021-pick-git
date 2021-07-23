@@ -1,5 +1,5 @@
 import { AxiosError } from "axios";
-import { QueryFunction, useInfiniteQuery, useMutation, useQuery } from "react-query";
+import { QueryFunction, useInfiniteQuery, useMutation } from "react-query";
 
 import { Post } from "../../@types";
 import { QUERY } from "../../constants/queries";
@@ -20,16 +20,16 @@ type UserPostsQueryKey = readonly [
   }
 ];
 
-const userPostsQueryFunction: QueryFunction<Post[]> = async ({ queryKey }) => {
+const userPostsQueryFunction: QueryFunction<Post[]> = async ({ queryKey, pageParam = 0 }) => {
   const [, { isMyFeed, username }] = queryKey as UserPostsQueryKey;
   const accessToken = getAccessToken();
 
   if (isMyFeed) {
     if (!accessToken) throw Error("no accessToken");
 
-    return await requestGetMyFeedPosts(0, accessToken);
+    return await requestGetMyFeedPosts(pageParam, accessToken);
   } else {
-    return await requestGetUserFeedPosts(username as string, 0, accessToken);
+    return await requestGetUserFeedPosts(username as string, pageParam, accessToken);
   }
 };
 
@@ -48,9 +48,14 @@ export const useHomeFeedPostsQuery = () => {
 };
 
 export const useUserPostsQuery = (isMyFeed: boolean, username: string | null) => {
-  return useQuery<Post[], AxiosError<Post[]>>(
+  return useInfiniteQuery<Post[], AxiosError<Post[]>>(
     [QUERY.GET_USER_FEED_POSTS, { isMyFeed, username }],
-    userPostsQueryFunction
+    userPostsQueryFunction,
+    {
+      getNextPageParam: (_, pages) => {
+        return pages.length;
+      },
+    }
   );
 };
 
