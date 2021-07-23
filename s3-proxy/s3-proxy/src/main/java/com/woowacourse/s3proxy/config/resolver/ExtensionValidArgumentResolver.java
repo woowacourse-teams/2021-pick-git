@@ -1,7 +1,7 @@
 package com.woowacourse.s3proxy.config.resolver;
 
-import com.woowacourse.s3proxy.common.fileValidator.FileValidator;
-import com.woowacourse.s3proxy.web.presentation.Dto.Files;
+import com.woowacourse.s3proxy.common.filevalidator.FileValidator;
+import com.woowacourse.s3proxy.web.presentation.dto.Files;
 import com.woowacourse.s3proxy.web.presentation.resolver.ExtensionValid;
 import java.util.List;
 import java.util.Objects;
@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 public class ExtensionValidArgumentResolver implements HandlerMethodArgumentResolver {
+
     private static final String FILE_NAME = "files";
     private static final String USER_NAME = "userName";
 
@@ -35,7 +36,7 @@ public class ExtensionValidArgumentResolver implements HandlerMethodArgumentReso
         ModelAndViewContainer mavContainer,
         NativeWebRequest webRequest,
         WebDataBinderFactory binderFactory
-    ) throws Exception {
+    ) {
         MultipartHttpServletRequest multipartHttpServletRequest =
             getMultipartHttpServletRequest(webRequest);
 

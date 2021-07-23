@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ExceptionAdvice {
 
     @ExceptionHandler
-    public ResponseEntity<ExceptionDto> PickGitStorageExceptionHandler(
+    public ResponseEntity<ExceptionDto> pickGitStorageExceptionHandler(
         PickGitStorageException e
     ) {
         return ResponseEntity.badRequest().body(

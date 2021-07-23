@@ -1,7 +1,7 @@
 package com.woowacourse.s3proxy.config;
 
-import com.woowacourse.s3proxy.common.fileValidator.FileValidator;
-import com.woowacourse.s3proxy.common.fileValidator.ImageFileValidator;
+import com.woowacourse.s3proxy.common.filevalidator.FileValidator;
+import com.woowacourse.s3proxy.common.filevalidator.ImageFileValidator;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

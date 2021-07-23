@@ -1,4 +1,4 @@
-package com.woowacourse.s3proxy.common.fileValidator;
+package com.woowacourse.s3proxy.common.filevalidator;
 
 import com.woowacourse.s3proxy.exception.UploadFailException;
 import java.io.IOException;

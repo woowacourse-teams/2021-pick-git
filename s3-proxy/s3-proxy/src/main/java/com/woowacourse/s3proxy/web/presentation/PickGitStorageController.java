@@ -2,7 +2,7 @@ package com.woowacourse.s3proxy.web.presentation;
 
 import com.woowacourse.s3proxy.web.application.PickGitStorageService;
 import com.woowacourse.s3proxy.web.application.dto.FilesDto;
-import com.woowacourse.s3proxy.web.presentation.Dto.Files;
+import com.woowacourse.s3proxy.web.presentation.dto.Files;
 import com.woowacourse.s3proxy.web.presentation.resolver.ExtensionValid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;

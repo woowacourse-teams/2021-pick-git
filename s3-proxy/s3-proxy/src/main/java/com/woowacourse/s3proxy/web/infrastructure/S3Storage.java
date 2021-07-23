@@ -15,7 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Repository
 public class S3Storage implements PickGitStorage {
 
-
     @Value("${aws.s3.bucket_name}")
     private String bucket;
 

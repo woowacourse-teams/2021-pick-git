@@ -1,4 +1,4 @@
-package com.woowacourse.s3proxy.common.fileValidator;
+package com.woowacourse.s3proxy.common.filevalidator;
 
 import org.springframework.web.multipart.MultipartFile;
 

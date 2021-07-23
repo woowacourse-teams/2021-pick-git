@@ -1,4 +1,4 @@
-package com.woowacourse.s3proxy.web.presentation.Dto;
+package com.woowacourse.s3proxy.web.presentation.dto;
 
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;

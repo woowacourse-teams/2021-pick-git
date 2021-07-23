@@ -12,7 +12,7 @@ import com.woowacourse.s3proxy.common.FileFactory;
 import com.woowacourse.s3proxy.exception.UploadFailException;
 import com.woowacourse.s3proxy.web.application.PickGitStorageService;
 import com.woowacourse.s3proxy.web.application.dto.FilesDto;
-import com.woowacourse.s3proxy.web.presentation.Dto.Files;
+import com.woowacourse.s3proxy.web.presentation.dto.Files;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -17,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileNameGenerator {
     private static final Tika tika = new Tika();
 
-
     public String generate(MultipartFile multipartFile, String userName) {
         return md5(multipartFile, userName) + extension(multipartFile);
     }

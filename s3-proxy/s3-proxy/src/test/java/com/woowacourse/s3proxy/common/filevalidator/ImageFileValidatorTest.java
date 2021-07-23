@@ -1,4 +1,4 @@
-package com.woowacourse.s3proxy.common.fileValidator;
+package com.woowacourse.s3proxy.common.filevalidator;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
