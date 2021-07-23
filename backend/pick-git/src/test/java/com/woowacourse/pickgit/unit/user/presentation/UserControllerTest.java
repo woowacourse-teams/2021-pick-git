@@ -20,6 +20,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woowacourse.pickgit.authentication.application.OAuthService;
@@ -27,7 +28,7 @@ import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.user.application.UserService;
-import com.woowacourse.pickgit.user.application.dto.AuthUserResponseDto;
+import com.woowacourse.pickgit.user.application.dto.AuthUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.presentation.UserController;
@@ -41,7 +42,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
 @AutoConfigureRestDocs
@@ -56,38 +56,44 @@ class UserControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private UserService userService;
-
-    @MockBean
     private OAuthService oAuthService;
 
-    @DisplayName("인증된 사용자의 프로필을 가져온다.")
-    @Test
-    void getAuthenticatedUserProfile() throws Exception {
-        UserProfileResponseDto userProfileResponseDto = UserFactory.mockLoginUserProfileServiceDto();
+    @MockBean
+    private UserService userService;
 
-        given(userService.getMyUserProfile(any(AuthUserResponseDto.class)))
-            .willReturn(userProfileResponseDto);
+    @DisplayName("사용자는 내 프로필을 조회할 수 있다.")
+    @Test
+    void getAuthenticatedUserProfile_LoginUser_Success() throws Exception {
+        // given
+        UserProfileResponseDto responseDto = UserFactory.mockLoginUserProfileResponseDto();
+
         given(oAuthService.validateToken(anyString()))
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(anyString()))
-            .willReturn(new LoginUser("test", "test"));
+            .willReturn(new LoginUser("loginUser", "testToken"));
+        given(userService.getMyUserProfile(any(AuthUserRequestDto.class)))
+            .willReturn(responseDto);
 
+        // when
         ResultActions perform = mockMvc.perform(get("/api/profiles/me")
             .header(HttpHeaders.AUTHORIZATION, "Bearer testToken")
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .accept(MediaType.ALL));
 
-        MvcResult mvcResult = perform.andReturn();
-        String body = mvcResult.getResponse().getContentAsString();
+        // then
+        String body = perform
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
-        assertThat(body).isEqualTo(objectMapper.writeValueAsString(userProfileResponseDto));
+        assertThat(body).isEqualTo(objectMapper.writeValueAsString(responseDto));
 
         perform.andDo(document("profilesMe",
             getDocumentRequest(),
             getDocumentResponse(),
             requestHeaders(
-                headerWithName(HttpHeaders.AUTHORIZATION).description("baerer token")
+                headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer token")
             ),
             responseFields(
                 fieldWithPath("name").type(STRING).description("사용자 이름"),
@@ -106,27 +112,69 @@ class UserControllerTest {
         ));
     }
 
-    @DisplayName("다른 사용자의 프로필을 가져온다. - 로그인")
+    @DisplayName("게스트는 내 프로필을 조회할 수 없다. - 401 예외")
     @Test
-    void getUserProfile_loggedIn() throws Exception {
-        UserProfileResponseDto userProfileResponseDto = UserFactory.mockLoginUserProfileServiceDto();
+    void getAuthenticatedUserProfile_LoginUser_401Exception() throws Exception {
+        // given
+        UserProfileResponseDto responseDto = UserFactory.mockGuestUserProfileResponseDto();
 
-        given(userService.getUserProfile(any(AppUser.class), anyString()))
-            .willReturn(userProfileResponseDto);
+        given(oAuthService.validateToken(any()))
+            .willReturn(true);
+        given(oAuthService.findRequestUserByToken(any()))
+            .willCallRealMethod();
+        given(userService.getMyUserProfile(any(AuthUserRequestDto.class)))
+            .willReturn(responseDto);
+
+        // when
+        ResultActions perform = mockMvc.perform(get("/api/profiles/me")
+            .header(HttpHeaders.AUTHORIZATION, "Bad testToken")
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .accept(MediaType.ALL));
+
+        // then
+        perform
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("errorCode").value("A0002"));
+
+        perform.andDo(document("profilesMe",
+            getDocumentRequest(),
+            getDocumentResponse(),
+            requestHeaders(
+                headerWithName(HttpHeaders.AUTHORIZATION).description("Bad token")
+            ),
+            responseFields(
+                fieldWithPath("errorCode").type(STRING).description("에러 코드")
+            )
+        ));
+    }
+
+    @DisplayName("사용자는 타인의 프로필을 조회할 수 있다.")
+    @Test
+    void getUserProfile_LoginUser_Success() throws Exception {
+        // given
+        UserProfileResponseDto responseDto = UserFactory.mockLoginUserProfileResponseDto();
+
         given(oAuthService.validateToken(anyString()))
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(anyString()))
-            .willReturn(new LoginUser("test", "test"));
+            .willReturn(new LoginUser("loginUser", "Bearer testToken"));
+        given(userService.getUserProfile(any(AppUser.class), anyString()))
+            .willReturn(responseDto);
 
+        // when
         ResultActions perform = mockMvc.perform(get("/api/profiles/{userName}}", "testUser")
             .header(HttpHeaders.AUTHORIZATION, "Bearer testToken")
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .accept(MediaType.ALL));
 
-        MvcResult mvcResult = perform.andReturn();
-        String body = mvcResult.getResponse().getContentAsString();
+        // then
+        String body = perform
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
-        assertThat(body).isEqualTo(objectMapper.writeValueAsString(userProfileResponseDto));
+        assertThat(body).isEqualTo(objectMapper.writeValueAsString(responseDto));
 
         perform.andDo(document("profiles-LoggedIn",
             getDocumentRequest(),
@@ -135,7 +183,7 @@ class UserControllerTest {
                 parameterWithName("userName").description("다른 사용자 이름")
             ),
             requestHeaders(
-                headerWithName(HttpHeaders.AUTHORIZATION).description("baerer token")
+                headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer token")
             ),
             responseFields(
                 fieldWithPath("name").type(STRING).description("사용자 이름"),
@@ -154,26 +202,32 @@ class UserControllerTest {
         ));
     }
 
-    @DisplayName("다른 사용자의 프로필을 가져온다. - 비 로그인")
+    @DisplayName("게스트는 타인의 프로필을 조회할 수 있다.")
     @Test
-    void getUserProfile_unLoggedIn() throws Exception {
-        UserProfileResponseDto userProfileResponseDto = UserFactory.mockUnLoginUserProfileServiceDto();
+    void getUserProfile_GuestUser_Success() throws Exception {
+        // given
+        UserProfileResponseDto responseDto = UserFactory.mockGuestUserProfileResponseDto();
 
-        given(userService.getUserProfile(any(AppUser.class), anyString()))
-            .willReturn(userProfileResponseDto);
-        given(oAuthService.validateToken(anyString()))
+        given(oAuthService.validateToken(any()))
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(any()))
-            .willReturn(new LoginUser("test", "test"));
+            .willCallRealMethod();
+        given(userService.getUserProfile(any(AppUser.class), anyString()))
+            .willReturn(responseDto);
 
+        // when
         ResultActions perform = mockMvc.perform(get("/api/profiles/{userName}}", "testUser")
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .accept(MediaType.ALL));
 
-        MvcResult mvcResult = perform.andReturn();
-        String body = mvcResult.getResponse().getContentAsString();
+        // then
+        String body = perform
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
-        assertThat(body).isEqualTo(objectMapper.writeValueAsString(userProfileResponseDto));
+        assertThat(body).isEqualTo(objectMapper.writeValueAsString(responseDto));
 
         perform.andDo(document("profiles-unLoggedIn",
             getDocumentRequest(),
@@ -198,33 +252,40 @@ class UserControllerTest {
         ));
     }
 
-    @DisplayName("팔로잉을 한다. - 로그인")
+    @DisplayName("사용자는 팔로우를 할 수 있다.")
     @Test
-    void followUser() throws Exception {
-        FollowResponseDto followResponseDto = new FollowResponseDto(1, true);
+    void followUser_LoginUser_Success() throws Exception {
+        // given
+        FollowResponseDto responseDto = new FollowResponseDto(1, true);
 
-        given(userService.followUser(any(AuthUserResponseDto.class), anyString()))
-            .willReturn(followResponseDto);
         given(oAuthService.validateToken(anyString()))
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(anyString()))
-            .willReturn(new LoginUser("test", "test"));
+            .willReturn(new LoginUser("loginUser", "Bearer testToken"));
+        given(userService.followUser(any(AuthUserRequestDto.class), anyString()))
+            .willReturn(responseDto);
 
-        ResultActions perform = mockMvc.perform(post("/api/profiles/{userName}/followings", "testUser")
-            .header(HttpHeaders.AUTHORIZATION, "Bearer testToken")
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .accept(MediaType.ALL));
+        // when
+        ResultActions perform = mockMvc
+            .perform(post("/api/profiles/{userName}/followings", "testUser")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer testToken")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.ALL));
 
-        MvcResult mvcResult = perform.andReturn();
-        String body = mvcResult.getResponse().getContentAsString();
+        // then
+        String body = perform
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
 
-        assertThat(body).isEqualTo(objectMapper.writeValueAsString(followResponseDto));
+        assertThat(body).isEqualTo(objectMapper.writeValueAsString(responseDto));
 
         perform.andDo(document("following-LoggedIn",
             getDocumentRequest(),
             getDocumentResponse(),
             requestHeaders(
-                headerWithName(HttpHeaders.AUTHORIZATION).description("bearer token")
+                headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer token")
             ),
             pathParameters(
                 parameterWithName("userName").description("다른 사용자 이름")
@@ -236,64 +297,29 @@ class UserControllerTest {
         ));
     }
 
-    @DisplayName("언팔로잉일 한다. - 로그인")
+    @DisplayName("게스트는 팔로우를 할 수 없다. - 401 예외")
     @Test
-    void unfollowUser() throws Exception {
-        FollowResponseDto followResponseDto = new FollowResponseDto(1, false);
+    void followUser_GuestUser_401Exception() throws Exception {
+        // given
+        FollowResponseDto responseDto = new FollowResponseDto(1, true);
 
-        given(userService.followUser(any(AuthUserResponseDto.class), anyString()))
-            .willReturn(followResponseDto);
-        given(oAuthService.validateToken(anyString()))
+        given(oAuthService.validateToken(any()))
             .willReturn(true);
-        given(oAuthService.findRequestUserByToken(anyString()))
-            .willReturn(new LoginUser("test", "test"));
+        given(oAuthService.findRequestUserByToken(any()))
+            .willCallRealMethod();
+        given(userService.followUser(any(AuthUserRequestDto.class), anyString()))
+            .willReturn(responseDto);
 
-        ResultActions perform = mockMvc.perform(post("/api/profiles/{userName}/followings", "testUser")
-            .header(HttpHeaders.AUTHORIZATION, "Bearer testToken")
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .accept(MediaType.ALL));
+        // when
+        ResultActions perform = mockMvc
+            .perform(post("/api/profiles/{userName}/followings", "testUser")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.ALL));
 
-        MvcResult mvcResult = perform.andReturn();
-        String body = mvcResult.getResponse().getContentAsString();
-
-        assertThat(body).isEqualTo(objectMapper.writeValueAsString(followResponseDto));
-
-        perform.andDo(document("unfollowing-LoggedIn",
-            getDocumentRequest(),
-            getDocumentResponse(),
-            requestHeaders(
-                headerWithName(HttpHeaders.AUTHORIZATION).description("bearer token")
-            ),
-            pathParameters(
-                parameterWithName("userName").description("다른 사용자 이름")
-            ),
-            responseFields(
-                fieldWithPath("followerCount").description("팔로워 수"),
-                fieldWithPath("following").description("팔로잉 여부")
-            )
-        ));
-    }
-
-    @DisplayName("팔로잉을 한다. - 비 로그인")
-    @Test
-    void followUser_unLogin() throws Exception {
-        FollowResponseDto followResponseDto = new FollowResponseDto(1, true);
-
-        given(userService.followUser(any(AuthUserResponseDto.class), anyString()))
-            .willReturn(followResponseDto);
-        given(oAuthService.validateToken(anyString()))
-            .willReturn(true);
-        given(oAuthService.findRequestUserByToken(anyString()))
-            .willReturn(new LoginUser("test", "test"));
-
-        ResultActions perform = mockMvc.perform(post("/api/profiles/{userName}/followings", "testUser")
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .accept(MediaType.ALL));
-
-        MvcResult mvcResult = perform.andReturn();
-        String body = mvcResult.getResponse().getContentAsString();
-
-        perform.andExpect(jsonPath("errorCode").value("A0001"));
+        // then
+        perform
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("errorCode").value("A0002"));
 
         perform.andDo(document("following-unLoggedIn",
             getDocumentRequest(),
@@ -302,28 +328,79 @@ class UserControllerTest {
                 parameterWithName("userName").description("다른 사용자 이름")
             ),
             responseFields(
-                fieldWithPath("errorCode").description("A0001")
+                fieldWithPath("errorCode").description("A0002")
             )
         ));
     }
 
-    @DisplayName("언팔로잉일 한다. - 비 로그인")
+    @DisplayName("사용자는 언팔로우를 할 수 있다.")
     @Test
-    void unfollowUser_unLogin() throws Exception {
+    void unfollowUser_LoginUser_Success() throws Exception {
+        // given
         FollowResponseDto followResponseDto = new FollowResponseDto(1, false);
 
-        given(userService.followUser(any(AuthUserResponseDto.class), anyString()))
-            .willReturn(followResponseDto);
         given(oAuthService.validateToken(anyString()))
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(anyString()))
-            .willReturn(new LoginUser("test", "test"));
+            .willReturn(new LoginUser("loginUser", "Bearer testToken"));
+        given(userService.followUser(any(AuthUserRequestDto.class), anyString()))
+            .willReturn(followResponseDto);
 
-        ResultActions perform = mockMvc.perform(post("/api/profiles/{userName}/followings", "testUser")
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .accept(MediaType.ALL));
+        // when
+        ResultActions perform = mockMvc
+            .perform(post("/api/profiles/{userName}/followings", "testUser")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer testToken")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.ALL));
 
-        perform.andExpect(jsonPath("errorCode").value("A0001"));
+        // then
+        String body = perform
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+        assertThat(body).isEqualTo(objectMapper.writeValueAsString(followResponseDto));
+
+        perform.andDo(document("unfollowing-LoggedIn",
+            getDocumentRequest(),
+            getDocumentResponse(),
+            requestHeaders(
+                headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer token")
+            ),
+            pathParameters(
+                parameterWithName("userName").description("다른 사용자 이름")
+            ),
+            responseFields(
+                fieldWithPath("followerCount").description("팔로워 수"),
+                fieldWithPath("following").description("팔로잉 여부")
+            )
+        ));
+    }
+
+    @DisplayName("게스트는 언팔로우를 할 수 없다. - 401 예외")
+    @Test
+    void unfollowUser_GuestUser_401Exception() throws Exception {
+        // given
+        FollowResponseDto followResponseDto = new FollowResponseDto(1, false);
+
+        given(oAuthService.validateToken(any()))
+            .willReturn(true);
+        given(oAuthService.findRequestUserByToken(any()))
+            .willCallRealMethod();
+        given(userService.followUser(any(AuthUserRequestDto.class), anyString()))
+            .willReturn(followResponseDto);
+
+        // when
+        ResultActions perform = mockMvc
+            .perform(post("/api/profiles/{userName}/followings", "testUser")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.ALL));
+
+        // then
+        perform
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("errorCode").value("A0002"));
 
         perform.andDo(document("unfollowing-unLoggedIn",
             getDocumentRequest(),
@@ -332,7 +409,7 @@ class UserControllerTest {
                 parameterWithName("userName").description("다른 사용자 이름")
             ),
             responseFields(
-                fieldWithPath("errorCode").description("A0001")
+                fieldWithPath("errorCode").description("A0002")
             )
         ));
     }

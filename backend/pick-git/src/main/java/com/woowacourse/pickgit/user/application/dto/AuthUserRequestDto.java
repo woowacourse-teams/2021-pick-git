@@ -1,10 +1,10 @@
 package com.woowacourse.pickgit.user.application.dto;
 
-public class AuthUserResponseDto {
+public class AuthUserRequestDto {
 
     private String githubName;
 
-    public AuthUserResponseDto(String githubName) {
+    public AuthUserRequestDto(String githubName) {
         this.githubName = githubName;
     }
 

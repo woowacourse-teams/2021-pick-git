@@ -27,9 +27,9 @@ public class UserFactory {
             .build();
     }
 
-    public static UserProfileResponseDto mockLoginUserProfileServiceDto() {
+    public static UserProfileResponseDto mockLoginUserProfileResponseDto() {
         return UserProfileResponseDto.builder()
-            .name("yjksw")
+            .name("loginUser")
             .image("http://img.com")
             .description("The Best")
             .followerCount(0)
@@ -44,9 +44,9 @@ public class UserFactory {
             .build();
     }
 
-    public static UserProfileResponseDto mockUnLoginUserProfileServiceDto() {
+    public static UserProfileResponseDto mockGuestUserProfileResponseDto() {
         return UserProfileResponseDto.builder()
-            .name("yjksw")
+            .name("guestUser")
             .image("http://img.com")
             .description("The Best")
             .followerCount(0)

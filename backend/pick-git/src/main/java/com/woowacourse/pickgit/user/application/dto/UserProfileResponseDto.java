@@ -8,22 +8,21 @@ public class UserProfileResponseDto {
     private final String name;
     private final String image;
     private final String description;
-
     private final int followerCount;
     private final int followingCount;
     private final int postCount;
-
     private final String githubUrl;
     private final String company;
     private final String location;
     private final String website;
     private final String twitter;
-
     private final Boolean following;
 
-    public UserProfileResponseDto(String name, String image, String description,
-        int followerCount, int followingCount, int postCount, String githubUrl, String company,
-        String location, String website, String twitter, Boolean following) {
+    public UserProfileResponseDto(
+        String name, String image, String description,
+        int followerCount, int followingCount, int postCount,
+        String githubUrl, String company, String location, String website, String twitter,
+        Boolean following) {
         this.name = name;
         this.image = image;
         this.description = description;
