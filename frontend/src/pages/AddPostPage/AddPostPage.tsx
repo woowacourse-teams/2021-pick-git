@@ -19,6 +19,7 @@ import {
   isGithubRepositoryEmpty,
   isValidPostUploadData,
 } from "../../utils/postUpload";
+import { getAPIErrorMessage } from "../../utils/error";
 
 const AddPostPage = () => {
   const { stepIndex, goNextStep, setStepMoveEventHandler, removeStepMoveEventHandler, completeStep } = useStep(
@@ -51,7 +52,7 @@ const AddPostPage = () => {
       resetPostUploadData();
       completeStep();
     } catch (error) {
-      showAlertModal(error.message);
+      showAlertModal(getAPIErrorMessage(error.response?.data.errorCode));
     }
   };
 

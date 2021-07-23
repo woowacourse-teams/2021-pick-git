@@ -1,8 +1,11 @@
 import { useEffect } from "react";
+import { useHistory } from "react-router-dom";
 import { FAILURE_MESSAGE } from "../../constants/messages";
+import { PAGE_URL } from "../../constants/urls";
 import useMessageModal from "../../services/hooks/@common/useMessageModal";
 import usePostUpload from "../../services/hooks/usePostUpload";
 import { useGithubTagsQuery } from "../../services/queries";
+import { getAPIErrorMessage } from "../../utils/error";
 import { hasDuplicatedTag, isGithubRepositoryEmpty, isValidTagFormat, isValidTagLength } from "../../utils/postUpload";
 import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
 import PageLoading from "../@layout/PageLoading/PageLoading";
@@ -14,6 +17,7 @@ const TagInputForm = () => {
   const { githubRepositoryName, tags, setTags } = usePostUpload();
   const { data: defaultTags, isLoading, error, refetch } = useGithubTagsQuery(githubRepositoryName);
   const { modalMessage, isModalShown, hideMessageModal, showAlertModal } = useMessageModal();
+  const history = useHistory();
 
   useEffect(() => {
     defaultTags && setTags((state) => [...defaultTags, ...state]);
@@ -64,8 +68,15 @@ const TagInputForm = () => {
     </TagListItem>
   ));
 
+  const handleErrorConfirm = () => {
+    history.push(PAGE_URL.HOME);
+  };
+
   if (error) {
-    return <div>에러!!</div>;
+    error.response && showAlertModal(getAPIErrorMessage(error.response?.data.errorCode));
+
+    // TODO : MessageModal 이 confirmText 와 cancelText 모두 받을 수 있게 되어야 함
+    return <MessageModalPortal heading={modalMessage} onConfirm={handleErrorConfirm} onClose={hideMessageModal} />;
   }
 
   if (isLoading) {

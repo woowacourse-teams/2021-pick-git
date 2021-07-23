@@ -1,3 +1,4 @@
+import { ErrorResponse } from "../@types";
 import { getMBFromBite } from "../utils/postUpload";
 import { LIMIT } from "./limits";
 
@@ -21,3 +22,21 @@ export const WARNING_MESSAGE = {
 export const REDIRECT_MESSAGE = {
   NO_REPOSITORY_EXIST: "공개된 깃허브 Repository가 존재하지 않습니다. 이전 페이지로 돌아갑니다.",
 };
+
+export const API_ERROR_MESSAGE: { [key in ErrorResponse["errorCode"]]: string } = {
+  A0001: "로그인이 만료되었습니다",
+  A0002: "로그인 후 이용할 수 있습니다",
+  F0001: "필요한 입력값이 입력되지 않았습니다",
+  F0002: "댓글 글자수가 형식에 맞지 않습니다",
+  F0003: "태그 글자수가 형식에 맞지 않습니다",
+  U0001: "해당 유저는 존재하지 않습니다",
+  U0002: "이미 팔로우하고 있는 유저입니다",
+  U0003: "존재하지 않는 유저에 대한 팔로우를 수행할 수 없습니다",
+  U0004: "본인이 본인을 팔로우할 수 없습니다",
+  V0001: "깃허브 로그인에 실패하였습니다",
+  P0001: "중복되는 태그가 존재합니다",
+  P0002: "게시된 게시글이 없습니다",
+  S0001: "서버 상의 에러가 발생하였습니다.",
+};
+
+export const UNKNOWN_ERROR_MESSAGE = "알 수 없는 에러가 발생하였습니다.";

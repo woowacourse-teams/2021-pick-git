@@ -9,6 +9,7 @@ import useMessageModal from "../../services/hooks/@common/useMessageModal";
 import useStep from "../../services/hooks/@common/useStep";
 import usePostUpload from "../../services/hooks/usePostUpload";
 import { useGithubRepositoriesQuery } from "../../services/queries";
+import { getAPIErrorMessage } from "../../utils/error";
 import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
 import PageLoading from "../@layout/PageLoading/PageLoading";
 import CircleIcon from "../@shared/CircleIcon/CircleIcon";
@@ -26,7 +27,7 @@ const RepositorySelector = () => {
   const { setGithubRepositoryName } = usePostUpload();
   const { goNextStep } = useStep(STEPS, PAGE_URL.HOME);
   const { data: repositories, isLoading, error } = useGithubRepositoriesQuery();
-  const { modalMessage, isModalShown, showAlertModal } = useMessageModal();
+  const { modalMessage, isModalShown, showAlertModal, hideMessageModal } = useMessageModal();
   const { color } = useContext(ThemeContext);
   const history = useHistory();
 
@@ -54,8 +55,14 @@ const RepositorySelector = () => {
     showAlertModal(REDIRECT_MESSAGE.NO_REPOSITORY_EXIST);
   }
 
+  const handleErrorConfirm = () => {
+    history.push(PAGE_URL.HOME);
+  };
+
   if (error) {
-    return <div>에러!!</div>;
+    error.response && showAlertModal(getAPIErrorMessage(error.response?.data.errorCode));
+
+    return <MessageModalPortal heading={modalMessage} onConfirm={handleErrorConfirm} onClose={hideMessageModal} />;
   }
 
   if (isLoading) {
