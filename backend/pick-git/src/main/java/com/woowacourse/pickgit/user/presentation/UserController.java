@@ -2,6 +2,7 @@ package com.woowacourse.pickgit.user.presentation;
 
 import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
+import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.AuthUserServiceDto;
 import com.woowacourse.pickgit.user.application.dto.FollowServiceDto;
@@ -30,9 +31,11 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<UserProfileResponse> getAuthenticatedUserProfile(
-        @Authenticated AppUser appUser) {
+        @Authenticated AppUser user) {
+        validateIsGuest(user);
+
         UserProfileServiceDto userProfileServiceDto = userService.getMyUserProfile(
-            new AuthUserServiceDto(appUser.getUsername())
+            new AuthUserServiceDto(user.getUsername())
         );
 
         return ResponseEntity.ok(getUserProfileResponseDto(userProfileServiceDto));
@@ -61,11 +64,12 @@ public class UserController {
 
     @PostMapping("/{username}/followings")
     public ResponseEntity<FollowResponse> followUser(
-        @Authenticated AppUser appUser,
-        @PathVariable String username
-    ) {
+        @Authenticated AppUser user,
+        @PathVariable String username) {
+        validateIsGuest(user);
+
         AuthUserServiceDto authUserServiceDto =
-            new AuthUserServiceDto(appUser.getUsername());
+            new AuthUserServiceDto(user.getUsername());
 
         FollowServiceDto followServiceDto = userService.followUser(authUserServiceDto, username);
 
@@ -74,15 +78,22 @@ public class UserController {
 
     @DeleteMapping("/{username}/followings")
     public ResponseEntity<FollowResponse> unfollowUser(
-        @Authenticated AppUser appUser,
-        @PathVariable String username
-    ) {
+        @Authenticated AppUser user,
+        @PathVariable String username) {
+        validateIsGuest(user);
+
         AuthUserServiceDto authUserServiceDto =
-            new AuthUserServiceDto(appUser.getUsername());
+            new AuthUserServiceDto(user.getUsername());
 
         FollowServiceDto followServiceDto = userService.unfollowUser(authUserServiceDto, username);
 
         return ResponseEntity.ok(createFollowResponseDto(followServiceDto));
+    }
+
+    private void validateIsGuest(AppUser user) {
+        if (user.isGuest()) {
+            throw new UnauthorizedException();
+        }
     }
 
     private FollowResponse createFollowResponseDto(FollowServiceDto followServiceDto) {
