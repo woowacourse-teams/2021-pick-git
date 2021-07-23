@@ -7,7 +7,7 @@ const PostAddStepHeader = () => {
 
   return (
     <StepHeader isNextStepExist={stepIndex < STEPS.length - 1} onGoBack={goBack} onNextStepClick={goNextStep}>
-      {STEPS[stepIndex]}
+      {STEPS[stepIndex].title}
     </StepHeader>
   );
 };

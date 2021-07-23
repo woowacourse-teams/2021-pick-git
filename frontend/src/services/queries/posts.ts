@@ -1,7 +1,7 @@
 import { AxiosError } from "axios";
 import { QueryFunction, useInfiniteQuery, useMutation } from "react-query";
 
-import { Post } from "../../@types";
+import { ErrorResponse, Post } from "../../@types";
 import { QUERY } from "../../constants/queries";
 import { getAccessToken } from "../../storage/storage";
 import {
@@ -34,7 +34,7 @@ const userPostsQueryFunction: QueryFunction<Post[]> = async ({ queryKey, pagePar
 };
 
 export const useHomeFeedPostsQuery = () => {
-  return useInfiniteQuery(
+  return useInfiniteQuery<Post[], AxiosError<ErrorResponse>>(
     QUERY.GET_HOME_FEED_POSTS,
     async ({ pageParam = 0 }) => {
       return await requestGetHomeFeedPosts(pageParam, getAccessToken());
@@ -48,7 +48,7 @@ export const useHomeFeedPostsQuery = () => {
 };
 
 export const useUserPostsQuery = (isMyFeed: boolean, username: string | null) => {
-  return useInfiniteQuery<Post[], AxiosError<Post[]>>(
+  return useInfiniteQuery<Post[], AxiosError<ErrorResponse>>(
     [QUERY.GET_USER_FEED_POSTS, { isMyFeed, username }],
     userPostsQueryFunction,
     {

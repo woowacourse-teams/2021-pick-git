@@ -1,6 +1,5 @@
 import { Container, Content, EmptySpace, StepLink } from "./StepHeader.style";
 import { GoBackIcon, GoForwardIcon } from "../../../assets/icons";
-import { useHistory } from "react-router-dom";
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   isNextStepExist: boolean;

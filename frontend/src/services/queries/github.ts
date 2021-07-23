@@ -1,24 +1,29 @@
+import { AxiosError } from "axios";
 import { useQuery } from "react-query";
-import { GithubRepository, Tags } from "../../@types";
+import { ErrorResponse, GithubRepository, Tags } from "../../@types";
 import { QUERY } from "../../constants/queries";
 import { getAccessToken } from "../../storage/storage";
 import { requestGetRepositories, requestGetTags } from "../requests/github";
 
-export const useGithubRepositoriesQuery = (username: string) => {
-  const isUserNotNameEmpty = username !== "";
-
-  return useQuery<GithubRepository[]>(
+export const useGithubRepositoriesQuery = () => {
+  return useQuery<GithubRepository[], AxiosError<ErrorResponse>>(
     QUERY.GET_GITHUB_REPOSITORIES,
-    () => requestGetRepositories(username, getAccessToken()),
-    { enabled: isUserNotNameEmpty, cacheTime: 0 }
+    () => requestGetRepositories(getAccessToken()),
+    {
+      cacheTime: 0,
+    }
   );
 };
 
-export const useGithubTagsQuery = (username: string, repositoryName: string) => {
+export const useGithubTagsQuery = (repositoryName: string) => {
   const isRepositoryNameNotEmpty = repositoryName !== "";
 
-  return useQuery<Tags>(QUERY.GET_GITHUB_TAGS, () => requestGetTags(username, repositoryName, getAccessToken()), {
-    enabled: isRepositoryNameNotEmpty,
-    cacheTime: 0,
-  });
+  return useQuery<Tags, AxiosError<ErrorResponse>>(
+    QUERY.GET_GITHUB_TAGS,
+    () => requestGetTags(repositoryName, getAccessToken()),
+    {
+      enabled: isRepositoryNameNotEmpty,
+      cacheTime: 0,
+    }
+  );
 };

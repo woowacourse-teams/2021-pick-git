@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { Post } from "../../@types";
 import { LIMIT } from "../../constants/limits";
-import { FAILURE_MESSAGE } from "../../constants/message";
+import { FAILURE_MESSAGE } from "../../constants/messages";
 import SnackBarContext from "../../contexts/SnackbarContext";
 import useFeed from "../../services/hooks/useFeed";
 import PostItem from "../@shared/PostItem/PostItem";
