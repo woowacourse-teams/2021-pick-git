@@ -6,7 +6,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
 import com.woowacourse.s3proxy.common.FileFactory;
-import com.woowacourse.s3proxy.exception.UploadFailException;
+import com.woowacourse.s3proxy.exception.upload.UploadFailureException;
 import com.woowacourse.s3proxy.web.application.dto.FilesDto.Request;
 import com.woowacourse.s3proxy.web.application.dto.FilesDto.Response;
 import com.woowacourse.s3proxy.web.domain.PickGitStorage;
@@ -65,7 +65,7 @@ class PickGitStorageServiceTest {
             .willReturn(List.of(
                 new PickGitStorage.StoreResult(
                     testFailImage1.getOriginalFilename(),
-                    new UploadFailException(new RuntimeException())
+                    new UploadFailureException(new RuntimeException())
                 ),
                 new PickGitStorage.StoreResult(
                     testRightImage2.getOriginalFilename(),

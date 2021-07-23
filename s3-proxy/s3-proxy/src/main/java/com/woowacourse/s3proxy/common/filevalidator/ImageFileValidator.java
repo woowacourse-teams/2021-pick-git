@@ -1,6 +1,6 @@
 package com.woowacourse.s3proxy.common.filevalidator;
 
-import com.woowacourse.s3proxy.exception.UploadFailException;
+import com.woowacourse.s3proxy.exception.upload.UploadFailureException;
 import java.io.IOException;
 import org.apache.tika.Tika;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,10 +14,10 @@ public class ImageFileValidator implements FileValidator {
         try {
             String MIMEType = tika.detect(multipartFile.getInputStream());
             if(!MIMEType.startsWith(REQUIRE_MIME_TYPE)) {
-                throw new UploadFailException();
+                throw new UploadFailureException();
             }
         } catch (IOException e) {
-            throw new UploadFailException();
+            throw new UploadFailureException();
         }
     }
 }

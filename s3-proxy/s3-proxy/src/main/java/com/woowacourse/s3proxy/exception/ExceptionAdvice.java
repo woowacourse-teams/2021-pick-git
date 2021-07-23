@@ -7,28 +7,29 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ExceptionAdvice {
 
-    @ExceptionHandler
-    public ResponseEntity<ExceptionDto> pickGitStorageExceptionHandler(
-        PickGitStorageException e
+    @ExceptionHandler(ApplicationException.class)
+    public ResponseEntity<ExceptionDto> applicationException(
+        ApplicationException applicationException
     ) {
-        return ResponseEntity.badRequest().body(
-            new ExceptionDto(e.getMessage())
-        );
+        return ResponseEntity.status(applicationException.getHttpStatus())
+            .body(
+                new ExceptionDto(applicationException.getErrorCode())
+            );
     }
 
     public static class ExceptionDto {
 
-        private String message;
+        private String errorCode;
 
         private ExceptionDto() {
         }
 
-        public ExceptionDto(String message) {
-            this.message = message;
+        public ExceptionDto(String errorCode) {
+            this.errorCode = errorCode;
         }
 
-        public String getMessage() {
-            return message;
+        public String getErrorCode() {
+            return errorCode;
         }
     }
 }

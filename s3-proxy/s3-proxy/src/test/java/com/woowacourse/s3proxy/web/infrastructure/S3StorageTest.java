@@ -8,7 +8,7 @@ import static org.mockito.BDDMockito.given;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectResult;
 import com.woowacourse.s3proxy.common.FileFactory;
-import com.woowacourse.s3proxy.exception.UploadFailException;
+import com.woowacourse.s3proxy.exception.upload.UploadFailureException;
 import com.woowacourse.s3proxy.web.domain.PickGitStorage.StoreResult;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -101,8 +101,8 @@ class S3StorageTest {
         String secondFileName = fileNameGenerator.generate(multipartFiles.get(1), userName);
 
         return List.of(
-            new StoreResult(firstFileName, new UploadFailException()),
-            new StoreResult(secondFileName, new UploadFailException())
+            new StoreResult(firstFileName, new UploadFailureException()),
+            new StoreResult(secondFileName, new UploadFailureException())
         );
     }
 }

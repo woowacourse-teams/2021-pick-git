@@ -9,7 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woowacourse.s3proxy.common.FileFactory;
-import com.woowacourse.s3proxy.exception.UploadFailException;
+import com.woowacourse.s3proxy.exception.upload.UploadFailureException;
 import com.woowacourse.s3proxy.web.application.PickGitStorageService;
 import com.woowacourse.s3proxy.web.application.dto.FilesDto;
 import com.woowacourse.s3proxy.web.presentation.dto.Files;
@@ -71,8 +71,8 @@ class PickGitStorageControllerTest {
 
         //then
         resultActions.andExpect(status().isBadRequest());
-        resultActions.andExpect(jsonPath("message")
-            .value(new UploadFailException().getMessage()));
+        resultActions.andExpect(jsonPath("errorCode")
+            .value(new UploadFailureException().getErrorCode()));
     }
 
     @DisplayName("비정상 이미지를 전송한다 - 실패.")
@@ -87,7 +87,7 @@ class PickGitStorageControllerTest {
 
         //then
         resultActions.andExpect(status().isBadRequest());
-        resultActions.andExpect(jsonPath("message")
-            .value(new UploadFailException().getMessage()));
+        resultActions.andExpect(jsonPath("errorCode")
+            .value(new UploadFailureException().getErrorCode()));
     }
 }

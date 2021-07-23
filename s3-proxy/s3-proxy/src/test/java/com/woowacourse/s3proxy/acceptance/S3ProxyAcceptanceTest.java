@@ -13,7 +13,6 @@ import com.woowacourse.s3proxy.web.presentation.dto.Files.Response;
 import io.restassured.RestAssured;
 import io.restassured.specification.RequestSpecification;
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -77,7 +76,7 @@ class S3ProxyAcceptanceTest {
 
         assertThat(result)
             .usingRecursiveComparison()
-            .isEqualTo(new ExceptionDto("업로드 실패"));
+            .isEqualTo(new ExceptionDto("I0001"));
     }
 
     @DisplayName("정상 이미지들을 저장하고 주소를 반환받는다. - 성공")
@@ -124,7 +123,7 @@ class S3ProxyAcceptanceTest {
 
         assertThat(result)
             .usingRecursiveComparison()
-            .isEqualTo(new ExceptionDto("업로드 실패"));
+            .isEqualTo(new ExceptionDto("I0001"));
     }
 
     @DisplayName("비정상 이미지와 정상 이미지를 함게 저장하고 에러를 반환받는다. - 실패")
@@ -141,7 +140,7 @@ class S3ProxyAcceptanceTest {
 
         assertThat(result)
             .usingRecursiveComparison()
-            .isEqualTo(new ExceptionDto("업로드 실패"));
+            .isEqualTo(new ExceptionDto("I0001"));
     }
 
     private static class Request {

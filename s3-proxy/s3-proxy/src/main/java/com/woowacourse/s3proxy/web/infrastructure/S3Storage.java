@@ -4,7 +4,7 @@ import static java.util.stream.Collectors.toList;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.woowacourse.s3proxy.exception.UploadFailException;
+import com.woowacourse.s3proxy.exception.upload.UploadFailureException;
 import com.woowacourse.s3proxy.web.domain.PickGitStorage;
 import java.io.IOException;
 import java.util.List;
@@ -51,7 +51,7 @@ public class S3Storage implements PickGitStorage {
         } catch (Exception e) {
             return new PickGitStorage.StoreResult(
                 originalFileName,
-                new UploadFailException(e)
+                new UploadFailureException(e)
             );
         }
     }

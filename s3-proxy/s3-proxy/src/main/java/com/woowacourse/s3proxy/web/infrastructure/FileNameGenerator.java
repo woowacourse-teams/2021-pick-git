@@ -1,6 +1,7 @@
 package com.woowacourse.s3proxy.web.infrastructure;
 
-import com.woowacourse.s3proxy.exception.PickGitStorageException;
+import com.woowacourse.s3proxy.exception.format.FileExtensionException;
+import com.woowacourse.s3proxy.exception.format.HashFailureException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -29,7 +30,7 @@ public class FileNameGenerator {
             );
             return mimeType.getExtension();
         } catch (MimeTypeException | IOException e) {
-            throw new PickGitStorageException("확장자 추출 실패");
+            throw new FileExtensionException("확장자 추출 실패");
         }
     }
 
@@ -42,7 +43,7 @@ public class FileNameGenerator {
 
             return Hex.encodeHexString(messageDigest.digest());
         } catch (NoSuchAlgorithmException e) {
-            throw new PickGitStorageException("파일 이름 해시화 실패");
+            throw new HashFailureException("파일 이름 해시화 실패");
         }
     }
 }
