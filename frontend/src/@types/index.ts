@@ -71,3 +71,20 @@ export type Step = {
   title: string;
   path: string;
 };
+
+export type ErrorResponse = {
+  errorCode:
+    | "A0001"
+    | "A0002"
+    | "F0001"
+    | "F0002"
+    | "F0003"
+    | "U0001"
+    | "U0002"
+    | "U0003"
+    | "U0004"
+    | "V0001"
+    | "P0001"
+    | "P0002"
+    | "S0001";
+};

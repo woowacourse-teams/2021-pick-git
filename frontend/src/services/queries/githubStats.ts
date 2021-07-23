@@ -1,6 +1,6 @@
 import { AxiosError } from "axios";
 import { QueryFunction, useQuery } from "react-query";
-import { GithubStats } from "../../@types";
+import { ErrorResponse, GithubStats } from "../../@types";
 import { QUERY } from "../../constants/queries";
 import { requestGetGithubStats } from "../requests";
 
@@ -13,7 +13,7 @@ const githubStatsQueryFunction: QueryFunction<GithubStats> = async ({ queryKey }
 };
 
 export const useGithubStatsQuery = (username: string | null) => {
-  return useQuery<GithubStats, AxiosError<GithubStats> | Error>(
+  return useQuery<GithubStats, AxiosError<ErrorResponse> | Error>(
     [QUERY.GET_GITHUB_STATS, username],
     githubStatsQueryFunction
   );
