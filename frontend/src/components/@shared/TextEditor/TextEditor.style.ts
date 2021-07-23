@@ -10,6 +10,7 @@ const TextArea = styled.textarea<React.CSSProperties>`
 
   border: none;
   outline: none;
+  background-color: transparent;
 `;
 
 export default TextArea;
