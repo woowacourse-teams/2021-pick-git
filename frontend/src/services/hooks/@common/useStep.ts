@@ -1,15 +1,16 @@
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { useHistory } from "react-router-dom";
+import { Step } from "../../../@types";
 import PostAddStepContext from "../../../contexts/PostAddStepContext";
 import { getLastPath } from "../../../utils/history";
 
-const useStep = (steps: string[], stepCompleteLink?: string) => {
+const useStep = (steps: Step[], stepCompleteLink?: string) => {
   const { stepIndex, setStepIndex } = useContext(PostAddStepContext);
   const history = useHistory();
 
   const setStepMoveEventHandler = () => {
     window.onpopstate = () => {
-      if (getLastPath(history.location.pathname) === steps[stepIndex + 1]) {
+      if (getLastPath(history.location.pathname) === steps[stepIndex + 1]?.path) {
         setStepIndex(stepIndex + 1);
         return;
       }
@@ -32,7 +33,7 @@ const useStep = (steps: string[], stepCompleteLink?: string) => {
 
   const goNextStep = () => {
     setStepIndex(stepIndex + 1);
-    history.push(steps[stepIndex + 1]);
+    history.push(steps[stepIndex + 1].path);
   };
 
   const completeStep = () => {

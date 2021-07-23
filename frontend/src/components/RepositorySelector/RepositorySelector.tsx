@@ -1,12 +1,16 @@
 import { useContext } from "react";
+import { useHistory } from "react-router-dom";
 import { ThemeContext } from "styled-components";
 import { RepositoryIcon, SearchIcon } from "../../assets/icons";
+import { REDIRECT_MESSAGE } from "../../constants/messages";
 import { STEPS } from "../../constants/steps";
 import { PAGE_URL } from "../../constants/urls";
-import PostAddDataContext from "../../contexts/PostAddDataContext";
-import UserContext from "../../contexts/UserContext";
+import useMessageModal from "../../services/hooks/@common/useMessageModal";
 import useStep from "../../services/hooks/@common/useStep";
+import usePostUpload from "../../services/hooks/usePostUpload";
 import { useGithubRepositoriesQuery } from "../../services/queries";
+import { getAPIErrorMessage } from "../../utils/error";
+import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
 import PageLoading from "../@layout/PageLoading/PageLoading";
 import CircleIcon from "../@shared/CircleIcon/CircleIcon";
 import Input from "../@shared/Input/Input";
@@ -20,15 +24,20 @@ import {
 } from "./RepositorySelector.style";
 
 const RepositorySelector = () => {
-  const { currentUsername } = useContext(UserContext);
-  const { setGithubRepositoryName } = useContext(PostAddDataContext);
+  const { setGithubRepositoryName } = usePostUpload();
   const { goNextStep } = useStep(STEPS, PAGE_URL.HOME);
-  const { data: repositories, isLoading, error } = useGithubRepositoriesQuery(currentUsername);
+  const { data: repositories, isLoading, error } = useGithubRepositoriesQuery();
+  const { modalMessage, isModalShown, showAlertModal, hideMessageModal } = useMessageModal();
   const { color } = useContext(ThemeContext);
+  const history = useHistory();
 
   const handleRepositorySelect = (repositoryName: string) => {
     setGithubRepositoryName(repositoryName);
     goNextStep();
+  };
+
+  const goBackToHome = () => {
+    history.goBack();
   };
 
   const repositoryListItems = repositories?.map((repository) => (
@@ -42,8 +51,18 @@ const RepositorySelector = () => {
     </RepositoryListItem>
   ));
 
+  if (repositories?.length === 0) {
+    showAlertModal(REDIRECT_MESSAGE.NO_REPOSITORY_EXIST);
+  }
+
+  const handleErrorConfirm = () => {
+    history.push(PAGE_URL.HOME);
+  };
+
   if (error) {
-    return <div>에러!!</div>;
+    error.response && showAlertModal(getAPIErrorMessage(error.response?.data.errorCode));
+
+    return <MessageModalPortal heading={modalMessage} onConfirm={handleErrorConfirm} onClose={hideMessageModal} />;
   }
 
   if (isLoading) {
@@ -56,6 +75,7 @@ const RepositorySelector = () => {
         <Input kind="borderBottom" icon={<SearchIcon />} />
       </SearchInputWrapper>
       <RepositoryList>{repositoryListItems}</RepositoryList>
+      {isModalShown && <MessageModalPortal heading={modalMessage} onConfirm={goBackToHome} onClose={goBackToHome} />}
     </Container>
   );
 };

@@ -1,7 +1,7 @@
 import { QueryFunction, useMutation, useQuery, useQueryClient } from "react-query";
 import axios, { AxiosError } from "axios";
 
-import { ProfileData } from "../../@types";
+import { ErrorResponse, ProfileData } from "../../@types";
 import { QUERY } from "../../constants/queries";
 import { requestAddFollow, requestDeleteFollow, requestGetSelfProfile, requestGetUserProfile } from "../requests";
 import UserContext from "../../contexts/UserContext";
@@ -33,7 +33,7 @@ export const useProfileQuery = (isMyProfile: boolean, username: string | null) =
     }
   };
 
-  return useQuery<ProfileData, AxiosError<ProfileData>>(
+  return useQuery<ProfileData, AxiosError<ErrorResponse>>(
     [QUERY.GET_PROFILE, { isMyProfile, username }],
     profileQueryFunction
   );

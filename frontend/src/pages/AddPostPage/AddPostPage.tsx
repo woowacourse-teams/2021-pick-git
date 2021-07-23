@@ -8,13 +8,27 @@ import Button from "../../components/@shared/Button/Button";
 import useStep from "../../services/hooks/@common/useStep";
 import { PAGE_URL } from "../../constants/urls";
 import usePostUpload from "../../services/hooks/usePostUpload";
+import useMessageModal from "../../services/hooks/@common/useMessageModal";
+import MessageModalPortal from "../../components/@layout/MessageModalPortal/MessageModalPortal";
+import { FAILURE_MESSAGE, WARNING_MESSAGE } from "../../constants/messages";
+import {
+  getFailedValidationMessage,
+  isContentEmpty,
+  isFilesEmpty,
+  isValidContentLength,
+  isGithubRepositoryEmpty,
+  isValidPostUploadData,
+} from "../../utils/postUpload";
+import { getAPIErrorMessage } from "../../utils/error";
 
 const AddPostPage = () => {
   const { stepIndex, goNextStep, setStepMoveEventHandler, removeStepMoveEventHandler, completeStep } = useStep(
     STEPS,
     PAGE_URL.HOME
   );
-  const { uploadPost, resetUploadData } = usePostUpload();
+  const { content, githubRepositoryName, tags, files, uploadPost, resetPostUploadData } = usePostUpload();
+  const { modalMessage, isModalShown, isCancelButtonShown, showAlertModal, showConfirmModal, hideMessageModal } =
+    useMessageModal();
 
   const stepComponents = [
     <RepositorySelector key="repository-selector" />,
@@ -28,33 +42,83 @@ const AddPostPage = () => {
   }, [stepIndex]);
 
   const handlePostAddComplete = async () => {
+    if (!isValidPostUploadData({ content, githubRepositoryName, tags, files })) {
+      showAlertModal(getFailedValidationMessage({ content, githubRepositoryName, tags, files }));
+      return;
+    }
+
     try {
       await uploadPost();
-      resetUploadData();
+      resetPostUploadData();
       completeStep();
     } catch (error) {
-      alert(error.message);
+      showAlertModal(getAPIErrorMessage(error.response?.data.errorCode));
     }
+  };
+
+  const handleNextButtonClick = () => {
+    if (stepIndex === 0 && !isGithubRepositoryEmpty(githubRepositoryName)) {
+      showAlertModal(FAILURE_MESSAGE.POST_REPOSITORY_NOT_SELECTED);
+      return;
+    }
+
+    if (stepIndex === 1 && !isValidContentLength(content)) {
+      showAlertModal(FAILURE_MESSAGE.POST_CONTENT_LENGTH_LIMIT_EXCEEDED);
+      return;
+    }
+
+    if (stepIndex === 1 && isContentEmpty(content) && isFilesEmpty(files)) {
+      showAlertModal(FAILURE_MESSAGE.POST_FILE_AND_CONTENT_EMPTY);
+      return;
+    }
+
+    if (stepIndex === 1 && isFilesEmpty(files)) {
+      showConfirmModal(WARNING_MESSAGE.POST_FILE_NOT_UPLOADED);
+      return;
+    }
+
+    if (stepIndex === 1 && isContentEmpty(content)) {
+      showConfirmModal(WARNING_MESSAGE.POST_CONTENT_EMPTY);
+      return;
+    }
+
+    goNextStep();
+  };
+
+  const handleConfirmModalConfirm = () => {
+    hideMessageModal();
+    goNextStep();
   };
 
   return (
     <Container>
       <StepSlider stepCount={STEPS.length} stepIndex={stepIndex}>
         {STEPS.map((STEP, index) => (
-          <StepContainer key={STEP} stepCount={STEPS.length} isShown={stepIndex === index}>
+          <StepContainer key={STEP.title} stepCount={STEPS.length} isShown={stepIndex === index}>
             {stepComponents[index]}
           </StepContainer>
         ))}
       </StepSlider>
       <NextStepButtonWrapper>
         {stepIndex < STEPS.length - 1 ? (
-          <Button kind="roundedBlock" onClick={goNextStep}>
+          <Button kind="roundedBlock" onClick={handleNextButtonClick}>
             다음
           </Button>
         ) : (
           <Button kind="roundedBlock" onClick={handlePostAddComplete}>
             작성 완료
           </Button>
+        )}
+        {isModalShown && (
+          <MessageModalPortal heading={modalMessage} onConfirm={hideMessageModal} onClose={hideMessageModal} />
+        )}
+        {isModalShown && isCancelButtonShown && (
+          <MessageModalPortal
+            heading={modalMessage}
+            onConfirm={handleConfirmModalConfirm}
+            onClose={hideMessageModal}
+            onCancel={hideMessageModal}
+          />
         )}
       </NextStepButtonWrapper>
     </Container>

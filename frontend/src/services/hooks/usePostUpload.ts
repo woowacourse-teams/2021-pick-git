@@ -15,7 +15,7 @@ const usePostUpload = () => {
     await requestAddPost(currentUsername, { content, files, tags, githubRepositoryName }, accessToken);
   };
 
-  const resetUploadData = () => {
+  const resetPostUploadData = () => {
     setContent("");
     setFiles([]);
     setGithubRepositoryName("");
@@ -23,8 +23,16 @@ const usePostUpload = () => {
   };
 
   return {
+    files,
+    githubRepositoryName,
+    content,
+    tags,
+    setFiles,
+    setContent,
+    setGithubRepositoryName,
+    setTags,
     uploadPost,
-    resetUploadData,
+    resetPostUploadData,
   };
 };
 
