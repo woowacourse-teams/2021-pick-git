@@ -1,11 +1,11 @@
 package com.woowacourse.pickgit.user.application.dto;
 
-public class FollowServiceDto {
+public class FollowResponseDto {
 
     private boolean isFollowing;
     private int followerCount;
 
-    public FollowServiceDto(int followerCount, boolean isFollowing) {
+    public FollowResponseDto(int followerCount, boolean isFollowing) {
         this.followerCount = followerCount;
         this.isFollowing = isFollowing;
     }

@@ -1,9 +1,9 @@
 package com.woowacourse.pickgit.user.application;
 
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
-import com.woowacourse.pickgit.user.application.dto.AuthUserServiceDto;
-import com.woowacourse.pickgit.user.application.dto.FollowServiceDto;
-import com.woowacourse.pickgit.user.application.dto.UserProfileServiceDto;
+import com.woowacourse.pickgit.user.application.dto.AuthUserResponseDto;
+import com.woowacourse.pickgit.user.application.dto.FollowResponseDto;
+import com.woowacourse.pickgit.user.application.dto.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
@@ -22,10 +22,11 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserProfileServiceDto getMyUserProfile(AuthUserServiceDto authUserServiceDto) {
-        User user = findUserByName(authUserServiceDto.getGithubName());
+    public UserProfileResponseDto getMyUserProfile(
+        AuthUserResponseDto authUserResponseDto) {
+        User user = findUserByName(authUserResponseDto.getGithubName());
 
-        return new UserProfileServiceDto(
+        return new UserProfileResponseDto(
             user.getName(), user.getImage(), user.getDescription(),
             user.getFollowerCount(), user.getFollowingCount(), user.getPostCount(),
             user.getGithubUrl(), user.getCompany(), user.getLocation(),
@@ -34,11 +35,11 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserProfileServiceDto getUserProfile(AppUser appUser, String targetUsername) {
+    public UserProfileResponseDto getUserProfile(AppUser appUser, String targetUsername) {
         User targetUser = findUserByName(targetUsername);
 
         if (appUser.isGuest()) {
-            return new UserProfileServiceDto(
+            return new UserProfileResponseDto(
                 targetUser.getName(), targetUser.getImage(), targetUser.getDescription(),
                 targetUser.getFollowerCount(), targetUser.getFollowingCount(), targetUser.getPostCount(),
                 targetUser.getGithubUrl(), targetUser.getCompany(), targetUser.getLocation(),
@@ -48,7 +49,7 @@ public class UserService {
 
         User sourceUser = findUserByName(appUser.getUsername());
 
-        return new UserProfileServiceDto(
+        return new UserProfileResponseDto(
             targetUser.getName(), targetUser.getImage(), targetUser.getDescription(),
             targetUser.getFollowerCount(), targetUser.getFollowingCount(), targetUser.getPostCount(),
             targetUser.getGithubUrl(), targetUser.getCompany(), targetUser.getLocation(),
@@ -56,26 +57,26 @@ public class UserService {
         );
     }
 
-    public FollowServiceDto followUser(AuthUserServiceDto authUserServiceDto,
+    public FollowResponseDto followUser(AuthUserResponseDto authUserResponseDto,
         String targetUsername) {
-        User source = findUserByName(authUserServiceDto.getGithubName());
+        User source = findUserByName(authUserResponseDto.getGithubName());
         User target = findUserByName(targetUsername);
 
         validateDifferentSourceTarget(source, target);
         source.follow(target);
 
-        return new FollowServiceDto(target.getFollowerCount(), true);
+        return new FollowResponseDto(target.getFollowerCount(), true);
     }
 
-    public FollowServiceDto unfollowUser(AuthUserServiceDto authUserServiceDto,
+    public FollowResponseDto unfollowUser(AuthUserResponseDto authUserResponseDto,
         String targetUsername) {
-        User source = findUserByName(authUserServiceDto.getGithubName());
+        User source = findUserByName(authUserResponseDto.getGithubName());
         User target = findUserByName(targetUsername);
 
         validateDifferentSourceTarget(source, target);
         source.unfollow(target);
 
-        return new FollowServiceDto(target.getFollowerCount(), false);
+        return new FollowResponseDto(target.getFollowerCount(), false);
     }
 
     private User findUserByName(String githubName) {

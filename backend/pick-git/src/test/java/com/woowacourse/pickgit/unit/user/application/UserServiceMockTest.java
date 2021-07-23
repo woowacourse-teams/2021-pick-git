@@ -11,15 +11,14 @@ import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.user.application.UserService;
-import com.woowacourse.pickgit.user.application.dto.AuthUserServiceDto;
-import com.woowacourse.pickgit.user.application.dto.FollowServiceDto;
-import com.woowacourse.pickgit.user.application.dto.UserProfileServiceDto;
+import com.woowacourse.pickgit.user.application.dto.AuthUserResponseDto;
+import com.woowacourse.pickgit.user.application.dto.FollowResponseDto;
+import com.woowacourse.pickgit.user.application.dto.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import com.woowacourse.pickgit.exception.user.DuplicateFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -60,14 +59,14 @@ class UserServiceMockTest {
             userRepository.findByBasicProfile_Name(anyString())
         ).willReturn(Optional.of(UserFactory.user(NAME)));
 
-        UserProfileServiceDto expectedUserProfileDto = new UserProfileServiceDto(
+        UserProfileResponseDto expectedUserProfileDto = new UserProfileResponseDto(
             NAME, IMAGE, DESCRIPTION,
             0, 0, 0,
             GITHUB_URL, COMPANY, LOCATION, WEBSITE, TWITTER, null
         );
 
         //when
-        UserProfileServiceDto actualUserProfileDto = userService.getUserProfile(appUser, NAME);
+        UserProfileResponseDto actualUserProfileDto = userService.getUserProfile(appUser, NAME);
 
         //then
         assertThat(actualUserProfileDto)
@@ -95,7 +94,7 @@ class UserServiceMockTest {
     @Test
     void followUser_ValidUser_Success() {
         //given
-        AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(NAME);
+        AuthUserResponseDto authUserResponseDto = new AuthUserResponseDto(NAME);
         String targetName = "target";
 
         given(
@@ -107,11 +106,12 @@ class UserServiceMockTest {
         ).willReturn(Optional.of(UserFactory.user(2L, "testUser2")));
 
         //when
-        FollowServiceDto followServiceDto = userService.followUser(authUserServiceDto, targetName);
+        FollowResponseDto followResponseDto = userService.followUser(
+            authUserResponseDto, targetName);
 
         //then
-        assertThat(followServiceDto.getFollowerCount()).isEqualTo(1);
-        assertThat(followServiceDto.isFollowing()).isTrue();
+        assertThat(followResponseDto.getFollowerCount()).isEqualTo(1);
+        assertThat(followResponseDto.isFollowing()).isTrue();
 
         verify(userRepository, times(2)).findByBasicProfile_Name(anyString());
     }
@@ -120,7 +120,7 @@ class UserServiceMockTest {
     @Test
     void followUser_ExistingFollow_ExceptionThrown() {
         //given
-        AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(NAME);
+        AuthUserResponseDto authUserResponseDto = new AuthUserResponseDto(NAME);
         String targetName = "target";
 
         given(userRepository.findByBasicProfile_Name(NAME))
@@ -129,12 +129,12 @@ class UserServiceMockTest {
         given(userRepository.findByBasicProfile_Name("target"))
             .willReturn(Optional.of(UserFactory.user(2L,"testUser2")));
 
-        userService.followUser(authUserServiceDto, targetName);
+        userService.followUser(authUserResponseDto, targetName);
 
         //when
         //then
         assertThatThrownBy(
-            () -> userService.followUser(authUserServiceDto, targetName)
+            () -> userService.followUser(authUserResponseDto, targetName)
         ).hasMessage(new DuplicateFollowException().getMessage());
 
         verify(userRepository, times(4)).findByBasicProfile_Name(anyString());
@@ -144,7 +144,7 @@ class UserServiceMockTest {
     @Test
     void unfollowUser_ValidUser_Success() {
         //given
-        AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(NAME);
+        AuthUserResponseDto authUserResponseDto = new AuthUserResponseDto(NAME);
         String targetName = "target";
 
         given(
@@ -155,15 +155,15 @@ class UserServiceMockTest {
             userRepository.findByBasicProfile_Name("target")
         ).willReturn(Optional.of(UserFactory.user(2L,"testUser1")));
 
-        userService.followUser(authUserServiceDto, targetName);
+        userService.followUser(authUserResponseDto, targetName);
 
         //when
-        FollowServiceDto followServiceDto = userService
-            .unfollowUser(authUserServiceDto, targetName);
+        FollowResponseDto followResponseDto = userService
+            .unfollowUser(authUserResponseDto, targetName);
 
         //then
-        assertThat(followServiceDto.getFollowerCount()).isEqualTo(0);
-        assertThat(followServiceDto.isFollowing()).isFalse();
+        assertThat(followResponseDto.getFollowerCount()).isEqualTo(0);
+        assertThat(followResponseDto.isFollowing()).isFalse();
 
         verify(userRepository, times(4)).findByBasicProfile_Name(anyString());
     }
@@ -172,7 +172,7 @@ class UserServiceMockTest {
     @Test
     void unfollowUser_NotExistingFollow_ExceptionThrown() {
         //given
-        AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(NAME);
+        AuthUserResponseDto authUserResponseDto = new AuthUserResponseDto(NAME);
         String targetName = "target";
 
         given(
@@ -186,7 +186,7 @@ class UserServiceMockTest {
         //when
         //then
         assertThatThrownBy(
-            () -> userService.unfollowUser(authUserServiceDto, targetName)
+            () -> userService.unfollowUser(authUserResponseDto, targetName)
         ).hasMessage(new InvalidFollowException().getMessage());
 
         verify(userRepository, times(2)).findByBasicProfile_Name(anyString());

@@ -27,9 +27,9 @@ import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.user.application.UserService;
-import com.woowacourse.pickgit.user.application.dto.AuthUserServiceDto;
-import com.woowacourse.pickgit.user.application.dto.FollowServiceDto;
-import com.woowacourse.pickgit.user.application.dto.UserProfileServiceDto;
+import com.woowacourse.pickgit.user.application.dto.AuthUserResponseDto;
+import com.woowacourse.pickgit.user.application.dto.FollowResponseDto;
+import com.woowacourse.pickgit.user.application.dto.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.presentation.UserController;
 import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.DisplayName;
@@ -64,10 +64,10 @@ class UserControllerTest {
     @DisplayName("인증된 사용자의 프로필을 가져온다.")
     @Test
     void getAuthenticatedUserProfile() throws Exception {
-        UserProfileServiceDto userProfileServiceDto = UserFactory.mockLoginUserProfileServiceDto();
+        UserProfileResponseDto userProfileResponseDto = UserFactory.mockLoginUserProfileServiceDto();
 
-        given(userService.getMyUserProfile(any(AuthUserServiceDto.class)))
-            .willReturn(userProfileServiceDto);
+        given(userService.getMyUserProfile(any(AuthUserResponseDto.class)))
+            .willReturn(userProfileResponseDto);
         given(oAuthService.validateToken(anyString()))
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(anyString()))
@@ -81,7 +81,7 @@ class UserControllerTest {
         MvcResult mvcResult = perform.andReturn();
         String body = mvcResult.getResponse().getContentAsString();
 
-        assertThat(body).isEqualTo(objectMapper.writeValueAsString(userProfileServiceDto));
+        assertThat(body).isEqualTo(objectMapper.writeValueAsString(userProfileResponseDto));
 
         perform.andDo(document("profilesMe",
             getDocumentRequest(),
@@ -109,10 +109,10 @@ class UserControllerTest {
     @DisplayName("다른 사용자의 프로필을 가져온다. - 로그인")
     @Test
     void getUserProfile_loggedIn() throws Exception {
-        UserProfileServiceDto userProfileServiceDto = UserFactory.mockLoginUserProfileServiceDto();
+        UserProfileResponseDto userProfileResponseDto = UserFactory.mockLoginUserProfileServiceDto();
 
         given(userService.getUserProfile(any(AppUser.class), anyString()))
-            .willReturn(userProfileServiceDto);
+            .willReturn(userProfileResponseDto);
         given(oAuthService.validateToken(anyString()))
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(anyString()))
@@ -126,7 +126,7 @@ class UserControllerTest {
         MvcResult mvcResult = perform.andReturn();
         String body = mvcResult.getResponse().getContentAsString();
 
-        assertThat(body).isEqualTo(objectMapper.writeValueAsString(userProfileServiceDto));
+        assertThat(body).isEqualTo(objectMapper.writeValueAsString(userProfileResponseDto));
 
         perform.andDo(document("profiles-LoggedIn",
             getDocumentRequest(),
@@ -157,10 +157,10 @@ class UserControllerTest {
     @DisplayName("다른 사용자의 프로필을 가져온다. - 비 로그인")
     @Test
     void getUserProfile_unLoggedIn() throws Exception {
-        UserProfileServiceDto userProfileServiceDto = UserFactory.mockUnLoginUserProfileServiceDto();
+        UserProfileResponseDto userProfileResponseDto = UserFactory.mockUnLoginUserProfileServiceDto();
 
         given(userService.getUserProfile(any(AppUser.class), anyString()))
-            .willReturn(userProfileServiceDto);
+            .willReturn(userProfileResponseDto);
         given(oAuthService.validateToken(anyString()))
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(any()))
@@ -173,7 +173,7 @@ class UserControllerTest {
         MvcResult mvcResult = perform.andReturn();
         String body = mvcResult.getResponse().getContentAsString();
 
-        assertThat(body).isEqualTo(objectMapper.writeValueAsString(userProfileServiceDto));
+        assertThat(body).isEqualTo(objectMapper.writeValueAsString(userProfileResponseDto));
 
         perform.andDo(document("profiles-unLoggedIn",
             getDocumentRequest(),
@@ -201,10 +201,10 @@ class UserControllerTest {
     @DisplayName("팔로잉을 한다. - 로그인")
     @Test
     void followUser() throws Exception {
-        FollowServiceDto followServiceDto = new FollowServiceDto(1, true);
+        FollowResponseDto followResponseDto = new FollowResponseDto(1, true);
 
-        given(userService.followUser(any(AuthUserServiceDto.class), anyString()))
-            .willReturn(followServiceDto);
+        given(userService.followUser(any(AuthUserResponseDto.class), anyString()))
+            .willReturn(followResponseDto);
         given(oAuthService.validateToken(anyString()))
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(anyString()))
@@ -218,7 +218,7 @@ class UserControllerTest {
         MvcResult mvcResult = perform.andReturn();
         String body = mvcResult.getResponse().getContentAsString();
 
-        assertThat(body).isEqualTo(objectMapper.writeValueAsString(followServiceDto));
+        assertThat(body).isEqualTo(objectMapper.writeValueAsString(followResponseDto));
 
         perform.andDo(document("following-LoggedIn",
             getDocumentRequest(),
@@ -239,10 +239,10 @@ class UserControllerTest {
     @DisplayName("언팔로잉일 한다. - 로그인")
     @Test
     void unfollowUser() throws Exception {
-        FollowServiceDto followServiceDto = new FollowServiceDto(1, false);
+        FollowResponseDto followResponseDto = new FollowResponseDto(1, false);
 
-        given(userService.followUser(any(AuthUserServiceDto.class), anyString()))
-            .willReturn(followServiceDto);
+        given(userService.followUser(any(AuthUserResponseDto.class), anyString()))
+            .willReturn(followResponseDto);
         given(oAuthService.validateToken(anyString()))
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(anyString()))
@@ -256,7 +256,7 @@ class UserControllerTest {
         MvcResult mvcResult = perform.andReturn();
         String body = mvcResult.getResponse().getContentAsString();
 
-        assertThat(body).isEqualTo(objectMapper.writeValueAsString(followServiceDto));
+        assertThat(body).isEqualTo(objectMapper.writeValueAsString(followResponseDto));
 
         perform.andDo(document("unfollowing-LoggedIn",
             getDocumentRequest(),
@@ -277,10 +277,10 @@ class UserControllerTest {
     @DisplayName("팔로잉을 한다. - 비 로그인")
     @Test
     void followUser_unLogin() throws Exception {
-        FollowServiceDto followServiceDto = new FollowServiceDto(1, true);
+        FollowResponseDto followResponseDto = new FollowResponseDto(1, true);
 
-        given(userService.followUser(any(AuthUserServiceDto.class), anyString()))
-            .willReturn(followServiceDto);
+        given(userService.followUser(any(AuthUserResponseDto.class), anyString()))
+            .willReturn(followResponseDto);
         given(oAuthService.validateToken(anyString()))
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(anyString()))
@@ -310,10 +310,10 @@ class UserControllerTest {
     @DisplayName("언팔로잉일 한다. - 비 로그인")
     @Test
     void unfollowUser_unLogin() throws Exception {
-        FollowServiceDto followServiceDto = new FollowServiceDto(1, false);
+        FollowResponseDto followResponseDto = new FollowResponseDto(1, false);
 
-        given(userService.followUser(any(AuthUserServiceDto.class), anyString()))
-            .willReturn(followServiceDto);
+        given(userService.followUser(any(AuthUserResponseDto.class), anyString()))
+            .willReturn(followResponseDto);
         given(oAuthService.validateToken(anyString()))
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(anyString()))

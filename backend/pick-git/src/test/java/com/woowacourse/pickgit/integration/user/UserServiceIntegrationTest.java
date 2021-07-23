@@ -12,9 +12,9 @@ import com.woowacourse.pickgit.exception.user.DuplicateFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
 import com.woowacourse.pickgit.user.application.UserService;
-import com.woowacourse.pickgit.user.application.dto.AuthUserServiceDto;
-import com.woowacourse.pickgit.user.application.dto.FollowServiceDto;
-import com.woowacourse.pickgit.user.application.dto.UserProfileServiceDto;
+import com.woowacourse.pickgit.user.application.dto.AuthUserResponseDto;
+import com.woowacourse.pickgit.user.application.dto.FollowResponseDto;
+import com.woowacourse.pickgit.user.application.dto.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -52,17 +52,17 @@ class UserServiceIntegrationTest {
     @Test
     public void getMyUserProfile_FindUserInfoByName_Success() {
         //given
-        AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(NAME);
+        AuthUserResponseDto authUserResponseDto = new AuthUserResponseDto(NAME);
         userRepository.save(UserFactory.user());
-        UserProfileServiceDto expectedUserProfileDto = new UserProfileServiceDto(
+        UserProfileResponseDto expectedUserProfileDto = new UserProfileResponseDto(
             NAME, IMAGE, DESCRIPTION,
             0, 0, 0,
             GITHUB_URL, COMPANY, LOCATION, WEBSITE, TWITTER, null
         );
 
         //when
-        UserProfileServiceDto actualUserProfileDto = userService
-            .getMyUserProfile(authUserServiceDto);
+        UserProfileResponseDto actualUserProfileDto = userService
+            .getMyUserProfile(authUserResponseDto);
 
         //then
         assertThat(actualUserProfileDto)
@@ -76,14 +76,14 @@ class UserServiceIntegrationTest {
         //given
         AppUser guestUser = new GuestUser();
         userRepository.save(UserFactory.user());
-        UserProfileServiceDto expectedUserProfileDto = new UserProfileServiceDto(
+        UserProfileResponseDto expectedUserProfileDto = new UserProfileResponseDto(
             NAME, IMAGE, DESCRIPTION,
             0, 0, 0,
             GITHUB_URL, COMPANY, LOCATION, WEBSITE, TWITTER, null
         );
 
         //when
-        UserProfileServiceDto actualUserProfileDto = userService.getUserProfile(guestUser, NAME);
+        UserProfileResponseDto actualUserProfileDto = userService.getUserProfile(guestUser, NAME);
 
         //then
         assertThat(actualUserProfileDto)
@@ -99,10 +99,10 @@ class UserServiceIntegrationTest {
         User source = userRepository.save(UserFactory.user(NAME));
         User target = userRepository.save(UserFactory.user("testUser2"));
 
-        AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(source.getName());
-        userService.followUser(authUserServiceDto, target.getName());
+        AuthUserResponseDto authUserResponseDto = new AuthUserResponseDto(source.getName());
+        userService.followUser(authUserResponseDto, target.getName());
 
-        UserProfileServiceDto expectedUserProfileDto = new UserProfileServiceDto(
+        UserProfileResponseDto expectedUserProfileDto = new UserProfileResponseDto(
             target.getName(), target.getImage(), target.getDescription(),
             1, 0, 0,
             target.getGithubUrl(), target.getCompany(), target.getLocation(),
@@ -110,7 +110,7 @@ class UserServiceIntegrationTest {
         );
 
         //when
-        UserProfileServiceDto actualUserProfileDto = userService
+        UserProfileResponseDto actualUserProfileDto = userService
             .getUserProfile(loginUser, target.getName());
 
         //then
@@ -127,14 +127,14 @@ class UserServiceIntegrationTest {
         userRepository.save(UserFactory.user(1L, NAME));
         userRepository.save(UserFactory.user(2L, "testUser2"));
 
-        UserProfileServiceDto expectedUserProfileDto = new UserProfileServiceDto(
+        UserProfileResponseDto expectedUserProfileDto = new UserProfileResponseDto(
             NAME, IMAGE, DESCRIPTION,
             0, 0, 0,
             GITHUB_URL, COMPANY, LOCATION, WEBSITE, TWITTER, false
         );
 
         //when
-        UserProfileServiceDto actualUserProfileDto = userService.getUserProfile(loginUser, NAME);
+        UserProfileResponseDto actualUserProfileDto = userService.getUserProfile(loginUser, NAME);
 
         //then
         assertThat(actualUserProfileDto)
@@ -161,14 +161,15 @@ class UserServiceIntegrationTest {
         String targetName = "pickgit";
         userRepository.save(UserFactory.user(NAME));
         userRepository.save(UserFactory.user(targetName));
-        AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(NAME);
+        AuthUserResponseDto authUserResponseDto = new AuthUserResponseDto(NAME);
 
         //when
-        FollowServiceDto followServiceDto = userService.followUser(authUserServiceDto, targetName);
+        FollowResponseDto followResponseDto = userService.followUser(
+            authUserResponseDto, targetName);
 
         //then
-        assertThat(followServiceDto.getFollowerCount()).isEqualTo(1);
-        assertThat(followServiceDto.isFollowing()).isTrue();
+        assertThat(followResponseDto.getFollowerCount()).isEqualTo(1);
+        assertThat(followResponseDto.isFollowing()).isTrue();
     }
 
     @DisplayName("이미 존재하는 Follow 추가 시 예외가 발생한다.")
@@ -178,14 +179,14 @@ class UserServiceIntegrationTest {
         String targetName = "pickgit";
         userRepository.save(UserFactory.user(NAME));
         userRepository.save(UserFactory.user(targetName));
-        AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(NAME);
+        AuthUserResponseDto authUserResponseDto = new AuthUserResponseDto(NAME);
 
-        userService.followUser(authUserServiceDto, targetName);
+        userService.followUser(authUserResponseDto, targetName);
 
         //when
         //then
         assertThatThrownBy(
-            () -> userService.followUser(authUserServiceDto, targetName)
+            () -> userService.followUser(authUserResponseDto, targetName)
         ).hasMessage(new DuplicateFollowException().getMessage());
     }
 
@@ -196,17 +197,17 @@ class UserServiceIntegrationTest {
         String targetName = "pickgit";
         userRepository.save(UserFactory.user(NAME));
         userRepository.save(UserFactory.user(targetName));
-        AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(NAME);
+        AuthUserResponseDto authUserResponseDto = new AuthUserResponseDto(NAME);
 
-        userService.followUser(authUserServiceDto, targetName);
+        userService.followUser(authUserResponseDto, targetName);
 
         //when
-        FollowServiceDto followServiceDto = userService
-            .unfollowUser(authUserServiceDto, targetName);
+        FollowResponseDto followResponseDto = userService
+            .unfollowUser(authUserResponseDto, targetName);
 
         //then
-        assertThat(followServiceDto.getFollowerCount()).isEqualTo(0);
-        assertThat(followServiceDto.isFollowing()).isFalse();
+        assertThat(followResponseDto.getFollowerCount()).isEqualTo(0);
+        assertThat(followResponseDto.isFollowing()).isFalse();
     }
 
     @DisplayName("존재하지 않는 Follow 관계를 unfollow 하면 예외가 발생한다.")
@@ -216,12 +217,12 @@ class UserServiceIntegrationTest {
         String targetName = "pickgit";
         userRepository.save(UserFactory.user(NAME));
         userRepository.save(UserFactory.user(targetName));
-        AuthUserServiceDto authUserServiceDto = new AuthUserServiceDto(NAME);
+        AuthUserResponseDto authUserResponseDto = new AuthUserResponseDto(NAME);
 
         //when
         //then
         assertThatThrownBy(
-            () -> userService.unfollowUser(authUserServiceDto, targetName)
+            () -> userService.unfollowUser(authUserResponseDto, targetName)
         ).hasMessage(new InvalidFollowException().getMessage());
     }
 }

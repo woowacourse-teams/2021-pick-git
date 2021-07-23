@@ -3,7 +3,7 @@ package com.woowacourse.pickgit.user.application.dto;
 import lombok.Builder;
 
 @Builder
-public class UserProfileServiceDto {
+public class UserProfileResponseDto {
 
     private final String name;
     private final String image;
@@ -21,7 +21,7 @@ public class UserProfileServiceDto {
 
     private final Boolean following;
 
-    public UserProfileServiceDto(String name, String image, String description,
+    public UserProfileResponseDto(String name, String image, String description,
         int followerCount, int followingCount, int postCount, String githubUrl, String company,
         String location, String website, String twitter, Boolean following) {
         this.name = name;
