@@ -13,8 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 class FileNameGeneratorTest {
 
-    private final FileNameGenerator fileNameGenerator =
-        new FileNameGenerator();
+    private final FileNameGenerator fileNameGenerator = new FileNameGenerator();
 
     @DisplayName("제공된 파일의 타입과 일치하는 확장자를 반환한다.")
     @ParameterizedTest
