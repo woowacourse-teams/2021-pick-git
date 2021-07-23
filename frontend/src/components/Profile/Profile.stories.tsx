@@ -17,11 +17,9 @@ const Template: Story<Props> = (args) => (
 export const Default = Template.bind({});
 Default.args = {
   isMyProfile: false,
-  username: "Chris",
 };
 
 export const ProfileMe = Template.bind({});
 ProfileMe.args = {
   isMyProfile: true,
-  username: "Tanney",
 };

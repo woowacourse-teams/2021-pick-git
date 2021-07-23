@@ -60,4 +60,9 @@ export interface GithubRepository {
   name: string;
 }
 
+export interface TabItem {
+  name: string;
+  onTabChange: () => void;
+}
+
 export type Tags = string[];

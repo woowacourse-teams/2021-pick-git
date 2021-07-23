@@ -1,15 +1,13 @@
+import { AxiosError } from "axios";
 import { useContext } from "react";
+import { UseQueryResult } from "react-query";
 import { ThemeContext } from "styled-components";
 
 import { GithubStats } from "../../@types";
 import { BookIcon, ClockIcon, IssueIcon, PrIcon, StarIcon } from "../../assets/icons";
-import { useGithubStatsQuery } from "../../services/queries/githubStats";
+import PageLoading from "../@layout/PageLoading/PageLoading";
 import CircleIcon from "../@shared/CircleIcon/CircleIcon";
 import { Container, ContributionGraphWrapper, GithubStatsWrapper, Stat } from "./GithubStatistics.style";
-
-export interface Props {
-  username: string;
-}
 
 // TODO: typing
 const stats = {
@@ -20,12 +18,17 @@ const stats = {
   contributes: { name: "Contributes", icon: <BookIcon /> },
 };
 
-const GithubStatistics = ({ username }: Props) => {
+export interface Props {
+  username: string | null;
+  githubStatisticQueryResult: UseQueryResult<GithubStats, AxiosError<GithubStats> | Error>;
+}
+
+const GithubStatistics = ({ username, githubStatisticQueryResult }: Props) => {
   const { color } = useContext(ThemeContext);
-  const { data, isLoading, error } = useGithubStatsQuery(username);
+  const { data, isLoading, error } = githubStatisticQueryResult;
 
   if (isLoading) {
-    return <div>loading</div>;
+    return <PageLoading />;
   }
 
   const GithubStats = () => {
