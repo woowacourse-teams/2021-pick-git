@@ -32,8 +32,6 @@ import org.springframework.http.HttpStatus;
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
-    private static final String NAME = "yjksw";
-
     @InjectMocks
     private UserService userService;
 
