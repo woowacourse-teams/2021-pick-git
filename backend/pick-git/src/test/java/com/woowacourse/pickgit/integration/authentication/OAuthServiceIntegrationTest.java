@@ -103,7 +103,7 @@ class OAuthServiceIntegrationTest {
         // when
         oAuthService.createToken(code);
 
-        oAuthProfileResponse.setCompany("@woowabros");
+        //oAuthProfileResponse.setCompany("@woowabros");
         oAuthService.createToken(code);
 
         // then

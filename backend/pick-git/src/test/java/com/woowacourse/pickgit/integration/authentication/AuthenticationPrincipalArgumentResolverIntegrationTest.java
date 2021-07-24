@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.unit.authentication.presentation;
+package com.woowacourse.pickgit.integration.authentication;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -26,7 +26,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.web.context.request.ServletWebRequest;
 
 @ExtendWith(MockitoExtension.class)
-class AuthenticationPrincipalArgumentResolverTest {
+class AuthenticationPrincipalArgumentResolverIntegrationTest {
 
     private JwtTokenProvider jwtTokenProvider;
 

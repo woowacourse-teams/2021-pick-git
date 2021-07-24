@@ -2,8 +2,8 @@ package com.woowacourse.pickgit.unit.authentication.presentation;
 
 import static com.woowacourse.pickgit.docs.ApiDocumentUtils.getDocumentRequest;
 import static com.woowacourse.pickgit.docs.ApiDocumentUtils.getDocumentResponse;
-import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
@@ -44,7 +44,7 @@ class OAuthControllerTest {
     void authorizationGithubUrl_InvalidAccount_GithubUrl() throws Exception {
         // given
         String githubAuthorizationGithubUrl = "http://github.authorization.url";
-        when(oAuthService.getGithubAuthorizationUrl()).thenReturn(githubAuthorizationGithubUrl);
+        given(oAuthService.getGithubAuthorizationUrl()).willReturn(githubAuthorizationGithubUrl);
 
         // when, then
         ResultActions perform = mockMvc.perform(get("/api/authorization/github"))
@@ -66,8 +66,8 @@ class OAuthControllerTest {
     void afterAuthorizeGithubLogin_ValidAccount_JWTToken() throws Exception {
         // given
         String githubAuthorizationCode = "random";
-        when(oAuthService.createToken(githubAuthorizationCode))
-            .thenReturn(new TokenDto("jwt token", "binghe"));
+        given(oAuthService.createToken(githubAuthorizationCode))
+            .willReturn(new TokenDto("jwt token", "binghe"));
 
         // when, then
         ResultActions perform = mockMvc

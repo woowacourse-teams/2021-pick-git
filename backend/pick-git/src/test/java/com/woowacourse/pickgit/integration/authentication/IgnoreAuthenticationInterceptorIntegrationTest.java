@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.unit.authentication.presentation.interceptor;
+package com.woowacourse.pickgit.integration.authentication;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -26,7 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpMethod;
 
 @ExtendWith(MockitoExtension.class)
-class IgnoreAuthenticationInterceptorTest {
+class IgnoreAuthenticationInterceptorIntegrationTest {
 
     private JwtTokenProvider jwtTokenProvider;
 
@@ -61,7 +61,7 @@ class IgnoreAuthenticationInterceptorTest {
         verify(request, times(2)).setAttribute(anyString(), anyString());
     }
 
-    @DisplayName("토큰이 아예 없으면 true를 반환한다. (GuestUser)")
+    @DisplayName("토큰이 아예 없으면 true를 반환한다. - GuestUser인 경우")
     @Test
     void preHandle_WithOutToken_ReturnTrue() throws Exception {
         // mock
