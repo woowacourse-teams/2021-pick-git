@@ -1,13 +1,13 @@
 package com.woowacourse.pickgit.user.application;
 
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
-import com.woowacourse.pickgit.user.application.dto.AuthUserResponseDto;
+import com.woowacourse.pickgit.exception.user.InvalidUserException;
+import com.woowacourse.pickgit.exception.user.SameSourceTargetUserException;
+import com.woowacourse.pickgit.user.application.dto.AuthUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
-import com.woowacourse.pickgit.exception.user.InvalidUserException;
-import com.woowacourse.pickgit.exception.user.SameSourceTargetUserException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,45 +22,43 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserProfileResponseDto getMyUserProfile(
-        AuthUserResponseDto authUserResponseDto) {
-        User user = findUserByName(authUserResponseDto.getGithubName());
+    public UserProfileResponseDto getMyUserProfile(AuthUserRequestDto requestDto) {
+        User user = findUserByName(requestDto.getGithubName());
 
         return new UserProfileResponseDto(
             user.getName(), user.getImage(), user.getDescription(),
             user.getFollowerCount(), user.getFollowingCount(), user.getPostCount(),
             user.getGithubUrl(), user.getCompany(), user.getLocation(),
-            user.getWebsite(), user.getTwitter(), null
-        );
+            user.getWebsite(), user.getTwitter(), false);
     }
 
     @Transactional(readOnly = true)
-    public UserProfileResponseDto getUserProfile(AppUser appUser, String targetUsername) {
-        User targetUser = findUserByName(targetUsername);
+    public UserProfileResponseDto getUserProfile(AppUser user, String targetName) {
+        User target = findUserByName(targetName);
 
-        if (appUser.isGuest()) {
+        if (user.isGuest()) {
             return new UserProfileResponseDto(
-                targetUser.getName(), targetUser.getImage(), targetUser.getDescription(),
-                targetUser.getFollowerCount(), targetUser.getFollowingCount(), targetUser.getPostCount(),
-                targetUser.getGithubUrl(), targetUser.getCompany(), targetUser.getLocation(),
-                targetUser.getWebsite(), targetUser.getTwitter(), null
-            );
+                target.getName(), target.getImage(), target.getDescription(),
+                target.getFollowerCount(), target.getFollowingCount(),
+                target.getPostCount(),
+                target.getGithubUrl(), target.getCompany(), target.getLocation(),
+                target.getWebsite(), target.getTwitter(), null);
         }
 
-        User sourceUser = findUserByName(appUser.getUsername());
+        User source = findUserByName(user.getUsername());
 
         return new UserProfileResponseDto(
-            targetUser.getName(), targetUser.getImage(), targetUser.getDescription(),
-            targetUser.getFollowerCount(), targetUser.getFollowingCount(), targetUser.getPostCount(),
-            targetUser.getGithubUrl(), targetUser.getCompany(), targetUser.getLocation(),
-            targetUser.getWebsite(), targetUser.getTwitter(), sourceUser.isFollowing(targetUser)
+            target.getName(), target.getImage(), target.getDescription(),
+            target.getFollowerCount(), target.getFollowingCount(),
+            target.getPostCount(),
+            target.getGithubUrl(), target.getCompany(), target.getLocation(),
+            target.getWebsite(), target.getTwitter(), source.isFollowing(target)
         );
     }
 
-    public FollowResponseDto followUser(AuthUserResponseDto authUserResponseDto,
-        String targetUsername) {
-        User source = findUserByName(authUserResponseDto.getGithubName());
-        User target = findUserByName(targetUsername);
+    public FollowResponseDto followUser(AuthUserRequestDto requestDto, String targetName) {
+        User source = findUserByName(requestDto.getGithubName());
+        User target = findUserByName(targetName);
 
         validateDifferentSourceTarget(source, target);
         source.follow(target);
@@ -68,10 +66,9 @@ public class UserService {
         return new FollowResponseDto(target.getFollowerCount(), true);
     }
 
-    public FollowResponseDto unfollowUser(AuthUserResponseDto authUserResponseDto,
-        String targetUsername) {
-        User source = findUserByName(authUserResponseDto.getGithubName());
-        User target = findUserByName(targetUsername);
+    public FollowResponseDto unfollowUser(AuthUserRequestDto requestDto, String targetName) {
+        User source = findUserByName(requestDto.getGithubName());
+        User target = findUserByName(targetName);
 
         validateDifferentSourceTarget(source, target);
         source.unfollow(target);

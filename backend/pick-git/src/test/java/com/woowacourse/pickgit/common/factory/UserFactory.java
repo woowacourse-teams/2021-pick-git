@@ -8,16 +8,16 @@ public class UserFactory {
     private UserFactory() {
     }
 
-    public static User user(String name) {
-        return createUser(null, name);
-    }
-
     public static User user(Long id, String name) {
         return createUser(id, name);
     }
 
+    public static User user(String name) {
+        return createUser(null, name);
+    }
+
     public static User user() {
-        return createUser(null,"yjksw");
+        return createUser(null,"loginUser");
     }
 
     public static User createUser(Long id, String name) {
@@ -33,8 +33,8 @@ public class UserFactory {
             .image("http://img.com")
             .description("The Best")
             .followerCount(0)
-            .followingCount(11)
-            .postCount(1)
+            .followingCount(0)
+            .postCount(0)
             .githubUrl("https://github.com/yjksw")
             .company("woowacourse")
             .location("Seoul")
@@ -50,8 +50,8 @@ public class UserFactory {
             .image("http://img.com")
             .description("The Best")
             .followerCount(0)
-            .followingCount(11)
-            .postCount(1)
+            .followingCount(0)
+            .postCount(0)
             .githubUrl("https://github.com/yjksw")
             .company("woowacourse")
             .location("Seoul")

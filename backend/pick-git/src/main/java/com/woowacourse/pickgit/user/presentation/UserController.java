@@ -4,7 +4,7 @@ import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.user.application.UserService;
-import com.woowacourse.pickgit.user.application.dto.AuthUserResponseDto;
+import com.woowacourse.pickgit.user.application.dto.AuthUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.presentation.dto.FollowResponse;
@@ -35,7 +35,7 @@ public class UserController {
         validateIsGuest(user);
 
         UserProfileResponseDto responseDto =
-            userService.getMyUserProfile(new AuthUserResponseDto(user.getUsername()));
+            userService.getMyUserProfile(new AuthUserRequestDto(user.getUsername()));
 
         return ResponseEntity.ok(createUserProfileResponse(responseDto));
     }
@@ -72,9 +72,9 @@ public class UserController {
         @PathVariable String username) {
         validateIsGuest(user);
 
-        AuthUserResponseDto authUserResponseDto = new AuthUserResponseDto(user.getUsername());
+        AuthUserRequestDto authUserRequestDto = new AuthUserRequestDto(user.getUsername());
         FollowResponseDto followResponseDto =
-            userService.followUser(authUserResponseDto, username);
+            userService.followUser(authUserRequestDto, username);
 
         return ResponseEntity.ok(createFollowResponse(followResponseDto));
     }
@@ -85,9 +85,9 @@ public class UserController {
         @PathVariable String username) {
         validateIsGuest(user);
 
-        AuthUserResponseDto authUserResponseDto = new AuthUserResponseDto(user.getUsername());
+        AuthUserRequestDto authUserRequestDto = new AuthUserRequestDto(user.getUsername());
         FollowResponseDto followResponseDto =
-            userService.unfollowUser(authUserResponseDto, username);
+            userService.unfollowUser(authUserRequestDto, username);
 
         return ResponseEntity.ok(createFollowResponse(followResponseDto));
     }

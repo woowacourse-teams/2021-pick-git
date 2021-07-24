@@ -32,7 +32,7 @@ class UserRepositoryTest {
     @Test
     void findUserByBasicProfile_Name_saveUser_Success() {
         User actualUser = userRepository
-            .findByBasicProfile_Name("yjksw")
+            .findByBasicProfile_Name("loginUser")
             .get();
 
         assertThat(actualUser)

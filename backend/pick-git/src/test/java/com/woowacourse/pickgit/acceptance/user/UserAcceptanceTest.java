@@ -34,7 +34,7 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 class UserAcceptanceTest {
 
-    private static final String SOURCE_USER_NAME = "yjksw";
+    private static final String SOURCE_USER_NAME = "loginUser";
     private static final String TARGET_USER_NAME = "pickgit";
 
     @LocalServerPort
@@ -72,7 +72,7 @@ class UserAcceptanceTest {
             new UserProfileResponse(user.getName(), user.getImage(), user.getDescription(),
                 user.getFollowerCount(), user.getFollowingCount(), user.getPostCount(),
                 user.getGithubUrl(), user.getCompany(), user.getLocation(), user.getWebsite(),
-                user.getTwitter(), null);
+                user.getTwitter(), false);
 
         //when
         UserProfileResponse actualResponseDto =
