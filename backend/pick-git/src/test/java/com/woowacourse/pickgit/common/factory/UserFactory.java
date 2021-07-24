@@ -17,7 +17,7 @@ public class UserFactory {
     }
 
     public static User user() {
-        return createUser(null,"loginUser");
+        return createUser(null,"testUser");
     }
 
     public static User createUser(Long id, String name) {
@@ -29,7 +29,7 @@ public class UserFactory {
 
     public static UserProfileResponseDto mockLoginUserProfileResponseDto() {
         return UserProfileResponseDto.builder()
-            .name("loginUser")
+            .name("testUser")
             .image("http://img.com")
             .description("The Best")
             .followerCount(0)
@@ -46,7 +46,7 @@ public class UserFactory {
 
     public static UserProfileResponseDto mockGuestUserProfileResponseDto() {
         return UserProfileResponseDto.builder()
-            .name("guestUser")
+            .name("testUser")
             .image("http://img.com")
             .description("The Best")
             .followerCount(0)

@@ -36,7 +36,7 @@ class UserRepositoryTest {
     void findUserByBasicProfile_Name_ValidUserName_Success() {
         // when
         User user = userRepository
-            .findByBasicProfile_Name("loginUser")
+            .findByBasicProfile_Name("testUser")
             .orElseThrow(InvalidUserException::new);
 
         // then

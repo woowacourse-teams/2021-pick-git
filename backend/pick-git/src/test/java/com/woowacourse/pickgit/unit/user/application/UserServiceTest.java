@@ -42,11 +42,11 @@ class UserServiceTest {
     @Test
     void getMyUserProfile_WithMyName_Success() {
         // given
-        AuthUserRequestDto requestDto = new AuthUserRequestDto("loginUser");
-        User loginUser = UserFactory.user();
+        AuthUserRequestDto requestDto = new AuthUserRequestDto("testUser");
+        User testUser = UserFactory.user();
 
         given(userRepository.findByBasicProfile_Name(anyString()))
-            .willReturn(Optional.of(loginUser));
+            .willReturn(Optional.of(testUser));
 
         UserProfileResponseDto responseDto = UserFactory.mockLoginUserProfileResponseDto();
 
@@ -66,16 +66,16 @@ class UserServiceTest {
     @Test
     void getUserProfile_FindByNameInCaseOfGuestUser_Success() {
         //given
-        AppUser user = new GuestUser();
-        User guestUser = UserFactory.user("guestUser");
+        AppUser guestUser = new GuestUser();
+        User testUser = UserFactory.user("testUser");
 
         given(userRepository.findByBasicProfile_Name(anyString()))
-            .willReturn(Optional.of(guestUser));
+            .willReturn(Optional.of(testUser));
 
         UserProfileResponseDto responseDto = UserFactory.mockGuestUserProfileResponseDto();
 
         //when
-        UserProfileResponseDto userProfile = userService.getUserProfile(user, "guestUser");
+        UserProfileResponseDto userProfile = userService.getUserProfile(guestUser, "guestUser");
 
         //then
         assertThat(userProfile)
@@ -90,16 +90,16 @@ class UserServiceTest {
     @Test
     void getUserProfile_FindByNameInCaseOfLoginUser_Success() {
         //given
-        AppUser user = new LoginUser("loginUser", "Bearer testToken");
-        User loginUser = UserFactory.user("loginUser");
+        AppUser loginUser = new LoginUser("loginUser", "Bearer testToken");
+        User testUser = UserFactory.user("testUser");
 
         given(userRepository.findByBasicProfile_Name(anyString()))
-            .willReturn(Optional.of(loginUser));
+            .willReturn(Optional.of(testUser));
 
         UserProfileResponseDto responseDto = UserFactory.mockLoginUserProfileResponseDto();
 
         //when
-        UserProfileResponseDto userProfile = userService.getUserProfile(user, "loginUser");
+        UserProfileResponseDto userProfile = userService.getUserProfile(loginUser, "testUser");
 
         //then
         assertThat(userProfile)
@@ -114,11 +114,11 @@ class UserServiceTest {
     @Test
     void getUserProfile_FindByInvalidNameInCaseOfGuestUser_400Exception() {
         //given
-        AppUser user = new GuestUser();
+        AppUser guestUser = new GuestUser();
 
         //when
         assertThatThrownBy(
-            () -> userService.getUserProfile(user, "InvalidName")
+            () -> userService.getUserProfile(guestUser, "InvalidName")
         ).isInstanceOf(InvalidUserException.class)
             .hasFieldOrPropertyWithValue("errorCode", "U0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
