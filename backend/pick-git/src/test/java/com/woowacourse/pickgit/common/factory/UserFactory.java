@@ -44,6 +44,40 @@ public class UserFactory {
             .build();
     }
 
+    public static UserProfileResponseDto mockLoginUserProfileIsFollowingResponseDto() {
+        return UserProfileResponseDto.builder()
+            .name("testUser2")
+            .image("http://img.com")
+            .description("The Best")
+            .followerCount(1)
+            .followingCount(0)
+            .postCount(0)
+            .githubUrl("https://github.com/yjksw")
+            .company("woowacourse")
+            .location("Seoul")
+            .website("www.pick-git.com")
+            .twitter("pick-git twitter")
+            .following(true)
+            .build();
+    }
+
+    public static UserProfileResponseDto mockLoginUserProfileIsNotFollowingResponseDto() {
+        return UserProfileResponseDto.builder()
+            .name("testUser2")
+            .image("http://img.com")
+            .description("The Best")
+            .followerCount(0)
+            .followingCount(0)
+            .postCount(0)
+            .githubUrl("https://github.com/yjksw")
+            .company("woowacourse")
+            .location("Seoul")
+            .website("www.pick-git.com")
+            .twitter("pick-git twitter")
+            .following(false)
+            .build();
+    }
+
     public static UserProfileResponseDto mockGuestUserProfileResponseDto() {
         return UserProfileResponseDto.builder()
             .name("testUser")

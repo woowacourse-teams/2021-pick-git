@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
@@ -33,196 +34,195 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 class UserServiceIntegrationTest {
 
-    private static final String NAME = "loginUser";
-    private static final String IMAGE = "http://img.com";
-    private static final String DESCRIPTION = "The Best";
-    private static final String GITHUB_URL = "https://github.com/yjksw";
-    private static final String COMPANY = "woowacourse";
-    private static final String LOCATION = "Seoul";
-    private static final String WEBSITE = "www.pick-git.com";
-    private static final String TWITTER = "pick-git twitter";
-
     @Autowired
     private UserService userService;
 
     @Autowired
     private UserRepository userRepository;
 
-    @DisplayName("개인 프로필 정보를 성공적으로 가져온다.")
+    @DisplayName("사용자는 자신의 프로필을 조회할 수 있다.")
     @Test
-    public void getMyUserProfile_FindUserInfoByName_Success() {
+    public void getMyUserProfile_WithMyName_Success() {
         //given
-        AuthUserRequestDto authUserRequestDto = new AuthUserRequestDto(NAME);
+        AuthUserRequestDto requestDto = new AuthUserRequestDto("testUser");
+        UserProfileResponseDto responseDto = UserFactory.mockLoginUserProfileResponseDto();
+
         userRepository.save(UserFactory.user());
-        UserProfileResponseDto expectedUserProfileDto = new UserProfileResponseDto(
-            NAME, IMAGE, DESCRIPTION,
-            0, 0, 0,
-            GITHUB_URL, COMPANY, LOCATION, WEBSITE, TWITTER, false
-        );
 
         //when
-        UserProfileResponseDto actualUserProfileDto = userService
-            .getMyUserProfile(authUserRequestDto);
+        UserProfileResponseDto myUserProfile = userService.getMyUserProfile(requestDto);
 
         //then
-        assertThat(actualUserProfileDto)
+        assertThat(myUserProfile)
             .usingRecursiveComparison()
-            .isEqualTo(expectedUserProfileDto);
+            .isEqualTo(responseDto);
     }
 
-    @DisplayName("게스트 유저가 프로필 조회시 프로필 정보를 성공적으로 가져온다.")
+    @DisplayName("게스트는 유저 이름으로 검색하여 유저의 프로필을 조회할 수 있다.")
     @Test
-    public void getUserProfile_GuestFindUserInfoByName_Success() {
+    public void getUserProfile_FindByNameInCaseOfGuestUser_Success() {
         //given
         AppUser guestUser = new GuestUser();
+        UserProfileResponseDto responseDto = UserFactory.mockGuestUserProfileResponseDto();
+
         userRepository.save(UserFactory.user());
-        UserProfileResponseDto expectedUserProfileDto = new UserProfileResponseDto(
-            NAME, IMAGE, DESCRIPTION,
-            0, 0, 0,
-            GITHUB_URL, COMPANY, LOCATION, WEBSITE, TWITTER, null
-        );
 
         //when
-        UserProfileResponseDto actualUserProfileDto = userService.getUserProfile(guestUser, NAME);
+        UserProfileResponseDto userProfile = userService.getUserProfile(guestUser, "testUser");
 
         //then
-        assertThat(actualUserProfileDto)
+        assertThat(userProfile)
             .usingRecursiveComparison()
-            .isEqualTo(expectedUserProfileDto);
+            .isEqualTo(responseDto);
     }
 
-    @DisplayName("로그인 유저가 팔로우 하는 프로필 조회시 프로필 정보를 성공적으로 가져온다.")
+    @DisplayName("사용자는 유저 이름으로 검색하여 유저의 프로필을 조회할 수 있다. - 팔로잉을 한 경우")
     @Test
-    public void getUserProfile_FindFollowingUserInfoByName_Success() {
-        //given
-        AppUser loginUser = new LoginUser(NAME, "token");
-        User source = userRepository.save(UserFactory.user(NAME));
+    void getUserProfile_FindByNameInCaseOfLoginUserIsFollowing_Success() {
+        // given
+        AppUser loginUser = new LoginUser("testUser", "Bearer testToken");
+
+        User source = userRepository.save(UserFactory.user("testUser"));
         User target = userRepository.save(UserFactory.user("testUser2"));
 
-        AuthUserRequestDto authUserRequestDto = new AuthUserRequestDto(source.getName());
-        userService.followUser(authUserRequestDto, target.getName());
+        AuthUserRequestDto requestDto = new AuthUserRequestDto(source.getName());
+        userService.followUser(requestDto, target.getName());
 
-        UserProfileResponseDto expectedUserProfileDto = new UserProfileResponseDto(
-            target.getName(), target.getImage(), target.getDescription(),
-            1, 0, 0,
-            target.getGithubUrl(), target.getCompany(), target.getLocation(),
-            target.getWebsite(), target.getTwitter(), true
-        );
+        UserProfileResponseDto responseDto =
+            UserFactory.mockLoginUserProfileIsFollowingResponseDto();
 
-        //when
-        UserProfileResponseDto actualUserProfileDto = userService
-            .getUserProfile(loginUser, target.getName());
+        // when
+        UserProfileResponseDto userProfile =
+            userService.getUserProfile(loginUser, target.getName());
 
-        //then
-        assertThat(actualUserProfileDto)
+        // then
+        assertThat(userProfile)
             .usingRecursiveComparison()
-            .isEqualTo(expectedUserProfileDto);
+            .isEqualTo(responseDto);
     }
 
-    @DisplayName("로그인 유저가 팔로우하고 있지 않은 프로필 조회시 프로필 정보를 성공적으로 가져온다.")
+    @DisplayName("사용자는 유저 이름으로 검색하여 유저의 프로필을 조회할 수 있다. - 팔로잉을 하지 않은 경우")
     @Test
-    public void getUserProfile_FindUnfollowingUserInfoByName_Success() {
-        //given
-        AppUser loginUser = new LoginUser(NAME, "token");
-        userRepository.save(UserFactory.user(1L, NAME));
-        userRepository.save(UserFactory.user(2L, "testUser2"));
+    void getUserProfile_FindByNameInCaseOfLoginUserIsNotFollowing_Success() {
+        // given
+        AppUser loginUser = new LoginUser("testUser", "Bearer testToken");
 
-        UserProfileResponseDto expectedUserProfileDto = new UserProfileResponseDto(
-            NAME, IMAGE, DESCRIPTION,
-            0, 0, 0,
-            GITHUB_URL, COMPANY, LOCATION, WEBSITE, TWITTER, false
-        );
+        userRepository.save(UserFactory.user("testUser"));
+        userRepository.save(UserFactory.user("testUser2"));
 
-        //when
-        UserProfileResponseDto actualUserProfileDto = userService.getUserProfile(loginUser, NAME);
+        UserProfileResponseDto responseDto =
+            UserFactory.mockLoginUserProfileIsNotFollowingResponseDto();
 
-        //then
-        assertThat(actualUserProfileDto)
+        // when
+        UserProfileResponseDto userProfile = userService.getUserProfile(loginUser, "testUser2");
+
+        // then
+        assertThat(userProfile)
             .usingRecursiveComparison()
-            .isEqualTo(expectedUserProfileDto);
+            .isEqualTo(responseDto);
     }
 
-    @DisplayName("존재하지 않는 유저 이름으로 프로필 조회시 예외가 발생한다.")
+    @DisplayName("게스트는 존재하지 않는 유저 이름으로 프로필을 조회할 수 없다. - 400 예외")
     @Test
-    void getUserProfile_FindUserInfoByInvalidName_Success() {
-        //given
-        //when
-        //then
-        AppUser appUser = new GuestUser();
-        assertThatThrownBy(
-            () -> userService.getUserProfile(appUser, "InvalidName")
-        ).hasMessage(new InvalidUserException().getMessage());
+    void getUserProfile_FindByInvalidNameInCaseOfGuestUser_400Exception() {
+        // given
+        AppUser guestUser = new GuestUser();
+
+        // when
+        assertThatThrownBy(() -> {
+            userService.getUserProfile(guestUser, "invalidName");
+        }).isInstanceOf(InvalidUserException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "U0001")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
+            .hasMessage("유효하지 않은 유저입니다.");
     }
 
-    @DisplayName("Source 유저가 Target 유저를 follow 하면 성공한다.")
+    @DisplayName("사용자는 존재하지 않는 유저 이름으로 프로필을 조회할 수 없다. - 400 예외")
     @Test
-    void followUser_ValidUser_Success() {
-        //given
-        String targetName = "pickgit";
-        userRepository.save(UserFactory.user(NAME));
-        userRepository.save(UserFactory.user(targetName));
-        AuthUserRequestDto authUserRequestDto = new AuthUserRequestDto(NAME);
+    void getUserProfile_FindByInvalidNameInCaseOfLoginUser_400Exception() {
+        // given
+        AppUser guestUser = new LoginUser("testUser", "Bearer testToken");
 
-        //when
-        FollowResponseDto followResponseDto = userService.followUser(
-            authUserRequestDto, targetName);
-
-        //then
-        assertThat(followResponseDto.getFollowerCount()).isEqualTo(1);
-        assertThat(followResponseDto.isFollowing()).isTrue();
+        // when
+        assertThatThrownBy(() -> {
+            userService.getUserProfile(guestUser, "invalidName");
+        }).isInstanceOf(InvalidUserException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "U0001")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
+            .hasMessage("유효하지 않은 유저입니다.");
     }
 
-    @DisplayName("이미 존재하는 Follow 추가 시 예외가 발생한다.")
+    @DisplayName("source 유저는 target 유저를 팔로우할 수 있다.")
     @Test
-    void followUser_ExistingFollow_ExceptionThrown() {
-        //given
-        String targetName = "pickgit";
-        userRepository.save(UserFactory.user(NAME));
-        userRepository.save(UserFactory.user(targetName));
-        AuthUserRequestDto authUserRequestDto = new AuthUserRequestDto(NAME);
+    void followUser_SourceToTarget_Success() {
+        // given
+        AuthUserRequestDto requestDto = new AuthUserRequestDto("testUser");
 
-        userService.followUser(authUserRequestDto, targetName);
+        userRepository.save(UserFactory.user("testUser"));
+        User target = userRepository.save(UserFactory.user("testUser2"));
 
-        //when
-        //then
-        assertThatThrownBy(
-            () -> userService.followUser(authUserRequestDto, targetName)
-        ).hasMessage(new DuplicateFollowException().getMessage());
+        // when
+        FollowResponseDto responseDto = userService.followUser(requestDto, target.getName());
+
+        // then
+        assertThat(responseDto.getFollowerCount()).isEqualTo(1);
+        assertThat(responseDto.isFollowing()).isTrue();
     }
 
-    @DisplayName("Source 유저가 Target 유저를 unfollow 하면 성공한다.")
+    @DisplayName("이미 팔로우 중이라면 팔로우할 수 없다. - 400 예외")
     @Test
-    void unfollowUser_ValidUser_Success() {
-        //given
-        String targetName = "pickgit";
-        userRepository.save(UserFactory.user(NAME));
-        userRepository.save(UserFactory.user(targetName));
-        AuthUserRequestDto authUserRequestDto = new AuthUserRequestDto(NAME);
+    void followUser_ExistingFollow_400Exception() {
+        // given
+        AuthUserRequestDto requestDto = new AuthUserRequestDto("testUser");
 
-        userService.followUser(authUserRequestDto, targetName);
+        userRepository.save(UserFactory.user("testUser"));
+        User target = userRepository.save(UserFactory.user("testUser2"));
 
-        //when
-        FollowResponseDto followResponseDto = userService
-            .unfollowUser(authUserRequestDto, targetName);
+        userService.followUser(requestDto, target.getName());
 
-        //then
-        assertThat(followResponseDto.getFollowerCount()).isEqualTo(0);
-        assertThat(followResponseDto.isFollowing()).isFalse();
+        // when
+        assertThatThrownBy(() -> {
+            userService.followUser(requestDto, target.getName());
+        }).isInstanceOf(DuplicateFollowException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "U0002")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
+            .hasMessage("이미 팔로우 중 입니다.");
     }
 
-    @DisplayName("존재하지 않는 Follow 관계를 unfollow 하면 예외가 발생한다.")
+    @DisplayName("source 유저는 target 유저를 언팔로우할 수 있다.")
     @Test
-    void unfollowUser_NotExistingFollow_ExceptionThrown() {
-        //given
-        String targetName = "pickgit";
-        userRepository.save(UserFactory.user(NAME));
-        userRepository.save(UserFactory.user(targetName));
-        AuthUserRequestDto authUserRequestDto = new AuthUserRequestDto(NAME);
+    void unfollowUser_SourceToTarget_Success() {
+        // given
+        AuthUserRequestDto requestDto = new AuthUserRequestDto("testUser");
 
-        //when
-        //then
-        assertThatThrownBy(
-            () -> userService.unfollowUser(authUserRequestDto, targetName)
-        ).hasMessage(new InvalidFollowException().getMessage());
+        userRepository.save(UserFactory.user("testUser"));
+        User target = userRepository.save(UserFactory.user("testUser2"));
+
+        userService.followUser(requestDto, target.getName());
+
+        // when
+        FollowResponseDto responseDto = userService.unfollowUser(requestDto, target.getName());
+
+        // then
+        assertThat(responseDto.getFollowerCount()).isEqualTo(0);
+        assertThat(responseDto.isFollowing()).isFalse();
+    }
+
+    @DisplayName("이미 언팔로우 중이라면 언팔로우할 수 없다. - 400 예외")
+    @Test
+    void unfollowUser_NotExistingFollow_400Exception() {
+        // given
+        AuthUserRequestDto requestDto = new AuthUserRequestDto("testUser");
+
+        userRepository.save(UserFactory.user("testUser"));
+        User target = userRepository.save(UserFactory.user("testUser2"));
+
+        // when
+        assertThatThrownBy(() -> {
+            userService.unfollowUser(requestDto, target.getName());
+        }).isInstanceOf(InvalidFollowException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "U0003")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
+            .hasMessage("존재하지 않는 팔로우 입니다.");
     }
 }
