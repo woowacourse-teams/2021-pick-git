@@ -90,16 +90,17 @@ class UserServiceTest {
     @Test
     void getUserProfile_FindByNameInCaseOfLoginUser_Success() {
         //given
-        AppUser loginUser = new LoginUser("loginUser", "Bearer testToken");
-        User testUser = UserFactory.user("testUser");
+        AppUser loginUser = new LoginUser("testUser", "Bearer testToken");
+        User testUser = UserFactory.user("testUser2");
 
         given(userRepository.findByBasicProfile_Name(anyString()))
             .willReturn(Optional.of(testUser));
 
-        UserProfileResponseDto responseDto = UserFactory.mockLoginUserProfileResponseDto();
+        UserProfileResponseDto responseDto =
+            UserFactory.mockLoginUserProfileIsNotFollowingResponseDto();
 
         //when
-        UserProfileResponseDto userProfile = userService.getUserProfile(loginUser, "testUser");
+        UserProfileResponseDto userProfile = userService.getUserProfile(loginUser, "testUser2");
 
         //then
         assertThat(userProfile)
@@ -152,10 +153,10 @@ class UserServiceTest {
     @Test
     void followUser_SourceToTarget_Success() {
         //given
-        AuthUserRequestDto requestDto = new AuthUserRequestDto("loginUser");
+        AuthUserRequestDto requestDto = new AuthUserRequestDto("testUser");
 
-        given(userRepository.findByBasicProfile_Name("loginUser"))
-            .willReturn(Optional.of(UserFactory.user(1L, "loginUser")));
+        given(userRepository.findByBasicProfile_Name("testUser"))
+            .willReturn(Optional.of(UserFactory.user(1L, "testUser")));
         given(userRepository.findByBasicProfile_Name("targetUser"))
             .willReturn(Optional.of(UserFactory.user(2L, "targetUser")));
 
@@ -174,10 +175,10 @@ class UserServiceTest {
     @Test
     void followUser_ExistingFollow_400Exception() {
         //given
-        AuthUserRequestDto requestDto = new AuthUserRequestDto("loginUser");
+        AuthUserRequestDto requestDto = new AuthUserRequestDto("testUser");
 
-        given(userRepository.findByBasicProfile_Name("loginUser"))
-            .willReturn(Optional.of(UserFactory.user(1L, "loginUser")));
+        given(userRepository.findByBasicProfile_Name("testUser"))
+            .willReturn(Optional.of(UserFactory.user(1L, "testUser")));
         given(userRepository.findByBasicProfile_Name("targetUser"))
             .willReturn(Optional.of(UserFactory.user(2L, "targetUser")));
 
@@ -200,10 +201,10 @@ class UserServiceTest {
     @Test
     void unfollowUser_SourceToTarget_Success() {
         //given
-        AuthUserRequestDto requestDto = new AuthUserRequestDto("loginUser");
+        AuthUserRequestDto requestDto = new AuthUserRequestDto("testUser");
 
-        given(userRepository.findByBasicProfile_Name("loginUser"))
-            .willReturn(Optional.of(UserFactory.user(1L, "loginUser")));
+        given(userRepository.findByBasicProfile_Name("testUser"))
+            .willReturn(Optional.of(UserFactory.user(1L, "testUser")));
         given(userRepository.findByBasicProfile_Name("targetUser"))
             .willReturn(Optional.of(UserFactory.user(2L, "targetUser")));
 
@@ -224,10 +225,10 @@ class UserServiceTest {
     @Test
     void unfollowUser_NotExistingFollow_400Exception() {
         //given
-        AuthUserRequestDto requestDto = new AuthUserRequestDto("loginUser");
+        AuthUserRequestDto requestDto = new AuthUserRequestDto("testUser");
 
-        given(userRepository.findByBasicProfile_Name("loginUser"))
-            .willReturn(Optional.of(UserFactory.user(1L, "loginUser")));
+        given(userRepository.findByBasicProfile_Name("testUser"))
+            .willReturn(Optional.of(UserFactory.user(1L, "testUser")));
         given(userRepository.findByBasicProfile_Name("targetUser"))
             .willReturn(Optional.of(UserFactory.user(2L, "targetUser")));
 

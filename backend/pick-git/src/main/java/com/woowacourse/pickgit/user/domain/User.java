@@ -44,8 +44,7 @@ public class User {
     public User(
         Long id,
         BasicProfile basicProfile,
-        GithubProfile githubProfile
-    ) {
+        GithubProfile githubProfile) {
         this.id = id;
         this.basicProfile = basicProfile;
         this.githubProfile = githubProfile;
@@ -53,8 +52,7 @@ public class User {
 
     public User(
         BasicProfile basicProfile,
-        GithubProfile githubProfile
-    ) {
+        GithubProfile githubProfile) {
         this.basicProfile = basicProfile;
         this.githubProfile = githubProfile;
     }
