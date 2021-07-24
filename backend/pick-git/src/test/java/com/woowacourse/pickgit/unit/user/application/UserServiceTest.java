@@ -129,6 +129,25 @@ class UserServiceTest {
             .findByBasicProfile_Name(anyString());
     }
 
+    @DisplayName("사용자는 존재하지 않는 유저 이름으로 프로필을 조회할 수 없다. - 400 예외")
+    @Test
+    void getUserProfile_FindByInvalidNameInCaseOfLoginUser_400Exception() {
+        //given
+        AppUser loginUser = new LoginUser("testUser", "Bearer testToken");
+
+        //when
+        assertThatThrownBy(
+            () -> userService.getUserProfile(loginUser, "InvalidName")
+        ).isInstanceOf(InvalidUserException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "U0001")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
+            .hasMessage("유효하지 않은 유저입니다.");
+
+        // then
+        verify(userRepository, times(1))
+            .findByBasicProfile_Name(anyString());
+    }
+
     @DisplayName("source 유저는 target 유저를 팔로우할 수 있다.")
     @Test
     void followUser_SourceToTarget_Success() {
