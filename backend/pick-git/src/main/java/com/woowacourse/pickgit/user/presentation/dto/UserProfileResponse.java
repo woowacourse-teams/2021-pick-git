@@ -5,11 +5,9 @@ public class UserProfileResponse {
     private String name;
     private String image;
     private String description;
-
     private int followerCount;
     private int followingCount;
     private int postCount;
-
     private String githubUrl;
     private String company;
     private String location;
@@ -21,9 +19,11 @@ public class UserProfileResponse {
     private UserProfileResponse() {
     }
 
-    public UserProfileResponse(String name, String image, String description, int followerCount,
-        int followingCount, int postCount, String githubUrl, String company, String location,
-        String website, String twitter, Boolean following) {
+    public UserProfileResponse(
+        String name, String image, String description,
+        int followerCount, int followingCount, int postCount,
+        String githubUrl, String company, String location, String website, String twitter,
+        Boolean following) {
         this.name = name;
         this.image = image;
         this.description = description;
