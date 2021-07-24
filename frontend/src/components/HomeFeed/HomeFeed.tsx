@@ -3,8 +3,10 @@ import { Post } from "../../@types";
 import { LIMIT } from "../../constants/limits";
 import { FAILURE_MESSAGE } from "../../constants/messages";
 import SnackBarContext from "../../contexts/SnackbarContext";
+import UserContext from "../../contexts/UserContext";
 import useFeed from "../../services/hooks/useFeed";
 import PostItem from "../@shared/PostItem/PostItem";
+import CommentInputPortal from "../CommentInputPortal/CommentInputPortal";
 import { Container, PostItemWrapper } from "./HomeFeed.style";
 
 interface Props {
@@ -14,6 +16,7 @@ interface Props {
 const HomeFeed = ({ posts }: Props) => {
   const { pushSnackbarMessage } = useContext(SnackBarContext);
   const { commentValue, setCommentValue, deletePostLike, addPostLike, setPosts, addComment } = useFeed();
+  const { isLoggedIn, currentUsername } = useContext(UserContext);
 
   const handleCommentValueChange: React.ChangeEventHandler<HTMLTextAreaElement> = ({ target: { value } }) => {
     if (value.length > LIMIT.COMMENT_LENGTH) {
@@ -69,7 +72,7 @@ const HomeFeed = ({ posts }: Props) => {
             createdAt={post.createdAt}
             comments={post.comments}
             content={post.content}
-            isEditable={true}
+            isEditable={currentUsername === post.authorName && isLoggedIn}
             isLiked={post.isLiked}
             likeCount={post.likesCount}
             tags={post.tags}
@@ -81,6 +84,7 @@ const HomeFeed = ({ posts }: Props) => {
           />
         </PostItemWrapper>
       ))}
+      <CommentInputPortal />
     </Container>
   );
 };
