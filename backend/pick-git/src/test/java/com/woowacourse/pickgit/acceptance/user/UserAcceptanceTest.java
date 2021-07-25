@@ -43,7 +43,6 @@ class UserAcceptanceTest {
     private OAuthClient oAuthClient;
 
     private String loginUserAccessToken;
-    private String targetUserAccessToken;
 
     private User loginUser;
     private User targetUser;
@@ -56,7 +55,7 @@ class UserAcceptanceTest {
         targetUser = UserFactory.user("testUser2");
 
         loginUserAccessToken = 로그인_되어있음(loginUser).getToken();
-        targetUserAccessToken = 로그인_되어있음(targetUser).getToken();
+        로그인_되어있음(targetUser);
     }
 
     @DisplayName("사용자는 자신의 프로필을 조회할 수 있다.")
