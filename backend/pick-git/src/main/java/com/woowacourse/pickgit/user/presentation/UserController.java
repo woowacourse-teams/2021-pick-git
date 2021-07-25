@@ -4,11 +4,11 @@ import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.user.application.UserService;
-import com.woowacourse.pickgit.user.application.dto.AuthUserRequestDto;
-import com.woowacourse.pickgit.user.application.dto.FollowResponseDto;
-import com.woowacourse.pickgit.user.application.dto.UserProfileResponseDto;
-import com.woowacourse.pickgit.user.presentation.dto.FollowResponse;
-import com.woowacourse.pickgit.user.presentation.dto.UserProfileResponse;
+import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
+import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
+import com.woowacourse.pickgit.user.presentation.dto.response.FollowResponse;
+import com.woowacourse.pickgit.user.presentation.dto.response.UserProfileResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -51,19 +51,20 @@ public class UserController {
 
     private UserProfileResponse createUserProfileResponse(
         UserProfileResponseDto userProfileResponseDto) {
-        return new UserProfileResponse(
-            userProfileResponseDto.getName(),
-            userProfileResponseDto.getImage(),
-            userProfileResponseDto.getDescription(),
-            userProfileResponseDto.getFollowerCount(),
-            userProfileResponseDto.getFollowingCount(),
-            userProfileResponseDto.getPostCount(),
-            userProfileResponseDto.getGithubUrl(),
-            userProfileResponseDto.getCompany(),
-            userProfileResponseDto.getLocation(),
-            userProfileResponseDto.getWebsite(),
-            userProfileResponseDto.getTwitter(),
-            userProfileResponseDto.getFollowing());
+        return UserProfileResponse.builder()
+            .name(userProfileResponseDto.getName())
+            .image(userProfileResponseDto.getImage())
+            .description(userProfileResponseDto.getDescription())
+            .followerCount(userProfileResponseDto.getFollowerCount())
+            .followingCount(userProfileResponseDto.getFollowingCount())
+            .postCount(userProfileResponseDto.getPostCount())
+            .githubUrl(userProfileResponseDto.getGithubUrl())
+            .company(userProfileResponseDto.getCompany())
+            .location(userProfileResponseDto.getLocation())
+            .website(userProfileResponseDto.getWebsite())
+            .twitter(userProfileResponseDto.getTwitter())
+            .following(userProfileResponseDto.getFollowing())
+            .build();
     }
 
     @PostMapping("/{username}/followings")
@@ -99,8 +100,9 @@ public class UserController {
     }
 
     private FollowResponse createFollowResponse(FollowResponseDto followResponseDto) {
-        return new FollowResponse(
-            followResponseDto.getFollowerCount(),
-            followResponseDto.isFollowing());
+        return FollowResponse.builder()
+            .followerCount(followResponseDto.getFollowerCount())
+            .following(followResponseDto.isFollowing())
+            .build();
     }
 }

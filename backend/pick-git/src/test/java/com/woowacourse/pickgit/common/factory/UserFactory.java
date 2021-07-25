@@ -1,6 +1,6 @@
 package com.woowacourse.pickgit.common.factory;
 
-import com.woowacourse.pickgit.user.application.dto.UserProfileResponseDto;
+import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
 
 public class UserFactory {

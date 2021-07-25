@@ -3,9 +3,9 @@ package com.woowacourse.pickgit.user.application;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
 import com.woowacourse.pickgit.exception.user.SameSourceTargetUserException;
-import com.woowacourse.pickgit.user.application.dto.AuthUserRequestDto;
-import com.woowacourse.pickgit.user.application.dto.FollowResponseDto;
-import com.woowacourse.pickgit.user.application.dto.UserProfileResponseDto;
+import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
+import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import org.springframework.stereotype.Service;
@@ -25,11 +25,20 @@ public class UserService {
     public UserProfileResponseDto getMyUserProfile(AuthUserRequestDto requestDto) {
         User user = findUserByName(requestDto.getGithubName());
 
-        return new UserProfileResponseDto(
-            user.getName(), user.getImage(), user.getDescription(),
-            user.getFollowerCount(), user.getFollowingCount(), user.getPostCount(),
-            user.getGithubUrl(), user.getCompany(), user.getLocation(),
-            user.getWebsite(), user.getTwitter(), false);
+        return UserProfileResponseDto.builder()
+            .name(user.getName())
+            .image(user.getImage())
+            .description(user.getDescription())
+            .followerCount(user.getFollowerCount())
+            .followingCount(user.getFollowingCount())
+            .postCount(user.getPostCount())
+            .githubUrl(user.getGithubUrl())
+            .company(user.getCompany())
+            .location(user.getLocation())
+            .website(user.getWebsite())
+            .twitter(user.getTwitter())
+            .following(false)
+            .build();
     }
 
     @Transactional(readOnly = true)
@@ -37,23 +46,38 @@ public class UserService {
         User target = findUserByName(targetName);
 
         if (user.isGuest()) {
-            return new UserProfileResponseDto(
-                target.getName(), target.getImage(), target.getDescription(),
-                target.getFollowerCount(), target.getFollowingCount(),
-                target.getPostCount(),
-                target.getGithubUrl(), target.getCompany(), target.getLocation(),
-                target.getWebsite(), target.getTwitter(), null);
+            return UserProfileResponseDto.builder()
+                .name(target.getName())
+                .image(target.getImage())
+                .description(target.getDescription())
+                .followerCount(target.getFollowerCount())
+                .followingCount(target.getFollowingCount())
+                .postCount(target.getPostCount())
+                .githubUrl(target.getGithubUrl())
+                .company(target.getCompany())
+                .location(target.getLocation())
+                .website(target.getWebsite())
+                .twitter(target.getTwitter())
+                .following(null)
+                .build();
         }
 
         User source = findUserByName(user.getUsername());
 
-        return new UserProfileResponseDto(
-            target.getName(), target.getImage(), target.getDescription(),
-            target.getFollowerCount(), target.getFollowingCount(),
-            target.getPostCount(),
-            target.getGithubUrl(), target.getCompany(), target.getLocation(),
-            target.getWebsite(), target.getTwitter(), source.isFollowing(target)
-        );
+        return UserProfileResponseDto.builder()
+            .name(target.getName())
+            .image(target.getImage())
+            .description(target.getDescription())
+            .followerCount(target.getFollowerCount())
+            .followingCount(target.getFollowingCount())
+            .postCount(target.getPostCount())
+            .githubUrl(target.getGithubUrl())
+            .company(target.getCompany())
+            .location(target.getLocation())
+            .website(target.getWebsite())
+            .twitter(target.getTwitter())
+            .following(source.isFollowing(target))
+            .build();
     }
 
     public FollowResponseDto followUser(AuthUserRequestDto requestDto, String targetName) {
@@ -63,7 +87,10 @@ public class UserService {
         validateDifferentSourceTarget(source, target);
         source.follow(target);
 
-        return new FollowResponseDto(target.getFollowerCount(), true);
+        return FollowResponseDto.builder()
+            .followerCount(target.getFollowerCount())
+            .isFollowing(true)
+            .build();
     }
 
     public FollowResponseDto unfollowUser(AuthUserRequestDto requestDto, String targetName) {
@@ -73,7 +100,10 @@ public class UserService {
         validateDifferentSourceTarget(source, target);
         source.unfollow(target);
 
-        return new FollowResponseDto(target.getFollowerCount(), false);
+        return FollowResponseDto.builder()
+            .followerCount(target.getFollowerCount())
+            .isFollowing(false)
+            .build();
     }
 
     private User findUserByName(String githubName) {

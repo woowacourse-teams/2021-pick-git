@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.user.presentation.dto;
+package com.woowacourse.pickgit.user.presentation.dto.request;
 
 public class AuthUserRequest {
 

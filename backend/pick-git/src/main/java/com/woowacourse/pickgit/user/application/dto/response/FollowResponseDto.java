@@ -1,9 +1,12 @@
-package com.woowacourse.pickgit.user.application.dto;
+package com.woowacourse.pickgit.user.application.dto.response;
 
+import lombok.Builder;
+
+@Builder
 public class FollowResponseDto {
 
-    private boolean isFollowing;
     private int followerCount;
+    private boolean isFollowing;
 
     public FollowResponseDto(int followerCount, boolean isFollowing) {
         this.followerCount = followerCount;

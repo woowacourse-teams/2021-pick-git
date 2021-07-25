@@ -9,10 +9,10 @@ import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenRespons
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
-import com.woowacourse.pickgit.user.application.dto.UserProfileResponseDto;
+import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
-import com.woowacourse.pickgit.user.presentation.dto.FollowResponse;
-import com.woowacourse.pickgit.user.presentation.dto.UserProfileResponse;
+import com.woowacourse.pickgit.user.presentation.dto.response.FollowResponse;
+import com.woowacourse.pickgit.user.presentation.dto.response.UserProfileResponse;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
