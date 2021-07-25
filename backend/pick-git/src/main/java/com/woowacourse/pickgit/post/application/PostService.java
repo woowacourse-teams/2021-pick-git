@@ -51,17 +51,19 @@ public class PostService {
     private final PickGitStorage pickgitStorage;
     private final PlatformRepositoryExtractor platformRepositoryExtractor;
     private final TagService tagService;
+    private final EntityManager entityManager;
 
     public PostService(UserRepository userRepository,
         PostRepository postRepository,
         PickGitStorage pickgitStorage,
         PlatformRepositoryExtractor platformRepositoryExtractor,
-        TagService tagService) {
+        TagService tagService, EntityManager entityManager) {
         this.userRepository = userRepository;
         this.postRepository = postRepository;
         this.pickgitStorage = pickgitStorage;
         this.platformRepositoryExtractor = platformRepositoryExtractor;
         this.tagService = tagService;
+        this.entityManager = entityManager;
     }
 
     public PostImageUrlResponseDto write(PostRequestDto postRequestDto) {
@@ -144,6 +146,7 @@ public class PostService {
             ));
         Comment comment = new Comment(commentRequest.getContent());
         user.addComment(post, comment);
+        entityManager.flush();
         return CommentResponse.from(comment);
     }
 

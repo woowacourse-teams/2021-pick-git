@@ -273,6 +273,27 @@ class PostAcceptanceTest {
         assertThat(response.getContent()).isEqualTo("this is content");
     }
 
+    @DisplayName("비로그인 User는 Comment를 등록할 수 없다.")
+    @Test
+    void addComment_GuestUser_Fail() {
+        // given
+        String writePostToken = 로그인_되어있음(ANOTHER_USERNAME).getToken();
+        String invalidToken = "invalid token";
+        Long postId = 1L;
+
+        requestWrite(writePostToken);
+
+        ContentRequest request = new ContentRequest("this is content");
+
+        // when
+        ApiErrorResponse response
+            = requestAddComment(invalidToken, postId, request, HttpStatus.UNAUTHORIZED)
+            .as(ApiErrorResponse.class);
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("A0001");
+    }
+
     private void requestWrite(String token) {
         given().log().all()
             .auth().oauth2(token)
