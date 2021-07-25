@@ -40,6 +40,6 @@ public class Followings {
 
     public Boolean isFollowing(User targetUser) {
         return followings.stream()
-            .anyMatch(follow -> follow.getTarget().equals(targetUser));
+            .anyMatch(follow -> follow.isFollowing(targetUser));
     }
 }
