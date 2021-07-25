@@ -1,5 +1,8 @@
 package com.woowacourse.pickgit.user.presentation.dto.request;
 
+import lombok.Builder;
+
+@Builder
 public class AuthUserRequest {
 
     private String githubName;

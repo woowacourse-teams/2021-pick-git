@@ -16,7 +16,6 @@ public class UserProfileResponse {
     private String location;
     private String website;
     private String twitter;
-
     private Boolean following;
 
     private UserProfileResponse() {

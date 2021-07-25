@@ -5,18 +5,21 @@ import lombok.Builder;
 @Builder
 public class UserProfileResponseDto {
 
-    private final String name;
-    private final String image;
-    private final String description;
-    private final int followerCount;
-    private final int followingCount;
-    private final int postCount;
-    private final String githubUrl;
-    private final String company;
-    private final String location;
-    private final String website;
-    private final String twitter;
-    private final Boolean following;
+    private String name;
+    private String image;
+    private String description;
+    private int followerCount;
+    private int followingCount;
+    private int postCount;
+    private String githubUrl;
+    private String company;
+    private String location;
+    private String website;
+    private String twitter;
+    private Boolean following;
+
+    private UserProfileResponseDto() {
+    }
 
     public UserProfileResponseDto(
         String name, String image, String description,
