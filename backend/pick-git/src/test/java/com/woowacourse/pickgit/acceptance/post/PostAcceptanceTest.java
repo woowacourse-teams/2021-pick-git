@@ -106,7 +106,7 @@ class PostAcceptanceTest {
             .extract();
     }
 
-    @DisplayName("")
+    @DisplayName("잘못된 태그 이름을 가진 게시글을 작성할 수 없다.")
     @ParameterizedTest
     @EmptySource
     @ValueSource(strings = {" ", "  ", "abcdeabcdeabcdeabcdea"})

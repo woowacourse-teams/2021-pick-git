@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
@@ -127,10 +129,11 @@ class TagServiceIntegrationTest {
     }
 
     @DisplayName("잘못된 태그 이름을 태그로 변환 시도시 실패한다.")
-    @Test
-    void findOrCreateTags_InvalidTagName_ExceptionThrown() {
+    @ParameterizedTest
+    @ValueSource(strings = {"", " ", "#$%"})
+    void findOrCreateTags_InvalidTagName_ExceptionThrown(String tagName) {
         // given
-        List<String> tagNames = Arrays.asList("tag1", "tag2", "");
+        List<String> tagNames = Arrays.asList("tag1", "tag2", tagName);
         TagsDto tagsDto = new TagsDto(tagNames);
 
         // when, then

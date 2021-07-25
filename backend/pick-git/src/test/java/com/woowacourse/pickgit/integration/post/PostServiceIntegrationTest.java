@@ -48,6 +48,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
@@ -231,7 +232,9 @@ class PostServiceIntegrationTest {
 
         // when, then
         assertThatCode(() -> postService.write(requestDto))
-            .isInstanceOf(CannotAddTagException.class);
+            .isInstanceOf(CannotAddTagException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "P0001")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST);
     }
 
     @DisplayName("사용자는 Repository 목록을 가져올 수 있다.")

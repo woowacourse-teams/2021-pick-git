@@ -1,6 +1,7 @@
 package com.woowacourse.pickgit.post.domain;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 import com.woowacourse.pickgit.exception.post.CannotAddTagException;
 import com.woowacourse.pickgit.post.domain.comment.Comment;
@@ -109,9 +110,7 @@ public class Post {
         validateDuplicateTag(tags);
         List<Tag> existingTags = getTags();
         for (Tag tag : tags) {
-            if (existingTags.contains(tag)) {
-                throw new CannotAddTagException();
-            }
+            validateDuplicateTagAlreadyExistsInPost(existingTags, tag);
             PostTag postTag = new PostTag(this, tag);
             postTags.add(postTag);
         }
@@ -120,7 +119,7 @@ public class Post {
     private void validateDuplicateTag(List<Tag> tags) {
         Set<String> nonDuplicatetagNames = tags.stream()
             .map(Tag::getName)
-            .collect(Collectors.toSet());
+            .collect(toSet());
         if (nonDuplicatetagNames.size() != tags.size()) {
             throw new CannotAddTagException();
         }
@@ -130,6 +129,12 @@ public class Post {
         return postTags.stream()
             .map(PostTag::getTag)
             .collect(toList());
+    }
+
+    private void validateDuplicateTagAlreadyExistsInPost(List<Tag> existingTags, Tag tag) {
+        if (existingTags.contains(tag)) {
+            throw new CannotAddTagException();
+        }
     }
 
     @Override
