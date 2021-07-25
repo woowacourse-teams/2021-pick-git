@@ -44,7 +44,7 @@ class OAuthAcceptanceTest {
 
     @DisplayName("로그인 - Github OAuth 로그인 URL을 요청한다.")
     @Test
-    void Authorization_Github_ReturnLoginUrl() {
+    void githubAuthorizationUrl_Github_ReturnLoginUrl() {
         // mock
         when(oAuthClient.getLoginUrl()).thenReturn("https://github.com/login/oauth/authorize?");
 
@@ -64,30 +64,57 @@ class OAuthAcceptanceTest {
         ).isTrue();
     }
 
-    @DisplayName("로그인 - Github 인증후 리다이렉션을 통해 요청이 오면 토큰을 생성하여 반환한다.")
+    @DisplayName("첫 로그인 - Github 인증후 리다이렉션을 통해 요청이 오면 토큰을 생성하여 반환한다.")
     @Test
-    void Authorization_Redirection_ReturnJwtToken() {
+    void afterAuthorizeGithubLogin_InitialLogin_ReturnJwtToken() {
+        //given
+        OAuthProfileResponse oAuthProfileResponse = OAuthProfileResponse.builder()
+            .name("pick-git-login")
+            .description("hi~")
+            .githubUrl("github.com/")
+            .build();
+
         // then
-        OAuthTokenResponse tokenResponse = 로그인_되어있음();
+        OAuthTokenResponse tokenResponse = 로그인_되어있음(oAuthProfileResponse);
         assertThat(tokenResponse.getToken()).isNotBlank();
         assertThat(tokenResponse.getUsername()).isEqualTo("pick-git-login");
     }
 
-    public OAuthTokenResponse 로그인_되어있음() {
-        OAuthTokenResponse response = 로그인_요청().as(OAuthTokenResponse.class);
+    @DisplayName("재 로그인 - 첫 로그인 이후로 동일한 유저로 로그인하면 정보 업데이트 후 토큰을 생성하여 반환한다.")
+    @Test
+    void afterAuthorizeGithubLogin_ReLogin_ReturnJwtToken() {
+        //given
+        OAuthProfileResponse previousOAuthProfileResponse = OAuthProfileResponse.builder()
+            .name("pick-git-login")
+            .description("hi~")
+            .githubUrl("github.com/")
+            .build();
+
+        OAuthProfileResponse afterOAuthProfileResponse = OAuthProfileResponse.builder()
+            .name("pick-git-login")
+            .description("bye~")
+            .githubUrl("github.com/")
+            .build();
+
+        //when
+        로그인_되어있음(previousOAuthProfileResponse);
+
+        // then
+        OAuthTokenResponse tokenResponse = 로그인_되어있음(afterOAuthProfileResponse);
+        assertThat(tokenResponse.getToken()).isNotBlank();
+        assertThat(tokenResponse.getUsername()).isEqualTo("pick-git-login");
+    }
+
+    private OAuthTokenResponse 로그인_되어있음(OAuthProfileResponse oAuthProfileResponse) {
+        OAuthTokenResponse response = 로그인_요청(oAuthProfileResponse).as(OAuthTokenResponse.class);
         assertThat(response.getToken()).isNotBlank();
         return response;
     }
 
-    public ExtractableResponse<Response> 로그인_요청() {
+    private ExtractableResponse<Response> 로그인_요청(OAuthProfileResponse oAuthProfileResponse) {
         // given
         String oauthCode = "1234";
         String accessToken = "oauth.access.token";
-
-        OAuthProfileResponse oAuthProfileResponse = new OAuthProfileResponse(
-            "pick-git-login", "image", "hi~", "github.com/",
-            null, null, null, null
-        );
 
         // mock
         when(oAuthClient.getAccessToken(oauthCode)).thenReturn(accessToken);
