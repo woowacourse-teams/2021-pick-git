@@ -30,7 +30,17 @@ public class Like {
     protected Like() {
     }
 
-    public boolean contains(String userName) {
+    public Like(Post post, User user) {
+        this(null, post, user);
+    }
+
+    public Like(Long id, Post post, User user) {
+        this.id = id;
+        this.post = post;
+        this.user = user;
+    }
+
+    public boolean isOwnedBy(String userName) {
         return user.getName().equals(userName);
     }
 

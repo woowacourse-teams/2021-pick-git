@@ -82,7 +82,7 @@ class PostRepositoryTest {
     void save_SavedPost_Success() {
         // given
         Images images = new Images(List.of(new Image(image)));
-        Post post = new Post(postContent, images, githubRepoUrl, user);
+        Post post = new Post(images, postContent, githubRepoUrl, user);
 
         // when
         Post savedPost = postRepository.save(post);
@@ -96,7 +96,7 @@ class PostRepositoryTest {
     void save_SavedPostWithCreatedDate_Success() {
         // given
         Images images = new Images(List.of(new Image(image)));
-        Post post = new Post(postContent, images, githubRepoUrl, user);
+        Post post = new Post(images, postContent, githubRepoUrl, user);
 
         // when
         Post savedPost = postRepository.save(post);

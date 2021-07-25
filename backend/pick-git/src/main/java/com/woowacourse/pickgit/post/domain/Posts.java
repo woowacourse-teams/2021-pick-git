@@ -10,9 +10,14 @@ import javax.persistence.OneToMany;
 public class Posts {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Post> posts = new ArrayList<>();
+    private List<Post> posts;
 
     public Posts() {
+        this(new ArrayList<>());
+    }
+
+    public Posts(List<Post> post) {
+        this.posts = post;
     }
 
     public int getCounts() {

@@ -15,9 +15,11 @@ import com.woowacourse.pickgit.post.presentation.dto.request.CommentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.ContentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.HomeFeedRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.PostRequest;
+
 import java.net.URI;
 import java.util.List;
 import javax.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,23 +47,31 @@ public class PostController {
     public ResponseEntity<List<PostResponseDto>> readHomeFeed(
         @Authenticated AppUser appUser,
         @RequestParam Long page,
-        @RequestParam Long limit) {
+        @RequestParam Long limit
+    ) {
         HomeFeedRequest homeFeedRequest = new HomeFeedRequest(appUser, page, limit);
         List<PostResponseDto> postResponseDtos = postService.readHomeFeed(homeFeedRequest);
         return ResponseEntity.ok(postResponseDtos);
     }
 
     @GetMapping("/posts/me")
-    public ResponseEntity<List<PostResponseDto>> readMyFeed(@Authenticated AppUser appUser,
-        @RequestParam Long page, @RequestParam Long limit) {
+    public ResponseEntity<List<PostResponseDto>> readMyFeed(
+        @Authenticated AppUser appUser,
+        @RequestParam Long page,
+        @RequestParam Long limit
+    ) {
         HomeFeedRequest homeFeedRequest = new HomeFeedRequest(appUser, page, limit);
         List<PostResponseDto> postResponseDtos = postService.readMyFeed(homeFeedRequest);
         return ResponseEntity.ok(postResponseDtos);
     }
 
     @GetMapping("/posts/{username}")
-    public ResponseEntity<List<PostResponseDto>> readUserFeed(@Authenticated AppUser appUser,
-        @PathVariable String username, @RequestParam Long page, @RequestParam Long limit) {
+    public ResponseEntity<List<PostResponseDto>> readUserFeed(
+        @Authenticated AppUser appUser,
+        @PathVariable String username,
+        @RequestParam Long page,
+        @RequestParam Long limit
+    ) {
         HomeFeedRequest homeFeedRequest = new HomeFeedRequest(appUser, page, limit);
         List<PostResponseDto> postResponseDtos = postService
             .readUserFeed(homeFeedRequest, username);

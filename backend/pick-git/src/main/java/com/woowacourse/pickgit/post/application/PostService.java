@@ -71,8 +71,10 @@ public class PostService {
 
         User user = findUserByName(postRequestDto.getUsername());
 
-        Post post = new Post(postContent, getImages(postRequestDto),
-            postRequestDto.getGithubRepoUrl(), user);
+        Post post = new Post(
+            getImages(postRequestDto),postContent,
+            postRequestDto.getGithubRepoUrl(), user
+        );
 
         List<Tag> tags = tagService.findOrCreateTags(new TagsDto(postRequestDto.getTags()));
         post.addTags(tags);

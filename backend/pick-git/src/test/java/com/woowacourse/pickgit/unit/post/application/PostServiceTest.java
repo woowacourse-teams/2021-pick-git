@@ -161,7 +161,7 @@ class PostServiceTest {
         verify(userRepository, times(1))
             .findByBasicProfile_Name(requestDto.getUsername());
         verify(postRepository, times(1))
-            .save(new Post(postContent, any(), githubRepoUrl, user));
+            .save(new Post(any(), postContent, githubRepoUrl, user));
         verify(pickGitStorage, times(1))
             .store(anyList(), anyString());
         verify(tagService, times(1))

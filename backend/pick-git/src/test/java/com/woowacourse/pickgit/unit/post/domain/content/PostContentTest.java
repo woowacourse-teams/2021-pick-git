@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.unit.post.domain;
+package com.woowacourse.pickgit.unit.post.domain.content;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -16,7 +16,7 @@ class PostContentTest {
         String content = "hi".repeat(500);
 
         // then
-        assertThatThrownBy(() -> { new PostContent(content); })
+        assertThatThrownBy(() -> new PostContent(content))
             .isInstanceOf(PostFormatException.class)
             .extracting("errorCode")
             .isEqualTo("F0001");
