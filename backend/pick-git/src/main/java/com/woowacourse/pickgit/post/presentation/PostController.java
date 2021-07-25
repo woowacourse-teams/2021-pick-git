@@ -85,9 +85,8 @@ public class PostController {
     ) {
         validateIsGuest(user);
 
-        PostImageUrlResponseDto responseDto = postService.write(
-            createPostRequestDto(user, request)
-        );
+        PostImageUrlResponseDto responseDto = postService
+            .write(createPostRequestDto(user, request));
 
         return ResponseEntity
             .created(redirectUrl(user, responseDto))
