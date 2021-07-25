@@ -34,7 +34,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Function;
-import javax.persistence.EntityManager;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -46,24 +45,24 @@ import org.springframework.web.multipart.MultipartFile;
 @Transactional
 public class PostService {
 
+    private final TagService tagService;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final PickGitStorage pickgitStorage;
     private final PlatformRepositoryExtractor platformRepositoryExtractor;
-    private final TagService tagService;
-    private final EntityManager entityManager;
 
-    public PostService(UserRepository userRepository,
+    public PostService(
+        UserRepository userRepository,
         PostRepository postRepository,
         PickGitStorage pickgitStorage,
         PlatformRepositoryExtractor platformRepositoryExtractor,
-        TagService tagService, EntityManager entityManager) {
+        TagService tagService
+    ) {
         this.userRepository = userRepository;
         this.postRepository = postRepository;
         this.pickgitStorage = pickgitStorage;
         this.platformRepositoryExtractor = platformRepositoryExtractor;
         this.tagService = tagService;
-        this.entityManager = entityManager;
     }
 
     public PostImageUrlResponseDto write(PostRequestDto postRequestDto) {
@@ -72,8 +71,10 @@ public class PostService {
         User user = findUserByName(postRequestDto.getUsername());
 
         Post post = new Post(
-            getImages(postRequestDto),postContent,
-            postRequestDto.getGithubRepoUrl(), user
+            getImagesFrom(postRequestDto),
+            postContent,
+            postRequestDto.getGithubRepoUrl(),
+            user
         );
 
         List<Tag> tags = tagService.findOrCreateTags(new TagsDto(postRequestDto.getTags()));
@@ -92,13 +93,13 @@ public class PostService {
                 "해당하는 사용자를 찾을 수 없습니다."));
     }
 
-    private Images getImages(PostRequestDto postRequestDto) {
+    private Images getImagesFrom(PostRequestDto postRequestDto) {
         List<File> files = filesOf(postRequestDto);
 
-        return new Images(getImages(postRequestDto, files));
+        return new Images(getImagesFrom(postRequestDto, files));
     }
 
-    private List<Image> getImages(PostRequestDto postRequestDto, List<File> files) {
+    private List<Image> getImagesFrom(PostRequestDto postRequestDto, List<File> files) {
         return pickgitStorage
             .store(files, postRequestDto.getUsername())
             .stream()
@@ -148,7 +149,6 @@ public class PostService {
             ));
         Comment comment = new Comment(commentRequest.getContent());
         user.addComment(post, comment);
-        entityManager.flush();
         return CommentResponse.from(comment);
     }
 
