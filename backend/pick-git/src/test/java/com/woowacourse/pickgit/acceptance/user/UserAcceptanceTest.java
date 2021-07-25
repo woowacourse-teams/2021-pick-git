@@ -366,13 +366,13 @@ class UserAcceptanceTest {
             .extract();
     }
 
-    public OAuthTokenResponse 로그인_되어있음(User user) {
+    private OAuthTokenResponse 로그인_되어있음(User user) {
         OAuthTokenResponse response = 로그인_요청(user).as(OAuthTokenResponse.class);
         assertThat(response.getToken()).isNotBlank();
         return response;
     }
 
-    public ExtractableResponse<Response> 로그인_요청(User user) {
+    private ExtractableResponse<Response> 로그인_요청(User user) {
         // given
         String oauthCode = "1234";
         String accessToken = "oauth.access.token";

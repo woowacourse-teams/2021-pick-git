@@ -42,7 +42,7 @@ class UserServiceIntegrationTest {
 
     @DisplayName("사용자는 자신의 프로필을 조회할 수 있다.")
     @Test
-    public void getMyUserProfile_WithMyName_Success() {
+    void getMyUserProfile_WithMyName_Success() {
         //given
         AuthUserRequestDto requestDto = new AuthUserRequestDto("testUser");
         UserProfileResponseDto responseDto = UserFactory.mockLoginUserProfileResponseDto();
@@ -60,7 +60,7 @@ class UserServiceIntegrationTest {
 
     @DisplayName("게스트는 유저 이름으로 검색하여 유저의 프로필을 조회할 수 있다.")
     @Test
-    public void getUserProfile_FindByNameInCaseOfGuestUser_Success() {
+    void getUserProfile_FindByNameInCaseOfGuestUser_Success() {
         //given
         AppUser guestUser = new GuestUser();
         UserProfileResponseDto responseDto = UserFactory.mockGuestUserProfileResponseDto();
