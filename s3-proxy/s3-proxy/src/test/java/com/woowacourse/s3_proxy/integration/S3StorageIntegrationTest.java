@@ -1,6 +1,5 @@
 package com.woowacourse.s3_proxy.integration;
 
-import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import cloud.localstack.docker.LocalstackDockerExtension;
@@ -37,7 +36,7 @@ class S3StorageIntegrationTest {
 
     @DisplayName("S3에 파일을 업로드 하고 결과를 확인한다. - 성공")
     @Test
-    void store_UplaodFilesToS3AndCheckReturn_Ture() {
+    void store_UploadFilesToS3AndCheckReturn_Ture() {
         MockMultipartFile image1 = FileFactory.getTestRightImage1();
         MockMultipartFile image2 = FileFactory.getTestRightImage2();
         String userName = "testUser";
@@ -52,24 +51,24 @@ class S3StorageIntegrationTest {
                 createStoreResult(fileNameGenerator.generate(image2, userName))
                 )
             );
-
     }
 
-    @DisplayName("S3에 파일을 업로드 하고 실패한 파일과 성공한 파일의 결과를 확인한다. - 성공")
+    /*
+    테스트 보완 필요
+     */
+    @DisplayName("S3에 파일을 업로드할 때 1장이라도 실패하면 업로드 실패 예외가 발생한다.")
     @Test
-    void store_UploadFilesToS3AndCheckReturnThatHasFailAndSuccessResult_True() {
-        MockMultipartFile image1 = FileFactory.getTestRightImage1();
-        MockMultipartFile image2 = FileFactory.getTestRightImage2();
-        String userName = "testUser";
-
-        List<Boolean> succeeds = s3Storage.store(List.of(image1, image2), userName).stream()
-            .map(PickGitStorage.StoreResult::isSucceed)
-            .filter(b -> b)
-            .collect(toList());
-
-        assertThat(succeeds).hasSize(2);
+    void store_UploadFilesToS3AndFail_ExceptionThrown() {
+//        MockMultipartFile image1 = FileFactory.getTestRightImage1();
+//        MockMultipartFile image2 = FileFactory.getTestRightImage2();
+//        String userName = "testUser";
+//
+//        assertThatCode(() -> s3Storage.store(List.of(image1, image2), userName))
+//            .isInstanceOf(UploadFailureException.class)
+//            .hasFieldOrPropertyWithValue("errorCode", "I0001")
+//            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
+//            .hasFieldOrPropertyWithValue("message", "업로드 실패");
     }
-
 
     private PickGitStorage.StoreResult createStoreResult(String fileName) {
         return new PickGitStorage.StoreResult(

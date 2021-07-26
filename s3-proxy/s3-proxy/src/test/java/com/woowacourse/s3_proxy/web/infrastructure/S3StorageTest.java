@@ -1,6 +1,7 @@
 package com.woowacourse.s3_proxy.web.infrastructure;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -74,7 +76,7 @@ class S3StorageTest {
         );
     }
 
-    @DisplayName("이미지 파일에 실패하면, 결과에 예외가 포함되어 반환된다.")
+    @DisplayName("복수의 이미지 파일을 업로드할 때 한 장이라도 실패하면 예외가 발생한다.")
     @Test
     void store_Results_Failure() {
         List<MultipartFile> multipartFiles = List.of(
@@ -88,23 +90,10 @@ class S3StorageTest {
         given(amazonS3.putObject(any(), any(), any(), any()))
             .willThrow(RuntimeException.class);
 
-        List<StoreResult> actual = s3Storage.store(multipartFiles, userName);
-        List<StoreResult> expected = generateFailureResults(multipartFiles, userName);
-
-        assertThat(actual)
-            .usingRecursiveComparison()
-            .isEqualTo(expected);
-    }
-
-    private List<StoreResult> generateFailureResults(
-        List<MultipartFile> multipartFiles, String userName
-    ) {
-        String firstFileName = fileNameGenerator.generate(multipartFiles.get(0), userName);
-        String secondFileName = fileNameGenerator.generate(multipartFiles.get(1), userName);
-
-        return List.of(
-            new StoreResult(firstFileName, new UploadFailureException()),
-            new StoreResult(secondFileName, new UploadFailureException())
-        );
+        assertThatCode(() -> s3Storage.store(multipartFiles, userName))
+            .isInstanceOf(UploadFailureException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "I0001")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
+            .hasFieldOrPropertyWithValue("message", "업로드 실패");
     }
 }

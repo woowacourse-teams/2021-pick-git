@@ -49,10 +49,7 @@ public class S3Storage implements PickGitStorage {
                 String.format(fileUrlFormat, originalFileName)
             );
         } catch (Exception e) {
-            return new PickGitStorage.StoreResult(
-                originalFileName,
-                new UploadFailureException(e)
-            );
+            throw new UploadFailureException(e);
         }
     }
 

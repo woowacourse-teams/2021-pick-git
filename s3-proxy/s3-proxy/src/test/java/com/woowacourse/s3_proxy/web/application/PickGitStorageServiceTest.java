@@ -1,6 +1,7 @@
 package com.woowacourse.s3_proxy.web.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
 
 @ExtendWith(MockitoExtension.class)
@@ -54,34 +56,24 @@ class PickGitStorageServiceTest {
         assertThat(store.getUrls()).containsExactly(testUrl, testUrl);
     }
 
-    @DisplayName("파일 저장에 실패한 것은 제외하여 응답을 반환한다.")
+    @DisplayName("파일 저장이 1개라도 실패하면 예외가 발생한다.")
     @Test
     void store_storeFiles_Failure() {
         //given
-        MockMultipartFile testFailImage1 = FileFactory.getTestFailImage1();
-        MockMultipartFile testRightImage2 = FileFactory.getTestRightImage2();
-
         given(pickGitStorage.store(anyList(), anyString()))
-            .willReturn(List.of(
-                new PickGitStorage.StoreResult(
-                    testFailImage1.getOriginalFilename(),
-                    new UploadFailureException(new RuntimeException())
-                ),
-                new PickGitStorage.StoreResult(
-                    testRightImage2.getOriginalFilename(),
-                    "testUrl")
-                )
-            );
+            .willThrow(new UploadFailureException());
 
         //when
-        Response store = pickGitStorageService.store(
-            new Request("neozal", List.of(
-                FileFactory.getTestRightImage1(),
-                FileFactory.getTestRightImage2()
-            ))
-        );
-
-        //then
-        assertThat(store.getUrls()).hasSize(1);
+        assertThatCode(() -> {
+            pickGitStorageService.store(
+                new Request("neozal", List.of(
+                    FileFactory.getTestRightImage1(),
+                    FileFactory.getTestRightImage2()
+                ))
+            );
+        }).isInstanceOf(UploadFailureException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "I0001")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
+            .hasFieldOrPropertyWithValue("message", "업로드 실패");
     }
 }
