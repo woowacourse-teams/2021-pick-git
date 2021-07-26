@@ -1,31 +1,33 @@
-package com.woowacourse.pickgit.user.presentation.dto;
+package com.woowacourse.pickgit.user.application.dto.response;
 
-public class UserProfileResponse {
+import lombok.Builder;
+
+@Builder
+public class UserProfileResponseDto {
 
     private String name;
-    private String image;
+    private String imageUrl;
     private String description;
-
     private int followerCount;
     private int followingCount;
     private int postCount;
-
     private String githubUrl;
     private String company;
     private String location;
     private String website;
     private String twitter;
-
     private Boolean following;
 
-    private UserProfileResponse() {
+    private UserProfileResponseDto() {
     }
 
-    public UserProfileResponse(String name, String image, String description, int followerCount,
-        int followingCount, int postCount, String githubUrl, String company, String location,
-        String website, String twitter, Boolean following) {
+    public UserProfileResponseDto(
+        String name, String imageUrl, String description,
+        int followerCount, int followingCount, int postCount,
+        String githubUrl, String company, String location, String website, String twitter,
+        Boolean following) {
         this.name = name;
-        this.image = image;
+        this.imageUrl = imageUrl;
         this.description = description;
         this.followerCount = followerCount;
         this.followingCount = followingCount;
@@ -42,8 +44,8 @@ public class UserProfileResponse {
         return name;
     }
 
-    public String getImage() {
-        return image;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
     public String getDescription() {
