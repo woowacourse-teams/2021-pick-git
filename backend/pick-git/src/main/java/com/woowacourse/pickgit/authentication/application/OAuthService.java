@@ -1,7 +1,7 @@
 package com.woowacourse.pickgit.authentication.application;
 
-import com.woowacourse.pickgit.authentication.application.dto.TokenDto;
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
+import com.woowacourse.pickgit.authentication.application.dto.TokenDto;
 import com.woowacourse.pickgit.authentication.dao.OAuthAccessTokenDao;
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
@@ -41,7 +41,8 @@ public class OAuthService {
     public TokenDto createToken(String code) {
         String githubAccessToken = githubOAuthClient.getAccessToken(code);
 
-        OAuthProfileResponse githubProfileResponse = githubOAuthClient.getGithubProfile(githubAccessToken);
+        OAuthProfileResponse githubProfileResponse = githubOAuthClient
+            .getGithubProfile(githubAccessToken);
 
         updateUserOrCreateUser(githubProfileResponse);
 

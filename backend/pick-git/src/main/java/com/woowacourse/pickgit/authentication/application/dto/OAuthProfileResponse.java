@@ -3,7 +3,9 @@ package com.woowacourse.pickgit.authentication.application.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
 import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
+import lombok.Builder;
 
+@Builder
 public class OAuthProfileResponse {
 
     @JsonProperty("login")
@@ -43,18 +45,6 @@ public class OAuthProfileResponse {
         this.twitter = twitter;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
     public GithubProfile toGithubProfile() {
         return new GithubProfile(
             githubUrl,
@@ -73,55 +63,35 @@ public class OAuthProfileResponse {
         );
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public String getName() {
+        return name;
+    }
+
+    public String getImage() {
+        return image;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public String getGithubUrl() {
         return githubUrl;
-    }
-
-    public void setGithubUrl(String githubUrl) {
-        this.githubUrl = githubUrl;
     }
 
     public String getCompany() {
         return company;
     }
 
-    public void setCompany(String company) {
-        this.company = company;
-    }
-
     public String getLocation() {
         return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
     }
 
     public String getWebsite() {
         return website;
     }
 
-    public void setWebsite(String website) {
-        this.website = website;
-    }
-
     public String getTwitter() {
         return twitter;
-    }
-
-    public void setTwitter(String twitter) {
-        this.twitter = twitter;
     }
 }
