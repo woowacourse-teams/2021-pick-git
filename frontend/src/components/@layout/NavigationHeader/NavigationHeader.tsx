@@ -12,6 +12,9 @@ const NavigationHeader = () => {
 
   const UnAuthenticatedNavigation = () => (
     <Navigation>
+      <NavigationItem to={PAGE_URL.HOME}>
+        <HomeIcon />
+      </NavigationItem>
       <NavigationItem to={PAGE_URL.SEARCH}>
         <SearchIcon />
       </NavigationItem>
