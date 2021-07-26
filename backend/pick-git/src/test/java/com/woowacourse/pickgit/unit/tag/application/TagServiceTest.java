@@ -185,6 +185,6 @@ class TagServiceTest {
         List<Tag> tags = tagService.findOrCreateTags(tagsDto);
 
         // then
-        assertThat(tags.size()).isEqualTo(0);
+        assertThat(tags.size()).isZero();
     }
 }

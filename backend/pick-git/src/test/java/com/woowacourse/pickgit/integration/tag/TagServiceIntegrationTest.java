@@ -60,13 +60,12 @@ class TagServiceIntegrationTest {
             .userName(userName)
             .repositoryName(repositoryName)
             .build();
-        List<String> tags = Arrays.asList("JavaScript", "HTML", "CSS");
 
         // when
         TagsDto tagsDto = tagService.extractTags(extractionRequestDto);
 
         // then
-        assertThat(tagsDto.getTagNames()).containsAll(Arrays.asList("javascript", "html", "css"));
+        assertThat(tagsDto.getTagNames()).containsAll(List.of("javascript", "html", "css"));
     }
 
     @DisplayName("잘못된 경로로 태그 추출 요청시 예외가 발생한다.")
