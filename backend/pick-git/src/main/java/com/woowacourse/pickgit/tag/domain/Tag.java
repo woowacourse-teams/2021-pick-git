@@ -32,7 +32,7 @@ public class Tag {
 
     private boolean isNotValidTag(String name) {
         return Objects.isNull(name)
-            || name.isEmpty()
+            || name.isBlank()
             || name.length() > MAX_TAG_LENGTH;
     }
 

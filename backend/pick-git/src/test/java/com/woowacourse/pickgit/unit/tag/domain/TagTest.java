@@ -22,7 +22,7 @@ class TagTest {
     @DisplayName("태그 이름이 null이거나 빈 문자열이거나 20자를 넘어가면 예외가 발생한다.")
     @ParameterizedTest
     @NullAndEmptySource
-    @ValueSource(strings = {"abcdeabcdeabcdeabcdea"})
+    @ValueSource(strings = {"abcdeabcdeabcdeabcdea", " ", "  "})
     void newTag_InvalidName_Failure(String name) {
         assertThatCode(() -> new Tag(name))
             .isInstanceOf(TagFormatException.class)

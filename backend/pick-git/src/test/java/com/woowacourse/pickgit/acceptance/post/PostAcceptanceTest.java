@@ -25,6 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -103,6 +104,35 @@ class PostAcceptanceTest {
             .then().log().all()
             .statusCode(HttpStatus.CREATED.value())
             .extract();
+    }
+
+    @DisplayName("")
+    @ParameterizedTest
+    @EmptySource
+    @ValueSource(strings = {" ", "  ", "abcdeabcdeabcdeabcdea"})
+    void write_LoginUserWithInvalidTags_Fail(String tagName) {
+        // given
+        String token = 로그인_되어있음(USERNAME).getToken();
+        List<String> invalidTags = List.of("Java", "JavaScript", tagName);
+
+        // when
+        ApiErrorResponse response = given().log().all()
+            .auth().oauth2(token)
+            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+            .formParams("githubRepoUrl", githubRepoUrl)
+            .formParams("content", content)
+            .formParams("tags", invalidTags)
+            .multiPart("images", FileFactory.getTestImage1File())
+            .multiPart("images", FileFactory.getTestImage2File())
+            .when()
+            .post("/api/posts")
+            .then().log().all()
+            .statusCode(HttpStatus.BAD_REQUEST.value())
+            .extract()
+            .as(ApiErrorResponse.class);
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("F0003");
     }
 
     @DisplayName("사용자는 중복된 태그를 가진 게시글을 작성할 수 없다.")

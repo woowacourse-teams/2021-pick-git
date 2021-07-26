@@ -23,6 +23,10 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -149,10 +153,12 @@ class TagServiceTest {
     }
 
     @DisplayName("잘못된 태그 이름을 태그로 변환 시도시 실패한다.")
-    @Test
-    void findOrCreateTags_InvalidTagName_ExceptionThrown() {
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {" ", "  ", "abcdeabcdeabcdeabcdea"})
+    void findOrCreateTags_InvalidTagName_ExceptionThrown(String tagName) {
         // given
-        List<String> tagNames = Arrays.asList("tag1", "tag2", "");
+        List<String> tagNames = Arrays.asList("tag1", "tag2", tagName);
         TagsDto tagsDto = new TagsDto(tagNames);
 
         // mock
@@ -160,7 +166,7 @@ class TagServiceTest {
             .willReturn(Optional.empty());
         given(tagRepository.findByName("tag2"))
             .willReturn(Optional.empty());
-        given(tagRepository.findByName(""))
+        given(tagRepository.findByName(tagName))
             .willReturn(Optional.empty());
 
         // when, then
@@ -168,7 +174,7 @@ class TagServiceTest {
             .isInstanceOf(TagFormatException.class)
             .extracting("errorCode")
             .isEqualTo("F0003");
-        verify(tagRepository, times(3)).findByName(anyString());
+        verify(tagRepository, times(3)).findByName(any());
     }
 
     @DisplayName("태그 이름이 없다면 빈 태그를 반환한다.")

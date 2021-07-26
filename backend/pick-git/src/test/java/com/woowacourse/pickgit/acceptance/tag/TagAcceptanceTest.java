@@ -40,7 +40,6 @@ class TagAcceptanceTest {
     private OAuthClient oAuthClient;
 
     private String accessToken;
-    private String userName = "jipark3";
     private String repositoryName = "doms-react";
 
     @BeforeEach

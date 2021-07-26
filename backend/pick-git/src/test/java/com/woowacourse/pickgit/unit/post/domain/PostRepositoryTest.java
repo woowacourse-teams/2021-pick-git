@@ -105,7 +105,7 @@ class PostRepositoryTest {
         assertThat(savedPost.getCreatedAt()).isBefore(LocalDateTime.now());
     }
 
-    @DisplayName("Post을 저장할 때 PostTag도 함께 영속화된다. (DB에 이미 Tag가 존재할 경우)")
+    @DisplayName("Post을 저장할 때 PostTag도 함께 영속화된다.")
     @Test
     void save_WhenSavingPostAndExistsTag_PostTagSavedTogether() {
         // given
@@ -119,33 +119,6 @@ class PostRepositoryTest {
 
         testEntityManager.flush();
         testEntityManager.clear();
-
-        // when
-        post.addTags(List.of(tag1, tag2));
-        Post savedPost = postRepository.save(post);
-
-        testEntityManager.flush();
-        testEntityManager.clear();
-
-        // then
-        Post findPost = postRepository.findById(savedPost.getId())
-            .orElse(null);
-
-        assertThat(findPost).isNotNull();
-        assertThat(findPost.getTags()).hasSize(2);
-    }
-
-    @DisplayName("Post을 저장할 때 PostTag도 함께 영속화된다. (DB에 Tag도 같이 저장할 경우)")
-    @Test
-    void save_WhenSavingPostAndNotExistsTag_PostTagSavedTogether() {
-        // given
-        Post post =
-            new Post(null, null, new PostContent("abc"), githubRepoUrl, null, null, new ArrayList<>(),
-                null);
-        Tag tag1 = new Tag("tag1");
-        Tag tag2 = new Tag("tag2");
-        tagRepository.save(tag1);
-        tagRepository.save(tag2);
 
         // when
         post.addTags(List.of(tag1, tag2));
