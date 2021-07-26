@@ -27,8 +27,8 @@ public class CommentContent {
 
     private boolean isNotValidContent(String content) {
         return Objects.isNull(content)
-            || content.isEmpty()
-            || content.length() > MAX_COMMENT_CONTENT_LENGTH;
+            || content.isBlank()
+            || content.length() >= MAX_COMMENT_CONTENT_LENGTH;
     }
 
     public String getContent() {

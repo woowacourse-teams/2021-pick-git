@@ -127,17 +127,20 @@ class PostRepositoryTest {
     @DisplayName("Post에 Comment를 추가하면 Comment가 자동 영속화된다.")
     @Test
     void addComment_WhenSavingPost_CommentSavedTogether() {
+        // given
         Post post =
             new Post(null, null, new PostContent("abc"), githubRepoUrl, null, new Comments(), new ArrayList<>(),
                 null);
-        Comment comment = new Comment("test comment")
-            .toPost(post);
+        Comment comment = new Comment("test comment");
         post.addComment(comment);
 
+        // when
         postRepository.save(post);
+
         testEntityManager.flush();
         testEntityManager.clear();
 
+        // then
         Post findPost = postRepository.findById(post.getId())
             .orElseThrow(IllegalArgumentException::new);
         List<Comment> comments = findPost.getComments();
