@@ -2,9 +2,11 @@ import { useContext } from "react";
 import { ThemeContext } from "styled-components";
 import { ProfileData } from "../../../@types";
 
-import SnackBarContext from "../../../contexts/SnackbarContext";
 import UserContext from "../../../contexts/UserContext";
+import useModal from "../../../services/hooks/@common/useModal";
 import { useFollowingMutation, useUnfollowingMutation } from "../../../services/queries";
+import ModalPortal from "../../@layout/Modal/ModalPortal";
+import ProfileModificationForm from "../../ProfileModificationForm/ProfileModificationForm";
 import Avatar from "../Avatar/Avatar";
 import Button from "../Button/Button";
 import CountIndicator from "../CountIndicator/CountIndicator";
@@ -18,7 +20,7 @@ export interface Props {
 const ProfileHeader = ({ isMyProfile, profile }: Props) => {
   const theme = useContext(ThemeContext);
   const { isLoggedIn } = useContext(UserContext);
-  const { pushSnackbarMessage } = useContext(SnackBarContext);
+  const { isModalShown, showModal, hideModal } = useModal(false);
 
   const { mutate: follow, isLoading: isFollowLoading } = useFollowingMutation(profile?.name);
   const { mutate: unFollow, isLoading: isUnfollowLoading } = useUnfollowingMutation(profile?.name);
@@ -49,7 +51,7 @@ const ProfileHeader = ({ isMyProfile, profile }: Props) => {
 
     if (isMyProfile) {
       return (
-        <Button type="button" kind="squaredBlock" onClick={() => pushSnackbarMessage("아직 지원하지 않는 기능입니다")}>
+        <Button type="button" kind="squaredBlock" onClick={showModal}>
           프로필 수정
         </Button>
       );
@@ -86,6 +88,16 @@ const ProfileHeader = ({ isMyProfile, profile }: Props) => {
         </Indicators>
         <ProfileButton />
       </div>
+      {isModalShown && isLoggedIn && (
+        <ModalPortal onClose={hideModal} isCloseButtonShown={true}>
+          <ProfileModificationForm
+            username={profile?.name}
+            profileImageUrl={profile?.imageUrl}
+            prevDescription={profile?.description}
+            onTerminate={hideModal}
+          />
+        </ModalPortal>
+      )}
     </Container>
   );
 };

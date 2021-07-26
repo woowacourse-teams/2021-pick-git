@@ -39,6 +39,10 @@ public class Follow {
         this.target = target;
     }
 
+    public boolean isFollowing(User targetUser) {
+        return this.target.equals(targetUser);
+    }
+
     public Long getId() {
         return id;
     }

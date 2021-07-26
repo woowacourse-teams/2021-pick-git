@@ -1,8 +1,8 @@
-package com.woowacourse.pickgit.unit.authentication.presentation;
+package com.woowacourse.pickgit.integration.authentication;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.given;
 
 import com.woowacourse.pickgit.authentication.application.JwtTokenProvider;
 import com.woowacourse.pickgit.authentication.application.OAuthService;
@@ -19,14 +19,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpHeaders;
 import org.springframework.web.context.request.ServletWebRequest;
 
 @ExtendWith(MockitoExtension.class)
-class AuthenticationPrincipalArgumentResolverTest {
+class AuthenticationPrincipalArgumentResolverIntegrationTest {
 
     private JwtTokenProvider jwtTokenProvider;
 
@@ -35,17 +33,20 @@ class AuthenticationPrincipalArgumentResolverTest {
     @Mock
     private HttpServletRequest httpServletRequest;
 
-    @InjectMocks
     private OAuthService oAuthService;
 
     private AuthenticationPrincipalArgumentResolver authenticationPrincipalArgumentResolver;
 
     @BeforeEach
     void setUp() {
-        jwtTokenProvider = new JwtTokenProviderImpl("pick-git", 3600000);
-        oAuthAccessTokenDao = new CollectionOAuthAccessTokenDao();
-        oAuthService = new OAuthService(null, jwtTokenProvider, oAuthAccessTokenDao, null);
-        authenticationPrincipalArgumentResolver = new AuthenticationPrincipalArgumentResolver(oAuthService);
+        jwtTokenProvider =
+            new JwtTokenProviderImpl("pick-git", 3600000);
+        oAuthAccessTokenDao =
+            new CollectionOAuthAccessTokenDao();
+        oAuthService =
+            new OAuthService(null, jwtTokenProvider, oAuthAccessTokenDao, null);
+        authenticationPrincipalArgumentResolver =
+            new AuthenticationPrincipalArgumentResolver(oAuthService);
     }
 
     @DisplayName("유효한 토큰이면 LoginUser를 반환한다.")
@@ -59,10 +60,11 @@ class AuthenticationPrincipalArgumentResolverTest {
         oAuthAccessTokenDao.insert(jwtToken, accessToken);
 
         // mock
-        when(httpServletRequest.getAttribute(AuthHeader.AUTHENTICATION)).thenReturn(jwtToken);
+        given(httpServletRequest.getAttribute(AuthHeader.AUTHENTICATION)).willReturn(jwtToken);
 
         // when
-        AppUser loginUser = (AppUser) authenticationPrincipalArgumentResolver.resolveArgument(null, null, new ServletWebRequest(httpServletRequest), null);
+        AppUser loginUser = (AppUser) authenticationPrincipalArgumentResolver
+            .resolveArgument(null, null, new ServletWebRequest(httpServletRequest), null);
 
         // then
         assertThat(loginUser.isGuest()).isFalse();
@@ -77,11 +79,12 @@ class AuthenticationPrincipalArgumentResolverTest {
         String jwtToken = "invalid jwt token";
 
         // mock
-        when(httpServletRequest.getAttribute(AuthHeader.AUTHENTICATION)).thenReturn(jwtToken);
+        given(httpServletRequest.getAttribute(AuthHeader.AUTHENTICATION)).willReturn(jwtToken);
 
         // then
         assertThatThrownBy(() -> {
-            authenticationPrincipalArgumentResolver.resolveArgument(null, null, new ServletWebRequest(httpServletRequest), null);
+            authenticationPrincipalArgumentResolver
+                .resolveArgument(null, null, new ServletWebRequest(httpServletRequest), null);
         }).isInstanceOf(InvalidTokenException.class);
     }
 
@@ -92,10 +95,11 @@ class AuthenticationPrincipalArgumentResolverTest {
         String jwtToken = jwtTokenProvider.createToken("pick-git");
 
         // when
-        when(httpServletRequest.getAttribute(AuthHeader.AUTHENTICATION)).thenReturn(jwtToken);
+        given(httpServletRequest.getAttribute(AuthHeader.AUTHENTICATION)).willReturn(jwtToken);
 
         assertThatThrownBy(() -> {
-            authenticationPrincipalArgumentResolver.resolveArgument(null, null, new ServletWebRequest(httpServletRequest), null);
+            authenticationPrincipalArgumentResolver
+                .resolveArgument(null, null, new ServletWebRequest(httpServletRequest), null);
         }).isInstanceOf(InvalidTokenException.class);
     }
 
@@ -103,10 +107,11 @@ class AuthenticationPrincipalArgumentResolverTest {
     @Test
     void resolveArgument_InValidUserToken_ReturnGuest() throws Exception {
         // mock
-        when(httpServletRequest.getAttribute(AuthHeader.AUTHENTICATION)).thenReturn(null);
+        given(httpServletRequest.getAttribute(AuthHeader.AUTHENTICATION)).willReturn(null);
 
         // when
-        AppUser loginUser = (AppUser) authenticationPrincipalArgumentResolver.resolveArgument(null, null, new ServletWebRequest(httpServletRequest), null);
+        AppUser loginUser = (AppUser) authenticationPrincipalArgumentResolver
+            .resolveArgument(null, null, new ServletWebRequest(httpServletRequest), null);
 
         // then
         assertThat(loginUser.isGuest()).isTrue();

@@ -31,7 +31,6 @@ export const TabIndicator = styled.div<{ tabIndex: number; tabCount: number; tab
   position: absolute;
   border-bottom: 2px solid ${({ theme, tabIndicatorColor }) => tabIndicatorColor ?? theme.color.primaryColor};
   bottom: 0;
-  z-index: 100;
   transition: transform 0.5s;
 
   ${({ tabIndex, tabCount }) => `

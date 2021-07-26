@@ -4,6 +4,7 @@ export interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   kind?: "squaredInline" | "squaredBlock" | "roundedInline" | "roundedBlock";
   backgroundColor?: string;
   color?: string;
+  padding?: string;
 }
 
 const Button = ({ kind = "squaredInline", ...props }: Props) => {

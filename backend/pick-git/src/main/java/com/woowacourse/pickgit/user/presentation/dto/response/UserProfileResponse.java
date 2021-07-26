@@ -1,31 +1,33 @@
-package com.woowacourse.pickgit.user.application.dto;
+package com.woowacourse.pickgit.user.presentation.dto.response;
 
 import lombok.Builder;
 
 @Builder
-public class UserProfileServiceDto {
+public class UserProfileResponse {
 
-    private final String name;
-    private final String image;
-    private final String description;
+    private String name;
+    private String imageUrl;
+    private String description;
+    private int followerCount;
+    private int followingCount;
+    private int postCount;
+    private String githubUrl;
+    private String company;
+    private String location;
+    private String website;
+    private String twitter;
+    private Boolean following;
 
-    private final int followerCount;
-    private final int followingCount;
-    private final int postCount;
+    private UserProfileResponse() {
+    }
 
-    private final String githubUrl;
-    private final String company;
-    private final String location;
-    private final String website;
-    private final String twitter;
-
-    private final Boolean following;
-
-    public UserProfileServiceDto(String name, String image, String description,
-        int followerCount, int followingCount, int postCount, String githubUrl, String company,
-        String location, String website, String twitter, Boolean following) {
+    public UserProfileResponse(
+        String name, String imageUrl, String description,
+        int followerCount, int followingCount, int postCount,
+        String githubUrl, String company, String location, String website, String twitter,
+        Boolean following) {
         this.name = name;
-        this.image = image;
+        this.imageUrl = imageUrl;
         this.description = description;
         this.followerCount = followerCount;
         this.followingCount = followingCount;
@@ -42,8 +44,8 @@ public class UserProfileServiceDto {
         return name;
     }
 
-    public String getImage() {
-        return image;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
     public String getDescription() {
