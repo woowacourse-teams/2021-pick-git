@@ -12,8 +12,11 @@ import com.woowacourse.pickgit.tag.domain.Tag;
 import com.woowacourse.pickgit.user.domain.User;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -103,6 +106,7 @@ public class Post {
     }
 
     public void addTags(List<Tag> tags) {
+        validateDuplicateTag(tags);
         List<Tag> existingTags = getTags();
         for (Tag tag : tags) {
             if (existingTags.contains(tag)) {
@@ -110,6 +114,15 @@ public class Post {
             }
             PostTag postTag = new PostTag(this, tag);
             postTags.add(postTag);
+        }
+    }
+
+    private void validateDuplicateTag(List<Tag> tags) {
+        Set<String> nonDuplicatetagNames = tags.stream()
+            .map(Tag::getName)
+            .collect(Collectors.toSet());
+        if (nonDuplicatetagNames.size() != tags.size()) {
+            throw new CannotAddTagException();
         }
     }
 

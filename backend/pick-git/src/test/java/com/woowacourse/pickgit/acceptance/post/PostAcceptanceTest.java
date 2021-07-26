@@ -21,7 +21,6 @@ import io.restassured.response.Response;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.validation.constraints.Null;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -85,7 +84,55 @@ class PostAcceptanceTest {
         requestWrite(token);
     }
 
-    @DisplayName("로그인일때 게시물을 조회한다. - Comment 및 게시글의 좋아요 여부를 확인할 수 있다.")
+    @DisplayName("사용자는 태그 없이 게시글을 작성할 수 있다.")
+    @Test
+    void write_LoginUserWithNoneTags_Success() {
+        // given
+        String token = 로그인_되어있음(USERNAME).getToken();
+
+        // when, then
+        given().log().all()
+            .auth().oauth2(token)
+            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+            .formParams("githubRepoUrl", githubRepoUrl)
+            .formParams("content", content)
+            .multiPart("images", FileFactory.getTestImage1File())
+            .multiPart("images", FileFactory.getTestImage2File())
+            .when()
+            .post("/api/posts")
+            .then().log().all()
+            .statusCode(HttpStatus.CREATED.value())
+            .extract();
+    }
+
+    @DisplayName("사용자는 중복된 태그를 가진 게시글을 작성할 수 없다.")
+    @Test
+    void write_LoginUserWithDuplicatedTags_Fail() {
+        // given
+        String token = 로그인_되어있음(USERNAME).getToken();
+        List<String> duplicatedTags = List.of("Java", "JavaScript", "Java");
+
+        // when
+        ApiErrorResponse response = given().log().all()
+            .auth().oauth2(token)
+            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+            .formParams("githubRepoUrl", githubRepoUrl)
+            .formParams("content", content)
+            .formParams("tags", duplicatedTags)
+            .multiPart("images", FileFactory.getTestImage1File())
+            .multiPart("images", FileFactory.getTestImage2File())
+            .when()
+            .post("/api/posts")
+            .then().log().all()
+            .statusCode(HttpStatus.BAD_REQUEST.value())
+            .extract()
+            .as(ApiErrorResponse.class);
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("P0001");
+    }
+
+    @DisplayName("로그인일때 게시물을 조회한다. - 댓글 및 게시글의 좋아요 여부를 확인할 수 있다.")
     @Test
     void read_LoginUser_Success() {
         String token = 로그인_되어있음(ANOTHER_USERNAME).getToken();

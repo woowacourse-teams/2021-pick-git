@@ -2,6 +2,7 @@ package com.woowacourse.pickgit.unit.tag.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -125,6 +126,10 @@ class TagServiceTest {
         TagsDto tagsDto = new TagsDto(tagNames);
 
         // mock
+        given(tagRepository.save(new Tag("tag1")))
+            .willReturn(new Tag("tag1"));
+        given(tagRepository.save(new Tag("tag2")))
+            .willReturn(new Tag("tag2"));
         given(tagRepository.findByName("tag1"))
             .willReturn(Optional.empty());
         given(tagRepository.findByName("tag2"))
@@ -164,5 +169,18 @@ class TagServiceTest {
             .extracting("errorCode")
             .isEqualTo("F0003");
         verify(tagRepository, times(3)).findByName(anyString());
+    }
+
+    @DisplayName("태그 이름이 없다면 빈 태그를 반환한다.")
+    @Test
+    void findOrCreateTags_NoneTagName_ReturnEmptyList() {
+        // given
+        TagsDto tagsDto = new TagsDto(null);
+
+        // when
+        List<Tag> tags = tagService.findOrCreateTags(tagsDto);
+
+        // then
+        assertThat(tags.size()).isEqualTo(0);
     }
 }
