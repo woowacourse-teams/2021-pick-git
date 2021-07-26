@@ -11,7 +11,7 @@ public class PostImageUrlResponseDto {
     }
 
     public PostImageUrlResponseDto(Long id) {
-        this(id, null);
+        this(id, List.of());
     }
 
     public PostImageUrlResponseDto(Long id, List<String> imageUrls) {

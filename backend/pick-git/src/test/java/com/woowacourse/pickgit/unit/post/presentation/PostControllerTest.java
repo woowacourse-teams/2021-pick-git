@@ -49,8 +49,6 @@ import com.woowacourse.pickgit.post.presentation.dto.request.CommentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.ContentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.HomeFeedRequest;
 import java.util.List;
-import org.apache.http.entity.ContentType;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -61,14 +59,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.multipart.MultipartFile;
 
 @AutoConfigureRestDocs
 @Import(InfrastructureTestConfiguration.class)
@@ -93,50 +87,33 @@ class PostControllerTest {
     @MockBean
     private OAuthService oAuthService;
 
-    private LoginUser user;
-    private List<MultipartFile> images;
-    private String githubRepoUrl;
-    private String[] tags;
-    private String postContent;
-
-    @BeforeEach
-    void setUp() {
-        user = new LoginUser(USERNAME, ACCESS_TOKEN);
-        images = List.of(
-            FileFactory.getTestImage1(),
-            FileFactory.getTestImage2()
-        );
-        githubRepoUrl = "https://github.com/woowacourse-teams/2021-pick-git/";
-        tags = new String[]{"java", "spring"};
-        postContent = "pickgit";
-    }
 
     @DisplayName("게시물을 작성할 수 있다. - 사용자")
     @Test
     void write_LoginUser_Success() throws Exception {
         // given
+        LoginUser loginUser = new LoginUser("testUser", "at");
+
         given(oAuthService.validateToken(any()))
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(any()))
-            .willReturn(user);
+            .willReturn(loginUser);
         given(postService.write(any(PostRequestDto.class)))
             .willReturn(new PostImageUrlResponseDto(1L));
 
-        MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
-        multiValueMap.add("githubRepoUrl", githubRepoUrl);
-        multiValueMap.add("content", postContent);
+        // when
+        ResultActions perform = mockMvc.perform(multipart("/api/posts")
+            .file(FileFactory.getTestImage1())
+            .file(FileFactory.getTestImage2())
+            .param(PickGit.GITHUB_REPO_URL, "https://github.com/bperhaps")
+            .param(PickGit.CONTENT, "content")
+            .param(PickGit.TAGS, new String[]{"tag1", "tag2"})
+            .header(HttpHeaders.AUTHORIZATION, loginUser.getAccessToken()));
 
         // then
-        ResultActions perform = mockMvc.perform(multipart("/api/posts")
-            .file(new MockMultipartFile("images", "testImage1.jpg",
-                ContentType.IMAGE_JPEG.getMimeType(), "testimage1Binary".getBytes()))
-            .file(new MockMultipartFile("images", "testImage2.jpg",
-                ContentType.IMAGE_JPEG.getMimeType(), "testimage2Binary".getBytes()))
-            .params(multiValueMap)
-            .param("tags", this.tags)
-            .header(HttpHeaders.AUTHORIZATION, user.getAccessToken()))
-            .andExpect(status().isCreated());
+        perform.andExpect(status().isCreated());
 
+        //documentation
         perform.andDo(document("posts-post-user",
             getDocumentRequest(),
             getDocumentResponse(),
@@ -159,23 +136,21 @@ class PostControllerTest {
         given(oAuthService.findRequestUserByToken(any()))
             .willCallRealMethod();
 
-        MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
-        multiValueMap.add("githubRepoUrl", githubRepoUrl);
-        multiValueMap.add("content", postContent);
+        // when
+        ResultActions perform = mockMvc.perform(multipart("/api/posts")
+            .file(FileFactory.getTestImage1())
+            .file(FileFactory.getTestImage2())
+            .param(PickGit.GITHUB_REPO_URL, "https://github.com/bperhaps")
+            .param(PickGit.CONTENT, "content")
+            .param(PickGit.TAGS, new String[]{"tag1", "tag2"})
+            .header(HttpHeaders.AUTHORIZATION, "invalid AccessToken"));
 
         // then
-        ResultActions perform = mockMvc.perform(multipart("/api/posts")
-            .file(new MockMultipartFile("images", "testImage1.jpg",
-                ContentType.IMAGE_JPEG.getMimeType(), "testimage1Binary".getBytes()))
-            .file(new MockMultipartFile("images", "testImage2.jpg",
-                ContentType.IMAGE_JPEG.getMimeType(), "testimage2Binary".getBytes()))
-
-            .params(multiValueMap)
-            .param("tags", tags)
-            .header(HttpHeaders.AUTHORIZATION, "Bad AccessToken"))
+        perform
             .andExpect(status().isUnauthorized())
             .andExpect(jsonPath("errorCode").value("A0002"));
 
+        //documentation
         perform.andDo(document("posts-post-guest",
             getDocumentRequest(),
             getDocumentResponse(),
@@ -189,24 +164,20 @@ class PostControllerTest {
         ));
     }
 
-    @DisplayName("특정 Post에 Comment을 추가한다.")
+    @DisplayName("특정 Post에 댓글을 추가한다.")
     @Test
     void addComment_ValidContent_Success() throws Exception {
         // given
         LoginUser loginUser = new LoginUser("kevin", "token");
-        String url = "/api/posts/{postId}/comments";
-        Long postId = 1L;
-        String requestBody = objectMapper.writeValueAsString(new ContentRequest("test comment"));
         CommentResponse commentResponse = CommentResponse.builder()
             .id(1L)
             .profileImageUrl("kevin profile image url")
-            .authorName("kevin")
-            .content("test comment")
+            .authorName(loginUser.getUsername())
+            .content("test Comment")
             .isLiked(false)
             .build();
-        String responseBody = objectMapper.writeValueAsString(commentResponse);
+        ContentRequest commentRequest = new ContentRequest("test Comment");
 
-        // mock
         given(oAuthService.validateToken(anyString()))
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(anyString()))
@@ -214,18 +185,21 @@ class PostControllerTest {
         given(postService.addComment(any(CommentRequest.class)))
             .willReturn(commentResponse);
 
+        String requestBody = objectMapper.writeValueAsString(commentRequest);
+        String responseBody = objectMapper.writeValueAsString(commentResponse);
+
         // when
-        ResultActions response = addCommentApi(url, postId, requestBody);
+        ResultActions perform = addCommentApi("/api/posts/{postId}/comments", 1L, requestBody);
 
         // then
-        response
+        perform
             .andExpect(status().isOk())
             .andExpect(content().string(responseBody));
 
         verify(postService, times(1)).addComment(any(CommentRequest.class));
 
-        // restdocs
-        response.andDo(document("comment-post",
+        // documentation
+        perform.andDo(document("comment-post",
             getDocumentRequest(),
             getDocumentResponse(),
             requestHeaders(
@@ -247,34 +221,35 @@ class PostControllerTest {
         ));
     }
 
-    @DisplayName("특정 Post에 댓글 등록 실패한다. - 빈 Comment인 경우.")
+    @DisplayName("특정 Post에 댓글 등록 실패한다. - 빈 댓글인 경우.")
     @Test
     void addComment_InValidContent_ExceptionThrown() throws Exception {
         // given
-        LoginUser loginUser = new LoginUser("kevin", "token");
-        String url = "/api/posts/{postId}/comments";
-        Long postId = 1L;
-        String requestBody = objectMapper.writeValueAsString("");
+        ContentRequest commentRequest = new ContentRequest("");
 
-        // mock
+        LoginUser loginUser = new LoginUser("kevin", "token");
         given(oAuthService.validateToken(anyString()))
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(anyString()))
             .willReturn(loginUser);
+
         given(postService.addComment(any(CommentRequest.class)))
             .willThrow(new CommentFormatException());
 
+        String requestBody = objectMapper.writeValueAsString(commentRequest);
+
         // when
-        ResultActions response = addCommentApi(url, postId, requestBody);
+        ResultActions perform = addCommentApi("/api/posts/{postId}/comments", 1L, requestBody);
 
         // then
-        response
+        perform
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("errorCode").value("F0001"));
+
         verify(postService, never()).addComment(any(CommentRequest.class));
 
-        // restdocs
-        response.andDo(document("comment-post-emptyContent",
+        // documentation
+        perform.andDo(document("comment-post-emptyContent",
             getDocumentRequest(),
             getDocumentResponse(),
             requestHeaders(
@@ -289,7 +264,8 @@ class PostControllerTest {
         ));
     }
 
-    private ResultActions addCommentApi(String url, Long postId, String requestBody) throws Exception {
+    private ResultActions addCommentApi(String url, Long postId, String requestBody)
+        throws Exception {
         return mockMvc.perform(post(url, postId)
             .header("Authorization", "Bearer test")
             .contentType(MediaType.APPLICATION_JSON)
@@ -300,27 +276,32 @@ class PostControllerTest {
     @Test
     void showRepositories_LoginUser_Success() throws Exception {
         // given
-        given(oAuthService.validateToken(any()))
-            .willReturn(true);
-        given(oAuthService.findRequestUserByToken(any()))
-            .willReturn(user);
-
         RepositoriesResponseDto responseDto = new RepositoriesResponseDto(List.of(
             new RepositoryResponseDto("pick", "https://github.com/jipark3/pick"),
             new RepositoryResponseDto("git", "https://github.com/jipark3/git")
         ));
-        String repositories = objectMapper.writeValueAsString(responseDto.getRepositories());
 
+        LoginUser loginUser = new LoginUser("testUser", "at");
+
+        given(oAuthService.validateToken(any()))
+            .willReturn(true);
+        given(oAuthService.findRequestUserByToken(any()))
+            .willReturn(loginUser);
         given(postService.showRepositories(any(RepositoryRequestDto.class)))
             .willReturn(responseDto);
 
-        // then
+        // when
         ResultActions perform = mockMvc
             .perform(get("/api/github/${userName}/repositories", USERNAME)
-                .header(HttpHeaders.AUTHORIZATION, API_ACCESS_TOKEN))
+                .header(HttpHeaders.AUTHORIZATION, API_ACCESS_TOKEN));
+
+        // then
+        String repositories = objectMapper.writeValueAsString(responseDto);
+        perform
             .andExpect(status().isOk())
             .andExpect(content().string(repositories));
 
+        // documentation
         perform.andDo(document("repositories-loggedIn",
             getDocumentRequest(),
             getDocumentResponse(),
@@ -340,14 +321,19 @@ class PostControllerTest {
     @DisplayName("비로그인 유저는 홈피드를 조회할 수 있다.")
     @Test
     void readHomeFeed_GuestUser_Success() throws Exception {
+        // given
         given(postService.readHomeFeed(any(HomeFeedRequest.class)))
             .willReturn(PostFactory.mockPostResponseDtos());
 
+        // when
         ResultActions perform = mockMvc.perform(get("/api/posts")
             .param("page", "0")
-            .param("limit", "3"))
-            .andExpect(status().isOk());
+            .param("limit", "3"));
 
+        // then
+        perform.andExpect(status().isOk());
+
+        // documentation
         perform.andDo(document("post-homefeed-unLoggedIn",
             getDocumentRequest(),
             getDocumentResponse(),
@@ -368,7 +354,8 @@ class PostControllerTest {
                 fieldWithPath("[].updatedAt").type(STRING).description("마지막 글 수정 시간"),
                 fieldWithPath("[].comments").type(ARRAY).description("댓글 목록"),
                 fieldWithPath("[].comments[].id").type(NUMBER).description("댓글 아이디"),
-                fieldWithPath("[].comments[].profileImageUrl").type(STRING).description("댓글 작성자 프로필 사진"),
+                fieldWithPath("[].comments[].profileImageUrl").type(STRING)
+                    .description("댓글 작성자 프로필 사진"),
                 fieldWithPath("[].comments[].authorName").type(STRING).description("댓글 작성자 이름"),
                 fieldWithPath("[].comments[].content").type(STRING).description("댓글 내용"),
                 fieldWithPath("[].comments[].isLiked").type(BOOLEAN).description("댓글 좋아요 여부"),
@@ -382,17 +369,24 @@ class PostControllerTest {
     @DisplayName("로그인 유저는 홈피드를 조회할 수 있다.")
     @Test
     void readHomeFeed_LoginUser_Success() throws Exception {
+        // given
+        LoginUser loginUser = new LoginUser("testUser", "at");
+
         given(oAuthService.validateToken(any()))
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(any()))
-            .willReturn(user);
+            .willReturn(loginUser);
         given(postService.readHomeFeed(any(HomeFeedRequest.class)))
             .willReturn(PostFactory.mockPostResponseDtos());
 
+        // when
         ResultActions perform = mockMvc.perform(get("/api/posts")
             .param("page", "0")
             .param("limit", "3")
-            .header(HttpHeaders.AUTHORIZATION, API_ACCESS_TOKEN))
+            .header(HttpHeaders.AUTHORIZATION, API_ACCESS_TOKEN));
+
+        // then
+        perform
             .andExpect(status().isOk());
 
         perform.andDo(document("post-homefeed-LoggedIn",
@@ -415,7 +409,8 @@ class PostControllerTest {
                 fieldWithPath("[].updatedAt").type(STRING).description("마지막 글 수정 시간"),
                 fieldWithPath("[].comments").type(ARRAY).description("댓글 목록"),
                 fieldWithPath("[].comments[].id").type(NUMBER).description("댓글 아이디"),
-                fieldWithPath("[].comments[].profileImageUrl").type(STRING).description("댓글 작성자 프로필 사진"),
+                fieldWithPath("[].comments[].profileImageUrl").type(STRING)
+                    .description("댓글 작성자 프로필 사진"),
                 fieldWithPath("[].comments[].authorName").type(STRING).description("댓글 작성자 이름"),
                 fieldWithPath("[].comments[].content").type(STRING).description("댓글 내용"),
                 fieldWithPath("[].comments[].isLiked").type(BOOLEAN).description("댓글 좋아요 여부"),
@@ -423,5 +418,13 @@ class PostControllerTest {
             )
             )
         );
+    }
+
+    private static class PickGit {
+
+        public static final String GITHUB_REPO_URL = "githubRepoUrl";
+        public static final String CONTENT = "content";
+        public static final String TAGS = "tags";
+        public static final String IMAGES = "images";
     }
 }
