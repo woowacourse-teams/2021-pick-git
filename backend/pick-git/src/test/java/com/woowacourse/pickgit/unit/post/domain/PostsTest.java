@@ -3,6 +3,7 @@ package com.woowacourse.pickgit.unit.post.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.woowacourse.pickgit.common.factory.PostBuilder;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.Posts;
 import java.util.List;
@@ -15,9 +16,9 @@ class PostsTest {
     @Test
     void getCounts_getCountsOfPosts_returnCountsOfPosts() {
         Posts posts = new Posts(List.of(
-            new Post(null, null, null, null),
-            new Post(null, null, null, null),
-            new Post(null, null, null, null)
+            new PostBuilder().build(),
+            new PostBuilder().build(),
+            new PostBuilder().build()
         ));
 
         assertThat(posts.getCounts()).isEqualTo(3);

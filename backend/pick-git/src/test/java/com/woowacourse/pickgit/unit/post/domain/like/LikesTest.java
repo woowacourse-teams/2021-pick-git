@@ -3,6 +3,7 @@ package com.woowacourse.pickgit.unit.post.domain.like;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.woowacourse.pickgit.common.factory.PostBuilder;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.like.Like;
@@ -21,7 +22,7 @@ class LikesTest {
 
     @BeforeEach
     void setUp() {
-        Post post = new Post(1L, null, null, null, null, null, null, null);
+        Post post = new PostBuilder().id(1L).build();
 
         User testUser1 = UserFactory.user("testUser1");
         User testUser2 = UserFactory.user("testUser2");

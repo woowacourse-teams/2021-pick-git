@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.unit.post.domain.like;
 
+import com.woowacourse.pickgit.common.factory.PostBuilder;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.like.Like;
@@ -18,7 +19,7 @@ class LikeTest {
         //given
         final String userName = "testUser1";
 
-        Post post = new Post(1L, null, null, null, null, null, null, null);
+        Post post = new PostBuilder().id(1L).build();
         User user = UserFactory.user("testUser1");
         Like like = new Like(post, user);
 

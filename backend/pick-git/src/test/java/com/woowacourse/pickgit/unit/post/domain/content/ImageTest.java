@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.unit.post.domain.content;
 
+import com.woowacourse.pickgit.common.factory.PostBuilder;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.content.Image;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +16,7 @@ class ImageTest {
     @Test
     void toPost() throws NoSuchFieldException, IllegalAccessException {
         //given
-        Post post = new Post(1L, null, null, null, null, null, null, null);
+        Post post = new PostBuilder().id(1L).build();
         Image testImageUrl = new Image("testImageUrl");
 
         //when

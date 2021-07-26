@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.unit.post.domain.content;
 
+import com.woowacourse.pickgit.common.factory.PostBuilder;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.content.Image;
 import com.woowacourse.pickgit.post.domain.content.Images;
@@ -50,7 +51,7 @@ class ImagesTest {
     @Test
     void setMapping() throws NoSuchFieldException, IllegalAccessException {
         //when
-        Post post = new Post(1L, null, null, null, null, null, null, null);
+        Post post = new PostBuilder().id(1L).build();
         images.setMapping(post);
 
         List<Post> actual = getMappedPostsOf(images);
