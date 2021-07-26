@@ -20,7 +20,9 @@ public class IgnoreAuthenticationInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
+    public boolean preHandle(
+        HttpServletRequest request,
+        HttpServletResponse response,
         Object handler) throws Exception {
         if (isPreflightRequest(request)) {
             return true;

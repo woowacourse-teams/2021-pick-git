@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.unit.authentication.presentation.interceptor;
+package com.woowacourse.pickgit.integration.authentication;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -9,13 +9,13 @@ import static org.mockito.Mockito.verify;
 
 import com.woowacourse.pickgit.authentication.application.JwtTokenProvider;
 import com.woowacourse.pickgit.authentication.application.OAuthService;
-import com.woowacourse.pickgit.authentication.infrastructure.AuthorizationExtractor;
 import com.woowacourse.pickgit.authentication.infrastructure.JwtTokenProviderImpl;
 import com.woowacourse.pickgit.authentication.presentation.interceptor.IgnoreAuthenticationInterceptor;
 import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import java.util.Collections;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,7 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpMethod;
 
 @ExtendWith(MockitoExtension.class)
-class IgnoreAuthenticationInterceptorTest {
+class IgnoreAuthenticationInterceptorIntegrationTest {
 
     private JwtTokenProvider jwtTokenProvider;
 
@@ -53,7 +53,7 @@ class IgnoreAuthenticationInterceptorTest {
 
         // mock
         given(request.getMethod()).willReturn(HttpMethod.GET.toString());
-        given(request.getHeaders(AuthorizationExtractor.AUTHORIZATION))
+        given(request.getHeaders(HttpHeaders.AUTHORIZATION))
             .willReturn(Collections.enumeration(List.of(validToken)));
 
         // when, then
@@ -61,12 +61,12 @@ class IgnoreAuthenticationInterceptorTest {
         verify(request, times(2)).setAttribute(anyString(), anyString());
     }
 
-    @DisplayName("토큰이 아예 없으면 true를 반환한다. (GuestUser)")
+    @DisplayName("토큰이 아예 없으면 true를 반환한다. - GuestUser인 경우")
     @Test
     void preHandle_WithOutToken_ReturnTrue() throws Exception {
         // mock
         given(request.getMethod()).willReturn(HttpMethod.GET.toString());
-        given(request.getHeaders(AuthorizationExtractor.AUTHORIZATION))
+        given(request.getHeaders(HttpHeaders.AUTHORIZATION))
             .willReturn(Collections.emptyEnumeration());
 
         // when, then
@@ -81,7 +81,7 @@ class IgnoreAuthenticationInterceptorTest {
 
         // mock
         given(request.getMethod()).willReturn(HttpMethod.GET.toString());
-        given(request.getHeaders(AuthorizationExtractor.AUTHORIZATION))
+        given(request.getHeaders(HttpHeaders.AUTHORIZATION))
             .willReturn(Collections.enumeration(List.of(invalidToken)));
 
         // when, then
