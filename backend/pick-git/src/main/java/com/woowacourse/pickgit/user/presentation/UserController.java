@@ -53,7 +53,7 @@ public class UserController {
         UserProfileResponseDto userProfileResponseDto) {
         return UserProfileResponse.builder()
             .name(userProfileResponseDto.getName())
-            .image(userProfileResponseDto.getImage())
+            .imageUrl(userProfileResponseDto.getImageUrl())
             .description(userProfileResponseDto.getDescription())
             .followerCount(userProfileResponseDto.getFollowerCount())
             .followingCount(userProfileResponseDto.getFollowingCount())

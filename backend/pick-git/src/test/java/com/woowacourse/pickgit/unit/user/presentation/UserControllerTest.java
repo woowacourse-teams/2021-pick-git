@@ -97,7 +97,7 @@ class UserControllerTest {
             ),
             responseFields(
                 fieldWithPath("name").type(STRING).description("사용자 이름"),
-                fieldWithPath("image").type(STRING).description("프로필 이미지 url"),
+                fieldWithPath("imageUrl").type(STRING).description("프로필 이미지 url"),
                 fieldWithPath("description").type(STRING).description("한줄 소개"),
                 fieldWithPath("followerCount").type(NUMBER).description("팔로워 수"),
                 fieldWithPath("followingCount").type(NUMBER).description("팔로잉 수"),
@@ -187,7 +187,7 @@ class UserControllerTest {
             ),
             responseFields(
                 fieldWithPath("name").type(STRING).description("사용자 이름"),
-                fieldWithPath("image").type(STRING).description("프로필 이미지 url"),
+                fieldWithPath("imageUrl").type(STRING).description("프로필 이미지 url"),
                 fieldWithPath("description").type(STRING).description("한줄 소개"),
                 fieldWithPath("followerCount").type(NUMBER).description("팔로워 수"),
                 fieldWithPath("followingCount").type(NUMBER).description("팔로잉 수"),
@@ -237,7 +237,7 @@ class UserControllerTest {
             ),
             responseFields(
                 fieldWithPath("name").type(STRING).description("사용자 이름"),
-                fieldWithPath("image").type(STRING).description("프로필 이미지 url"),
+                fieldWithPath("imageUrl").type(STRING).description("프로필 이미지 url"),
                 fieldWithPath("description").type(STRING).description("한줄 소개"),
                 fieldWithPath("followerCount").type(NUMBER).description("팔로워 수"),
                 fieldWithPath("followingCount").type(NUMBER).description("팔로잉 수"),

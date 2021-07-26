@@ -30,7 +30,7 @@ public class UserFactory {
     public static UserProfileResponseDto mockLoginUserProfileResponseDto() {
         return UserProfileResponseDto.builder()
             .name("testUser")
-            .image("http://img.com")
+            .imageUrl("http://img.com")
             .description("The Best")
             .followerCount(0)
             .followingCount(0)
@@ -47,7 +47,7 @@ public class UserFactory {
     public static UserProfileResponseDto mockLoginUserProfileIsFollowingResponseDto() {
         return UserProfileResponseDto.builder()
             .name("testUser2")
-            .image("http://img.com")
+            .imageUrl("http://img.com")
             .description("The Best")
             .followerCount(1)
             .followingCount(0)
@@ -64,7 +64,7 @@ public class UserFactory {
     public static UserProfileResponseDto mockLoginUserProfileIsNotFollowingResponseDto() {
         return UserProfileResponseDto.builder()
             .name("testUser2")
-            .image("http://img.com")
+            .imageUrl("http://img.com")
             .description("The Best")
             .followerCount(0)
             .followingCount(0)
@@ -81,7 +81,7 @@ public class UserFactory {
     public static UserProfileResponseDto mockGuestUserProfileResponseDto() {
         return UserProfileResponseDto.builder()
             .name("testUser")
-            .image("http://img.com")
+            .imageUrl("http://img.com")
             .description("The Best")
             .followerCount(0)
             .followingCount(0)

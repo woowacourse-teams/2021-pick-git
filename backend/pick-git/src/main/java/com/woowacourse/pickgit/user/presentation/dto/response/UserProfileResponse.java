@@ -6,7 +6,7 @@ import lombok.Builder;
 public class UserProfileResponse {
 
     private String name;
-    private String image;
+    private String imageUrl;
     private String description;
     private int followerCount;
     private int followingCount;
@@ -22,12 +22,12 @@ public class UserProfileResponse {
     }
 
     public UserProfileResponse(
-        String name, String image, String description,
+        String name, String imageUrl, String description,
         int followerCount, int followingCount, int postCount,
         String githubUrl, String company, String location, String website, String twitter,
         Boolean following) {
         this.name = name;
-        this.image = image;
+        this.imageUrl = imageUrl;
         this.description = description;
         this.followerCount = followerCount;
         this.followingCount = followingCount;
@@ -44,8 +44,8 @@ public class UserProfileResponse {
         return name;
     }
 
-    public String getImage() {
-        return image;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
     public String getDescription() {

@@ -27,7 +27,7 @@ public class UserService {
 
         return UserProfileResponseDto.builder()
             .name(user.getName())
-            .image(user.getImage())
+            .imageUrl(user.getImage())
             .description(user.getDescription())
             .followerCount(user.getFollowerCount())
             .followingCount(user.getFollowingCount())
@@ -48,7 +48,7 @@ public class UserService {
         if (user.isGuest()) {
             return UserProfileResponseDto.builder()
                 .name(target.getName())
-                .image(target.getImage())
+                .imageUrl(target.getImage())
                 .description(target.getDescription())
                 .followerCount(target.getFollowerCount())
                 .followingCount(target.getFollowingCount())
@@ -66,7 +66,7 @@ public class UserService {
 
         return UserProfileResponseDto.builder()
             .name(target.getName())
-            .image(target.getImage())
+            .imageUrl(target.getImage())
             .description(target.getDescription())
             .followerCount(target.getFollowerCount())
             .followingCount(target.getFollowingCount())
