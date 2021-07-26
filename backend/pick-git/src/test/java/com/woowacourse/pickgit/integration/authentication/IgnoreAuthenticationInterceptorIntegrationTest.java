@@ -15,6 +15,7 @@ import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import java.util.Collections;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,7 +53,7 @@ class IgnoreAuthenticationInterceptorIntegrationTest {
 
         // mock
         given(request.getMethod()).willReturn(HttpMethod.GET.toString());
-        given(request.getHeaders("Authorization"))
+        given(request.getHeaders(HttpHeaders.AUTHORIZATION))
             .willReturn(Collections.enumeration(List.of(validToken)));
 
         // when, then
@@ -65,7 +66,7 @@ class IgnoreAuthenticationInterceptorIntegrationTest {
     void preHandle_WithOutToken_ReturnTrue() throws Exception {
         // mock
         given(request.getMethod()).willReturn(HttpMethod.GET.toString());
-        given(request.getHeaders("Authorization"))
+        given(request.getHeaders(HttpHeaders.AUTHORIZATION))
             .willReturn(Collections.emptyEnumeration());
 
         // when, then
@@ -80,7 +81,7 @@ class IgnoreAuthenticationInterceptorIntegrationTest {
 
         // mock
         given(request.getMethod()).willReturn(HttpMethod.GET.toString());
-        given(request.getHeaders("Authorization"))
+        given(request.getHeaders(HttpHeaders.AUTHORIZATION))
             .willReturn(Collections.enumeration(List.of(invalidToken)));
 
         // when, then

@@ -15,6 +15,7 @@ import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import java.util.Collections;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -70,7 +71,7 @@ class AuthenticationInterceptorIntegrationTest {
         // mock, when
         given(httpServletRequest.getMethod())
             .willReturn(HttpMethod.OPTIONS.toString());
-        given(httpServletRequest.getHeaders("Authorization"))
+        given(httpServletRequest.getHeaders(HttpHeaders.AUTHORIZATION))
             .willReturn(Collections.enumeration(
                 List.of(validToken)));
 
@@ -88,7 +89,7 @@ class AuthenticationInterceptorIntegrationTest {
         // mock
         given(httpServletRequest.getMethod())
             .willReturn(HttpMethod.OPTIONS.toString());
-        given(httpServletRequest.getHeaders("Authorization"))
+        given(httpServletRequest.getHeaders(HttpHeaders.AUTHORIZATION))
             .willReturn(Collections.enumeration(
                 List.of(bearerToken)));
 
@@ -108,7 +109,7 @@ class AuthenticationInterceptorIntegrationTest {
         // mock
         given(httpServletRequest.getMethod())
             .willReturn(HttpMethod.GET.toString());
-        given(httpServletRequest.getHeaders("Authorization"))
+        given(httpServletRequest.getHeaders(HttpHeaders.AUTHORIZATION))
             .willReturn(Collections.enumeration(
                 List.of(bearerToken)));
 
