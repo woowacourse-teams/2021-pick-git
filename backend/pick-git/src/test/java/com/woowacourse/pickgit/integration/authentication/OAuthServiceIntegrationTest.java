@@ -8,60 +8,73 @@ import com.woowacourse.pickgit.authentication.application.JwtTokenProvider;
 import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
 import com.woowacourse.pickgit.authentication.application.dto.TokenDto;
+import com.woowacourse.pickgit.authentication.dao.CollectionOAuthAccessTokenDao;
 import com.woowacourse.pickgit.authentication.dao.OAuthAccessTokenDao;
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
+import com.woowacourse.pickgit.authentication.infrastructure.JwtTokenProviderImpl;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
 @Import(InfrastructureTestConfiguration.class)
-@DisplayName("OAuthService 통합 테스트 (UserRepository 사용)")
-@SpringBootTest(webEnvironment = WebEnvironment.NONE)
+@DataJpaTest
 @ActiveProfiles("test")
-@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 class OAuthServiceIntegrationTest {
 
-    @MockBean
+    private static final String SECRET_KEY = "secret-key";
+    private static final Long EXPIRATION_TIME_IN_MILLISECONDS = 3600000L;
+
+    @Mock
     private OAuthClient oAuthClient;
-
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
-
-    @Autowired
-    private OAuthAccessTokenDao oAuthAccessTokenDao;
 
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
+    private OAuthAccessTokenDao oAuthAccessTokenDao;
+
     private OAuthService oAuthService;
+
+    @BeforeEach
+    void setUp() {
+        this.jwtTokenProvider =  new JwtTokenProviderImpl(SECRET_KEY, EXPIRATION_TIME_IN_MILLISECONDS);;
+        this.oAuthAccessTokenDao = new CollectionOAuthAccessTokenDao();
+        this.oAuthService = new OAuthService(oAuthClient, jwtTokenProvider, oAuthAccessTokenDao, userRepository);
+    }
 
     @DisplayName("Github 로그인 URL을 반환한다.")
     @Test
     void getGithubAuthorizationUrl_Anonymous_ReturnGithubAuthorizationUrl() {
         // mock
-        given(oAuthClient.getLoginUrl()).willReturn("https://github.com/login/oauth/authorize?");
+        given(oAuthClient.getLoginUrl())
+            .willReturn("https://github.com/login/oauth/authorize?");
 
         // when
-        String githubAuthorizationUrl = oAuthService.getGithubAuthorizationUrl();
+        String githubAuthorizationUrl =
+            oAuthService.getGithubAuthorizationUrl();
 
         // then
-        assertThat(githubAuthorizationUrl).startsWith("https://github.com/login/oauth/authorize?");
+        assertThat(githubAuthorizationUrl)
+            .startsWith("https://github.com/login/oauth/authorize?");
     }
 
     @DisplayName("회원가입(첫 로그인)시 Github Profile을 가져와서 DB에 insert한다.")
@@ -77,7 +90,8 @@ class OAuthServiceIntegrationTest {
             .build();
 
         // mock
-        given(oAuthClient.getAccessToken(code)).willReturn(oauthAccessToken);
+        given(oAuthClient.getAccessToken(code))
+            .willReturn(oauthAccessToken);
         given(oAuthClient.getGithubProfile(oauthAccessToken))
             .willReturn(oAuthProfileResponse);
 

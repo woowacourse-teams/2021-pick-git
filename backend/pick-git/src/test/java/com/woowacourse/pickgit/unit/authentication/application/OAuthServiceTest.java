@@ -28,9 +28,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 
-@DisplayName("OAuthService Mock 단위 테스트")
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
 class OAuthServiceTest {
@@ -211,7 +211,10 @@ class OAuthServiceTest {
 
         // then
         assertThatThrownBy(() -> oAuthService.findRequestUserByToken(notSavedToken))
-            .isInstanceOf(InvalidTokenException.class);
+            .isInstanceOf(InvalidTokenException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "A0001")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)
+            .hasMessage("토큰 인증 에러");
     }
 
     @DisplayName("빈 JWT 토큰이면 GuestUser를 반환한다.")

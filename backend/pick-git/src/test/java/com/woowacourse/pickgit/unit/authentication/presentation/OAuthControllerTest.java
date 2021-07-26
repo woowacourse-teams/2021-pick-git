@@ -28,7 +28,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 @AutoConfigureRestDocs
-@ExtendWith(SpringExtension.class)
 @WebMvcTest(OAuthController.class)
 @ActiveProfiles("test")
 class OAuthControllerTest {

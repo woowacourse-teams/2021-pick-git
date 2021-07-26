@@ -9,7 +9,6 @@ import static org.mockito.Mockito.verify;
 
 import com.woowacourse.pickgit.authentication.application.JwtTokenProvider;
 import com.woowacourse.pickgit.authentication.application.OAuthService;
-import com.woowacourse.pickgit.authentication.infrastructure.AuthorizationExtractor;
 import com.woowacourse.pickgit.authentication.infrastructure.JwtTokenProviderImpl;
 import com.woowacourse.pickgit.authentication.presentation.interceptor.IgnoreAuthenticationInterceptor;
 import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
@@ -53,7 +52,7 @@ class IgnoreAuthenticationInterceptorIntegrationTest {
 
         // mock
         given(request.getMethod()).willReturn(HttpMethod.GET.toString());
-        given(request.getHeaders(AuthorizationExtractor.AUTHORIZATION))
+        given(request.getHeaders("Authorization"))
             .willReturn(Collections.enumeration(List.of(validToken)));
 
         // when, then
@@ -66,7 +65,7 @@ class IgnoreAuthenticationInterceptorIntegrationTest {
     void preHandle_WithOutToken_ReturnTrue() throws Exception {
         // mock
         given(request.getMethod()).willReturn(HttpMethod.GET.toString());
-        given(request.getHeaders(AuthorizationExtractor.AUTHORIZATION))
+        given(request.getHeaders("Authorization"))
             .willReturn(Collections.emptyEnumeration());
 
         // when, then
@@ -81,7 +80,7 @@ class IgnoreAuthenticationInterceptorIntegrationTest {
 
         // mock
         given(request.getMethod()).willReturn(HttpMethod.GET.toString());
-        given(request.getHeaders(AuthorizationExtractor.AUTHORIZATION))
+        given(request.getHeaders("Authorization"))
             .willReturn(Collections.enumeration(List.of(invalidToken)));
 
         // when, then

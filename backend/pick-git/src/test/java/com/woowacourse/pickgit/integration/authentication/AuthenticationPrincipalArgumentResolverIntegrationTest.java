@@ -39,11 +39,14 @@ class AuthenticationPrincipalArgumentResolverIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        jwtTokenProvider = new JwtTokenProviderImpl("pick-git", 3600000);
-        oAuthAccessTokenDao = new CollectionOAuthAccessTokenDao();
-        oAuthService = new OAuthService(null, jwtTokenProvider, oAuthAccessTokenDao, null);
-        authenticationPrincipalArgumentResolver = new AuthenticationPrincipalArgumentResolver(
-            oAuthService);
+        jwtTokenProvider =
+            new JwtTokenProviderImpl("pick-git", 3600000);
+        oAuthAccessTokenDao =
+            new CollectionOAuthAccessTokenDao();
+        oAuthService =
+            new OAuthService(null, jwtTokenProvider, oAuthAccessTokenDao, null);
+        authenticationPrincipalArgumentResolver =
+            new AuthenticationPrincipalArgumentResolver(oAuthService);
     }
 
     @DisplayName("유효한 토큰이면 LoginUser를 반환한다.")

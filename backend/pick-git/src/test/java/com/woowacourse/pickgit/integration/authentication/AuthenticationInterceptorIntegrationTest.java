@@ -9,7 +9,6 @@ import static org.mockito.Mockito.verify;
 
 import com.woowacourse.pickgit.authentication.application.JwtTokenProvider;
 import com.woowacourse.pickgit.authentication.application.OAuthService;
-import com.woowacourse.pickgit.authentication.infrastructure.AuthorizationExtractor;
 import com.woowacourse.pickgit.authentication.infrastructure.JwtTokenProviderImpl;
 import com.woowacourse.pickgit.authentication.presentation.interceptor.AuthenticationInterceptor;
 import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
@@ -53,8 +52,10 @@ class AuthenticationInterceptorIntegrationTest {
             .willReturn(HttpMethod.OPTIONS.toString());
         given(httpServletRequest.getHeader("Access-Control-Request-Headers"))
             .willReturn("X-PINGOTHER, Content-Type");
-        given(httpServletRequest.getHeader("Access-Control-Request-Method")).willReturn("POST");
-        given(httpServletRequest.getHeader("Origin")).willReturn("http://pick-git.example");
+        given(httpServletRequest.getHeader("Access-Control-Request-Method"))
+            .willReturn("POST");
+        given(httpServletRequest.getHeader("Origin"))
+            .willReturn("http://pick-git.example");
 
         // then
         assertThat(authenticationInterceptor.preHandle(httpServletRequest, null, null)).isTrue();
@@ -67,8 +68,9 @@ class AuthenticationInterceptorIntegrationTest {
         String validToken = "Bearer " + jwtTokenProvider.createToken("pick-git");
 
         // mock, when
-        given(httpServletRequest.getMethod()).willReturn(HttpMethod.OPTIONS.toString());
-        given(httpServletRequest.getHeaders(AuthorizationExtractor.AUTHORIZATION))
+        given(httpServletRequest.getMethod())
+            .willReturn(HttpMethod.OPTIONS.toString());
+        given(httpServletRequest.getHeaders("Authorization"))
             .willReturn(Collections.enumeration(
                 List.of(validToken)));
 
@@ -84,8 +86,9 @@ class AuthenticationInterceptorIntegrationTest {
         String bearerToken = "Bearer " + "invalid token";
 
         // mock
-        given(httpServletRequest.getMethod()).willReturn(HttpMethod.OPTIONS.toString());
-        given(httpServletRequest.getHeaders(AuthorizationExtractor.AUTHORIZATION))
+        given(httpServletRequest.getMethod())
+            .willReturn(HttpMethod.OPTIONS.toString());
+        given(httpServletRequest.getHeaders("Authorization"))
             .willReturn(Collections.enumeration(
                 List.of(bearerToken)));
 
@@ -103,8 +106,9 @@ class AuthenticationInterceptorIntegrationTest {
         String bearerToken = "Bearer " + jwtTokenProvider.createToken("pick-git");
 
         // mock
-        given(httpServletRequest.getMethod()).willReturn(HttpMethod.GET.toString());
-        given(httpServletRequest.getHeaders(AuthorizationExtractor.AUTHORIZATION))
+        given(httpServletRequest.getMethod())
+            .willReturn(HttpMethod.GET.toString());
+        given(httpServletRequest.getHeaders("Authorization"))
             .willReturn(Collections.enumeration(
                 List.of(bearerToken)));
 
