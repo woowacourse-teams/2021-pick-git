@@ -8,6 +8,7 @@ export const Z_INDEX = {
   HIGH: 900,
   MIDDLE: 600,
   LOW: 300,
+  LOWER: 200,
   ROOT: 0,
   UNDER_ROOT: -1,
 };

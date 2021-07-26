@@ -3,16 +3,15 @@ import { ThemeContext } from "styled-components";
 
 import { GoBackIcon, GoForwardIcon } from "../../../assets/icons/index";
 import useThrottle from "../../../services/hooks/@common/useThrottle";
-import { Container, ImageList, ImageListSlider, SlideButton } from "./ImageSlider.style";
+import { Container, ImageList, ImageListSlider, Indicator, SlideButton } from "./ImageSlider.style";
 
 export interface Props extends React.CSSProperties {
   imageUrls: string[];
-  slideButtonKind: "in-box" | "stick-out";
 }
 
 const SLIDE_THROTTLE_DELAY = 800;
 
-const ImageSlider = ({ imageUrls, slideButtonKind, width }: Props) => {
+const ImageSlider = ({ imageUrls, width }: Props) => {
   const [imageIndex, setImageIndex] = useState(0);
   const [isFirstImage, setIsFirstImage] = useState(true);
   const [isLastImage, setIsLastImage] = useState(false);
@@ -72,6 +71,11 @@ const ImageSlider = ({ imageUrls, slideButtonKind, width }: Props) => {
         <SlideButton type="button" onClick={onForwardButtonClick} direction="right">
           <GoForwardIcon color={theme.color.white} />
         </SlideButton>
+      )}
+      {imageCount.current > 1 && (
+        <Indicator>
+          {imageIndex + 1} / {imageCount.current}
+        </Indicator>
       )}
     </Container>
   );
