@@ -199,6 +199,7 @@ class PostControllerTest {
         String requestBody = objectMapper.writeValueAsString(new ContentRequest("test comment"));
         CommentResponse commentResponse = CommentResponse.builder()
             .id(1L)
+            .profileImageUrl("kevin profile image url")
             .authorName("kevin")
             .content("test comment")
             .isLiked(false)
@@ -238,6 +239,7 @@ class PostControllerTest {
             ),
             responseFields(
                 fieldWithPath("id").type(NUMBER).description("댓글 id"),
+                fieldWithPath("profileImageUrl").type(STRING).description("댓글 작성자 프로필 사진"),
                 fieldWithPath("authorName").type(STRING).description("작성자 이름"),
                 fieldWithPath("content").type(STRING).description("댓글 내용"),
                 fieldWithPath("isLiked").type(BOOLEAN).description("좋아요 여부")
@@ -366,6 +368,7 @@ class PostControllerTest {
                 fieldWithPath("[].updatedAt").type(STRING).description("마지막 글 수정 시간"),
                 fieldWithPath("[].comments").type(ARRAY).description("댓글 목록"),
                 fieldWithPath("[].comments[].id").type(NUMBER).description("댓글 아이디"),
+                fieldWithPath("[].comments[].profileImageUrl").type(STRING).description("댓글 작성자 프로필 사진"),
                 fieldWithPath("[].comments[].authorName").type(STRING).description("댓글 작성자 이름"),
                 fieldWithPath("[].comments[].content").type(STRING).description("댓글 내용"),
                 fieldWithPath("[].comments[].isLiked").type(BOOLEAN).description("댓글 좋아요 여부"),
@@ -412,6 +415,7 @@ class PostControllerTest {
                 fieldWithPath("[].updatedAt").type(STRING).description("마지막 글 수정 시간"),
                 fieldWithPath("[].comments").type(ARRAY).description("댓글 목록"),
                 fieldWithPath("[].comments[].id").type(NUMBER).description("댓글 아이디"),
+                fieldWithPath("[].comments[].profileImageUrl").type(STRING).description("댓글 작성자 프로필 사진"),
                 fieldWithPath("[].comments[].authorName").type(STRING).description("댓글 작성자 이름"),
                 fieldWithPath("[].comments[].content").type(STRING).description("댓글 내용"),
                 fieldWithPath("[].comments[].isLiked").type(BOOLEAN).description("댓글 좋아요 여부"),

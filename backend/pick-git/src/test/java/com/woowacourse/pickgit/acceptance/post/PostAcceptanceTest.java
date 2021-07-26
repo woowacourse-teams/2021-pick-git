@@ -98,7 +98,7 @@ class PostAcceptanceTest {
             .auth().oauth2(token)
             .when()
             .get("/api/posts?page=0&limit=3")
-            .then()
+            .then().log().all()
             .statusCode(HttpStatus.OK.value())
             .extract()
             .as(new TypeRef<List<PostResponseDto>>() {
@@ -119,7 +119,7 @@ class PostAcceptanceTest {
         List<PostResponseDto> response = given().log().all()
             .when()
             .get("/api/posts?page=0&limit=3")
-            .then()
+            .then().log().all()
             .statusCode(HttpStatus.OK.value())
             .extract()
             .as(new TypeRef<List<PostResponseDto>>() {
@@ -141,7 +141,7 @@ class PostAcceptanceTest {
             .auth().oauth2(token)
             .when()
             .get("/api/posts/me?page=0&limit=3")
-            .then()
+            .then().log().all()
             .statusCode(HttpStatus.OK.value())
             .extract()
             .as(new TypeRef<List<PostResponseDto>>() {
@@ -182,7 +182,7 @@ class PostAcceptanceTest {
             .auth().oauth2(loginUserToken)
             .when()
             .get("/api/posts/" + ANOTHER_USERNAME + "?page=0&limit=3")
-            .then()
+            .then().log().all()
             .statusCode(HttpStatus.OK.value())
             .extract()
             .as(new TypeRef<List<PostResponseDto>>() {
@@ -203,7 +203,7 @@ class PostAcceptanceTest {
         List<PostResponseDto> response = given().log().all()
             .when()
             .get("/api/posts/" + ANOTHER_USERNAME + "?page=0&limit=3")
-            .then()
+            .then().log().all()
             .statusCode(HttpStatus.OK.value())
             .extract()
             .as(new TypeRef<List<PostResponseDto>>() {

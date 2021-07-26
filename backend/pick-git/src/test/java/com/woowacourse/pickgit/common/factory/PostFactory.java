@@ -122,6 +122,7 @@ public class PostFactory {
     public static List<PostResponseDto> mockPostResponseDtos() {
         CommentResponse commentFixture1 = CommentResponse.builder()
             .id(1L)
+            .profileImageUrl("commentAuthorProfileImageUrl")
             .authorName("commentAuthorName1")
             .content("commentContent1")
             .isLiked(false)
@@ -129,6 +130,7 @@ public class PostFactory {
 
         CommentResponse commentFixture2 = CommentResponse.builder()
             .id(2L)
+            .profileImageUrl("commentAuthorProfileImageUrl")
             .authorName("commentAuthorName2")
             .content("commentContent2")
             .isLiked(false)
