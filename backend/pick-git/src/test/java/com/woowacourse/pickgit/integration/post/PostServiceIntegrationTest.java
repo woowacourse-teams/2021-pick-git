@@ -13,6 +13,8 @@ import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.post.CommentFormatException;
+import com.woowacourse.pickgit.exception.post.PostNotFoundException;
+import com.woowacourse.pickgit.exception.user.UserNotFoundException;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
@@ -36,7 +38,12 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Import;
@@ -105,34 +112,85 @@ class PostServiceIntegrationTest {
         postRepository.save(post);
     }
 
-    @DisplayName("게시물에 댓글을 정상 등록한다.")
+    @DisplayName("Post에 Comment를 정상 등록한다.")
     @Test
     void addComment_ValidContent_Success() {
+        // given
         post = new Post(null, null, null, null, null, new Comments(), new ArrayList<>(), null);
-        postRepository.save(post);
+        Post savedPost = postRepository.save(post);
 
-        CommentRequest commentRequest =
-            new CommentRequest("kevin", "test comment", post.getId());
-
+        // when
+        CommentRequest commentRequest = CommentRequest.builder()
+            .userName("kevin")
+            .content("test comment")
+            .postId(savedPost.getId())
+            .build();
         CommentResponse commentResponseDto = postService.addComment(commentRequest);
 
+        // then
         assertThat(commentResponseDto.getAuthorName()).isEqualTo("kevin");
         assertThat(commentResponseDto.getContent()).isEqualTo("test comment");
     }
 
-    @DisplayName("게시물에 빈 댓글은 등록할 수 없다.")
-    @Test
-    void addComment_InvalidContent_ExceptionThrown() {
+    @DisplayName("Post에 빈 Comment은 등록할 수 없다.")
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {" ", "  "})
+    void addComment_InvalidContent_ExceptionThrown(String content) {
+        // given
         post = new Post(null, null, null, null, null, new Comments(), new ArrayList<>(), null);
-        postRepository.save(post);
+        Post savedPost = postRepository.save(post);
 
-        CommentRequest commentRequest =
-            new CommentRequest("kevin", "", post.getId());
+        // when
+        CommentRequest commentRequest = CommentRequest.builder()
+            .userName("kevin")
+            .content(content)
+            .postId(savedPost.getId())
+            .build();
 
+        // then
         assertThatCode(() -> postService.addComment(commentRequest))
             .isInstanceOf(CommentFormatException.class)
             .extracting("errorCode")
             .isEqualTo("F0002");
+    }
+
+    @DisplayName("존재하지 않는 Post에 Comment를 등록할 수 없다.")
+    @Test
+    void addComment_PostNotFound_ExceptionThrown() {
+        // when
+        CommentRequest commentRequest = CommentRequest.builder()
+            .userName("kevin")
+            .content(content)
+            .postId(-1L)
+            .build();
+
+        // then
+        assertThatCode(() -> postService.addComment(commentRequest))
+            .isInstanceOf(PostNotFoundException.class)
+            .extracting("errorCode")
+            .isEqualTo("P0002");
+    }
+
+    @DisplayName("존재하지 않는 User는 Comment를 등록할 수 없다.")
+    @Test
+    void addComment_UserNotFound_ExceptionThrown() {
+        // given
+        post = new Post(null, null, null, null, null, new Comments(), new ArrayList<>(), null);
+        Post savedPost = postRepository.save(post);
+
+        // when
+        CommentRequest commentRequest = CommentRequest.builder()
+            .userName("anonymous")
+            .content(content)
+            .postId(savedPost.getId())
+            .build();
+
+        // then
+        assertThatCode(() -> postService.addComment(commentRequest))
+            .isInstanceOf(UserNotFoundException.class)
+            .extracting("errorCode")
+            .isEqualTo("U0001");
     }
 
     @DisplayName("사용자는 게시물을 등록할 수 있다.")

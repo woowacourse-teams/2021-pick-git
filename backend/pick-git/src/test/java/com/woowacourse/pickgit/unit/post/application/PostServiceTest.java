@@ -11,6 +11,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.woowacourse.pickgit.common.factory.FileFactory;
+import com.woowacourse.pickgit.exception.post.PostNotFoundException;
+import com.woowacourse.pickgit.exception.user.UserNotFoundException;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
@@ -42,6 +44,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -177,43 +182,104 @@ class PostServiceTest {
         );
     }
 
-    @DisplayName("게시물에 댓글을 정상 등록한다.")
+    @DisplayName("Post에 Comment을 정상 등록한다.")
     @Test
     void addComment_ValidContent_Success() {
+        // mock
         given(postRepository.findById(1L))
             .willReturn(Optional.of(post2));
         given(userRepository.findByBasicProfile_Name("kevin"))
             .willReturn(Optional.of(user2));
-        Mockito.doNothing().when(entityManager).flush();
 
-        CommentRequest commentRequest =
-            new CommentRequest("kevin", "test comment", 1L);
+        // given
+        CommentRequest commentRequest = CommentRequest.builder()
+            .userName("kevin")
+            .content("test comment")
+            .postId(1L)
+            .build();
 
+        // when
         CommentResponse commentResponseDto = postService.addComment(commentRequest);
 
+        // then
         assertThat(commentResponseDto.getAuthorName()).isEqualTo("kevin");
         assertThat(commentResponseDto.getContent()).isEqualTo("test comment");
         verify(postRepository, times(1)).findById(1L);
         verify(userRepository, times(1)).findByBasicProfile_Name("kevin");
     }
 
-    @DisplayName("게시물에 빈 댓글을 등록할 수 없다.")
-    @Test
-    void addComment_InvalidContent_ExceptionThrown() {
+    @DisplayName("Post에 빈 Comment을 등록할 수 없다.")
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {" ", "  "})
+    void addComment_InvalidContent_ExceptionThrown(String content) {
+        // mock
         given(postRepository.findById(1L))
             .willReturn(Optional.of(post));
-        given(userRepository.findByBasicProfile_Name("kevin"))
+        given(userRepository.findByBasicProfile_Name(USERNAME))
             .willReturn(Optional.of(user));
 
-        CommentRequest commentRequest =
-            new CommentRequest("kevin", "", 1L);
+        // given
+        CommentRequest commentRequest = CommentRequest.builder()
+            .userName(USERNAME)
+            .content(content)
+            .postId(1L)
+            .build();
 
+        // then
         assertThatCode(() -> postService.addComment(commentRequest))
             .isInstanceOf(CommentFormatException.class)
             .extracting("errorCode")
             .isEqualTo("F0002");
         verify(postRepository, times(1)).findById(1L);
-        verify(userRepository, times(1)).findByBasicProfile_Name("kevin");
+        verify(userRepository, times(1)).findByBasicProfile_Name(USERNAME);
+    }
+
+    @DisplayName("존재하지 않는 Post에 Comment을 등록할 수 없다.")
+    @Test
+    void addComment_PostNotFound_ExceptionThrown() {
+        // mock
+        given(postRepository.findById(1L))
+            .willReturn(Optional.empty());
+        given(userRepository.findByBasicProfile_Name(USERNAME))
+            .willReturn(Optional.of(user));
+
+        // given
+        CommentRequest commentRequest = CommentRequest.builder()
+            .userName(USERNAME)
+            .content("hi~")
+            .postId(1L)
+            .build();
+
+        // then
+        assertThatCode(() -> postService.addComment(commentRequest))
+            .isInstanceOf(PostNotFoundException.class)
+            .extracting("errorCode")
+            .isEqualTo("P0002");
+        verify(postRepository, times(1)).findById(1L);
+        verify(userRepository, times(1)).findByBasicProfile_Name(USERNAME);
+    }
+
+    @DisplayName("존재하지 않는 User는 Comment을 등록할 수 없다.")
+    @Test
+    void addComment_UserNotFound_ExceptionThrown() {
+        // mock
+        given(userRepository.findByBasicProfile_Name("binghe"))
+            .willReturn(Optional.empty());
+
+        // given
+        CommentRequest commentRequest = CommentRequest.builder()
+            .userName("binghe")
+            .content("hi~")
+            .postId(1L)
+            .build();
+
+        // then
+        assertThatCode(() -> postService.addComment(commentRequest))
+            .isInstanceOf(UserNotFoundException.class)
+            .extracting("errorCode")
+            .isEqualTo("U0001");
+        verify(userRepository, times(1)).findByBasicProfile_Name("binghe");
     }
 
     @DisplayName("사용자는 Repository 목록을 가져올 수 있다.")
