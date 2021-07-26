@@ -3,11 +3,19 @@ import axios, { AxiosError } from "axios";
 
 import { ErrorResponse, ProfileData } from "../../@types";
 import { QUERY } from "../../constants/queries";
-import { requestAddFollow, requestDeleteFollow, requestGetSelfProfile, requestGetUserProfile } from "../requests";
+import {
+  requestAddFollow,
+  requestDeleteFollow,
+  requestGetSelfProfile,
+  requestGetUserProfile,
+  requestSetProfile,
+} from "../requests";
 import UserContext from "../../contexts/UserContext";
 import { useContext } from "react";
 import { getAccessToken } from "../../storage/storage";
 import SnackBarContext from "../../contexts/SnackbarContext";
+import { SUCCESS_MESSAGE, UNKNOWN_ERROR_MESSAGE } from "../../constants/messages";
+import { handleHTTPError } from "../../utils/api";
 
 type ProfileQueryKey = readonly [
   typeof QUERY.GET_PROFILE,
@@ -16,6 +24,16 @@ type ProfileQueryKey = readonly [
     username: string | null;
   }
 ];
+
+interface SetProfileVariable {
+  image: File | null;
+  description: string | null;
+}
+
+interface SetProfileResponse {
+  imageUrl: string;
+  description: string;
+}
 
 export const useProfileQuery = (isMyProfile: boolean, username: string | null) => {
   const profileQueryFunction: QueryFunction<ProfileData> = async ({ queryKey }) => {
@@ -62,16 +80,18 @@ const useFollowMutation = (
 
     onError: (error) => {
       if (axios.isAxiosError(error)) {
-        const { status } = error.response ?? {};
+        const { status, data } = error.response ?? {};
 
-        if (status === 401) {
-          pushSnackbarMessage("로그인한 사용자만 이용할 수 있는 기능입니다.");
-          logout();
+        if (status) {
+          handleHTTPError(status, {
+            unauthorized: () => logout(),
+          });
         }
 
-        return;
+        pushSnackbarMessage(data.errorCode);
+      } else {
+        pushSnackbarMessage(UNKNOWN_ERROR_MESSAGE);
       }
-      pushSnackbarMessage("요청하신 작업을 수행할 수 없습니다.");
     },
   });
 };
@@ -80,3 +100,45 @@ export const useFollowingMutation = (username: string | undefined) => useFollowM
 
 export const useUnfollowingMutation = (username: string | undefined) =>
   useFollowMutation(username, requestDeleteFollow);
+
+export const useProfileMutation = (username: string | null) => {
+  const queryClient = useQueryClient();
+  const currentProfileQueryKey = [QUERY.GET_PROFILE, { isMyProfile: false, username }];
+  const currentProfileQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
+  const { logout } = useContext(UserContext);
+  const { pushSnackbarMessage } = useContext(SnackBarContext);
+
+  return useMutation<SetProfileResponse, AxiosError<ErrorResponse> | Error, SetProfileVariable>(
+    ({ image, description }) => requestSetProfile(image, description, getAccessToken()),
+    {
+      onSuccess: ({ imageUrl, description }) => {
+        if (!currentProfileQueryData) return;
+
+        queryClient.setQueryData<ProfileData>(currentProfileQueryKey, {
+          ...currentProfileQueryData,
+          imageUrl,
+          description,
+        });
+
+        pushSnackbarMessage(SUCCESS_MESSAGE.SET_PROFILE);
+      },
+      onError: (error) => {
+        if (axios.isAxiosError(error)) {
+          const { status, data } = error.response ?? {};
+
+          if (status) {
+            handleHTTPError(status, {
+              unauthorized: () => logout(),
+              notFound: () => pushSnackbarMessage("아직 준비되지 않은 서비스입니다."),
+              methodNotAllowed: () => pushSnackbarMessage("아직 준비되지 않은 서비스입니다."),
+            });
+          }
+
+          data?.errorCode && pushSnackbarMessage(data.errorCode);
+        } else {
+          pushSnackbarMessage(UNKNOWN_ERROR_MESSAGE);
+        }
+      },
+    }
+  );
+};

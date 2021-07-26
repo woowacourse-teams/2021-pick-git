@@ -1,26 +1,5 @@
-import styled, { css, keyframes } from "styled-components";
-
-const BottomToBottom = keyframes`
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(50%);
-  }
-  
-  25% {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-
-  75% {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-
-  to {
-    opacity: 0;
-    transform: translateX(-50%) translateY(50%);
-  }
-`;
+import styled, { css } from "styled-components";
+import { bottomToBottom } from "../../@styled/keyframes";
 
 export const Container = styled.div<{ snackbarDuration: number } & React.CSSProperties>`
   display: flex;
@@ -42,6 +21,6 @@ export const Container = styled.div<{ snackbarDuration: number } & React.CSSProp
   padding: 1rem 2rem;
 
   animation: ${({ animationDuration }) => css`
-    ${BottomToBottom} ${animationDuration} ease
+    ${bottomToBottom} ${animationDuration} ease
   `};
 `;

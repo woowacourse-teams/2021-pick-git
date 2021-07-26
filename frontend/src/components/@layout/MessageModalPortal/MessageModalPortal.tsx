@@ -1,6 +1,4 @@
-import BackDrop from "../../@shared/BackDrop/BackDrop";
 import { createPortal } from "react-dom";
-import Button from "../../@shared/Button/Button";
 import {
   ButtonsWrapper,
   ModalBody,
@@ -10,8 +8,7 @@ import {
   CancelButton,
   ConfirmButton,
 } from "./MessageModalPortal.styles";
-import { useContext } from "react";
-import { ThemeContext } from "styled-components";
+import BackDrop from "../../@styled/BackDrop";
 
 export interface Props {
   heading: string;
@@ -21,11 +18,9 @@ export interface Props {
 }
 
 export const MessageModal = ({ heading, onClose, onCancel, onConfirm }: Props) => {
-  const { color } = useContext(ThemeContext);
-
   return (
     <Container>
-      <BackDrop onBackDropClick={onClose} />
+      <BackDrop onMouseDown={onClose} />
       <ModalContent>
         <ModalBody>
           <Text>{heading}</Text>

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
 import { createContext, ReactNode, useEffect, useState } from "react";
 
 import SnackBar from "../components/@layout/Snackbar/Snackbar";

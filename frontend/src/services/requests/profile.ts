@@ -57,3 +57,30 @@ export const requestDeleteFollow = async (username: string | undefined, accessTo
 
   return response.data;
 };
+
+export const requestSetProfile = async (
+  profileImage: File | null,
+  description: string | null,
+  accessToken: string | null
+) => {
+  if (!accessToken) {
+    throw Error("no accessToken");
+  }
+
+  if (!profileImage && !description) {
+    throw Error("no data to set");
+  }
+
+  const formData = new FormData();
+
+  profileImage && formData.append("image", profileImage);
+  description && formData.append("description", description);
+
+  const response = await axios.put(API_URL.SELF_PROFILE, formData, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  return response.data;
+};

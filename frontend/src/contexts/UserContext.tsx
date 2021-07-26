@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
 import { createContext, useEffect, useState } from "react";
 import { requestGetSelfProfile } from "../services/requests";
 import { getAccessToken, getUsername, setAccessToken, setUsername } from "../storage/storage";
