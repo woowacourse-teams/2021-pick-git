@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { Z_INDEX } from "../../../constants/layout";
 import { fadeIn } from "../../@styled/keyframes";
 
 export const Container = styled.div`
@@ -9,12 +10,13 @@ export const Container = styled.div`
   top: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 100;
+  z-index: ${Z_INDEX.HIGHEST};
   animation: ${fadeIn} 0.5s forwards;
 `;
 
 export const ModalContent = styled.div`
   width: 90%;
+  max-width: 25rem;
   height: 30%;
   border-radius: 8px;
   box-shadow: 5px 5px 25px rgba(0, 0, 0, 0.2);
