@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Layout } from "../../constants/layout";
+import { Layout, Z_INDEX } from "../../constants/layout";
 
 export const Header = styled.header`
   position: fixed;
@@ -7,7 +7,7 @@ export const Header = styled.header`
   width: 100%;
   height: ${Layout.HEADER_HEIGHT};
   background-color: ${({ theme }) => theme.color.white};
-  z-index: 100;
+  z-index: ${Z_INDEX.ROOT};
 
   @media (min-width: 425px) {
     border-bottom: 1px solid ${({ theme }) => theme.color.borderColor};

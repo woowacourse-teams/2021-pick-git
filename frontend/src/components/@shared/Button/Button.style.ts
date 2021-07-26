@@ -14,20 +14,20 @@ const Button = styled.button<React.CSSProperties>`
   }
 `;
 
-const InlineButton = styled(Button)`
+const InlineButton = styled(Button)<React.CSSProperties>`
   display: inline-block;
-  padding: 0.4375rem 0.875rem;
+  padding: ${({ padding }) => `${padding ?? "0.4375rem 0.875rem"}`};
   font-size: 0.75rem;
 `;
 
 const BlockButton = styled(Button)`
   display: block;
   width: 100%;
-  padding: 0.5rem;
+  padding: ${({ padding }) => `${padding ?? "0.5rem"}`};
   font-size: 1rem;
 `;
 
-export const SquaredInlineButton = styled(InlineButton)`
+export const SquaredInlineButton = styled(InlineButton)<React.CSSProperties>`
   border-radius: 4px;
 `;
 

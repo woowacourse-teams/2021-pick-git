@@ -1,23 +1,5 @@
-import styled, { keyframes } from "styled-components";
-
-const bounceAnimation = keyframes`
-  0%, 80%, 100% {
-    transform: scale(0);
-  }
-  40% {
-    transform: scale(1);
-  }
-`;
-
-const spinAnimation = keyframes`
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-`;
+import styled from "styled-components";
+import { bounceAnimation, spinAnimation } from "../../@styled/keyframes";
 
 export const LoadingDots = styled.div<React.CSSProperties>``;
 

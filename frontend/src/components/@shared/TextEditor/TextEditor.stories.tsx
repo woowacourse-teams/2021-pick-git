@@ -55,3 +55,11 @@ Transparent.args = {
   placeholder: "내용을 입력해주세요",
   autoGrow: true,
 };
+
+export const WithIndicator = Template.bind({});
+WithIndicator.args = {
+  width: "100%",
+  height: "200px",
+  placeholder: "내용을 입력해주세요",
+  maxLength: 50,
+};

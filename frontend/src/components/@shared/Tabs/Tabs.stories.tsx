@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
 import { Story } from "@storybook/react";
 
 import Tabs, { Props } from "./Tabs";
