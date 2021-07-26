@@ -21,6 +21,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -65,7 +66,7 @@ class TagServiceIntegrationTest {
         TagsDto tagsDto = tagService.extractTags(extractionRequestDto);
 
         // then
-        assertThat(tagsDto.getTagNames()).containsAll(tags);
+        assertThat(tagsDto.getTagNames()).containsAll(Arrays.asList("javascript", "html", "css"));
     }
 
     @DisplayName("잘못된 경로로 태그 추출 요청시 예외가 발생한다.")
@@ -112,7 +113,7 @@ class TagServiceIntegrationTest {
     void findOrCreateTags_ValidTag_TransformationSuccess() {
         // given
         tagRepository.save(new Tag("tag3"));
-        List<String> tagNames = Arrays.asList("tag1", "tag2", "tag3");
+        List<String> tagNames = Arrays.asList("Tag1", "tag2", "tag3");
         TagsDto tagsDto = new TagsDto(tagNames);
 
         entityManager.flush();
@@ -125,12 +126,12 @@ class TagServiceIntegrationTest {
             .collect(Collectors.toList());
 
         // then
-        assertThat(tags).containsAll(tagNames);
+        assertThat(tags).containsAll(Arrays.asList("tag1", "tag2", "tag3"));
     }
 
     @DisplayName("잘못된 태그 이름을 태그로 변환 시도시 실패한다.")
     @ParameterizedTest
-    @ValueSource(strings = {"", " ", "#$%"})
+    @ValueSource(strings = {"", " "})
     void findOrCreateTags_InvalidTagName_ExceptionThrown(String tagName) {
         // given
         List<String> tagNames = Arrays.asList("tag1", "tag2", tagName);

@@ -71,7 +71,7 @@ class TagAcceptanceTest {
             .as(new TypeRef<List<String>>() {});
 
         // then
-        assertThat(response).containsExactly("JavaScript", "HTML", "CSS");
+        assertThat(response).containsExactly("javascript", "html", "css");
     }
 
     @DisplayName("유효하지 않은 레포지토리 태그 추출 요청시 500 예외 메시지가 반환된다.")

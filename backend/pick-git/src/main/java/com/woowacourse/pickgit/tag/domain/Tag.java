@@ -27,7 +27,7 @@ public class Tag {
         if (isNotValidTag(name)) {
             throw new TagFormatException();
         }
-        this.name = name;
+        this.name = name.toLowerCase();
     }
 
     private boolean isNotValidTag(String name) {

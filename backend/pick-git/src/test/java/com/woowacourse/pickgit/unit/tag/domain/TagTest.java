@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.unit.tag.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
 import com.woowacourse.pickgit.exception.post.TagFormatException;
@@ -28,5 +29,15 @@ class TagTest {
             .isInstanceOf(TagFormatException.class)
             .extracting("errorCode")
             .isEqualTo("F0003");
+    }
+
+    @DisplayName("태그 이름은 소문자로 자동 변환된다.")
+    @Test
+    void newTag_ToLowerCase_Success() {
+        // given
+        Tag tag = new Tag("Java");
+
+        // when, then
+        assertThat(tag.getName()).isEqualTo("java");
     }
 }

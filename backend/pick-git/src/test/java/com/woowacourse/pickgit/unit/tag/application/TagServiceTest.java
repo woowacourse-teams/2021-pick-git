@@ -67,7 +67,7 @@ class TagServiceTest {
         TagsDto tagsDto = tagService.extractTags(extractionRequestDto);
 
         // then
-        assertThat(tagsDto.getTagNames()).containsAll(tags);
+        assertThat(tagsDto.getTagNames()).containsAll(Arrays.asList("java", "html", "css"));
         verify(platformTagExtractor, times(1)).extractTags(accessToken, userName, repositoryName);
     }
 
@@ -126,7 +126,7 @@ class TagServiceTest {
     @Test
     void findOrCreateTags_ValidTag_TransformationSuccess() {
         // given
-        List<String> tagNames = Arrays.asList("tag1", "tag2", "tag3");
+        List<String> tagNames = Arrays.asList("Tag1", "tag2", "tag3");
         TagsDto tagsDto = new TagsDto(tagNames);
 
         // mock
@@ -148,7 +148,7 @@ class TagServiceTest {
             .collect(Collectors.toList());
 
         // then
-        assertThat(tags).containsAll(tagNames);
+        assertThat(tags).containsAll(Arrays.asList("tag1", "tag2", "tag3"));
         verify(tagRepository, times(3)).findByName(anyString());
     }
 
@@ -166,15 +166,13 @@ class TagServiceTest {
             .willReturn(Optional.empty());
         given(tagRepository.findByName("tag2"))
             .willReturn(Optional.empty());
-        given(tagRepository.findByName(tagName))
-            .willReturn(Optional.empty());
 
         // when, then
         assertThatCode(() -> tagService.findOrCreateTags(tagsDto))
             .isInstanceOf(TagFormatException.class)
             .extracting("errorCode")
             .isEqualTo("F0003");
-        verify(tagRepository, times(3)).findByName(any());
+        verify(tagRepository, times(2)).findByName(any());
     }
 
     @DisplayName("태그 이름이 없다면 빈 태그를 반환한다.")
