@@ -7,6 +7,7 @@ import lombok.Builder;
 public class CommentResponse {
 
     private Long id;
+    private String profileImageUrl;
     private String authorName;
     private String content;
     private Boolean isLiked;
@@ -14,16 +15,23 @@ public class CommentResponse {
     private CommentResponse() {
     }
 
-    public CommentResponse(Long id, String authorName, String content, Boolean isLiked) {
+    public CommentResponse(Long id, String profileImageUrl, String authorName, String content,
+        Boolean isLiked) {
         this.id = id;
+        this.profileImageUrl = profileImageUrl;
         this.authorName = authorName;
         this.content = content;
         this.isLiked = isLiked;
     }
 
     public static CommentResponse from(Comment comment) {
-        return new CommentResponse(comment.getId(), comment.getAuthorName(),
-            comment.getContent(), false);
+        return CommentResponse.builder()
+            .id(comment.getId())
+            .profileImageUrl(comment.getProfileImageUrl())
+            .authorName(comment.getAuthorName())
+            .content(comment.getContent())
+            .isLiked(false)
+            .build();
     }
 
     public Long getId() {
@@ -40,5 +48,9 @@ public class CommentResponse {
 
     public Boolean getIsLiked() {
         return isLiked;
+    }
+
+    public String getProfileImageUrl() {
+        return profileImageUrl;
     }
 }

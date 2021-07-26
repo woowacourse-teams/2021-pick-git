@@ -16,14 +16,17 @@ class UserTest {
     @DisplayName("User가 특정 Post에 Comment를 추가한다.")
     @Test
     void addComment_Valid_RegistrationSuccess() {
+        // given
         Post post = new Post(null, null, null, null, null, new Comments(), new ArrayList<>(), null);
         Comment comment = new Comment("test comment.");
         User user = new User(null, null, null);
 
+        // when
         user.addComment(post, comment);
-        List<Comment> comments = post.getComments();
 
+        // then
+        List<Comment> comments = post.getComments();
         assertThat(comments).hasSize(1);
-        assertThat(comments.get(0).getUser()).isEqualTo(user);
+        assertThat(comments.get(0).getUser()).isSameAs(user);
     }
 }

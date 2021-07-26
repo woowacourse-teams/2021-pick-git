@@ -82,8 +82,7 @@ public class User {
     }
 
     public void addComment(Post post, Comment comment) {
-        comment.toPost(post)
-            .writeBy(this);
+        comment.writeBy(this);
         post.addComment(comment);
     }
 

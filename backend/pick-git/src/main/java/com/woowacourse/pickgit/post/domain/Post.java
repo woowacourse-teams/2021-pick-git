@@ -90,6 +90,7 @@ public class Post {
     }
 
     public void addComment(Comment comment) {
+        comment.toPost(this);
         comments.addComment(comment);
     }
 

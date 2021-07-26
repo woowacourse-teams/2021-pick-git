@@ -21,9 +21,13 @@ import io.restassured.response.Response;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.validation.constraints.Null;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -81,7 +85,7 @@ class PostAcceptanceTest {
         requestWrite(token);
     }
 
-    @DisplayName("로그인일때 게시물을 조회한다. - 댓글 및 게시글의 좋아요 여부를 확인할 수 있다.")
+    @DisplayName("로그인일때 게시물을 조회한다. - Comment 및 게시글의 좋아요 여부를 확인할 수 있다.")
     @Test
     void read_LoginUser_Success() {
         String token = 로그인_되어있음(ANOTHER_USERNAME).getToken();
@@ -94,7 +98,7 @@ class PostAcceptanceTest {
             .auth().oauth2(token)
             .when()
             .get("/api/posts?page=0&limit=3")
-            .then()
+            .then().log().all()
             .statusCode(HttpStatus.OK.value())
             .extract()
             .as(new TypeRef<List<PostResponseDto>>() {
@@ -103,7 +107,7 @@ class PostAcceptanceTest {
         assertThat(response).hasSize(3);
     }
 
-    @DisplayName("비 로그인이어도 게시글 조회가 가능하다. - 댓글 및 게시물 좋아요 여부는 항상 false")
+    @DisplayName("비 로그인이어도 게시글 조회가 가능하다. - Comment 및 게시물 좋아요 여부는 항상 false")
     @Test
     void read_GuestUser_Success() {
         String token = 로그인_되어있음(ANOTHER_USERNAME).getToken();
@@ -115,7 +119,7 @@ class PostAcceptanceTest {
         List<PostResponseDto> response = given().log().all()
             .when()
             .get("/api/posts?page=0&limit=3")
-            .then()
+            .then().log().all()
             .statusCode(HttpStatus.OK.value())
             .extract()
             .as(new TypeRef<List<PostResponseDto>>() {
@@ -137,7 +141,7 @@ class PostAcceptanceTest {
             .auth().oauth2(token)
             .when()
             .get("/api/posts/me?page=0&limit=3")
-            .then()
+            .then().log().all()
             .statusCode(HttpStatus.OK.value())
             .extract()
             .as(new TypeRef<List<PostResponseDto>>() {
@@ -178,7 +182,7 @@ class PostAcceptanceTest {
             .auth().oauth2(loginUserToken)
             .when()
             .get("/api/posts/" + ANOTHER_USERNAME + "?page=0&limit=3")
-            .then()
+            .then().log().all()
             .statusCode(HttpStatus.OK.value())
             .extract()
             .as(new TypeRef<List<PostResponseDto>>() {
@@ -199,7 +203,7 @@ class PostAcceptanceTest {
         List<PostResponseDto> response = given().log().all()
             .when()
             .get("/api/posts/" + ANOTHER_USERNAME + "?page=0&limit=3")
-            .then()
+            .then().log().all()
             .statusCode(HttpStatus.OK.value())
             .extract()
             .as(new TypeRef<List<PostResponseDto>>() {
@@ -249,23 +253,45 @@ class PostAcceptanceTest {
             .extract();
     }
 
-    @DisplayName("사용자는 댓글을 등록할 수 있다.")
+    @DisplayName("User는 Comment을 등록할 수 있다.")
     @Test
     void addComment_LoginUser_Success() {
         // given
         String token = 로그인_되어있음(ANOTHER_USERNAME).getToken();
+        Long postId = 1L;
 
         requestWrite(token);
 
         ContentRequest request = new ContentRequest("this is content");
 
         // when
-        CommentResponse response = requestAddComment(token, request, HttpStatus.OK)
+        CommentResponse response = requestAddComment(token, postId, request, HttpStatus.OK)
             .as(CommentResponse.class);
 
         // then
         assertThat(response.getAuthorName()).isEqualTo(ANOTHER_USERNAME);
         assertThat(response.getContent()).isEqualTo("this is content");
+    }
+
+    @DisplayName("비로그인 User는 Comment를 등록할 수 없다.")
+    @Test
+    void addComment_GuestUser_Fail() {
+        // given
+        String writePostToken = 로그인_되어있음(ANOTHER_USERNAME).getToken();
+        String invalidToken = "invalid token";
+        Long postId = 1L;
+
+        requestWrite(writePostToken);
+
+        ContentRequest request = new ContentRequest("this is content");
+
+        // when
+        ApiErrorResponse response
+            = requestAddComment(invalidToken, postId, request, HttpStatus.UNAUTHORIZED)
+            .as(ApiErrorResponse.class);
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("A0001");
     }
 
     private void requestWrite(String token) {
@@ -282,60 +308,50 @@ class PostAcceptanceTest {
             .extract();
     }
 
-    @DisplayName("댓글 내용이 null인 경우 예외가 발생한다. - 400 예외")
-    @Test
-    void addComment_Null_400Exception() {
+    @DisplayName("Comment 내용이 빈 경우 예외가 발생한다. - 400 예외")
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {" ", "  "})
+    void addComment_NullOrEmpty_400Exception(String content) {
         // given
         String token = 로그인_되어있음(ANOTHER_USERNAME).getToken();
-        ContentRequest request = new ContentRequest(null);
+        Long postId = 1L;
+        ContentRequest request = new ContentRequest(content);
 
         // when
-        ApiErrorResponse response = requestAddComment(token, request, HttpStatus.BAD_REQUEST)
+        ApiErrorResponse response = requestAddComment(token, postId, request, HttpStatus.BAD_REQUEST)
             .as(ApiErrorResponse.class);
 
         // then
         assertThat(response.getErrorCode()).isEqualTo("F0001");
     }
 
-    @DisplayName("댓글 내용이 빈 칸인 경우 예외가 발생한다. - 400 예외")
+    @DisplayName("존재하지 않는 Post에 Comment를 등록할 수 없다. - 500 예외")
     @Test
-    void addComment_Empty_400Exception() {
+    void addComment_PostNotFound_500Exception() {
         // given
         String token = 로그인_되어있음(ANOTHER_USERNAME).getToken();
-        ContentRequest request = new ContentRequest("");
+        Long postId = 0L;
+        ContentRequest request = new ContentRequest("a");
 
         // when
-        ApiErrorResponse response = requestAddComment(token, request, HttpStatus.BAD_REQUEST)
+        ApiErrorResponse response = requestAddComment(token, postId, request, HttpStatus.INTERNAL_SERVER_ERROR)
             .as(ApiErrorResponse.class);
 
         // then
-        assertThat(response.getErrorCode()).isEqualTo("F0001");
+        assertThat(response.getErrorCode()).isEqualTo("P0002");
     }
 
-    @DisplayName("댓글 내용이 공백인 경우 예외가 발생한다. - 400 예외")
-    @Test
-    void addComment_Blank_400Exception() {
-        // given
-        String token = 로그인_되어있음(ANOTHER_USERNAME).getToken();
-        ContentRequest request = new ContentRequest(" ");
-
-        // when
-        ApiErrorResponse response = requestAddComment(token, request, HttpStatus.BAD_REQUEST)
-            .as(ApiErrorResponse.class);
-
-        // then
-        assertThat(response.getErrorCode()).isEqualTo("F0001");
-    }
-
-    @DisplayName("댓글 내용이 100자 초과인 경우 예외가 발생한다. - 400 예외")
+    @DisplayName("Comment 내용이 100자 초과인 경우 예외가 발생한다. - 400 예외")
     @Test
     void addComment_Over100_400Exception() {
         // given
         String token = 로그인_되어있음(ANOTHER_USERNAME).getToken();
+        Long postId = 1L;
         ContentRequest request = new ContentRequest("a".repeat(101));
 
         // when
-        ApiErrorResponse response = requestAddComment(token, request, HttpStatus.BAD_REQUEST)
+        ApiErrorResponse response = requestAddComment(token, postId, request, HttpStatus.BAD_REQUEST)
             .as(ApiErrorResponse.class);
 
         // then
@@ -344,6 +360,7 @@ class PostAcceptanceTest {
 
     private ExtractableResponse<Response> requestAddComment(
         String token,
+        Long postId,
         ContentRequest request,
         HttpStatus httpStatus) {
         return given().log().all()
@@ -351,7 +368,7 @@ class PostAcceptanceTest {
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(request)
             .when()
-            .post("/api/posts/{postId}/comments", 1L)
+            .post("/api/posts/{postId}/comments", postId)
             .then().log().all()
             .statusCode(httpStatus.value())
             .extract();

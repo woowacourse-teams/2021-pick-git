@@ -78,4 +78,8 @@ public class Comment {
     public String getContent() {
         return content.getContent();
     }
+
+    public String getProfileImageUrl() {
+        return user.getImage();
+    }
 }

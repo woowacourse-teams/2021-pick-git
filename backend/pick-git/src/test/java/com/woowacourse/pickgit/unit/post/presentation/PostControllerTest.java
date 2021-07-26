@@ -111,7 +111,6 @@ class PostControllerTest {
         postContent = "pickgit";
     }
 
-
     @DisplayName("게시물을 작성할 수 있다. - 사용자")
     @Test
     void write_LoginUser_Success() throws Exception {
@@ -190,31 +189,43 @@ class PostControllerTest {
         ));
     }
 
-    @DisplayName("특정 Post에 댓글을 추가한다.")
+    @DisplayName("특정 Post에 Comment을 추가한다.")
     @Test
     void addComment_ValidContent_Success() throws Exception {
+        // given
         LoginUser loginUser = new LoginUser("kevin", "token");
+        String url = "/api/posts/{postId}/comments";
+        Long postId = 1L;
+        String requestBody = objectMapper.writeValueAsString(new ContentRequest("test comment"));
+        CommentResponse commentResponse = CommentResponse.builder()
+            .id(1L)
+            .profileImageUrl("kevin profile image url")
+            .authorName("kevin")
+            .content("test comment")
+            .isLiked(false)
+            .build();
+        String responseBody = objectMapper.writeValueAsString(commentResponse);
+
+        // mock
         given(oAuthService.validateToken(anyString()))
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(anyString()))
             .willReturn(loginUser);
-
-        String url = "/api/posts/{postId}/comments";
-        CommentResponse commentResponseDto =
-            new CommentResponse(1L, "kevin", "test comment", false);
-
-        String requestBody = objectMapper.writeValueAsString(new ContentRequest("test"));
-        String responseBody = objectMapper.writeValueAsString(commentResponseDto);
         given(postService.addComment(any(CommentRequest.class)))
-            .willReturn(commentResponseDto);
+            .willReturn(commentResponse);
 
-        ResultActions perform = addCommentApi(url, requestBody)
+        // when
+        ResultActions response = addCommentApi(url, postId, requestBody);
+
+        // then
+        response
             .andExpect(status().isOk())
             .andExpect(content().string(responseBody));
 
         verify(postService, times(1)).addComment(any(CommentRequest.class));
 
-        perform.andDo(document("comment-post",
+        // restdocs
+        response.andDo(document("comment-post",
             getDocumentRequest(),
             getDocumentResponse(),
             requestHeaders(
@@ -228,6 +239,7 @@ class PostControllerTest {
             ),
             responseFields(
                 fieldWithPath("id").type(NUMBER).description("댓글 id"),
+                fieldWithPath("profileImageUrl").type(STRING).description("댓글 작성자 프로필 사진"),
                 fieldWithPath("authorName").type(STRING).description("작성자 이름"),
                 fieldWithPath("content").type(STRING).description("댓글 내용"),
                 fieldWithPath("isLiked").type(BOOLEAN).description("좋아요 여부")
@@ -235,26 +247,34 @@ class PostControllerTest {
         ));
     }
 
-    @DisplayName("특정 Post에 댓글 등록 실패한다. - 빈 댓글인 경우.")
+    @DisplayName("특정 Post에 댓글 등록 실패한다. - 빈 Comment인 경우.")
     @Test
     void addComment_InValidContent_ExceptionThrown() throws Exception {
+        // given
         LoginUser loginUser = new LoginUser("kevin", "token");
+        String url = "/api/posts/{postId}/comments";
+        Long postId = 1L;
+        String requestBody = objectMapper.writeValueAsString("");
+
+        // mock
         given(oAuthService.validateToken(anyString()))
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(anyString()))
             .willReturn(loginUser);
-
-        String url = "/api/posts/{postId}/comments";
-        String requestBody = objectMapper.writeValueAsString("");
         given(postService.addComment(any(CommentRequest.class)))
             .willThrow(new CommentFormatException());
 
-        ResultActions perform = addCommentApi(url, requestBody)
+        // when
+        ResultActions response = addCommentApi(url, postId, requestBody);
+
+        // then
+        response
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("errorCode").value("F0001"));
         verify(postService, never()).addComment(any(CommentRequest.class));
 
-        perform.andDo(document("comment-post-emptyContent",
+        // restdocs
+        response.andDo(document("comment-post-emptyContent",
             getDocumentRequest(),
             getDocumentResponse(),
             requestHeaders(
@@ -269,8 +289,8 @@ class PostControllerTest {
         ));
     }
 
-    private ResultActions addCommentApi(String url, String requestBody) throws Exception {
-        return mockMvc.perform(post(url, 1)
+    private ResultActions addCommentApi(String url, Long postId, String requestBody) throws Exception {
+        return mockMvc.perform(post(url, postId)
             .header("Authorization", "Bearer test")
             .contentType(MediaType.APPLICATION_JSON)
             .content(requestBody));
@@ -348,6 +368,7 @@ class PostControllerTest {
                 fieldWithPath("[].updatedAt").type(STRING).description("마지막 글 수정 시간"),
                 fieldWithPath("[].comments").type(ARRAY).description("댓글 목록"),
                 fieldWithPath("[].comments[].id").type(NUMBER).description("댓글 아이디"),
+                fieldWithPath("[].comments[].profileImageUrl").type(STRING).description("댓글 작성자 프로필 사진"),
                 fieldWithPath("[].comments[].authorName").type(STRING).description("댓글 작성자 이름"),
                 fieldWithPath("[].comments[].content").type(STRING).description("댓글 내용"),
                 fieldWithPath("[].comments[].isLiked").type(BOOLEAN).description("댓글 좋아요 여부"),
@@ -394,6 +415,7 @@ class PostControllerTest {
                 fieldWithPath("[].updatedAt").type(STRING).description("마지막 글 수정 시간"),
                 fieldWithPath("[].comments").type(ARRAY).description("댓글 목록"),
                 fieldWithPath("[].comments[].id").type(NUMBER).description("댓글 아이디"),
+                fieldWithPath("[].comments[].profileImageUrl").type(STRING).description("댓글 작성자 프로필 사진"),
                 fieldWithPath("[].comments[].authorName").type(STRING).description("댓글 작성자 이름"),
                 fieldWithPath("[].comments[].content").type(STRING).description("댓글 내용"),
                 fieldWithPath("[].comments[].isLiked").type(BOOLEAN).description("댓글 좋아요 여부"),
