@@ -20,12 +20,10 @@ public class PostTag {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
-    @NonNull
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tag_id", nullable = false)
-    @NonNull
     private Tag tag;
 
     protected PostTag() {
