@@ -7,6 +7,7 @@ import { Container, PostItemWrapper } from "./Feed.style";
 import useBottomSlider from "../../services/hooks/@common/useBottomSlider";
 import CommentSlider from "../CommentSlider/CommentSlider";
 import useFeedMutation from "../../services/hooks/useFeedMutation";
+import { FAILURE_MESSAGE } from "../../constants/messages";
 
 interface Props {
   posts: Post[];
@@ -68,11 +69,15 @@ const Feed = ({ posts, queryKey }: Props) => {
       return;
     }
 
-    const newComment = await mutateAddComment({ postId: selectedPostId, commentContent: value });
-    const newPosts = [...posts];
-    newPosts.find((post) => post.id === selectedPostId)?.comments.push(newComment);
+    try {
+      const newComment = await mutateAddComment({ postId: selectedPostId, commentContent: value });
+      const newPosts = [...posts];
+      newPosts.find((post) => post.id === selectedPostId)?.comments.push(newComment);
 
-    setPosts(newPosts);
+      setPosts(newPosts);
+    } catch (error) {
+      pushSnackbarMessage(FAILURE_MESSAGE.COMMENT_SAVE_FAILED);
+    }
   };
 
   return (

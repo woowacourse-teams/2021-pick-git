@@ -23,7 +23,7 @@ import {
   CommentContent,
   CommentTextAreaWrapper,
 } from "./CommentSlider.styles";
-import { CommentData, Post, TabItem } from "../../@types";
+import { Post, TabItem } from "../../@types";
 import { COMMENT_SLIDE_STEPS } from "../../constants/steps";
 import { useContext, useEffect, useRef, useState } from "react";
 import { PAGE_URL } from "../../constants/urls";
