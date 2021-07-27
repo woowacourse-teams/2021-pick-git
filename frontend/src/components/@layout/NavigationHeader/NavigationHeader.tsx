@@ -47,7 +47,7 @@ const NavigationHeader = () => {
       {isLoggedIn ? (
         <FlexWrapper>
           <AuthenticatedNavigation />
-          <Button kind="roundedInline" padding="0.6rem" onClick={handleLogoutButtonClick}>
+          <Button kind="roundedInline" padding="0.1rem 0.7rem 0.2rem" onClick={handleLogoutButtonClick}>
             로그아웃
           </Button>
         </FlexWrapper>

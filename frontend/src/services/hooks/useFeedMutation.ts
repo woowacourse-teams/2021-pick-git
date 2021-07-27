@@ -1,7 +1,5 @@
-import { useState } from "react";
-import { UseInfiniteQueryResult, useQueryClient } from "react-query";
+import { useQueryClient } from "react-query";
 import { CommentData, Post } from "../../@types";
-import { QUERY } from "../../constants/queries";
 
 import {
   useAddPostLikeMutation,
@@ -10,13 +8,16 @@ import {
   useDeletePostCommentMutation,
 } from "../queries";
 
-const useFeed = () => {
-  const queryClient = useQueryClient();
-  const [commentValue, setCommentValue] = useState("");
+const useFeedMutation = (queryKey: string) => {
   const { mutateAsync: mutateDeletePostLike } = useDeletePostLikeMutation();
   const { mutateAsync: mutateAddPostLike } = useAddPostLikeMutation();
   const { mutateAsync: mutateAddComment } = useAddPostCommentMutation();
   const { mutateAsync: mutateDeleteComment } = useDeletePostCommentMutation();
+  const queryClient = useQueryClient();
+
+  const setPosts = (posts: Post[]) => {
+    queryClient.setQueryData<Post[]>(queryKey, posts);
+  };
 
   const deletePostLike = async (post: Post) => {
     try {
@@ -34,41 +35,21 @@ const useFeed = () => {
     }
   };
 
-  const addComment = async (postId: Post["id"], commentContent: CommentData["content"]) => {
+  const deleteComment = async (postId: Post["id"], commendId: CommentData["id"]) => {
     try {
-      await mutateAddComment({ postId, commentContent });
+      await mutateDeleteComment(commendId);
     } catch (error) {
       alert(error.message);
     }
-  };
-
-  const deleteComment = async (postId: Post["id"]) => {
-    try {
-      await mutateDeleteComment(postId);
-    } catch (error) {
-      alert(error.message);
-    }
-  };
-
-  const setPosts = (posts: Post[]) => {
-    queryClient.setQueryData(QUERY.GET_HOME_FEED_POSTS, posts);
   };
 
   return {
-    // postsPages: data?.pages,
-    // isLoading,
-    // error,
-    // isFetchingNextPage,
-    // hasNextPage,
-    // fetchNextPage,
-    commentValue,
-    setCommentValue,
+    setPosts,
     deletePostLike,
     addPostLike,
-    setPosts,
-    addComment,
+    mutateAddComment,
     deleteComment,
   };
 };
 
-export default useFeed;
+export default useFeedMutation;

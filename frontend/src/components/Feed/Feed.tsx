@@ -1,38 +1,39 @@
-import { forwardRef, useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Post } from "../../@types";
-import { LIMIT } from "../../constants/limits";
-import { FAILURE_MESSAGE } from "../../constants/messages";
 import SnackBarContext from "../../contexts/SnackbarContext";
-import useFeed from "../../services/hooks/useFeed";
+import UserContext from "../../contexts/UserContext";
 import PostItem from "../@shared/PostItem/PostItem";
 import { Container, PostItemWrapper } from "./Feed.style";
+import useBottomSlider from "../../services/hooks/@common/useBottomSlider";
+import CommentSlider from "../CommentSlider/CommentSlider";
+import useFeedMutation from "../../services/hooks/useFeedMutation";
+import { FAILURE_MESSAGE } from "../../constants/messages";
 
 interface Props {
   posts: Post[];
+  queryKey: string;
 }
 
-const Feed = ({ posts }: Props) => {
+const Feed = ({ posts, queryKey }: Props) => {
+  const [selectedPostId, setSelectedPostId] = useState<Post["id"]>();
   const { pushSnackbarMessage } = useContext(SnackBarContext);
-  const { commentValue, setCommentValue, deletePostLike, addPostLike, setPosts, addComment } = useFeed();
+  const { setPosts, deletePostLike, addPostLike, mutateAddComment } = useFeedMutation(queryKey);
+  const { isBottomSliderShown, showBottomSlider, hideBottomSlider, removeSlideEventHandler, setSlideEventHandler } =
+    useBottomSlider();
+  const { isLoggedIn, currentUsername } = useContext(UserContext);
 
-  const handleCommentValueChange: React.ChangeEventHandler<HTMLTextAreaElement> = ({ target: { value } }) => {
-    if (value.length > LIMIT.COMMENT_LENGTH) {
-      pushSnackbarMessage(FAILURE_MESSAGE.COMMENT_CONTENT_MAX_LENGTH_EXCEEDED);
-      return;
-    }
+  const selectedPost = posts.find((post) => post.id === selectedPostId);
 
-    setCommentValue(value);
-  };
+  useEffect(() => {
+    setSlideEventHandler();
+    return removeSlideEventHandler;
+  }, []);
 
-  const handleCommentValueSave = (postId: Post["id"]) => {
-    addComment(postId, commentValue);
-  };
-
-  const handleCommentLike = (commentId: string) => {
+  const handleCommentLike = (commentId: number) => {
     pushSnackbarMessage("아직 구현되지 않은 기능입니다.");
   };
 
-  const handlePostLike = (postId: string) => {
+  const handlePostLike = (postId: number) => {
     const newPosts = [...posts];
     const targetPost = newPosts.find((post) => post.id === postId);
 
@@ -54,6 +55,31 @@ const Feed = ({ posts }: Props) => {
     }
   };
 
+  const handleCommentsClick = (postId: Post["id"]) => {
+    showBottomSlider();
+    setSelectedPostId(postId);
+  };
+
+  const handleCommentSliderClose = () => {
+    hideBottomSlider();
+  };
+
+  const handleCommentSave = async (value: string) => {
+    if (!selectedPostId) {
+      return;
+    }
+
+    try {
+      const newComment = await mutateAddComment({ postId: selectedPostId, commentContent: value });
+      const newPosts = [...posts];
+      newPosts.find((post) => post.id === selectedPostId)?.comments.push(newComment);
+
+      setPosts(newPosts);
+    } catch (error) {
+      pushSnackbarMessage(FAILURE_MESSAGE.COMMENT_SAVE_FAILED);
+    }
+  };
+
   return (
     <Container>
       {posts?.map((post) => (
@@ -69,18 +95,23 @@ const Feed = ({ posts }: Props) => {
             createdAt={post.createdAt}
             comments={post.comments}
             content={post.content}
-            isEditable={true}
+            isEditable={currentUsername === post.authorName && isLoggedIn}
             isLiked={post.isLiked}
             likeCount={post.likesCount}
             tags={post.tags}
-            commentValue={commentValue}
-            onCommentValueChange={handleCommentValueChange}
-            onCommentValueSave={() => handleCommentValueSave(post.id)}
+            onCommentClick={() => handleCommentsClick(post.id)}
+            onCommentInputClick={() => handleCommentsClick(post.id)}
             onCommentLike={handleCommentLike}
             onPostLike={() => handlePostLike(post.id)}
           />
         </PostItemWrapper>
       ))}
+      <CommentSlider
+        onCommentSave={handleCommentSave}
+        post={selectedPost}
+        isSliderShown={isBottomSliderShown}
+        onSliderClose={handleCommentSliderClose}
+      />
     </Container>
   );
 };

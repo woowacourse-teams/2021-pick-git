@@ -92,6 +92,8 @@ export const TagItemLinkButton = styled(Link)`
   margin-bottom: 0.5625rem;
 `;
 
+export const CommentsWrapper = styled.div``;
+
 export const CommentWrapper = styled.div`
   margin-bottom: 0.5rem;
 `;

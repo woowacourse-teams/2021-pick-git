@@ -12,6 +12,7 @@ export const requestGetHomeFeedPosts = async (pageParam: number, accessToken: st
         },
       }
     : {};
+
   const response = await axios.get<Post[]>(API_URL.POSTS(pageParam, LIMIT.FEED_COUNT_PER_FETCH), config);
 
   return response.data;

@@ -1,4 +1,4 @@
-import { STEPS } from "./steps";
+import { POST_ADD_STEPS } from "./steps";
 
 export const URL_PARAMS = {
   ME: "me",
@@ -14,7 +14,7 @@ export const PAGE_URL = {
   LOGIN: "/login",
   AUTH_PROCESSING: "/auth",
   ADD_POST: "/add-post",
-  ADD_POST_FIRST_STEP: `/add-post/${STEPS[0].path}`,
+  ADD_POST_FIRST_STEP: `/add-post/${POST_ADD_STEPS[0].path}`,
   EDIT_POST: "/edit-post",
   SEARCH: "/search",
   PROFILE: "/profile",
@@ -35,8 +35,8 @@ export const API_URL = {
   MY_POSTS: (page: number, limit: number) => `/posts/me?page=${page}&limit=${limit}`,
   USER_POSTS: (username: string, page: number, limit: number) => `/posts/${username}?page=${page}&limit=${limit}`,
   AFTER_LOGIN: (code: string) => `afterlogin?code=${code}`,
-  POSTS_LIKES: (postId: string) => `/posts/${postId}/likes`,
-  POSTS_COMMENTS: (postId: string) => `/posts/${postId}/comments`,
+  POSTS_LIKES: (postId: number) => `/posts/${postId}/likes`,
+  POSTS_COMMENTS: (postId: number) => `/posts/${postId}/comments`,
   GITHUB_REPOSITORIES: "/github/swon3210/repositories",
   GITHUB_TAGS: (repositoryName: string) => `/github/repositories/${repositoryName}/tags/languages`,
 };

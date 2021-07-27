@@ -3,10 +3,10 @@ import { useHistory } from "react-router-dom";
 import { ThemeContext } from "styled-components";
 import { RepositoryIcon, SearchIcon } from "../../assets/icons";
 import { REDIRECT_MESSAGE } from "../../constants/messages";
-import { STEPS } from "../../constants/steps";
+import { POST_ADD_STEPS } from "../../constants/steps";
 import { PAGE_URL } from "../../constants/urls";
 import useMessageModal from "../../services/hooks/@common/useMessageModal";
-import useStep from "../../services/hooks/@common/useStep";
+import usePostAddStep from "../../services/hooks/usePostAddStep";
 import usePostUpload from "../../services/hooks/usePostUpload";
 import { useGithubRepositoriesQuery } from "../../services/queries";
 import { getAPIErrorMessage } from "../../utils/error";
@@ -25,7 +25,7 @@ import {
 
 const RepositorySelector = () => {
   const { setGithubRepositoryName } = usePostUpload();
-  const { goNextStep } = useStep(STEPS, PAGE_URL.HOME);
+  const { goNextStep } = usePostAddStep(POST_ADD_STEPS, PAGE_URL.HOME);
   const { data: repositories, isLoading, error } = useGithubRepositoriesQuery();
   const { modalMessage, isModalShown, showAlertModal, hideMessageModal } = useMessageModal();
   const { color } = useContext(ThemeContext);

@@ -11,7 +11,7 @@ import { useHomeFeedPostsQuery } from "../queries";
 
 const useHomeFeed = () => {
   const { logout } = useContext(UserContext);
-  const [allPosts, setAllPosts] = useState<Post[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
   const { data, isLoading, error, isError, isFetching, fetchNextPage } = useHomeFeedPostsQuery();
   const queryClient = useQueryClient();
 
@@ -40,7 +40,7 @@ const useHomeFeed = () => {
     const fetchedPosts = data?.pages?.reduce((acc, postPage) => acc.concat(postPage), []) ?? [];
     const filteredPosts = removeDuplicatedData<Post>(fetchedPosts, (post) => post.id);
 
-    setAllPosts(filteredPosts);
+    setPosts(filteredPosts);
   };
 
   useEffect(() => {
@@ -51,7 +51,7 @@ const useHomeFeed = () => {
     handleError();
   }, [error]);
 
-  return { allPosts, handlePostsEndIntersect, isLoading, isFetching, isError };
+  return { posts, handlePostsEndIntersect, isLoading, isFetching, isError };
 };
 
 export default useHomeFeed;

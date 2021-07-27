@@ -14,7 +14,8 @@ export interface ProfileData {
 }
 
 export interface CommentData {
-  commentId: string;
+  id: number;
+  profileImageUrl: String;
   authorName: string;
   content: string;
   isLiked: boolean;
@@ -26,7 +27,7 @@ export interface CommentAddData {
 }
 
 export interface Post {
-  id: string;
+  id: number;
   imageUrls: string[];
   githubRepoUrl: string;
   content: string;
@@ -88,3 +89,5 @@ export type ErrorResponse = {
     | "P0002"
     | "S0001";
 };
+
+export type TabIndicatorKind = "line" | "pill";
