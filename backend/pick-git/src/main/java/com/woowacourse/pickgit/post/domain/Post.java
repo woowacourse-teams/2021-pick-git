@@ -1,24 +1,22 @@
 package com.woowacourse.pickgit.post.domain;
 
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 
-import com.woowacourse.pickgit.exception.post.CannotAddTagException;
 import com.woowacourse.pickgit.exception.post.PostNotBelongToUserException;
 import com.woowacourse.pickgit.post.domain.comment.Comment;
 import com.woowacourse.pickgit.post.domain.comment.Comments;
+import com.woowacourse.pickgit.post.domain.content.Image;
 import com.woowacourse.pickgit.post.domain.content.Images;
 import com.woowacourse.pickgit.post.domain.content.PostContent;
 import com.woowacourse.pickgit.post.domain.like.Like;
 import com.woowacourse.pickgit.post.domain.like.Likes;
+import com.woowacourse.pickgit.post.domain.tag.PostTags;
 import com.woowacourse.pickgit.tag.domain.Tag;
 import com.woowacourse.pickgit.user.domain.User;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import javax.persistence.CascadeType;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -28,7 +26,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -40,13 +37,15 @@ public class Post {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
     @Embedded
     private Images images;
 
     @Embedded
     private PostContent content;
-
-    private String githubRepoUrl;
 
     @Embedded
     private Likes likes;
@@ -54,67 +53,56 @@ public class Post {
     @Embedded
     private Comments comments;
 
+    @Embedded
+    private PostTags postTags;
+
+    private String githubRepoUrl;
+
     @CreatedDate
     private LocalDateTime createdAt;
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    @OneToMany(
-        mappedBy = "post",
-        fetch = FetchType.LAZY,
-        cascade = CascadeType.PERSIST,
-        orphanRemoval = true
-    )
-    private List<PostTag> postTags = new ArrayList<>();
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-
     protected Post() {
     }
 
-    public Post(Images images, PostContent content, String githubRepoUrl, User user) {
-        this(
-            null, images, content, githubRepoUrl,
-            new Likes(), new Comments(), new ArrayList<>(), user
-        );
-    }
-
-    public Post(
-        Long id, Images images, PostContent content, String githubRepoUrl,
-        Likes likes, Comments comments, List<PostTag> postTags, User user
+    protected Post(
+        Long id,
+        User user,
+        Images images,
+        PostContent content,
+        Likes likes,
+        Comments comments,
+        PostTags postTags,
+        String githubRepoUrl,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt
     ) {
         this.id = id;
+        this.user = user;
         this.images = images;
-        this.content = content;
-        this.githubRepoUrl = githubRepoUrl;
         this.likes = likes;
+        this.content = content;
         this.comments = comments;
         this.postTags = postTags;
-        this.user = user;
+        this.githubRepoUrl = githubRepoUrl;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
 
-        if (!Objects.isNull(images)) {
-            images.setMapping(this);
-        }
+        images.belongTo(this);
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     public void addComment(Comment comment) {
-        comment.toPost(this);
-        comments.addComment(comment);
+        comments.addComment(comment, this);
     }
 
-    public List<Tag> getTags() {
-        return postTags.stream()
-            .map(PostTag::getTag)
-            .collect(toList());
-    }
-
-    public List<String> getTagNames() {
-        return postTags.stream()
-            .map(PostTag::getTagName)
-            .collect(toList());
+    public void addTags(List<Tag> tags) {
+        postTags.addAll(this, tags);
     }
 
     public void like(User user) {
@@ -127,12 +115,12 @@ public class Post {
         likes.remove(like);
     }
 
-    public boolean isLikedBy(String userName) {
-        return likes.contains(userName);
+    public boolean isLikedBy(User user) {
+        return likes.contains(new Like(this, user));
     }
 
     public boolean belongsToUser(User user) {
-        if (getUser().isSameAs(user)) {
+        if (user.equals(user)) {
             return true;
         }
         throw new PostNotBelongToUserException();
@@ -145,31 +133,6 @@ public class Post {
     public void updateTags(List<Tag> tags) {
         postTags.clear();
         addTags(tags);
-    }
-
-    public void addTags(List<Tag> tags) {
-        validateDuplicateTag(tags);
-        List<Tag> existingTags = getTags();
-        for (Tag tag : tags) {
-            validateDuplicateTagAlreadyExistsInPost(existingTags, tag);
-            PostTag postTag = new PostTag(this, tag);
-            postTags.add(postTag);
-        }
-    }
-
-    private void validateDuplicateTag(List<Tag> tags) {
-        Set<String> nonDuplicateTagNames = tags.stream()
-            .map(Tag::getName)
-            .collect(toSet());
-        if (nonDuplicateTagNames.size() != tags.size()) {
-            throw new CannotAddTagException();
-        }
-    }
-
-    private void validateDuplicateTagAlreadyExistsInPost(List<Tag> existingTags, Tag tag) {
-        if (existingTags.contains(tag)) {
-            throw new CannotAddTagException();
-        }
     }
 
     public Long getId() {
@@ -200,12 +163,20 @@ public class Post {
         return content.getContent();
     }
 
-    public User getUser() {
-        return user;
+    public String getAuthorName() {
+        return user.getName();
+    }
+
+    public String getAuthorProfileImage() {
+        return user.getImage();
     }
 
     public List<Comment> getComments() {
         return comments.getComments();
+    }
+
+    public List<Tag> getTags() {
+        return postTags.getTags();
     }
 
     @Override
@@ -217,11 +188,102 @@ public class Post {
             return false;
         }
         Post post = (Post) o;
-        return Objects.equals(id, post.id);
+        return Objects.equals(id, post.getId());
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    public static class Builder {
+
+        private Long id;
+        private User author;
+        private Images images = new Images(List.of());
+        private PostContent content;
+        private Likes likes = new Likes();
+        private Comments comments = new Comments();
+        private PostTags postTags = new PostTags();
+        private String githubRepoUrl;
+        private LocalDateTime createdAt = null;
+        private LocalDateTime updatedAt = null;
+
+        private List<Tag> tags = new ArrayList<>();
+
+        public Builder id(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder author(User user) {
+            this.author = user;
+            return this;
+        }
+
+        public Builder images(List<String> imageUrls) {
+            List<Image> images = imageUrls.stream()
+                .map(Image::new)
+                .collect(toList());
+
+            this.images = new Images(images);
+            return this;
+        }
+
+        public Builder images(Images images) {
+            this.images = images;
+            return this;
+        }
+
+        public Builder content(String content) {
+            this.content = new PostContent(content);
+            return this;
+        }
+
+        public Builder tags(Tag... tags) {
+            tags(List.of(tags));
+            return this;
+        }
+
+        public Builder tags(List<Tag> tags) {
+            this.tags = tags;
+            return this;
+        }
+
+        public Builder githubRepoUrl(String githubRepoUrl) {
+            this.githubRepoUrl = githubRepoUrl;
+            return this;
+        }
+
+        @Deprecated
+        public Builder createdAt(LocalDateTime createdAt) {
+            this.createdAt = createdAt;
+            return this;
+        }
+
+        @Deprecated
+        public Builder updatedAt(LocalDateTime updatedAt) {
+            this.updatedAt = updatedAt;
+            return this;
+        }
+
+        public Post build() {
+            Post post = new Post(
+                id,
+                author,
+                images,
+                content,
+                likes,
+                comments,
+                postTags,
+                githubRepoUrl,
+                createdAt,
+                updatedAt
+            );
+
+            post.addTags(tags);
+
+            return post;
+        }
     }
 }

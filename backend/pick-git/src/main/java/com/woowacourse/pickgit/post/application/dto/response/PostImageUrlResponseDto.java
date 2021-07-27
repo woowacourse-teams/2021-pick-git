@@ -1,7 +1,9 @@
 package com.woowacourse.pickgit.post.application.dto.response;
 
 import java.util.List;
+import lombok.Builder;
 
+@Builder
 public class PostImageUrlResponseDto {
 
     private Long id;

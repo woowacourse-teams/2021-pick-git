@@ -41,14 +41,30 @@ public class Comment {
         this.content = new CommentContent(content);
     }
 
+    //todo must delete this method
     public Comment writeBy(User user) {
         this.user = user;
         return this;
     }
 
-    public Comment toPost(Post post) {
+    public void belongTo(Post post) {
         this.post = post;
-        return this;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getProfileImageUrl() {
+        return user.getImage();
+    }
+
+    public String getAuthorName() {
+        return user.getName();
+    }
+
+    public String getContent() {
+        return content.getContent();
     }
 
     public String getProfileImageUrl() {
@@ -64,27 +80,11 @@ public class Comment {
             return false;
         }
         Comment comment = (Comment) o;
-        return Objects.equals(id, comment.id);
+        return Objects.equals(id, comment.getId());
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id);
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getAuthorName() {
-        return user.getName();
-    }
-
-    public String getContent() {
-        return content.getContent();
-    }
-
-    public User getUser() {
-        return user;
     }
 }

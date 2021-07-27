@@ -1,6 +1,6 @@
 package com.woowacourse.pickgit.common.factory;
 
-import com.woowacourse.pickgit.post.application.dto.CommentResponse;
+import com.woowacourse.pickgit.post.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import java.time.LocalDateTime;
@@ -121,7 +121,7 @@ public class PostFactory {
     }
 
     public static List<PostResponseDto> mockPostResponseDtos() {
-        CommentResponse commentFixture1 = CommentResponse.builder()
+        CommentResponseDto commentFixture1 = CommentResponseDto.builder()
             .id(1L)
             .profileImageUrl("commentAuthorProfileImageUrl")
             .authorName("commentAuthorName1")
@@ -129,7 +129,7 @@ public class PostFactory {
             .liked(false)
             .build();
 
-        CommentResponse commentFixture2 = CommentResponse.builder()
+        CommentResponseDto commentFixture2 = CommentResponseDto.builder()
             .id(2L)
             .profileImageUrl("commentAuthorProfileImageUrl")
             .authorName("commentAuthorName2")

@@ -1,10 +1,12 @@
 package com.woowacourse.pickgit.post.presentation.dto.response;
 
-import com.woowacourse.pickgit.post.domain.comment.Comment;
+import lombok.Builder;
 
+@Builder
 public class CommentResponse {
 
     private Long id;
+    private String profileImageUrl;
     private String authorName;
     private String content;
     private Boolean liked;
@@ -12,15 +14,37 @@ public class CommentResponse {
     private CommentResponse() {
     }
 
-    public CommentResponse(Long id, String authorName, String content, Boolean liked) {
+    public CommentResponse(
+        Long id,
+        String profileImageUrl,
+        String authorName,
+        String content,
+        Boolean liked
+    ) {
         this.id = id;
+        this.profileImageUrl = profileImageUrl;
         this.authorName = authorName;
         this.content = content;
         this.liked = liked;
     }
 
-    public static CommentResponse from(Comment comment) {
-        return new CommentResponse(comment.getId(), comment.getAuthorName(),
-            comment.getContent(), false);
+    public Long getId() {
+        return id;
+    }
+
+    public String getAuthorName() {
+        return authorName;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public Boolean getLiked() {
+        return liked;
+    }
+
+    public String getProfileImageUrl() {
+        return profileImageUrl;
     }
 }

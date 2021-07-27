@@ -29,7 +29,6 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.requestP
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
-import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -40,33 +39,25 @@ import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.FileFactory;
-import com.woowacourse.pickgit.common.factory.PostFactory;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.exception.post.CannotUnlikeException;
 import com.woowacourse.pickgit.exception.post.CommentFormatException;
 import com.woowacourse.pickgit.exception.post.DuplicatedLikeException;
 import com.woowacourse.pickgit.post.application.PostService;
-import com.woowacourse.pickgit.post.application.dto.CommentResponse;
-import com.woowacourse.pickgit.post.application.dto.request.PostDeleteRequestDto;
+import com.woowacourse.pickgit.post.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
-import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
-import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
-import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDtos;
 import com.woowacourse.pickgit.post.presentation.PostController;
-import com.woowacourse.pickgit.post.presentation.dto.request.CommentRequest;
+import com.woowacourse.pickgit.post.application.dto.request.CommentRequestDto;
 import com.woowacourse.pickgit.post.presentation.dto.request.ContentRequest;
-import com.woowacourse.pickgit.post.presentation.dto.request.HomeFeedRequest;
-import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
-import com.woowacourse.pickgit.post.presentation.dto.response.LikeResponse;
-import com.woowacourse.pickgit.post.presentation.dto.response.PostUpdateResponse;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -75,13 +66,11 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 @AutoConfigureRestDocs
 @Import(InfrastructureTestConfiguration.class)
-@ExtendWith(SpringExtension.class)
 @WebMvcTest(PostController.class)
 @ActiveProfiles("test")
 class PostControllerTest {
@@ -101,6 +90,7 @@ class PostControllerTest {
 
     @MockBean
     private OAuthService oAuthService;
+
 
     @DisplayName("게시물을 작성할 수 있다. - 사용자")
     @Test
@@ -180,12 +170,12 @@ class PostControllerTest {
     void addComment_ValidContent_Success() throws Exception {
         // given
         LoginUser loginUser = new LoginUser("kevin", "token");
-        CommentResponse commentResponse = CommentResponse.builder()
+        CommentResponseDto commentResponseDto = CommentResponseDto.builder()
             .id(1L)
             .profileImageUrl("kevin profile image url")
             .authorName(loginUser.getUsername())
             .content("test Comment")
-            .liked(false)
+            .isLiked(false)
             .build();
         ContentRequest commentRequest = new ContentRequest("test Comment");
 
@@ -193,11 +183,11 @@ class PostControllerTest {
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(anyString()))
             .willReturn(loginUser);
-        given(postService.addComment(any(CommentRequest.class)))
-            .willReturn(commentResponse);
+        given(postService.addComment(any(CommentRequestDto.class)))
+            .willReturn(commentResponseDto);
 
         String requestBody = objectMapper.writeValueAsString(commentRequest);
-        String responseBody = objectMapper.writeValueAsString(commentResponse);
+        String responseBody = objectMapper.writeValueAsString(commentResponseDto);
 
         // when
         ResultActions perform = addCommentApi("/api/posts/{postId}/comments", 1L, requestBody);
@@ -207,7 +197,7 @@ class PostControllerTest {
             .andExpect(status().isOk())
             .andExpect(content().string(responseBody));
 
-        verify(postService, times(1)).addComment(any(CommentRequest.class));
+        verify(postService, times(1)).addComment(any(CommentRequestDto.class));
 
         // documentation
         perform.andDo(document("comment-post",
@@ -243,7 +233,7 @@ class PostControllerTest {
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(anyString()))
             .willReturn(loginUser);
-        given(postService.addComment(any(CommentRequest.class)))
+        given(postService.addComment(any(CommentRequestDto.class)))
             .willThrow(new CommentFormatException());
 
         String requestBody = objectMapper.writeValueAsString(commentRequest);
@@ -256,7 +246,7 @@ class PostControllerTest {
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("errorCode").value("F0001"));
 
-        verify(postService, never()).addComment(any(CommentRequest.class));
+        verify(postService, never()).addComment(any(CommentRequestDto.class));
 
         // documentation
         perform.andDo(document("comment-post-emptyContent",
@@ -293,13 +283,13 @@ class PostControllerTest {
         given(oAuthService.findRequestUserByToken(any()))
             .willReturn(loginUser);
 
-        RepositoriesResponseDto responseDto = new RepositoriesResponseDto(List.of(
+        RepositoryResponseDtos responseDto = new RepositoryResponseDtos(List.of(
             new RepositoryResponseDto("pick", "https://github.com/jipark3/pick"),
             new RepositoryResponseDto("git", "https://github.com/jipark3/git")
         ));
-        String repositories = objectMapper.writeValueAsString(responseDto.getRepositories());
+        String repositories = objectMapper.writeValueAsString(responseDto.getRepositoryResponseDtos());
 
-        given(postService.showRepositories(any(RepositoryRequestDto.class)))
+        given(postService.userRepositories(any(RepositoryRequestDto.class)))
             .willReturn(responseDto);
 
         // then

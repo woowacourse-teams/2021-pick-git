@@ -1,6 +1,7 @@
 package com.woowacourse.pickgit.post.domain.content;
 
 import com.woowacourse.pickgit.exception.post.PostFormatException;
+import java.util.Objects;
 import javax.persistence.Embeddable;
 import javax.persistence.Lob;
 
@@ -16,21 +17,34 @@ public class PostContent {
     }
 
     public PostContent(String content) {
-        validate(content);
+        validateLengthIsOverThenMaximumContentLength(content);
         this.content = content;
     }
 
-    private void validate(String content) {
-        if (isOver500(content)) {
+    private void validateLengthIsOverThenMaximumContentLength(String content) {
+        if (content.length() > MAXIMUM_CONTENT_LENGTH) {
             throw new PostFormatException();
         }
     }
 
-    private boolean isOver500(String content) {
-        return content.length() > MAXIMUM_CONTENT_LENGTH;
-    }
-
     public String getContent() {
         return content;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        PostContent that = (PostContent) o;
+        return Objects.equals(content, that.getContent());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(content);
     }
 }

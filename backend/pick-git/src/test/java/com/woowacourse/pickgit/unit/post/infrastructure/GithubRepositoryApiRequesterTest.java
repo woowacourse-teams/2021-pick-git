@@ -2,6 +2,7 @@ package com.woowacourse.pickgit.unit.post.infrastructure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.woowacourse.pickgit.post.infrastructure.requester.GithubRepositoryApiRequester;
 import com.woowacourse.pickgit.post.infrastructure.GithubRepositoryApiRequester;
 import java.util.List;
 import java.util.Optional;

@@ -1,7 +1,6 @@
 package com.woowacourse.pickgit.post.domain.like;
 
-import com.woowacourse.pickgit.exception.post.CannotUnlikeException;
-import com.woowacourse.pickgit.exception.post.DuplicatedLikeException;
+import com.woowacourse.pickgit.user.domain.User;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
@@ -32,9 +31,9 @@ public class Likes {
         return likes.size();
     }
 
-    public boolean contains(String userName) {
+    public boolean contains(Like like) {
         return likes.stream()
-            .anyMatch(like -> like.isOwnedBy(userName));
+            .anyMatch(l -> l.equals(like));
     }
 
     public void add(Like like) {

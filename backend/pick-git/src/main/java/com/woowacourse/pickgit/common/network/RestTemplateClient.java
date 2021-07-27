@@ -1,6 +1,6 @@
 package com.woowacourse.pickgit.common.network;
 
-import com.woowacourse.pickgit.post.infrastructure.RestClient;
+import com.woowacourse.pickgit.post.domain.util.RestClient;
 import java.net.URI;
 import java.util.Map;
 import java.util.Set;

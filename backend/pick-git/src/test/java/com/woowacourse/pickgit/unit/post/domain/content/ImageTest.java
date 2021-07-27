@@ -2,7 +2,6 @@ package com.woowacourse.pickgit.unit.post.domain.content;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.woowacourse.pickgit.common.factory.PostBuilder;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.content.Image;
 import java.lang.reflect.Field;
@@ -15,11 +14,11 @@ class ImageTest {
     @Test
     void toPost() throws NoSuchFieldException, IllegalAccessException {
         //given
-        Post post = new PostBuilder().id(1L).build();
+        Post post = Post.builder().id(1L).build();
         Image testImageUrl = new Image("testImageUrl");
 
         //when
-        testImageUrl.toPost(post);
+        testImageUrl.belongTo(post);
 
         //then
         Field postField = Image.class.getDeclaredField("post");

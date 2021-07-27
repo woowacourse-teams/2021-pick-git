@@ -4,7 +4,6 @@ import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileRespon
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.infrastructure.dto.OAuthAccessTokenRequest;
 import com.woowacourse.pickgit.authentication.infrastructure.dto.OAuthAccessTokenResponse;
-import com.woowacourse.pickgit.exception.platform.PlatformException;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;

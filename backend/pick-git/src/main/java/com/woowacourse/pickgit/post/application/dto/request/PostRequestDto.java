@@ -17,8 +17,14 @@ public class PostRequestDto {
     private PostRequestDto() {
     }
 
-    public PostRequestDto(String token, String username, List<MultipartFile> images,
-        String githubRepoUrl, List<String> tags, String content) {
+    public PostRequestDto(
+        String token,
+        String username,
+        List<MultipartFile> images,
+        String githubRepoUrl,
+        List<String> tags,
+        String content
+    ) {
         this.token = token;
         this.username = username;
         this.images = images;

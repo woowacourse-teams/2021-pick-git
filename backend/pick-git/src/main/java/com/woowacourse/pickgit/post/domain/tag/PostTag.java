@@ -1,8 +1,8 @@
-package com.woowacourse.pickgit.post.domain;
+package com.woowacourse.pickgit.post.domain.tag;
 
+import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.tag.domain.Tag;
 import java.util.Objects;
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -10,7 +10,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import org.springframework.lang.NonNull;
 
 @Entity
 public class PostTag {
@@ -19,12 +18,12 @@ public class PostTag {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
-    private Post post;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tag_id", nullable = false)
     private Tag tag;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post;
 
     protected PostTag() {
     }
@@ -34,12 +33,16 @@ public class PostTag {
         this.tag = tag;
     }
 
+    public boolean hasSameTag(Tag tag) {
+        return Objects.equals(this.tag, tag);
+    }
+
     public Tag getTag() {
         return tag;
     }
 
-    public String getTagName() {
-        return tag.getName();
+    private Long getId() {
+        return id;
     }
 
     @Override
@@ -51,7 +54,7 @@ public class PostTag {
             return false;
         }
         PostTag postTag = (PostTag) o;
-        return Objects.equals(id, postTag.id);
+        return Objects.equals(id, postTag.getId());
     }
 
     @Override

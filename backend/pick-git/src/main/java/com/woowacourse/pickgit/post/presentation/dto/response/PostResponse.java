@@ -1,11 +1,12 @@
-package com.woowacourse.pickgit.post.application.dto.response;
+package com.woowacourse.pickgit.post.presentation.dto.response;
 
+import com.woowacourse.pickgit.post.application.dto.response.CommentResponseDto;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
 
 @Builder
-public class PostResponseDto {
+public class PostResponse {
 
     private Long id;
     private List<String> imageUrls;
@@ -20,10 +21,10 @@ public class PostResponseDto {
     private List<CommentResponseDto> comments;
     private Boolean isLiked;
 
-    private PostResponseDto() {
+    private PostResponse() {
     }
 
-    public PostResponseDto(
+    public PostResponse(
         Long id,
         List<String> imageUrls,
         String githubRepoUrl,
@@ -48,7 +49,7 @@ public class PostResponseDto {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.comments = comments;
-        this.liked = liked;
+        this.isLiked = isLiked;
     }
 
     public Long getId() {
@@ -95,7 +96,7 @@ public class PostResponseDto {
         return comments;
     }
 
-    public Boolean getLiked() {
-        return liked;
+    public Boolean getIsLiked() {
+        return isLiked;
     }
 }

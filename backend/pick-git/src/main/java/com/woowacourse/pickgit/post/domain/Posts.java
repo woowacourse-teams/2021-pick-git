@@ -14,6 +14,10 @@ public class Posts {
     protected Posts() {
     }
 
+    public Posts() {
+        this(new ArrayList<>());
+    }
+
     public Posts(List<Post> posts) {
         this.posts = posts;
     }

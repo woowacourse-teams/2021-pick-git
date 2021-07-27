@@ -22,7 +22,7 @@ class PostTest {
     @DisplayName("Tag를 정상적으로 Post에 등록한다.")
     @Test
     void addTags_ValidTags_RegistrationSuccess() {
-        Post post = new PostBuilder()
+        Post post = Post.builder()
             .content("abc")
             .build();
 
@@ -40,7 +40,7 @@ class PostTest {
     @DisplayName("중복되는 이름의 Tag가 존재하면 Post에 추가할 수 없다.")
     @Test
     void addTags_DuplicatedTagName_ExceptionThrown() {
-        Post post = new PostBuilder()
+        Post post = Post.builder()
             .content("abc")
             .build();
 
