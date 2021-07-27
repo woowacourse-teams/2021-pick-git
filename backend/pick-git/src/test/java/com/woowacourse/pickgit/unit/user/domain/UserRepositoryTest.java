@@ -280,9 +280,9 @@ class UserRepositoryTest {
         // given
         User user = userRepository.findByBasicProfile_Name("testUser")
             .orElseThrow(IllegalArgumentException::new);
-        Post post = new Post(new PostContent("hi"), new Images(new ArrayList<>()), "url", user);
-        Post post1 = new Post(new PostContent("hi"), new Images(new ArrayList<>()), "url", user);
-        Post post2 = new Post(new PostContent("hi"), new Images(new ArrayList<>()), "url", user);
+        Post post = new Post(new Images(new ArrayList<>()), new PostContent("hi"), "url", user);
+        Post post1 = new Post(new Images(new ArrayList<>()), new PostContent("hi"), "url", user);
+        Post post2 = new Post(new Images(new ArrayList<>()), new PostContent("hi"), "url", user);
         postRepository.save(post);
         postRepository.save(post1);
         postRepository.save(post2);
