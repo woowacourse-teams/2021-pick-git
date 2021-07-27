@@ -118,14 +118,6 @@ public class User {
         return id;
     }
 
-    public BasicProfile getBasicProfile() {
-        return basicProfile;
-    }
-
-    public GithubProfile getGithubProfile() {
-        return githubProfile;
-    }
-
     public int getFollowerCount() {
         return followers.count();
     }
