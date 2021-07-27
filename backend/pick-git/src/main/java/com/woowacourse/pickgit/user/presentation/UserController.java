@@ -140,7 +140,7 @@ public class UserController {
             )
         );
     }
-    
+
     private FollowResponse createFollowResponse(FollowResponseDto followResponseDto) {
         return FollowResponse.builder()
             .followerCount(followResponseDto.getFollowerCount())
