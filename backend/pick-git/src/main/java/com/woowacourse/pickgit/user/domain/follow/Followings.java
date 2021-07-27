@@ -22,14 +22,6 @@ public class Followings {
     public Followings() {
     }
 
-    public boolean existFollow(Follow follow) {
-        return this.followings.contains(follow);
-    }
-
-    public int count() {
-        return followings.size();
-    }
-
     public void add(Follow follow) {
         followings.add(follow);
     }
@@ -41,5 +33,13 @@ public class Followings {
     public Boolean isFollowing(User targetUser) {
         return followings.stream()
             .anyMatch(follow -> follow.isFollowing(targetUser));
+    }
+
+    public boolean contains(Follow follow) {
+        return this.followings.contains(follow);
+    }
+
+    public int count() {
+        return followings.size();
     }
 }

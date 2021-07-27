@@ -78,7 +78,7 @@ public class User {
     public void follow(User target) {
         validateDifferentSourceTarget(target);
         Follow follow = new Follow(this, target);
-        if (this.followings.existFollow(follow)) {
+        if (this.followings.contains(follow)) {
             throw new DuplicateFollowException();
         }
         this.followings.add(follow);
@@ -94,7 +94,7 @@ public class User {
     public void unfollow(User target) {
         validateDifferentSourceTarget(target);
         Follow follow = new Follow(this, target);
-        if (!this.followings.existFollow(follow)) {
+        if (!this.followings.contains(follow)) {
             throw new InvalidFollowException();
         }
         this.followings.remove(follow);

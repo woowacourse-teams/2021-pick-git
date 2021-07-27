@@ -21,10 +21,6 @@ public class Followers {
     public Followers() {
     }
 
-    public int count() {
-        return followers.size();
-    }
-
     public void add(Follow follow) {
         followers.add(follow);
     }
@@ -33,7 +29,7 @@ public class Followers {
         followers.remove(follow);
     }
 
-    public List<Follow> getFollowers() {
-        return followers;
+    public int count() {
+        return followers.size();
     }
 }
