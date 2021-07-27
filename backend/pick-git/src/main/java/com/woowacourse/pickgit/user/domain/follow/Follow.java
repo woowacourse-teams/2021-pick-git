@@ -20,7 +20,8 @@ import javax.persistence.UniqueConstraint;
 )
 public class Follow {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -64,12 +65,12 @@ public class Follow {
             return false;
         }
         Follow follow = (Follow) o;
-        return Objects.equals(source, follow.source) && Objects
-            .equals(target, follow.target);
+        return Objects.equals(getSource(), follow.getSource())
+            && Objects.equals(getTarget(), follow.getTarget());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(source, target);
+        return Objects.hash(getSource(), getTarget());
     }
 }
