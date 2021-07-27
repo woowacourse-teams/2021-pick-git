@@ -32,13 +32,13 @@ public class PostDtoAssembler {
             .collect(Collectors.toList());
 
         if (appUser.isGuest()) {
-            return new PostResponseDto(post.getId(), post.getImagaeUrls(), post.getGithubRepoUrl(),
+            return new PostResponseDto(post.getId(), post.getImageUrls(), post.getGithubRepoUrl(),
                 post.getContent(), postWriter.getName(), postWriter.getBasicProfile().getImage(),
                 post.getLikeCounts(),
                 tags, post.getCreatedAt(), post.getUpdatedAt(), comments, null);
         }
 
-        return new PostResponseDto(post.getId(), post.getImagaeUrls(), post.getGithubRepoUrl(),
+        return new PostResponseDto(post.getId(), post.getImageUrls(), post.getGithubRepoUrl(),
             post.getContent(), postWriter.getName(), postWriter.getBasicProfile().getImage(),
             post.getLikeCounts(),
             tags, post.getCreatedAt(), post.getUpdatedAt(), comments, post.isLikedBy(appUser.getUsername()));

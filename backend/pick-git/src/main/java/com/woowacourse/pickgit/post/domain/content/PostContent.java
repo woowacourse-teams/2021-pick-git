@@ -7,6 +7,7 @@ import javax.persistence.Lob;
 @Embeddable
 public class PostContent {
 
+    public static final int MAXIMUM_CONTENT_LENGTH = 500;
     @Lob
     private String content;
 
@@ -25,7 +26,7 @@ public class PostContent {
     }
 
     private boolean isOver500(String content) {
-        return content.length() > 500;
+        return content.length() > MAXIMUM_CONTENT_LENGTH;
     }
 
     public String getContent() {

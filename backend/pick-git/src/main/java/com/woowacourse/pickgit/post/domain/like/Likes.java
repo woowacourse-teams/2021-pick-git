@@ -10,9 +10,14 @@ import javax.persistence.OneToMany;
 public class Likes {
 
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
-    private List<Like> likes = new ArrayList<>();
+    private List<Like> likes;
 
-    protected Likes() {
+    public Likes() {
+        this(new ArrayList<>());
+    }
+
+    public Likes(List<Like> likes) {
+        this.likes = likes;
     }
 
     public int getCounts() {
@@ -21,6 +26,6 @@ public class Likes {
 
     public boolean contains(String userName) {
         return likes.stream()
-            .anyMatch(like -> like.contains(userName));
+            .anyMatch(like -> like.isOwnedBy(userName));
     }
 }

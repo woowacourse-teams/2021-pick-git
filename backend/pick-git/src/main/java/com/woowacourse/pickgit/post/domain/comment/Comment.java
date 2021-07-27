@@ -33,6 +33,11 @@ public class Comment {
     }
 
     public Comment(String content) {
+        this(null, content);
+    }
+
+    public Comment(Long id, String content) {
+        this.id = id;
         this.content = new CommentContent(content);
     }
 
@@ -44,6 +49,10 @@ public class Comment {
     public Comment toPost(Post post) {
         this.post = post;
         return this;
+    }
+
+    public String getProfileImageUrl() {
+        return user.getImage();
     }
 
     @Override
@@ -63,10 +72,6 @@ public class Comment {
         return Objects.hash(id);
     }
 
-    public User getUser() {
-        return user;
-    }
-
     public Long getId() {
         return id;
     }
@@ -79,7 +84,7 @@ public class Comment {
         return content.getContent();
     }
 
-    public String getProfileImageUrl() {
-        return user.getImage();
+    public User getUser() {
+        return user;
     }
 }
