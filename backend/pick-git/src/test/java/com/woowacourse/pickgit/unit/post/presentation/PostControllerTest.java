@@ -164,7 +164,7 @@ class PostControllerTest {
         ));
     }
 
-    @DisplayName("특정 Post에 댓글을 추가한다.")
+    @DisplayName("특정 Post에 Comment을 추가한다.")
     @Test
     void addComment_ValidContent_Success() throws Exception {
         // given
@@ -221,7 +221,7 @@ class PostControllerTest {
         ));
     }
 
-    @DisplayName("특정 Post에 댓글 등록 실패한다. - 빈 댓글인 경우.")
+    @DisplayName("특정 Post에 댓글 등록 실패한다. - 빈 Comment인 경우.")
     @Test
     void addComment_InValidContent_ExceptionThrown() throws Exception {
         // given
@@ -232,7 +232,6 @@ class PostControllerTest {
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(anyString()))
             .willReturn(loginUser);
-
         given(postService.addComment(any(CommentRequest.class)))
             .willThrow(new CommentFormatException());
 
@@ -264,10 +263,9 @@ class PostControllerTest {
         ));
     }
 
-    private ResultActions addCommentApi(String url, Long postId, String requestBody)
-        throws Exception {
+    private ResultActions addCommentApi(String url,  Long postId, String requestBody) throws Exception {
         return mockMvc.perform(post(url, postId)
-            .header("Authorization", "Bearer test")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer test")
             .contentType(MediaType.APPLICATION_JSON)
             .content(requestBody));
     }
@@ -276,32 +274,30 @@ class PostControllerTest {
     @Test
     void showRepositories_LoginUser_Success() throws Exception {
         // given
-        RepositoriesResponseDto responseDto = new RepositoriesResponseDto(List.of(
-            new RepositoryResponseDto("pick", "https://github.com/jipark3/pick"),
-            new RepositoryResponseDto("git", "https://github.com/jipark3/git")
-        ));
-
         LoginUser loginUser = new LoginUser("testUser", "at");
 
         given(oAuthService.validateToken(any()))
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(any()))
             .willReturn(loginUser);
+
+        RepositoriesResponseDto responseDto = new RepositoriesResponseDto(List.of(
+            new RepositoryResponseDto("pick", "https://github.com/jipark3/pick"),
+            new RepositoryResponseDto("git", "https://github.com/jipark3/git")
+        ));
+        String repositories = objectMapper.writeValueAsString(responseDto.getRepositories());
+
         given(postService.showRepositories(any(RepositoryRequestDto.class)))
             .willReturn(responseDto);
 
-        // when
+        // then
         ResultActions perform = mockMvc
             .perform(get("/api/github/${userName}/repositories", USERNAME)
-                .header(HttpHeaders.AUTHORIZATION, API_ACCESS_TOKEN));
-
-        // then
-        String repositories = objectMapper.writeValueAsString(responseDto);
-        perform
+                .header(HttpHeaders.AUTHORIZATION, API_ACCESS_TOKEN))
             .andExpect(status().isOk())
             .andExpect(content().string(repositories));
 
-        // documentation
+        //documentation
         perform.andDo(document("repositories-loggedIn",
             getDocumentRequest(),
             getDocumentResponse(),
@@ -354,8 +350,7 @@ class PostControllerTest {
                 fieldWithPath("[].updatedAt").type(STRING).description("마지막 글 수정 시간"),
                 fieldWithPath("[].comments").type(ARRAY).description("댓글 목록"),
                 fieldWithPath("[].comments[].id").type(NUMBER).description("댓글 아이디"),
-                fieldWithPath("[].comments[].profileImageUrl").type(STRING)
-                    .description("댓글 작성자 프로필 사진"),
+                fieldWithPath("[].comments[].profileImageUrl").type(STRING).description("댓글 작성자 프로필 사진"),
                 fieldWithPath("[].comments[].authorName").type(STRING).description("댓글 작성자 이름"),
                 fieldWithPath("[].comments[].content").type(STRING).description("댓글 내용"),
                 fieldWithPath("[].comments[].isLiked").type(BOOLEAN).description("댓글 좋아요 여부"),
@@ -409,8 +404,7 @@ class PostControllerTest {
                 fieldWithPath("[].updatedAt").type(STRING).description("마지막 글 수정 시간"),
                 fieldWithPath("[].comments").type(ARRAY).description("댓글 목록"),
                 fieldWithPath("[].comments[].id").type(NUMBER).description("댓글 아이디"),
-                fieldWithPath("[].comments[].profileImageUrl").type(STRING)
-                    .description("댓글 작성자 프로필 사진"),
+                fieldWithPath("[].comments[].profileImageUrl").type(STRING).description("댓글 작성자 프로필 사진"),
                 fieldWithPath("[].comments[].authorName").type(STRING).description("댓글 작성자 이름"),
                 fieldWithPath("[].comments[].content").type(STRING).description("댓글 내용"),
                 fieldWithPath("[].comments[].isLiked").type(BOOLEAN).description("댓글 좋아요 여부"),

@@ -402,7 +402,7 @@ class PostServiceTest {
         );
 
         HomeFeedRequest homeFeedRequest = HomeFeedRequest.builder()
-            .appUser(new GuestUser())
+            .appUser(new LoginUser("testUser", "at"))
             .page(1L)
             .limit(3L)
             .build();

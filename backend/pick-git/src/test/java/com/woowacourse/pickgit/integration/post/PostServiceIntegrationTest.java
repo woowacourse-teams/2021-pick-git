@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyString;
 
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
@@ -129,6 +130,8 @@ class PostServiceIntegrationTest {
     @DisplayName("존재하지 않는 Post에 Comment를 등록할 수 없다.")
     @Test
     void addComment_PostNotFound_ExceptionThrown() {
+        userRepository.save(UserFactory.user("kevin"));
+
         // when
         CommentRequest commentRequest = CommentRequest.builder()
             .userName("kevin")
@@ -195,6 +198,8 @@ class PostServiceIntegrationTest {
     @Test
     void write_LoginUserWithDuplicateTag_Fail() {
         // given
+        userRepository.save(UserFactory.user(USERNAME));
+
         PostRequestDto requestDto = PostRequestDto.builder()
             .token(ACCESS_TOKEN)
             .username(USERNAME)

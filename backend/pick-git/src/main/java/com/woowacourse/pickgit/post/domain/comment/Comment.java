@@ -71,4 +71,20 @@ public class Comment {
     public int hashCode() {
         return Objects.hash(id);
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getAuthorName() {
+        return user.getName();
+    }
+
+    public String getContent() {
+        return content.getContent();
+    }
+
+    public User getUser() {
+        return user;
+    }
 }
