@@ -29,6 +29,8 @@ import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.ContributionRequestDto;
+import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.presentation.UserController;
@@ -248,6 +250,46 @@ class UserControllerTest {
                 fieldWithPath("website").type(STRING).description("웹 사이트"),
                 fieldWithPath("twitter").type(STRING).description("트위터"),
                 fieldWithPath("following").type(NULL).description("팔로잉 여부")
+            )
+        ));
+    }
+
+    @DisplayName("누구든지 활동 통계를 조회할 수 있다.")
+    @Test
+    void getContributions_Anyone_Success() throws Exception {
+        // given
+        ContributionResponseDto responseDto = UserFactory.mockContributionResponseDto();
+
+        given(userService.calculateContributions(any(ContributionRequestDto.class)))
+            .willReturn(responseDto);
+
+        // when
+        ResultActions perform = mockMvc
+            .perform(get("/api/profiles/{username}/contributions", "testUser")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.ALL));
+
+        // then
+        String body = perform
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+        assertThat(body).isEqualTo(objectMapper.writeValueAsString(responseDto));
+
+        perform.andDo(document("contributions-LoggedIn",
+            getDocumentRequest(),
+            getDocumentResponse(),
+            pathParameters(
+                parameterWithName("username").description("사용자 이름")
+            ),
+            responseFields(
+                fieldWithPath("starsCount").description("스타 개수"),
+                fieldWithPath("commitsCount").description("커밋 개수"),
+                fieldWithPath("prsCount").description("PR 개수"),
+                fieldWithPath("issuesCount").description("이슈 개수"),
+                fieldWithPath("reposCount").description("퍼블릭 레포지토리 개수")
             )
         ));
     }
