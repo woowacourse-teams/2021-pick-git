@@ -1,11 +1,10 @@
 import { useEffect } from "react";
 import { Container, StepSlider, StepContainer, NextStepButtonWrapper } from "./AddPostPage.style";
-import { STEPS } from "../../constants/steps";
+import { POST_ADD_STEPS } from "../../constants/steps";
 import RepositorySelector from "../../components/RepositorySelector/RepositorySelector";
 import PostContentUploader from "../../components/PostContentUploader/PostContentUploader";
 import TagInputForm from "../../components/TagInputForm/TagInputForm";
 import Button from "../../components/@shared/Button/Button";
-import useStep from "../../services/hooks/@common/useStep";
 import { PAGE_URL } from "../../constants/urls";
 import usePostUpload from "../../services/hooks/usePostUpload";
 import useMessageModal from "../../services/hooks/@common/useMessageModal";
@@ -20,10 +19,11 @@ import {
   isValidPostUploadData,
 } from "../../utils/postUpload";
 import { getAPIErrorMessage } from "../../utils/error";
+import usePostAddStep from "../../services/hooks/usePostAddStep";
 
 const AddPostPage = () => {
-  const { stepIndex, goNextStep, setStepMoveEventHandler, removeStepMoveEventHandler, completeStep } = useStep(
-    STEPS,
+  const { stepIndex, goNextStep, setStepMoveEventHandler, removeStepMoveEventHandler, completeStep } = usePostAddStep(
+    POST_ADD_STEPS,
     PAGE_URL.HOME
   );
   const { content, githubRepositoryName, tags, files, uploadPost, resetPostUploadData } = usePostUpload();
@@ -92,15 +92,15 @@ const AddPostPage = () => {
 
   return (
     <Container>
-      <StepSlider stepCount={STEPS.length} stepIndex={stepIndex}>
-        {STEPS.map((STEP, index) => (
-          <StepContainer key={STEP.title} stepCount={STEPS.length} isShown={stepIndex === index}>
+      <StepSlider stepCount={POST_ADD_STEPS.length} stepIndex={stepIndex}>
+        {POST_ADD_STEPS.map((STEP, index) => (
+          <StepContainer key={STEP.title} stepCount={POST_ADD_STEPS.length} isShown={stepIndex === index}>
             {stepComponents[index]}
           </StepContainer>
         ))}
       </StepSlider>
       <NextStepButtonWrapper>
-        {stepIndex < STEPS.length - 1 ? (
+        {stepIndex < POST_ADD_STEPS.length - 1 ? (
           <Button kind="roundedBlock" onClick={handleNextButtonClick}>
             다음
           </Button>

@@ -1,5 +1,5 @@
 import { Container } from "./TagFeedPage.style";
-import Feed from "../../components/Feed/Feed";
+import HomeFeed from "../../components/HomeFeed/HomeFeed";
 import { useHomeFeedPostsQuery } from "../../services/queries";
 import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
@@ -40,7 +40,7 @@ const TagFeedPage = () => {
   return (
     <Container>
       <InfiniteScrollContainer isLoaderShown={isFetching} onIntersect={handlePostsEndIntersect}>
-        <Feed posts={allPosts} />
+        <HomeFeed posts={allPosts} queryKey="" />
       </InfiniteScrollContainer>
     </Container>
   );

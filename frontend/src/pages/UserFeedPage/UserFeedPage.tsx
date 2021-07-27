@@ -1,6 +1,6 @@
-import { useRef, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
-import Feed from "../../components/Feed/Feed";
+import HomeFeed from "../../components/HomeFeed/HomeFeed";
 import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import useUserFeed from "../../services/hooks/useUserFeed";
@@ -11,6 +11,7 @@ import { useLocation } from "react-router-dom";
 
 import UserContext from "../../contexts/UserContext";
 import { LayoutInPx } from "../../constants/layout";
+import { QUERY } from "../../constants/queries";
 
 interface LocationState {
   prevData?: InfiniteData<Post[]>;
@@ -56,7 +57,7 @@ const UserFeedPage = () => {
   return (
     <Container>
       <InfiniteScrollContainer isLoaderShown={isFetchingNextPage} onIntersect={handleIntersect}>
-        <Feed posts={allPosts} />
+        <HomeFeed posts={allPosts} queryKey={QUERY.GET_USER_FEED_POSTS} />
       </InfiniteScrollContainer>
     </Container>
   );

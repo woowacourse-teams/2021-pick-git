@@ -1,41 +1,42 @@
-import { forwardRef, useContext } from "react";
+import { forwardRef, useContext, useEffect, useRef, useState } from "react";
 import { Post } from "../../@types";
-import { LIMIT } from "../../constants/limits";
-import { FAILURE_MESSAGE } from "../../constants/messages";
 import SnackBarContext from "../../contexts/SnackbarContext";
 import UserContext from "../../contexts/UserContext";
-import useFeed from "../../services/hooks/useFeed";
 import PostItem from "../@shared/PostItem/PostItem";
-import CommentInputPortal from "../CommentInputPortal/CommentInputPortal";
 import { Container, PostItemWrapper } from "./HomeFeed.style";
+import useBottomSlider from "../../services/hooks/@common/useBottomSlider";
+import CommentSlider from "../CommentSlider/CommentSlider";
+import { useHistory } from "react-router-dom";
+import useFeedMutation from "../../services/hooks/useFeedMutation";
 
 interface Props {
   posts: Post[];
+  queryKey: string;
 }
 
-const HomeFeed = ({ posts }: Props) => {
+const HomeFeed = ({ posts, queryKey }: Props) => {
+  const [selectedPostId, setSelectedPostId] = useState<Post["id"]>();
   const { pushSnackbarMessage } = useContext(SnackBarContext);
-  const { commentValue, setCommentValue, deletePostLike, addPostLike, setPosts, addComment } = useFeed();
+  const { setPosts, deletePostLike, addPostLike, mutateAddComment } = useFeedMutation(queryKey);
+  const { isBottomSliderShown, showBottomSlider, hideBottomSlider, removeSlideEventHandler, setSlideEventHandler } =
+    useBottomSlider();
   const { isLoggedIn, currentUsername } = useContext(UserContext);
+  const postItemRef = useRef<HTMLDivElement>(null);
+  const history = useHistory();
 
-  const handleCommentValueChange: React.ChangeEventHandler<HTMLTextAreaElement> = ({ target: { value } }) => {
-    if (value.length > LIMIT.COMMENT_LENGTH) {
-      pushSnackbarMessage(FAILURE_MESSAGE.COMMENT_CONTENT_MAX_LENGTH_EXCEEDED);
-      return;
-    }
+  const selectedPost = posts.find((post) => post.id === selectedPostId);
 
-    setCommentValue(value);
-  };
+  useEffect(() => {
+    history.push("#slide-down");
+    setSlideEventHandler();
+    return removeSlideEventHandler;
+  }, []);
 
-  const handleCommentValueSave = (postId: Post["id"]) => {
-    addComment(postId, commentValue);
-  };
-
-  const handleCommentLike = (commentId: string) => {
+  const handleCommentLike = (commentId: number) => {
     pushSnackbarMessage("아직 구현되지 않은 기능입니다.");
   };
 
-  const handlePostLike = (postId: string) => {
+  const handlePostLike = (postId: number) => {
     const newPosts = [...posts];
     const targetPost = newPosts.find((post) => post.id === postId);
 
@@ -57,6 +58,27 @@ const HomeFeed = ({ posts }: Props) => {
     }
   };
 
+  const handleCommentsClick = (postId: Post["id"]) => {
+    showBottomSlider();
+    setSelectedPostId(postId);
+  };
+
+  const handleCommentSliderClose = () => {
+    hideBottomSlider();
+  };
+
+  const handleCommentSave = async (value: string) => {
+    if (!selectedPostId) {
+      return;
+    }
+
+    const newComment = await mutateAddComment({ postId: selectedPostId, commentContent: value });
+    const newPosts = [...posts];
+    newPosts.find((post) => post.id === selectedPostId)?.comments.push(newComment);
+
+    setPosts(newPosts);
+  };
+
   return (
     <Container>
       {posts?.map((post) => (
@@ -76,15 +98,19 @@ const HomeFeed = ({ posts }: Props) => {
             isLiked={post.isLiked}
             likeCount={post.likesCount}
             tags={post.tags}
-            commentValue={commentValue}
-            onCommentValueChange={handleCommentValueChange}
-            onCommentValueSave={() => handleCommentValueSave(post.id)}
+            onCommentClick={() => handleCommentsClick(post.id)}
+            onCommentInputClick={() => handleCommentsClick(post.id)}
             onCommentLike={handleCommentLike}
             onPostLike={() => handlePostLike(post.id)}
           />
         </PostItemWrapper>
       ))}
-      <CommentInputPortal />
+      <CommentSlider
+        onCommentSave={handleCommentSave}
+        post={selectedPost}
+        isSliderShown={isBottomSliderShown}
+        onSliderClose={handleCommentSliderClose}
+      />
     </Container>
   );
 };

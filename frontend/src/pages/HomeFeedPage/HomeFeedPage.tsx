@@ -1,11 +1,12 @@
 import { Container } from "./HomeFeedPage.style";
-import Feed from "../../components/Feed/Feed";
+import Feed from "../../components/HomeFeed/HomeFeed";
 import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import useHomeFeed from "../../services/hooks/useHomeFeed";
+import { QUERY } from "../../constants/queries";
 
 const HomeFeedPage = () => {
-  const { allPosts, handlePostsEndIntersect, isLoading, isFetching, isError } = useHomeFeed();
+  const { posts, handlePostsEndIntersect, isLoading, isFetching, isError } = useHomeFeed();
 
   if (isError) {
     return <div>에러!!</div>;
@@ -22,7 +23,7 @@ const HomeFeedPage = () => {
   return (
     <Container>
       <InfiniteScrollContainer isLoaderShown={isFetching} onIntersect={handlePostsEndIntersect}>
-        <Feed posts={allPosts} />
+        <Feed posts={posts} queryKey={QUERY.GET_HOME_FEED_POSTS} />
       </InfiniteScrollContainer>
     </Container>
   );
