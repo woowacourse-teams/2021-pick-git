@@ -5,8 +5,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
+import com.woowacourse.pickgit.post.domain.Post;
+import com.woowacourse.pickgit.post.domain.PostRepository;
+import com.woowacourse.pickgit.post.domain.content.Images;
+import com.woowacourse.pickgit.post.domain.content.PostContent;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,18 +30,24 @@ class UserRepositoryTest {
     private UserRepository userRepository;
 
     @Autowired
-    private TestEntityManager entityManager;
+    private PostRepository postRepository;
+
+    @Autowired
+    private TestEntityManager testEntityManager;
 
     private List<User> users;
 
     @BeforeEach
     void setUp() {
+        // given
         users = UserFactory.mockSearchUsersWithId();
         users
             .stream()
             .forEach(user -> userRepository.save(user));
-        entityManager.flush();
-        entityManager.clear();
+        userRepository.save(UserFactory.user());
+
+        testEntityManager.flush();
+        testEntityManager.clear();
     }
 
     @DisplayName("유저 이름으로 유저를 조회한다.")
@@ -57,7 +68,7 @@ class UserRepositoryTest {
     @DisplayName("등록되지 않은 유저 이름으로 유저를 조회할 수 없다.- 400 예외")
     @Test
     void findUserByBasicProfile_Name_InvalidUserName_400Exception() {
-        // when
+        // when, then
         assertThatThrownBy(() -> {
             userRepository
                 .findByBasicProfile_Name("invalidUser")
@@ -121,5 +132,168 @@ class UserRepositoryTest {
 
         // then
         assertThat(searchResult).hasSize(0);
+    }
+
+    @DisplayName("특정 유저를 팔로우하면 팔로우 및 팔로워 정보 또한 함께 영속화된다.")
+    @Test
+    void follow_Valid_PersistenceSuccess() {
+        // given
+        User source = UserFactory.user("kevin");
+        User target = UserFactory.user("danyee");
+        userRepository.save(source);
+        userRepository.save(target);
+        source.follow(target);
+
+        testEntityManager.flush();
+        testEntityManager.clear();
+
+        // when
+        User findSource = userRepository.findById(source.getId())
+            .orElseThrow(IllegalArgumentException::new);
+        User findTarget = userRepository.findById(target.getId())
+            .orElseThrow(IllegalArgumentException::new);
+
+        // then
+        assertThat(findSource.getFollowingCount()).isEqualTo(1);
+        assertThat(findTarget.getFollowerCount()).isEqualTo(1);
+    }
+
+    @DisplayName("특정 유저를 언팔로우 하면 팔로우 및 팔로워 정보가 함께 영속화된다.")
+    @Test
+    void unfollow_Valid_PersistenceSuccess() {
+        // given
+        User source = UserFactory.user("kevin");
+        User target = UserFactory.user("danyee");
+        userRepository.save(source);
+        userRepository.save(target);
+        source.follow(target);
+
+        testEntityManager.flush();
+        testEntityManager.clear();
+
+        // when
+        User findSource = userRepository.findById(source.getId())
+            .orElseThrow(IllegalArgumentException::new);
+        User findTarget = userRepository.findById(target.getId())
+            .orElseThrow(IllegalArgumentException::new);
+        int beforeFollowingCounts = findSource.getFollowingCount();
+        int beforeFollowerCounts = findTarget.getFollowerCount();
+        findSource.unfollow(findTarget);
+
+        testEntityManager.flush();
+        testEntityManager.clear();
+
+        User findSource2 = userRepository.findById(source.getId())
+            .get();
+        User findTarget2 = userRepository.findById(target.getId())
+            .get();
+
+        // then
+        assertThat(beforeFollowingCounts).isOne();
+        assertThat(beforeFollowerCounts).isOne();
+        assertThat(findSource2.getFollowingCount()).isZero();
+        assertThat(findTarget2.getFollowerCount()).isZero();
+    }
+
+    @DisplayName("팔로우 중인 유저가 삭제되면 팔로우 정보 또한 변경된다.")
+    @Test
+    void follow_WhenFollowingDeleted_InformationUpdated() {
+        // given
+        User source = UserFactory.user("kevin");
+        User target = UserFactory.user("danyee");
+        userRepository.save(source);
+        userRepository.save(target);
+        source.follow(target);
+
+        testEntityManager.flush();
+        testEntityManager.clear();
+
+        // when
+        int comparableFollowingCounts = userRepository.findById(source.getId())
+            .orElseThrow(IllegalArgumentException::new)
+            .getFollowingCount();
+
+        testEntityManager.clear();
+
+        userRepository.deleteById(target.getId());
+
+        testEntityManager.flush();
+        testEntityManager.clear();
+
+        User findSource = userRepository.findById(source.getId())
+            .get();
+
+        // then
+        assertThat(comparableFollowingCounts).isOne();
+        assertThat(findSource.getFollowingCount()).isZero();
+    }
+
+    @DisplayName("팔로워 유저가 삭제되면 팔로워 정보 또한 변경된다.")
+    @Test
+    void follow_WhenFollowerDeleted_InformationUpdated() {
+        // given
+        User source = UserFactory.user("kevin");
+        User target = UserFactory.user("danyee");
+        userRepository.save(source);
+        userRepository.save(target);
+        source.follow(target);
+
+        testEntityManager.flush();
+        testEntityManager.clear();
+
+        // when
+        int comparableFollowerCounts = userRepository.findById(target.getId())
+            .orElseThrow(IllegalArgumentException::new)
+            .getFollowerCount();
+
+        testEntityManager.clear();
+
+        userRepository.deleteById(source.getId());
+
+        testEntityManager.flush();
+        testEntityManager.clear();
+
+        User findTarget = userRepository.findById(target.getId())
+            .get();
+
+        // then
+        assertThat(comparableFollowerCounts).isOne();
+        assertThat(findTarget.getFollowerCount()).isZero();
+    }
+
+    @DisplayName("특정 유저가 삭제되면 해당 유저가 작성한 게시물 또한 삭제된다.")
+    @Test
+    void deleteUser_RelatedPostsRemoved_True() {
+        // given
+        User user = userRepository.findByBasicProfile_Name("testUser")
+            .get();
+        Post post = new Post(new PostContent("hi"), new Images(new ArrayList<>()), "url", user);
+        Post post1 = new Post(new PostContent("hi"), new Images(new ArrayList<>()), "url", user);
+        Post post2 = new Post(new PostContent("hi"), new Images(new ArrayList<>()), "url", user);
+        postRepository.save(post);
+        postRepository.save(post1);
+        postRepository.save(post2);
+
+        testEntityManager.flush();
+        testEntityManager.clear();
+
+        // when
+        List<Post> beforePosts = testEntityManager.getEntityManager()
+            .createQuery("select p from Post p where p.user = :user", Post.class)
+            .setParameter("user", user)
+            .getResultList();
+        userRepository.deleteById(user.getId());
+
+        testEntityManager.flush();
+        testEntityManager.clear();
+
+        List<Post> afterPosts = testEntityManager.getEntityManager()
+            .createQuery("select p from Post p where p.user = :user", Post.class)
+            .setParameter("user", user)
+            .getResultList();
+
+        // then
+        assertThat(beforePosts).hasSize(3);
+        assertThat(afterPosts).isEmpty();
     }
 }
