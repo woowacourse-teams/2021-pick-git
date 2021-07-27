@@ -22,6 +22,7 @@ import com.woowacourse.pickgit.user.presentation.dto.response.ProfileEditRespons
 import com.woowacourse.pickgit.user.presentation.dto.response.UserProfileResponse;
 import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
+import io.restassured.http.Method;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.io.File;
@@ -55,12 +56,14 @@ class UserAcceptanceTest {
     private String loginUserAccessToken;
 
     private User loginUser;
+
     private User targetUser;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
 
+        //given
         loginUser = UserFactory.user("testUser");
         targetUser = UserFactory.user("testUser2");
 
@@ -68,7 +71,7 @@ class UserAcceptanceTest {
         로그인_되어있음(targetUser);
     }
 
-    @DisplayName("사용자는 자신의 프로필을 조회할 수 있다.")
+    @DisplayName("로그인된 사용자는 자신의 프로필을 조회할 수 있다.")
     @Test
     void getAuthenticatedUserProfile_LoginUser_Success() {
         // given
@@ -76,8 +79,12 @@ class UserAcceptanceTest {
 
         // when
         UserProfileResponse response =
-            authenticatedGetRequest(loginUserAccessToken, "/api/profiles/me", HttpStatus.OK)
-                .as(UserProfileResponse.class);
+            authenticatedRequest(
+                loginUserAccessToken,
+                "/api/profiles/me",
+                Method.GET,
+                HttpStatus.OK
+            ).as(UserProfileResponse.class);
 
         // then
         assertThat(response)
@@ -85,45 +92,59 @@ class UserAcceptanceTest {
             .isEqualTo(responseDto);
     }
 
-    @DisplayName("사용자는 유효하지 않은 토큰으로 자신의 프로필을 조회할 수 없다. - 401 예외")
+    @DisplayName("유효하지 않은 토큰을 지닌 사용자는 자신의 프로필을 조회할 수 없다. - 401 예외")
     @Test
     void getAuthenticatedUserProfile_LoginUserWithInvalidToken_401Exception() {
         // when
         ApiErrorResponse response =
-            authenticatedGetRequest("testToken", "/api/profiles/me", HttpStatus.UNAUTHORIZED)
-                .as(ApiErrorResponse.class);
+            authenticatedRequest(
+                "testToken",
+                "/api/profiles/me",
+                Method.GET,
+                HttpStatus.UNAUTHORIZED
+            ).as(ApiErrorResponse.class);
 
         // then
         assertThat(response.getErrorCode()).isEqualTo("A0001");
     }
 
-    @DisplayName("사용자는 토큰 없이 자신의 프로필을 조회할 수 없다. - 401 예외")
+    @DisplayName("토큰이 없는 사용자는 자신의 프로필을 조회할 수 없다. - 401 예외")
     @Test
     void getAuthenticatedUserProfile_LoginUserWithoutToken_401Exception() {
         // when
         ApiErrorResponse response =
-            unauthenticatedGetRequest("/api/profiles/me", HttpStatus.UNAUTHORIZED)
-                .as(ApiErrorResponse.class);
+            unauthenticatedRequest(
+                "/api/profiles/me",
+                Method.GET,
+                HttpStatus.UNAUTHORIZED
+            ).as(ApiErrorResponse.class);
 
         // then
         assertThat(response.getErrorCode()).isEqualTo("A0001");
     }
 
-    @DisplayName("사용자는 팔로우한 유저의 프로필을 조회할 수 있다.")
+    @DisplayName("로그인된 사용자는 팔로우한 유저의 프로필을 조회할 수 있다.")
     @Test
     void getUserProfile_LoginUserIsFollowing_Success() {
         // given
         UserProfileResponseDto responseDto =
             UserFactory.mockLoginUserProfileIsFollowingResponseDto();
 
-        authenticatedPostRequest(loginUserAccessToken,
-            String.format("/api/profiles/%s/followings", targetUser.getName()), HttpStatus.OK);
+        authenticatedRequest(
+            loginUserAccessToken,
+            String.format("/api/profiles/%s/followings", targetUser.getName()),
+            Method.POST,
+            HttpStatus.OK
+        );
 
         // when
         UserProfileResponse response =
-            authenticatedGetRequest(loginUserAccessToken,
-                String.format("/api/profiles/%s", targetUser.getName()), HttpStatus.OK)
-                .as(UserProfileResponse.class);
+            authenticatedRequest(
+                loginUserAccessToken,
+                String.format("/api/profiles/%s", targetUser.getName()),
+                Method.GET,
+                HttpStatus.OK
+            ).as(UserProfileResponse.class);
 
         // then
         assertThat(response)
@@ -131,7 +152,7 @@ class UserAcceptanceTest {
             .isEqualTo(responseDto);
     }
 
-    @DisplayName("사용자는 팔로우하지 않은 유저의 프로필을 조회할 수 있다.")
+    @DisplayName("로그인된 사용자는 팔로우하지 않은 유저의 프로필을 조회할 수 있다.")
     @Test
     void getUserProfile_LoginUserIsNotFollowing_Success() {
         // given
@@ -140,9 +161,12 @@ class UserAcceptanceTest {
 
         // when
         UserProfileResponse response =
-            authenticatedGetRequest(loginUserAccessToken,
-                String.format("/api/profiles/%s", targetUser.getName()), HttpStatus.OK)
-                .as(UserProfileResponse.class);
+            authenticatedRequest(
+                loginUserAccessToken,
+                String.format("/api/profiles/%s", targetUser.getName()),
+                Method.GET,
+                HttpStatus.OK
+            ).as(UserProfileResponse.class);
 
         // then
         assertThat(response)
@@ -150,16 +174,34 @@ class UserAcceptanceTest {
             .isEqualTo(responseDto);
     }
 
-    @DisplayName("게스트는 유저의 프로필을 조회할 수 있다.")
+    @DisplayName("로그인된 사용자는 존재하지 않는 유저 이름으로 프로필을 조회할 수 없다. - 400 예외")
+    @Test
+    void getUserProfile_LoginUser_400Exception() {
+        // when
+        ApiErrorResponse response =
+            authenticatedRequest(
+                loginUserAccessToken,
+                String.format("/api/profiles/%s", "invalidName"),
+                Method.GET,
+                HttpStatus.BAD_REQUEST
+            ).as(ApiErrorResponse.class);
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("U0001");
+    }
+
+    @DisplayName("게스트 유저는 다른 유저의 프로필을 조회할 수 있다.")
     @Test
     void getUserProfile_GuestUser_Success() {
         //given
         UserProfileResponseDto responseDto = UserFactory.mockGuestUserProfileResponseDto();
 
         //when
-        UserProfileResponse response = unauthenticatedGetRequest(
-            String.format("/api/profiles/%s", loginUser.getName()), HttpStatus.OK)
-            .as(UserProfileResponse.class);
+        UserProfileResponse response = unauthenticatedRequest(
+            String.format("/api/profiles/%s", loginUser.getName()),
+            Method.GET,
+            HttpStatus.OK
+        ).as(UserProfileResponse.class);
 
         //then
         assertThat(response)
@@ -167,29 +209,30 @@ class UserAcceptanceTest {
             .isEqualTo(responseDto);
     }
 
-    @DisplayName("게스트는 존재하지 않는 유저 이름으로 프로필을 조회할 수 없다. - 400 예외")
+    @DisplayName("게스트 유저는 존재하지 않는 유저 이름으로 프로필을 조회할 수 없다. - 400 예외")
     @Test
     void getUserProfile_GuestUser_400Exception() {
         // when
-        ApiErrorResponse response = unauthenticatedGetRequest(
-            String.format("/api/profiles/%s", "invalidName"), HttpStatus.BAD_REQUEST)
-            .as(ApiErrorResponse.class);
+        ApiErrorResponse response = unauthenticatedRequest(
+            String.format("/api/profiles/%s", "invalidName"),
+            Method.GET,
+            HttpStatus.BAD_REQUEST
+        ).as(ApiErrorResponse.class);
 
         // then
         assertThat(response.getErrorCode()).isEqualTo("U0001");
     }
 
-    @DisplayName("사용자는 존재하지 않는 유저 이름으로 프로필을 조회할 수 없다. - 400 예외")
+    @DisplayName("로그인되지 않은 사용자는 target 유저를 팔로우 할 수 없다.")
     @Test
-    void getUserProfile_LoginUser_400Exception() {
-        // when
-        ApiErrorResponse response =
-            authenticatedGetRequest(loginUserAccessToken,
-                String.format("/api/profiles/%s", "invalidName"), HttpStatus.BAD_REQUEST)
-                .as(ApiErrorResponse.class);
+    void followUser_NotLogin_Failure() {
+        ApiErrorResponse response = unauthenticatedRequest(
+            String.format("/api/profiles/%s/followings", targetUser.getName()),
+            Method.POST,
+            HttpStatus.UNAUTHORIZED
+        ).as(ApiErrorResponse.class);
 
-        // then
-        assertThat(response.getErrorCode()).isEqualTo("U0001");
+        assertThat(response.getErrorCode()).isEqualTo("A0001");
     }
 
     @DisplayName("누구든지 활동 통계를 조회할 수 있다.")
@@ -268,7 +311,7 @@ class UserAcceptanceTest {
             .isEqualTo("A0001");
     }
 
-    @DisplayName("source 유저는 target 유저를 팔로우할 수 있다.")
+    @DisplayName("팔로우중이지 않다면 source 유저는 target 유저를 팔로우할 수 있다.")
     @Test
     void followUser_SourceToTarget_Success() {
         // given
@@ -276,9 +319,12 @@ class UserAcceptanceTest {
 
         // when
         FollowResponse response =
-            authenticatedPostRequest(loginUserAccessToken,
-                String.format("/api/profiles/%s/followings", targetUser.getName()), HttpStatus.OK)
-                .as(FollowResponse.class);
+            authenticatedRequest(
+                loginUserAccessToken,
+                String.format("/api/profiles/%s/followings", targetUser.getName()),
+                Method.POST,
+                HttpStatus.OK
+            ).as(FollowResponse.class);
 
         // then
         assertThat(response)
@@ -291,9 +337,12 @@ class UserAcceptanceTest {
     void followUser_SameSourceToSameTarget_400Exception() {
         // when
         ApiErrorResponse response =
-            authenticatedPostRequest(loginUserAccessToken,
+            authenticatedRequest(
+                loginUserAccessToken,
                 String.format("/api/profiles/%s/followings", loginUser.getName()),
-                HttpStatus.BAD_REQUEST).as(ApiErrorResponse.class);
+                Method.POST,
+                HttpStatus.BAD_REQUEST
+            ).as(ApiErrorResponse.class);
 
         // then
         assertThat(response.getErrorCode()).isEqualTo("U0004");
@@ -304,9 +353,12 @@ class UserAcceptanceTest {
     void followUser_SourceToInvalidTarget_400Exception() {
         // when
         ApiErrorResponse response =
-            authenticatedPostRequest(loginUserAccessToken,
-                String.format("/api/profiles/%s/followings", "invalidName"), HttpStatus.BAD_REQUEST)
-                .as(ApiErrorResponse.class);
+            authenticatedRequest(
+                loginUserAccessToken,
+                String.format("/api/profiles/%s/followings", "invalidName"),
+                Method.POST,
+                HttpStatus.BAD_REQUEST
+            ).as(ApiErrorResponse.class);
 
         // then
         assertThat(response.getErrorCode()).isEqualTo("U0001");
@@ -317,9 +369,12 @@ class UserAcceptanceTest {
     void followUser_SourceToExistingTarget_400Exception() {
         // given
         FollowResponse followResponse =
-            authenticatedPostRequest(loginUserAccessToken,
-                String.format("/api/profiles/%s/followings", targetUser.getName()), HttpStatus.OK)
-                .as(FollowResponse.class);
+            authenticatedRequest(
+                loginUserAccessToken,
+                String.format("/api/profiles/%s/followings", targetUser.getName()),
+                Method.POST,
+                HttpStatus.OK
+            ).as(FollowResponse.class);
 
         FollowResponse expectedResponse = new FollowResponse(1, true);
 
@@ -329,12 +384,27 @@ class UserAcceptanceTest {
 
         // when
         ApiErrorResponse errorResponse =
-            authenticatedPostRequest(loginUserAccessToken,
+            authenticatedRequest(
+                loginUserAccessToken,
                 String.format("/api/profiles/%s/followings", targetUser.getName()),
-                HttpStatus.BAD_REQUEST).as(ApiErrorResponse.class);
+                Method.POST,
+                HttpStatus.BAD_REQUEST
+            ).as(ApiErrorResponse.class);
 
         // then
         assertThat(errorResponse.getErrorCode()).isEqualTo("U0002");
+    }
+
+    @DisplayName("로그인되지 않은 사용자는 target 유저를 언팔로우 할 수 없다.")
+    @Test
+    void unfollowUser_NotLogin_Failure() {
+        ApiErrorResponse response = unauthenticatedRequest(
+            String.format("/api/profiles/%s/followings", targetUser.getName()),
+            Method.DELETE,
+            HttpStatus.UNAUTHORIZED
+        ).as(ApiErrorResponse.class);
+
+        assertThat(response.getErrorCode()).isEqualTo("A0001");
     }
 
     @DisplayName("source 유저는 target 유저를 언팔로우할 수 있다.")
@@ -342,9 +412,12 @@ class UserAcceptanceTest {
     void unfollowUser_SourceToTarget_Success() {
         // given
         FollowResponse followResponse =
-            authenticatedPostRequest(loginUserAccessToken,
-                String.format("/api/profiles/%s/followings", targetUser.getName()), HttpStatus.OK)
-                .as(FollowResponse.class);
+            authenticatedRequest(
+                loginUserAccessToken,
+                String.format("/api/profiles/%s/followings", targetUser.getName()),
+                Method.POST,
+                HttpStatus.OK
+            ).as(FollowResponse.class);
 
         FollowResponse followExpectedResponse = new FollowResponse(1, true);
 
@@ -356,9 +429,12 @@ class UserAcceptanceTest {
 
         // when
         FollowResponse unfollowResponse =
-            authenticatedDeleteRequest(loginUserAccessToken,
-                String.format("/api/profiles/%s/followings", targetUser.getName()), HttpStatus.OK)
-                .as(FollowResponse.class);
+            authenticatedRequest(
+                loginUserAccessToken,
+                String.format("/api/profiles/%s/followings", targetUser.getName()),
+                Method.DELETE,
+                HttpStatus.OK
+            ).as(FollowResponse.class);
 
         // then
         assertThat(unfollowResponse)
@@ -371,9 +447,12 @@ class UserAcceptanceTest {
     void unfollowUser_SameSourceToSameTarget_400Exception() {
         // when
         ApiErrorResponse response =
-            authenticatedDeleteRequest(loginUserAccessToken,
+            authenticatedRequest(
+                loginUserAccessToken,
                 String.format("/api/profiles/%s/followings", loginUser.getName()),
-                HttpStatus.BAD_REQUEST).as(ApiErrorResponse.class);
+                Method.DELETE,
+                HttpStatus.BAD_REQUEST
+            ).as(ApiErrorResponse.class);
 
         // then
         assertThat(response.getErrorCode()).isEqualTo("U0004");
@@ -384,22 +463,28 @@ class UserAcceptanceTest {
     void unfollowUser_SourceToInvalidTarget_400Exception() {
         // when
         ApiErrorResponse response =
-            authenticatedDeleteRequest(loginUserAccessToken,
-                String.format("/api/profiles/%s/followings", "invalidName"), HttpStatus.BAD_REQUEST)
-                .as(ApiErrorResponse.class);
+            authenticatedRequest(
+                loginUserAccessToken,
+                String.format("/api/profiles/%s/followings", "invalidName"),
+                Method.DELETE,
+                HttpStatus.BAD_REQUEST
+            ).as(ApiErrorResponse.class);
 
         // then
         assertThat(response.getErrorCode()).isEqualTo("U0001");
     }
 
-    @DisplayName("source 유저는 존재하지 않는 팔로우에 대해 언팔로우할 수 없다. - 400 예외")
+    @DisplayName("source 유저는 팔로우하지 않는 유저를 언팔로우할 수 없다. - 400 예외")
     @Test
     void unfollowUser_NotExistingFollow_ExceptionThrown() {
         // when
         ApiErrorResponse response =
-            authenticatedDeleteRequest(loginUserAccessToken,
+            authenticatedRequest(
+                loginUserAccessToken,
                 String.format("/api/profiles/%s/followings", targetUser.getName()),
-                HttpStatus.BAD_REQUEST).as(ApiErrorResponse.class);
+                Method.DELETE,
+                HttpStatus.BAD_REQUEST
+            ).as(ApiErrorResponse.class);
 
         //then
         assertThat(response.getErrorCode()).isEqualTo("U0003");
@@ -450,47 +535,27 @@ class UserAcceptanceTest {
             );
     }
 
-    private ExtractableResponse<Response> authenticatedGetRequest(
+    private ExtractableResponse<Response> authenticatedRequest(
         String accessToken,
         String url,
-        HttpStatus httpStatus) {
+        Method method,
+        HttpStatus httpStatus
+    ) {
         return RestAssured.given().log().all()
             .auth().oauth2(accessToken)
-            .when().get(url)
+            .when().request(method, url)
             .then().log().all()
             .statusCode(httpStatus.value())
             .extract();
     }
 
-    private ExtractableResponse<Response> unauthenticatedGetRequest(
+    private ExtractableResponse<Response> unauthenticatedRequest(
         String url,
-        HttpStatus httpStatus) {
+        Method method,
+        HttpStatus httpStatus
+    ) {
         return RestAssured.given().log().all()
-            .when().get(url)
-            .then().log().all()
-            .statusCode(httpStatus.value())
-            .extract();
-    }
-
-    private ExtractableResponse<Response> authenticatedPostRequest(
-        String accessToken,
-        String url,
-        HttpStatus httpStatus) {
-        return RestAssured.given().log().all()
-            .auth().oauth2(accessToken)
-            .when().post(url)
-            .then().log().all()
-            .statusCode(httpStatus.value())
-            .extract();
-    }
-
-    private ExtractableResponse<Response> authenticatedDeleteRequest(
-        String accessToken,
-        String url,
-        HttpStatus httpStatus) {
-        return RestAssured.given().log().all()
-            .auth().oauth2(accessToken)
-            .when().delete(url)
+            .when().request(method, url)
             .then().log().all()
             .statusCode(httpStatus.value())
             .extract();
