@@ -1,6 +1,7 @@
 package com.woowacourse.pickgit.unit.post.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.woowacourse.pickgit.config.JpaTestConfiguration;
 import com.woowacourse.pickgit.post.domain.Post;
@@ -26,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 
 @Import(JpaTestConfiguration.class)
 @DataJpaTest
@@ -103,25 +105,49 @@ class PostRepositoryTest {
         assertThat(savedPost.getCreatedAt()).isBefore(LocalDateTime.now());
     }
 
-    @DisplayName("게시글을 저장할 때 태그도 함께 영속화된다.")
+    @DisplayName("Post을 저장할 때 PostTag도 함께 영속화된다.")
     @Test
-    void save_WhenSavingPost_TagSavedTogether() {
+    void save_WhenSavingPostAndExistsTag_PostTagSavedTogether() {
+        // given
         Post post =
             new Post(null, null, new PostContent("abc"), githubRepoUrl, null, null, new ArrayList<>(),
                 null);
-        List<Tag> tags = Arrays.asList(new Tag("tag1"), new Tag("tag2"));
-        post.addTags(tags);
-        postRepository.save(post);
-        Tag entityTag = tagRepository.save(new Tag("33"));
-        post.addTags(Arrays.asList(entityTag));
+        Tag tag1 = new Tag("tag1");
+        Tag tag2 = new Tag("tag2");
+        tagRepository.save(tag1);
+        tagRepository.save(tag2);
 
         testEntityManager.flush();
         testEntityManager.clear();
 
-        Post findPost = postRepository.findAll().get(0);
+        // when
+        post.addTags(List.of(tag1, tag2));
+        Post savedPost = postRepository.save(post);
 
-        assertThat(findPost.getTags()).hasSize(3);
-        assertThat(tagRepository.findAll()).hasSize(3);
+        testEntityManager.flush();
+        testEntityManager.clear();
+
+        // then
+        Post findPost = postRepository.findById(savedPost.getId())
+            .orElse(null);
+
+        assertThat(findPost).isNotNull();
+        assertThat(findPost.getTags()).hasSize(2);
+    }
+
+    @DisplayName("Post를 저장할 때 Tag는 함께 영속화되지 않는다. (태그가 존재하지 않을 경우 예외가 발생한다)")
+    @Test
+    void save_WhenSavingPost_TagNotSavedTogether() {
+        // given
+        Post post =
+            new Post(null, null, new PostContent("abc"), githubRepoUrl, null, null, new ArrayList<>(),
+                null);
+        List<Tag> tags = Arrays.asList(new Tag("tag1"), new Tag("tag2"));
+
+        // when, then
+        post.addTags(tags);
+        assertThatThrownBy(() -> postRepository.save(post))
+            .isInstanceOf(InvalidDataAccessApiUsageException.class);
     }
 
     @DisplayName("Post에 Comment를 추가하면 Comment가 자동 영속화된다.")
