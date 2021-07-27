@@ -65,13 +65,12 @@ class UserServiceTest {
     @Test
     void getMyUserProfile_WithMyName_Success() {
         // given
-        AppUser loginUser = new LoginUser("testUser", "Bearer testToken");
-        AuthUserRequestDto requestDto =
-            new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
-        User testUser = UserFactory.user();
+        User loginUser = UserFactory.user();
+        String username = loginUser.getName();
+        AuthUserRequestDto requestDto = createLoginAuthUserRequestDto(username);
 
-        given(userRepository.findByBasicProfile_Name(anyString()))
-            .willReturn(Optional.of(testUser));
+        given(userRepository.findByBasicProfile_Name(username))
+            .willReturn(Optional.of(loginUser));
 
         UserProfileResponseDto responseDto = UserFactory.mockLoginUserProfileResponseDto();
 
@@ -84,7 +83,17 @@ class UserServiceTest {
             .isEqualTo(responseDto);
 
         verify(userRepository, times(1))
-            .findByBasicProfile_Name(anyString());
+            .findByBasicProfile_Name(username);
+    }
+
+    private AuthUserRequestDto createLoginAuthUserRequestDto(String username) {
+        AppUser appUser = new LoginUser(username, "Bearer testToken");
+        return new AuthUserRequestDto(username, appUser.isGuest());
+    }
+
+    private AuthUserRequestDto createGuestAuthUserRequestDto() {
+        AppUser guestUser = new GuestUser();
+        return new AuthUserRequestDto(guestUser.getUsername2(), guestUser.isGuest());
     }
 
     @DisplayName("getUserProfile 메서드는")
@@ -99,19 +108,18 @@ class UserServiceTest {
             @Test
             void getUserProfile_FindByNameInCaseOfGuestUser_Success() {
                 //given
-                AppUser guestUser = new GuestUser();
-                AuthUserRequestDto authUserRequestDto =
-                    new AuthUserRequestDto(guestUser.getUsername2(), guestUser.isGuest());
-                User testUser = UserFactory.user("testUser");
+                AuthUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
+                User targetUser = UserFactory.user("testUser");
+                String targetUsername = targetUser.getName();
 
-                given(userRepository.findByBasicProfile_Name(anyString()))
-                    .willReturn(Optional.of(testUser));
+                given(userRepository.findByBasicProfile_Name(targetUsername))
+                    .willReturn(Optional.of(targetUser));
 
                 UserProfileResponseDto responseDto = UserFactory.mockGuestUserProfileResponseDto();
 
                 //when
                 UserProfileResponseDto userProfile = userService
-                    .getUserProfile(authUserRequestDto, "guestUser");
+                    .getUserProfile(authUserRequestDto, targetUsername);
 
                 //then
                 assertThat(userProfile)
@@ -119,20 +127,22 @@ class UserServiceTest {
                     .isEqualTo(responseDto);
 
                 verify(userRepository, times(1))
-                    .findByBasicProfile_Name(anyString());
+                    .findByBasicProfile_Name(targetUsername);
             }
 
             @DisplayName("존재하지 않는 유저 이름으로 프로필을 조회할 수 없다. - 400 예외")
             @Test
             void getUserProfile_FindByInvalidNameInCaseOfGuestUser_400Exception() {
                 //given
-                AppUser guestUser = new GuestUser();
-                AuthUserRequestDto authUserRequestDto =
-                    new AuthUserRequestDto(guestUser.getUsername2(), guestUser.isGuest());
+                AuthUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
+                String invalidName = "InvalidName";
+
+                given(userRepository.findByBasicProfile_Name(invalidName))
+                    .willReturn(Optional.empty());
 
                 //when
                 assertThatThrownBy(
-                    () -> userService.getUserProfile(authUserRequestDto, "InvalidName")
+                    () -> userService.getUserProfile(authUserRequestDto, invalidName)
                 ).isInstanceOf(InvalidUserException.class)
                     .hasFieldOrPropertyWithValue("errorCode", "U0001")
                     .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
@@ -140,7 +150,7 @@ class UserServiceTest {
 
                 // then
                 verify(userRepository, times(1))
-                    .findByBasicProfile_Name(anyString());
+                    .findByBasicProfile_Name(invalidName);
             }
         }
 
@@ -148,24 +158,30 @@ class UserServiceTest {
         @Nested
         class Context_LoginUser {
 
-            @DisplayName("유저 이름으로 검색하여 유저의 프로필을 조회할 수 있다.")
+            @DisplayName("팔로잉 중인 유저의 프로필을 조회할 수 있다.")
             @Test
-            void getUserProfile_FindByNameInCaseOfLoginUser_Success() {
+            void getUserProfile_FindByNameInCaseOfLoginUserIsFollowing_Success() {
                 //given
-                AppUser loginUser = new LoginUser("testUser", "Bearer testToken");
+                User loginUser = UserFactory.user(1L, "testUser");
+                String loginUsername = loginUser.getName();
                 AuthUserRequestDto authUserRequestDto =
-                    new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
-                User testUser = UserFactory.user("testUser2");
+                    createLoginAuthUserRequestDto(loginUsername);
+                User targetUser = UserFactory.user(2L, "testUser2");
+                String targetUsername = targetUser.getName();
 
-                given(userRepository.findByBasicProfile_Name(anyString()))
-                    .willReturn(Optional.of(testUser));
+                given(userRepository.findByBasicProfile_Name(targetUsername))
+                    .willReturn(Optional.of(targetUser));
+                given(userRepository.findByBasicProfile_Name(loginUsername))
+                    .willReturn(Optional.of(loginUser));
 
                 UserProfileResponseDto responseDto =
-                    UserFactory.mockLoginUserProfileIsNotFollowingResponseDto();
+                    UserFactory.mockLoginUserProfileIsFollowingResponseDto();
+
+                userService.followUser(authUserRequestDto, targetUsername);
 
                 //when
                 UserProfileResponseDto userProfile = userService
-                    .getUserProfile(authUserRequestDto, "testUser2");
+                    .getUserProfile(authUserRequestDto, targetUsername);
 
                 //then
                 assertThat(userProfile)
@@ -173,28 +189,70 @@ class UserServiceTest {
                     .isEqualTo(responseDto);
 
                 verify(userRepository, times(2))
-                    .findByBasicProfile_Name(anyString());
+                    .findByBasicProfile_Name(targetUsername);
+                verify(userRepository, times(2))
+                    .findByBasicProfile_Name(loginUsername);
+            }
+
+            @DisplayName("팔로잉하지 않은 유저의 프로필을 조회할 수 있다.")
+            @Test
+            void getUserProfile_FindByNameInCaseOfLoginUseIsNotFollowing_Success() {
+                //given
+                User loginUser = UserFactory.user("testUser");
+                String loginUsername = loginUser.getName();
+                AuthUserRequestDto authUserRequestDto =
+                    createLoginAuthUserRequestDto(loginUsername);
+                User targetUser = UserFactory.user("testUser2");
+                String targetUsername = targetUser.getName();
+
+                given(userRepository.findByBasicProfile_Name(targetUsername))
+                    .willReturn(Optional.of(targetUser));
+                given(userRepository.findByBasicProfile_Name(loginUsername))
+                    .willReturn(Optional.of(loginUser));
+
+                UserProfileResponseDto responseDto =
+                    UserFactory.mockLoginUserProfileIsNotFollowingResponseDto();
+
+                //when
+                UserProfileResponseDto userProfile = userService
+                    .getUserProfile(authUserRequestDto, targetUsername);
+
+                //then
+                assertThat(userProfile)
+                    .usingRecursiveComparison()
+                    .isEqualTo(responseDto);
+
+                verify(userRepository, times(1))
+                    .findByBasicProfile_Name(targetUsername);
+                verify(userRepository, times(1))
+                    .findByBasicProfile_Name(loginUsername);
             }
 
             @DisplayName("존재하지 않는 유저 이름으로 프로필을 조회할 수 없다. - 400 예외")
             @Test
             void getUserProfile_FindByInvalidNameInCaseOfLoginUser_400Exception() {
                 //given
-                AppUser loginUser = new LoginUser("testUser", "Bearer testToken");
+                User loginUser = UserFactory.user("testUser");
+                String loginUsername = loginUser.getName();
                 AuthUserRequestDto authUserRequestDto =
-                    new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
+                    createLoginAuthUserRequestDto(loginUsername);
+                String targetUsername = "invalidname";
 
-                //when
+                given(userRepository.findByBasicProfile_Name(targetUsername))
+                    .willReturn(Optional.empty());
+
+                //when, then
                 assertThatThrownBy(
-                    () -> userService.getUserProfile(authUserRequestDto, "InvalidName")
+                    () -> userService.getUserProfile(authUserRequestDto, targetUsername)
                 ).isInstanceOf(InvalidUserException.class)
                     .hasFieldOrPropertyWithValue("errorCode", "U0001")
                     .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
                     .hasMessage("유효하지 않은 유저입니다.");
 
-                // then
                 verify(userRepository, times(1))
-                    .findByBasicProfile_Name(anyString());
+                    .findByBasicProfile_Name(targetUsername);
+                verify(userRepository, times(0))
+                    .findByBasicProfile_Name(loginUsername);
             }
         }
     }
@@ -211,22 +269,28 @@ class UserServiceTest {
             @Test
             void follow_FindByInvalidName_400Exception() {
                 //given
-                AppUser loginUser = new LoginUser("testUser", "Bearer Token");
+                User loginUser = UserFactory.user(1L, "testUser");
+                String loginUsername = loginUser.getName();
                 AuthUserRequestDto authUserRequestDto =
-                    new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
+                    createLoginAuthUserRequestDto(loginUsername);
+                String invalidTargetName = "django";
 
-                given(userRepository.findByBasicProfile_Name("testUser"))
-                    .willReturn(Optional.of(UserFactory.user(1L, "testUser")));
-                given(userRepository.findByBasicProfile_Name("django"))
+                given(userRepository.findByBasicProfile_Name(loginUsername))
+                    .willReturn(Optional.of(loginUser));
+                given(userRepository.findByBasicProfile_Name(invalidTargetName))
                     .willReturn(Optional.empty());
 
                 // when, then
-                assertThatCode(() -> userService.followUser(authUserRequestDto, "django"))
+                assertThatCode(() -> userService.followUser(authUserRequestDto, invalidTargetName))
                     .isInstanceOf(InvalidUserException.class)
                     .hasFieldOrPropertyWithValue("errorCode", "U0001")
                     .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
                     .hasMessage("유효하지 않은 유저입니다.");
-                verify(userRepository, times(2)).findByBasicProfile_Name(anyString());
+
+                verify(userRepository, times(1))
+                    .findByBasicProfile_Name(loginUsername);
+                verify(userRepository, times(1))
+                    .findByBasicProfile_Name(invalidTargetName);
             }
         }
 
@@ -238,20 +302,23 @@ class UserServiceTest {
             @Test
             void follow_SameUser_400Exception() {
                 //given
-                AppUser loginUser = new LoginUser("testUser", "Bearer Token");
+                User loginUser = UserFactory.user(1L, "testUser");
+                String loginUsername = loginUser.getName();
                 AuthUserRequestDto authUserRequestDto =
-                    new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
+                    createLoginAuthUserRequestDto(loginUsername);
 
-                given(userRepository.findByBasicProfile_Name("testUser"))
-                    .willReturn(Optional.of(UserFactory.user(1L, "testUser")));
+                given(userRepository.findByBasicProfile_Name(loginUsername))
+                    .willReturn(Optional.of(loginUser));
 
                 // when, then
-                assertThatCode(() -> userService.followUser(authUserRequestDto, "testUser"))
+                assertThatCode(() -> userService.followUser(authUserRequestDto, loginUsername))
                     .isInstanceOf(SameSourceTargetUserException.class)
                     .hasFieldOrPropertyWithValue("errorCode", "U0004")
                     .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
                     .hasMessage("같은 Source 와 Target 유저입니다.");
-                verify(userRepository, times(2)).findByBasicProfile_Name(anyString());
+
+                verify(userRepository, times(2))
+                    .findByBasicProfile_Name(loginUsername);
             }
         }
 
@@ -263,24 +330,30 @@ class UserServiceTest {
             @Test
             void followUser_SourceToTarget_Success() {
                 //given
-                AppUser loginUser = new LoginUser("testUser", "Bearer testToken");
-                AuthUserRequestDto requestDto =
-                    new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
+                User loginUser = UserFactory.user(1L, "testUser");
+                String loginUsername = loginUser.getName();
+                AuthUserRequestDto authUserRequestDto =
+                    createLoginAuthUserRequestDto(loginUsername);
+                User targetUser = UserFactory.user(2L, "testUser2");
+                String targetUsername = targetUser.getName();
 
-                given(userRepository.findByBasicProfile_Name("testUser"))
-                    .willReturn(Optional.of(UserFactory.user(1L, "testUser")));
-                given(userRepository.findByBasicProfile_Name("targetUser"))
-                    .willReturn(Optional.of(UserFactory.user(2L, "targetUser")));
+                given(userRepository.findByBasicProfile_Name(loginUsername))
+                    .willReturn(Optional.of(loginUser));
+                given(userRepository.findByBasicProfile_Name(targetUsername))
+                    .willReturn(Optional.of(targetUser));
 
                 //when
-                FollowResponseDto responseDto = userService.followUser(requestDto, "targetUser");
+                FollowResponseDto responseDto =
+                    userService.followUser(authUserRequestDto, targetUsername);
 
                 //then
                 assertThat(responseDto.getFollowerCount()).isEqualTo(1);
                 assertThat(responseDto.isFollowing()).isTrue();
 
-                verify(userRepository, times(2))
-                    .findByBasicProfile_Name(anyString());
+                verify(userRepository, times(1))
+                    .findByBasicProfile_Name(loginUsername);
+                verify(userRepository, times(1))
+                    .findByBasicProfile_Name(targetUsername);
             }
         }
 
@@ -292,28 +365,32 @@ class UserServiceTest {
             @Test
             void followUser_ExistingFollow_400Exception() {
                 //given
-                AppUser loginUser = new LoginUser("testUser", "Bearer testToken");
-                AuthUserRequestDto requestDto =
-                    new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
+                User loginUser = UserFactory.user(1L, "testUser");
+                String loginUsername = loginUser.getName();
+                AuthUserRequestDto authUserRequestDto =
+                    createLoginAuthUserRequestDto(loginUsername);
+                User targetUser = UserFactory.user(2L, "testUser2");
+                String targetUsername = targetUser.getName();
 
-                given(userRepository.findByBasicProfile_Name("testUser"))
-                    .willReturn(Optional.of(UserFactory.user(1L, "testUser")));
-                given(userRepository.findByBasicProfile_Name("targetUser"))
-                    .willReturn(Optional.of(UserFactory.user(2L, "targetUser")));
+                given(userRepository.findByBasicProfile_Name(loginUsername))
+                    .willReturn(Optional.of(loginUser));
+                given(userRepository.findByBasicProfile_Name(targetUsername))
+                    .willReturn(Optional.of(targetUser));
 
-                userService.followUser(requestDto, "targetUser");
+                userService.followUser(authUserRequestDto, targetUsername);
 
-                //when
+                //when, then
                 assertThatThrownBy(
-                    () -> userService.followUser(requestDto, "targetUser")
+                    () -> userService.followUser(authUserRequestDto, targetUsername)
                 ).isInstanceOf(DuplicateFollowException.class)
                     .hasFieldOrPropertyWithValue("errorCode", "U0002")
                     .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
                     .hasMessage("이미 팔로우 중 입니다.");
 
-                // then
-                verify(userRepository, times(4))
-                    .findByBasicProfile_Name(anyString());
+                verify(userRepository, times(2))
+                    .findByBasicProfile_Name(loginUsername);
+                verify(userRepository, times(2))
+                    .findByBasicProfile_Name(targetUsername);
             }
         }
     }
@@ -433,22 +510,29 @@ class UserServiceTest {
             @Test
             void unfollow_FindByInvalidName_400Exception() {
                 //given
-                AppUser loginUser = new LoginUser("testUser", "Bearer Token");
+                User loginUser = UserFactory.user(1L, "testUser");
+                String loginUsername = loginUser.getName();
                 AuthUserRequestDto authUserRequestDto =
-                    new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
+                    createLoginAuthUserRequestDto(loginUsername);
+                String invalidTargetName = "django";
 
-                given(userRepository.findByBasicProfile_Name("testUser"))
-                    .willReturn(Optional.of(UserFactory.user(1L, "testUser")));
-                given(userRepository.findByBasicProfile_Name("django"))
+                given(userRepository.findByBasicProfile_Name(loginUsername))
+                    .willReturn(Optional.of(loginUser));
+                given(userRepository.findByBasicProfile_Name(invalidTargetName))
                     .willReturn(Optional.empty());
 
                 // when, then
-                assertThatCode(() -> userService.unfollowUser(authUserRequestDto, "django"))
+                assertThatCode(
+                    () -> userService.unfollowUser(authUserRequestDto, invalidTargetName))
                     .isInstanceOf(InvalidUserException.class)
                     .hasFieldOrPropertyWithValue("errorCode", "U0001")
                     .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
                     .hasMessage("유효하지 않은 유저입니다.");
-                verify(userRepository, times(2)).findByBasicProfile_Name(anyString());
+
+                verify(userRepository, times(1))
+                    .findByBasicProfile_Name(loginUsername);
+                verify(userRepository, times(1))
+                    .findByBasicProfile_Name(invalidTargetName);
             }
         }
 
@@ -460,20 +544,23 @@ class UserServiceTest {
             @Test
             void unfollow_SameUser_400Exception() {
                 //given
-                AppUser loginUser = new LoginUser("testUser", "Bearer Token");
+                User loginUser = UserFactory.user(1L, "testUser");
+                String loginUsername = loginUser.getName();
                 AuthUserRequestDto authUserRequestDto =
-                    new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
+                    createLoginAuthUserRequestDto(loginUsername);
 
-                given(userRepository.findByBasicProfile_Name("testUser"))
-                    .willReturn(Optional.of(UserFactory.user(1L, "testUser")));
+                given(userRepository.findByBasicProfile_Name(loginUsername))
+                    .willReturn(Optional.of(loginUser));
 
                 // when, then
-                assertThatCode(() -> userService.unfollowUser(authUserRequestDto, "testUser"))
+                assertThatCode(() -> userService.unfollowUser(authUserRequestDto, loginUsername))
                     .isInstanceOf(SameSourceTargetUserException.class)
                     .hasFieldOrPropertyWithValue("errorCode", "U0004")
                     .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
                     .hasMessage("같은 Source 와 Target 유저입니다.");
-                verify(userRepository, times(2)).findByBasicProfile_Name(anyString());
+
+                verify(userRepository, times(2))
+                    .findByBasicProfile_Name(loginUsername);
             }
         }
 
@@ -485,28 +572,32 @@ class UserServiceTest {
             @Test
             void unfollowUser_NotExistingFollow_400Exception() {
                 //given
-                AppUser loginUser = new LoginUser("testUser", "Bearer testToken");
-                AuthUserRequestDto requestDto =
-                    new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
+                User loginUser = UserFactory.user(1L, "testUser");
+                String loginUsername = loginUser.getName();
+                AuthUserRequestDto authUserRequestDto =
+                    createLoginAuthUserRequestDto(loginUsername);
+                User targetUser = UserFactory.user(2L, "testUser2");
+                String targetUsername = targetUser.getName();
 
-                given(userRepository.findByBasicProfile_Name("testUser"))
-                    .willReturn(Optional.of(UserFactory.user(1L, "testUser")));
-                given(userRepository.findByBasicProfile_Name("targetUser"))
-                    .willReturn(Optional.of(UserFactory.user(2L, "targetUser")));
+                given(userRepository.findByBasicProfile_Name(loginUsername))
+                    .willReturn(Optional.of(loginUser));
+                given(userRepository.findByBasicProfile_Name(targetUsername))
+                    .willReturn(Optional.of(targetUser));
 
                 //when
                 assertThatThrownBy(
-                    () -> userService.unfollowUser(requestDto, "targetUser")
+                    () -> userService.unfollowUser(authUserRequestDto, targetUsername)
                 ).isInstanceOf(InvalidFollowException.class)
                     .hasFieldOrPropertyWithValue("errorCode", "U0003")
                     .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
                     .hasMessage("존재하지 않는 팔로우 입니다.");
 
                 // then
-                verify(userRepository, times(2))
-                    .findByBasicProfile_Name(anyString());
+                verify(userRepository, times(1))
+                    .findByBasicProfile_Name(loginUsername);
+                verify(userRepository, times(1))
+                    .findByBasicProfile_Name(targetUsername);
             }
-
         }
 
         @DisplayName("Source 유저가 특정 Target 유저를 이미 팔로우 중이라면")
@@ -517,26 +608,32 @@ class UserServiceTest {
             @Test
             void unfollowUser_SourceToTarget_Success() {
                 //given
-                AppUser loginUser = new LoginUser("testUser", "Bearer testToken");
-                AuthUserRequestDto requestDto =
-                    new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
+                User loginUser = UserFactory.user(1L, "testUser");
+                String loginUsername = loginUser.getName();
+                AuthUserRequestDto authUserRequestDto =
+                    createLoginAuthUserRequestDto(loginUsername);
+                User targetUser = UserFactory.user(2L, "testUser2");
+                String targetUsername = targetUser.getName();
 
-                given(userRepository.findByBasicProfile_Name("testUser"))
-                    .willReturn(Optional.of(UserFactory.user(1L, "testUser")));
-                given(userRepository.findByBasicProfile_Name("targetUser"))
-                    .willReturn(Optional.of(UserFactory.user(2L, "targetUser")));
+                given(userRepository.findByBasicProfile_Name(loginUsername))
+                    .willReturn(Optional.of(loginUser));
+                given(userRepository.findByBasicProfile_Name(targetUsername))
+                    .willReturn(Optional.of(targetUser));
 
-                userService.followUser(requestDto, "targetUser");
+                userService.followUser(authUserRequestDto, targetUsername);
 
                 //when
-                FollowResponseDto responseDto = userService.unfollowUser(requestDto, "targetUser");
+                FollowResponseDto responseDto =
+                    userService.unfollowUser(authUserRequestDto, targetUsername);
 
                 //then
-                assertThat(responseDto.getFollowerCount()).isEqualTo(0);
+                assertThat(responseDto.getFollowerCount()).isZero();
                 assertThat(responseDto.isFollowing()).isFalse();
 
-                verify(userRepository, times(4))
-                    .findByBasicProfile_Name(anyString());
+                verify(userRepository, times(2))
+                    .findByBasicProfile_Name(loginUsername);
+                verify(userRepository, times(2))
+                    .findByBasicProfile_Name(targetUsername);
             }
         }
     }
