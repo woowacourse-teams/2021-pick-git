@@ -3,9 +3,6 @@ package com.woowacourse.pickgit.common.factory;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
-import com.woowacourse.pickgit.user.domain.User;
-import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
-import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,6 +10,10 @@ import org.springframework.web.multipart.MultipartFile;
 public class PostFactory {
 
     private PostFactory() {
+    }
+
+    public static class Builder {
+
     }
 
     public static List<PostRequestDto> mockPostRequestDtos() {

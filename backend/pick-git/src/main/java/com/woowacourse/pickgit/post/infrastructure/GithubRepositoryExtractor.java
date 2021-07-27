@@ -3,9 +3,11 @@ package com.woowacourse.pickgit.post.infrastructure;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.woowacourse.pickgit.exception.post.RepositoryParseException;
 import com.woowacourse.pickgit.post.domain.PlatformRepositoryExtractor;
 import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
 import java.util.List;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -39,7 +41,11 @@ public class GithubRepositoryExtractor implements PlatformRepositoryExtractor {
         try {
             return objectMapper.readValue(response, new TypeReference<>() {});
         } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException();
+            throw new RepositoryParseException(
+                "V0001",
+                HttpStatus.BAD_REQUEST,
+                "레포지토리 목록을 불러올 수 없습니다."
+            );
         }
     }
 }

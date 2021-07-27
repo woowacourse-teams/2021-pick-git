@@ -1,47 +1,89 @@
 package com.woowacourse.pickgit.unit.post.infrastructure;
 
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 
 import com.woowacourse.pickgit.common.factory.FileFactory;
-import com.woowacourse.pickgit.post.infrastructure.RestClient;
 import com.woowacourse.pickgit.post.infrastructure.S3Storage;
+import com.woowacourse.pickgit.post.infrastructure.S3Storage.StorageDto;
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
+import org.springframework.util.MultiValueMap;
 
-@ExtendWith(MockitoExtension.class)
 class S3StorageTest {
 
-    @InjectMocks
     private S3Storage s3Storage;
 
-    @Mock
-    private RestClient restClient;
+    @BeforeEach
+    void setUp() {
+        s3Storage = new S3Storage(
+            new StubRestClient() {
+                @Override
+                @SuppressWarnings({"rawtypes", "unchecked"})
+                public <T> ResponseEntity<T> postForEntity(
+                    String url,
+                    @Nullable Object request,
+                    Class<T> responseType,
+                    Object... uriVariables
+                ) {
+                    MultiValueMap datas = (MultiValueMap) request;
 
-    @DisplayName("이미지를 보내면 이미지 주소를 반환한다.")
+                    ArrayList<FileSystemResource> fileSystemResources =
+                        (ArrayList<FileSystemResource>) datas.get("files");
+
+                    if(Objects.isNull(fileSystemResources)) {
+                        fileSystemResources = new ArrayList<>();
+                    }
+
+                    List<String> fileNames = fileSystemResources.stream()
+                        .map(FileSystemResource::getFile)
+                        .map(File::getName)
+                        .collect(toList());
+
+                    return ResponseEntity.ok(
+                        responseType.cast(
+                            new StorageDto(fileNames)
+                        )
+                    );
+                }
+            },
+            "testS3ProxyUrl"
+        );
+    }
+
+    @DisplayName("이미지 저장을 요청하면 url을 반환한다.")
     @Test
-    void store_IfImagesGivenReturnUrls_True() {
-        //given
-        List<String> expected = List.of("testUrl1", "testUrl2");
-        given(restClient.postForEntity(any(), any(), any(), (Object) any()))
-            .willReturn(ResponseEntity.ok(
-                new S3Storage.StorageDto(expected))
-            );
+    void store_RequestToSaveImages_ReturnImageUrls() {
+        File testImage1File = FileFactory.getTestImage1File();
+        File testImage2File = FileFactory.getTestImage2File();
 
-        List<String> actual = s3Storage.store(List.of(
-            FileFactory.getTestImage1File(),
-            FileFactory.getTestImage2File()
-        ), "testUser");
+        List<File> imageFiles = List.of(
+            testImage1File, testImage2File
+        );
 
-        assertThat(expected)
-            .usingRecursiveComparison()
-            .isEqualTo(actual);
+        List<String> fileUrls = s3Storage.store(imageFiles, "testUser");
+
+        assertThat(fileUrls).containsExactly(
+            testImage1File.getName(),
+            testImage2File.getName()
+        );
+    }
+
+    @DisplayName("이미지 없이 저장을 요청하면 빈 배열을 요청한다.")
+    @Test
+    void store() {
+        List<File> imageFiles = List.of();
+
+        List<String> fileUrls = s3Storage.store(imageFiles, "testUser");
+
+        assertThat(fileUrls).isEmpty();
     }
 }

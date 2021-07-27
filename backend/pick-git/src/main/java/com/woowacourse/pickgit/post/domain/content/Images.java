@@ -29,11 +29,6 @@ public class Images {
             .map(Image::getUrl)
             .collect(toList());
     }
-    public List<String> getImageUrls() {
-        return images.stream()
-            .map(Image::getUrl)
-            .collect(Collectors.toList());
-    }
 
     public void setMapping(Post post) {
         images.forEach(image -> image.toPost(post));

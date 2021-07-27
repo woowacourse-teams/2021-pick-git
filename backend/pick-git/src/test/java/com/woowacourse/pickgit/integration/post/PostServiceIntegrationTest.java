@@ -4,10 +4,12 @@ import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyString;
 
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.FileFactory;
+import com.woowacourse.pickgit.common.factory.PostBuilder;
 import com.woowacourse.pickgit.common.factory.PostFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
@@ -25,26 +27,19 @@ import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostRepository;
-import com.woowacourse.pickgit.post.domain.comment.Comments;
 import com.woowacourse.pickgit.post.presentation.dto.request.CommentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.HomeFeedRequest;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
-import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
-import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Import;
@@ -58,7 +53,6 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 class PostServiceIntegrationTest {
-
     private static final String USERNAME = "jipark3";
     private static final String ACCESS_TOKEN = "oauth.access.token";
 
@@ -71,54 +65,21 @@ class PostServiceIntegrationTest {
     @Autowired
     private UserRepository userRepository;
 
-    private String image;
-    private String description;
-    private String githubUrl;
-    private String company;
-    private String location;
-    private String website;
-    private String twitter;
-    private String githubRepoUrl;
-    private List<String> tags;
-    private String content;
 
-    private BasicProfile basicProfile;
-    private GithubProfile githubProfile;
-    private User user1;
-    private User user2;
-    private Post post;
-
-    @BeforeEach
-    void setUp() {
-        image = "image1";
-        description = "hello";
-        githubUrl = "https://github.com/da-nyee";
-        company = "woowacourse";
-        location = "seoul";
-        website = "https://da-nyee.github.io/";
-        twitter = "dani";
-        githubRepoUrl = "https://github.com/woowacourse-teams/2021-pick-git/";
-        tags = List.of("java", "spring");
-        content = "this is content";
-
-        basicProfile = new BasicProfile(USERNAME, image, description);
-        githubProfile = new GithubProfile(githubUrl, company, location, website, twitter);
-        user1 = new User(basicProfile, githubProfile);
-        user2 = new User(new BasicProfile("kevin", "a.jpg", "a"),
-            new GithubProfile("github.com", "a", "a", "a", "a"));
-        post = new Post(null, null, null, null,
-            null, new Comments(), new ArrayList<>(), null);
-
-        userRepository.save(user1);
-        userRepository.save(user2);
-        postRepository.save(post);
-    }
-
-    @DisplayName("Post에 Comment를 정상 등록한다.")
+    @DisplayName("게시물에 댓글을 정상 등록한다.")
     @Test
     void addComment_ValidContent_Success() {
-        // given
-        post = new Post(null, null, null, null, null, new Comments(), new ArrayList<>(), null);
+        User testUser = UserFactory.user("testUser");
+        User savedTestUser = userRepository.save(testUser);
+
+        User kevin = UserFactory.user("kevin");
+        User savedKevin = userRepository.save(kevin);
+
+        Post post = new PostBuilder()
+            .content("testContent")
+            .githubRepoUrl("https://github.com/bperhaps")
+            .user(savedTestUser)
+            .build();
         Post savedPost = postRepository.save(post);
 
         // when
@@ -127,10 +88,11 @@ class PostServiceIntegrationTest {
             .content("test comment")
             .postId(savedPost.getId())
             .build();
+
         CommentResponse commentResponseDto = postService.addComment(commentRequest);
 
         // then
-        assertThat(commentResponseDto.getAuthorName()).isEqualTo("kevin");
+        assertThat(commentResponseDto.getAuthorName()).isEqualTo(savedKevin.getName());
         assertThat(commentResponseDto.getContent()).isEqualTo("test comment");
     }
 
@@ -139,11 +101,19 @@ class PostServiceIntegrationTest {
     @NullAndEmptySource
     @ValueSource(strings = {" ", "  "})
     void addComment_InvalidContent_ExceptionThrown(String content) {
-        // given
-        post = new Post(null, null, null, null, null, new Comments(), new ArrayList<>(), null);
+        User testUser = UserFactory.user("testUser");
+        User savedTestUser = userRepository.save(testUser);
+
+        User kevin = UserFactory.user("kevin");
+        User savedKevin = userRepository.save(kevin);
+
+        Post post = new PostBuilder()
+            .content("testContent")
+            .githubRepoUrl("https://github.com/bperhaps")
+            .user(savedTestUser)
+            .build();
         Post savedPost = postRepository.save(post);
 
-        // when
         CommentRequest commentRequest = CommentRequest.builder()
             .userName("kevin")
             .content(content)
@@ -160,10 +130,12 @@ class PostServiceIntegrationTest {
     @DisplayName("존재하지 않는 Post에 Comment를 등록할 수 없다.")
     @Test
     void addComment_PostNotFound_ExceptionThrown() {
+        userRepository.save(UserFactory.user("kevin"));
+
         // when
         CommentRequest commentRequest = CommentRequest.builder()
             .userName("kevin")
-            .content(content)
+            .content("content")
             .postId(-1L)
             .build();
 
@@ -178,13 +150,14 @@ class PostServiceIntegrationTest {
     @Test
     void addComment_UserNotFound_ExceptionThrown() {
         // given
-        post = new Post(null, null, null, null, null, new Comments(), new ArrayList<>(), null);
+        Post post = new PostBuilder()
+            .build();
         Post savedPost = postRepository.save(post);
 
         // when
         CommentRequest commentRequest = CommentRequest.builder()
             .userName("anonymous")
-            .content(content)
+            .content("content")
             .postId(savedPost.getId())
             .build();
 
@@ -199,15 +172,23 @@ class PostServiceIntegrationTest {
     @Test
     void write_LoginUser_Success() {
         // given
-        PostRequestDto requestDto =
-            new PostRequestDto(ACCESS_TOKEN, USERNAME,
-                List.of(
-                    FileFactory.getTestImage1(),
-                    FileFactory.getTestImage2()
-                ), githubRepoUrl, tags, content);
+        User user = UserFactory.user(USERNAME);
+        userRepository.save(user);
+
+        PostRequestDto postRequestDto = PostRequestDto.builder()
+            .token(ACCESS_TOKEN)
+            .username(USERNAME)
+            .images(List.of(
+                FileFactory.getTestImage1(),
+                FileFactory.getTestImage2()
+            ))
+            .githubRepoUrl("https://github.com/bperhaps")
+            .tags(List.of("java", "c++"))
+            .content("testContent")
+            .build();
 
         // when
-        PostImageUrlResponseDto responseDto = postService.write(requestDto);
+        PostImageUrlResponseDto responseDto = postService.write(postRequestDto);
 
         // then
         assertThat(responseDto.getId()).isNotNull();
@@ -217,6 +198,8 @@ class PostServiceIntegrationTest {
     @Test
     void write_LoginUserWithDuplicateTag_Fail() {
         // given
+        userRepository.save(UserFactory.user(USERNAME));
+
         PostRequestDto requestDto = PostRequestDto.builder()
             .token(ACCESS_TOKEN)
             .username(USERNAME)
@@ -226,9 +209,9 @@ class PostServiceIntegrationTest {
                     FileFactory.getTestImage2()
                 )
             )
-            .githubRepoUrl(githubRepoUrl)
+            .githubRepoUrl("https://github.com/bperhaps")
             .tags(List.of("Java", "Javascript", "Java"))
-            .content(content).build();
+            .content("content").build();
 
         // when, then
         assertThatCode(() -> postService.write(requestDto))
@@ -254,8 +237,10 @@ class PostServiceIntegrationTest {
     @Test
     void showRepositories_InvalidAccessToken_401Exception() {
         // given
+        String invalidToken = "invalidToken";
+
         RepositoryRequestDto requestDto =
-            new RepositoryRequestDto(ACCESS_TOKEN + "hi", USERNAME);
+            new RepositoryRequestDto(invalidToken, USERNAME);
 
         // then
         assertThatThrownBy(() -> {
@@ -269,13 +254,15 @@ class PostServiceIntegrationTest {
     @Test
     void showRepositories_InvalidUsername_404Exception() {
         // given
+        String invalidUserName = "invalidUser";
+
         RepositoryRequestDto requestDto =
-            new RepositoryRequestDto(ACCESS_TOKEN, USERNAME + "hi");
+            new RepositoryRequestDto(ACCESS_TOKEN, invalidUserName);
 
         // then
-        assertThatThrownBy(() -> {
-            postService.showRepositories(requestDto);
-        }).isInstanceOf(PlatformHttpErrorException.class)
+        assertThatThrownBy(() ->
+            postService.showRepositories(requestDto)
+        ).isInstanceOf(PlatformHttpErrorException.class)
             .extracting("errorCode")
             .isEqualTo("V0001");
     }
@@ -283,19 +270,26 @@ class PostServiceIntegrationTest {
     @DisplayName("저장된 게시물 중 3, 4번째 글을 최신날짜순으로 가져온다.")
     @Test
     void readHomeFeed_Success() {
+        //given
         createMockPosts();
 
-        HomeFeedRequest homeFeedRequest =
-            new HomeFeedRequest(new LoginUser("kevin", "a"), 1L, 2L);
+        LoginUser loginUser = new LoginUser("kevin", "a");
+
+        HomeFeedRequest homeFeedRequest = HomeFeedRequest.builder()
+            .appUser(loginUser)
+            .page(1L)
+            .limit(2L)
+            .build();
+
+        // when
         List<PostResponseDto> postResponseDtos = postService.readHomeFeed(homeFeedRequest);
 
+        //then
         List<String> postNames = postResponseDtos.stream()
             .map(PostResponseDto::getAuthorName)
             .collect(toList());
 
-        List<String> repoNames = postResponseDtos.stream()
-            .map(PostResponseDto::getGithubRepoUrl)
-            .collect(toList());
+        List<String> repoNames = extractGithubRepoUrls(postResponseDtos);
 
         assertThat(postResponseDtos).hasSize(2);
         assertThat(postNames).containsExactly("dani", "ginger");
@@ -327,15 +321,19 @@ class PostServiceIntegrationTest {
     @Test
     void readMyFeed_Success() {
         //given
+        User savedUser = userRepository.save(UserFactory.user("kevin"));
         List<PostRequestDto> postRequestDtos = PostFactory.mockPostRequestForAssertingMyFeed();
+        postRequestDtos.forEach(postService::write);
 
-        for (PostRequestDto postRequestDto : postRequestDtos) {
-            postService.write(postRequestDto);
-        }
+        LoginUser loginUser = new LoginUser(savedUser.getName(), "a");
 
         //when
-        HomeFeedRequest homeFeedRequest =
-            new HomeFeedRequest(new LoginUser("kevin", "a"), 0L, (long) postRequestDtos.size());
+        HomeFeedRequest homeFeedRequest = HomeFeedRequest.builder()
+            .appUser(loginUser)
+            .page(0L)
+            .limit((long) postRequestDtos.size())
+            .build();
+
         List<PostResponseDto> postResponseDtos = postService.readMyFeed(homeFeedRequest);
         List<String> repoNames = postResponseDtos.stream()
             .map(PostResponseDto::getGithubRepoUrl)
@@ -350,25 +348,25 @@ class PostServiceIntegrationTest {
     @Test
     void readUserFeed_LoginUser_Success() {
         //given
+        User neozal = userRepository.save(UserFactory.user("neozal"));
+        User kevin = userRepository.save(UserFactory.user("kevin"));
+
         List<PostRequestDto> postRequestDtos =
             PostFactory.mockPostRequestForAssertingMyFeed();
+        postRequestDtos.forEach(postService::write);
 
-        for (PostRequestDto postRequestDto : postRequestDtos) {
-            postService.write(postRequestDto);
-        }
+        LoginUser loginUser = new LoginUser(neozal.getName(), "a");
+        HomeFeedRequest homeFeedRequest = HomeFeedRequest.builder()
+            .appUser(loginUser)
+            .page(0L)
+            .limit((long) postRequestDtos.size())
+            .build();
 
         //when
-        HomeFeedRequest homeFeedRequest =
-            new HomeFeedRequest(
-                new LoginUser("ala", "a"),
-                0L,
-                (long) postRequestDtos.size()
-            );
         List<PostResponseDto> postResponseDtos =
-            postService.readUserFeed(homeFeedRequest, "kevin");
-        List<String> repoNames = postResponseDtos.stream()
-            .map(PostResponseDto::getGithubRepoUrl)
-            .collect(toList());
+            postService.readUserFeed(homeFeedRequest, kevin.getName());
+
+        List<String> repoNames = extractGithubRepoUrls(postResponseDtos);
         List<Boolean> likes = extractLikes(postResponseDtos);
 
         //then
@@ -380,17 +378,21 @@ class PostServiceIntegrationTest {
     @DisplayName("비로그인 사용자가 다른 사용자의 피드 게시물을 조회한다.")
     @Test
     void readUserFeed_GuestUser_Success() {
+        User savedUser = userRepository.save(UserFactory.user("kevin"));
+
         //given
         List<PostRequestDto> postRequestDtos = PostFactory.mockPostRequestForAssertingMyFeed();
+        postRequestDtos.forEach(postService::write);
 
-        for (PostRequestDto postRequestDto : postRequestDtos) {
-            postService.write(postRequestDto);
-        }
+        HomeFeedRequest homeFeedRequest = HomeFeedRequest.builder()
+            .appUser(new GuestUser())
+            .page(0L)
+            .limit((long) postRequestDtos.size())
+            .build();
 
         //when
-        HomeFeedRequest homeFeedRequest =
-            new HomeFeedRequest(new GuestUser(), 0L, (long) postRequestDtos.size());
-        List<PostResponseDto> postResponseDtos = postService.readUserFeed(homeFeedRequest, "kevin");
+        List<PostResponseDto> postResponseDtos =
+            postService.readUserFeed(homeFeedRequest, savedUser.getName());
         List<String> repoNames = extractGithubRepoUrls(postResponseDtos);
         List<Boolean> likes = extractLikes(postResponseDtos);
 

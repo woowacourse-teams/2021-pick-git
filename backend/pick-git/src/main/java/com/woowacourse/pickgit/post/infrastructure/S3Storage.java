@@ -13,16 +13,17 @@ import org.springframework.util.MultiValueMap;
 @Repository
 @Profile("!test")
 public class S3Storage implements PickGitStorage {
-
     private static final String MULTIPART_KEY = "files";
 
     private final RestClient restClient;
+    private final String s3ProxyUrl;
 
-    @Value("${storage.pickgit.s3proxy}")
-    private String s3ProxyUrl;
-
-    public S3Storage(RestClient restClient) {
+    public S3Storage(
+        RestClient restClient,
+        @Value("${storage.pickgit.s3proxy}") String s3ProxyUrl
+    ) {
         this.restClient = restClient;
+        this.s3ProxyUrl = s3ProxyUrl;
     }
 
     @Override

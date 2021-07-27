@@ -29,15 +29,18 @@ class GithubRepositoryExtractorTest {
             new GithubRepositoryExtractor(objectMapper, new MockRepositoryApiRequester());
     }
 
-    @DisplayName("Public Repository 목록을 가져온다.")
+    @DisplayName("깃허브 레포지토리를 요청하면, 레포지토리를 반환한다.")
     @Test
-    void extract_LoginUser_Success() {
-        // when
-        List<RepositoryResponseDto> responsesDto =
-            platformRepositoryExtractor.extract(ACCESS_TOKEN, USERNAME);
+    void extract_requestGithubRepository_returnRepositories() {
+        List<RepositoryResponseDto> repositories = platformRepositoryExtractor
+            .extract(ACCESS_TOKEN, "jipark3");
 
-        // then
-        assertThat(responsesDto).hasSize(2);
+        assertThat(repositories)
+            .usingRecursiveComparison()
+            .isEqualTo(List.of(
+                createRRepositoryResponseDto("binghe-hi", null),
+                createRRepositoryResponseDto("doms-react", null)
+            ));
     }
 
     @DisplayName("토큰이 유효하지 않은 경우 예외가 발생한다. - 500 예외")
@@ -60,5 +63,9 @@ class GithubRepositoryExtractorTest {
         }).isInstanceOf(PlatformHttpErrorException.class)
             .extracting("errorCode")
             .isEqualTo("V0001");
+    }
+
+    private RepositoryResponseDto createRRepositoryResponseDto(String name, String url) {
+        return new RepositoryResponseDto(name, url);
     }
 }
