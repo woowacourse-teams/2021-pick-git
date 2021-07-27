@@ -17,9 +17,14 @@ public class Followings {
         cascade = CascadeType.PERSIST,
         orphanRemoval = true
     )
-    private List<Follow> followings = new ArrayList<>();
+    private List<Follow> followings;
 
     public Followings() {
+        this(new ArrayList<>());
+    }
+
+    public Followings(List<Follow> followings) {
+        this.followings = followings;
     }
 
     public void add(Follow follow) {

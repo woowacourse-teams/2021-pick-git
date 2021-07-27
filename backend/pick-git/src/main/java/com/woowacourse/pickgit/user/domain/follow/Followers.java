@@ -16,9 +16,14 @@ public class Followers {
         cascade = CascadeType.PERSIST,
         orphanRemoval = true
     )
-    private List<Follow> followers = new ArrayList<>();
+    private List<Follow> followers;
 
     public Followers() {
+        this(new ArrayList<>());
+    }
+
+    public Followers(List<Follow> followers) {
+        this.followers = followers;
     }
 
     public void add(Follow follow) {
