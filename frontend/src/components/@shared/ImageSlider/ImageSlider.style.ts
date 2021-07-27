@@ -5,7 +5,7 @@ export const Container = styled.div<React.CSSProperties>`
     width: ${width};
   `}
 
-  overflow-x: hidden;
+  overflow: hidden;
   position: relative;
 `;
 
@@ -61,4 +61,19 @@ export const SlideButton = styled.button<{
   :active {
     filter: brightness(1.2);
   }
+`;
+
+export const Indicator = styled.div`
+  position: absolute;
+  left: 50%;
+  bottom: 0.8125rem;
+  transform: translateX(-50%);
+
+  width: fit-content;
+  font-size: 0.75rem;
+  line-height: 0.9;
+  color: ${({ theme }) => theme.color.white};
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 0.3rem 0.8rem;
+  border-radius: 10px;
 `;

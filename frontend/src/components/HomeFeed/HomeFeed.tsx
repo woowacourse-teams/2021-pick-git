@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { forwardRef, useContext } from "react";
 import { Post } from "../../@types";
 import { LIMIT } from "../../constants/limits";
 import { FAILURE_MESSAGE } from "../../constants/messages";
@@ -57,7 +57,7 @@ const HomeFeed = ({ posts }: Props) => {
   return (
     <Container>
       {posts?.map((post) => (
-        <PostItemWrapper key={post.id}>
+        <PostItemWrapper id={`post${post.id}`} key={post.id}>
           <PostItem
             authorName={post.authorName}
             authorGithubUrl={post.githubRepoUrl}

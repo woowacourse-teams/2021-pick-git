@@ -2,6 +2,7 @@ package com.woowacourse.pickgit.unit.tag.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -22,10 +23,13 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 
 @ExtendWith(MockitoExtension.class)
 class TagServiceTest {
@@ -46,30 +50,45 @@ class TagServiceTest {
     @DisplayName("Repository에 포함된 언어 태그를 추출한다.")
     @Test
     void extractTags_ValidRepository_ExtractionSuccess() {
-        ExtractionRequestDto extractionRequestDto =
-            new ExtractionRequestDto(accessToken, userName, repositoryName);
+        // given
+        ExtractionRequestDto extractionRequestDto = ExtractionRequestDto
+            .builder()
+            .accessToken(accessToken)
+            .userName(userName)
+            .repositoryName(repositoryName)
+            .build();
         List<String> tags = Arrays.asList("Java", "HTML", "CSS");
 
+        // mock
         given(platformTagExtractor.extractTags(accessToken, userName, repositoryName))
             .willReturn(tags);
 
+        // when
         TagsDto tagsDto = tagService.extractTags(extractionRequestDto);
 
-        assertThat(tagsDto.getTags()).containsAll(tags);
+        // then
+        assertThat(tagsDto.getTagNames()).containsAll(Arrays.asList("java", "html", "css"));
         verify(platformTagExtractor, times(1)).extractTags(accessToken, userName, repositoryName);
     }
 
-    @DisplayName("잘못된 경로로 태그 추출 요청시 404 예외가 발생한다.")
+    @DisplayName("잘못된 경로로 태그 추출 요청시 예외가 발생한다.")
     @Test
     void extractTags_InvalidUrl_ExceptionThrown() {
+        // given
         String userName = "nonuser";
         String repositoryName = "nonrepo";
-        ExtractionRequestDto extractionRequestDto =
-            new ExtractionRequestDto(accessToken, userName, repositoryName);
+        ExtractionRequestDto extractionRequestDto = ExtractionRequestDto
+            .builder()
+            .accessToken(accessToken)
+            .userName(userName)
+            .repositoryName(repositoryName)
+            .build();
 
+        // mock
         given(platformTagExtractor.extractTags(accessToken, userName, repositoryName))
             .willThrow(new PlatformHttpErrorException());
 
+        // when, then
         assertThatCode(() -> tagService.extractTags(extractionRequestDto))
             .isInstanceOf(PlatformHttpErrorException.class)
             .extracting("errorCode")
@@ -78,16 +97,23 @@ class TagServiceTest {
             .extractTags(accessToken, userName, repositoryName);
     }
 
-    @DisplayName("유효하지 않은 토큰으로 태그 추출 요청시 401 예외가 발생한다.")
+    @DisplayName("유효하지 않은 토큰으로 태그 추출 요청시 예외가 발생한다.")
     @Test
     void extractTags_InvalidToken_ExceptionThrown() {
+        // given
         String accessToken = "invalidtoken";
-        ExtractionRequestDto extractionRequestDto =
-            new ExtractionRequestDto(accessToken, userName, repositoryName);
+        ExtractionRequestDto extractionRequestDto = ExtractionRequestDto
+            .builder()
+            .accessToken(accessToken)
+            .userName(userName)
+            .repositoryName(repositoryName)
+            .build();
 
+        // mock
         given(platformTagExtractor.extractTags(accessToken, userName, repositoryName))
             .willThrow(new PlatformHttpErrorException());
 
+        // when, then
         assertThatCode(() -> tagService.extractTags(extractionRequestDto))
             .isInstanceOf(PlatformHttpErrorException.class)
             .extracting("errorCode")
@@ -99,9 +125,15 @@ class TagServiceTest {
     @DisplayName("태그 이름을 태그로 변환한다.")
     @Test
     void findOrCreateTags_ValidTag_TransformationSuccess() {
-        List<String> tagNames = Arrays.asList("tag1", "tag2", "tag3");
+        // given
+        List<String> tagNames = Arrays.asList("Tag1", "tag2", "tag3");
         TagsDto tagsDto = new TagsDto(tagNames);
 
+        // mock
+        given(tagRepository.save(new Tag("tag1")))
+            .willReturn(new Tag("tag1"));
+        given(tagRepository.save(new Tag("tag2")))
+            .willReturn(new Tag("tag2"));
         given(tagRepository.findByName("tag1"))
             .willReturn(Optional.empty());
         given(tagRepository.findByName("tag2"))
@@ -109,32 +141,50 @@ class TagServiceTest {
         given(tagRepository.findByName("tag3"))
             .willReturn(Optional.of(new Tag("tag3")));
 
+        // when
         List<String> tags = tagService.findOrCreateTags(tagsDto)
             .stream()
             .map(Tag::getName)
             .collect(Collectors.toList());
 
-        assertThat(tags).containsAll(tagNames);
+        // then
+        assertThat(tags).containsAll(Arrays.asList("tag1", "tag2", "tag3"));
         verify(tagRepository, times(3)).findByName(anyString());
     }
 
     @DisplayName("잘못된 태그 이름을 태그로 변환 시도시 실패한다.")
-    @Test
-    void findOrCreateTags_InvalidTagName_ExceptionThrown() {
-        List<String> tagNames = Arrays.asList("tag1", "tag2", "");
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {" ", "  ", "abcdeabcdeabcdeabcdea"})
+    void findOrCreateTags_InvalidTagName_ExceptionThrown(String tagName) {
+        // given
+        List<String> tagNames = Arrays.asList("tag1", "tag2", tagName);
         TagsDto tagsDto = new TagsDto(tagNames);
 
+        // mock
         given(tagRepository.findByName("tag1"))
             .willReturn(Optional.empty());
         given(tagRepository.findByName("tag2"))
             .willReturn(Optional.empty());
-        given(tagRepository.findByName(""))
-            .willReturn(Optional.empty());
 
+        // when, then
         assertThatCode(() -> tagService.findOrCreateTags(tagsDto))
             .isInstanceOf(TagFormatException.class)
             .extracting("errorCode")
             .isEqualTo("F0003");
-        verify(tagRepository, times(3)).findByName(anyString());
+        verify(tagRepository, times(2)).findByName(any());
+    }
+
+    @DisplayName("태그 이름이 없다면 빈 태그를 반환한다.")
+    @Test
+    void findOrCreateTags_NoneTagName_ReturnEmptyList() {
+        // given
+        TagsDto tagsDto = new TagsDto(null);
+
+        // when
+        List<Tag> tags = tagService.findOrCreateTags(tagsDto);
+
+        // then
+        assertThat(tags.size()).isZero();
     }
 }

@@ -33,18 +33,15 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 @AutoConfigureRestDocs
-@ExtendWith(SpringExtension.class)
 @WebMvcTest(TagController.class)
 class TagControllerTest {
 
@@ -76,16 +73,19 @@ class TagControllerTest {
     @DisplayName("특정 User의 Repository에 기술된 언어 태그들을 추출한다.")
     @Test
     void extractLanguageTags_ValidRepository_ExtractionSuccess() throws Exception {
+        // given
         String url =
             "/api/github/repositories/{repositoryName}}/tags/languages";
 
         List<String> tags = Arrays.asList("Java", "Python", "HTML");
         TagsDto tagsDto = new TagsDto(tags);
-        String expectedResponse = objectMapper.writeValueAsString(tagsDto.getTags());
+        String expectedResponse = objectMapper.writeValueAsString(tagsDto.getTagNames());
 
+        // mock
         given(tagService.extractTags(any(ExtractionRequestDto.class)))
             .willReturn(tagsDto);
 
+        // when, then
         ResultActions perform = mockMvc.perform(get(url, repositoryName)
             .header("Authorization", accessToken))
             .andExpect(status().isOk())
@@ -94,6 +94,7 @@ class TagControllerTest {
         verify(tagService, times(1))
             .extractTags(any(ExtractionRequestDto.class));
 
+        // restdocs
         perform.andDo(document("tag-extractTagFromRepositoryOfSpecificUser",
             getDocumentRequest(),
             getDocumentResponse(),
@@ -112,17 +113,21 @@ class TagControllerTest {
     @DisplayName("유효하지 않은 AccessToken으로 태그 추출 요청시 401 예외 메시지가 반환된다.")
     @Test
     void extractLanguageTags_InvalidAccessToken_ExceptionThrown() throws Exception {
+        // given
         String url =
             "/api/github/repositories/{repositoryName}}/tags/languages";
 
+        // mock
         given(oAuthService.validateToken(any(String.class)))
             .willReturn(false);
 
+        // when, then
         ResultActions perform = mockMvc.perform(get(url, userName)
             .header("Authorization", "Bearer invalid"))
             .andExpect(status().isUnauthorized())
             .andExpect(jsonPath("errorCode").value("A0001"));
 
+        // restdocs
         perform.andDo(document("tags-invalidToken",
             getDocumentRequest(),
             getDocumentResponse(),
@@ -141,12 +146,15 @@ class TagControllerTest {
     @DisplayName("유효하지 않은 레포지토리 태그 추출 요청시 404 예외 메시지가 반환된다.")
     @Test
     void extractLanguageTags_InvalidRepository_ExceptionThrown() throws Exception {
+        // given
         String url =
             "/api/github/repositories/{repositoryName}}/tags/languages";
 
+        // mock
         given(tagService.extractTags(any(ExtractionRequestDto.class)))
             .willThrow(new PlatformHttpErrorException());
 
+        // when, then
         ResultActions perform = mockMvc.perform(get(url, userName, "invalidrepo")
             .header("Authorization", accessToken))
             .andExpect(status().isInternalServerError())
@@ -155,6 +163,7 @@ class TagControllerTest {
         verify(tagService, times(1))
             .extractTags(any(ExtractionRequestDto.class));
 
+        // restdocs
         perform.andDo(document("tags-invalidRepository",
             getDocumentRequest(),
             getDocumentResponse(),

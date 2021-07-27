@@ -1,6 +1,7 @@
 package com.woowacourse.pickgit.post.domain;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 import com.woowacourse.pickgit.exception.post.CannotAddTagException;
 import com.woowacourse.pickgit.post.domain.comment.Comment;
@@ -12,8 +13,11 @@ import com.woowacourse.pickgit.tag.domain.Tag;
 import com.woowacourse.pickgit.user.domain.User;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -90,6 +94,7 @@ public class Post {
     }
 
     public void addComment(Comment comment) {
+        comment.toPost(this);
         comments.addComment(comment);
     }
 
@@ -102,13 +107,21 @@ public class Post {
     }
 
     public void addTags(List<Tag> tags) {
+        validateDuplicateTag(tags);
         List<Tag> existingTags = getTags();
         for (Tag tag : tags) {
-            if (existingTags.contains(tag)) {
-                throw new CannotAddTagException();
-            }
+            validateDuplicateTagAlreadyExistsInPost(existingTags, tag);
             PostTag postTag = new PostTag(this, tag);
             postTags.add(postTag);
+        }
+    }
+
+    private void validateDuplicateTag(List<Tag> tags) {
+        Set<String> nonDuplicatetagNames = tags.stream()
+            .map(Tag::getName)
+            .collect(toSet());
+        if (nonDuplicatetagNames.size() != tags.size()) {
+            throw new CannotAddTagException();
         }
     }
 
@@ -116,6 +129,12 @@ public class Post {
         return postTags.stream()
             .map(PostTag::getTag)
             .collect(toList());
+    }
+
+    private void validateDuplicateTagAlreadyExistsInPost(List<Tag> existingTags, Tag tag) {
+        if (existingTags.contains(tag)) {
+            throw new CannotAddTagException();
+        }
     }
 
     @Override

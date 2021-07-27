@@ -29,7 +29,9 @@ const userPostsQueryFunction: QueryFunction<Post[]> = async ({ queryKey, pagePar
 
     return await requestGetMyFeedPosts(pageParam, accessToken);
   } else {
-    return await requestGetUserFeedPosts(username as string, pageParam, accessToken);
+    if (!username) throw Error("no username");
+
+    return await requestGetUserFeedPosts(username, pageParam, accessToken);
   }
 };
 

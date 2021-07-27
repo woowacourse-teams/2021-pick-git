@@ -1,5 +1,8 @@
 package com.woowacourse.pickgit.post.presentation.dto.request;
 
+import lombok.Builder;
+
+@Builder
 public class CommentRequest {
 
     private String userName;

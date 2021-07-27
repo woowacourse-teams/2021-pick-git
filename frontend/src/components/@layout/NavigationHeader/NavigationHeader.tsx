@@ -12,6 +12,9 @@ const NavigationHeader = () => {
 
   const UnAuthenticatedNavigation = () => (
     <Navigation>
+      <NavigationItem to={PAGE_URL.HOME}>
+        <HomeIcon />
+      </NavigationItem>
       <NavigationItem to={PAGE_URL.SEARCH}>
         <SearchIcon />
       </NavigationItem>
@@ -44,8 +47,8 @@ const NavigationHeader = () => {
       {isLoggedIn ? (
         <FlexWrapper>
           <AuthenticatedNavigation />
-          <Button kind="roundedInline" onClick={handleLogoutButtonClick}>
-            Logout
+          <Button kind="roundedInline" padding="0.6rem" onClick={handleLogoutButtonClick}>
+            로그아웃
           </Button>
         </FlexWrapper>
       ) : (

@@ -7,7 +7,7 @@ export const Header = styled.header`
   width: 100%;
   height: ${Layout.HEADER_HEIGHT};
   background-color: ${({ theme }) => theme.color.white};
-  z-index: ${Z_INDEX.ROOT};
+  z-index: ${Z_INDEX.LOWER};
 
   @media (min-width: 425px) {
     border-bottom: 1px solid ${({ theme }) => theme.color.borderColor};
