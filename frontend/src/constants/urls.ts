@@ -8,8 +8,9 @@ export const URL_PARAMS = {
 export const PAGE_URL = {
   HOME: "/",
   HOME_FEED: "/posts",
-  TAG_FEED: (tag: string) => `/posts?tag=${tag}`,
-  USER_FEED: (username: string) => `/posts?username=${username}`,
+  TAG_FEED_BASE: "/posts/tag",
+  USER_FEED: "/posts/user",
+  TAG_FEED: (tag: string) => `/posts/tag?tag=${tag}`,
   LOGIN: "/login",
   AUTH_PROCESSING: "/auth",
   ADD_POST: "/add-post",

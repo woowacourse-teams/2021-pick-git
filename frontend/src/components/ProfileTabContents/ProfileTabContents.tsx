@@ -5,7 +5,7 @@ import ProfileFeed from "../ProfileFeed/ProfileFeed";
 
 export interface Props {
   isMyProfile: boolean;
-  username: string | null;
+  username: string;
   tabIndex: number;
 }
 
@@ -14,7 +14,7 @@ const ProfileTabContents = ({ isMyProfile, username, tabIndex }: Props) => {
   const githubStatisticQueryResult = useGithubStatsQuery(username);
 
   const tabContents = [
-    <ProfileFeed key="profile-feed" {...userFeedProps} />,
+    <ProfileFeed key="profile-feed" username={username} {...userFeedProps} />,
     <GithubStatistics key="github-stats" username={username} githubStatisticQueryResult={githubStatisticQueryResult} />,
   ];
 
