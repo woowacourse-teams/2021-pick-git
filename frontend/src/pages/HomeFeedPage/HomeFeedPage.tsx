@@ -1,5 +1,5 @@
 import { Container } from "./HomeFeedPage.style";
-import Feed from "../../components/HomeFeed/HomeFeed";
+import Feed from "../../components/Feed/Feed";
 import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import useHomeFeed from "../../services/hooks/useHomeFeed";

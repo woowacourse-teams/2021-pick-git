@@ -1,6 +1,5 @@
 import { useQueryClient } from "react-query";
 import { CommentData, Post } from "../../@types";
-import { QUERY } from "../../constants/queries";
 
 import {
   useAddPostLikeMutation,

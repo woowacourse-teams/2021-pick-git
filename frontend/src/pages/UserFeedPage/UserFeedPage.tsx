@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 
-import HomeFeed from "../../components/HomeFeed/HomeFeed";
+import Feed from "../../components/Feed/Feed";
 import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import useUserFeed from "../../services/hooks/useUserFeed";
@@ -23,9 +23,11 @@ const UserFeedPage = () => {
   const { currentUsername } = useContext(UserContext);
   const username = new URLSearchParams(location.search).get("username");
   const isMyFeed = currentUsername === username;
+
   const {
     state: { prevData, postId },
   } = useLocation<LocationState>();
+
   const { allPosts, handleIntersect, isLoading, isError, isFetchingNextPage } = useUserFeed(
     isMyFeed,
     username,
@@ -35,8 +37,6 @@ const UserFeedPage = () => {
   useEffect(() => {
     if (!isMountedOnce) {
       setIsMountedOnce(true);
-
-      return;
     }
 
     const $targetPost = document.querySelector(`#post${postId}`);
@@ -57,7 +57,7 @@ const UserFeedPage = () => {
   return (
     <Container>
       <InfiniteScrollContainer isLoaderShown={isFetchingNextPage} onIntersect={handleIntersect}>
-        <HomeFeed posts={allPosts} queryKey={QUERY.GET_USER_FEED_POSTS} />
+        <Feed posts={allPosts} queryKey={QUERY.GET_USER_FEED_POSTS} />
       </InfiniteScrollContainer>
     </Container>
   );

@@ -22,8 +22,13 @@ const useBottomSlider = () => {
   };
 
   const showBottomSlider = () => {
+    history.push({
+      hash: "#slide-up",
+      search: history.location.search,
+      state: history.location.state,
+    });
+
     setBottomSliderShown(true);
-    history.push("#slide-up");
   };
 
   const hideBottomSlider = () => {
