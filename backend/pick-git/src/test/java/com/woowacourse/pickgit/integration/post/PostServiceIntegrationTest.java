@@ -12,6 +12,7 @@ import com.woowacourse.pickgit.common.factory.PostFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
+import com.woowacourse.pickgit.exception.post.CannotAddTagException;
 import com.woowacourse.pickgit.exception.post.CommentFormatException;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
@@ -47,6 +48,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
@@ -209,6 +211,30 @@ class PostServiceIntegrationTest {
 
         // then
         assertThat(responseDto.getId()).isNotNull();
+    }
+
+    @DisplayName("사용자는 게시글 등록시 중복된 태그를 작성할 수 없다.")
+    @Test
+    void write_LoginUserWithDuplicateTag_Fail() {
+        // given
+        PostRequestDto requestDto = PostRequestDto.builder()
+            .token(ACCESS_TOKEN)
+            .username(USERNAME)
+            .images(
+                List.of(
+                    FileFactory.getTestImage1(),
+                    FileFactory.getTestImage2()
+                )
+            )
+            .githubRepoUrl(githubRepoUrl)
+            .tags(List.of("Java", "Javascript", "Java"))
+            .content(content).build();
+
+        // when, then
+        assertThatCode(() -> postService.write(requestDto))
+            .isInstanceOf(CannotAddTagException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "P0001")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST);
     }
 
     @DisplayName("사용자는 Repository 목록을 가져올 수 있다.")

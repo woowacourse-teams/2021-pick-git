@@ -4,16 +4,16 @@ import java.util.List;
 
 public class TagsDto {
 
-    private List<String> tags;
+    private List<String> tagNames;
 
     private TagsDto() {
     }
 
-    public TagsDto(List<String> tags) {
-        this.tags = tags;
+    public TagsDto(List<String> tagNames) {
+        this.tagNames = tagNames;
     }
 
-    public List<String> getTags() {
-        return tags;
+    public List<String> getTagNames() {
+        return tagNames;
     }
 }

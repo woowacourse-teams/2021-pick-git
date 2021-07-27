@@ -28,9 +28,12 @@ public class TagController {
     public ResponseEntity<List<String>> extractLanguageTags(@Authenticated AppUser appUser,
         @PathVariable String repositoryName) {
         String accessToken = appUser.getAccessToken();
-        ExtractionRequestDto extractionRequestDto =
-            new ExtractionRequestDto(accessToken, appUser.getUsername(), repositoryName);
+        ExtractionRequestDto extractionRequestDto = ExtractionRequestDto.builder()
+            .accessToken(accessToken)
+            .userName(appUser.getUsername())
+            .repositoryName(repositoryName)
+            .build();
         TagsDto tagsDto = tagService.extractTags(extractionRequestDto);
-        return ResponseEntity.ok(tagsDto.getTags());
+        return ResponseEntity.ok(tagsDto.getTagNames());
     }
 }
