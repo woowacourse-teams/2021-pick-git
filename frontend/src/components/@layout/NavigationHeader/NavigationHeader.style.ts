@@ -5,13 +5,18 @@ import { Header } from "../../@styled/layout";
 export const Container = styled(Header)<React.CSSProperties>`
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  height: fit-content;
   padding: 1.0625rem 1.375rem;
 `;
 
-export const HomeLink = styled(Link)``;
+export const HomeLink = styled(Link)`
+  height: fit-content;
+`;
 
 export const Navigation = styled.nav`
   display: flex;
+  align-items: center;
 `;
 
 export const NavigationItem = styled(Link)`

@@ -1,8 +1,10 @@
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
+import { InfiniteData, useQueryClient } from "react-query";
 import { useHistory } from "react-router-dom";
 
 import { Post } from "../../@types";
+import { QUERY } from "../../constants/queries";
 import { PAGE_URL } from "../../constants/urls";
 import SnackBarContext from "../../contexts/SnackbarContext";
 import UserContext from "../../contexts/UserContext";
@@ -10,7 +12,7 @@ import { handleHTTPError, HTTPErrorHandler } from "../../utils/api";
 import { removeDuplicatedData } from "../../utils/data";
 import { useUserPostsQuery } from "../queries";
 
-const useUserFeed = (isMyFeed: boolean, username: string | null) => {
+const useUserFeed = (isMyFeed: boolean, username: string | null, prevData?: InfiniteData<Post[]>) => {
   const [allPosts, setAllPosts] = useState<Post[]>([]);
   const [isAllPostsFetched, setIsAllPostsFetched] = useState(false);
   const { data, isLoading, error, isError, refetch, fetchNextPage, isFetchingNextPage } = useUserPostsQuery(
@@ -18,8 +20,9 @@ const useUserFeed = (isMyFeed: boolean, username: string | null) => {
     username
   );
 
+  const queryClient = useQueryClient();
   const { pushSnackbarMessage } = useContext(SnackBarContext);
-  const { isLoggedIn, logout } = useContext(UserContext);
+  const { logout } = useContext(UserContext);
   const history = useHistory();
 
   const handleIntersect = () => {
@@ -36,8 +39,6 @@ const useUserFeed = (isMyFeed: boolean, username: string | null) => {
 
     if (!lastPage || !lastPage.length) {
       setIsAllPostsFetched(true);
-
-      return;
     }
 
     const fetchedPosts = pages?.reduce((acc, postPage) => acc.concat(postPage), []) ?? [];
@@ -50,15 +51,12 @@ const useUserFeed = (isMyFeed: boolean, username: string | null) => {
     if (!error) return;
 
     if (axios.isAxiosError(error)) {
-      const { status } = error.response ?? {};
+      const { status, data } = error.response ?? {};
       const errorHandler: HTTPErrorHandler = {
         unauthorized: () => {
           if (isMyFeed) {
-            pushSnackbarMessage("로그인한 사용자만 사용할 수 있는 서비스입니다.");
-
             history.push(PAGE_URL.HOME);
           } else {
-            isLoggedIn && pushSnackbarMessage("사용자 정보가 유효하지 않아 자동으로 로그아웃합니다.");
             logout();
             refetch();
           }
@@ -68,8 +66,16 @@ const useUserFeed = (isMyFeed: boolean, username: string | null) => {
       if (status) {
         handleHTTPError(status, errorHandler);
       }
+
+      data?.errorCode && pushSnackbarMessage(data.errorCode);
     }
   };
+
+  useEffect(() => {
+    if (prevData) {
+      queryClient.setQueryData([QUERY.GET_USER_FEED_POSTS, { isMyFeed, username }], prevData);
+    }
+  }, []);
 
   useEffect(() => {
     handleDataFetch();
@@ -79,7 +85,7 @@ const useUserFeed = (isMyFeed: boolean, username: string | null) => {
     handleError();
   }, [error]);
 
-  return { allPosts, handleIntersect, isLoading, isError, isFetchingNextPage };
+  return { allPosts, handleIntersect, isLoading, isError, isFetchingNextPage, data };
 };
 
 export default useUserFeed;
