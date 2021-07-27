@@ -3,6 +3,11 @@ export const Layout = {
   PAGE_MARGIN_TOP: "4.625rem",
 };
 
+export const LayoutInPx = {
+  HEADER_HEIGHT: 58,
+  PAGE_MARGIN_TOP: 74,
+};
+
 export const Z_INDEX = {
   HIGHEST: 1200,
   HIGH: 900,

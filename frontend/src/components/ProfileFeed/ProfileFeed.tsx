@@ -1,13 +1,16 @@
 import { Link } from "react-router-dom";
+import { PAGE_URL } from "../../constants/urls";
 import useUserFeed from "../../services/hooks/useUserFeed";
 
 import PageLoading from "../@layout/PageLoading/PageLoading";
 import InfiniteScrollContainer from "../@shared/InfiniteScrollContainer/InfiniteScrollContainer";
 import { Container, Empty, Grid, GridItem } from "./ProfileFeed.styled";
 
-export interface Props extends ReturnType<typeof useUserFeed> {}
+export interface Props extends ReturnType<typeof useUserFeed> {
+  username: string;
+}
 
-const ProfileFeed = ({ allPosts, isLoading, isError, isFetchingNextPage, handleIntersect }: Props) => {
+const ProfileFeed = ({ username, allPosts, isLoading, isError, isFetchingNextPage, handleIntersect, data }: Props) => {
   if (isLoading) {
     return (
       <Empty>
@@ -30,7 +33,14 @@ const ProfileFeed = ({ allPosts, isLoading, isError, isFetchingNextPage, handleI
           >
             <Grid>
               {allPosts?.map(({ id, imageUrls, authorName, content }) => (
-                <Link to="" key={id}>
+                <Link
+                  to={{
+                    pathname: PAGE_URL.USER_FEED,
+                    search: `?username=${username}`,
+                    state: { prevData: data, postId: id },
+                  }}
+                  key={id}
+                >
                   <GridItem imageUrl={imageUrls[0]} aria-label={`${authorName}님의 게시물. ${content}`} />
                 </Link>
               ))}
