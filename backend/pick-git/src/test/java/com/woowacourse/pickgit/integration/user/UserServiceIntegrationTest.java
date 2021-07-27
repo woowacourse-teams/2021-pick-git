@@ -13,15 +13,14 @@ import com.woowacourse.pickgit.exception.user.InvalidFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Import;
@@ -31,19 +30,16 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
 @Import(InfrastructureTestConfiguration.class)
-@DataJpaTest
+@SpringBootTest(webEnvironment = WebEnvironment.NONE)
+@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @ActiveProfiles("test")
 class UserServiceIntegrationTest {
 
+    @Autowired
     private UserService userService;
 
     @Autowired
     private UserRepository userRepository;
-
-    @BeforeEach
-    void setUp() {
-        userService = new UserService(userRepository);
-    }
 
     @DisplayName("사용자는 자신의 프로필을 조회할 수 있다.")
     @Test
@@ -151,6 +147,35 @@ class UserServiceIntegrationTest {
         // when
         assertThatThrownBy(() -> {
             userService.getUserProfile(guestUser, "invalidName");
+        }).isInstanceOf(InvalidUserException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "U0001")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
+            .hasMessage("유효하지 않은 유저입니다.");
+    }
+
+    @DisplayName("누구든지 활동 통계를 조회할 수 있다.")
+    @Test
+    void getContributions_Anyone_Success() {
+        // given
+        userRepository.save(UserFactory.user());
+
+        ContributionResponseDto contributions = UserFactory.mockContributionResponseDto();
+
+        // when
+        ContributionResponseDto responseDto = userService.calculateContributions("testUser");
+
+        // then
+        assertThat(responseDto)
+            .usingRecursiveComparison()
+            .isEqualTo(contributions);
+    }
+
+    @DisplayName("존재하지 않은 유저 이름으로 활동 통계를 조회할 수 없다. - 400 예외")
+    @Test
+    void getContributions_InvalidUsername_400Exception() {
+        // when
+        assertThatThrownBy(() -> {
+            userService.calculateContributions("invalidName");
         }).isInstanceOf(InvalidUserException.class)
             .hasFieldOrPropertyWithValue("errorCode", "U0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)

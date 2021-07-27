@@ -29,7 +29,6 @@ import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
-import com.woowacourse.pickgit.user.application.dto.request.ContributionRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
@@ -260,7 +259,7 @@ class UserControllerTest {
         // given
         ContributionResponseDto responseDto = UserFactory.mockContributionResponseDto();
 
-        given(userService.calculateContributions(any(ContributionRequestDto.class)))
+        given(userService.calculateContributions(anyString()))
             .willReturn(responseDto);
 
         // when

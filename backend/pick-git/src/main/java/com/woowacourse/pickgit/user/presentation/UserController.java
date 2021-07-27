@@ -5,7 +5,6 @@ import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
-import com.woowacourse.pickgit.user.application.dto.request.ContributionRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
@@ -72,8 +71,7 @@ public class UserController {
 
     @GetMapping("/{username}/contributions")
     public ResponseEntity<ContributionResponse> getContributions(@PathVariable String username) {
-        ContributionResponseDto responseDto =
-            userService.calculateContributions(new ContributionRequestDto(username));
+        ContributionResponseDto responseDto = userService.calculateContributions(username);
 
         return ResponseEntity.ok(createContributionResponse(responseDto));
     }

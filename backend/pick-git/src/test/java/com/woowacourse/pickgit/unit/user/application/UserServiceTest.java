@@ -16,7 +16,6 @@ import com.woowacourse.pickgit.exception.user.InvalidFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
-import com.woowacourse.pickgit.user.application.dto.request.ContributionRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
@@ -162,7 +161,6 @@ class UserServiceTest {
     @Test
     void calculateContributions_Anyone_Success() {
         // given
-        ContributionRequestDto requestDto = new ContributionRequestDto("testUser");
         User user = UserFactory.user();
 
         given(userRepository.findByBasicProfile_Name(anyString()))
@@ -181,8 +179,7 @@ class UserServiceTest {
         ContributionResponseDto responseDto = UserFactory.mockContributionResponseDto();
 
         // when
-        ContributionResponseDto contributions =
-            userService.calculateContributions(requestDto);
+        ContributionResponseDto contributions = userService.calculateContributions("testUser");
 
         // then
         assertThat(contributions)
@@ -202,7 +199,7 @@ class UserServiceTest {
     void calculateContributions_InvalidUsername_400Exception() {
         // when
         assertThatThrownBy(() -> {
-            userService.calculateContributions(new ContributionRequestDto("invalidName"));
+            userService.calculateContributions("invalidName");
         }).isInstanceOf(InvalidUserException.class)
             .hasFieldOrPropertyWithValue("errorCode", "U0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)

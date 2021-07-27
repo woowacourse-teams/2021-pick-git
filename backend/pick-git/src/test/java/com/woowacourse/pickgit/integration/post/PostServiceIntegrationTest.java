@@ -29,6 +29,7 @@ import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostRepository;
 import com.woowacourse.pickgit.post.presentation.dto.request.CommentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.HomeFeedRequest;
+import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import java.util.List;
@@ -50,8 +51,8 @@ import org.springframework.test.context.ActiveProfiles;
 
 @Import(InfrastructureTestConfiguration.class)
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
-@ActiveProfiles("test")
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
+@ActiveProfiles("test")
 class PostServiceIntegrationTest {
     private static final String USERNAME = "jipark3";
     private static final String ACCESS_TOKEN = "oauth.access.token";

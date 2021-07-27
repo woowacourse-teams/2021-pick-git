@@ -4,7 +4,6 @@ import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
 import com.woowacourse.pickgit.exception.user.SameSourceTargetUserException;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
-import com.woowacourse.pickgit.user.application.dto.request.ContributionRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
@@ -90,8 +89,8 @@ public class UserService {
             .build();
     }
 
-    public ContributionResponseDto calculateContributions(ContributionRequestDto requestDto) {
-        User user = findUserByName(requestDto.getUsername());
+    public ContributionResponseDto calculateContributions(String username) {
+        User user = findUserByName(username);
 
         return ContributionResponseDto.builder()
             .starsCount(calculateStars(user.getName()))
