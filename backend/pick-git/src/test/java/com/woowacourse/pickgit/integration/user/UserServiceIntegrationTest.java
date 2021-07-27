@@ -59,12 +59,9 @@ class UserServiceIntegrationTest {
     @Test
     void getMyUserProfile_WithMyName_Success() {
         //given
-        AppUser loginUser = new LoginUser("testUser", "Bearer testToken");
-        AuthUserRequestDto requestDto =
-            new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
+        User loginUser = userRepository.save(UserFactory.user());
+        AuthUserRequestDto requestDto = createLoginAuthUserRequestDto(loginUser.getName());
         UserProfileResponseDto responseDto = UserFactory.mockLoginUserProfileResponseDto();
-
-        userRepository.save(UserFactory.user());
 
         //when
         UserProfileResponseDto myUserProfile = userService.getMyUserProfile(requestDto);
@@ -73,6 +70,16 @@ class UserServiceIntegrationTest {
         assertThat(myUserProfile)
             .usingRecursiveComparison()
             .isEqualTo(responseDto);
+    }
+
+    private AuthUserRequestDto createLoginAuthUserRequestDto(String username) {
+        AppUser appUser = new LoginUser(username, "Bearer testToken");
+        return new AuthUserRequestDto(username, appUser.isGuest());
+    }
+
+    private AuthUserRequestDto createGuestAuthUserRequestDto() {
+        AppUser guestUser = new GuestUser();
+        return new AuthUserRequestDto(guestUser.getUsername2(), guestUser.isGuest());
     }
 
     @DisplayName("getUserProfile 메서드는")
@@ -87,16 +94,13 @@ class UserServiceIntegrationTest {
             @Test
             void getUserProfile_FindByNameInCaseOfGuestUser_Success() {
                 //given
-                AppUser guestUser = new GuestUser();
-                AuthUserRequestDto authUserRequestDto =
-                    new AuthUserRequestDto(guestUser.getUsername2(), guestUser.isGuest());
+                AuthUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
                 UserProfileResponseDto responseDto = UserFactory.mockGuestUserProfileResponseDto();
-
-                userRepository.save(UserFactory.user());
+                User targetUser = userRepository.save(UserFactory.user());
 
                 //when
                 UserProfileResponseDto userProfile =
-                    userService.getUserProfile(authUserRequestDto, "testUser");
+                    userService.getUserProfile(authUserRequestDto, targetUser.getName());
 
                 //then
                 assertThat(userProfile)
@@ -108,14 +112,12 @@ class UserServiceIntegrationTest {
             @Test
             void getUserProfile_FindByInvalidNameInCaseOfGuestUser_400Exception() {
                 // given
-                AppUser guestUser = new GuestUser();
-                AuthUserRequestDto authUserRequestDto =
-                    new AuthUserRequestDto(guestUser.getUsername2(), guestUser.isGuest());
+                AuthUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
 
                 // when
-                assertThatThrownBy(() -> {
-                    userService.getUserProfile(authUserRequestDto, "invalidName");
-                }).isInstanceOf(InvalidUserException.class)
+                assertThatThrownBy(() ->
+                    userService.getUserProfile(authUserRequestDto, "invalidName")
+                ).isInstanceOf(InvalidUserException.class)
                     .hasFieldOrPropertyWithValue("errorCode", "U0001")
                     .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
                     .hasMessage("유효하지 않은 유저입니다.");
@@ -130,12 +132,10 @@ class UserServiceIntegrationTest {
             @Test
             void getUserProfile_FindByNameInCaseOfLoginUserIsFollowing_Success() {
                 // given
-                AppUser loginUser = new LoginUser("testUser", "Bearer testToken");
-                AuthUserRequestDto authUserRequestDto =
-                    new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
-
-                userRepository.save(UserFactory.user("testUser"));
+                User loginUser = userRepository.save(UserFactory.user("testUser"));
                 User target = userRepository.save(UserFactory.user("testUser2"));
+                AuthUserRequestDto authUserRequestDto =
+                    createLoginAuthUserRequestDto(loginUser.getName());
 
                 userService.followUser(authUserRequestDto, target.getName());
 
@@ -156,18 +156,17 @@ class UserServiceIntegrationTest {
             @Test
             void getUserProfile_FindByNameInCaseOfLoginUserIsNotFollowing_Success() {
                 // given
-                AppUser loginUser = new LoginUser("testUser", "Bearer testToken");
+                User loginUser = userRepository.save(UserFactory.user("testUser"));
+                User target = userRepository.save(UserFactory.user("testUser2"));
                 AuthUserRequestDto authUserRequestDto =
-                    new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
-
-                userRepository.save(UserFactory.user("testUser"));
-                userRepository.save(UserFactory.user("testUser2"));
+                    createLoginAuthUserRequestDto(loginUser.getName());
 
                 UserProfileResponseDto responseDto =
                     UserFactory.mockLoginUserProfileIsNotFollowingResponseDto();
 
                 // when
-                UserProfileResponseDto userProfile = userService.getUserProfile(authUserRequestDto, "testUser2");
+                UserProfileResponseDto userProfile =
+                    userService.getUserProfile(authUserRequestDto, target.getName());
 
                 // then
                 assertThat(userProfile)
@@ -179,9 +178,9 @@ class UserServiceIntegrationTest {
             @Test
             void getUserProfile_FindByInvalidNameInCaseOfLoginUser_400Exception() {
                 // given
-                AppUser guestUser = new LoginUser("testUser", "Bearer testToken");
+                User loginUser = userRepository.save(UserFactory.user("testUser"));
                 AuthUserRequestDto authUserRequestDto =
-                    new AuthUserRequestDto(guestUser.getUsername2(), guestUser.isGuest());
+                    createLoginAuthUserRequestDto(loginUser.getName());
 
                 // when
                 assertThatThrownBy(() -> {
@@ -206,10 +205,9 @@ class UserServiceIntegrationTest {
             @Test
             void follow_FindByInvalidName_400Exception() {
                 // given
-                AppUser guestUser = new LoginUser("testUser", "Bearer testToken");
+                User loginUser = userRepository.save(UserFactory.user("testUser"));
                 AuthUserRequestDto authUserRequestDto =
-                    new AuthUserRequestDto(guestUser.getUsername2(), guestUser.isGuest());
-                userRepository.save(UserFactory.user("testUser"));
+                    createLoginAuthUserRequestDto(loginUser.getName());
 
                 // when, then
                 assertThatCode(() -> userService.followUser(authUserRequestDto, "kevin"))
@@ -228,13 +226,13 @@ class UserServiceIntegrationTest {
             @Test
             void follow_SameUser_400Exception() {
                 //given
-                AppUser loginUser = new LoginUser("testUser", "Bearer Token");
+                User loginUser = userRepository.save(UserFactory.user("testUser"));
                 AuthUserRequestDto authUserRequestDto =
-                    new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
-                User source = userRepository.save(UserFactory.user("testUser"));
+                    createLoginAuthUserRequestDto(loginUser.getName());
 
                 // when, then
-                assertThatCode(() -> userService.followUser(authUserRequestDto, source.getName()))
+                assertThatCode(
+                    () -> userService.followUser(authUserRequestDto, loginUser.getName()))
                     .isInstanceOf(SameSourceTargetUserException.class)
                     .hasFieldOrPropertyWithValue("errorCode", "U0004")
                     .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
@@ -250,17 +248,17 @@ class UserServiceIntegrationTest {
             @Test
             void followUser_SourceToTarget_Success() {
                 // given
-                AppUser loginUser = new LoginUser("testUser", "Bearer testToken");
-                AuthUserRequestDto requestDto =
-                    new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
-                userRepository.save(UserFactory.user("testUser"));
+                User loginUser = userRepository.save(UserFactory.user("testUser"));
                 User target = userRepository.save(UserFactory.user("testUser2"));
+                AuthUserRequestDto authUserRequestDto =
+                    createLoginAuthUserRequestDto(loginUser.getName());
 
                 // when
-                FollowResponseDto responseDto = userService.followUser(requestDto, target.getName());
+                FollowResponseDto responseDto = userService
+                    .followUser(authUserRequestDto, target.getName());
 
                 // then
-                assertThat(responseDto.getFollowerCount()).isEqualTo(1);
+                assertThat(responseDto.getFollowerCount()).isOne();
                 assertThat(responseDto.isFollowing()).isTrue();
             }
         }
@@ -273,18 +271,17 @@ class UserServiceIntegrationTest {
             @Test
             void followUser_ExistingFollow_400Exception() {
                 // given
-                AppUser loginUser = new LoginUser("testUser", "Bearer testToken");
-                AuthUserRequestDto requestDto =
-                    new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
-                userRepository.save(UserFactory.user("testUser"));
+                User loginUser = userRepository.save(UserFactory.user("testUser"));
                 User target = userRepository.save(UserFactory.user("testUser2"));
+                AuthUserRequestDto authUserRequestDto =
+                    createLoginAuthUserRequestDto(loginUser.getName());
 
-                userService.followUser(requestDto, target.getName());
+                userService.followUser(authUserRequestDto, target.getName());
 
                 // when
-                assertThatThrownBy(() -> {
-                    userService.followUser(requestDto, target.getName());
-                }).isInstanceOf(DuplicateFollowException.class)
+                assertThatThrownBy(() ->
+                    userService.followUser(authUserRequestDto, target.getName()))
+                    .isInstanceOf(DuplicateFollowException.class)
                     .hasFieldOrPropertyWithValue("errorCode", "U0002")
                     .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
                     .hasMessage("이미 팔로우 중 입니다.");
@@ -381,10 +378,9 @@ class UserServiceIntegrationTest {
             @Test
             void unfollow_FindByInvalidName_400Exception() {
                 //given
-                AppUser loginUser = new LoginUser("testUser", "Bearer Token");
+                User loginUser = userRepository.save(UserFactory.user("testUser"));
                 AuthUserRequestDto authUserRequestDto =
-                    new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
-                userRepository.save(UserFactory.user("testUser"));
+                    createLoginAuthUserRequestDto(loginUser.getName());
 
                 // when, then
                 assertThatCode(() -> userService.followUser(authUserRequestDto, "kevin"))
@@ -403,13 +399,13 @@ class UserServiceIntegrationTest {
             @Test
             void unfollow_SameUser_400Exception() {
                 //given
-                AppUser loginUser = new LoginUser("testUser", "Bearer Token");
+                User loginUser = userRepository.save(UserFactory.user("testUser"));
                 AuthUserRequestDto authUserRequestDto =
-                    new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
-                User source = userRepository.save(UserFactory.user("testUser"));
+                    createLoginAuthUserRequestDto(loginUser.getName());
 
                 // when, then
-                assertThatCode(() -> userService.unfollowUser(authUserRequestDto, source.getName()))
+                assertThatCode(
+                    () -> userService.unfollowUser(authUserRequestDto, loginUser.getName()))
                     .isInstanceOf(SameSourceTargetUserException.class)
                     .hasFieldOrPropertyWithValue("errorCode", "U0004")
                     .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
@@ -425,17 +421,15 @@ class UserServiceIntegrationTest {
             @Test
             void unfollowUser_NotExistingFollow_400Exception() {
                 // given
-                AppUser loginUser = new LoginUser("testUser", "Bearer testToken");
-                AuthUserRequestDto requestDto =
-                    new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
-
-                userRepository.save(UserFactory.user("testUser"));
+                User loginUser = userRepository.save(UserFactory.user("testUser"));
                 User target = userRepository.save(UserFactory.user("testUser2"));
+                AuthUserRequestDto authUserRequestDto =
+                    createLoginAuthUserRequestDto(loginUser.getName());
 
-                // when
-                assertThatThrownBy(() -> {
-                    userService.unfollowUser(requestDto, target.getName());
-                }).isInstanceOf(InvalidFollowException.class)
+                // when, then
+                assertThatThrownBy(
+                    () -> userService.unfollowUser(authUserRequestDto, target.getName()))
+                    .isInstanceOf(InvalidFollowException.class)
                     .hasFieldOrPropertyWithValue("errorCode", "U0003")
                     .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
                     .hasMessage("존재하지 않는 팔로우 입니다.");
@@ -450,20 +444,19 @@ class UserServiceIntegrationTest {
             @Test
             void unfollowUser_SourceToTarget_Success() {
                 // given
-                AppUser loginUser = new LoginUser("testUser", "Bearer testToken");
-                AuthUserRequestDto requestDto =
-                    new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
-
-                userRepository.save(UserFactory.user("testUser"));
+                User loginUser = userRepository.save(UserFactory.user("testUser"));
                 User target = userRepository.save(UserFactory.user("testUser2"));
+                AuthUserRequestDto authUserRequestDto =
+                    createLoginAuthUserRequestDto(loginUser.getName());
 
-                userService.followUser(requestDto, target.getName());
+                userService.followUser(authUserRequestDto, target.getName());
 
                 // when
-                FollowResponseDto responseDto = userService.unfollowUser(requestDto, target.getName());
+                FollowResponseDto responseDto = userService
+                    .unfollowUser(authUserRequestDto, target.getName());
 
                 // then
-                assertThat(responseDto.getFollowerCount()).isEqualTo(0);
+                assertThat(responseDto.getFollowerCount()).isZero();
                 assertThat(responseDto.isFollowing()).isFalse();
             }
         }
