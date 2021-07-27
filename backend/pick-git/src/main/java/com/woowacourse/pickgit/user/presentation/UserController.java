@@ -5,8 +5,11 @@ import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.ContributionRequestDto;
+import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
+import com.woowacourse.pickgit.user.presentation.dto.response.ContributionResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.FollowResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.UserProfileResponse;
 import org.springframework.http.ResponseEntity;
@@ -64,6 +67,24 @@ public class UserController {
             .website(userProfileResponseDto.getWebsite())
             .twitter(userProfileResponseDto.getTwitter())
             .following(userProfileResponseDto.getFollowing())
+            .build();
+    }
+
+    @GetMapping("/{username}/contributions")
+    public ResponseEntity<ContributionResponse> getContributions(@PathVariable String username) {
+        ContributionResponseDto responseDto =
+            userService.calculateContributions(new ContributionRequestDto(username));
+
+        return ResponseEntity.ok(createContributionResponse(responseDto));
+    }
+
+    private ContributionResponse createContributionResponse(ContributionResponseDto responseDto) {
+        return ContributionResponse.builder()
+            .starsCount(responseDto.getStarsCount())
+            .commitsCount(responseDto.getCommitsCount())
+            .prsCount(responseDto.getPrsCount())
+            .issuesCount(responseDto.getIssuesCount())
+            .reposCount(responseDto.getReposCount())
             .build();
     }
 

@@ -4,10 +4,16 @@ import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
 import com.woowacourse.pickgit.exception.user.SameSourceTargetUserException;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.ContributionRequestDto;
+import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
+import com.woowacourse.pickgit.user.domain.PlatformExtractor;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.domain.dto.CountResponseDto;
+import com.woowacourse.pickgit.user.domain.dto.StarResponseDto;
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,9 +22,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PlatformExtractor platformExtractor;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(
+        UserRepository userRepository,
+        PlatformExtractor platformExtractor) {
         this.userRepository = userRepository;
+        this.platformExtractor = platformExtractor;
     }
 
     @Transactional(readOnly = true)
@@ -78,6 +88,54 @@ public class UserService {
             .twitter(target.getTwitter())
             .following(source.isFollowing(target))
             .build();
+    }
+
+    public ContributionResponseDto calculateContributions(ContributionRequestDto requestDto) {
+        User user = findUserByName(requestDto.getUsername());
+
+        return ContributionResponseDto.builder()
+            .starsCount(calculateStars(user.getName()))
+            .commitsCount(calculateCommits(user.getName()))
+            .issuesCount(calculateIssues(user.getName()))
+            .prsCount(calculatePRs(user.getName()))
+            .reposCount(calculateRepos(user.getName()))
+            .build();
+    }
+
+    private int calculateStars(String username) {
+        List<StarResponseDto> responseDtos = platformExtractor.extractStars(username);
+
+        return responseDtos.stream()
+            .mapToInt(StarResponseDto::getStars)
+            .sum();
+    }
+
+    private int calculateCommits(String username) {
+        CountResponseDto responseDto =
+            platformExtractor.extractCount("/commits?q=committer:%s", username);
+
+        return responseDto.getCount();
+    }
+
+    private int calculateIssues(String username) {
+        CountResponseDto responseDto =
+            platformExtractor.extractCount("/issues?q=author:%s type:issue", username);
+
+        return responseDto.getCount();
+    }
+
+    private int calculatePRs(String username) {
+        CountResponseDto responseDto =
+            platformExtractor.extractCount("/issues?q=author:%s type:pr", username);
+
+        return responseDto.getCount();
+    }
+
+    private int calculateRepos(String username) {
+        CountResponseDto responseDto =
+            platformExtractor.extractCount("/repositories?q=user:%s is:public", username);
+
+        return responseDto.getCount();
     }
 
     public FollowResponseDto followUser(AuthUserRequestDto requestDto, String targetName) {
