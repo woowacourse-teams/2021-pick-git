@@ -17,21 +17,21 @@ import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.exception.user.DuplicateFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
-import com.woowacourse.pickgit.post.domain.PickGitStorage;
 import com.woowacourse.pickgit.exception.user.SameSourceTargetUserException;
+import com.woowacourse.pickgit.post.domain.PickGitStorage;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
-import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.UserSearchRequestDto;
+import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.ProfileEditResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
+import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import com.woowacourse.pickgit.user.domain.Contribution;
 import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
-import com.woowacourse.pickgit.user.application.dto.request.UserSearchRequestDto;
-import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
@@ -43,7 +43,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -94,7 +93,7 @@ class UserServiceTest {
         @Nested
         class Context_GuestUser {
 
-            @DisplayName("유저의 프로필을 조회할 수 있다.")
+            @DisplayName("유저 이름으로 검색하여 유저의 프로필을 조회할 수 있다.")
             @Test
             void getUserProfile_FindByNameInCaseOfGuestUser_Success() {
                 //given
@@ -147,7 +146,7 @@ class UserServiceTest {
         @Nested
         class Context_LoginUser {
 
-            @DisplayName("유저의 프로필을 조회할 수 있다.")
+            @DisplayName("유저 이름으로 검색하여 유저의 프로필을 조회할 수 있다.")
             @Test
             void getUserProfile_FindByNameInCaseOfLoginUser_Success() {
                 //given
