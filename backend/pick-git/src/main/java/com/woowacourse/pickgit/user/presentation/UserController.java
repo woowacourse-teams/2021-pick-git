@@ -53,9 +53,10 @@ public class UserController {
     @GetMapping("/{username}")
     public ResponseEntity<UserProfileResponse> getUserProfile(
         @Authenticated AppUser appUser,
-        @PathVariable String username
-    ) {
-        UserProfileResponseDto responseDto = userService.getUserProfile(appUser, username);
+        @PathVariable String username) {
+        AuthUserRequestDto authUserRequestDto =
+            new AuthUserRequestDto(appUser.getUsername2(), appUser.isGuest());
+        UserProfileResponseDto responseDto = userService.getUserProfile(authUserRequestDto, username);
 
         return ResponseEntity.ok(createUserProfileResponse(responseDto));
     }

@@ -75,12 +75,15 @@ class UserServiceIntegrationTest {
     void getUserProfile_FindByNameInCaseOfGuestUser_Success() {
         //given
         AppUser guestUser = new GuestUser();
+        AuthUserRequestDto authUserRequestDto =
+            new AuthUserRequestDto(guestUser.getUsername2(), guestUser.isGuest());
         UserProfileResponseDto responseDto = UserFactory.mockGuestUserProfileResponseDto();
 
         userRepository.save(UserFactory.user());
 
         //when
-        UserProfileResponseDto userProfile = userService.getUserProfile(guestUser, "testUser");
+        UserProfileResponseDto userProfile =
+            userService.getUserProfile(authUserRequestDto, "testUser");
 
         //then
         assertThat(userProfile)
@@ -93,6 +96,8 @@ class UserServiceIntegrationTest {
     void getUserProfile_FindByNameInCaseOfLoginUserIsFollowing_Success() {
         // given
         AppUser loginUser = new LoginUser("testUser", "Bearer testToken");
+        AuthUserRequestDto authUserRequestDto =
+            new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
 
         User source = userRepository.save(UserFactory.user("testUser"));
         User target = userRepository.save(UserFactory.user("testUser2"));
@@ -105,7 +110,7 @@ class UserServiceIntegrationTest {
 
         // when
         UserProfileResponseDto userProfile =
-            userService.getUserProfile(loginUser, target.getName());
+            userService.getUserProfile(authUserRequestDto, target.getName());
 
         // then
         assertThat(userProfile)
@@ -118,6 +123,8 @@ class UserServiceIntegrationTest {
     void getUserProfile_FindByNameInCaseOfLoginUserIsNotFollowing_Success() {
         // given
         AppUser loginUser = new LoginUser("testUser", "Bearer testToken");
+        AuthUserRequestDto authUserRequestDto =
+            new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
 
         userRepository.save(UserFactory.user("testUser"));
         userRepository.save(UserFactory.user("testUser2"));
@@ -126,7 +133,7 @@ class UserServiceIntegrationTest {
             UserFactory.mockLoginUserProfileIsNotFollowingResponseDto();
 
         // when
-        UserProfileResponseDto userProfile = userService.getUserProfile(loginUser, "testUser2");
+        UserProfileResponseDto userProfile = userService.getUserProfile(authUserRequestDto, "testUser2");
 
         // then
         assertThat(userProfile)
@@ -139,10 +146,12 @@ class UserServiceIntegrationTest {
     void getUserProfile_FindByInvalidNameInCaseOfGuestUser_400Exception() {
         // given
         AppUser guestUser = new GuestUser();
+        AuthUserRequestDto authUserRequestDto =
+            new AuthUserRequestDto(guestUser.getUsername2(), guestUser.isGuest());
 
         // when
         assertThatThrownBy(() -> {
-            userService.getUserProfile(guestUser, "invalidName");
+            userService.getUserProfile(authUserRequestDto, "invalidName");
         }).isInstanceOf(InvalidUserException.class)
             .hasFieldOrPropertyWithValue("errorCode", "U0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
@@ -154,10 +163,12 @@ class UserServiceIntegrationTest {
     void getUserProfile_FindByInvalidNameInCaseOfLoginUser_400Exception() {
         // given
         AppUser guestUser = new LoginUser("testUser", "Bearer testToken");
+        AuthUserRequestDto authUserRequestDto =
+            new AuthUserRequestDto(guestUser.getUsername2(), guestUser.isGuest());
 
         // when
         assertThatThrownBy(() -> {
-            userService.getUserProfile(guestUser, "invalidName");
+            userService.getUserProfile(authUserRequestDto, "invalidName");
         }).isInstanceOf(InvalidUserException.class)
             .hasFieldOrPropertyWithValue("errorCode", "U0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)

@@ -80,12 +80,12 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserProfileResponseDto getUserProfile(AppUser user, String targetName) {
+    public UserProfileResponseDto getUserProfile(AuthUserRequestDto requestDto, String targetName) {
         User target = findUserByName(targetName);
-        if (user.isGuest()) {
+        if (requestDto.isGuest()) {
             return generateUserProfileResponse(target, null);
         }
-        User source = findUserByName(user.getUsername());
+        User source = findUserByName(requestDto.getGithubName());
         return generateUserProfileResponse(target, source.isFollowing(target));
     }
 

@@ -26,7 +26,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woowacourse.pickgit.authentication.application.OAuthService;
-import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
@@ -165,7 +164,7 @@ class UserControllerTest {
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(anyString()))
             .willReturn(new LoginUser("loginUser", "Bearer testToken"));
-        given(userService.getUserProfile(any(AppUser.class), anyString()))
+        given(userService.getUserProfile(any(AuthUserRequestDto.class), anyString()))
             .willReturn(responseDto);
 
         // when
@@ -219,7 +218,7 @@ class UserControllerTest {
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(any()))
             .willCallRealMethod();
-        given(userService.getUserProfile(any(AppUser.class), anyString()))
+        given(userService.getUserProfile(any(AuthUserRequestDto.class), anyString()))
             .willReturn(responseDto);
 
         // when
