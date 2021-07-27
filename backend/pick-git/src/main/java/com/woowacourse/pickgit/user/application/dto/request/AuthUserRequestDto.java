@@ -13,10 +13,6 @@ public class AuthUserRequestDto {
     private AuthUserRequestDto() {
     }
 
-    public AuthUserRequestDto(String githubName) {
-        this.githubName = githubName;
-    }
-
     public AuthUserRequestDto(String githubName, boolean isGuest) {
         this.githubName = githubName;
         this.isGuest = isGuest;

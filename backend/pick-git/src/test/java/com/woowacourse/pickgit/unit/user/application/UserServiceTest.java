@@ -65,7 +65,9 @@ class UserServiceTest {
     @Test
     void getMyUserProfile_WithMyName_Success() {
         // given
-        AuthUserRequestDto requestDto = new AuthUserRequestDto("testUser");
+        AppUser loginUser = new LoginUser("testUser", "Bearer testToken");
+        AuthUserRequestDto requestDto =
+            new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
         User testUser = UserFactory.user();
 
         given(userRepository.findByBasicProfile_Name(anyString()))
@@ -261,7 +263,9 @@ class UserServiceTest {
             @Test
             void followUser_SourceToTarget_Success() {
                 //given
-                AuthUserRequestDto requestDto = new AuthUserRequestDto("testUser");
+                AppUser loginUser = new LoginUser("testUser", "Bearer testToken");
+                AuthUserRequestDto requestDto =
+                    new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
 
                 given(userRepository.findByBasicProfile_Name("testUser"))
                     .willReturn(Optional.of(UserFactory.user(1L, "testUser")));
@@ -288,7 +292,9 @@ class UserServiceTest {
             @Test
             void followUser_ExistingFollow_400Exception() {
                 //given
-                AuthUserRequestDto requestDto = new AuthUserRequestDto("testUser");
+                AppUser loginUser = new LoginUser("testUser", "Bearer testToken");
+                AuthUserRequestDto requestDto =
+                    new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
 
                 given(userRepository.findByBasicProfile_Name("testUser"))
                     .willReturn(Optional.of(UserFactory.user(1L, "testUser")));
@@ -479,7 +485,9 @@ class UserServiceTest {
             @Test
             void unfollowUser_NotExistingFollow_400Exception() {
                 //given
-                AuthUserRequestDto requestDto = new AuthUserRequestDto("testUser");
+                AppUser loginUser = new LoginUser("testUser", "Bearer testToken");
+                AuthUserRequestDto requestDto =
+                    new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
 
                 given(userRepository.findByBasicProfile_Name("testUser"))
                     .willReturn(Optional.of(UserFactory.user(1L, "testUser")));
@@ -509,7 +517,9 @@ class UserServiceTest {
             @Test
             void unfollowUser_SourceToTarget_Success() {
                 //given
-                AuthUserRequestDto requestDto = new AuthUserRequestDto("testUser");
+                AppUser loginUser = new LoginUser("testUser", "Bearer testToken");
+                AuthUserRequestDto requestDto =
+                    new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
 
                 given(userRepository.findByBasicProfile_Name("testUser"))
                     .willReturn(Optional.of(UserFactory.user(1L, "testUser")));

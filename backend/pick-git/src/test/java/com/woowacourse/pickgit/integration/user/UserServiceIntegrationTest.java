@@ -59,7 +59,9 @@ class UserServiceIntegrationTest {
     @Test
     void getMyUserProfile_WithMyName_Success() {
         //given
-        AuthUserRequestDto requestDto = new AuthUserRequestDto("testUser");
+        AppUser loginUser = new LoginUser("testUser", "Bearer testToken");
+        AuthUserRequestDto requestDto =
+            new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
         UserProfileResponseDto responseDto = UserFactory.mockLoginUserProfileResponseDto();
 
         userRepository.save(UserFactory.user());
@@ -132,11 +134,10 @@ class UserServiceIntegrationTest {
                 AuthUserRequestDto authUserRequestDto =
                     new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
 
-                User source = userRepository.save(UserFactory.user("testUser"));
+                userRepository.save(UserFactory.user("testUser"));
                 User target = userRepository.save(UserFactory.user("testUser2"));
 
-                AuthUserRequestDto requestDto = new AuthUserRequestDto(source.getName());
-                userService.followUser(requestDto, target.getName());
+                userService.followUser(authUserRequestDto, target.getName());
 
                 UserProfileResponseDto responseDto =
                     UserFactory.mockLoginUserProfileIsFollowingResponseDto();
@@ -249,8 +250,9 @@ class UserServiceIntegrationTest {
             @Test
             void followUser_SourceToTarget_Success() {
                 // given
-                AuthUserRequestDto requestDto = new AuthUserRequestDto("testUser");
-
+                AppUser loginUser = new LoginUser("testUser", "Bearer testToken");
+                AuthUserRequestDto requestDto =
+                    new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
                 userRepository.save(UserFactory.user("testUser"));
                 User target = userRepository.save(UserFactory.user("testUser2"));
 
@@ -271,8 +273,9 @@ class UserServiceIntegrationTest {
             @Test
             void followUser_ExistingFollow_400Exception() {
                 // given
-                AuthUserRequestDto requestDto = new AuthUserRequestDto("testUser");
-
+                AppUser loginUser = new LoginUser("testUser", "Bearer testToken");
+                AuthUserRequestDto requestDto =
+                    new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
                 userRepository.save(UserFactory.user("testUser"));
                 User target = userRepository.save(UserFactory.user("testUser2"));
 
@@ -422,7 +425,9 @@ class UserServiceIntegrationTest {
             @Test
             void unfollowUser_NotExistingFollow_400Exception() {
                 // given
-                AuthUserRequestDto requestDto = new AuthUserRequestDto("testUser");
+                AppUser loginUser = new LoginUser("testUser", "Bearer testToken");
+                AuthUserRequestDto requestDto =
+                    new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
 
                 userRepository.save(UserFactory.user("testUser"));
                 User target = userRepository.save(UserFactory.user("testUser2"));
@@ -445,7 +450,9 @@ class UserServiceIntegrationTest {
             @Test
             void unfollowUser_SourceToTarget_Success() {
                 // given
-                AuthUserRequestDto requestDto = new AuthUserRequestDto("testUser");
+                AppUser loginUser = new LoginUser("testUser", "Bearer testToken");
+                AuthUserRequestDto requestDto =
+                    new AuthUserRequestDto(loginUser.getUsername(), loginUser.isGuest());
 
                 userRepository.save(UserFactory.user("testUser"));
                 User target = userRepository.save(UserFactory.user("testUser2"));

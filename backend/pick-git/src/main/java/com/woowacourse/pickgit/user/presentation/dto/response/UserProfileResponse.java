@@ -22,10 +22,19 @@ public class UserProfileResponse {
     }
 
     public UserProfileResponse(
-        String name, String imageUrl, String description,
-        int followerCount, int followingCount, int postCount,
-        String githubUrl, String company, String location, String website, String twitter,
-        Boolean following) {
+        String name,
+        String imageUrl,
+        String description,
+        int followerCount,
+        int followingCount,
+        int postCount,
+        String githubUrl,
+        String company,
+        String location,
+        String website,
+        String twitter,
+        Boolean following
+    ) {
         this.name = name;
         this.imageUrl = imageUrl;
         this.description = description;

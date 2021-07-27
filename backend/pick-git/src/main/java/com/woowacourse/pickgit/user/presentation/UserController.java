@@ -40,29 +40,26 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<UserProfileResponse> getAuthenticatedUserProfile(
-        @Authenticated AppUser user
+        @Authenticated AppUser appUser
     ) {
-        validateIsGuest(user);
+        validateIsGuest(appUser);
 
-        UserProfileResponseDto responseDto =
-            userService.getMyUserProfile(new AuthUserRequestDto(user.getUsername()));
+        AuthUserRequestDto authUserRequestDto =
+            new AuthUserRequestDto(appUser.getUsername2(), appUser.isGuest());
+        UserProfileResponseDto responseDto = userService.getMyUserProfile(authUserRequestDto);
 
         return ResponseEntity.ok(createUserProfileResponse(responseDto));
     }
 
-    @GetMapping("/{username}")
-    public ResponseEntity<UserProfileResponse> getUserProfile(
-        @Authenticated AppUser appUser,
-        @PathVariable String username) {
-        AuthUserRequestDto authUserRequestDto =
-            new AuthUserRequestDto(appUser.getUsername2(), appUser.isGuest());
-        UserProfileResponseDto responseDto = userService.getUserProfile(authUserRequestDto, username);
-
-        return ResponseEntity.ok(createUserProfileResponse(responseDto));
+    private void validateIsGuest(AppUser appUser) {
+        if (appUser.isGuest()) {
+            throw new UnauthorizedException();
+        }
     }
 
     private UserProfileResponse createUserProfileResponse(
-        UserProfileResponseDto userProfileResponseDto) {
+        UserProfileResponseDto userProfileResponseDto
+    ) {
         return UserProfileResponse.builder()
             .name(userProfileResponseDto.getName())
             .imageUrl(userProfileResponseDto.getImageUrl())
@@ -96,14 +93,28 @@ public class UserController {
             .build();
     }
 
-    @PostMapping("/{username}/followings")
-    public ResponseEntity<FollowResponse> followUser(
-        @Authenticated AppUser user,
+    @GetMapping("/{username}")
+    public ResponseEntity<UserProfileResponse> getUserProfile(
+        @Authenticated AppUser appUser,
         @PathVariable String username
     ) {
-        validateIsGuest(user);
+        AuthUserRequestDto authUserRequestDto =
+            new AuthUserRequestDto(appUser.getUsername2(), appUser.isGuest());
+        UserProfileResponseDto responseDto = userService
+            .getUserProfile(authUserRequestDto, username);
 
-        AuthUserRequestDto authUserRequestDto = new AuthUserRequestDto(user.getUsername());
+        return ResponseEntity.ok(createUserProfileResponse(responseDto));
+    }
+
+    @PostMapping("/{username}/followings")
+    public ResponseEntity<FollowResponse> followUser(
+        @Authenticated AppUser appUser,
+        @PathVariable String username
+    ) {
+        validateIsGuest(appUser);
+
+        AuthUserRequestDto authUserRequestDto =
+            new AuthUserRequestDto(appUser.getUsername2(), appUser.isGuest());
         FollowResponseDto followResponseDto =
             userService.followUser(authUserRequestDto, username);
 
@@ -129,31 +140,26 @@ public class UserController {
             )
         );
     }
-
-    @DeleteMapping("/{username}/followings")
-    public ResponseEntity<FollowResponse> unfollowUser(
-        @Authenticated AppUser user,
-        @PathVariable String username
-    ) {
-        validateIsGuest(user);
-
-        AuthUserRequestDto authUserRequestDto = new AuthUserRequestDto(user.getUsername());
-        FollowResponseDto followResponseDto =
-            userService.unfollowUser(authUserRequestDto, username);
-
-        return ResponseEntity.ok(createFollowResponse(followResponseDto));
-    }
-
-    private void validateIsGuest(AppUser user) {
-        if (user.isGuest()) {
-            throw new UnauthorizedException();
-        }
-    }
-
+    
     private FollowResponse createFollowResponse(FollowResponseDto followResponseDto) {
         return FollowResponse.builder()
             .followerCount(followResponseDto.getFollowerCount())
             .following(followResponseDto.isFollowing())
             .build();
+    }
+
+    @DeleteMapping("/{username}/followings")
+    public ResponseEntity<FollowResponse> unfollowUser(
+        @Authenticated AppUser appUser,
+        @PathVariable String username
+    ) {
+        validateIsGuest(appUser);
+
+        AuthUserRequestDto authUserRequestDto =
+            new AuthUserRequestDto(appUser.getUsername2(), appUser.isGuest());
+        FollowResponseDto followResponseDto =
+            userService.unfollowUser(authUserRequestDto, username);
+
+        return ResponseEntity.ok(createFollowResponse(followResponseDto));
     }
 }
