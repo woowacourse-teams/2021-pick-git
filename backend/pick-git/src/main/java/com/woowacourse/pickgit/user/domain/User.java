@@ -11,6 +11,7 @@ import com.woowacourse.pickgit.user.domain.follow.Followers;
 import com.woowacourse.pickgit.user.domain.follow.Followings;
 import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
 import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
+import java.util.ArrayList;
 import java.util.Objects;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -48,7 +49,8 @@ public class User {
     }
 
     public User(Long id, BasicProfile basicProfile, GithubProfile githubProfile) {
-        this(id, basicProfile, githubProfile, new Followers(), new Followings(), new Posts());
+        this(id, basicProfile, githubProfile, new Followers(new ArrayList<>()),
+            new Followings(new ArrayList<>()), new Posts(new ArrayList<>()));
     }
 
     public User(

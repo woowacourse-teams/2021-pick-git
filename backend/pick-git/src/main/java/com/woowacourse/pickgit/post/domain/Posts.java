@@ -1,6 +1,5 @@
 package com.woowacourse.pickgit.post.domain;
 
-import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Embeddable;
 import javax.persistence.FetchType;
@@ -12,8 +11,7 @@ public class Posts {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Post> posts;
 
-    public Posts() {
-        this(new ArrayList<>());
+    protected Posts() {
     }
 
     public Posts(List<Post> posts) {

@@ -1,7 +1,6 @@
 package com.woowacourse.pickgit.user.domain.follow;
 
 import com.woowacourse.pickgit.user.domain.User;
-import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
@@ -19,8 +18,7 @@ public class Followings {
     )
     private List<Follow> followings;
 
-    public Followings() {
-        this(new ArrayList<>());
+    protected Followings() {
     }
 
     public Followings(List<Follow> followings) {
