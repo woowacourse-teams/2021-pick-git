@@ -20,7 +20,7 @@ public class Posts {
         this.posts = post;
     }
 
-    public int getCounts() {
+    public int count() {
         return posts.size();
     }
 }

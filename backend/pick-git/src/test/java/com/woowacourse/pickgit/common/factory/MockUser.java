@@ -81,7 +81,10 @@ public class MockUser {
             return new User(
                 id,
                 new BasicProfile(name, image, description),
-                new GithubProfile(githubUrl, company, location, website, twitter)
+                new GithubProfile(githubUrl, company, location, website, twitter),
+                new Followers(),
+                new Followings(),
+                new Posts()
             );
         }
     }

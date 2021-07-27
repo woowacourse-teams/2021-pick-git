@@ -2,6 +2,7 @@ package com.woowacourse.pickgit.user.domain;
 
 import com.woowacourse.pickgit.exception.user.DuplicateFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidFollowException;
+import com.woowacourse.pickgit.exception.user.SameSourceTargetUserException;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.Posts;
 import com.woowacourse.pickgit.post.domain.comment.Comment;
@@ -20,7 +21,8 @@ import javax.persistence.Id;
 @Entity
 public class User {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Embedded
@@ -30,35 +32,39 @@ public class User {
     private GithubProfile githubProfile;
 
     @Embedded
-    private Followers followers = new Followers();
+    private Followers followers;
 
     @Embedded
-    private Followings followings = new Followings();
+    private Followings followings;
 
     @Embedded
-    private Posts posts = new Posts();
+    private Posts posts;
 
     protected User() {
+    }
+
+    public User(BasicProfile basicProfile, GithubProfile githubProfile) {
+        this(null, basicProfile, githubProfile);
+    }
+
+    public User(Long id, BasicProfile basicProfile, GithubProfile githubProfile) {
+        this(id, basicProfile, githubProfile, new Followers(), new Followings(), new Posts());
     }
 
     public User(
         Long id,
         BasicProfile basicProfile,
-        GithubProfile githubProfile) {
+        GithubProfile githubProfile,
+        Followers followers,
+        Followings followings,
+        Posts posts
+    ) {
         this.id = id;
         this.basicProfile = basicProfile;
         this.githubProfile = githubProfile;
-    }
-
-    public User(
-        BasicProfile basicProfile,
-        GithubProfile githubProfile) {
-        this.basicProfile = basicProfile;
-        this.githubProfile = githubProfile;
-    }
-
-    public void changeGithubProfile(GithubProfile githubProfile) {
-        this.githubProfile = githubProfile;
+        this.followers = followers;
+        this.followings = followings;
+        this.posts = posts;
     }
 
     public void updateDescription(String description) {
@@ -70,8 +76,8 @@ public class User {
     }
 
     public void follow(User target) {
+        validateDifferentSourceTarget(target);
         Follow follow = new Follow(this, target);
-
         if (this.followings.existFollow(follow)) {
             throw new DuplicateFollowException();
         }
@@ -79,9 +85,15 @@ public class User {
         target.followers.add(follow);
     }
 
-    public void unfollow(User target) {
-        Follow follow = new Follow(this, target);
+    private void validateDifferentSourceTarget(User target) {
+        if (this.equals(target)) {
+            throw new SameSourceTargetUserException();
+        }
+    }
 
+    public void unfollow(User target) {
+        validateDifferentSourceTarget(target);
+        Follow follow = new Follow(this, target);
         if (!this.followings.existFollow(follow)) {
             throw new InvalidFollowException();
         }
@@ -89,13 +101,29 @@ public class User {
         target.followers.remove(follow);
     }
 
+    public Boolean isFollowing(User targetUser) {
+        return this.followings.isFollowing(targetUser);
+    }
+
     public void addComment(Post post, Comment comment) {
         comment.writeBy(this);
         post.addComment(comment);
     }
 
-    public Boolean isFollowing(User targetUser) {
-        return this.followings.isFollowing(targetUser);
+    public void changeGithubProfile(GithubProfile githubProfile) {
+        this.githubProfile = githubProfile;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public BasicProfile getBasicProfile() {
+        return basicProfile;
+    }
+
+    public GithubProfile getGithubProfile() {
+        return githubProfile;
     }
 
     public int getFollowerCount() {
@@ -107,19 +135,7 @@ public class User {
     }
 
     public int getPostCount() {
-        return posts.getCounts();
-    }
-
-    public Long getId() {
-        return this.id;
-    }
-
-    public BasicProfile getBasicProfile() {
-        return basicProfile;
-    }
-
-    public GithubProfile getGithubProfile() {
-        return githubProfile;
+        return posts.count();
     }
 
     public String getName() {
