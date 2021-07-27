@@ -26,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woowacourse.pickgit.authentication.application.OAuthService;
+import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
@@ -39,6 +40,7 @@ import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponse
 import com.woowacourse.pickgit.user.presentation.UserController;
 import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
@@ -66,197 +68,6 @@ class UserControllerTest {
 
     @MockBean
     private UserService userService;
-
-    @DisplayName("사용자는 내 프로필을 조회할 수 있다.")
-    @Test
-    void getAuthenticatedUserProfile_LoginUser_Success() throws Exception {
-        // given
-        UserProfileResponseDto responseDto = UserFactory.mockLoginUserProfileResponseDto();
-
-        given(oAuthService.validateToken(anyString()))
-            .willReturn(true);
-        given(oAuthService.findRequestUserByToken(anyString()))
-            .willReturn(new LoginUser("loginUser", "testToken"));
-        given(userService.getMyUserProfile(any(AuthUserRequestDto.class)))
-            .willReturn(responseDto);
-
-        // when
-        ResultActions perform = mockMvc.perform(get("/api/profiles/me")
-            .header(HttpHeaders.AUTHORIZATION, "Bearer testToken")
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .accept(MediaType.ALL));
-
-        // then
-        String body = perform
-            .andExpect(status().isOk())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-
-        assertThat(body).isEqualTo(objectMapper.writeValueAsString(responseDto));
-
-        perform.andDo(document("profilesMe",
-            getDocumentRequest(),
-            getDocumentResponse(),
-            requestHeaders(
-                headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer token")
-            ),
-            responseFields(
-                fieldWithPath("name").type(STRING).description("사용자 이름"),
-                fieldWithPath("imageUrl").type(STRING).description("프로필 이미지 url"),
-                fieldWithPath("description").type(STRING).description("한줄 소개"),
-                fieldWithPath("followerCount").type(NUMBER).description("팔로워 수"),
-                fieldWithPath("followingCount").type(NUMBER).description("팔로잉 수"),
-                fieldWithPath("postCount").type(NUMBER).description("게시물 수"),
-                fieldWithPath("githubUrl").type(STRING).description("깃허브 url"),
-                fieldWithPath("company").type(STRING).description("회사"),
-                fieldWithPath("location").type(STRING).description("위치"),
-                fieldWithPath("website").type(STRING).description("웹 사이트"),
-                fieldWithPath("twitter").type(STRING).description("트위터"),
-                fieldWithPath("following").type(BOOLEAN).description("팔로잉 여부")
-            )
-        ));
-    }
-
-    @DisplayName("게스트는 내 프로필을 조회할 수 없다. - 401 예외")
-    @Test
-    void getAuthenticatedUserProfile_LoginUser_401Exception() throws Exception {
-        // given
-        UserProfileResponseDto responseDto = UserFactory.mockGuestUserProfileResponseDto();
-
-        given(oAuthService.validateToken(any()))
-            .willReturn(true);
-        given(oAuthService.findRequestUserByToken(any()))
-            .willCallRealMethod();
-        given(userService.getMyUserProfile(any(AuthUserRequestDto.class)))
-            .willReturn(responseDto);
-
-        // when
-        ResultActions perform = mockMvc.perform(get("/api/profiles/me")
-            .header(HttpHeaders.AUTHORIZATION, "Bad testToken")
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .accept(MediaType.ALL));
-
-        // then
-        perform
-            .andExpect(status().isUnauthorized())
-            .andExpect(jsonPath("errorCode").value("A0002"));
-
-        perform.andDo(document("profilesMe",
-            getDocumentRequest(),
-            getDocumentResponse(),
-            requestHeaders(
-                headerWithName(HttpHeaders.AUTHORIZATION).description("Bad token")
-            ),
-            responseFields(
-                fieldWithPath("errorCode").type(STRING).description("에러 코드")
-            )
-        ));
-    }
-
-    @DisplayName("사용자는 타인의 프로필을 조회할 수 있다.")
-    @Test
-    void getUserProfile_LoginUser_Success() throws Exception {
-        // given
-        UserProfileResponseDto responseDto = UserFactory.mockLoginUserProfileResponseDto();
-
-        given(oAuthService.validateToken(anyString()))
-            .willReturn(true);
-        given(oAuthService.findRequestUserByToken(anyString()))
-            .willReturn(new LoginUser("loginUser", "Bearer testToken"));
-        given(userService.getUserProfile(any(AuthUserRequestDto.class), anyString()))
-            .willReturn(responseDto);
-
-        // when
-        ResultActions perform = mockMvc.perform(get("/api/profiles/{userName}}", "testUser")
-            .header(HttpHeaders.AUTHORIZATION, "Bearer testToken")
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .accept(MediaType.ALL));
-
-        // then
-        String body = perform
-            .andExpect(status().isOk())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-
-        assertThat(body).isEqualTo(objectMapper.writeValueAsString(responseDto));
-
-        perform.andDo(document("profiles-LoggedIn",
-            getDocumentRequest(),
-            getDocumentResponse(),
-            pathParameters(
-                parameterWithName("userName").description("다른 사용자 이름")
-            ),
-            requestHeaders(
-                headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer token")
-            ),
-            responseFields(
-                fieldWithPath("name").type(STRING).description("사용자 이름"),
-                fieldWithPath("imageUrl").type(STRING).description("프로필 이미지 url"),
-                fieldWithPath("description").type(STRING).description("한줄 소개"),
-                fieldWithPath("followerCount").type(NUMBER).description("팔로워 수"),
-                fieldWithPath("followingCount").type(NUMBER).description("팔로잉 수"),
-                fieldWithPath("postCount").type(NUMBER).description("게시물 수"),
-                fieldWithPath("githubUrl").type(STRING).description("깃허브 url"),
-                fieldWithPath("company").type(STRING).description("회사"),
-                fieldWithPath("location").type(STRING).description("위치"),
-                fieldWithPath("website").type(STRING).description("웹 사이트"),
-                fieldWithPath("twitter").type(STRING).description("트위터"),
-                fieldWithPath("following").type(BOOLEAN).description("팔로잉 여부")
-            )
-        ));
-    }
-
-    @DisplayName("게스트는 타인의 프로필을 조회할 수 있다.")
-    @Test
-    void getUserProfile_GuestUser_Success() throws Exception {
-        // given
-        UserProfileResponseDto responseDto = UserFactory.mockGuestUserProfileResponseDto();
-
-        given(oAuthService.validateToken(any()))
-            .willReturn(true);
-        given(oAuthService.findRequestUserByToken(any()))
-            .willCallRealMethod();
-        given(userService.getUserProfile(any(AuthUserRequestDto.class), anyString()))
-            .willReturn(responseDto);
-
-        // when
-        ResultActions perform = mockMvc.perform(get("/api/profiles/{userName}}", "testUser")
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .accept(MediaType.ALL));
-
-        // then
-        String body = perform
-            .andExpect(status().isOk())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-
-        assertThat(body).isEqualTo(objectMapper.writeValueAsString(responseDto));
-
-        perform.andDo(document("profiles-unLoggedIn",
-            getDocumentRequest(),
-            getDocumentResponse(),
-            pathParameters(
-                parameterWithName("userName").description("다른 사용자 이름")
-            ),
-            responseFields(
-                fieldWithPath("name").type(STRING).description("사용자 이름"),
-                fieldWithPath("imageUrl").type(STRING).description("프로필 이미지 url"),
-                fieldWithPath("description").type(STRING).description("한줄 소개"),
-                fieldWithPath("followerCount").type(NUMBER).description("팔로워 수"),
-                fieldWithPath("followingCount").type(NUMBER).description("팔로잉 수"),
-                fieldWithPath("postCount").type(NUMBER).description("게시물 수"),
-                fieldWithPath("githubUrl").type(STRING).description("깃허브 url"),
-                fieldWithPath("company").type(STRING).description("회사"),
-                fieldWithPath("location").type(STRING).description("위치"),
-                fieldWithPath("website").type(STRING).description("웹 사이트"),
-                fieldWithPath("twitter").type(STRING).description("트위터"),
-                fieldWithPath("following").type(NULL).description("팔로잉 여부")
-            )
-        ));
-    }
 
     @DisplayName("누구든지 활동 통계를 조회할 수 있다.")
     @Test
@@ -368,165 +179,366 @@ class UserControllerTest {
             .andExpect(jsonPath("errorCode").value("A0001"));
     }
 
-    @DisplayName("사용자는 팔로우를 할 수 있다.")
-    @Test
-    void followUser_LoginUser_Success() throws Exception {
-        // given
-        FollowResponseDto responseDto = new FollowResponseDto(1, true);
+    @DisplayName("로그인 되어있을 때")
+    @Nested
+    class Describe_UnderLoginCondition {
 
-        given(oAuthService.validateToken(anyString()))
-            .willReturn(true);
-        given(oAuthService.findRequestUserByToken(anyString()))
-            .willReturn(new LoginUser("loginUser", "Bearer testToken"));
-        given(userService.followUser(any(AuthUserRequestDto.class), anyString()))
-            .willReturn(responseDto);
+        @DisplayName("사용자는 내 프로필을 조회할 수 있다.")
+        @Test
+        void getAuthenticatedUserProfile_LoginUser_Success() throws Exception {
+            // given
+            UserProfileResponseDto responseDto = UserFactory.mockLoginUserProfileResponseDto();
 
-        // when
-        ResultActions perform = mockMvc
-            .perform(post("/api/profiles/{userName}/followings", "testUser")
+            given(oAuthService.validateToken(anyString()))
+                .willReturn(true);
+            given(oAuthService.findRequestUserByToken(anyString()))
+                .willReturn(new LoginUser("loginUser", "testToken"));
+            given(userService.getMyUserProfile(any(AuthUserRequestDto.class)))
+                .willReturn(responseDto);
+
+            // when
+            ResultActions perform = mockMvc.perform(get("/api/profiles/me")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer testToken")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.ALL));
 
-        // then
-        String body = perform
-            .andExpect(status().isOk())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
+            // then
+            String body = perform
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
 
-        assertThat(body).isEqualTo(objectMapper.writeValueAsString(responseDto));
+            assertThat(body).isEqualTo(objectMapper.writeValueAsString(responseDto));
 
-        perform.andDo(document("following-LoggedIn",
-            getDocumentRequest(),
-            getDocumentResponse(),
-            requestHeaders(
-                headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer token")
-            ),
-            pathParameters(
-                parameterWithName("userName").description("다른 사용자 이름")
-            ),
-            responseFields(
-                fieldWithPath("followerCount").description("팔로워 수"),
-                fieldWithPath("following").description("팔로잉 여부")
-            )
-        ));
-    }
+            perform.andDo(document("profilesMe",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                requestHeaders(
+                    headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer token")
+                ),
+                responseFields(
+                    fieldWithPath("name").type(STRING).description("사용자 이름"),
+                    fieldWithPath("imageUrl").type(STRING).description("프로필 이미지 url"),
+                    fieldWithPath("description").type(STRING).description("한줄 소개"),
+                    fieldWithPath("followerCount").type(NUMBER).description("팔로워 수"),
+                    fieldWithPath("followingCount").type(NUMBER).description("팔로잉 수"),
+                    fieldWithPath("postCount").type(NUMBER).description("게시물 수"),
+                    fieldWithPath("githubUrl").type(STRING).description("깃허브 url"),
+                    fieldWithPath("company").type(STRING).description("회사"),
+                    fieldWithPath("location").type(STRING).description("위치"),
+                    fieldWithPath("website").type(STRING).description("웹 사이트"),
+                    fieldWithPath("twitter").type(STRING).description("트위터"),
+                    fieldWithPath("following").type(BOOLEAN).description("팔로잉 여부")
+                )
+            ));
+        }
 
-    @DisplayName("게스트는 팔로우를 할 수 없다. - 401 예외")
-    @Test
-    void followUser_GuestUser_401Exception() throws Exception {
-        // given
-        FollowResponseDto responseDto = new FollowResponseDto(1, true);
+        @DisplayName("사용자는 타인의 프로필을 조회할 수 있다.")
+        @Test
+        void getUserProfile_LoginUser_Success() throws Exception {
+            // given
+            UserProfileResponseDto responseDto = UserFactory.mockLoginUserProfileResponseDto();
 
-        given(oAuthService.validateToken(any()))
-            .willReturn(true);
-        given(oAuthService.findRequestUserByToken(any()))
-            .willCallRealMethod();
-        given(userService.followUser(any(AuthUserRequestDto.class), anyString()))
-            .willReturn(responseDto);
+            given(oAuthService.validateToken(anyString()))
+                .willReturn(true);
+            given(oAuthService.findRequestUserByToken(anyString()))
+                .willReturn(new LoginUser("loginUser", "Bearer testToken"));
+            given(userService.getUserProfile(any(AuthUserRequestDto.class), anyString()))
+                .willReturn(responseDto);
 
-        // when
-        ResultActions perform = mockMvc
-            .perform(post("/api/profiles/{userName}/followings", "testUser")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .accept(MediaType.ALL));
-
-        // then
-        perform
-            .andExpect(status().isUnauthorized())
-            .andExpect(jsonPath("errorCode").value("A0002"));
-
-        perform.andDo(document("following-unLoggedIn",
-            getDocumentRequest(),
-            getDocumentResponse(),
-            pathParameters(
-                parameterWithName("userName").description("다른 사용자 이름")
-            ),
-            responseFields(
-                fieldWithPath("errorCode").description("A0002")
-            )
-        ));
-    }
-
-    @DisplayName("사용자는 언팔로우를 할 수 있다.")
-    @Test
-    void unfollowUser_LoginUser_Success() throws Exception {
-        // given
-        FollowResponseDto followResponseDto = new FollowResponseDto(1, false);
-
-        given(oAuthService.validateToken(anyString()))
-            .willReturn(true);
-        given(oAuthService.findRequestUserByToken(anyString()))
-            .willReturn(new LoginUser("loginUser", "Bearer testToken"));
-        given(userService.followUser(any(AuthUserRequestDto.class), anyString()))
-            .willReturn(followResponseDto);
-
-        // when
-        ResultActions perform = mockMvc
-            .perform(post("/api/profiles/{userName}/followings", "testUser")
+            // when
+            ResultActions perform = mockMvc.perform(get("/api/profiles/{userName}}", "testUser")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer testToken")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.ALL));
 
-        // then
-        String body = perform
-            .andExpect(status().isOk())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
+            // then
+            String body = perform
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
 
-        assertThat(body).isEqualTo(objectMapper.writeValueAsString(followResponseDto));
+            assertThat(body).isEqualTo(objectMapper.writeValueAsString(responseDto));
 
-        perform.andDo(document("unfollowing-LoggedIn",
-            getDocumentRequest(),
-            getDocumentResponse(),
-            requestHeaders(
-                headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer token")
-            ),
-            pathParameters(
-                parameterWithName("userName").description("다른 사용자 이름")
-            ),
-            responseFields(
-                fieldWithPath("followerCount").description("팔로워 수"),
-                fieldWithPath("following").description("팔로잉 여부")
-            )
-        ));
+            perform.andDo(document("profiles-LoggedIn",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                pathParameters(
+                    parameterWithName("userName").description("다른 사용자 이름")
+                ),
+                requestHeaders(
+                    headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer token")
+                ),
+                responseFields(
+                    fieldWithPath("name").type(STRING).description("사용자 이름"),
+                    fieldWithPath("imageUrl").type(STRING).description("프로필 이미지 url"),
+                    fieldWithPath("description").type(STRING).description("한줄 소개"),
+                    fieldWithPath("followerCount").type(NUMBER).description("팔로워 수"),
+                    fieldWithPath("followingCount").type(NUMBER).description("팔로잉 수"),
+                    fieldWithPath("postCount").type(NUMBER).description("게시물 수"),
+                    fieldWithPath("githubUrl").type(STRING).description("깃허브 url"),
+                    fieldWithPath("company").type(STRING).description("회사"),
+                    fieldWithPath("location").type(STRING).description("위치"),
+                    fieldWithPath("website").type(STRING).description("웹 사이트"),
+                    fieldWithPath("twitter").type(STRING).description("트위터"),
+                    fieldWithPath("following").type(BOOLEAN).description("팔로잉 여부")
+                )
+            ));
+        }
+
+        @DisplayName("사용자는 팔로우를 할 수 있다.")
+        @Test
+        void followUser_LoginUser_Success() throws Exception {
+            // given
+            FollowResponseDto responseDto = new FollowResponseDto(1, true);
+
+            given(oAuthService.validateToken(anyString()))
+                .willReturn(true);
+            given(oAuthService.findRequestUserByToken(anyString()))
+                .willReturn(new LoginUser("loginUser", "Bearer testToken"));
+            given(userService.followUser(any(AuthUserRequestDto.class), anyString()))
+                .willReturn(responseDto);
+
+            // when
+            ResultActions perform = mockMvc
+                .perform(post("/api/profiles/{userName}/followings", "testUser")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer testToken")
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .accept(MediaType.ALL));
+
+            // then
+            String body = perform
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+            assertThat(body).isEqualTo(objectMapper.writeValueAsString(responseDto));
+
+            perform.andDo(document("following-LoggedIn",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                requestHeaders(
+                    headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer token")
+                ),
+                pathParameters(
+                    parameterWithName("userName").description("다른 사용자 이름")
+                ),
+                responseFields(
+                    fieldWithPath("followerCount").description("팔로워 수"),
+                    fieldWithPath("following").description("팔로잉 여부")
+                )
+            ));
+        }
+
+        @DisplayName("사용자는 언팔로우를 할 수 있다.")
+        @Test
+        void unfollowUser_LoginUser_Success() throws Exception {
+            // given
+            FollowResponseDto followResponseDto = new FollowResponseDto(1, false);
+
+            given(oAuthService.validateToken(anyString()))
+                .willReturn(true);
+            given(oAuthService.findRequestUserByToken(anyString()))
+                .willReturn(new LoginUser("loginUser", "Bearer testToken"));
+            given(userService.followUser(any(AuthUserRequestDto.class), anyString()))
+                .willReturn(followResponseDto);
+
+            // when
+            ResultActions perform = mockMvc
+                .perform(post("/api/profiles/{userName}/followings", "testUser")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer testToken")
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .accept(MediaType.ALL));
+
+            // then
+            String body = perform
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+            assertThat(body).isEqualTo(objectMapper.writeValueAsString(followResponseDto));
+
+            perform.andDo(document("unfollowing-LoggedIn",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                requestHeaders(
+                    headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer token")
+                ),
+                pathParameters(
+                    parameterWithName("userName").description("다른 사용자 이름")
+                ),
+                responseFields(
+                    fieldWithPath("followerCount").description("팔로워 수"),
+                    fieldWithPath("following").description("팔로잉 여부")
+                )
+            ));
+        }
     }
 
-    @DisplayName("게스트는 언팔로우를 할 수 없다. - 401 예외")
-    @Test
-    void unfollowUser_GuestUser_401Exception() throws Exception {
-        // given
-        FollowResponseDto followResponseDto = new FollowResponseDto(1, false);
+    @DisplayName("비로그인 상태일 때")
+    @Nested
+    class Describe_UnderGuestCondition {
 
-        given(oAuthService.validateToken(any()))
-            .willReturn(true);
-        given(oAuthService.findRequestUserByToken(any()))
-            .willCallRealMethod();
-        given(userService.followUser(any(AuthUserRequestDto.class), anyString()))
-            .willReturn(followResponseDto);
+        @DisplayName("게스트는 내 프로필을 조회할 수 없다. - 401 예외")
+        @Test
+        void getAuthenticatedUserProfile_LoginUser_401Exception() throws Exception {
+            // given
+            UserProfileResponseDto responseDto = UserFactory.mockGuestUserProfileResponseDto();
 
-        // when
-        ResultActions perform = mockMvc
-            .perform(post("/api/profiles/{userName}/followings", "testUser")
+            given(oAuthService.validateToken(any()))
+                .willReturn(true);
+            given(oAuthService.findRequestUserByToken(any()))
+                .willCallRealMethod();
+            given(userService.getMyUserProfile(any(AuthUserRequestDto.class)))
+                .willReturn(responseDto);
+
+            // when
+            ResultActions perform = mockMvc.perform(get("/api/profiles/me")
+                .header(HttpHeaders.AUTHORIZATION, "Bad testToken")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.ALL));
 
-        // then
-        perform
-            .andExpect(status().isUnauthorized())
-            .andExpect(jsonPath("errorCode").value("A0002"));
+            // then
+            perform
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("errorCode").value("A0002"));
 
-        perform.andDo(document("unfollowing-unLoggedIn",
-            getDocumentRequest(),
-            getDocumentResponse(),
-            pathParameters(
-                parameterWithName("userName").description("다른 사용자 이름")
-            ),
-            responseFields(
-                fieldWithPath("errorCode").description("A0002")
-            )
-        ));
+            perform.andDo(document("profilesMe",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                requestHeaders(
+                    headerWithName(HttpHeaders.AUTHORIZATION).description("Bad token")
+                ),
+                responseFields(
+                    fieldWithPath("errorCode").type(STRING).description("에러 코드")
+                )
+            ));
+        }
+
+        @DisplayName("게스트는 타인의 프로필을 조회할 수 있다.")
+        @Test
+        void getUserProfile_GuestUser_Success() throws Exception {
+            // given
+            UserProfileResponseDto responseDto = UserFactory.mockGuestUserProfileResponseDto();
+
+            given(oAuthService.validateToken(any()))
+                .willReturn(true);
+            given(oAuthService.findRequestUserByToken(any()))
+                .willCallRealMethod();
+            given(userService.getUserProfile(any(AuthUserRequestDto.class), anyString()))
+                .willReturn(responseDto);
+
+            // when
+            ResultActions perform = mockMvc.perform(get("/api/profiles/{userName}}", "testUser")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.ALL));
+
+            // then
+            String body = perform
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+            assertThat(body).isEqualTo(objectMapper.writeValueAsString(responseDto));
+
+            perform.andDo(document("profiles-unLoggedIn",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                pathParameters(
+                    parameterWithName("userName").description("다른 사용자 이름")
+                ),
+                responseFields(
+                    fieldWithPath("name").type(STRING).description("사용자 이름"),
+                    fieldWithPath("imageUrl").type(STRING).description("프로필 이미지 url"),
+                    fieldWithPath("description").type(STRING).description("한줄 소개"),
+                    fieldWithPath("followerCount").type(NUMBER).description("팔로워 수"),
+                    fieldWithPath("followingCount").type(NUMBER).description("팔로잉 수"),
+                    fieldWithPath("postCount").type(NUMBER).description("게시물 수"),
+                    fieldWithPath("githubUrl").type(STRING).description("깃허브 url"),
+                    fieldWithPath("company").type(STRING).description("회사"),
+                    fieldWithPath("location").type(STRING).description("위치"),
+                    fieldWithPath("website").type(STRING).description("웹 사이트"),
+                    fieldWithPath("twitter").type(STRING).description("트위터"),
+                    fieldWithPath("following").type(NULL).description("팔로잉 여부")
+                )
+            ));
+        }
+
+        @DisplayName("게스트는 팔로우를 할 수 없다. - 401 예외")
+        @Test
+        void followUser_GuestUser_401Exception() throws Exception {
+            // given
+            FollowResponseDto responseDto = new FollowResponseDto(1, true);
+
+            given(oAuthService.validateToken(any()))
+                .willReturn(true);
+            given(oAuthService.findRequestUserByToken(any()))
+                .willCallRealMethod();
+            given(userService.followUser(any(AuthUserRequestDto.class), anyString()))
+                .willReturn(responseDto);
+
+            // when
+            ResultActions perform = mockMvc
+                .perform(post("/api/profiles/{userName}/followings", "testUser")
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .accept(MediaType.ALL));
+
+            // then
+            perform
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("errorCode").value("A0002"));
+
+            perform.andDo(document("following-unLoggedIn",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                pathParameters(
+                    parameterWithName("userName").description("다른 사용자 이름")
+                ),
+                responseFields(
+                    fieldWithPath("errorCode").description("A0002")
+                )
+            ));
+        }
+
+        @DisplayName("게스트는 언팔로우를 할 수 없다. - 401 예외")
+        @Test
+        void unfollowUser_GuestUser_401Exception() throws Exception {
+            // given
+            FollowResponseDto followResponseDto = new FollowResponseDto(1, false);
+
+            given(oAuthService.validateToken(any()))
+                .willReturn(true);
+            given(oAuthService.findRequestUserByToken(any()))
+                .willCallRealMethod();
+            given(userService.followUser(any(AuthUserRequestDto.class), anyString()))
+                .willReturn(followResponseDto);
+
+            // when
+            ResultActions perform = mockMvc
+                .perform(post("/api/profiles/{userName}/followings", "testUser")
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .accept(MediaType.ALL));
+
+            // then
+            perform
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("errorCode").value("A0002"));
+
+            perform.andDo(document("unfollowing-unLoggedIn",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                pathParameters(
+                    parameterWithName("userName").description("다른 사용자 이름")
+                ),
+                responseFields(
+                    fieldWithPath("errorCode").description("A0002")
+                )
+            ));
+        }
     }
 }
