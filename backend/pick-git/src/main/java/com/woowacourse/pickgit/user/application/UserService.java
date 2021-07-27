@@ -95,8 +95,8 @@ public class UserService {
         return ContributionResponseDto.builder()
             .starsCount(calculateStars(user.getName()))
             .commitsCount(calculateCommits(user.getName()))
-            .issuesCount(calculateIssues(user.getName()))
             .prsCount(calculatePRs(user.getName()))
+            .issuesCount(calculateIssues(user.getName()))
             .reposCount(calculateRepos(user.getName()))
             .build();
     }
@@ -116,16 +116,16 @@ public class UserService {
         return responseDto.getCount();
     }
 
-    private int calculateIssues(String username) {
+    private int calculatePRs(String username) {
         CountResponseDto responseDto =
-            platformExtractor.extractCount("/issues?q=author:%s type:issue", username);
+            platformExtractor.extractCount("/issues?q=author:%s type:pr", username);
 
         return responseDto.getCount();
     }
 
-    private int calculatePRs(String username) {
+    private int calculateIssues(String username) {
         CountResponseDto responseDto =
-            platformExtractor.extractCount("/issues?q=author:%s type:pr", username);
+            platformExtractor.extractCount("/issues?q=author:%s type:issue", username);
 
         return responseDto.getCount();
     }

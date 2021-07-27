@@ -27,27 +27,6 @@ public class GithubExtractor implements PlatformExtractor {
     }
 
     @Override
-    public CountResponseDto extractCount(String restUrl, String username) {
-        String apiUrl = generateUrl(restUrl, username);
-        String response = platformApiRequester.request(apiUrl);
-
-        return parseToCount(response);
-    }
-
-    private String generateUrl(String restUrl, String username) {
-        return API_URL_FORMAT_FOR_COUNT + String.format(restUrl, username);
-    }
-
-    private CountResponseDto parseToCount(String response) {
-        try {
-            return objectMapper.readValue(response, new TypeReference<>() {
-            });
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException();
-        }
-    }
-
-    @Override
     public List<StarResponseDto> extractStars(String username) {
         String apiUrl = generateUrl(username);
         String response = platformApiRequester.request(apiUrl);
@@ -60,6 +39,27 @@ public class GithubExtractor implements PlatformExtractor {
     }
 
     private List<StarResponseDto> parseToStars(String response) {
+        try {
+            return objectMapper.readValue(response, new TypeReference<>() {
+            });
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    @Override
+    public CountResponseDto extractCount(String restUrl, String username) {
+        String apiUrl = generateUrl(restUrl, username);
+        String response = platformApiRequester.request(apiUrl);
+
+        return parseToCount(response);
+    }
+
+    private String generateUrl(String restUrl, String username) {
+        return API_URL_FORMAT_FOR_COUNT + String.format(restUrl, username);
+    }
+
+    private CountResponseDto parseToCount(String response) {
         try {
             return objectMapper.readValue(response, new TypeReference<>() {
             });

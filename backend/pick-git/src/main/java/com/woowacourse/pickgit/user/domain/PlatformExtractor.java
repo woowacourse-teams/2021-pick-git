@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface PlatformExtractor {
 
-    CountResponseDto extractCount(String restUrl, String username);
-
     List<StarResponseDto> extractStars(String username);
+
+    CountResponseDto extractCount(String restUrl, String username);
 }
