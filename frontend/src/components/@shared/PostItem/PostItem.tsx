@@ -2,6 +2,7 @@ import {
   Container,
   MyComment,
   CommentInputWrapper,
+  CommentsWrapper,
   CommentWrapper,
   IconLinkButton,
   IconLink,
@@ -45,11 +46,10 @@ export interface Props {
   commenterImageUrl: string;
   tags: string[];
   createdAt: string;
-  commentValue: string;
-  onCommentValueChange: React.ChangeEventHandler<HTMLTextAreaElement>;
-  onCommentValueSave: () => void;
+  onCommentClick: () => void;
+  onCommentInputClick: () => void;
   onPostLike: () => void;
-  onCommentLike: (commentId: string) => void;
+  onCommentLike: (commentId: CommentData["id"]) => void;
 }
 
 const timeDiffTextTable = {
@@ -72,9 +72,8 @@ const PostItem = ({
   commenterImageUrl,
   tags,
   createdAt,
-  commentValue,
-  onCommentValueChange,
-  onCommentValueSave,
+  onCommentClick,
+  onCommentInputClick,
   onCommentLike,
   onPostLike,
 }: Props) => {
@@ -91,13 +90,13 @@ const PostItem = ({
     : timeDiffTextTable.sec();
 
   const commentList = comments.map((comment) => (
-    <CommentWrapper key={comment.commentId}>
+    <CommentWrapper key={comment.id}>
       <Comment
         content={comment.content}
         isLiked={comment.isLiked}
         authorName={comment.authorName}
         link={`/profile/${comment.authorName}`}
-        onCommentLike={() => onCommentLike(comment.commentId)}
+        onCommentLike={() => onCommentLike(comment.id)}
       />
     </CommentWrapper>
   ));
@@ -143,23 +142,20 @@ const PostItem = ({
           {shouldHideContent && <MoreContentLinkButton onClick={onMoreContentShow}>더보기</MoreContentLinkButton>}
         </PostContent>
         <TagListWrapper>{shouldHideContent || tagList}</TagListWrapper>
-        {commentList}
+        <CommentsWrapper onClick={onCommentClick}>{commentList}</CommentsWrapper>
       </PostBody>
-      <MyComment>
+      <MyComment onClick={onCommentInputClick}>
         <Avatar diameter="1.9375rem" imageUrl={commenterImageUrl} />
         <CommentInputWrapper>
           <TextEditor
+            value=""
+            onChange={() => {}}
             placeholder="댓글 달기..."
-            onChange={onCommentValueChange}
-            value={commentValue}
             width="100%"
             height="0.8rem;"
             fontSize="0.625rem"
           />
         </CommentInputWrapper>
-        <IconLink onClick={onCommentValueSave}>
-          <SendIcon />
-        </IconLink>
       </MyComment>
       <PostCreatedDateText>{currentTimeDiffText}</PostCreatedDateText>
     </Container>

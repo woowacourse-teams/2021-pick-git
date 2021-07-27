@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { TabIndicatorKind } from "../../../@types";
 
 export const Container = styled.section`
   width: 100%;
@@ -12,24 +13,35 @@ export const TabButtonWrapper = styled.div`
   justify-content: space-between;
 `;
 
-export const TabButton = styled.button<{ textColor?: string }>`
+export const TabButton = styled.button<{
+  textColor?: string;
+  tabIndicatorKind: TabIndicatorKind;
+}>`
   width: 100%;
   flex-grow: 1;
-  padding: 0.625rem;
+  padding: 0.5rem 0.625rem 0.625rem 0.625rem;
   text-align: center;
   font-weight: 600;
   overflow: hidden;
-  color: ${({ theme, textColor }) => (textColor ? textColor : theme.color.textColor)};
+  transition: background-color 0.5s, opacity 0.5s;
 
-  transition: background-color 0.5s;
-  :hover {
-    background-color: #eee;
-  }
+  ${({ theme, textColor, tabIndicatorKind }) => `
+    color: ${textColor ? textColor : theme.color.textColor};
+
+    :hover {
+      background-color: ${tabIndicatorKind === "line" && "#eee"};
+      opacity: ${tabIndicatorKind === "pill" && "0.5"};
+    }
+  `};
 `;
 
-export const TabIndicator = styled.div<{ tabIndex: number; tabCount: number; tabIndicatorColor?: string }>`
+export const TabIndicator = styled.div<{
+  tabIndicatorKind: TabIndicatorKind;
+  tabIndex: number;
+  tabCount: number;
+  tabIndicatorColor?: string;
+}>`
   position: absolute;
-  border-bottom: 2px solid ${({ theme, tabIndicatorColor }) => tabIndicatorColor ?? theme.color.primaryColor};
   bottom: 0;
   transition: transform 0.5s;
 
@@ -37,4 +49,17 @@ export const TabIndicator = styled.div<{ tabIndex: number; tabCount: number; tab
     transform: translateX(${100 * tabIndex}%);
     width: ${100 / tabCount}%;
   `};
+
+  ${({ theme, tabIndicatorKind, tabIndicatorColor }) =>
+    tabIndicatorKind === "line"
+      ? `
+        border-bottom: 2px solid ${tabIndicatorColor ?? theme.color.primaryColor};
+        z-index: 100;
+      `
+      : `
+        background-color: ${tabIndicatorColor ?? theme.color.primaryColor};
+        border-radius: 24px;
+        height: 100%;
+        z-index: -1;
+      `}
 `;

@@ -1,16 +1,17 @@
 import { useContext, useState } from "react";
 
 import { ThemeContext } from "styled-components";
-import { TabItem } from "../../../@types";
+import { TabIndicatorKind, TabItem } from "../../../@types";
+import { getTabTextColor } from "../../../utils/tabs";
 import { Container, TabIndicator, TabButton, TabButtonWrapper } from "./Tabs.style";
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   tabItems: TabItem[];
   tabIndicatorColor?: string;
+  tabIndicatorKind: TabIndicatorKind;
 }
 
-const Tabs = ({ tabItems, tabIndicatorColor, ...props }: Props) => {
-  const { color } = useContext(ThemeContext);
+const Tabs = ({ tabIndicatorKind, tabItems, tabIndicatorColor, ...props }: Props) => {
   const [tabIndex, setTabIndex] = useState(0);
 
   const handleTabIndexChange = (index: number, onTabChange: () => void) => {
@@ -20,8 +21,9 @@ const Tabs = ({ tabItems, tabIndicatorColor, ...props }: Props) => {
 
   const tabButtonList = tabItems.map((tabItem, index) => (
     <TabButton
+      tabIndicatorKind={tabIndicatorKind}
       key={tabItem.name}
-      textColor={index === tabIndex ? color.textColor : color.lighterTextColor}
+      textColor={getTabTextColor(tabIndicatorKind, index === tabIndex)}
       onClick={() => handleTabIndexChange(index, tabItem.onTabChange)}
     >
       {tabItem.name}
@@ -32,7 +34,12 @@ const Tabs = ({ tabItems, tabIndicatorColor, ...props }: Props) => {
     <Container {...props}>
       <TabButtonWrapper>
         {tabButtonList}
-        <TabIndicator tabIndex={tabIndex} tabCount={tabItems.length} tabIndicatorColor={tabIndicatorColor} />
+        <TabIndicator
+          tabIndicatorKind={tabIndicatorKind}
+          tabIndex={tabIndex}
+          tabCount={tabItems.length}
+          tabIndicatorColor={tabIndicatorColor}
+        />
       </TabButtonWrapper>
     </Container>
   );

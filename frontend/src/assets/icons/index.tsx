@@ -27,3 +27,4 @@ export { ReactComponent as IssueIcon } from "./issue.svg";
 export { ReactComponent as BookIcon } from "./book.svg";
 export { ReactComponent as RepositoryIcon } from "./github-repository.svg";
 export { ReactComponent as CameraIcon } from "./camera.svg";
+export { ReactComponent as GoDownIcon } from "./go-down.svg";
