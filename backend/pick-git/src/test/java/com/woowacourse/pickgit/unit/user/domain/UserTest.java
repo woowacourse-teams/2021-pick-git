@@ -8,7 +8,6 @@ import com.woowacourse.pickgit.exception.user.DuplicateFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidFollowException;
 import com.woowacourse.pickgit.exception.user.SameSourceTargetUserException;
 import com.woowacourse.pickgit.post.domain.Post;
-import com.woowacourse.pickgit.post.domain.Posts;
 import com.woowacourse.pickgit.post.domain.comment.Comment;
 import com.woowacourse.pickgit.post.domain.comment.Comments;
 import com.woowacourse.pickgit.user.domain.User;
@@ -39,7 +38,7 @@ class UserTest {
         Post post =
             new Post(null, null, null, "repo-url", null, new Comments(), new ArrayList<>(), null);
         Comment comment = new Comment("test comment.");
-        User user = new User(null, null, null, null, null, new Posts());
+        User user = new User(null, null, null, null, null, null);
 
         // when
         user.addComment(post, comment);
@@ -176,35 +175,45 @@ class UserTest {
         }
     }
 
-    @DisplayName("현재 팔로우 중이면 True를 반환한다.")
-    @Test
-    void isFollowing_Valid_True() {
-        // given
-        source.follow(target);
+    @DisplayName("isFollowing 메서드는")
+    @Nested
+    class Describe_isFollowing {
 
-        // when, then
-        assertThat(source.isFollowing(target)).isTrue();
+        @DisplayName("현재 팔로우 중이면 True를 반환한다.")
+        @Test
+        void isFollowing_Valid_True() {
+            // given
+            source.follow(target);
+
+            // when, then
+            assertThat(source.isFollowing(target)).isTrue();
+        }
+
+        @DisplayName("현재 팔로우 중이 아니라면 False를 반환한다.")
+        @Test
+        void isFollowing_Invalid_False() {
+            // when, then
+            assertThat(source.isFollowing(target)).isFalse();
+        }
     }
 
-    @DisplayName("현재 팔로우 중이 아니라면 False를 반환한다.")
-    @Test
-    void isFollowing_Invalid_False() {
-        // when, then
-        assertThat(source.isFollowing(target)).isFalse();
-    }
+    @DisplayName("equals 메서드는")
+    @Nested
+    class Describe_equals {
 
-    @DisplayName("ID 식별자가 동일하면 동일 엔티티로 인식한다.")
-    @Test
-    void equals_SameId_True() {
-        User source = UserFactory.createUser(1L, "kevin");
-        User target = UserFactory.createUser(1L, "mark");
+        @DisplayName("ID 식별자가 동일하면 동일 엔티티로 인식한다.")
+        @Test
+        void equals_SameId_True() {
+            User source = UserFactory.createUser(1L, "kevin");
+            User target = UserFactory.createUser(1L, "mark");
 
-        assertThat(source).isEqualTo(target);
-    }
+            assertThat(source).isEqualTo(target);
+        }
 
-    @DisplayName("ID 식별자가 다르면 다른 엔티티로 인식한다.")
-    @Test
-    void equals_DifferentId_False() {
-        assertThat(source).isNotEqualTo(target);
+        @DisplayName("ID 식별자가 다르면 다른 엔티티로 인식한다.")
+        @Test
+        void equals_DifferentId_False() {
+            assertThat(source).isNotEqualTo(target);
+        }
     }
 }
