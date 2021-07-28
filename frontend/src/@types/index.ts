@@ -31,19 +31,6 @@ export interface SearchResult {
   tags: SearchResultTag[];
 }
 
-export interface SearchResultUser {
-  imageUrl: string;
-  username: string;
-  following: boolean | null;
-}
-
-export interface SearchResultTag {}
-
-export interface SearchResult {
-  users: SearchResultUser[];
-  tags: SearchResultTag[];
-}
-
 export interface CommentData {
   id: number;
   profileImageUrl: string;
