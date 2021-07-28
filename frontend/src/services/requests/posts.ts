@@ -55,6 +55,18 @@ export const requestAddPostLike = async (postId: Post["id"], accessToken: string
   return response.data;
 };
 
+export const requestDeletePost = async (postId: Post["id"], accessToken: string | null) => {
+  if (!accessToken) {
+    throw Error("no accessToken");
+  }
+
+  await axios.delete(API_URL.POST(postId), {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+};
+
 export const requestDeletePostLike = async (postId: Post["id"], accessToken: string | null) => {
   if (!accessToken) {
     throw Error("no accessToken");
