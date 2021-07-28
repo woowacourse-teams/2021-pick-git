@@ -57,6 +57,19 @@ public class UserController {
         }
     }
 
+    @GetMapping("/{username}")
+    public ResponseEntity<UserProfileResponse> getUserProfile(
+        @Authenticated AppUser appUser,
+        @PathVariable String username
+    ) {
+        AuthUserRequestDto authUserRequestDto =
+            new AuthUserRequestDto(appUser.getUsername2(), appUser.isGuest());
+        UserProfileResponseDto responseDto = userService
+            .getUserProfile(authUserRequestDto, username);
+
+        return ResponseEntity.ok(createUserProfileResponse(responseDto));
+    }
+
     private UserProfileResponse createUserProfileResponse(
         UserProfileResponseDto userProfileResponseDto
     ) {
@@ -91,19 +104,6 @@ public class UserController {
             .issuesCount(responseDto.getIssuesCount())
             .reposCount(responseDto.getReposCount())
             .build();
-    }
-
-    @GetMapping("/{username}")
-    public ResponseEntity<UserProfileResponse> getUserProfile(
-        @Authenticated AppUser appUser,
-        @PathVariable String username
-    ) {
-        AuthUserRequestDto authUserRequestDto =
-            new AuthUserRequestDto(appUser.getUsername2(), appUser.isGuest());
-        UserProfileResponseDto responseDto = userService
-            .getUserProfile(authUserRequestDto, username);
-
-        return ResponseEntity.ok(createUserProfileResponse(responseDto));
     }
 
     @PostMapping("/{username}/followings")
@@ -141,13 +141,6 @@ public class UserController {
         );
     }
 
-    private FollowResponse createFollowResponse(FollowResponseDto followResponseDto) {
-        return FollowResponse.builder()
-            .followerCount(followResponseDto.getFollowerCount())
-            .following(followResponseDto.isFollowing())
-            .build();
-    }
-
     @DeleteMapping("/{username}/followings")
     public ResponseEntity<FollowResponse> unfollowUser(
         @Authenticated AppUser appUser,
@@ -161,5 +154,12 @@ public class UserController {
             userService.unfollowUser(authUserRequestDto, username);
 
         return ResponseEntity.ok(createFollowResponse(followResponseDto));
+    }
+
+    private FollowResponse createFollowResponse(FollowResponseDto followResponseDto) {
+        return FollowResponse.builder()
+            .followerCount(followResponseDto.getFollowerCount())
+            .following(followResponseDto.isFollowing())
+            .build();
     }
 }
