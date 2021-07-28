@@ -31,7 +31,7 @@ const SearchPage = () => {
 
   return (
     <Container>
-      <Tabs tabItems={tabItems} />
+      <Tabs tabItems={tabItems} tabIndicatorKind="line" />
       {tabContents[tabIndex]}
     </Container>
   );
