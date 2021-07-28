@@ -796,6 +796,48 @@ class PostAcceptanceTest {
             .extract();
     }
 
+    @DisplayName("사용자는 게시물을 삭제한다.")
+    @Test
+    void delete_LoginUser_Success() {
+        // given
+        String token = 로그인_되어있음(USERNAME).getToken();
+
+        requestWrite(token);
+
+        // when
+        deleteApiForUpdate(token, HttpStatus.NO_CONTENT);
+    }
+
+    @DisplayName("유효하지 않은 토큰으로 게시물을 삭제할 수 없다. - 401 예외")
+    @Test
+    void delete_invalidToken_401Exception() {
+        // given
+        String token = 로그인_되어있음(USERNAME).getToken();
+
+        requestWrite(token);
+
+        // when
+        ApiErrorResponse response =
+            deleteApiForUpdate("invalidToken", HttpStatus.UNAUTHORIZED)
+                .as(ApiErrorResponse.class);
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("A0001");
+    }
+
+    private ExtractableResponse<Response> deleteApiForUpdate(
+        String token,
+        HttpStatus httpStatus) {
+        return given().log().all()
+            .auth().oauth2(token)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .delete("/api/posts/{postId}", 1L)
+            .then().log().all()
+            .statusCode(httpStatus.value())
+            .extract();
+    }
+
     private OAuthTokenResponse 로그인_되어있음(String name) {
         OAuthTokenResponse response = 로그인_요청(name)
             .as(OAuthTokenResponse.class);
