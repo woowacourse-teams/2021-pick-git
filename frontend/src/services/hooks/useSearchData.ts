@@ -11,7 +11,7 @@ import { removeDuplicatedData } from "../../utils/data";
 import { useSearchResultQuery } from "../queries/search";
 
 const useSearchData = () => {
-  const { keyword } = useContext(SearchContext);
+  const { keyword, onKeywordChange } = useContext(SearchContext);
   const { pushSnackbarMessage } = useContext(SnackBarContext);
   const { logout } = useContext(UserContext);
 
@@ -86,6 +86,10 @@ const useSearchData = () => {
   useEffect(() => {
     handleIntersect("users");
   }, [data]);
+
+  useEffect(() => {
+    onKeywordChange("");
+  }, []);
 
   return { results, isError, isLoading, isFetchingNextPage, handleIntersect, refetch };
 };
