@@ -127,15 +127,15 @@ class UserRepositoryTest {
         assertThat(searchResult).hasSize(0);
     }
 
-    @DisplayName("특정 User를 Follow할 때")
+    @DisplayName("save 메서드는")
     @Nested
-    class Describe_FollowOtherUser {
+    class Describe_save {
 
-        @DisplayName("User가 영속화되면")
+        @DisplayName("저장하려는 유저가 다른 유저를 팔로우한다면")
         @Nested
-        class Context_WhenUserSaved {
+        class Context_UserFollowingOther {
 
-            @DisplayName("Follow 정보 또한 함께 영속화된다.")
+            @DisplayName("추가된 Followings & Followers 정보 또한 함께 영속화시킨다.")
             @Test
             void follow_Valid_PersistenceSuccess() {
                 // given
@@ -160,9 +160,56 @@ class UserRepositoryTest {
             }
         }
 
-        @DisplayName("팔로우 중인 Target User가 삭제되면")
+        @DisplayName("영속화된 유저가 다른 유저를 언팔로우하면")
         @Nested
-        class Context_WhenFollowingUserDeleted {
+        class Context_UserUnfollowingOther {
+
+            @DisplayName("변경된 Followings & Followers 정보도 변경 감지 대상이 된다.")
+            @Test
+            void unfollow_Valid_PersistenceSuccess() {
+                // given
+                User source = UserFactory.user("kevin");
+                User target = UserFactory.user("danyee");
+                userRepository.save(source);
+                userRepository.save(target);
+                source.follow(target);
+
+                testEntityManager.flush();
+                testEntityManager.clear();
+
+                // when
+                User findSource = userRepository.findById(source.getId())
+                    .orElseThrow(IllegalArgumentException::new);
+                User findTarget = userRepository.findById(target.getId())
+                    .orElseThrow(IllegalArgumentException::new);
+                int beforeFollowingCounts = findSource.getFollowingCount();
+                int beforeFollowerCounts = findTarget.getFollowerCount();
+                findSource.unfollow(findTarget);
+
+                testEntityManager.flush();
+                testEntityManager.clear();
+
+                User findSource2 = userRepository.findById(source.getId())
+                    .orElseThrow(IllegalArgumentException::new);
+                User findTarget2 = userRepository.findById(target.getId())
+                    .orElseThrow(IllegalArgumentException::new);
+
+                // then
+                assertThat(beforeFollowingCounts).isOne();
+                assertThat(beforeFollowerCounts).isOne();
+                assertThat(findSource2.getFollowingCount()).isZero();
+                assertThat(findTarget2.getFollowerCount()).isZero();
+            }
+        }
+    }
+
+    @DisplayName("delete 메서드는")
+    @Nested
+    class Describe_delete {
+
+        @DisplayName("팔로우 중인 Target User를 삭제하면")
+        @Nested
+        class Context_FollowingUserDeleted {
 
             @DisplayName("Source User의 팔로잉 정보 또한 변경된다.")
             @Test
@@ -198,9 +245,9 @@ class UserRepositoryTest {
             }
         }
 
-        @DisplayName("팔로워인 Source User가 삭제되면")
+        @DisplayName("팔로워인 Source User를 삭제하면")
         @Nested
-        class Context_WhenFollowerUserDeleted {
+        class Context_FollowerUserDeleted {
 
             @DisplayName("Target User의 팔로워 정보 또한 변경된다.")
             @Test
@@ -235,78 +282,49 @@ class UserRepositoryTest {
                 assertThat(findTarget.getFollowerCount()).isZero();
             }
         }
-    }
 
-    @DisplayName("특정 유저를 언팔로우 하면 변경된 팔로우 및 팔로잉 정보가 함께 영속화된다.")
-    @Test
-    void unfollow_Valid_PersistenceSuccess() {
-        // given
-        User source = UserFactory.user("kevin");
-        User target = UserFactory.user("danyee");
-        userRepository.save(source);
-        userRepository.save(target);
-        source.follow(target);
+        @DisplayName("특정 유저를 삭제하면")
+        @Nested
+        class Context_AnyUserDeleted {
 
-        testEntityManager.flush();
-        testEntityManager.clear();
+            @DisplayName("해당 유저가 작성한 게시물 또한 삭제된다.")
+            @Test
+            void deleteUser_RelatedPostsRemoved_True() {
+                // given
+                User user = userRepository.findByBasicProfile_Name("testUser")
+                    .orElseThrow(IllegalArgumentException::new);
+                Post post =
+                    new Post(new Images(new ArrayList<>()), new PostContent("hi"), "url", user);
+                Post post1 =
+                    new Post(new Images(new ArrayList<>()), new PostContent("hi"), "url", user);
+                Post post2 =
+                    new Post(new Images(new ArrayList<>()), new PostContent("hi"), "url", user);
+                postRepository.save(post);
+                postRepository.save(post1);
+                postRepository.save(post2);
 
-        // when
-        User findSource = userRepository.findById(source.getId())
-            .orElseThrow(IllegalArgumentException::new);
-        User findTarget = userRepository.findById(target.getId())
-            .orElseThrow(IllegalArgumentException::new);
-        int beforeFollowingCounts = findSource.getFollowingCount();
-        int beforeFollowerCounts = findTarget.getFollowerCount();
-        findSource.unfollow(findTarget);
+                testEntityManager.flush();
+                testEntityManager.clear();
 
-        testEntityManager.flush();
-        testEntityManager.clear();
+                // when
+                List<Post> beforePosts = testEntityManager.getEntityManager()
+                    .createQuery("select p from Post p where p.user = :user", Post.class)
+                    .setParameter("user", user)
+                    .getResultList();
+                userRepository.deleteById(user.getId());
 
-        User findSource2 = userRepository.findById(source.getId())
-            .orElseThrow(IllegalArgumentException::new);
-        User findTarget2 = userRepository.findById(target.getId())
-            .orElseThrow(IllegalArgumentException::new);
+                testEntityManager.flush();
+                testEntityManager.clear();
 
-        // then
-        assertThat(beforeFollowingCounts).isOne();
-        assertThat(beforeFollowerCounts).isOne();
-        assertThat(findSource2.getFollowingCount()).isZero();
-        assertThat(findTarget2.getFollowerCount()).isZero();
-    }
+                List<Post> afterPosts = testEntityManager.getEntityManager()
+                    .createQuery("select p from Post p where p.user = :user", Post.class)
+                    .setParameter("user", user)
+                    .getResultList();
 
-    @DisplayName("특정 유저가 삭제되면 해당 유저가 작성한 게시물 또한 삭제된다.")
-    @Test
-    void deleteUser_RelatedPostsRemoved_True() {
-        // given
-        User user = userRepository.findByBasicProfile_Name("testUser")
-            .orElseThrow(IllegalArgumentException::new);
-        Post post = new Post(new Images(new ArrayList<>()), new PostContent("hi"), "url", user);
-        Post post1 = new Post(new Images(new ArrayList<>()), new PostContent("hi"), "url", user);
-        Post post2 = new Post(new Images(new ArrayList<>()), new PostContent("hi"), "url", user);
-        postRepository.save(post);
-        postRepository.save(post1);
-        postRepository.save(post2);
-
-        testEntityManager.flush();
-        testEntityManager.clear();
-
-        // when
-        List<Post> beforePosts = testEntityManager.getEntityManager()
-            .createQuery("select p from Post p where p.user = :user", Post.class)
-            .setParameter("user", user)
-            .getResultList();
-        userRepository.deleteById(user.getId());
-
-        testEntityManager.flush();
-        testEntityManager.clear();
-
-        List<Post> afterPosts = testEntityManager.getEntityManager()
-            .createQuery("select p from Post p where p.user = :user", Post.class)
-            .setParameter("user", user)
-            .getResultList();
-
-        // then
-        assertThat(beforePosts).hasSize(3);
-        assertThat(afterPosts).isEmpty();
+                // then
+                assertThat(beforePosts).hasSize(3);
+                assertThat(afterPosts).isEmpty();
+            }
+        }
     }
 }
