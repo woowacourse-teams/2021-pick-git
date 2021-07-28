@@ -3,6 +3,7 @@ package com.woowacourse.pickgit.unit.post.application;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -11,6 +12,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.PostBuilder;
@@ -18,6 +20,8 @@ import com.woowacourse.pickgit.common.factory.PostFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.post.CommentFormatException;
+import com.woowacourse.pickgit.exception.post.CannotUnlikeException;
+import com.woowacourse.pickgit.exception.post.DuplicatedLikeException;
 import com.woowacourse.pickgit.exception.post.PostFormatException;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.post.RepositoryParseException;
@@ -26,6 +30,7 @@ import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
+import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
@@ -568,5 +573,129 @@ class PostServiceTest {
         assertThat(actual).containsAll(expected);
 
         verify(userRepository, times(1)).findByBasicProfile_Name(anyString());
+    }
+
+    @DisplayName("사용자는 특정 게시물을 좋아요 할 수 있다.")
+    @Test
+    void like_ValidUser_Success() {
+        // given
+        AppUser user = new LoginUser("test user", "token");
+        Long postId = 1L;
+
+        given(userRepository.findByBasicProfile_Name(anyString()))
+            .willReturn(Optional.of(UserFactory.user(1L, user.getUsername())));
+        given(postRepository.findById(anyLong()))
+            .willReturn(Optional.of(
+                new PostBuilder()
+                    .id(postId)
+                    .content("abc")
+                    .build())
+            );
+
+        // when
+        LikeResponseDto likeResponseDto = postService.like(user, postId);
+
+        // then
+        assertThat(likeResponseDto.getLikeCount()).isEqualTo(1);
+        assertThat(likeResponseDto.isLiked()).isTrue();
+
+        verify(userRepository, times(1))
+            .findByBasicProfile_Name(anyString());
+        verify(postRepository, times(1))
+            .findById(anyLong());
+    }
+
+    @DisplayName("사용자는 특정 게시물을 좋아요 취소 할 수 있다.")
+    @Test
+    void unlike_ValidUser_Success() {
+        // given
+        AppUser appUser = new LoginUser("test user", "token");
+        Long postId = 1L;
+        User user = UserFactory.user(1L, appUser.getUsername());
+        Post post = new PostBuilder()
+            .id(postId)
+            .content("abc")
+            .build();
+
+        post.like(user);
+
+        given(userRepository.findByBasicProfile_Name(anyString()))
+            .willReturn(Optional.of(user));
+        given(postRepository.findById(anyLong()))
+            .willReturn(Optional.of(post));
+
+        // when
+        LikeResponseDto likeResponseDto = postService.unlike(appUser, postId);
+
+        // then
+        assertThat(likeResponseDto.getLikeCount()).isEqualTo(0);
+        assertThat(likeResponseDto.isLiked()).isFalse();
+
+        verify(userRepository, times(1))
+            .findByBasicProfile_Name(anyString());
+        verify(postRepository, times(1))
+            .findById(anyLong());
+    }
+
+    @DisplayName("사용자는 이미 좋아요 한 게시물을 좋아요 할 수 없다.")
+    @Test
+    void like_DuplicatedLike_400ExceptionThrown() {
+        // given
+        AppUser appUser = new LoginUser("test user", "token");
+        Long postId = 1L;
+        User user = UserFactory.user(1L, appUser.getUsername());
+        Post post = new PostBuilder()
+            .id(postId)
+            .content("abc")
+            .build();
+
+        post.like(user);
+
+        given(userRepository.findByBasicProfile_Name(anyString()))
+            .willReturn(Optional.of(user));
+        given(postRepository.findById(anyLong()))
+            .willReturn(Optional.of(post));
+
+        // when then
+        assertThatThrownBy(() -> postService.like(appUser, postId))
+            .isInstanceOf(DuplicatedLikeException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "P0003")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
+            .hasMessage("이미 좋아요한 게시물 중복 좋아요 에러");
+
+        verify(userRepository, times(1))
+            .findByBasicProfile_Name(anyString());
+        verify(postRepository, times(1))
+            .findById(anyLong());
+    }
+
+    @DisplayName("사용자는 좋아요 누르지 않은 게시물을 좋아요 취소 할 수 없다.")
+    @Test
+    void unlike_UnlikePost_400ExceptionThrown() {
+        // given
+        AppUser appUser = new LoginUser("test user", "token");
+        Long postId = 1L;
+        User user = UserFactory.user(1L, appUser.getUsername());
+        Post post = new PostBuilder()
+            .id(postId)
+            .content("abc")
+            .build();
+
+        given(userRepository.findByBasicProfile_Name(anyString()))
+            .willReturn(Optional.of(user));
+        given(postRepository.findById(anyLong()))
+            .willReturn(Optional.of(post));
+
+        // when then
+        assertThatThrownBy(() -> postService.unlike(appUser, postId))
+            .isInstanceOf(CannotUnlikeException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "P0004")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
+            .hasMessage("좋아요 하지 않은 게시물 좋아요 취소 에러");
+
+        verify(userRepository, times(1))
+            .findByBasicProfile_Name(anyString());
+        verify(postRepository, times(1))
+            .findById(anyLong());
     }
 }

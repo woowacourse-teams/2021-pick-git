@@ -2,11 +2,11 @@ package com.woowacourse.pickgit.post.presentation.dto.response;
 
 public class LikeResponse {
     private int likeCount;
-    private boolean isLiked;
+    private boolean liked;
 
-    public LikeResponse(int likeCount, boolean isLiked) {
+    public LikeResponse(int likeCount, boolean liked) {
         this.likeCount = likeCount;
-        this.isLiked = isLiked;
+        this.liked = liked;
     }
 
     public LikeResponse() {
@@ -17,6 +17,6 @@ public class LikeResponse {
     }
 
     public boolean isLiked() {
-        return isLiked;
+        return liked;
     }
 }

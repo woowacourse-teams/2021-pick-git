@@ -1,7 +1,5 @@
 package com.woowacourse.pickgit.post.domain.like;
 
-import com.woowacourse.pickgit.post.domain.Post;
-import com.woowacourse.pickgit.user.domain.User;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;

@@ -46,4 +46,6 @@ class LikesTest {
     void contains(String userName, boolean expected) {
         assertThat(likes.contains(userName)).isEqualTo(expected);
     }
+
+
 }
