@@ -13,6 +13,19 @@ export interface ProfileData {
   following?: boolean;
 }
 
+export interface SearchResultUser {
+  imageUrl: string;
+  username: string;
+  following: boolean | null;
+}
+
+export interface SearchResultTag {}
+
+export interface SearchResult {
+  users: SearchResultUser[];
+  tags: SearchResultTag[];
+}
+
 export interface CommentData {
   id: number;
   profileImageUrl: String;
