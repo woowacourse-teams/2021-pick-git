@@ -199,7 +199,7 @@ public class PostController {
         @Authenticated AppUser user,
         @PathVariable Long postId
     ) {
-        postService.delete(PostDeleteRequestDto.toPostDeleteRequestDto(postId));
+        postService.delete(PostDeleteRequestDto.toPostDeleteRequestDto(user, postId));
 
         return ResponseEntity
             .noContent()

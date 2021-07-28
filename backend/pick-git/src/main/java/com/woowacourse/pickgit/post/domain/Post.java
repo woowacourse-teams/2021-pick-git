@@ -60,7 +60,11 @@ public class Post {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @OneToMany(
+        mappedBy = "post",
+        fetch = FetchType.LAZY,
+        cascade = {CascadeType.PERSIST, CascadeType.REMOVE}
+    )
     private List<PostTag> postTags = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
