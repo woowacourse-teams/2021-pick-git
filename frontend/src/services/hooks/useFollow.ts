@@ -18,7 +18,7 @@ const useFollow = () => {
   const { mutateAsync: mutateToFollow, isLoading: isFollowLoading } = useFollowingMutation();
   const { mutateAsync: mutateToUnFollow, isLoading: isUnfollowLoading } = useUnfollowingMutation();
 
-  const setProfileQueryData = (followerCount: number, following: boolean) => {
+  const setProfileQueryData = (username: string, followerCount: number, following: boolean) => {
     const currentProfileQueryKey = [QUERY.GET_PROFILE, { isMyProfile: false, username }];
     const currentProfileQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
 
@@ -53,7 +53,7 @@ const useFollow = () => {
         ? await mutateToUnFollow(username)
         : await mutateToFollow(username);
 
-      setProfileQueryData(followerCount, following);
+      setProfileQueryData(username, followerCount, following);
     } catch (error) {
       handleError(error);
     }

@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { Spinner } from "../@shared/Loader/Loader.style";
 
 export const UserList = styled.li`
   display: flex;
@@ -33,4 +34,16 @@ export const NameTag = styled.div`
     display: inline-block;
     margin-left: 1rem;
   }
+`;
+
+export const ButtonLoader = styled(Button)`
+  opacity: 0.6;
+  position: relative;
+`;
+
+export const ButtonSpinner = styled(Spinner)`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 `;

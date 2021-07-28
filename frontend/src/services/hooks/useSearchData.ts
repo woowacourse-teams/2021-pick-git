@@ -87,7 +87,7 @@ const useSearchData = () => {
     handleIntersect("users");
   }, [data]);
 
-  return { results, isError, isLoading, isFetchingNextPage, handleIntersect };
+  return { results, isError, isLoading, isFetchingNextPage, handleIntersect, refetch };
 };
 
 export default useSearchData;
