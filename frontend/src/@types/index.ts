@@ -28,7 +28,7 @@ export interface SearchResult {
 
 export interface CommentData {
   id: number;
-  profileImageUrl: String;
+  profileImageUrl: string;
   authorName: string;
   content: string;
   isLiked: boolean;
