@@ -1,7 +1,9 @@
 package com.woowacourse.pickgit.post.presentation.dto.request;
 
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
+import lombok.Builder;
 
+@Builder
 public class HomeFeedRequest {
 
     private AppUser appUser;

@@ -28,7 +28,7 @@ const ProfilePage = ({ isMyProfile }: Props) => {
   return (
     <Container>
       <Profile isMyProfile={isMyProfile} username={fixedUsername} />
-      <Tabs tabItems={tabItems} />
+      <Tabs tabIndicatorKind="line" tabItems={tabItems} />
       <ProfileTabContents isMyProfile={isMyProfile} username={fixedUsername} tabIndex={tabIndex} />
     </Container>
   );

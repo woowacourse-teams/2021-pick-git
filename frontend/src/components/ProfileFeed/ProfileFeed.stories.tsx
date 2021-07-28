@@ -13,7 +13,7 @@ export const Default = Template.bind({});
 Default.args = {
   allPosts: [
     {
-      id: "1",
+      id: 1,
       imageUrls: [
         "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80",
         "https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80",
@@ -29,7 +29,9 @@ Default.args = {
       updatedAt: "2일 전",
       comments: [
         {
-          commentId: "4",
+          id: 4,
+          profileImageUrl:
+            "https://images.unsplash.com/photo-1543610892-0b1f7e6d8ac1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=634&q=80",
           authorName: "브콜",
           content: "하하하하",
           isLiked: true,
@@ -38,7 +40,7 @@ Default.args = {
       isLiked: true,
     },
     {
-      id: "2",
+      id: 2,
       imageUrls: [
         "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80",
         "https://images.unsplash.com/photo-1502161254066-6c74afbf07aa?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1051&q=80",
@@ -53,7 +55,9 @@ Default.args = {
       updatedAt: "2일 전",
       comments: [
         {
-          commentId: "5",
+          id: 5,
+          profileImageUrl:
+            "https://images.unsplash.com/photo-1543610892-0b1f7e6d8ac1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=634&q=80",
           authorName: "브콜",
           content: "하하하하",
           isLiked: true,

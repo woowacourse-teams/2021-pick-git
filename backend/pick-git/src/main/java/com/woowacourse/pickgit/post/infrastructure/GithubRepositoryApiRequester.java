@@ -4,11 +4,16 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 @Component
 @Profile("!test")
 public class GithubRepositoryApiRequester implements PlatformRepositoryApiRequester {
+
+    private final RestClient restClient;
+
+    public GithubRepositoryApiRequester(RestClient restClient) {
+        this.restClient = restClient;
+    }
 
     @Override
     public String request(String token, String url) {
@@ -20,7 +25,7 @@ public class GithubRepositoryApiRequester implements PlatformRepositoryApiReques
             .headers(httpHeaders)
             .build();
 
-        return new RestTemplate()
+        return restClient
             .exchange(requestEntity, String.class)
             .getBody();
     }

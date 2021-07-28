@@ -40,7 +40,7 @@ const TagFeedPage = () => {
   return (
     <Container>
       <InfiniteScrollContainer isLoaderShown={isFetching} onIntersect={handlePostsEndIntersect}>
-        <Feed posts={allPosts} />
+        <Feed posts={allPosts} queryKey="" />
       </InfiniteScrollContainer>
     </Container>
   );

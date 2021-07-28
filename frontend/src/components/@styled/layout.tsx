@@ -1,11 +1,11 @@
 import styled from "styled-components";
-import { Layout, Z_INDEX } from "../../constants/layout";
+import { LAYOUT, Z_INDEX } from "../../constants/layout";
 
 export const Header = styled.header`
   position: fixed;
   top: 0;
   width: 100%;
-  height: ${Layout.HEADER_HEIGHT};
+  height: ${LAYOUT.HEADER_HEIGHT};
   background-color: ${({ theme }) => theme.color.white};
   z-index: ${Z_INDEX.LOWER};
 
@@ -18,10 +18,10 @@ export const Page = styled.main`
   width: 100%;
   height: fit-content;
   max-width: 425px;
-  padding-top: ${Layout.HEADER_HEIGHT};
+  padding-top: ${LAYOUT.HEADER_HEIGHT};
   margin: 0 auto;
 
   @media (min-width: 425px) {
-    padding-top: ${Layout.PAGE_MARGIN_TOP};
+    padding-top: ${LAYOUT.PAGE_MARGIN_TOP};
   }
 `;

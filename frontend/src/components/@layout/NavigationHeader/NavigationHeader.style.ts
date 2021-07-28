@@ -6,7 +6,6 @@ export const Container = styled(Header)<React.CSSProperties>`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: fit-content;
   padding: 1.0625rem 1.375rem;
 `;
 

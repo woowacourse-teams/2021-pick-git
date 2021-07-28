@@ -1,11 +1,15 @@
-import { useContext } from "react";
+import { Dispatch, SetStateAction } from "react";
 import { useHistory } from "react-router-dom";
 import { Step } from "../../../@types";
-import PostAddStepContext from "../../../contexts/PostAddStepContext";
 import { getLastPath } from "../../../utils/history";
 
-const useStep = (steps: Step[], stepCompleteLink?: string) => {
-  const { stepIndex, setStepIndex } = useContext(PostAddStepContext);
+interface Parameters {
+  steps: Step[];
+  stepIndex: number;
+  setStepIndex: Dispatch<SetStateAction<number>>;
+}
+
+const useStep = ({ steps, stepIndex, setStepIndex }: Parameters) => {
   const history = useHistory();
 
   const setStepMoveEventHandler = () => {
@@ -36,18 +40,12 @@ const useStep = (steps: Step[], stepCompleteLink?: string) => {
     history.push(steps[stepIndex + 1].path);
   };
 
-  const completeStep = () => {
-    setStepIndex(0);
-    stepCompleteLink && history.push(stepCompleteLink);
-  };
-
   return {
     stepIndex,
     setStepMoveEventHandler,
     removeStepMoveEventHandler,
     goBack,
     goNextStep,
-    completeStep,
   };
 };
 
