@@ -28,7 +28,7 @@ export const GlobalStyle = createGlobalStyle`
     padding: 0;
     height: 100%;
     font-size: 16px;
-    font-family: 'Noto Sans KR', sans-serif;  
+    font-family: 'Noto Sans KR', sans-serif;
   }
 
   body {

@@ -6,11 +6,13 @@ import {
   useDeletePostLikeMutation,
   useAddPostCommentMutation,
   useDeletePostCommentMutation,
+  useDeletePostMutation,
 } from "../queries";
 
 const useFeedMutation = (queryKey: string) => {
   const { mutateAsync: mutateDeletePostLike } = useDeletePostLikeMutation();
   const { mutateAsync: mutateAddPostLike } = useAddPostLikeMutation();
+  const { mutateAsync: mutateDeletePost } = useDeletePostMutation();
   const { mutateAsync: mutateAddComment } = useAddPostCommentMutation();
   const { mutateAsync: mutateDeleteComment } = useDeletePostCommentMutation();
   const queryClient = useQueryClient();
@@ -48,6 +50,7 @@ const useFeedMutation = (queryKey: string) => {
     deletePostLike,
     addPostLike,
     mutateAddComment,
+    mutateDeletePost,
     deleteComment,
   };
 };

@@ -1,6 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="15.669" height="15.803" viewBox="0 0 15.669 15.803">
-  <g id="edit-icon" transform="translate(0.582 2.01)">
-    <path id="Path" d="M7.792,2.833H2.833A1.417,1.417,0,0,0,1.417,4.25v9.917a1.416,1.416,0,0,0,1.416,1.416H12.75a1.417,1.417,0,0,0,1.417-1.416V9.208" transform="translate(-1.29 -2.499)" fill="none" stroke="#3d3d3d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.417"/>
-    <path id="Path-2" data-name="Path" d="M13.1,1.771A1.5,1.5,0,1,1,15.229,3.9L8.5,10.625l-2.833.708L6.375,8.5Z" transform="translate(-1.29 -2.499)" fill="none" stroke="#3d3d3d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.417"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="18.19" height="18.383" viewBox="0 0 18.19 18.383">
+  <g id="edit-icon" transform="translate(0.456 1.716)">
+    <path id="Path" d="M14.167,2.5A2.357,2.357,0,1,1,17.5,5.833L6.25,17.083l-4.583,1.25,1.25-4.583Z" transform="translate(-1.29 -2.499)" fill="none" stroke="#5a5a5a" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.667"/>
   </g>
 </svg>
