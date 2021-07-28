@@ -28,6 +28,7 @@ import com.woowacourse.pickgit.exception.post.RepositoryParseException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
+import com.woowacourse.pickgit.post.application.dto.request.PostDeleteRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
@@ -867,6 +868,63 @@ class PostServiceTest {
         // when
         assertThatThrownBy(() -> {
             postService.update(updateRequestDto);
+        }).isInstanceOf(PostNotFoundException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "P0002")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
+            .hasMessage("해당하는 게시물을 찾을 수 없습니다.");
+
+        // then
+        verify(postRepository, times(1))
+            .findById(anyLong());
+    }
+
+    @DisplayName("사용자는 게시물을 삭제한다.")
+    @Test
+    void delete_LoginUser_Success() {
+        // given
+        User user = UserFactory.user(1L, "testUser");
+        Post post = new PostBuilder()
+            .id(1L)
+            .content("testContent")
+            .user(user)
+            .build();
+
+        given(postRepository.findById(anyLong()))
+            .willReturn(Optional.of(post));
+
+        PostDeleteRequestDto deleteRequestDto = PostDeleteRequestDto
+            .toPostDeleteRequestDto(new LoginUser("testUser", "Bearer testToken"), 1L);
+
+        // when
+        postService.delete(deleteRequestDto);
+
+        // then
+        verify(postRepository, times(1))
+            .findById(anyLong());
+    }
+
+    @DisplayName("게스트는 게시물을 삭제할 수 없다. - 401 예외")
+    @Test
+    void delete_GuestUser_401Exception() {
+        // when
+        assertThatThrownBy(() -> {
+            PostDeleteRequestDto.toPostDeleteRequestDto(new GuestUser(), 1L);
+        }).isInstanceOf(UnauthorizedException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "A0002")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)
+            .hasMessage("권한 에러");
+    }
+
+    @DisplayName("등록되지 않은 게시물을 삭제할 수 없다. - 500 예외")
+    @Test
+    void delete_InvalidPost_500Exception() {
+        // given
+        PostDeleteRequestDto deleteRequestDto = PostDeleteRequestDto
+            .toPostDeleteRequestDto(new LoginUser("testUser", "Bearer testToken"), 1L);
+
+        // when
+        assertThatThrownBy(() -> {
+            postService.delete(deleteRequestDto);
         }).isInstanceOf(PostNotFoundException.class)
             .hasFieldOrPropertyWithValue("errorCode", "P0002")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
