@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3.333" height="15" viewBox="0 0 3.333 15">
+  <g id="vertical-dot-icon" transform="translate(-7.043 -0.001)">
+    <circle id="Path" cx="0.833" cy="0.833" r="0.833" transform="translate(7.877 6.668)" fill="none" stroke="#3d3d3d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.667"/>
+    <circle id="Path-2" data-name="Path" cx="0.833" cy="0.833" r="0.833" transform="translate(7.877 0.834)" fill="none" stroke="#3d3d3d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.667"/>
+    <circle id="Path-3" data-name="Path" cx="0.833" cy="0.833" r="0.833" transform="translate(7.877 12.501)" fill="none" stroke="#3d3d3d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.667"/>
+  </g>
+</svg>
