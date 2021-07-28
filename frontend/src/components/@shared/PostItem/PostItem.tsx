@@ -25,13 +25,15 @@ import Comment from "../Comment/Comment";
 import ImageSlider from "../ImageSlider/ImageSlider";
 import Chip from "../Chip/Chip";
 import { CommentData } from "../../../@types";
-import { EditIcon, PostHeartIcon, PostHeartLineIcon, GithubIcon, SendIcon } from "../../../assets/icons";
+import { EditIcon, PostHeartIcon, PostHeartLineIcon, GithubIcon, SendIcon, TrashIcon } from "../../../assets/icons";
 import { useContext, useState } from "react";
 import { ThemeContext } from "styled-components";
 import { PAGE_URL } from "../../../constants/urls";
 import { LIMIT } from "../../../constants/limits";
 import TextEditor from "../TextEditor/TextEditor";
 import { getTimeDiffFromCurrent } from "../../../utils/date";
+import EmptyPostImage from "../../../assets/images/empty-post-image.png";
+import ButtonDrawer from "../ButtonDrawer/ButtonDrawer";
 
 export interface Props {
   authorName: string;
@@ -48,6 +50,7 @@ export interface Props {
   createdAt: string;
   onCommentClick: () => void;
   onCommentInputClick: () => void;
+  onPostDelete: () => void;
   onPostLike: () => void;
   onCommentLike: (commentId: CommentData["id"]) => void;
 }
@@ -75,6 +78,7 @@ const PostItem = ({
   onCommentClick,
   onCommentInputClick,
   onCommentLike,
+  onPostDelete,
   onPostLike,
 }: Props) => {
   const [shouldHideContent, setShouldHideContent] = useState(content.length > LIMIT.POST_CONTENT_HIDE_LENGTH);
@@ -88,6 +92,11 @@ const PostItem = ({
     : min
     ? timeDiffTextTable.min(min)
     : timeDiffTextTable.sec();
+
+  const circleButtons = [
+    { node: <EditIcon />, onClick: () => alert("click!") },
+    { node: <TrashIcon />, onClick: onPostDelete },
+  ];
 
   const commentList = comments.map((comment) => (
     <CommentWrapper key={comment.id}>
@@ -119,13 +128,9 @@ const PostItem = ({
           <Avatar diameter="1.9375rem" imageUrl={authorImageUrl} />
           <PostAuthorName>{authorName}</PostAuthorName>
         </PostAuthorInfoLink>
-        {isEditable && (
-          <IconLinkButton to={PAGE_URL.EDIT_POST}>
-            <EditIcon />
-          </IconLinkButton>
-        )}
+        {isEditable && <ButtonDrawer circleButtons={circleButtons} />}
       </PostHeader>
-      <ImageSlider imageUrls={imageUrls} slideButtonKind="in-box" />
+      <ImageSlider imageUrls={imageUrls.length !== 0 ? imageUrls : [EmptyPostImage]} slideButtonKind="in-box" />
       <PostBody>
         <IconLinkButtonsWrapper>
           <IconLink onClick={onPostLike}>{isLiked ? <PostHeartIcon /> : <PostHeartLineIcon />}</IconLink>

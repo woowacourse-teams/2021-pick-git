@@ -10,6 +10,7 @@ import {
   requestDeletePostLike,
   requestGetMyFeedPosts,
   requestGetUserFeedPosts,
+  requestDeletePost,
 } from "../requests";
 
 type UserPostsQueryKey = readonly [
@@ -63,6 +64,12 @@ export const useUserPostsQuery = (isMyFeed: boolean, username: string | null) =>
 
 export const useAddPostLikeMutation = () => {
   return useMutation((postId: Post["id"]) => requestAddPostLike(postId, getAccessToken()));
+};
+
+export const useDeletePostMutation = () => {
+  return useMutation<void, AxiosError<ErrorResponse>, Post["id"]>((postId: Post["id"]) =>
+    requestDeletePost(postId, getAccessToken())
+  );
 };
 
 export const useDeletePostLikeMutation = () => {

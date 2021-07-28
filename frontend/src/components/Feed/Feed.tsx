@@ -8,6 +8,7 @@ import useBottomSlider from "../../services/hooks/@common/useBottomSlider";
 import CommentSlider from "../CommentSlider/CommentSlider";
 import useFeedMutation from "../../services/hooks/useFeedMutation";
 import { FAILURE_MESSAGE } from "../../constants/messages";
+import { getAPIErrorMessage } from "../../utils/error";
 
 interface Props {
   posts: Post[];
@@ -17,7 +18,7 @@ interface Props {
 const Feed = ({ posts, queryKey }: Props) => {
   const [selectedPostId, setSelectedPostId] = useState<Post["id"]>();
   const { pushSnackbarMessage } = useContext(SnackBarContext);
-  const { setPosts, deletePostLike, addPostLike, mutateAddComment } = useFeedMutation(queryKey);
+  const { setPosts, deletePostLike, addPostLike, mutateAddComment, mutateDeletePost } = useFeedMutation(queryKey);
   const { isBottomSliderShown, showBottomSlider, hideBottomSlider, removeSlideEventHandler, setSlideEventHandler } =
     useBottomSlider();
   const { isLoggedIn, currentUsername } = useContext(UserContext);
@@ -29,11 +30,16 @@ const Feed = ({ posts, queryKey }: Props) => {
     return removeSlideEventHandler;
   }, []);
 
-  const handleCommentLike = (commentId: number) => {
-    pushSnackbarMessage("아직 구현되지 않은 기능입니다.");
+  const handlePostDelete = async (postId: Post["id"]) => {
+    try {
+      await mutateDeletePost(postId);
+    } catch (error) {
+      console.dir(error);
+      pushSnackbarMessage(getAPIErrorMessage(error.response?.data.errorCode));
+    }
   };
 
-  const handlePostLike = (postId: number) => {
+  const handlePostLike = (postId: Post["id"]) => {
     const newPosts = [...posts];
     const targetPost = newPosts.find((post) => post.id === postId);
 
@@ -53,6 +59,10 @@ const Feed = ({ posts, queryKey }: Props) => {
       targetPost.isLiked = true;
       setPosts(newPosts);
     }
+  };
+
+  const handleCommentLike = (commentId: number) => {
+    pushSnackbarMessage("아직 구현되지 않은 기능입니다.");
   };
 
   const handleCommentsClick = (postId: Post["id"]) => {
@@ -99,10 +109,11 @@ const Feed = ({ posts, queryKey }: Props) => {
             isLiked={post.isLiked}
             likeCount={post.likesCount}
             tags={post.tags}
+            onPostDelete={() => handlePostDelete(post.id)}
+            onPostLike={() => handlePostLike(post.id)}
             onCommentClick={() => handleCommentsClick(post.id)}
             onCommentInputClick={() => handleCommentsClick(post.id)}
             onCommentLike={handleCommentLike}
-            onPostLike={() => handlePostLike(post.id)}
           />
         </PostItemWrapper>
       ))}
