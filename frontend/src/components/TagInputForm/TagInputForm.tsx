@@ -39,16 +39,19 @@ const TagInputForm = () => {
     }
 
     if (!isValidTagLength(newTag)) {
+      event.currentTarget["tag-input"].blur();
       showAlertModal(FAILURE_MESSAGE.POST_TAG_LENGTH_LIMIT_EXCEEDED);
       return;
     }
 
     if (!isValidTagFormat(newTag)) {
+      event.currentTarget["tag-input"].blur();
       showAlertModal(FAILURE_MESSAGE.POST_TAG_SPECIAL_SYMBOL_EXIST);
       return;
     }
 
     if (hasDuplicatedTag([...tags, newTag])) {
+      event.currentTarget["tag-input"].blur();
       showAlertModal(FAILURE_MESSAGE.POST_DUPLICATED_TAG_EXIST);
       return;
     }
