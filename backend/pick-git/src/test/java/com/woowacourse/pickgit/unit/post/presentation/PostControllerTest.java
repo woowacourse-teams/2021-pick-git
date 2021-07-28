@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -46,6 +47,7 @@ import com.woowacourse.pickgit.exception.post.CommentFormatException;
 import com.woowacourse.pickgit.exception.post.DuplicatedLikeException;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
+import com.woowacourse.pickgit.post.application.dto.request.PostDeleteRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
@@ -798,7 +800,7 @@ class PostControllerTest {
             getDocumentRequest(),
             getDocumentResponse(),
             requestHeaders(
-                headerWithName(HttpHeaders.AUTHORIZATION).description("bearer token")
+                headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer token")
             ),
             pathParameters(
                 parameterWithName("postId").description("게시물 id")
@@ -849,7 +851,7 @@ class PostControllerTest {
             getDocumentRequest(),
             getDocumentResponse(),
             requestHeaders(
-                headerWithName(HttpHeaders.AUTHORIZATION).description("bearer token")
+                headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer token")
             ),
             pathParameters(
                 parameterWithName("postId").description("게시물 id")
@@ -860,6 +862,43 @@ class PostControllerTest {
             ),
             responseFields(
                 fieldWithPath("errorCode").type(STRING).description("에러 코드")
+            )
+        ));
+    }
+
+    @DisplayName("사용자는 게시물을 삭제한다.")
+    @Test
+    void delete_LoginUser_Success() throws Exception {
+        // given
+        LoginUser user = new LoginUser("testUser", "Bearer testToken");
+
+        given(oAuthService.validateToken(any()))
+            .willReturn(true);
+        given(oAuthService.findRequestUserByToken(any()))
+            .willReturn(user);
+        willDoNothing()
+            .given(postService)
+            .delete(any(PostDeleteRequestDto.class));
+
+        // when
+        ResultActions perform = mockMvc.perform(delete("/api/posts/{postId}", 1L)
+            .header(HttpHeaders.AUTHORIZATION, "Bearer testToken"));
+
+        // then
+        perform
+            .andExpect(status().isNoContent());
+
+        verify(postService, times(1))
+            .delete(any(PostDeleteRequestDto.class));
+
+        perform.andDo(document("post-delete",
+            getDocumentRequest(),
+            getDocumentResponse(),
+            requestHeaders(
+                headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer token")
+            ),
+            pathParameters(
+                parameterWithName("postId").description("게시물 id")
             )
         ));
     }
