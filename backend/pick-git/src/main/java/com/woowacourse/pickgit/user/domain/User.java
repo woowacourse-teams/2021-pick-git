@@ -1,7 +1,5 @@
 package com.woowacourse.pickgit.user.domain;
 
-import com.woowacourse.pickgit.exception.user.DuplicateFollowException;
-import com.woowacourse.pickgit.exception.user.InvalidFollowException;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.Posts;
 import com.woowacourse.pickgit.post.domain.comment.Comment;
@@ -84,18 +82,12 @@ public class User {
 
     public void follow(User target) {
         Follow follow = new Follow(this, target);
-        if (this.followings.contains(follow)) {
-            throw new DuplicateFollowException();
-        }
         this.followings.add(follow);
         target.followers.add(follow);
     }
 
     public void unfollow(User target) {
         Follow follow = new Follow(this, target);
-        if (!this.followings.contains(follow)) {
-            throw new InvalidFollowException();
-        }
         this.followings.remove(follow);
         target.followers.remove(follow);
     }

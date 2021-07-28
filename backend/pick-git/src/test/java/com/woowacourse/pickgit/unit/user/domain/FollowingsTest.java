@@ -1,8 +1,11 @@
 package com.woowacourse.pickgit.unit.user.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 import com.woowacourse.pickgit.common.factory.UserFactory;
+import com.woowacourse.pickgit.exception.user.DuplicateFollowException;
+import com.woowacourse.pickgit.exception.user.InvalidFollowException;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.follow.Follow;
 import com.woowacourse.pickgit.user.domain.follow.Followings;
@@ -25,32 +28,88 @@ class FollowingsTest {
         followings.add(new Follow(user1, user2));
     }
 
-    @DisplayName("팔로잉 목록에 Follow를 추가한다.")
-    @Test
-    void add_Success() {
-        // given
-        User user1 = UserFactory.user(3L, "kafd2");
-        User user2 = UserFactory.user(4L, "daadfadfe");
+    @DisplayName("add 메서드는")
+    @Nested
+    class Describe_add {
 
-        // when
-        followings.add(new Follow(user1, user2));
+        @DisplayName("현재 팔로잉 목록에 동일한 Follow 정보가 없을 때")
+        @Nested
+        class Context_NotDuplicateFollowExits {
 
-        // then
-        assertThat(followings.count()).isEqualTo(2);
+            @DisplayName("팔로잉 목록에 Follow 정보를 추가한다.")
+            @Test
+            void add_Success() {
+                // given
+                User user1 = UserFactory.user(3L, "kafd2");
+                User user2 = UserFactory.user(4L, "daadfadfe");
+
+                // when
+                followings.add(new Follow(user1, user2));
+
+                // then
+                assertThat(followings.count()).isEqualTo(2);
+            }
+        }
+
+        @DisplayName("현재 팔로잉 목록에 동일한 Follow 정보가 존재하면")
+        @Nested
+        class Context_DuplicateFollowExits {
+
+            @DisplayName("팔로잉 목록에 Follow 정보를 추가할 수 없다.")
+            @Test
+            void add_ExceptionThrown() {
+                // given
+                User user1 = UserFactory.user(1L, "kevin");
+                User user2 = UserFactory.user(2L, "danyee");
+
+                // when, then
+                assertThatCode(() -> followings.add(new Follow(user1, user2)))
+                    .isInstanceOf(DuplicateFollowException.class)
+                    .hasMessage("이미 팔로우 중 입니다.");
+            }
+        }
     }
 
-    @DisplayName("팔로잉 목록에 Follow를 삭제한다.")
-    @Test
-    void remove_Success() {
-        // given
-        User user1 = UserFactory.user(1L, "kevin");
-        User user2 = UserFactory.user(2L, "danyee");
+    @DisplayName("remove 메서드는")
+    @Nested
+    class Describe_remove {
 
-        // when
-        followings.remove(new Follow(user1, user2));
+        @DisplayName("팔로잉 목록에 동일한 Follow 정보가 있을 때")
+        @Nested
+        class Context_DuplicateFollowExits {
 
-        // then
-        assertThat(followings.count()).isZero();
+            @DisplayName("팔로잉 목록에 Follow 정보를 삭제한다.")
+            @Test
+            void remove_Success() {
+                // given
+                User user1 = UserFactory.user(1L, "kevin");
+                User user2 = UserFactory.user(2L, "danyee");
+
+                // when
+                followings.remove(new Follow(user1, user2));
+
+                // then
+                assertThat(followings.count()).isZero();
+            }
+        }
+
+        @DisplayName("팔로잉 목록에 동일한 Follow 정보가 없을 때")
+        @Nested
+        class Context_NotDuplicateFollowExits {
+
+            @DisplayName("팔로잉 목록에 Follow 정보를 삭제할 수 없다.")
+            @Test
+            void remove_ExceptionThrown() {
+                // given
+                User user1 = UserFactory.user(3L, "kadfevin");
+                User user2 = UserFactory.user(4L, "danyafdadfee");
+
+                // when, then
+                assertThatCode(() -> followings.remove(new Follow(user1, user2)))
+                    .isInstanceOf(InvalidFollowException.class)
+                    .hasMessage("존재하지 않는 팔로우 입니다.");
+            }
+        }
     }
 
     @DisplayName("contains 메서드는")

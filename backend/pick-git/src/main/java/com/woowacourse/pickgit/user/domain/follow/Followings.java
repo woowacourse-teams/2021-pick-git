@@ -1,5 +1,7 @@
 package com.woowacourse.pickgit.user.domain.follow;
 
+import com.woowacourse.pickgit.exception.user.DuplicateFollowException;
+import com.woowacourse.pickgit.exception.user.InvalidFollowException;
 import com.woowacourse.pickgit.user.domain.User;
 import java.util.List;
 import javax.persistence.CascadeType;
@@ -26,10 +28,16 @@ public class Followings {
     }
 
     public void add(Follow follow) {
+        if (this.followings.contains(follow)) {
+            throw new DuplicateFollowException();
+        }
         followings.add(follow);
     }
 
     public void remove(Follow follow) {
+        if (!this.followings.contains(follow)) {
+            throw new InvalidFollowException();
+        }
         followings.remove(follow);
     }
 
