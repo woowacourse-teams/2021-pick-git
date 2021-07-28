@@ -4,7 +4,7 @@ import { ProfileData } from "../../../@types";
 
 import UserContext from "../../../contexts/UserContext";
 import useModal from "../../../services/hooks/@common/useModal";
-import { useFollowingMutation, useUnfollowingMutation } from "../../../services/queries";
+import useFollow from "../../../services/hooks/useFollow";
 import ModalPortal from "../../@layout/Modal/ModalPortal";
 import ProfileModificationForm from "../../ProfileModificationForm/ProfileModificationForm";
 import Avatar from "../Avatar/Avatar";
@@ -15,23 +15,18 @@ import { ButtonLoader, ButtonSpinner, Container, Indicators } from "./ProfileHea
 export interface Props {
   isMyProfile: boolean;
   profile: ProfileData | null;
+  username: string;
 }
 
-const ProfileHeader = ({ isMyProfile, profile }: Props) => {
+const ProfileHeader = ({ isMyProfile, profile, username }: Props) => {
   const theme = useContext(ThemeContext);
   const { isLoggedIn } = useContext(UserContext);
   const { isModalShown, showModal, hideModal } = useModal(false);
+  const { toggleFollow, isFollowLoading, isUnfollowLoading } = useFollow();
 
-  const { mutate: follow, isLoading: isFollowLoading } = useFollowingMutation(profile?.name);
-  const { mutate: unFollow, isLoading: isUnfollowLoading } = useUnfollowingMutation(profile?.name);
-
-  const onFollowButtonClick = () => {
-    if (profile?.following === null) return;
-
-    if (profile?.following) {
-      unFollow();
-    } else {
-      follow();
+  const handleFollowButtonClick = () => {
+    if (profile && profile.following !== null) {
+      toggleFollow(username, profile.following);
     }
   };
 
@@ -63,14 +58,14 @@ const ProfileHeader = ({ isMyProfile, profile }: Props) => {
           type="button"
           kind="squaredBlock"
           backgroundColor={theme.color.tertiaryColor}
-          onClick={onFollowButtonClick}
+          onClick={handleFollowButtonClick}
         >
           팔로우 취소
         </Button>
       );
     } else {
       return (
-        <Button type="button" kind="squaredBlock" onClick={onFollowButtonClick}>
+        <Button type="button" kind="squaredBlock" onClick={handleFollowButtonClick}>
           팔로우
         </Button>
       );
@@ -91,7 +86,7 @@ const ProfileHeader = ({ isMyProfile, profile }: Props) => {
       {isModalShown && isLoggedIn && (
         <ModalPortal onClose={hideModal} isCloseButtonShown={true}>
           <ProfileModificationForm
-            username={profile?.name}
+            username={username}
             profileImageUrl={profile?.imageUrl}
             prevDescription={profile?.description}
             onTerminate={hideModal}

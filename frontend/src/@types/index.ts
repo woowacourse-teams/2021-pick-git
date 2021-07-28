@@ -10,7 +10,12 @@ export interface ProfileData {
   location: string;
   website: string;
   twitter: string;
-  following?: boolean;
+  following: boolean | null;
+}
+
+export interface MutateResponseFollow {
+  followerCount: number;
+  following: boolean;
 }
 
 export interface SearchResultUser {

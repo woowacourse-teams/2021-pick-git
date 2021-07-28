@@ -6,7 +6,7 @@ import { Container, Description, DetailInfo } from "./Profile.style";
 
 export interface Props {
   isMyProfile: boolean;
-  username: string | null;
+  username: string;
 }
 
 const Profile = ({ isMyProfile, username }: Props) => {
@@ -18,7 +18,7 @@ const Profile = ({ isMyProfile, username }: Props) => {
 
   return (
     <Container>
-      <ProfileHeader isMyProfile={isMyProfile} profile={data ?? null} />
+      <ProfileHeader isMyProfile={isMyProfile} profile={data ?? null} username={username} />
       <Description>{data?.description}</Description>
       <DetailInfo>
         <CompanyIcon />
