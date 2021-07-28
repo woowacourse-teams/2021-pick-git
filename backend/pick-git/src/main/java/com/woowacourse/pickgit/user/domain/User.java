@@ -2,7 +2,6 @@ package com.woowacourse.pickgit.user.domain;
 
 import com.woowacourse.pickgit.exception.user.DuplicateFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidFollowException;
-import com.woowacourse.pickgit.exception.user.SameSourceTargetUserException;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.Posts;
 import com.woowacourse.pickgit.post.domain.comment.Comment;
@@ -49,8 +48,14 @@ public class User {
     }
 
     public User(Long id, BasicProfile basicProfile, GithubProfile githubProfile) {
-        this(id, basicProfile, githubProfile, new Followers(new ArrayList<>()),
-            new Followings(new ArrayList<>()), new Posts(new ArrayList<>()));
+        this(
+            id,
+            basicProfile,
+            githubProfile,
+            new Followers(new ArrayList<>()),
+            new Followings(new ArrayList<>()),
+            new Posts(new ArrayList<>())
+        );
     }
 
     public User(
@@ -78,7 +83,6 @@ public class User {
     }
 
     public void follow(User target) {
-        validateDifferentSourceTarget(target);
         Follow follow = new Follow(this, target);
         if (this.followings.contains(follow)) {
             throw new DuplicateFollowException();
@@ -87,14 +91,7 @@ public class User {
         target.followers.add(follow);
     }
 
-    private void validateDifferentSourceTarget(User target) {
-        if (this.equals(target)) {
-            throw new SameSourceTargetUserException();
-        }
-    }
-
     public void unfollow(User target) {
-        validateDifferentSourceTarget(target);
         Follow follow = new Follow(this, target);
         if (!this.followings.contains(follow)) {
             throw new InvalidFollowException();
