@@ -7,13 +7,8 @@ import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.exception.user.DuplicateFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidFollowException;
 import com.woowacourse.pickgit.exception.user.SameSourceTargetUserException;
-import com.woowacourse.pickgit.post.domain.Post;
-import com.woowacourse.pickgit.post.domain.comment.Comment;
-import com.woowacourse.pickgit.post.domain.comment.Comments;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -29,27 +24,6 @@ class UserTest {
         // given
         source = UserFactory.createUser(1L, "source");
         target = UserFactory.createUser(2L, "target");
-    }
-
-    @DisplayName("User가 Post에 Comment를 추가한다.")
-    @Test
-    void addComment_Valid_RegistrationSuccess() {
-        // given
-        Post post =
-            new Post(null, null, null, "repo-url", null, new Comments(), new ArrayList<>(), null);
-        Comment comment = new Comment("test comment.");
-        User user = new User(null, null, null, null, null, null);
-
-        // when
-        user.addComment(post, comment);
-        List<Comment> comments = post.getComments();
-        Comment savedComment = comments.get(0);
-
-        // then
-        assertThat(comments).hasSize(1);
-        assertThat(savedComment)
-            .extracting("user", "post")
-            .contains(user, post);
     }
 
     @DisplayName("User는 자신의 GithubProfile을 변경한다.")

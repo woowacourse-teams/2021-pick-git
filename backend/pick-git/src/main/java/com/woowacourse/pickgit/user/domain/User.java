@@ -96,6 +96,7 @@ public class User {
         return this.followings.isFollowing(targetUser);
     }
 
+    //todo 너잘과 병합시 삭제
     public void addComment(Post post, Comment comment) {
         comment.writeBy(this);
         post.addComment(comment);
