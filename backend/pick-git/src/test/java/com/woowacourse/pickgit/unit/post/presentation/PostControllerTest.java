@@ -263,7 +263,8 @@ class PostControllerTest {
         ));
     }
 
-    private ResultActions addCommentApi(String url,  Long postId, String requestBody) throws Exception {
+    private ResultActions addCommentApi(String url, Long postId, String requestBody)
+        throws Exception {
         return mockMvc.perform(post(url, postId)
             .header(HttpHeaders.AUTHORIZATION, "Bearer test")
             .contentType(MediaType.APPLICATION_JSON)
@@ -350,7 +351,8 @@ class PostControllerTest {
                 fieldWithPath("[].updatedAt").type(STRING).description("마지막 글 수정 시간"),
                 fieldWithPath("[].comments").type(ARRAY).description("댓글 목록"),
                 fieldWithPath("[].comments[].id").type(NUMBER).description("댓글 아이디"),
-                fieldWithPath("[].comments[].profileImageUrl").type(STRING).description("댓글 작성자 프로필 사진"),
+                fieldWithPath("[].comments[].profileImageUrl").type(STRING)
+                    .description("댓글 작성자 프로필 사진"),
                 fieldWithPath("[].comments[].authorName").type(STRING).description("댓글 작성자 이름"),
                 fieldWithPath("[].comments[].content").type(STRING).description("댓글 내용"),
                 fieldWithPath("[].comments[].isLiked").type(BOOLEAN).description("댓글 좋아요 여부"),
@@ -404,7 +406,8 @@ class PostControllerTest {
                 fieldWithPath("[].updatedAt").type(STRING).description("마지막 글 수정 시간"),
                 fieldWithPath("[].comments").type(ARRAY).description("댓글 목록"),
                 fieldWithPath("[].comments[].id").type(NUMBER).description("댓글 아이디"),
-                fieldWithPath("[].comments[].profileImageUrl").type(STRING).description("댓글 작성자 프로필 사진"),
+                fieldWithPath("[].comments[].profileImageUrl").type(STRING)
+                    .description("댓글 작성자 프로필 사진"),
                 fieldWithPath("[].comments[].authorName").type(STRING).description("댓글 작성자 이름"),
                 fieldWithPath("[].comments[].content").type(STRING).description("댓글 내용"),
                 fieldWithPath("[].comments[].isLiked").type(BOOLEAN).description("댓글 좋아요 여부"),

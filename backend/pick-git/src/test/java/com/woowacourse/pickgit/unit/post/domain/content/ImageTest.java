@@ -1,14 +1,13 @@
 package com.woowacourse.pickgit.unit.post.domain.content;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.woowacourse.pickgit.common.factory.PostBuilder;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.content.Image;
+import java.lang.reflect.Field;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.lang.reflect.Field;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class ImageTest {
 

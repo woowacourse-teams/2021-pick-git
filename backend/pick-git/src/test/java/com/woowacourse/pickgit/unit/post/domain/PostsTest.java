@@ -1,10 +1,8 @@
 package com.woowacourse.pickgit.unit.post.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 import com.woowacourse.pickgit.common.factory.PostBuilder;
-import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.Posts;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;

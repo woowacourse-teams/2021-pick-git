@@ -23,14 +23,9 @@ import com.woowacourse.pickgit.user.domain.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -56,9 +51,11 @@ class OAuthServiceIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        this.jwtTokenProvider =  new JwtTokenProviderImpl(SECRET_KEY, EXPIRATION_TIME_IN_MILLISECONDS);;
+        this.jwtTokenProvider = new JwtTokenProviderImpl(SECRET_KEY,
+            EXPIRATION_TIME_IN_MILLISECONDS);
         this.oAuthAccessTokenDao = new CollectionOAuthAccessTokenDao();
-        this.oAuthService = new OAuthService(oAuthClient, jwtTokenProvider, oAuthAccessTokenDao, userRepository);
+        this.oAuthService = new OAuthService(oAuthClient, jwtTokenProvider, oAuthAccessTokenDao,
+            userRepository);
     }
 
     @DisplayName("Github 로그인 URL을 반환한다.")

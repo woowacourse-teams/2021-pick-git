@@ -8,7 +8,7 @@ import com.woowacourse.pickgit.common.mockapi.MockContributionApiRequester;
 import com.woowacourse.pickgit.exception.user.ContributionParseException;
 import com.woowacourse.pickgit.user.domain.PlatformContributionExtractor;
 import com.woowacourse.pickgit.user.domain.dto.CountResponseDto;
-import com.woowacourse.pickgit.user.domain.dto.StarResponseDto;
+import com.woowacourse.pickgit.user.domain.dto.StarsResponseDto;
 import com.woowacourse.pickgit.user.infrastructure.extractor.GithubContributionExtractor;
 import com.woowacourse.pickgit.user.infrastructure.requester.PlatformContributionApiRequester;
 import java.util.List;
@@ -39,11 +39,11 @@ public class GithubContributionExtractorTest {
     @Test
     void extractStars_Stars_Success() {
         // when
-        List<StarResponseDto> stars = platformContributionExtractor.extractStars("testUser");
+        List<StarsResponseDto> stars = platformContributionExtractor.extractStars("testUser");
 
         // then
         assertThat(stars.stream()
-            .mapToInt(StarResponseDto::getStars)
+            .mapToInt(StarsResponseDto::getStars)
             .sum())
             .isEqualTo(11);
     }
@@ -155,7 +155,8 @@ public class GithubContributionExtractorTest {
 
         // when
         assertThatThrownBy(() -> {
-            platformContributionExtractor.extractCount("/issues?q=author:%s type:issue", "testUser");
+            platformContributionExtractor
+                .extractCount("/issues?q=author:%s type:issue", "testUser");
         }).isInstanceOf(ContributionParseException.class)
             .hasFieldOrPropertyWithValue("errorCode", "V0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
@@ -187,7 +188,8 @@ public class GithubContributionExtractorTest {
 
         // when
         assertThatThrownBy(() -> {
-            platformContributionExtractor.extractCount("/repositories?q=user:%s is:public", "testUser");
+            platformContributionExtractor
+                .extractCount("/repositories?q=user:%s is:public", "testUser");
         }).isInstanceOf(ContributionParseException.class)
             .hasFieldOrPropertyWithValue("errorCode", "V0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
@@ -195,8 +197,7 @@ public class GithubContributionExtractorTest {
     }
 
     private static class MockContributionApiErrorRequester
-        implements PlatformContributionApiRequester
-    {
+        implements PlatformContributionApiRequester {
 
         @Override
         public String request(String url) {

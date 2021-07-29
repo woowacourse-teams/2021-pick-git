@@ -24,7 +24,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
@@ -43,9 +42,9 @@ class TagServiceTest {
     @Mock
     private TagRepository tagRepository;
 
-    private String accessToken = "abc";
-    private String userName = "asap";
-    private String repositoryName = "next-level";
+    private final String accessToken = "abc";
+    private final String userName = "asap";
+    private final String repositoryName = "next-level";
 
     @DisplayName("Repository에 포함된 언어 태그를 추출한다.")
     @Test

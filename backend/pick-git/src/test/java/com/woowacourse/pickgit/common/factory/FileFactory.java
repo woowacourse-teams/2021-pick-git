@@ -9,6 +9,7 @@ import org.apache.http.entity.ContentType;
 import org.springframework.mock.web.MockMultipartFile;
 
 public class FileFactory {
+
     private static final ClassLoader CLASS_LOADER = FileFactory.class.getClassLoader();
     private static final String FILE_KEY = "images";
 

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.woowacourse.pickgit.common.mockapi.MockTagApiRequester;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.post.TagFormatException;
 import com.woowacourse.pickgit.tag.application.ExtractionRequestDto;
@@ -13,7 +14,6 @@ import com.woowacourse.pickgit.tag.domain.PlatformTagExtractor;
 import com.woowacourse.pickgit.tag.domain.Tag;
 import com.woowacourse.pickgit.tag.domain.TagRepository;
 import com.woowacourse.pickgit.tag.infrastructure.GithubTagExtractor;
-import com.woowacourse.pickgit.common.mockapi.MockTagApiRequester;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,7 +21,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -38,10 +37,10 @@ class TagServiceIntegrationTest {
     @Autowired
     private TestEntityManager entityManager;
 
-    private String accessToken = "oauth.access.token";
-    private String userName = "jipark3";
-    private String repositoryName = "doms-react";
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final String accessToken = "oauth.access.token";
+    private final String userName = "jipark3";
+    private final String repositoryName = "doms-react";
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() {

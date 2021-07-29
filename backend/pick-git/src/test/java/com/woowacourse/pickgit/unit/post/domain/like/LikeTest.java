@@ -1,5 +1,7 @@
 package com.woowacourse.pickgit.unit.post.domain.like;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.woowacourse.pickgit.common.factory.PostBuilder;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.post.domain.Post;
@@ -7,9 +9,6 @@ import com.woowacourse.pickgit.post.domain.like.Like;
 import com.woowacourse.pickgit.user.domain.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class LikeTest {
 

@@ -18,7 +18,7 @@ public class UserFactory {
     }
 
     public static User user() {
-        return createUser(null,"testUser");
+        return createUser(null, "testUser");
     }
 
     public static User createUser(Long id, String name) {
