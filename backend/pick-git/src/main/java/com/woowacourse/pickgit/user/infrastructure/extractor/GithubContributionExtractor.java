@@ -8,23 +8,27 @@ import com.woowacourse.pickgit.user.domain.dto.CountResponseDto;
 import com.woowacourse.pickgit.user.domain.dto.StarResponseDto;
 import com.woowacourse.pickgit.user.infrastructure.requester.PlatformContributionApiRequester;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class GithubContributionExtractor implements PlatformContributionExtractor {
 
-    private static final String API_URL_FORMAT_FOR_COUNT = "https://api.github.com/search/";
-    private static final String API_URL_FORMAT_FOR_STAR = "https://api.github.com/search/repositories?q=user:%s stars:>=1";
-
     private final ObjectMapper objectMapper;
     private final PlatformContributionApiRequester platformContributionApiRequester;
+    private final String apiUrlFormatForStar;
+    private final String apiUrlFormatForCount;
 
     public GithubContributionExtractor(
         ObjectMapper objectMapper,
-        PlatformContributionApiRequester platformContributionApiRequester
+        PlatformContributionApiRequester platformContributionApiRequester,
+        @Value("${github.contribution.star-url}") String apiUrlFormatForStar,
+        @Value("${github.contribution.count-url}") String apiUrlFormatForCount
     ) {
         this.objectMapper = objectMapper;
         this.platformContributionApiRequester = platformContributionApiRequester;
+        this.apiUrlFormatForStar = apiUrlFormatForStar;
+        this.apiUrlFormatForCount = apiUrlFormatForCount;
     }
 
     @Override
@@ -36,7 +40,7 @@ public class GithubContributionExtractor implements PlatformContributionExtracto
     }
 
     private String generateUrl(String username) {
-        return String.format(API_URL_FORMAT_FOR_STAR, username);
+        return String.format(apiUrlFormatForStar, username);
     }
 
     private List<StarResponseDto> parseToStars(String response) {
@@ -57,7 +61,7 @@ public class GithubContributionExtractor implements PlatformContributionExtracto
     }
 
     private String generateUrl(String restUrl, String username) {
-        return API_URL_FORMAT_FOR_COUNT + String.format(restUrl, username);
+        return apiUrlFormatForCount + String.format(restUrl, username);
     }
 
     private CountResponseDto parseToCount(String response) {

@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class GithubExtractorTest {
+public class GithubContributionExtractorTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -21,7 +21,15 @@ public class GithubExtractorTest {
 
     @BeforeEach
     void setUp() {
-        platformContributionExtractor = new GithubContributionExtractor(objectMapper, new MockContributionApiRequester());
+        String apiUrlFormatForStar = "https://api.github.com/search/repositories?q=user:%s stars:>=1";
+        String apiUrlFormatForCount = "https://api.github.com/search/";
+
+        platformContributionExtractor = new GithubContributionExtractor(
+            objectMapper,
+            new MockContributionApiRequester(),
+            apiUrlFormatForStar,
+            apiUrlFormatForCount
+        );
     }
 
     @DisplayName("스타 개수를 추출한다.")
@@ -64,7 +72,8 @@ public class GithubExtractorTest {
     void extractCount_Issues_Success() {
         // when
         CountResponseDto issues =
-            platformContributionExtractor.extractCount("/issues?q=author:%s type:issue", "testUser");
+            platformContributionExtractor
+                .extractCount("/issues?q=author:%s type:issue", "testUser");
 
         // then
         assertThat(issues.getCount()).isEqualTo(48);
