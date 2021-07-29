@@ -7,12 +7,9 @@ import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
-import com.woowacourse.pickgit.user.domain.PlatformContributionExtractor;
+import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
-import com.woowacourse.pickgit.user.domain.dto.CountResponseDto;
-import com.woowacourse.pickgit.user.domain.dto.StarResponseDto;
-import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,14 +18,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final PlatformContributionExtractor platformContributionExtractor;
+    private final PlatformContributionCalculator platformContributionCalculator;
 
     public UserService(
         UserRepository userRepository,
-        PlatformContributionExtractor platformContributionExtractor
+        PlatformContributionCalculator platformContributionCalculator
     ) {
         this.userRepository = userRepository;
-        this.platformContributionExtractor = platformContributionExtractor;
+        this.platformContributionCalculator = platformContributionCalculator;
     }
 
     @Transactional(readOnly = true)
@@ -93,49 +90,7 @@ public class UserService {
     public ContributionResponseDto calculateContributions(String username) {
         User user = findUserByName(username);
 
-        return ContributionResponseDto.builder()
-            .starsCount(calculateStars(user.getName()))
-            .commitsCount(calculateCommits(user.getName()))
-            .prsCount(calculatePRs(user.getName()))
-            .issuesCount(calculateIssues(user.getName()))
-            .reposCount(calculateRepos(user.getName()))
-            .build();
-    }
-
-    private int calculateStars(String username) {
-        List<StarResponseDto> responseDtos = platformContributionExtractor.extractStars(username);
-
-        return responseDtos.stream()
-            .mapToInt(StarResponseDto::getStars)
-            .sum();
-    }
-
-    private int calculateCommits(String username) {
-        CountResponseDto responseDto =
-            platformContributionExtractor.extractCount("/commits?q=committer:%s", username);
-
-        return responseDto.getCount();
-    }
-
-    private int calculatePRs(String username) {
-        CountResponseDto responseDto =
-            platformContributionExtractor.extractCount("/issues?q=author:%s type:pr", username);
-
-        return responseDto.getCount();
-    }
-
-    private int calculateIssues(String username) {
-        CountResponseDto responseDto =
-            platformContributionExtractor.extractCount("/issues?q=author:%s type:issue", username);
-
-        return responseDto.getCount();
-    }
-
-    private int calculateRepos(String username) {
-        CountResponseDto responseDto =
-            platformContributionExtractor.extractCount("/repositories?q=user:%s is:public", username);
-
-        return responseDto.getCount();
+        return platformContributionCalculator.calculate(user.getName());
     }
 
     public FollowResponseDto followUser(AuthUserRequestDto requestDto, String targetName) {

@@ -4,15 +4,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 
 @Builder
-public class StarResponseDto {
+public class StarsResponseDto {
 
     @JsonProperty("stargazers_count")
     private int stars;
 
-    private StarResponseDto() {
+    private StarsResponseDto() {
     }
 
-    public StarResponseDto(int stars) {
+    public StarsResponseDto(int stars) {
         this.stars = stars;
     }
 
