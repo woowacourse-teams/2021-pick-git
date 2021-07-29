@@ -15,8 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    private static final String LOG_FORMAT_WITH_ERROR_CODE = "Class : {}, Code : {}, Message : {}";
-    private static final String LOG_FORMAT_WITHOUT_ERROR_CODE = "Class : {}, Message : {}";
+    private static final String LOG_FORMAT = "Class : {}, Code : {}, Message : {}";
     private static final String INTERNAL_SERVER_ERROR_CODE = "S0001";
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -26,7 +25,7 @@ public class GlobalExceptionHandler {
         String errorCode = requireNonNull(e.getFieldError())
             .getDefaultMessage();
         ApiErrorResponse exceptionResponse = new ApiErrorResponse(errorCode);
-        log.warn(LOG_FORMAT_WITH_ERROR_CODE, e.getClass().getSimpleName(), errorCode, "@Valid");
+        log.warn(LOG_FORMAT, e.getClass().getSimpleName(), errorCode, "@Valid");
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST.value())
             .body(exceptionResponse);
@@ -36,7 +35,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponse> applicationException(ApplicationException e) {
         String errorCode = e.getErrorCode();
         log.warn(
-            LOG_FORMAT_WITH_ERROR_CODE,
+            LOG_FORMAT,
             e.getClass().getSimpleName(),
             errorCode,
             e.getMessage()
@@ -48,7 +47,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DataAccessException.class)
     public ResponseEntity<ApiErrorResponse> dataAccessException(DataAccessException e) {
-        log.error(LOG_FORMAT_WITHOUT_ERROR_CODE, e.getClass().getSimpleName(), e.getMessage());
+        log.error(
+            LOG_FORMAT,
+            e.getClass().getSimpleName(),
+            INTERNAL_SERVER_ERROR_CODE,
+            e.getMessage()
+        );
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(new ApiErrorResponse(INTERNAL_SERVER_ERROR_CODE));
@@ -56,7 +60,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiErrorResponse> runtimeException(RuntimeException e) {
-        log.error(LOG_FORMAT_WITHOUT_ERROR_CODE, e.getClass().getSimpleName(), e.getMessage());
+        log.error(
+            LOG_FORMAT,
+            e.getClass().getSimpleName(),
+            INTERNAL_SERVER_ERROR_CODE,
+            e.getMessage()
+        );
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(new ApiErrorResponse(INTERNAL_SERVER_ERROR_CODE));
