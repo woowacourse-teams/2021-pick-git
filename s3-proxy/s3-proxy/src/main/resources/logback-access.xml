@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <include resource="./logback/prod/prod-access-logger.xml"/>
-  <include resource="./logback/test/test-access-logger.xml"/>
-
-  <springProfile name="prod">
-    <appender-ref ref="prod-access-logger"/>
+  <springProfile name="prod, local">
+    <include resource="./logback/access-logger.xml"/>
+    <appender-ref ref="access-logger"/>
   </springProfile>
 
   <springProfile name="test">
+    <include resource="./logback/test/test-access-logger.xml"/>
     <appender-ref ref="test-access-logger"/>
   </springProfile>
 </configuration>
