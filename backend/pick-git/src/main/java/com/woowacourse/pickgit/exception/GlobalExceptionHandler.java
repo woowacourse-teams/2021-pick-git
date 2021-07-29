@@ -15,44 +15,48 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 public class GlobalExceptionHandler {
 
+    private static final String LOG_FORMAT_WITH_ERROR_CODE = "Class : {}, Code : {}, Message : {}";
+    private static final String LOG_FORMAT_WITHOUT_ERROR_CODE = "Class : {}, Message : {}";
     private static final String INTERNAL_SERVER_ERROR_CODE = "S0001";
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> methodArgumentNotValidException(
-        MethodArgumentNotValidException e) {
-        String message = requireNonNull(e.getFieldError())
+        MethodArgumentNotValidException e
+    ) {
+        String errorCode = requireNonNull(e.getFieldError())
             .getDefaultMessage();
-        ApiErrorResponse exceptionResponse = new ApiErrorResponse(message);
-        log.error(message);
-
+        ApiErrorResponse exceptionResponse = new ApiErrorResponse(errorCode);
+        log.warn(LOG_FORMAT_WITH_ERROR_CODE, e.getClass().getSimpleName(), errorCode, "@Valid");
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST.value())
             .body(exceptionResponse);
     }
 
     @ExceptionHandler(ApplicationException.class)
-    public ResponseEntity<ApiErrorResponse> applicationException(
-        ApplicationException e) {
+    public ResponseEntity<ApiErrorResponse> applicationException(ApplicationException e) {
         String errorCode = e.getErrorCode();
-        log.error(errorCode);
-
+        log.warn(
+            LOG_FORMAT_WITH_ERROR_CODE,
+            e.getClass().getSimpleName(),
+            errorCode,
+            e.getMessage()
+        );
         return ResponseEntity
-            .status(e.getHttpStatus().value())
+            .status(e.getHttpStatus())
             .body(new ApiErrorResponse(errorCode));
     }
 
     @ExceptionHandler(DataAccessException.class)
-    public ResponseEntity<ApiErrorResponse> dataAccessException(
-        DataAccessException dataAccessException) {
-        log.warn(dataAccessException.getMessage());
+    public ResponseEntity<ApiErrorResponse> dataAccessException(DataAccessException e) {
+        log.error(LOG_FORMAT_WITHOUT_ERROR_CODE, e.getClass().getSimpleName(), e.getMessage());
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(new ApiErrorResponse(INTERNAL_SERVER_ERROR_CODE));
     }
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ApiErrorResponse> runtimeException(RuntimeException runtimeException) {
-        log.warn(runtimeException.getMessage());
+    public ResponseEntity<ApiErrorResponse> runtimeException(RuntimeException e) {
+        log.error(LOG_FORMAT_WITHOUT_ERROR_CODE, e.getClass().getSimpleName(), e.getMessage());
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(new ApiErrorResponse(INTERNAL_SERVER_ERROR_CODE));

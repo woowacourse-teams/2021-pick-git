@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<included>
+  <property name="home" value="logs/test/test"/>
+  <appender name="test-console-logger" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <charset>utf8</charset>
+      <Pattern>
+        %d{yyyy-MM-dd HH:mm:ss.SSS} %boldGreen(%-5level) %boldCyan(%t) %boldYellow(%class{36}).%boldMagenta(%M) %boldWhite(L:%L) %n %boldRed(     >) %m%n
+      </Pattern>
+    </encoder>
+  </appender>
+</included>
