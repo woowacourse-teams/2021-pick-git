@@ -3,12 +3,14 @@ package com.woowacourse.pickgit.user.infrastructure.extractor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.woowacourse.pickgit.exception.user.ContributionParseException;
 import com.woowacourse.pickgit.user.domain.PlatformContributionExtractor;
 import com.woowacourse.pickgit.user.domain.dto.CountResponseDto;
 import com.woowacourse.pickgit.user.domain.dto.StarResponseDto;
 import com.woowacourse.pickgit.user.infrastructure.requester.PlatformContributionApiRequester;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -48,7 +50,11 @@ public class GithubContributionExtractor implements PlatformContributionExtracto
             return objectMapper.readValue(response, new TypeReference<>() {
             });
         } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException();
+            throw new ContributionParseException(
+                "V0001",
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "활동 통계를 조회할 수 없습니다."
+            );
         }
     }
 
@@ -69,7 +75,11 @@ public class GithubContributionExtractor implements PlatformContributionExtracto
             return objectMapper.readValue(response, new TypeReference<>() {
             });
         } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException();
+            throw new ContributionParseException(
+                "V0001",
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "활동 통계를 조회할 수 없습니다."
+            );
         }
     }
 }
