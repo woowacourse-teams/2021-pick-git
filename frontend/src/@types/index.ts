@@ -1,4 +1,4 @@
-import { httpErrorStatus, httpErrorStatusName } from "../constants/httpError";
+import { httpErrorStatus, httpErrorStatusName } from "../constants/error";
 import { API_ERROR_MESSAGE } from "../constants/messages";
 
 export interface ProfileData {

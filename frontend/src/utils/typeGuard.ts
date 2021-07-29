@@ -1,5 +1,5 @@
 import { ErrorCode, HTTPErrorStatus } from "../@types";
-import { httpErrorStatus } from "../constants/httpError";
+import { httpErrorStatus } from "../constants/error";
 import { API_ERROR_MESSAGE } from "../constants/messages";
 
 export const isErrorCode = (errorCode: string): errorCode is ErrorCode => errorCode in API_ERROR_MESSAGE;

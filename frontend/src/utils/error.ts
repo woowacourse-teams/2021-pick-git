@@ -1,5 +1,5 @@
 import { ErrorCode, HTTPErrorHandler, HTTPErrorStatus } from "../@types";
-import { httpErrorStatus } from "../constants/httpError";
+import { httpErrorStatus } from "../constants/error";
 import { API_ERROR_MESSAGE, UNKNOWN_ERROR_MESSAGE } from "../constants/messages";
 
 export const handleHTTPError = (errorStatus: HTTPErrorStatus, handler: HTTPErrorHandler) => {
