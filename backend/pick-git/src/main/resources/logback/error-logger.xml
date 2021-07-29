@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <included>
-  <property name="home" value="logs/prod/prod"/>
-  <appender name="prod-access-logger" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>${home}-file.log</file>
+  <property name="home" value="logs/"/>
+  <appender name="error-logger" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${home}error.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>${home}-file-%d{yyyyMMdd}-%i.log</fileNamePattern>
+      <fileNamePattern>${home}error-%d{yyyyMMdd}-%i.log</fileNamePattern>
       <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
         <maxFileSize>15MB</maxFileSize>
       </timeBasedFileNamingAndTriggeringPolicy>
@@ -13,7 +13,7 @@
     <encoder>
       <charset>utf8</charset>
       <Pattern>
-        %n%boldGreen(###### HTTP Request ######) %n%fullRequest%boldCyan(###### HTTP Response ######) %n%fullResponse
+        %d{yyyy-MM-dd HH:mm:ss.SSS} %boldGreen(%-5level) %boldCyan(%t) %boldYellow(%class{36}).%boldMagenta(%M) %boldWhite(L:%L) %n %boldRed(     >) %m%n
       </Pattern>
     </encoder>
   </appender>
