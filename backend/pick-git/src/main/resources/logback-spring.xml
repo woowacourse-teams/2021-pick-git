@@ -1,52 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration debug="false">
   <include resource="org/springframework/boot/logging/logback/base.xml"/>
-  <include resource="./logback/prod-file-logger.xml"/>
-  <include resource="./logback/local-file-logger.xml"/>
-  <include resource="./logback/test-console-logger.xml"/>
+  <include resource="./logback/prod/prod-basic-logger.xml"/>
+  <include resource="./logback/local/local-basic-logger.xml"/>
+  <include resource="./logback/test/test-basic-logger.xml"/>
 
   <springProfile name="prod">
     <logger name="com.woowacourse.pickgit" level="INFO">
-      <appender-ref ref="prod-file-logger"/>
+      <appender-ref ref="prod-basic-logger"/>
     </logger>
     <logger name="org.springframework" level="INFO" additivity="false">
-      <appender-ref ref="prod-file-logger"/>
+      <appender-ref ref="prod-basic-logger"/>
     </logger>
     <logger name="org.hibernate.tool.hbm2ddl" level="DEBUG" additivity="false">
-      <appender-ref ref="prod-file-logger"/>
+      <appender-ref ref="prod-basic-logger"/>
     </logger>
   </springProfile>
 
   <springProfile name="local">
     <logger name="com.woowacourse.pickgit" level="INFO">
-      <appender-ref ref="local-file-logger"/>
+      <appender-ref ref="local-basic-logger"/>
     </logger>
     <logger name="org.springframework" level="INFO" additivity="false">
-      <appender-ref ref="local-file-logger"/>
+      <appender-ref ref="local-basic-logger"/>
     </logger>
     <logger name="org.hibernate.tool.hbm2ddl" level="DEBUG" additivity="false">
-      <appender-ref ref="local-file-logger"/>
+      <appender-ref ref="local-basic-logger"/>
     </logger>
     <logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
-      <appender-ref ref="local-file-logger"/>
+      <appender-ref ref="local-basic-logger"/>
     </logger>
     <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" additivity="false">
-      <appender-ref ref="local-file-logger"/>
+      <appender-ref ref="local-basic-logger"/>
     </logger>
     <logger name="org.hibernate.type.descriptor.sql.BasicExtractor" level="TRACE" additivity="false">
-      <appender-ref ref="local-file-logger"/>
+      <appender-ref ref="local-basic-logger"/>
     </logger>
   </springProfile>
 
   <springProfile name="test">
     <logger name="com.woowacourse.pickgit" level="TRACE">
-      <appender-ref ref="test-console-logger"/>
+      <appender-ref ref="test-basic-logger"/>
     </logger>
     <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" additivity="false">
-      <appender-ref ref="test-console-logger"/>
+      <appender-ref ref="test-basic-logger"/>
     </logger>
     <logger name="org.hibernate.type.descriptor.sql.BasicExtractor" level="TRACE" additivity="false">
-      <appender-ref ref="test-console-logger"/>
+      <appender-ref ref="test-basic-logger"/>
     </logger>
   </springProfile>
 </configuration>
