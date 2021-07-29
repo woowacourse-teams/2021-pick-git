@@ -21,7 +21,8 @@ public class GithubExtractor implements PlatformExtractor {
 
     public GithubExtractor(
         ObjectMapper objectMapper,
-        PlatformApiRequester platformApiRequester) {
+        PlatformApiRequester platformApiRequester
+    ) {
         this.objectMapper = objectMapper;
         this.platformApiRequester = platformApiRequester;
     }

@@ -15,8 +15,12 @@ public class ContributionResponseDto {
     }
 
     public ContributionResponseDto(
-        int starsCount, int commitsCount, int prsCount,
-        int issuesCount, int reposCount) {
+        int starsCount,
+        int commitsCount,
+        int prsCount,
+        int issuesCount,
+        int reposCount
+    ) {
         this.starsCount = starsCount;
         this.commitsCount = commitsCount;
         this.prsCount = prsCount;

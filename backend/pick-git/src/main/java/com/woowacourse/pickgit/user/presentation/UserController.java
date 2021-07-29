@@ -33,7 +33,8 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<UserProfileResponse> getAuthenticatedUserProfile(
-        @Authenticated AppUser user) {
+        @Authenticated AppUser user
+    ) {
         validateIsGuest(user);
 
         UserProfileResponseDto responseDto =
@@ -45,7 +46,8 @@ public class UserController {
     @GetMapping("/{username}")
     public ResponseEntity<UserProfileResponse> getUserProfile(
         @Authenticated AppUser appUser,
-        @PathVariable String username) {
+        @PathVariable String username
+    ) {
         UserProfileResponseDto responseDto = userService.getUserProfile(appUser, username);
 
         return ResponseEntity.ok(createUserProfileResponse(responseDto));
@@ -89,7 +91,8 @@ public class UserController {
     @PostMapping("/{username}/followings")
     public ResponseEntity<FollowResponse> followUser(
         @Authenticated AppUser user,
-        @PathVariable String username) {
+        @PathVariable String username
+    ) {
         validateIsGuest(user);
 
         AuthUserRequestDto authUserRequestDto = new AuthUserRequestDto(user.getUsername());
@@ -102,7 +105,8 @@ public class UserController {
     @DeleteMapping("/{username}/followings")
     public ResponseEntity<FollowResponse> unfollowUser(
         @Authenticated AppUser user,
-        @PathVariable String username) {
+        @PathVariable String username
+    ) {
         validateIsGuest(user);
 
         AuthUserRequestDto authUserRequestDto = new AuthUserRequestDto(user.getUsername());

@@ -25,7 +25,8 @@ public class UserService {
 
     public UserService(
         UserRepository userRepository,
-        PlatformExtractor platformExtractor) {
+        PlatformExtractor platformExtractor
+    ) {
         this.userRepository = userRepository;
         this.platformExtractor = platformExtractor;
     }
