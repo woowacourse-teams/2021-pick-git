@@ -5,17 +5,29 @@ export interface Props extends React.HTMLAttributes<HTMLInputElement>, StyleProp
   kind?: "borderBottom" | "rounded";
   icon?: React.ReactNode;
   name?: string;
+  value?: string;
 }
 
-const Input = ({ kind, icon, textAlign = "left", backgroundColor, bottomBorderColor, name, ...props }: Props) => {
+const Input = ({
+  kind,
+  icon,
+  textAlign = "left",
+  backgroundColor,
+  bottomBorderColor,
+  name,
+  value,
+  ...props
+}: Props) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const input = (
     <>
       {icon}
       <StyledInput
         name={name}
+        type="text"
         ref={inputRef}
         textAlign={textAlign}
+        value={value}
         {...props}
         style={icon ? { marginLeft: "0.9375rem" } : {}}
       />

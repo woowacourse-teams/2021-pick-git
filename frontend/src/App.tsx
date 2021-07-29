@@ -11,6 +11,8 @@ import AddPostPage from "./pages/AddPostPage/AddPostPage";
 import { PostAddDataContextProvider } from "./contexts/PostAddDataContext";
 import UserFeedPage from "./pages/UserFeedPage/UserFeedPage";
 import TagFeedPage from "./pages/TagFeedPage/TagFeedPage";
+import SearchPage from "./pages/SearchPage/SearchPage";
+import SearchHeader from "./components/@layout/SearchHeader/SearchHeader";
 
 const App = () => {
   return (
@@ -22,6 +24,9 @@ const App = () => {
         <Route path={PAGE_URL.ADD_POST}>
           <PostAddStepHeader />
         </Route>
+        <Route path={PAGE_URL.SEARCH}>
+          <SearchHeader />
+        </Route>
       </Switch>
       <Switch>
         <Route exact path={[PAGE_URL.HOME, PAGE_URL.HOME_FEED]}>
@@ -32,6 +37,9 @@ const App = () => {
         </Route>
         <Route exact path={PAGE_URL.TAG_FEED_BASE}>
           <TagFeedPage />
+        </Route>
+        <Route exact path={PAGE_URL.SEARCH}>
+          <SearchPage />
         </Route>
         <Route exact path={PAGE_URL.LOGIN}>
           <LoginPage />

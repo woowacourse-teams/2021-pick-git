@@ -1,7 +1,7 @@
 import { QueryFunction, useMutation, useQuery, useQueryClient } from "react-query";
 import axios, { AxiosError } from "axios";
 
-import { ErrorResponse, ProfileData } from "../../@types";
+import { ErrorResponse, MutateResponseFollow, ProfileData } from "../../@types";
 import { QUERY } from "../../constants/queries";
 import {
   requestAddFollow,
@@ -57,49 +57,15 @@ export const useProfileQuery = (isMyProfile: boolean, username: string | null) =
   );
 };
 
-const useFollowMutation = (
-  username: string | undefined,
-  callback: (userName: string | undefined, accessToken: string | null) => Promise<any>
-) => {
-  const queryClient = useQueryClient();
-  const currentProfileQueryKey = [QUERY.GET_PROFILE, { isMyProfile: false, username }];
-  const currentProfileQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
-  const { logout } = useContext(UserContext);
-  const { pushSnackbarMessage } = useContext(SnackBarContext);
+export const useFollowingMutation = () =>
+  useMutation<MutateResponseFollow, AxiosError<ErrorResponse>, string>((username) =>
+    requestAddFollow(username, getAccessToken())
+  );
 
-  return useMutation(() => callback(username, getAccessToken()), {
-    onSuccess: ({ followerCount, following }) => {
-      if (!currentProfileQueryData) return;
-
-      queryClient.setQueryData<ProfileData>(currentProfileQueryKey, {
-        ...currentProfileQueryData,
-        followerCount,
-        following,
-      });
-    },
-
-    onError: (error) => {
-      if (axios.isAxiosError(error)) {
-        const { status, data } = error.response ?? {};
-
-        if (status) {
-          handleHTTPError(status, {
-            unauthorized: () => logout(),
-          });
-        }
-
-        pushSnackbarMessage(data.errorCode);
-      } else {
-        pushSnackbarMessage(UNKNOWN_ERROR_MESSAGE);
-      }
-    },
-  });
-};
-
-export const useFollowingMutation = (username: string | undefined) => useFollowMutation(username, requestAddFollow);
-
-export const useUnfollowingMutation = (username: string | undefined) =>
-  useFollowMutation(username, requestDeleteFollow);
+export const useUnfollowingMutation = () =>
+  useMutation<MutateResponseFollow, AxiosError<ErrorResponse>, string>((username) =>
+    requestDeleteFollow(username, getAccessToken())
+  );
 
 export const useProfileMutation = (username: string | null) => {
   const queryClient = useQueryClient();
