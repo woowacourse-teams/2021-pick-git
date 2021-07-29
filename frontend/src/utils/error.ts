@@ -1,6 +1,6 @@
-import { ErrorCode, HTTPErrorHandler, HTTPErrorStatus } from "../@types";
-import { httpErrorStatus } from "../constants/error";
-import { API_ERROR_MESSAGE, UNKNOWN_ERROR_MESSAGE } from "../constants/messages";
+import { APIErrorCode, ClientErrorCode, ClientErrorHandler, HTTPErrorHandler, HTTPErrorStatus } from "../@types";
+import { clientErrorCodeMap, httpErrorStatus } from "../constants/error";
+import { API_ERROR_MESSAGE, CLIENT_ERROR_MESSAGE } from "../constants/messages";
 
 export const handleHTTPError = (errorStatus: HTTPErrorStatus, handler: HTTPErrorHandler) => {
   const currentHandler = handler[httpErrorStatus[errorStatus]];
@@ -12,8 +12,22 @@ export const handleHTTPError = (errorStatus: HTTPErrorStatus, handler: HTTPError
   currentHandler();
 };
 
-export const getAPIErrorMessage = (errorCode: ErrorCode) => {
-  return API_ERROR_MESSAGE[errorCode] ?? UNKNOWN_ERROR_MESSAGE;
+export const handleClientError = (errorCode: ClientErrorCode, handler: ClientErrorHandler) => {
+  const currentHandler = handler[clientErrorCodeMap[errorCode]];
+
+  if (!currentHandler) {
+    throw Error("undefined handler");
+  }
+
+  currentHandler();
+};
+
+export const getAPIErrorMessage = (errorCode: APIErrorCode) => {
+  return API_ERROR_MESSAGE[errorCode];
+};
+
+export const getClientErrorMessage = (errorCode: ClientErrorCode) => {
+  return CLIENT_ERROR_MESSAGE[errorCode];
 };
 
 export const customError = {

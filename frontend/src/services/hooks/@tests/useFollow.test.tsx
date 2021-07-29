@@ -6,7 +6,7 @@ import nock from "nock";
 import { ProfileData } from "../../../@types";
 import { QUERY } from "../../../constants/queries";
 import useFollow from "../useFollow";
-import { getAPIErrorMessage } from "../../../utils/error";
+import { getAPIErrorMessage, getClientErrorMessage } from "../../../utils/error";
 import UserContext from "../../../contexts/UserContext";
 import SnackBarContext from "../../../contexts/SnackbarContext";
 
@@ -126,7 +126,7 @@ test("should handle empty accessToken error", async () => {
 
   expect(currentQueryData?.followerCount).toBe(prevQueryData.followerCount);
   expect(currentQueryData?.following).toBe(prevQueryData.following);
-  expect(pushSnackbarMessage.mock.calls[0][0]).toBe(getAPIErrorMessage("C0001"));
+  expect(pushSnackbarMessage.mock.calls[0][0]).toBe(getClientErrorMessage("C0001"));
   expect(logout.mock.calls.length).toBe(1);
 
   localStorage.setItem("accessToken", "asdfasdf");

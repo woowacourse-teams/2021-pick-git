@@ -1,7 +1,7 @@
-import { ErrorCode, HTTPErrorStatus } from "../@types";
+import { ClientErrorCode, HTTPErrorStatus } from "../@types";
 import { httpErrorStatus } from "../constants/error";
-import { API_ERROR_MESSAGE } from "../constants/messages";
+import { CLIENT_ERROR_MESSAGE } from "../constants/messages";
 
-export const isErrorCode = (errorCode: string): errorCode is ErrorCode => errorCode in API_ERROR_MESSAGE;
+export const isClientErrorCode = (errorCode: string): errorCode is ClientErrorCode => errorCode in CLIENT_ERROR_MESSAGE;
 
 export const isHttpErrorStatus = (status: number): status is HTTPErrorStatus => status in httpErrorStatus;

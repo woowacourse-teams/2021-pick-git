@@ -10,3 +10,9 @@ export const httpErrorStatus = {
 } as const;
 
 export const httpErrorStatusName = Object.values(httpErrorStatus);
+
+export const clientErrorCodeMap = {
+  C0001: "noAccessToken",
+} as const;
+
+export const clientErrorCodeName = Object.values(clientErrorCodeMap);

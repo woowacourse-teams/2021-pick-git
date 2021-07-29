@@ -44,6 +44,9 @@ export const API_ERROR_MESSAGE = {
   P0001: "중복되는 태그가 존재합니다",
   P0002: "게시된 게시글이 없습니다",
   S0001: "서버 상의 에러가 발생하였습니다.",
+};
+
+export const CLIENT_ERROR_MESSAGE = {
   C0001: "로그인이 만료되었습니다",
 };
 

@@ -1,5 +1,5 @@
-import { httpErrorStatus, httpErrorStatusName } from "../constants/error";
-import { API_ERROR_MESSAGE } from "../constants/messages";
+import { clientErrorCodeName, httpErrorStatus, httpErrorStatusName } from "../constants/error";
+import { API_ERROR_MESSAGE, CLIENT_ERROR_MESSAGE } from "../constants/messages";
 
 export interface ProfileData {
   name: string;
@@ -96,10 +96,10 @@ export type Step = {
 
 export type TabIndicatorKind = "line" | "pill";
 
-export type ErrorCode = keyof typeof API_ERROR_MESSAGE;
+export type APIErrorCode = keyof typeof API_ERROR_MESSAGE;
 
 export type ErrorResponse = {
-  errorCode: ErrorCode;
+  errorCode: APIErrorCode;
 };
 
 export type HTTPErrorStatus = keyof typeof httpErrorStatus;
@@ -108,4 +108,12 @@ export type HTTPErrorStatusName = typeof httpErrorStatusName[number];
 
 export type HTTPErrorHandler = {
   [V in HTTPErrorStatusName]?: () => void;
+};
+
+export type ClientErrorCode = keyof typeof CLIENT_ERROR_MESSAGE;
+
+export type ClientErrorCodeName = typeof clientErrorCodeName[number];
+
+export type ClientErrorHandler = {
+  [V in ClientErrorCodeName]?: () => void;
 };
