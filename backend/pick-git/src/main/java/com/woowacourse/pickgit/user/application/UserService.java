@@ -7,7 +7,7 @@ import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
-import com.woowacourse.pickgit.user.domain.PlatformExtractor;
+import com.woowacourse.pickgit.user.domain.PlatformContributionExtractor;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import com.woowacourse.pickgit.user.domain.dto.CountResponseDto;
@@ -21,14 +21,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final PlatformExtractor platformExtractor;
+    private final PlatformContributionExtractor platformContributionExtractor;
 
     public UserService(
         UserRepository userRepository,
-        PlatformExtractor platformExtractor
+        PlatformContributionExtractor platformContributionExtractor
     ) {
         this.userRepository = userRepository;
-        this.platformExtractor = platformExtractor;
+        this.platformContributionExtractor = platformContributionExtractor;
     }
 
     @Transactional(readOnly = true)
@@ -103,7 +103,7 @@ public class UserService {
     }
 
     private int calculateStars(String username) {
-        List<StarResponseDto> responseDtos = platformExtractor.extractStars(username);
+        List<StarResponseDto> responseDtos = platformContributionExtractor.extractStars(username);
 
         return responseDtos.stream()
             .mapToInt(StarResponseDto::getStars)
@@ -112,28 +112,28 @@ public class UserService {
 
     private int calculateCommits(String username) {
         CountResponseDto responseDto =
-            platformExtractor.extractCount("/commits?q=committer:%s", username);
+            platformContributionExtractor.extractCount("/commits?q=committer:%s", username);
 
         return responseDto.getCount();
     }
 
     private int calculatePRs(String username) {
         CountResponseDto responseDto =
-            platformExtractor.extractCount("/issues?q=author:%s type:pr", username);
+            platformContributionExtractor.extractCount("/issues?q=author:%s type:pr", username);
 
         return responseDto.getCount();
     }
 
     private int calculateIssues(String username) {
         CountResponseDto responseDto =
-            platformExtractor.extractCount("/issues?q=author:%s type:issue", username);
+            platformContributionExtractor.extractCount("/issues?q=author:%s type:issue", username);
 
         return responseDto.getCount();
     }
 
     private int calculateRepos(String username) {
         CountResponseDto responseDto =
-            platformExtractor.extractCount("/repositories?q=user:%s is:public", username);
+            platformContributionExtractor.extractCount("/repositories?q=user:%s is:public", username);
 
         return responseDto.getCount();
     }

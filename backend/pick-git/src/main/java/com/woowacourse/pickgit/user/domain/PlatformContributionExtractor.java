@@ -4,7 +4,7 @@ import com.woowacourse.pickgit.user.domain.dto.CountResponseDto;
 import com.woowacourse.pickgit.user.domain.dto.StarResponseDto;
 import java.util.List;
 
-public interface PlatformExtractor {
+public interface PlatformContributionExtractor {
 
     List<StarResponseDto> extractStars(String username);
 

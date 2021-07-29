@@ -19,7 +19,7 @@ import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
-import com.woowacourse.pickgit.user.domain.PlatformExtractor;
+import com.woowacourse.pickgit.user.domain.PlatformContributionExtractor;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import com.woowacourse.pickgit.user.domain.dto.CountResponseDto;
@@ -44,7 +44,7 @@ class UserServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private PlatformExtractor platformExtractor;
+    private PlatformContributionExtractor platformContributionExtractor;
 
     @DisplayName("사용자는 내 이름으로 내 프로필을 조회할 수 있다.")
     @Test
@@ -165,15 +165,15 @@ class UserServiceTest {
 
         given(userRepository.findByBasicProfile_Name(anyString()))
             .willReturn(Optional.of(user));
-        given(platformExtractor.extractStars(anyString()))
+        given(platformContributionExtractor.extractStars(anyString()))
             .willReturn(List.of(new StarResponseDto(5), new StarResponseDto(6)));
-        given(platformExtractor.extractCount(anyString(), anyString()))
+        given(platformContributionExtractor.extractCount(anyString(), anyString()))
             .willReturn(new CountResponseDto(48));
-        given(platformExtractor.extractCount(anyString(), anyString()))
+        given(platformContributionExtractor.extractCount(anyString(), anyString()))
             .willReturn(new CountResponseDto(48));
-        given(platformExtractor.extractCount(anyString(), anyString()))
+        given(platformContributionExtractor.extractCount(anyString(), anyString()))
             .willReturn(new CountResponseDto(48));
-        given(platformExtractor.extractCount(anyString(), anyString()))
+        given(platformContributionExtractor.extractCount(anyString(), anyString()))
             .willReturn(new CountResponseDto(48));
 
         ContributionResponseDto responseDto = UserFactory.mockContributionResponseDto();
@@ -188,9 +188,9 @@ class UserServiceTest {
 
         verify(userRepository, times(1))
             .findByBasicProfile_Name(anyString());
-        verify(platformExtractor, times(1))
+        verify(platformContributionExtractor, times(1))
             .extractStars(anyString());
-        verify(platformExtractor, times(4))
+        verify(platformContributionExtractor, times(4))
             .extractCount(anyString(), anyString());
     }
 

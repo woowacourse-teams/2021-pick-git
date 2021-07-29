@@ -1,9 +1,9 @@
 package com.woowacourse.pickgit.common.mockapi;
 
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
-import com.woowacourse.pickgit.user.infrastructure.requester.PlatformApiRequester;
+import com.woowacourse.pickgit.user.infrastructure.requester.PlatformContributionApiRequester;
 
-public class MockApiRequester implements PlatformApiRequester {
+public class MockContributionApiRequester implements PlatformContributionApiRequester {
 
     @Override
     public String request(String url) {

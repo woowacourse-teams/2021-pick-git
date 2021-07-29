@@ -3,11 +3,11 @@ package com.woowacourse.pickgit.unit.user.infrastructure;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.woowacourse.pickgit.common.mockapi.MockApiRequester;
-import com.woowacourse.pickgit.user.domain.PlatformExtractor;
+import com.woowacourse.pickgit.common.mockapi.MockContributionApiRequester;
+import com.woowacourse.pickgit.user.domain.PlatformContributionExtractor;
 import com.woowacourse.pickgit.user.domain.dto.CountResponseDto;
 import com.woowacourse.pickgit.user.domain.dto.StarResponseDto;
-import com.woowacourse.pickgit.user.infrastructure.extractor.GithubExtractor;
+import com.woowacourse.pickgit.user.infrastructure.extractor.GithubContributionExtractor;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,18 +17,18 @@ public class GithubExtractorTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private PlatformExtractor platformExtractor;
+    private PlatformContributionExtractor platformContributionExtractor;
 
     @BeforeEach
     void setUp() {
-        platformExtractor = new GithubExtractor(objectMapper, new MockApiRequester());
+        platformContributionExtractor = new GithubContributionExtractor(objectMapper, new MockContributionApiRequester());
     }
 
     @DisplayName("스타 개수를 추출한다.")
     @Test
     void extractStars_Stars_Success() {
         // when
-        List<StarResponseDto> stars = platformExtractor.extractStars("testUser");
+        List<StarResponseDto> stars = platformContributionExtractor.extractStars("testUser");
 
         // then
         assertThat(stars.stream()
@@ -42,7 +42,7 @@ public class GithubExtractorTest {
     void extractCount_Commits_Success() {
         // when
         CountResponseDto commits =
-            platformExtractor.extractCount("/commits?q=committer:%s", "testUser");
+            platformContributionExtractor.extractCount("/commits?q=committer:%s", "testUser");
 
         // then
         assertThat(commits.getCount()).isEqualTo(48);
@@ -53,7 +53,7 @@ public class GithubExtractorTest {
     void extractCount_PRs_Success() {
         // when
         CountResponseDto prs =
-            platformExtractor.extractCount("/issues?q=author:%s type:pr", "testUser");
+            platformContributionExtractor.extractCount("/issues?q=author:%s type:pr", "testUser");
 
         // then
         assertThat(prs.getCount()).isEqualTo(48);
@@ -64,7 +64,7 @@ public class GithubExtractorTest {
     void extractCount_Issues_Success() {
         // when
         CountResponseDto issues =
-            platformExtractor.extractCount("/issues?q=author:%s type:issue", "testUser");
+            platformContributionExtractor.extractCount("/issues?q=author:%s type:issue", "testUser");
 
         // then
         assertThat(issues.getCount()).isEqualTo(48);
@@ -75,7 +75,8 @@ public class GithubExtractorTest {
     void extractCount_Repos_Success() {
         // when
         CountResponseDto repos =
-            platformExtractor.extractCount("/repositories?q=user:%s is:public", "testUser");
+            platformContributionExtractor
+                .extractCount("/repositories?q=user:%s is:public", "testUser");
 
         // then
         assertThat(repos.getCount()).isEqualTo(48);
