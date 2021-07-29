@@ -1,0 +1,9 @@
+security:
+  public_keys:
+    pick_git: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCqLIG/jZ9jAmEZUzrOBkoF8/K+og4DIhAJ4MpWa0BYRtLjbvce1YXqlvUjHj7AcQgw/p0vc1JvzIJyEZIxLFG/3+WC3kv2RWZywUv2BDAApGjSocozeYaQIax/4sIFWXKqUASrvmtZOyV+fKZU4Nmxxhrfa8B1KWw0fsuaV01btVKLslC+es+dFvk/r4AbAeGQR6nk0JmeKeJFEgnXy9uNkJ5trjWGwYjXF46DWG0AnCxcLciPTZik4vUOG4e4KfAA2LVVgHGo0V/qtZuT6myaOFzRazetmvBKQt2B0yHZPRjLDNBZfWXV2refn60N65yJEc8Hv7OgnhhCZp6c04Tesj9RxLIzF8ItqwNj4YftuDH73al7VmYNMRPIowwD+X7lsZqRNRQxZEHYeropIxYEwHCNLbirPpdAoHtLAXhisAG6mQO4if6f0GESYvzGoTcrlfDbl1nF/Mk5Wh8QaRLYrFHxNltJVBnkQoakZiJKtxlNVtbLU20/HedIaRkwWSU= bperhaps@sonminscBookAir
+
+aws:
+  cloud_front:
+    file_url_format: https://djgd6o993rakk.cloudfront.net/images/%s
+  s3:
+    bucket_name: pick-git-datas/images
