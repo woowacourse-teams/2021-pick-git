@@ -16,6 +16,7 @@ import { getAccessToken } from "../../storage/storage";
 import SnackBarContext from "../../contexts/SnackbarContext";
 import { SUCCESS_MESSAGE, UNKNOWN_ERROR_MESSAGE } from "../../constants/messages";
 import { handleHTTPError } from "../../utils/api";
+import { customError } from "../../utils/error";
 
 type ProfileQueryKey = readonly [
   typeof QUERY.GET_PROFILE,
@@ -41,7 +42,7 @@ export const useProfileQuery = (isMyProfile: boolean, username: string | null) =
     const accessToken = getAccessToken();
 
     if (isMyProfile) {
-      if (!accessToken) throw Error("no accessToken");
+      if (!accessToken) throw customError.noAccessToken;
 
       return await requestGetSelfProfile(accessToken);
     } else {
