@@ -93,8 +93,10 @@ export type Step = {
   path: string;
 };
 
+export type ErrorCode = keyof typeof API_ERROR_MESSAGE;
+
 export type ErrorResponse = {
-  errorCode: keyof typeof API_ERROR_MESSAGE;
+  errorCode: ErrorCode;
 };
 
 export type TabIndicatorKind = "line" | "pill";
