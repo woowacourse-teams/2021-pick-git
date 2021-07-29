@@ -8,6 +8,7 @@ import { theme, GlobalStyle } from "./App.style";
 import { UserContextProvider } from "./contexts/UserContext";
 import { PostAddStepContextProvider } from "./contexts/PostAddStepContext";
 import { SnackBarContextProvider } from "./contexts/SnackbarContext";
+import { SearchContextProvider } from "./contexts/SearchContext";
 
 const queryClient = new QueryClient();
 
@@ -16,10 +17,12 @@ ReactDOM.render(
     <QueryClientProvider client={queryClient}>
       <UserContextProvider>
         <PostAddStepContextProvider>
-          <SnackBarContextProvider>
-            <GlobalStyle />
-            <App />
-          </SnackBarContextProvider>
+          <SearchContextProvider>
+            <SnackBarContextProvider>
+              <GlobalStyle />
+              <App />
+            </SnackBarContextProvider>
+          </SearchContextProvider>
         </PostAddStepContextProvider>
       </UserContextProvider>
     </QueryClientProvider>

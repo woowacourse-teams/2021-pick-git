@@ -10,12 +10,30 @@ export interface ProfileData {
   location: string;
   website: string;
   twitter: string;
-  following?: boolean;
+  following: boolean | null;
+}
+
+export interface MutateResponseFollow {
+  followerCount: number;
+  following: boolean;
+}
+
+export interface SearchResultUser {
+  imageUrl: string;
+  username: string;
+  following: boolean | null;
+}
+
+export interface SearchResultTag {}
+
+export interface SearchResult {
+  users: SearchResultUser[];
+  tags: SearchResultTag[];
 }
 
 export interface CommentData {
   id: number;
-  profileImageUrl: String;
+  profileImageUrl: string;
   authorName: string;
   content: string;
   isLiked: boolean;

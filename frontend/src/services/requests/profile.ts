@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import { ProfileData } from "../../@types";
+import { MutateResponseFollow, ProfileData } from "../../@types";
 import { API_URL } from "../../constants/urls";
 
 export const requestGetSelfProfile = async (accessToken: string | null) => {
@@ -35,7 +35,7 @@ export const requestAddFollow = async (username: string | undefined, accessToken
     throw Error("Invalid Request");
   }
 
-  const response = await axios.post(API_URL.USER_PROFILE_FOLLOW(username), null, {
+  const response = await axios.post<MutateResponseFollow>(API_URL.USER_PROFILE_FOLLOW(username), null, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -49,7 +49,7 @@ export const requestDeleteFollow = async (username: string | undefined, accessTo
     throw Error("Invalid Request");
   }
 
-  const response = await axios.delete(API_URL.USER_PROFILE_FOLLOW(username), {
+  const response = await axios.delete<MutateResponseFollow>(API_URL.USER_PROFILE_FOLLOW(username), {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },

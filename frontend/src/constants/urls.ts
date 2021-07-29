@@ -33,6 +33,7 @@ export const API_URL = {
   USER_PROFILE_FOLLOW: (username: string) => `/profiles/${username}/followings`,
   MY_POSTS: (page: number, limit: number) => `/posts/me?page=${page}&limit=${limit}`,
   USER_POSTS: (username: string, page: number, limit: number) => `/posts/${username}?page=${page}&limit=${limit}`,
+  SEARCH: (keyword: string, page: number, limit: number) => `/search?keyword=${keyword}&page=${page}&limit=${limit}`,
   AFTER_LOGIN: (code: string) => `afterlogin?code=${code}`,
   POST: (postId: number) => `/posts/${postId}`,
   POSTS: (page: number, limit: number) => `/posts?page=${page}&limit=${limit}`,
