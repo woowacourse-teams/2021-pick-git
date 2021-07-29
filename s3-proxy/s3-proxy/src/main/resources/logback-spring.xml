@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration debug="false">
   <include resource="org/springframework/boot/logging/logback/base.xml"/>
-  <include resource="./logback/prod-file-logger.xml"/>
-  <include resource="./logback/test-file-logger.xml"/>
+  <include resource="./logback/prod/prod-basic-logger.xml"/>
+  <include resource="./logback/test/test-basic-logger.xml"/>
 
   <springProfile name="prod">
     <logger name="com.woowacourse.s3proxy" level="INFO">
-      <appender-ref ref="prod-file-logger"/>
+      <appender-ref ref="prod-basic-logger"/>
     </logger>
-    <logger name="org.springframework" level="INFO">
-      <appender-ref ref="prod-file-logger"/>
+    <logger name="org.springframework" level="INFO" additivity="false">
+      <appender-ref ref="prod-basic-logger"/>
     </logger>
   </springProfile>
 
   <springProfile name="test">
     <logger name="com.woowacourse.s3proxy" level="INFO">
-      <appender-ref ref="test-file-logger"/>
+      <appender-ref ref="test-basic-logger"/>
     </logger>
-    <logger name="org.springframework" level="INFO">
-      <appender-ref ref="test-file-logger"/>
+    <logger name="org.springframework" level="INFO" additivity="false">
+      <appender-ref ref="test-basic-logger"/>
     </logger>
   </springProfile>
 </configuration>
