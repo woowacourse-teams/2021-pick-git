@@ -12,16 +12,13 @@ public class PostDeleteRequestDto {
     private PostDeleteRequestDto() {
     }
 
+    public PostDeleteRequestDto(AppUser user, Long postId) {
+        this(user.getUsername(), postId);
+    }
+
     public PostDeleteRequestDto(String username, Long postId) {
         this.username = username;
         this.postId = postId;
-    }
-
-    public static PostDeleteRequestDto toPostDeleteRequestDto(AppUser user, Long postId) {
-        return PostDeleteRequestDto.builder()
-            .username(user.getUsername())
-            .postId(postId)
-            .build();
     }
 
     public String getUsername() {

@@ -577,8 +577,8 @@ class PostServiceIntegrationTest {
         PostUpdateRequest updateRequest =
             new PostUpdateRequest(List.of("java", "spring", "spring-boot"), "hello");
 
-        PostUpdateRequestDto updateRequestDto = PostUpdateRequestDto
-            .toUpdateRequestDto(user, 1L, updateRequest);
+        PostUpdateRequestDto updateRequestDto = new PostUpdateRequestDto(user, 1L,
+            updateRequest.getTags(), updateRequest.getContent());
 
         PostUpdateResponseDto responseDto =
             new PostUpdateResponseDto(List.of("java", "spring", "spring-boot"), "hello");
@@ -615,8 +615,8 @@ class PostServiceIntegrationTest {
         PostUpdateRequest updateRequest =
             new PostUpdateRequest(List.of("java", "spring", "spring-boot"), "testContent");
 
-        PostUpdateRequestDto updateRequestDto = PostUpdateRequestDto
-            .toUpdateRequestDto(user, 1L, updateRequest);
+        PostUpdateRequestDto updateRequestDto = new PostUpdateRequestDto(user, 1L,
+            updateRequest.getTags(), updateRequest.getContent());
 
         PostUpdateResponseDto responseDto =
             new PostUpdateResponseDto(List.of("java", "spring", "spring-boot"), "testContent");
@@ -653,8 +653,8 @@ class PostServiceIntegrationTest {
         PostUpdateRequest updateRequest =
             new PostUpdateRequest(List.of("java", "spring"), "hello");
 
-        PostUpdateRequestDto updateRequestDto = PostUpdateRequestDto
-            .toUpdateRequestDto(user, 1L, updateRequest);
+        PostUpdateRequestDto updateRequestDto = new PostUpdateRequestDto(user, 1L,
+            updateRequest.getTags(), updateRequest.getContent());
 
         PostUpdateResponseDto responseDto =
             new PostUpdateResponseDto(List.of("java", "spring"), "hello");
@@ -679,7 +679,7 @@ class PostServiceIntegrationTest {
 
         // when
         assertThatThrownBy(() -> {
-            PostUpdateRequestDto.toUpdateRequestDto(user, 1L, updateRequest);
+            new PostUpdateRequestDto(user, 1L, updateRequest.getTags(), updateRequest.getContent());
         }).isInstanceOf(UnauthorizedException.class)
             .hasFieldOrPropertyWithValue("errorCode", "A0002")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)
@@ -695,8 +695,8 @@ class PostServiceIntegrationTest {
         PostUpdateRequest updateRequest =
             new PostUpdateRequest(List.of("java", "spring"), "hello");
 
-        PostUpdateRequestDto updateRequestDto =
-            PostUpdateRequestDto.toUpdateRequestDto(user, 1L, updateRequest);
+        PostUpdateRequestDto updateRequestDto = new PostUpdateRequestDto(user, 1L,
+            updateRequest.getTags(), updateRequest.getContent());
 
         // when
         assertThatThrownBy(() -> {
@@ -727,8 +727,7 @@ class PostServiceIntegrationTest {
 
         postService.write(requestDto);
 
-        PostDeleteRequestDto deleteRequestDto =
-            PostDeleteRequestDto.toPostDeleteRequestDto(user, 1L);
+        PostDeleteRequestDto deleteRequestDto = new PostDeleteRequestDto(user, 1L);
 
         // when
         postService.delete(deleteRequestDto);
@@ -755,7 +754,7 @@ class PostServiceIntegrationTest {
 
         // when
         assertThatThrownBy(() -> {
-            PostDeleteRequestDto.toPostDeleteRequestDto(user, 1L);
+            new PostDeleteRequestDto(user, 1L);
         }).isInstanceOf(UnauthorizedException.class)
             .hasFieldOrPropertyWithValue("errorCode", "A0002")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)
@@ -768,8 +767,7 @@ class PostServiceIntegrationTest {
         // given
         LoginUser user = new LoginUser(USERNAME, ACCESS_TOKEN);
 
-        PostDeleteRequestDto deleteRequestDto =
-            PostDeleteRequestDto.toPostDeleteRequestDto(user, 1L);
+        PostDeleteRequestDto deleteRequestDto = new PostDeleteRequestDto(user, 1L);
 
         // when
         assertThatThrownBy(() -> {

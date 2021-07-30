@@ -225,7 +225,10 @@ public class PostService {
 
         Post updatedPost = post.update(updateRequestDto.getContent(), tags);
 
-        return PostUpdateResponseDto.toPostUpdateResponseDto(updatedPost);
+        return PostUpdateResponseDto.builder()
+            .content(updatedPost.getContent())
+            .tags(updatedPost.getTagNames())
+            .build();
     }
 
     public void delete(PostDeleteRequestDto deleteRequestDto) {

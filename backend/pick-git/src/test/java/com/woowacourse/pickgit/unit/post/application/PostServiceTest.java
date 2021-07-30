@@ -718,8 +718,9 @@ class PostServiceTest {
             .tags(List.of("java", "spring"))
             .content("hello")
             .build();
-        PostUpdateRequestDto updateRequestDto = PostUpdateRequestDto
-            .toUpdateRequestDto(new LoginUser("testUser", "Bearer testToken"), 1L, updateRequest);
+        PostUpdateRequestDto updateRequestDto = new PostUpdateRequestDto(
+            new LoginUser("testUser", "Bearer testToken"), 1L,
+            updateRequest.getTags(), updateRequest.getContent());
 
         given(postRepository.findById(anyLong()))
             .willReturn(Optional.of(post));
@@ -760,8 +761,9 @@ class PostServiceTest {
             .tags(List.of())
             .content("hello")
             .build();
-        PostUpdateRequestDto updateRequestDto = PostUpdateRequestDto
-            .toUpdateRequestDto(new LoginUser("testUser", "Bearer testToken"), 1L, updateRequest);
+        PostUpdateRequestDto updateRequestDto = new PostUpdateRequestDto(
+            new LoginUser("testUser", "Bearer testToken"), 1L,
+            updateRequest.getTags(), updateRequest.getContent());
 
         given(postRepository.findById(anyLong()))
             .willReturn(Optional.of(post));
@@ -802,8 +804,9 @@ class PostServiceTest {
             .tags(List.of("java", "spring"))
             .content("testContent")
             .build();
-        PostUpdateRequestDto updateRequestDto = PostUpdateRequestDto
-            .toUpdateRequestDto(new LoginUser("testUser", "Bearer testToken"), 1L, updateRequest);
+        PostUpdateRequestDto updateRequestDto = new PostUpdateRequestDto(
+            new LoginUser("testUser", "Bearer testToken"), 1L,
+            updateRequest.getTags(), updateRequest.getContent());
 
         given(postRepository.findById(anyLong()))
             .willReturn(Optional.of(post));
@@ -840,7 +843,8 @@ class PostServiceTest {
 
         // when
         assertThatThrownBy(() -> {
-            PostUpdateRequestDto.toUpdateRequestDto(new GuestUser(), 1L, updateRequest);
+            new PostUpdateRequestDto(new GuestUser(), 1L,
+                updateRequest.getTags(), updateRequest.getContent());
         }).isInstanceOf(UnauthorizedException.class)
             .hasFieldOrPropertyWithValue("errorCode", "A0002")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)
@@ -855,8 +859,9 @@ class PostServiceTest {
             .tags(List.of("java", "spring"))
             .content("testContent")
             .build();
-        PostUpdateRequestDto updateRequestDto = PostUpdateRequestDto
-            .toUpdateRequestDto(new LoginUser("testUser", "Bearer testToken"), 1L, updateRequest);
+        PostUpdateRequestDto updateRequestDto = new PostUpdateRequestDto(
+            new LoginUser("testUser", "Bearer testToken"), 1L,
+            updateRequest.getTags(), updateRequest.getContent());
 
         given(postRepository.findById(anyLong()))
             .willThrow(new PostNotFoundException(
@@ -892,8 +897,8 @@ class PostServiceTest {
         given(postRepository.findById(anyLong()))
             .willReturn(Optional.of(post));
 
-        PostDeleteRequestDto deleteRequestDto = PostDeleteRequestDto
-            .toPostDeleteRequestDto(new LoginUser("testUser", "Bearer testToken"), 1L);
+        PostDeleteRequestDto deleteRequestDto = new PostDeleteRequestDto(
+            new LoginUser("testUser", "Bearer testToken"), 1L);
 
         // when
         postService.delete(deleteRequestDto);
@@ -908,7 +913,7 @@ class PostServiceTest {
     void delete_GuestUser_401Exception() {
         // when
         assertThatThrownBy(() -> {
-            PostDeleteRequestDto.toPostDeleteRequestDto(new GuestUser(), 1L);
+            new PostDeleteRequestDto(new GuestUser(), 1L);
         }).isInstanceOf(UnauthorizedException.class)
             .hasFieldOrPropertyWithValue("errorCode", "A0002")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)
@@ -919,8 +924,8 @@ class PostServiceTest {
     @Test
     void delete_InvalidPost_500Exception() {
         // given
-        PostDeleteRequestDto deleteRequestDto = PostDeleteRequestDto
-            .toPostDeleteRequestDto(new LoginUser("testUser", "Bearer testToken"), 1L);
+        PostDeleteRequestDto deleteRequestDto = new PostDeleteRequestDto(
+            new LoginUser("testUser", "Bearer testToken"), 1L);
 
         // when
         assertThatThrownBy(() -> {

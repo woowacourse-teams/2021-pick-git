@@ -57,8 +57,8 @@ public class PostController {
         @RequestParam Long limit
     ) {
         HomeFeedRequest homeFeedRequest = new HomeFeedRequest(appUser, page, limit);
-        List<PostResponseDto> postResponseDtos = postService.readHomeFeed(homeFeedRequest);
-        return ResponseEntity.ok(postResponseDtos);
+        List<PostResponseDto> postResponsesDto = postService.readHomeFeed(homeFeedRequest);
+        return ResponseEntity.ok(postResponsesDto);
     }
 
     @GetMapping("/posts/me")
@@ -80,9 +80,9 @@ public class PostController {
         @RequestParam Long limit
     ) {
         HomeFeedRequest homeFeedRequest = new HomeFeedRequest(appUser, page, limit);
-        List<PostResponseDto> postResponseDtos = postService
+        List<PostResponseDto> postResponsesDto = postService
             .readUserFeed(homeFeedRequest, username);
-        return ResponseEntity.ok(postResponseDtos);
+        return ResponseEntity.ok(postResponsesDto);
     }
 
     @PostMapping("/posts")
@@ -182,12 +182,31 @@ public class PostController {
         @PathVariable Long postId,
         @Valid @RequestBody PostUpdateRequest updateRequest
     ) {
-        PostUpdateResponseDto responseDto = postService
-            .update(PostUpdateRequestDto.toUpdateRequestDto(user, postId, updateRequest));
+        PostUpdateResponseDto updateResponseDto = postService
+            .update(createPostUpdateRequestDto(user, postId, updateRequest));
 
         return ResponseEntity
             .created(redirectUrl(user.getUsername(), postId))
-            .body(PostUpdateResponse.toPostUpdateResponse(responseDto));
+            .body(createPostUpdateResponse(updateResponseDto));
+    }
+
+    private PostUpdateRequestDto createPostUpdateRequestDto(
+        AppUser user,
+        Long postId,
+        PostUpdateRequest updateRequest) {
+        return new PostUpdateRequestDto(
+            user,
+            postId,
+            updateRequest.getTags(),
+            updateRequest.getContent()
+        );
+    }
+
+    private PostUpdateResponse createPostUpdateResponse(PostUpdateResponseDto updateResponseDto) {
+        return PostUpdateResponse.builder()
+            .tags(updateResponseDto.getTags())
+            .content(updateResponseDto.getContent())
+            .build();
     }
 
     private URI redirectUrl(String username, Long postId) {
@@ -199,10 +218,14 @@ public class PostController {
         @Authenticated AppUser user,
         @PathVariable Long postId
     ) {
-        postService.delete(PostDeleteRequestDto.toPostDeleteRequestDto(user, postId));
+        postService.delete(createPostDeleteRequestDto(user, postId));
 
         return ResponseEntity
             .noContent()
             .build();
+    }
+
+    private PostDeleteRequestDto createPostDeleteRequestDto(AppUser user, Long postId) {
+        return new PostDeleteRequestDto(user, postId);
     }
 }

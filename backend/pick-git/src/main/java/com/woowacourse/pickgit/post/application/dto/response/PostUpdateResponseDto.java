@@ -1,6 +1,5 @@
 package com.woowacourse.pickgit.post.application.dto.response;
 
-import com.woowacourse.pickgit.post.domain.Post;
 import java.util.List;
 import lombok.Builder;
 
@@ -16,13 +15,6 @@ public class PostUpdateResponseDto {
     public PostUpdateResponseDto(List<String> tags, String content) {
         this.tags = tags;
         this.content = content;
-    }
-
-    public static PostUpdateResponseDto toPostUpdateResponseDto(Post post) {
-        return PostUpdateResponseDto.builder()
-            .content(post.getContent())
-            .tags(post.getTagNames())
-            .build();
     }
 
     public List<String> getTags() {

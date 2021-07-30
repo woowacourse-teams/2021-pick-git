@@ -1,7 +1,6 @@
 package com.woowacourse.pickgit.post.application.dto.request;
 
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
-import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
 import java.util.List;
 import lombok.Builder;
 
@@ -16,24 +15,15 @@ public class PostUpdateRequestDto {
     private PostUpdateRequestDto() {
     }
 
+    public PostUpdateRequestDto(AppUser user, Long postId, List<String> tags, String content) {
+        this(user.getUsername(), postId, tags, content);
+    }
+
     public PostUpdateRequestDto(String username, Long postId, List<String> tags, String content) {
         this.username = username;
         this.postId = postId;
         this.tags = tags;
         this.content = content;
-    }
-
-    public static PostUpdateRequestDto toUpdateRequestDto(
-        AppUser user,
-        Long postId,
-        PostUpdateRequest updateRequest
-    ) {
-        return PostUpdateRequestDto.builder()
-            .username(user.getUsername())
-            .postId(postId)
-            .tags(updateRequest.getTags())
-            .content(updateRequest.getContent())
-            .build();
     }
 
     public String getUsername() {
