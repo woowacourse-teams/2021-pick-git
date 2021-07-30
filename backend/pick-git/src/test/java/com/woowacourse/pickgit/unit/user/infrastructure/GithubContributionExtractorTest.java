@@ -8,10 +8,10 @@ import com.woowacourse.pickgit.common.mockapi.MockContributionApiRequester;
 import com.woowacourse.pickgit.exception.user.ContributionParseException;
 import com.woowacourse.pickgit.user.domain.PlatformContributionExtractor;
 import com.woowacourse.pickgit.user.infrastructure.dto.CountDto;
+import com.woowacourse.pickgit.user.infrastructure.dto.ItemDto;
 import com.woowacourse.pickgit.user.infrastructure.dto.StarsDto;
 import com.woowacourse.pickgit.user.infrastructure.extractor.GithubContributionExtractor;
 import com.woowacourse.pickgit.user.infrastructure.requester.PlatformContributionApiRequester;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,11 +39,11 @@ class GithubContributionExtractorTest {
     @Test
     void extractStars_Stars_Success() {
         // when
-        List<StarsDto> stars = platformContributionExtractor
-            .extractStars("testUser");
+        ItemDto stars = platformContributionExtractor.extractStars("testUser");
 
         // then
-        assertThat(stars.stream()
+        assertThat(stars.getItems()
+            .stream()
             .mapToInt(StarsDto::getStars)
             .sum())
             .isEqualTo(11);
@@ -201,7 +201,7 @@ class GithubContributionExtractorTest {
         @Override
         public String request(String url) {
             if (url.contains("stars")) {
-                return "[{\"stargazers\": \"5\"}, {\"stargazers\": \"6\"}]";
+                return "{\"items\": [{\"stargazers\": \"5\"}, {\"stargazers\": \"6\"}]}";
             }
             return "{\"total\": \"48\"}";
         }
