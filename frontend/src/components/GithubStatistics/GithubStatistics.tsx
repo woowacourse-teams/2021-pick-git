@@ -3,25 +3,32 @@ import { useContext } from "react";
 import { UseQueryResult } from "react-query";
 import { ThemeContext } from "styled-components";
 
-import { GithubStats } from "../../@types";
+import { ErrorResponse, GithubStats } from "../../@types";
 import { BookIcon, ClockIcon, IssueIcon, PrIcon, StarIcon } from "../../assets/icons";
 import PageLoading from "../@layout/PageLoading/PageLoading";
 import CircleIcon from "../@shared/CircleIcon/CircleIcon";
 import { Container, ContributionGraphWrapper, GithubStatsWrapper, Stat } from "./GithubStatistics.style";
 
-// TODO: typing
-const stats = {
-  stars: { name: "Stars", icon: <StarIcon /> },
-  commits: { name: "Commits", icon: <ClockIcon /> },
-  prs: { name: "PRs", icon: <PrIcon /> },
-  issues: { name: "Issues", icon: <IssueIcon /> },
-  contributes: { name: "Contributes", icon: <BookIcon /> },
-};
+interface Stats {
+  [K: string]: {
+    name: string;
+    icon: React.ReactElement;
+    countVariable: keyof GithubStats;
+  };
+}
 
 export interface Props {
   username: string | null;
-  githubStatisticQueryResult: UseQueryResult<GithubStats, AxiosError<GithubStats> | Error>;
+  githubStatisticQueryResult: UseQueryResult<GithubStats, AxiosError<ErrorResponse>>;
 }
+
+const stats: Stats = {
+  stars: { name: "Stars", icon: <StarIcon />, countVariable: "starsCount" },
+  commits: { name: "Commits", icon: <ClockIcon />, countVariable: "commitsCount" },
+  prs: { name: "PRs", icon: <PrIcon />, countVariable: "prsCount" },
+  issues: { name: "Issues", icon: <IssueIcon />, countVariable: "issuesCount" },
+  repos: { name: "Contributes", icon: <BookIcon />, countVariable: "reposCount" },
+};
 
 const GithubStatistics = ({ username, githubStatisticQueryResult }: Props) => {
   const { color } = useContext(ThemeContext);
@@ -32,22 +39,30 @@ const GithubStatistics = ({ username, githubStatisticQueryResult }: Props) => {
   }
 
   const GithubStats = () => {
-    if (error) {
-      return <div>Github Stats을 표시할 수 없습니다.</div>;
-    }
+    const Content = () => {
+      if (error) {
+        return <div>Github Stats을 표시할 수 없습니다.</div>;
+      }
 
-    return (
-      <>
-        <h2>Github Stats</h2>
-        <GithubStatsWrapper>
+      return (
+        <>
           {Object.entries(stats).map(([key, content]) => (
             <Stat key={key}>
               <CircleIcon diameter="2.375rem" fontSize="0.625rem" name={content.name}>
                 {content.icon}
               </CircleIcon>
-              <span>{data?.[key as keyof GithubStats] ?? 0}</span>
+              <span>{data?.[content.countVariable] ?? 0}</span>
             </Stat>
           ))}
+        </>
+      );
+    };
+
+    return (
+      <>
+        <h2>Github Stats</h2>
+        <GithubStatsWrapper>
+          <Content />
         </GithubStatsWrapper>
       </>
     );

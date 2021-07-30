@@ -39,6 +39,7 @@ export const API_URL = {
   POSTS: (page: number, limit: number) => `/posts?page=${page}&limit=${limit}`,
   POSTS_LIKES: (postId: number) => `/posts/${postId}/likes`,
   POSTS_COMMENTS: (postId: number) => `/posts/${postId}/comments`,
+  GITHUB_STATS: (username: string) => `/profiles/${username}/contributions`,
   GITHUB_REPOSITORIES: "/github/swon3210/repositories",
   GITHUB_TAGS: (repositoryName: string) => `/github/repositories/${repositoryName}/tags/languages`,
 };
