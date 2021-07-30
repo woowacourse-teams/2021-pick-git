@@ -147,7 +147,7 @@ public class PostController {
         LikeResponseDto likeResponseDto = postService.like(user, postId);
 
         LikeResponse likeResponse =
-            new LikeResponse(likeResponseDto.getLikesCount(), likeResponseDto.isLiked());
+            new LikeResponse(likeResponseDto.getLikesCount(), likeResponseDto.getLiked());
 
         return ResponseEntity.ok(likeResponse);
     }
@@ -161,7 +161,7 @@ public class PostController {
         LikeResponseDto likeResponseDto = postService.unlike(user, postId);
 
         LikeResponse likeResponse =
-            new LikeResponse(likeResponseDto.getLikesCount(), likeResponseDto.isLiked());
+            new LikeResponse(likeResponseDto.getLikesCount(), likeResponseDto.getLiked());
 
         return ResponseEntity.ok(likeResponse);
     }

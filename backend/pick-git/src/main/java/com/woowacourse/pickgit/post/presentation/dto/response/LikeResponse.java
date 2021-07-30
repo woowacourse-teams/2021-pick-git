@@ -3,7 +3,7 @@ package com.woowacourse.pickgit.post.presentation.dto.response;
 public class LikeResponse {
 
     private int likesCount;
-    private boolean liked;
+    private Boolean liked;
 
     private LikeResponse() {
     }
@@ -17,7 +17,7 @@ public class LikeResponse {
         return likesCount;
     }
 
-    public boolean isLiked() {
+    public Boolean getLiked() {
         return liked;
     }
 }

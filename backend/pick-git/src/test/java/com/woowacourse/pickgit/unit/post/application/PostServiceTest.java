@@ -603,7 +603,7 @@ class PostServiceTest {
 
         // then
         assertThat(likeResponseDto.getLikesCount()).isEqualTo(1);
-        assertThat(likeResponseDto.isLiked()).isTrue();
+        assertThat(likeResponseDto.getLiked()).isTrue();
 
         verify(userRepository, times(1))
             .findByBasicProfile_Name(appUser.getUsername());
@@ -635,7 +635,7 @@ class PostServiceTest {
 
         // then
         assertThat(likeResponseDto.getLikesCount()).isEqualTo(0);
-        assertThat(likeResponseDto.isLiked()).isFalse();
+        assertThat(likeResponseDto.getLiked()).isFalse();
 
         verify(userRepository, times(1))
             .findByBasicProfile_Name(appUser.getUsername());

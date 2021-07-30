@@ -450,7 +450,7 @@ class PostServiceIntegrationTest {
 
         // then
         assertThat(likeResponseDto.getLikesCount()).isEqualTo(1);
-        assertThat(likeResponseDto.isLiked()).isTrue();
+        assertThat(likeResponseDto.getLiked()).isTrue();
     }
 
     @DisplayName("사용자는 특정 게시물을 좋아요 취소 할 수 있다. - 성공")
@@ -470,7 +470,7 @@ class PostServiceIntegrationTest {
 
         // then
         assertThat(likeResponseDto.getLikesCount()).isEqualTo(0);
-        assertThat(likeResponseDto.isLiked()).isFalse();
+        assertThat(likeResponseDto.getLiked()).isFalse();
     }
 
     @DisplayName("사용자는 이미 좋아요 한 게시물을 좋아요 추가 할 수 없다. - 실패")
