@@ -2,6 +2,7 @@ package com.woowacourse.pickgit.integration.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.groups.Tuple.tuple;
 
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
@@ -13,14 +14,19 @@ import com.woowacourse.pickgit.exception.user.InvalidFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.UserSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
+import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Import;
@@ -254,5 +260,76 @@ class UserServiceIntegrationTest {
             .hasFieldOrPropertyWithValue("errorCode", "U0003")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
             .hasMessage("존재하지 않는 팔로우 입니다.");
+    }
+
+    @DisplayName("로그인 - 저장된 유저중 유사한 이름을 가진 유저를 검색한다. 단, 자기 자신은 검색되지 않는다. (팔로잉한 여부 boolean)")
+    @Test
+    void searchUser_LoginUser_Success() {
+        // given
+        String searchKeyword = "bing";
+        UserSearchRequestDto userSearchRequestDto = UserSearchRequestDto
+            .builder()
+            .keyword(searchKeyword)
+            .page(0L)
+            .limit(5L)
+            .build();
+        List<User> usersInDb = UserFactory.mockSearchUsers();
+        User loginUser = usersInDb.get(0);
+        List<User> searchedUsers = usersInDb.subList(1, usersInDb.size());
+
+        userRepository.save(loginUser);
+        searchedUsers.forEach(user -> userRepository.save(user));
+
+        // when
+        User source = userRepository.findByBasicProfile_Name(loginUser.getName())
+            .orElseThrow();
+        User target = userRepository.findByBasicProfile_Name(searchedUsers.get(0).getName())
+            .orElseThrow();
+        source.follow(target);
+
+        userRepository.flush();
+
+        List<UserSearchResponseDto> searchResult =
+            userService.searchUser(new LoginUser(loginUser.getName(), "token"),
+                userSearchRequestDto);
+
+        // then
+        assertThat(searchResult).hasSize(4);
+        assertThat(searchResult)
+            .extracting("username", "imageUrl", "following")
+            .containsExactly(
+                tuple(searchedUsers.get(0).getName(), searchedUsers.get(0).getImage(), true),
+                tuple(searchedUsers.get(1).getName(), searchedUsers.get(1).getImage(), false),
+                tuple(searchedUsers.get(2).getName(), searchedUsers.get(2).getImage(), false),
+                tuple(searchedUsers.get(3).getName(), searchedUsers.get(3).getImage(), false)
+            );
+    }
+
+    @DisplayName("비 로그인 - 저장된 유저중 유사한 이름을 가진 유저를 검색한다. (팔로잉 필드 null)")
+    @Test
+    void searchUser_GuestUser_Success() {
+        // given
+        String searchKeyword = "bing";
+        UserSearchRequestDto userSearchRequestDto = UserSearchRequestDto
+            .builder()
+            .keyword(searchKeyword)
+            .page(0L)
+            .limit(3L)
+            .build();
+        List<User> userInDb = UserFactory.mockSearchUsers();
+        userRepository.saveAll(userInDb);
+
+        // when
+        List<UserSearchResponseDto> searchResult =
+            userService.searchUser(new GuestUser(), userSearchRequestDto);
+
+        // then
+        assertThat(searchResult)
+            .extracting("username", "imageUrl", "following")
+            .containsExactly(
+                tuple(userInDb.get(0).getName(), userInDb.get(0).getImage(), null),
+                tuple(userInDb.get(1).getName(), userInDb.get(1).getImage(), null),
+                tuple(userInDb.get(2).getName(), userInDb.get(2).getImage(), null)
+            );
     }
 }
