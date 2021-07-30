@@ -24,15 +24,18 @@ import com.woowacourse.pickgit.exception.user.UserNotFoundException;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostRepository;
 import com.woowacourse.pickgit.post.presentation.dto.request.CommentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.HomeFeedRequest;
+import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import java.util.List;
@@ -490,25 +493,6 @@ class PostServiceIntegrationTest {
     }
 
 
-    @DisplayName("사용자는 좋아요 누르지 않은 게시물을 좋아요 취소 할 수 없다. - 실패")
-    @Test
-    void unlike_UnlikePost_400ExceptionThrown() {
-        // given
-        PostRequestDto postRequestDtos = PostFactory.mockPostRequestDtos().get(0);
-        User loginUser = userRepository.save(UserFactory.user(postRequestDtos.getUsername()));
-
-        AppUser appUser = new LoginUser(loginUser.getName(), "token");
-
-        PostImageUrlResponseDto writtenPost = postService.write(postRequestDtos);
-
-        // when then
-        assertThatThrownBy(() -> postService.unlike(appUser, writtenPost.getId()))
-            .isInstanceOf(CannotUnlikeException.class)
-            .hasFieldOrPropertyWithValue("errorCode", "P0004")
-            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
-            .hasMessage("좋아요 하지 않은 게시물 좋아요 취소 에러");
-    }
-
     @DisplayName("게스트는 게시물을 좋아요 할 수 없다. - 실패")
     @Test
     void like_GuestUser_401ExceptionThrown() {
@@ -526,6 +510,25 @@ class PostServiceIntegrationTest {
             .hasFieldOrPropertyWithValue("errorCode", "A0002")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)
             .hasMessage("권한 에러");
+    }
+
+    @DisplayName("사용자는 좋아요 누르지 않은 게시물을 좋아요 취소 할 수 없다. - 실패")
+    @Test
+    void unlike_UnlikePost_400ExceptionThrown() {
+        // given
+        PostRequestDto postRequestDtos = PostFactory.mockPostRequestDtos().get(0);
+        User loginUser = userRepository.save(UserFactory.user(postRequestDtos.getUsername()));
+
+        AppUser appUser = new LoginUser(loginUser.getName(), "token");
+
+        PostImageUrlResponseDto writtenPost = postService.write(postRequestDtos);
+
+        // when then
+        assertThatThrownBy(() -> postService.unlike(appUser, writtenPost.getId()))
+            .isInstanceOf(CannotUnlikeException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "P0004")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
+            .hasMessage("좋아요 하지 않은 게시물 좋아요 취소 에러");
     }
 
     @DisplayName("게스트는 게시물을 좋아요 취소 할 수 없다. - 실패")
@@ -548,5 +551,158 @@ class PostServiceIntegrationTest {
             .hasFieldOrPropertyWithValue("errorCode", "A0002")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)
             .hasMessage("권한 에러");
+    }
+
+    @DisplayName("게시물의 태그, 내용을 수정한다.")
+    @Test
+    void update_TagsAndContentInCaseOfLoginUser_Success() {
+        // given
+        userRepository.save(UserFactory.user(USERNAME));
+        LoginUser user = new LoginUser(USERNAME, ACCESS_TOKEN);
+
+        PostRequestDto requestDto = PostRequestDto.builder()
+            .token(ACCESS_TOKEN)
+            .username(USERNAME)
+            .images(List.of(
+                FileFactory.getTestImage1(),
+                FileFactory.getTestImage2()))
+            .githubRepoUrl("https://github.com/da-nyee/woowacourse-projects")
+            .tags(List.of("java", "spring"))
+            .content("testContent")
+            .build();
+
+        postService.write(requestDto);
+
+        PostUpdateRequest updateRequest =
+            new PostUpdateRequest(List.of("java", "spring", "spring-boot"), "hello");
+
+        PostUpdateRequestDto updateRequestDto = PostUpdateRequestDto
+            .toUpdateRequestDto(user, 1L, updateRequest);
+
+        PostUpdateResponseDto responseDto =
+            new PostUpdateResponseDto(List.of("java", "spring", "spring-boot"), "hello");
+
+        // when
+        PostUpdateResponseDto updateResponseDto = postService.update(updateRequestDto);
+
+        // then
+        assertThat(updateResponseDto)
+            .usingRecursiveComparison()
+            .isEqualTo(responseDto);
+    }
+
+    @DisplayName("게시물의 태그를 수정한다.")
+    @Test
+    void update_TagsInCaseOfLoginUser_Success() {
+        // given
+        userRepository.save(UserFactory.user(USERNAME));
+        LoginUser user = new LoginUser(USERNAME, ACCESS_TOKEN);
+
+        PostRequestDto requestDto = PostRequestDto.builder()
+            .token(ACCESS_TOKEN)
+            .username(USERNAME)
+            .images(List.of(
+                FileFactory.getTestImage1(),
+                FileFactory.getTestImage2()))
+            .githubRepoUrl("https://github.com/da-nyee/woowacourse-projects")
+            .tags(List.of("java", "spring"))
+            .content("testContent")
+            .build();
+
+        postService.write(requestDto);
+
+        PostUpdateRequest updateRequest =
+            new PostUpdateRequest(List.of("java", "spring", "spring-boot"), "testContent");
+
+        PostUpdateRequestDto updateRequestDto = PostUpdateRequestDto
+            .toUpdateRequestDto(user, 1L, updateRequest);
+
+        PostUpdateResponseDto responseDto =
+            new PostUpdateResponseDto(List.of("java", "spring", "spring-boot"), "testContent");
+
+        // when
+        PostUpdateResponseDto updateResponseDto = postService.update(updateRequestDto);
+
+        // then
+        assertThat(updateResponseDto)
+            .usingRecursiveComparison()
+            .isEqualTo(responseDto);
+    }
+
+    @DisplayName("게시물의 내용을 수정한다.")
+    @Test
+    void update_ContentInCaseOfLoginUser_Success() {
+        // given
+        userRepository.save(UserFactory.user(USERNAME));
+        LoginUser user = new LoginUser(USERNAME, ACCESS_TOKEN);
+
+        PostRequestDto requestDto = PostRequestDto.builder()
+            .token(ACCESS_TOKEN)
+            .username(USERNAME)
+            .images(List.of(
+                FileFactory.getTestImage1(),
+                FileFactory.getTestImage2()))
+            .githubRepoUrl("https://github.com/da-nyee/woowacourse-projects")
+            .tags(List.of("java", "spring"))
+            .content("testContent")
+            .build();
+
+        postService.write(requestDto);
+
+        PostUpdateRequest updateRequest =
+            new PostUpdateRequest(List.of("java", "spring"), "hello");
+
+        PostUpdateRequestDto updateRequestDto = PostUpdateRequestDto
+            .toUpdateRequestDto(user, 1L, updateRequest);
+
+        PostUpdateResponseDto responseDto =
+            new PostUpdateResponseDto(List.of("java", "spring"), "hello");
+
+        // when
+        PostUpdateResponseDto updateResponseDto = postService.update(updateRequestDto);
+
+        // then
+        assertThat(updateResponseDto)
+            .usingRecursiveComparison()
+            .isEqualTo(responseDto);
+    }
+
+    @DisplayName("게스트는 게시물을 수정할 수 없다. - 401 예외")
+    @Test
+    void update_GuestUser_401Exception() {
+        // given
+        GuestUser user = new GuestUser();
+
+        PostUpdateRequest updateRequest =
+            new PostUpdateRequest(List.of("java", "spring"), "hello");
+
+        // when
+        assertThatThrownBy(() -> {
+            PostUpdateRequestDto.toUpdateRequestDto(user, 1L, updateRequest);
+        }).isInstanceOf(UnauthorizedException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "A0002")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)
+            .hasMessage("권한 에러");
+    }
+
+    @DisplayName("등록되지 않은 게시물을 수정할 수 없다. - 500 예외")
+    @Test
+    void update_InvalidPost_500Exception() {
+        // given
+        LoginUser user = new LoginUser(USERNAME, ACCESS_TOKEN);
+
+        PostUpdateRequest updateRequest =
+            new PostUpdateRequest(List.of("java", "spring"), "hello");
+
+        PostUpdateRequestDto updateRequestDto =
+            PostUpdateRequestDto.toUpdateRequestDto(user, 1L, updateRequest);
+
+        // when
+        assertThatThrownBy(() -> {
+            postService.update(updateRequestDto);
+        }).isInstanceOf(PostNotFoundException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "P0002")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
+            .hasMessage("해당하는 게시물을 찾을 수 없습니다.");
     }
 }
