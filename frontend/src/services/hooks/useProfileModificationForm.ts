@@ -19,7 +19,7 @@ const useProfileModificationForm = (
   submitEffect?: () => void
 ) => {
   const [image, setImage] = useState<File | null>(null);
-  const [imageUrl, setImageUrl] = useState<string>(initialValue.imageUrl ?? "");
+  const [imageUrl, setImageUrl] = useState(initialValue.imageUrl ?? "");
   const [description, setDescription] = useState(initialValue.description ?? "");
 
   const { logout } = useContext(UserContext);
@@ -48,14 +48,8 @@ const useProfileModificationForm = (
   };
 
   const submitValidation = () => {
-    if (!image && (!initialValue.description || initialValue.description === description)) {
+    if (!image && initialValue.description === description) {
       messageViewer?.(FAILURE_MESSAGE.NO_CONTENT_MODIFIED);
-
-      return false;
-    }
-
-    if (image && !isValidFileSize(image)) {
-      messageViewer?.(FAILURE_MESSAGE.POST_FILE_SIZE_EXCEEDED);
 
       return false;
     }
