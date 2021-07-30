@@ -7,10 +7,10 @@ import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
+import com.woowacourse.pickgit.user.domain.Contribution;
 import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
-import com.woowacourse.pickgit.user.domain.dto.ContributionDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -91,7 +91,7 @@ public class UserService {
     public ContributionResponseDto calculateContributions(String username) {
         User user = findUserByName(username);
 
-        ContributionDto contribution = platformContributionCalculator.calculate(user.getName());
+        Contribution contribution = platformContributionCalculator.calculate(user.getName());
 
         return ContributionResponseDto.builder()
             .starsCount(contribution.getStarsCount())

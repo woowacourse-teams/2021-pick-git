@@ -1,8 +1,8 @@
 package com.woowacourse.pickgit.user.infrastructure.calculator;
 
+import com.woowacourse.pickgit.user.domain.Contribution;
 import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
 import com.woowacourse.pickgit.user.domain.PlatformContributionExtractor;
-import com.woowacourse.pickgit.user.domain.dto.ContributionDto;
 import com.woowacourse.pickgit.user.infrastructure.dto.CountDto;
 import com.woowacourse.pickgit.user.infrastructure.dto.StarsDto;
 import java.util.List;
@@ -20,14 +20,14 @@ public class GithubContributionCalculator implements PlatformContributionCalcula
     }
 
     @Override
-    public ContributionDto calculate(String username) {
-        return ContributionDto.builder()
-            .starsCount(calculateStars(username))
-            .commitsCount(calculateCommits(username))
-            .prsCount(calculatePRs(username))
-            .issuesCount(calculateIssues(username))
-            .reposCount(calculateRepos(username))
-            .build();
+    public Contribution calculate(String username) {
+        return new Contribution(
+            calculateStars(username),
+            calculateCommits(username),
+            calculatePRs(username),
+            calculateIssues(username),
+            calculateRepos(username)
+        );
     }
 
     private int calculateStars(String username) {

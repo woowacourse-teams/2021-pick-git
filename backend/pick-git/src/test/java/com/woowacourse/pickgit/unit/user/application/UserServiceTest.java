@@ -19,6 +19,7 @@ import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
+import com.woowacourse.pickgit.user.domain.Contribution;
 import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
@@ -160,7 +161,8 @@ class UserServiceTest {
     void calculateContributions_Anyone_Success() {
         // given
         User user = UserFactory.user();
-        ContributionDto contribution = UserFactory.mockContributionDto();
+
+        Contribution contribution = new Contribution(11, 48, 48, 48, 48);
 
         given(userRepository.findByBasicProfile_Name(anyString()))
             .willReturn(Optional.of(user));

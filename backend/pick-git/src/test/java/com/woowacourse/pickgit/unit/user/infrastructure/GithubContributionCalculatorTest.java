@@ -4,12 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.common.mockapi.MockContributionApiRequester;
 import com.woowacourse.pickgit.exception.user.ContributionParseException;
+import com.woowacourse.pickgit.user.domain.Contribution;
 import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
 import com.woowacourse.pickgit.user.domain.PlatformContributionExtractor;
-import com.woowacourse.pickgit.user.domain.dto.ContributionDto;
 import com.woowacourse.pickgit.user.infrastructure.calculator.GithubContributionCalculator;
 import com.woowacourse.pickgit.user.infrastructure.extractor.GithubContributionExtractor;
 import com.woowacourse.pickgit.user.infrastructure.requester.PlatformContributionApiRequester;
@@ -44,10 +43,10 @@ class GithubContributionCalculatorTest {
     @Test
     void calculate_ValidCalculation_Success() {
         // given
-        ContributionDto contribution = UserFactory.mockContributionDto();
+        Contribution contribution = new Contribution(11, 48, 48, 48, 48);
 
         // when
-        ContributionDto result = platformContributionCalculator.calculate("testUser");
+        Contribution result = platformContributionCalculator.calculate("testUser");
 
         // then
         assertThat(result)
