@@ -523,7 +523,7 @@ class PostAcceptanceTest {
             });
 
         // then
-        assertThat(response.getLikeCount()).isEqualTo(1);
+        assertThat(response.getLikesCount()).isEqualTo(1);
         assertThat(response.isLiked()).isTrue();
     }
 
@@ -547,7 +547,7 @@ class PostAcceptanceTest {
             .as(new TypeRef<>() {
             });
 
-        assertThat(likePostResponse.getLikeCount()).isEqualTo(1);
+        assertThat(likePostResponse.getLikesCount()).isEqualTo(1);
         assertThat(likePostResponse.isLiked()).isTrue();
 
         // when
@@ -562,7 +562,7 @@ class PostAcceptanceTest {
             });
 
         // then
-        assertThat(unlikePostResponse.getLikeCount()).isEqualTo(0);
+        assertThat(unlikePostResponse.getLikesCount()).isEqualTo(0);
         assertThat(unlikePostResponse.isLiked()).isFalse();
     }
 
@@ -632,7 +632,7 @@ class PostAcceptanceTest {
             .as(new TypeRef<>() {
             });
 
-        assertThat(likePostResponse.getLikeCount()).isEqualTo(1);
+        assertThat(likePostResponse.getLikesCount()).isEqualTo(1);
         assertThat(likePostResponse.isLiked()).isTrue();
 
         // when

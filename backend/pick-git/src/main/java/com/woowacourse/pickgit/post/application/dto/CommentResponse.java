@@ -10,18 +10,18 @@ public class CommentResponse {
     private String profileImageUrl;
     private String authorName;
     private String content;
-    private Boolean isLiked;
+    private Boolean liked;
 
     private CommentResponse() {
     }
 
     public CommentResponse(Long id, String profileImageUrl, String authorName, String content,
-        Boolean isLiked) {
+        Boolean liked) {
         this.id = id;
         this.profileImageUrl = profileImageUrl;
         this.authorName = authorName;
         this.content = content;
-        this.isLiked = isLiked;
+        this.liked = liked;
     }
 
     public static CommentResponse from(Comment comment) {
@@ -30,7 +30,7 @@ public class CommentResponse {
             .profileImageUrl(comment.getProfileImageUrl())
             .authorName(comment.getAuthorName())
             .content(comment.getContent())
-            .isLiked(false)
+            .liked(false)
             .build();
     }
 
@@ -46,8 +46,8 @@ public class CommentResponse {
         return content;
     }
 
-    public Boolean getIsLiked() {
-        return isLiked;
+    public Boolean getLiked() {
+        return liked;
     }
 
     public String getProfileImageUrl() {

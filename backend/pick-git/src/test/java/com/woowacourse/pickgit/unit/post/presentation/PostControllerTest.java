@@ -185,7 +185,7 @@ class PostControllerTest {
             .profileImageUrl("kevin profile image url")
             .authorName(loginUser.getUsername())
             .content("test Comment")
-            .isLiked(false)
+            .liked(false)
             .build();
         ContentRequest commentRequest = new ContentRequest("test Comment");
 
@@ -444,7 +444,7 @@ class PostControllerTest {
 
         String likeResponse =
             objectMapper.writeValueAsString(
-                new LikeResponse(likeResponseDto.getLikeCount(), likeResponseDto.isLiked())
+                new LikeResponse(likeResponseDto.getLikesCount(), likeResponseDto.isLiked())
             );
 
         // when
@@ -498,7 +498,7 @@ class PostControllerTest {
 
         String likeResponse =
             objectMapper.writeValueAsString(
-                new LikeResponse(likeResponseDto.getLikeCount(), likeResponseDto.isLiked())
+                new LikeResponse(likeResponseDto.getLikesCount(), likeResponseDto.isLiked())
             );
 
         // when
