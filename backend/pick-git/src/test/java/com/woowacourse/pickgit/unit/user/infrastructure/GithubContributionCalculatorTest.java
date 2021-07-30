@@ -18,7 +18,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-public class GithubContributionCalculatorTest {
+class GithubContributionCalculatorTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final String apiUrlFormatForStar = "https://api.github.com/search/repositories?q=user:%s stars:>=1";
