@@ -4,8 +4,8 @@ import com.woowacourse.pickgit.user.domain.Contribution;
 import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
 import com.woowacourse.pickgit.user.domain.PlatformContributionExtractor;
 import com.woowacourse.pickgit.user.infrastructure.dto.CountDto;
+import com.woowacourse.pickgit.user.infrastructure.dto.ItemDto;
 import com.woowacourse.pickgit.user.infrastructure.dto.StarsDto;
-import java.util.List;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -31,10 +31,10 @@ public class GithubContributionCalculator implements PlatformContributionCalcula
     }
 
     private int calculateStars(String username) {
-        List<StarsDto> stars = platformContributionExtractor
-            .extractStars(username);
+        ItemDto stars = platformContributionExtractor.extractStars(username);
 
-        return stars.stream()
+        return stars.getItems()
+            .stream()
             .mapToInt(StarsDto::getStars)
             .sum();
     }
