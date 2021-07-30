@@ -2,10 +2,11 @@ import axios from "axios";
 
 import { MutateResponseFollow, ProfileData } from "../../@types";
 import { API_URL } from "../../constants/urls";
+import { customError } from "../../utils/error";
 
 export const requestGetSelfProfile = async (accessToken: string | null) => {
   if (!accessToken) {
-    throw Error("no accessToken");
+    throw customError.noAccessToken;
   }
 
   const response = await axios.get<ProfileData>(API_URL.SELF_PROFILE, {
@@ -30,9 +31,9 @@ export const requestGetUserProfile = async (username: string, accessToken: strin
   return response.data;
 };
 
-export const requestAddFollow = async (username: string | undefined, accessToken: string | null) => {
-  if (!accessToken || !username) {
-    throw Error("Invalid Request");
+export const requestAddFollow = async (username: string, accessToken: string | null) => {
+  if (!accessToken) {
+    throw customError.noAccessToken;
   }
 
   const response = await axios.post<MutateResponseFollow>(API_URL.USER_PROFILE_FOLLOW(username), null, {
@@ -44,9 +45,9 @@ export const requestAddFollow = async (username: string | undefined, accessToken
   return response.data;
 };
 
-export const requestDeleteFollow = async (username: string | undefined, accessToken: string | null) => {
-  if (!accessToken || !username) {
-    throw Error("Invalid Request");
+export const requestDeleteFollow = async (username: string, accessToken: string | null) => {
+  if (!accessToken) {
+    throw customError.noAccessToken;
   }
 
   const response = await axios.delete<MutateResponseFollow>(API_URL.USER_PROFILE_FOLLOW(username), {
@@ -64,7 +65,7 @@ export const requestSetProfile = async (
   accessToken: string | null
 ) => {
   if (!accessToken) {
-    throw Error("no accessToken");
+    throw customError.noAccessToken;
   }
 
   if (!profileImage && !description) {

@@ -1,13 +1,14 @@
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 
-import { SearchResult, SearchResultUser } from "../../@types";
+import { HTTPErrorHandler, SearchResult } from "../../@types";
 import { UNKNOWN_ERROR_MESSAGE } from "../../constants/messages";
 import SearchContext from "../../contexts/SearchContext";
 import SnackBarContext from "../../contexts/SnackbarContext";
 import UserContext from "../../contexts/UserContext";
-import { handleHTTPError, HTTPErrorHandler } from "../../utils/api";
 import { removeDuplicatedData } from "../../utils/data";
+import { handleHTTPError } from "../../utils/error";
+import { isHttpErrorStatus } from "../../utils/typeGuard";
 import { useSearchResultQuery } from "../queries/search";
 
 const useSearchData = () => {
@@ -69,7 +70,7 @@ const useSearchData = () => {
         },
       };
 
-      if (status) {
+      if (status && isHttpErrorStatus(status)) {
         handleHTTPError(status, errorHandler);
       }
 
