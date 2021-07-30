@@ -413,7 +413,7 @@ class PostServiceIntegrationTest {
 
     private List<Boolean> extractLikes(List<PostResponseDto> postResponseDtos) {
         return postResponseDtos.stream()
-            .map(PostResponseDto::getIsLiked)
+            .map(PostResponseDto::getLiked)
             .collect(toList());
     }
 
@@ -449,7 +449,7 @@ class PostServiceIntegrationTest {
         LikeResponseDto likeResponseDto = postService.like(appUser, writtenPost.getId());
 
         // then
-        assertThat(likeResponseDto.getLikeCount()).isEqualTo(1);
+        assertThat(likeResponseDto.getLikesCount()).isEqualTo(1);
         assertThat(likeResponseDto.isLiked()).isTrue();
     }
 
@@ -469,7 +469,7 @@ class PostServiceIntegrationTest {
         LikeResponseDto likeResponseDto = postService.unlike(appUser, writtenPost.getId());
 
         // then
-        assertThat(likeResponseDto.getLikeCount()).isEqualTo(0);
+        assertThat(likeResponseDto.getLikesCount()).isEqualTo(0);
         assertThat(likeResponseDto.isLiked()).isFalse();
     }
 

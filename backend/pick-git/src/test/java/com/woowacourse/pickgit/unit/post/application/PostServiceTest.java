@@ -602,7 +602,7 @@ class PostServiceTest {
         LikeResponseDto likeResponseDto = postService.like(appUser, postId);
 
         // then
-        assertThat(likeResponseDto.getLikeCount()).isEqualTo(1);
+        assertThat(likeResponseDto.getLikesCount()).isEqualTo(1);
         assertThat(likeResponseDto.isLiked()).isTrue();
 
         verify(userRepository, times(1))
@@ -634,7 +634,7 @@ class PostServiceTest {
         LikeResponseDto likeResponseDto = postService.unlike(appUser, postId);
 
         // then
-        assertThat(likeResponseDto.getLikeCount()).isEqualTo(0);
+        assertThat(likeResponseDto.getLikesCount()).isEqualTo(0);
         assertThat(likeResponseDto.isLiked()).isFalse();
 
         verify(userRepository, times(1))
