@@ -14,6 +14,7 @@ import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
+import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.user.DuplicateFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
@@ -56,44 +57,57 @@ class UserServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private PlatformContributionCalculator platformContributionCalculator;
-
-    @Mock
     private PickGitStorage pickGitStorage;
 
-    @DisplayName("사용자는 내 이름으로 내 프로필을 조회할 수 있다.")
-    @Test
-    void getMyUserProfile_WithMyName_Success() {
-        // given
-        User loginUser = UserFactory.user();
-        String username = loginUser.getName();
-        AuthUserRequestDto requestDto = createLoginAuthUserRequestDto(username);
+    @DisplayName("getMyUserProfile 메서드는")
+    @Nested
+    class Describe_getMyUserProfile {
 
-        given(userRepository.findByBasicProfile_Name(username))
-            .willReturn(Optional.of(loginUser));
+        @DisplayName("로그인 되어있을 때")
+        @Nested
+        class Context_Login {
 
-        UserProfileResponseDto responseDto = UserFactory.mockLoginUserProfileResponseDto();
+            @DisplayName("사용자는 내 프로필을 조회할 수 있다.")
+            @Test
+            void getMyUserProfile_WithMyName_Success() {
+                // given
+                User loginUser = UserFactory.user();
+                String username = loginUser.getName();
+                AuthUserRequestDto requestDto = createLoginAuthUserRequestDto(username);
 
-        // when
-        UserProfileResponseDto myUserProfile = userService.getMyUserProfile(requestDto);
+                given(userRepository.findByBasicProfile_Name(username))
+                    .willReturn(Optional.of(loginUser));
 
-        // then
-        assertThat(myUserProfile)
-            .usingRecursiveComparison()
-            .isEqualTo(responseDto);
+                UserProfileResponseDto responseDto = UserFactory.mockLoginUserProfileResponseDto();
 
-        verify(userRepository, times(1))
-            .findByBasicProfile_Name(username);
-    }
+                // when
+                UserProfileResponseDto myUserProfile = userService.getMyUserProfile(requestDto);
 
-    private AuthUserRequestDto createLoginAuthUserRequestDto(String username) {
-        AppUser appUser = new LoginUser(username, "Bearer testToken");
-        return new AuthUserRequestDto(username, appUser.isGuest());
-    }
+                // then
+                assertThat(myUserProfile)
+                    .usingRecursiveComparison()
+                    .isEqualTo(responseDto);
 
-    private AuthUserRequestDto createGuestAuthUserRequestDto() {
-        AppUser guestUser = new GuestUser();
-        return new AuthUserRequestDto(guestUser.getUsername2(), guestUser.isGuest());
+                verify(userRepository, times(1))
+                    .findByBasicProfile_Name(username);
+            }
+        }
+
+        @DisplayName("비로그인되어 있으면")
+        @Nested
+        class Context_Guest {
+
+            @DisplayName("사용자는 내 프로필을 조회할 수 없다.")
+            @Test
+            void getMyUserProfile_Guest_Failure() {
+                // given
+                AuthUserRequestDto requestDto = createGuestAuthUserRequestDto();
+
+                // when, then
+                assertThatCode(() -> userService.getMyUserProfile(requestDto))
+                    .isInstanceOf(UnauthorizedException.class);
+            }
+        }
     }
 
     @DisplayName("getUserProfile 메서드는")
@@ -260,6 +274,22 @@ class UserServiceTest {
     @DisplayName("followUser 메서드는")
     @Nested
     class Describe_followUser {
+
+        @DisplayName("비로그인되어 있으면")
+        @Nested
+        class Context_Guest {
+
+            @DisplayName("팔로우할 수 없다.")
+            @Test
+            void follow_Guest_Failure() {
+                // given
+                AuthUserRequestDto requestDto = createGuestAuthUserRequestDto();
+
+                // when, then
+                assertThatCode(() -> userService.followUser(requestDto, "testUser"))
+                    .isInstanceOf(UnauthorizedException.class);
+            }
+        }
 
         @DisplayName("Target 유저가 존재하지 않는다면")
         @Nested
@@ -502,6 +532,22 @@ class UserServiceTest {
     @Nested
     class Describe_unfollowUser {
 
+        @DisplayName("비로그인되어 있으면")
+        @Nested
+        class Context_Guest {
+
+            @DisplayName("언팔로우할 수 없다.")
+            @Test
+            void unfollow_Guest_Failure() {
+                // given
+                AuthUserRequestDto requestDto = createGuestAuthUserRequestDto();
+
+                // when, then
+                assertThatCode(() -> userService.unfollowUser(requestDto, "testUser"))
+                    .isInstanceOf(UnauthorizedException.class);
+            }
+        }
+
         @DisplayName("Target 유저가 존재하지 않는다면")
         @Nested
         class Context_NotExistingOtherUser {
@@ -683,7 +729,8 @@ class UserServiceTest {
     void searchUser_GuestUser_Success() {
         // given
         String searchKeyword = "bing";
-        int page = 0; int limit = 5;
+        int page = 0;
+        int limit = 5;
         List<User> usersInDb = UserFactory.mockSearchUsersWithId();
         UserSearchRequestDto userSearchRequestDto = UserSearchRequestDto
             .builder()
@@ -708,7 +755,17 @@ class UserServiceTest {
         assertThat(searchResult)
             .extracting("following")
             .containsExactly(null, null, null, null, null);
-        verify(userRepository, times(1)).searchByUsernameLike(searchKeyword, PageRequest.of(page, limit));
+        verify(userRepository, times(1))
+            .searchByUsernameLike(searchKeyword, PageRequest.of(page, limit));
         verify(userRepository, times(0)).findByBasicProfile_Name(anyString());
+    }
+
+    private AuthUserRequestDto createLoginAuthUserRequestDto(String username) {
+        AppUser appUser = new LoginUser(username, "Bearer testToken");
+        return AuthUserRequestDto.from(appUser);
+    }
+
+    private AuthUserRequestDto createGuestAuthUserRequestDto() {
+        return AuthUserRequestDto.from(new GuestUser());
     }
 }

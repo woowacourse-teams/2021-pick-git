@@ -11,6 +11,7 @@ import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
+import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.user.DuplicateFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
@@ -55,31 +56,47 @@ class UserServiceIntegrationTest {
     @Autowired
     private PickGitStorage pickGitStorage;
 
-    @DisplayName("사용자는 자신의 프로필을 조회할 수 있다.")
-    @Test
-    void getMyUserProfile_WithMyName_Success() {
-        //given
-        User loginUser = userRepository.save(UserFactory.user());
-        AuthUserRequestDto requestDto = createLoginAuthUserRequestDto(loginUser.getName());
-        UserProfileResponseDto responseDto = UserFactory.mockLoginUserProfileResponseDto();
+    @DisplayName("getMyUserProfile 메서드는")
+    @Nested
+    class Describe_getMyUserProfile {
 
-        //when
-        UserProfileResponseDto myUserProfile = userService.getMyUserProfile(requestDto);
+        @DisplayName("비로그인되어 있으면")
+        @Nested
+        class Context_Guest {
 
-        //then
-        assertThat(myUserProfile)
-            .usingRecursiveComparison()
-            .isEqualTo(responseDto);
-    }
+            @DisplayName("사용자는 내 프로필을 조회할 수 없다.")
+            @Test
+            void getMyUserProfile_Guest_Failure() {
+                // given
+                AuthUserRequestDto requestDto = createGuestAuthUserRequestDto();
 
-    private AuthUserRequestDto createLoginAuthUserRequestDto(String username) {
-        AppUser appUser = new LoginUser(username, "Bearer testToken");
-        return new AuthUserRequestDto(username, appUser.isGuest());
-    }
+                // when, then
+                assertThatCode(() -> userService.getMyUserProfile(requestDto))
+                    .isInstanceOf(UnauthorizedException.class);
+            }
+        }
 
-    private AuthUserRequestDto createGuestAuthUserRequestDto() {
-        AppUser guestUser = new GuestUser();
-        return new AuthUserRequestDto(guestUser.getUsername2(), guestUser.isGuest());
+        @DisplayName("로그인되어 있으면")
+        @Nested
+        class Context_Login {
+
+            @DisplayName("사용자는 자신의 프로필을 조회할 수 있다.")
+            @Test
+            void getMyUserProfile_WithMyName_Success() {
+                //given
+                User loginUser = userRepository.save(UserFactory.user());
+                AuthUserRequestDto requestDto = createLoginAuthUserRequestDto(loginUser.getName());
+                UserProfileResponseDto responseDto = UserFactory.mockLoginUserProfileResponseDto();
+
+                //when
+                UserProfileResponseDto myUserProfile = userService.getMyUserProfile(requestDto);
+
+                //then
+                assertThat(myUserProfile)
+                    .usingRecursiveComparison()
+                    .isEqualTo(responseDto);
+            }
+        }
     }
 
     @DisplayName("getUserProfile 메서드는")
@@ -183,9 +200,9 @@ class UserServiceIntegrationTest {
                     createLoginAuthUserRequestDto(loginUser.getName());
 
                 // when
-                assertThatThrownBy(() -> {
-                    userService.getUserProfile(authUserRequestDto, "invalidName");
-                }).isInstanceOf(InvalidUserException.class)
+                assertThatThrownBy(() ->
+                    userService.getUserProfile(authUserRequestDto, "invalidName"))
+                    .isInstanceOf(InvalidUserException.class)
                     .hasFieldOrPropertyWithValue("errorCode", "U0001")
                     .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
                     .hasMessage("유효하지 않은 유저입니다.");
@@ -196,6 +213,22 @@ class UserServiceIntegrationTest {
     @DisplayName("followUser 메서드는")
     @Nested
     class Describe_followUser {
+
+        @DisplayName("비로그인되어 있으면")
+        @Nested
+        class Context_Guest {
+
+            @DisplayName("팔로우할 수 없다.")
+            @Test
+            void follow_Guest_Failure() {
+                // given
+                AuthUserRequestDto requestDto = createGuestAuthUserRequestDto();
+
+                // when, then
+                assertThatCode(() -> userService.followUser(requestDto, "testUser"))
+                    .isInstanceOf(UnauthorizedException.class);
+            }
+        }
 
         @DisplayName("Target 유저가 존재하지 않는다면")
         @Nested
@@ -370,6 +403,22 @@ class UserServiceIntegrationTest {
     @Nested
     class Describe_unfollowUser {
 
+        @DisplayName("비로그인되어 있으면")
+        @Nested
+        class Context_Guest {
+
+            @DisplayName("언팔로우할 수 없다.")
+            @Test
+            void unfollow_Guest_Failure() {
+                // given
+                AuthUserRequestDto requestDto = createGuestAuthUserRequestDto();
+
+                // when, then
+                assertThatCode(() -> userService.unfollowUser(requestDto, "testUser"))
+                    .isInstanceOf(UnauthorizedException.class);
+            }
+        }
+
         @DisplayName("Target 유저가 존재하지 않는다면")
         @Nested
         class Context_NotExistingOtherUser {
@@ -525,5 +574,14 @@ class UserServiceIntegrationTest {
                 tuple(userInDb.get(1).getName(), userInDb.get(1).getImage(), null),
                 tuple(userInDb.get(2).getName(), userInDb.get(2).getImage(), null)
             );
+    }
+
+    private AuthUserRequestDto createLoginAuthUserRequestDto(String username) {
+        AppUser appUser = new LoginUser(username, "Bearer testToken");
+        return AuthUserRequestDto.from(appUser);
+    }
+
+    private AuthUserRequestDto createGuestAuthUserRequestDto() {
+        return AuthUserRequestDto.from(new GuestUser());
     }
 }

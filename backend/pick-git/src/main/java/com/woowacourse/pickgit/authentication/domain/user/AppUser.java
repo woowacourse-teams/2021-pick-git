@@ -18,9 +18,5 @@ public abstract class AppUser {
         return accessToken;
     }
 
-    public String getUsername2() {
-        return username;
-    }
-
     public abstract boolean isGuest();
 }

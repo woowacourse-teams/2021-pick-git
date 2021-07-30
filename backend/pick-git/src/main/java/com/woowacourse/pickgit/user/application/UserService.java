@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
+import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
 import com.woowacourse.pickgit.post.domain.PickGitStorage;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
@@ -52,8 +53,9 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserProfileResponseDto getMyUserProfile(AuthUserRequestDto requestDto) {
+        validateIsGuest(requestDto);
         User user = findUserByName(requestDto.getGithubName());
-        return generateUserProfileResponse(user, false);
+        return generateUserProfileResponse(user, null);
     }
 
     @Transactional(readOnly = true)
@@ -150,6 +152,7 @@ public class UserService {
     }
 
     public FollowResponseDto followUser(AuthUserRequestDto requestDto, String targetName) {
+        validateIsGuest(requestDto);
         User source = findUserByName(requestDto.getGithubName());
         User target = findUserByName(targetName);
         source.follow(target);
@@ -157,6 +160,7 @@ public class UserService {
     }
 
     public FollowResponseDto unfollowUser(AuthUserRequestDto requestDto, String targetName) {
+        validateIsGuest(requestDto);
         User source = findUserByName(requestDto.getGithubName());
         User target = findUserByName(targetName);
         source.unfollow(target);
@@ -171,8 +175,7 @@ public class UserService {
     }
 
     private User findUserByName(String githubName) {
-        return userRepository
-            .findByBasicProfile_Name(githubName)
+        return userRepository.findByBasicProfile_Name(githubName)
             .orElseThrow(InvalidUserException::new);
     }
 
@@ -217,5 +220,11 @@ public class UserService {
 
     private Predicate<User> isLoginUser(User loginUser) {
         return user -> !user.equals(loginUser);
+    }
+
+    private void validateIsGuest(AuthUserRequestDto requestDto) {
+        if (requestDto.isGuest()) {
+            throw new UnauthorizedException();
+        }
     }
 }

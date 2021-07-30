@@ -2,7 +2,6 @@ package com.woowacourse.pickgit.user.presentation;
 
 import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
-import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
@@ -23,9 +22,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/profiles")
@@ -42,19 +39,10 @@ public class UserController {
     public ResponseEntity<UserProfileResponse> getAuthenticatedUserProfile(
         @Authenticated AppUser appUser
     ) {
-        validateIsGuest(appUser);
-
-        AuthUserRequestDto authUserRequestDto =
-            new AuthUserRequestDto(appUser.getUsername2(), appUser.isGuest());
+        AuthUserRequestDto authUserRequestDto = AuthUserRequestDto.from(appUser);
         UserProfileResponseDto responseDto = userService.getMyUserProfile(authUserRequestDto);
 
         return ResponseEntity.ok(createUserProfileResponse(responseDto));
-    }
-
-    private void validateIsGuest(AppUser appUser) {
-        if (appUser.isGuest()) {
-            throw new UnauthorizedException();
-        }
     }
 
     @GetMapping("/{username}")
@@ -62,8 +50,7 @@ public class UserController {
         @Authenticated AppUser appUser,
         @PathVariable String username
     ) {
-        AuthUserRequestDto authUserRequestDto =
-            new AuthUserRequestDto(appUser.getUsername2(), appUser.isGuest());
+        AuthUserRequestDto authUserRequestDto = AuthUserRequestDto.from(appUser);
         UserProfileResponseDto responseDto = userService
             .getUserProfile(authUserRequestDto, username);
 
@@ -111,10 +98,7 @@ public class UserController {
         @Authenticated AppUser appUser,
         @PathVariable String username
     ) {
-        validateIsGuest(appUser);
-
-        AuthUserRequestDto authUserRequestDto =
-            new AuthUserRequestDto(appUser.getUsername2(), appUser.isGuest());
+        AuthUserRequestDto authUserRequestDto = AuthUserRequestDto.from(appUser);
         FollowResponseDto followResponseDto =
             userService.followUser(authUserRequestDto, username);
 
@@ -146,10 +130,7 @@ public class UserController {
         @Authenticated AppUser appUser,
         @PathVariable String username
     ) {
-        validateIsGuest(appUser);
-
-        AuthUserRequestDto authUserRequestDto =
-            new AuthUserRequestDto(appUser.getUsername2(), appUser.isGuest());
+        AuthUserRequestDto authUserRequestDto = AuthUserRequestDto.from(appUser);
         FollowResponseDto followResponseDto =
             userService.unfollowUser(authUserRequestDto, username);
 

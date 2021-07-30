@@ -239,7 +239,7 @@ class UserControllerTest {
                     fieldWithPath("location").type(STRING).description("위치"),
                     fieldWithPath("website").type(STRING).description("웹 사이트"),
                     fieldWithPath("twitter").type(STRING).description("트위터"),
-                    fieldWithPath("following").type(BOOLEAN).description("팔로잉 여부")
+                    fieldWithPath("following").type(NULL).description("팔로잉 여부")
                 )
             ));
         }
@@ -248,7 +248,8 @@ class UserControllerTest {
         @Test
         void getUserProfile_LoginUser_Success() throws Exception {
             // given
-            UserProfileResponseDto responseDto = UserFactory.mockLoginUserProfileResponseDto();
+            UserProfileResponseDto responseDto =
+                UserFactory.mockLoginUserProfileIsFollowingResponseDto();
 
             given(oAuthService.validateToken(anyString()))
                 .willReturn(true);
@@ -258,7 +259,7 @@ class UserControllerTest {
                 .willReturn(responseDto);
 
             // when
-            ResultActions perform = mockMvc.perform(get("/api/profiles/{userName}}", "testUser")
+            ResultActions perform = mockMvc.perform(get("/api/profiles/{userName}}", "testUser2")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer testToken")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.ALL));
