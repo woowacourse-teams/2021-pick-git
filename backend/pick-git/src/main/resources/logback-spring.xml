@@ -22,7 +22,6 @@
       </encoder>
     </appender>
 
-    <property name="home" value="logs/"/>
     <appender name="error-logger" class="ch.qos.logback.core.rolling.RollingFileAppender">
       <file>${home}error.log</file>
       <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
