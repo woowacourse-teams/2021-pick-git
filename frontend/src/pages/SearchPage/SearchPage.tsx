@@ -4,36 +4,43 @@ import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import Tabs from "../../components/@shared/Tabs/Tabs";
 import SearchListUser from "../../components/SearchListUser/SearchListUser";
 import useFollow from "../../services/hooks/useFollow";
-import useSearchData from "../../services/hooks/useSearchData";
+import useSearchUserData from "../../services/hooks/useSearchUserData";
 import { Container, Empty } from "./SearchPage.style";
 
 const tabNames = ["계정", "태그"];
 
 const SearchPage = () => {
   const [tabIndex, setTabIndex] = useState(0);
-  const { results, isError, isLoading, isFetchingNextPage, handleIntersect, refetch } = useSearchData();
+  const {
+    results: userSearchResults,
+    isError: isUserSearchError,
+    isLoading: isUserSearchLoading,
+    isFetchingNextPage: isUserSearchFetchingNextPage,
+    handleIntersect: handleUserSearchIntersect,
+    refetch: userSearchRefetch,
+  } = useSearchUserData();
   const follow = useFollow();
 
   const tabItems = tabNames.map((name, index) => ({ name, onTabChange: () => setTabIndex(index) }));
   const tabContents = [
     <SearchListUser
       key="user"
-      users={results.users}
-      isFetchingNextPage={isFetchingNextPage}
-      onIntersect={() => handleIntersect("users")}
+      users={userSearchResults}
+      isFetchingNextPage={isUserSearchFetchingNextPage}
+      onIntersect={handleUserSearchIntersect}
       follow={follow}
-      refetch={refetch}
+      refetch={userSearchRefetch}
     />,
     <Empty key="tag">서비스 준비중입니다.</Empty>,
   ];
 
   const Content = ({ tabIndex }: { tabIndex: number }) => {
-    if (isLoading) {
+    if (isUserSearchLoading) {
       return <PageLoading />;
     }
 
-    if (isError) {
-      return <Empty key="tag">검색결과를 표시할 수 없습니다.</Empty>;
+    if (isUserSearchError) {
+      return <Empty>검색결과를 표시할 수 없습니다.</Empty>;
     }
 
     return tabContents[tabIndex];

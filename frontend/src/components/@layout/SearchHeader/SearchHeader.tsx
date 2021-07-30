@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 
 import Input from "../../@shared/Input/Input";
@@ -22,6 +22,10 @@ const SearchHeader = () => {
     setLocalKeyword(value);
     applyKeywordToContext();
   };
+
+  useEffect(() => {
+    onKeywordChange("");
+  }, []);
 
   return (
     <Container>
