@@ -1,13 +1,10 @@
-import { useContext } from "react";
+import { Dispatch, SetStateAction, useContext } from "react";
 import { useHistory } from "react-router-dom";
 import { ThemeContext } from "styled-components";
 import { RepositoryIcon, SearchIcon } from "../../assets/icons";
 import { REDIRECT_MESSAGE } from "../../constants/messages";
-import { POST_ADD_STEPS } from "../../constants/steps";
 import { PAGE_URL } from "../../constants/urls";
 import useMessageModal from "../../services/hooks/@common/useMessageModal";
-import usePostAddStep from "../../services/hooks/usePostAddStep";
-import usePostUpload from "../../services/hooks/usePostUpload";
 import { useGithubRepositoriesQuery } from "../../services/queries";
 import { getAPIErrorMessage } from "../../utils/error";
 import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
@@ -23,9 +20,12 @@ import {
   RepositoryName,
 } from "./RepositorySelector.style";
 
-const RepositorySelector = () => {
-  const { setGithubRepositoryName } = usePostUpload();
-  const { goNextStep } = usePostAddStep(POST_ADD_STEPS, PAGE_URL.HOME);
+interface Props {
+  setGithubRepositoryName: Dispatch<SetStateAction<string>>;
+  goNextStep: () => void;
+}
+
+const RepositorySelector = ({ setGithubRepositoryName, goNextStep }: Props) => {
   const { data: repositories, isLoading, error } = useGithubRepositoriesQuery();
   const { modalMessage, isModalShown, showAlertModal, hideMessageModal } = useMessageModal();
   const { color } = useContext(ThemeContext);

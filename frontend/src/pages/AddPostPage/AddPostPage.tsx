@@ -11,7 +11,7 @@ import useMessageModal from "../../services/hooks/@common/useMessageModal";
 import MessageModalPortal from "../../components/@layout/MessageModalPortal/MessageModalPortal";
 import { FAILURE_MESSAGE, WARNING_MESSAGE } from "../../constants/messages";
 import {
-  getFailedValidationMessage,
+  getPostAddValidationMessage,
   isContentEmpty,
   isFilesEmpty,
   isValidContentLength,
@@ -20,20 +20,49 @@ import {
 } from "../../utils/postUpload";
 import { getAPIErrorMessage } from "../../utils/error";
 import usePostAddStep from "../../services/hooks/usePostAddStep";
+import { useGithubTagsQuery } from "../../services/queries";
 
 const AddPostPage = () => {
   const { stepIndex, goNextStep, setStepMoveEventHandler, removeStepMoveEventHandler, completeStep } = usePostAddStep(
     POST_ADD_STEPS,
     PAGE_URL.HOME
   );
-  const { content, githubRepositoryName, tags, files, uploadPost, resetPostUploadData } = usePostUpload();
+  const {
+    content,
+    githubRepositoryName,
+    tags,
+    files,
+    setContent,
+    setFiles,
+    setGithubRepositoryName,
+    setTags,
+    uploadPost,
+    resetPostUploadData,
+  } = usePostUpload();
   const { modalMessage, isModalShown, isCancelButtonShown, showAlertModal, showConfirmModal, hideMessageModal } =
     useMessageModal();
+  const tagsQueryResult = useGithubTagsQuery(githubRepositoryName);
 
   const stepComponents = [
-    <RepositorySelector key="repository-selector" />,
-    <PostContentUploader key="post-content-uploader" />,
-    <TagInputForm key="tag-input-form" />,
+    <RepositorySelector
+      key="repository-selector"
+      setGithubRepositoryName={setGithubRepositoryName}
+      goNextStep={goNextStep}
+    />,
+    <PostContentUploader
+      key="post-content-uploader"
+      isImageUploaderShown={true}
+      content={content}
+      setContent={setContent}
+      setFiles={setFiles}
+    />,
+    <TagInputForm
+      key="tag-input-form"
+      tagsQueryResult={tagsQueryResult}
+      githubRepositoryName={githubRepositoryName}
+      tags={tags}
+      setTags={setTags}
+    />,
   ];
 
   useEffect(() => {
@@ -43,7 +72,7 @@ const AddPostPage = () => {
 
   const handlePostAddComplete = async () => {
     if (!isValidPostUploadData({ content, githubRepositoryName, tags, files })) {
-      showAlertModal(getFailedValidationMessage({ content, githubRepositoryName, tags, files }));
+      showAlertModal(getPostAddValidationMessage({ content, githubRepositoryName, tags, files }));
       return;
     }
 
