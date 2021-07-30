@@ -59,11 +59,7 @@ export const requestDeleteFollow = async (username: string, accessToken: string 
   return response.data;
 };
 
-export const requestSetProfile = async (
-  profileImage: File | null,
-  description: string | null,
-  accessToken: string | null
-) => {
+export const requestSetProfile = async (profileImage: File | null, description: string, accessToken: string | null) => {
   if (!accessToken) {
     throw customError.noAccessToken;
   }
@@ -74,10 +70,10 @@ export const requestSetProfile = async (
 
   const formData = new FormData();
 
-  profileImage && formData.append("image", profileImage);
-  description && formData.append("description", description);
+  formData.append("image", profileImage ?? new File([], ""));
+  formData.append("description", description);
 
-  const response = await axios.put(API_URL.SELF_PROFILE, formData, {
+  const response = await axios.post(API_URL.SELF_PROFILE, formData, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
