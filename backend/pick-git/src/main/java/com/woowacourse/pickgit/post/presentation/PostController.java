@@ -100,10 +100,6 @@ public class PostController {
             .build();
     }
 
-    private URI redirectUrl(AppUser user, PostImageUrlResponseDto responseDto) {
-        return URI.create(String.format(REDIRECT_URL, user.getUsername(), responseDto.getId()));
-    }
-
     private PostRequestDto createPostRequestDto(AppUser user, PostRequest request) {
         return new PostRequestDto(
             user.getAccessToken(),

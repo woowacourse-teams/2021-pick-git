@@ -9,6 +9,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -23,6 +24,7 @@ import com.woowacourse.pickgit.exception.post.CannotUnlikeException;
 import com.woowacourse.pickgit.exception.post.CommentFormatException;
 import com.woowacourse.pickgit.exception.post.DuplicatedLikeException;
 import com.woowacourse.pickgit.exception.post.PostFormatException;
+import com.woowacourse.pickgit.exception.post.PostNotBelongToUserException;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.post.RepositoryParseException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
@@ -707,7 +709,8 @@ class PostServiceTest {
     @Test
     void update_TagsAndContentInCaseOfLoginUser_Success() {
         // given
-        User user = UserFactory.user(1L, "testUser");
+        LoginUser loginUser = new LoginUser("testUser", "Bearer testToken");
+        User user = UserFactory.user(1L, loginUser.getUsername());
         Post post = new PostBuilder()
             .id(1L)
             .content("testContent")
@@ -718,11 +721,12 @@ class PostServiceTest {
             .tags(List.of("java", "spring"))
             .content("hello")
             .build();
-        PostUpdateRequestDto updateRequestDto = new PostUpdateRequestDto(
-            new LoginUser("testUser", "Bearer testToken"), 1L,
+        PostUpdateRequestDto updateRequestDto = new PostUpdateRequestDto(loginUser, 1L,
             updateRequest.getTags(), updateRequest.getContent());
 
-        given(postRepository.findById(anyLong()))
+        given(userRepository.findByBasicProfile_Name(anyString()))
+            .willReturn(Optional.of(user));
+        given(postRepository.findByUser(any(User.class)))
             .willReturn(Optional.of(post));
         given(tagService.findOrCreateTags(any(TagsDto.class)))
             .willReturn(List.of(new Tag("java"), new Tag("spring")));
@@ -740,8 +744,10 @@ class PostServiceTest {
             .usingRecursiveComparison()
             .isEqualTo(responseDto);
 
+        verify(userRepository, times(1))
+            .findByBasicProfile_Name("testUser");
         verify(postRepository, times(2))
-            .findById(1L);
+            .findByUser(any(User.class));
         verify(tagService, times(1))
             .findOrCreateTags(any(TagsDto.class));
     }
@@ -750,7 +756,8 @@ class PostServiceTest {
     @Test
     void update_TagsInCaseOfLoginUser_Success() {
         // given
-        User user = UserFactory.user(1L, "testUser");
+        LoginUser loginUser = new LoginUser("testUser", "Bearer testToken");
+        User user = UserFactory.user(1L, loginUser.getUsername());
         Post post = new PostBuilder()
             .id(1L)
             .content("testContent")
@@ -761,11 +768,12 @@ class PostServiceTest {
             .tags(List.of())
             .content("hello")
             .build();
-        PostUpdateRequestDto updateRequestDto = new PostUpdateRequestDto(
-            new LoginUser("testUser", "Bearer testToken"), 1L,
+        PostUpdateRequestDto updateRequestDto = new PostUpdateRequestDto(loginUser, 1L,
             updateRequest.getTags(), updateRequest.getContent());
 
-        given(postRepository.findById(anyLong()))
+        given(userRepository.findByBasicProfile_Name(anyString()))
+            .willReturn(Optional.of(user));
+        given(postRepository.findByUser(any(User.class)))
             .willReturn(Optional.of(post));
         given(tagService.findOrCreateTags(any(TagsDto.class)))
             .willReturn(List.of());
@@ -783,8 +791,10 @@ class PostServiceTest {
             .usingRecursiveComparison()
             .isEqualTo(responseDto);
 
+        verify(userRepository, times(1))
+            .findByBasicProfile_Name("testUser");
         verify(postRepository, times(2))
-            .findById(1L);
+            .findByUser(any(User.class));
         verify(tagService, times(1))
             .findOrCreateTags(any(TagsDto.class));
     }
@@ -793,7 +803,8 @@ class PostServiceTest {
     @Test
     void update_ContentInCaseOfLoginUser_Success() {
         // given
-        User user = UserFactory.user(1L, "testUser");
+        LoginUser loginUser = new LoginUser("testUser", "Bearer testToken");
+        User user = UserFactory.user(1L, loginUser.getUsername());
         Post post = new PostBuilder()
             .id(1L)
             .content("testContent")
@@ -804,11 +815,12 @@ class PostServiceTest {
             .tags(List.of("java", "spring"))
             .content("testContent")
             .build();
-        PostUpdateRequestDto updateRequestDto = new PostUpdateRequestDto(
-            new LoginUser("testUser", "Bearer testToken"), 1L,
+        PostUpdateRequestDto updateRequestDto = new PostUpdateRequestDto(loginUser, 1L,
             updateRequest.getTags(), updateRequest.getContent());
 
-        given(postRepository.findById(anyLong()))
+        given(userRepository.findByBasicProfile_Name(anyString()))
+            .willReturn(Optional.of(user));
+        given(postRepository.findByUser(any(User.class)))
             .willReturn(Optional.of(post));
         given(tagService.findOrCreateTags(any(TagsDto.class)))
             .willReturn(List.of(new Tag("java"), new Tag("spring")));
@@ -826,8 +838,10 @@ class PostServiceTest {
             .usingRecursiveComparison()
             .isEqualTo(responseDto);
 
+        verify(userRepository, times(1))
+            .findByBasicProfile_Name("testUser");
         verify(postRepository, times(2))
-            .findById(1L);
+            .findByUser(any(User.class));
         verify(tagService, times(1))
             .findOrCreateTags(any(TagsDto.class));
     }
@@ -836,6 +850,8 @@ class PostServiceTest {
     @Test
     void update_GuestUser_401Exception() {
         // given
+        GuestUser guestUser = new GuestUser();
+
         PostUpdateRequest updateRequest = PostUpdateRequest.builder()
             .tags(List.of("java", "spring"))
             .content("testContent")
@@ -843,7 +859,7 @@ class PostServiceTest {
 
         // when
         assertThatThrownBy(() -> {
-            new PostUpdateRequestDto(new GuestUser(), 1L,
+            new PostUpdateRequestDto(guestUser, 1L,
                 updateRequest.getTags(), updateRequest.getContent());
         }).isInstanceOf(UnauthorizedException.class)
             .hasFieldOrPropertyWithValue("errorCode", "A0002")
@@ -851,19 +867,57 @@ class PostServiceTest {
             .hasMessage("권한 에러");
     }
 
-    @DisplayName("등록되지 않은 게시물의 내용을 수정할 수 없다. - 500 예외")
+    @DisplayName("해당하는 사용자의 게시물이 아닌 경우 수정할 수 없다. - 400 예외")
     @Test
-    void update_InvalidPost_500Exception() {
+    void update_PostNotBelongToUser_400Exception() {
         // given
+        LoginUser loginUser = new LoginUser("testUser", "Bearer testToken");
+        User user = UserFactory.user(1L, loginUser.getUsername());
+
+        given(userRepository.findByBasicProfile_Name(anyString()))
+            .willReturn(Optional.of(user));
+        given(postRepository.findByUser(any(User.class)))
+            .willThrow(new PostNotBelongToUserException());
+
         PostUpdateRequest updateRequest = PostUpdateRequest.builder()
             .tags(List.of("java", "spring"))
             .content("testContent")
             .build();
-        PostUpdateRequestDto updateRequestDto = new PostUpdateRequestDto(
-            new LoginUser("testUser", "Bearer testToken"), 1L,
+        PostUpdateRequestDto updateRequestDto = new PostUpdateRequestDto(loginUser, 1L,
             updateRequest.getTags(), updateRequest.getContent());
 
-        given(postRepository.findById(anyLong()))
+        // when
+        assertThatThrownBy(() -> {
+            postService.update(updateRequestDto);
+        }).isInstanceOf(PostNotBelongToUserException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "P0005")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
+            .hasMessage("해당하는 사용자의 게시물이 아닌 에러");
+
+        // then
+        verify(userRepository, times(1))
+            .findByBasicProfile_Name("testUser");
+        verify(postRepository, times(1))
+            .findByUser(any(User.class));
+    }
+
+    @DisplayName("등록되지 않은 게시물의 내용을 수정할 수 없다. - 500 예외")
+    @Test
+    void update_InvalidPost_500Exception() {
+        // given
+        LoginUser loginUser = new LoginUser("testUser", "Bearer testToken");
+        User user = UserFactory.user(1L, loginUser.getUsername());
+
+        PostUpdateRequest updateRequest = PostUpdateRequest.builder()
+            .tags(List.of("java", "spring"))
+            .content("testContent")
+            .build();
+        PostUpdateRequestDto updateRequestDto = new PostUpdateRequestDto(loginUser, 1L,
+            updateRequest.getTags(), updateRequest.getContent());
+
+        given(userRepository.findByBasicProfile_Name(anyString()))
+            .willReturn(Optional.of(user));
+        given(postRepository.findByUser(any(User.class)))
             .willThrow(new PostNotFoundException(
                 "P0002",
                 HttpStatus.INTERNAL_SERVER_ERROR,
@@ -879,53 +933,107 @@ class PostServiceTest {
             .hasMessage("해당하는 게시물을 찾을 수 없습니다.");
 
         // then
+        verify(userRepository, times(1))
+            .findByBasicProfile_Name("testUser");
         verify(postRepository, times(1))
-            .findById(1L);
+            .findByUser(any(User.class));
     }
 
     @DisplayName("사용자는 게시물을 삭제한다.")
     @Test
     void delete_LoginUser_Success() {
         // given
-        User user = UserFactory.user(1L, "testUser");
+        LoginUser loginUser = new LoginUser("testUser", "Bearer testToken");
+        User user = UserFactory.user(1L, loginUser.getUsername());
         Post post = new PostBuilder()
             .id(1L)
             .content("testContent")
             .user(user)
             .build();
 
-        given(postRepository.findById(anyLong()))
+        given(userRepository.findByBasicProfile_Name(anyString()))
+            .willReturn(Optional.of(user));
+        given(postRepository.findByUser(any(User.class)))
             .willReturn(Optional.of(post));
+        willDoNothing()
+            .given(postRepository)
+            .delete(any(Post.class));
 
-        PostDeleteRequestDto deleteRequestDto = new PostDeleteRequestDto(
-            new LoginUser("testUser", "Bearer testToken"), 1L);
+        PostDeleteRequestDto deleteRequestDto = new PostDeleteRequestDto(loginUser, 1L);
 
         // when
         postService.delete(deleteRequestDto);
 
         // then
+        verify(userRepository, times(1))
+            .findByBasicProfile_Name("testUser");
         verify(postRepository, times(1))
-            .findById(1L);
+            .findByUser(any(User.class));
+        verify(postRepository, times(1))
+            .delete(any(Post.class));
     }
 
     @DisplayName("게스트는 게시물을 삭제할 수 없다. - 401 예외")
     @Test
     void delete_GuestUser_401Exception() {
+        // given
+        GuestUser guestUser = new GuestUser();
+
         // when
         assertThatThrownBy(() -> {
-            new PostDeleteRequestDto(new GuestUser(), 1L);
+            new PostDeleteRequestDto(guestUser, 1L);
         }).isInstanceOf(UnauthorizedException.class)
             .hasFieldOrPropertyWithValue("errorCode", "A0002")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)
             .hasMessage("권한 에러");
     }
 
+    @DisplayName("해당하는 사용자의 게시물이 아닌 경우 삭제할 수 없다. - 400 예외")
+    @Test
+    void delete_PostNotBelongToUser_400Exception() {
+        // given
+        LoginUser loginUser = new LoginUser("testUser", "Bearer testToken");
+        User user = UserFactory.user(1L, loginUser.getUsername());
+
+        given(userRepository.findByBasicProfile_Name(anyString()))
+            .willReturn(Optional.of(user));
+        given(postRepository.findByUser(any(User.class)))
+            .willThrow(new PostNotBelongToUserException());
+
+        PostDeleteRequestDto deleteRequestDto = new PostDeleteRequestDto(loginUser, 1L);
+
+        // when
+        assertThatThrownBy(() -> {
+            postService.delete(deleteRequestDto);
+        }).isInstanceOf(PostNotBelongToUserException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "P0005")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
+            .hasMessage("해당하는 사용자의 게시물이 아닌 에러");
+
+        // then
+        verify(userRepository, times(1))
+            .findByBasicProfile_Name("testUser");
+        verify(postRepository, times(1))
+            .findByUser(any(User.class));
+    }
+
     @DisplayName("등록되지 않은 게시물을 삭제할 수 없다. - 500 예외")
     @Test
     void delete_InvalidPost_500Exception() {
         // given
-        PostDeleteRequestDto deleteRequestDto = new PostDeleteRequestDto(
-            new LoginUser("testUser", "Bearer testToken"), 1L);
+        LoginUser loginUser = new LoginUser("testUser", "Bearer testToken");
+        User user = UserFactory.user(1L, loginUser.getUsername());
+
+        PostDeleteRequestDto deleteRequestDto = new PostDeleteRequestDto(loginUser, 1L);
+
+        given(userRepository.findByBasicProfile_Name(anyString()))
+            .willReturn(Optional.of(user));
+        given(postRepository.findByUser(any(User.class)))
+            .willThrow(new PostNotFoundException(
+                "P0002",
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "해당하는 게시물을 찾을 수 없습니다."
+            ));
 
         // when
         assertThatThrownBy(() -> {
@@ -936,7 +1044,9 @@ class PostServiceTest {
             .hasMessage("해당하는 게시물을 찾을 수 없습니다.");
 
         // then
+        verify(userRepository, times(1))
+            .findByBasicProfile_Name("testUser");
         verify(postRepository, times(1))
-            .findById(1L);
+            .findByUser(any(User.class));
     }
 }
