@@ -334,13 +334,7 @@ class UserServiceIntegrationTest {
         searchedUsers.forEach(user -> userRepository.save(user));
 
         // when
-        User source = userRepository.findByBasicProfile_Name(loginUser.getName())
-            .orElseThrow();
-        User target = userRepository.findByBasicProfile_Name(searchedUsers.get(0).getName())
-            .orElseThrow();
-        source.follow(target);
-
-        userRepository.flush();
+        userService.followUser(new AuthUserRequestDto(loginUser.getName()), searchedUsers.get(0).getName());
 
         List<UserSearchResponseDto> searchResult =
             userService.searchUser(new LoginUser(loginUser.getName(), "token"),

@@ -10,6 +10,7 @@ import com.woowacourse.pickgit.user.application.dto.response.ContributionRespons
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.ProfileEditResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
+import com.woowacourse.pickgit.user.presentation.dto.request.ProfileEditRequest;
 import com.woowacourse.pickgit.user.presentation.dto.response.ContributionResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.FollowResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.ProfileEditResponse;
@@ -18,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -110,13 +112,12 @@ public class UserController {
     @PostMapping("/me")
     public ResponseEntity<ProfileEditResponse> editProfile(
         @Authenticated AppUser appUser,
-        @RequestParam(value = "image", required = false) MultipartFile image,
-        @RequestParam(value = "description") String description
+        @ModelAttribute ProfileEditRequest request
     ) {
         ProfileEditRequestDto requestDto = ProfileEditRequestDto
             .builder()
-            .image(image)
-            .decription(description)
+            .image(request.getImage())
+            .decription(request.getDescription())
             .build();
         ProfileEditResponseDto responseDto = userService.editProfile(appUser, requestDto);
 

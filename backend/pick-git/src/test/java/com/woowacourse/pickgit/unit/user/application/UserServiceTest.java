@@ -31,6 +31,7 @@ import com.woowacourse.pickgit.user.domain.UserRepository;
 import com.woowacourse.pickgit.user.application.dto.request.UserSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import java.io.File;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

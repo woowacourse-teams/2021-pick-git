@@ -245,29 +245,6 @@ class UserAcceptanceTest {
         assertThat(response.getDescription()).isEqualTo(description);
     }
 
-    @DisplayName("사용자는 자신의 프로필(한 줄 소개만 포함)을 수정할 수 있다.")
-    @Test
-    void editUserProfile_LoginUserWithDescription_Success() {
-        // given
-        String description = "updated profile description";
-
-        // when
-        ProfileEditResponse response = given().log().all()
-            .auth().oauth2(loginUserAccessToken)
-            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-            .formParams("description", description)
-            .multiPart("image", "")
-            .when()
-            .post("/api/profiles/me")
-            .then().log().all()
-            .extract()
-            .as(ProfileEditResponse.class);
-
-        // then
-        assertThat(response.getImageUrl()).isEqualTo(loginUser.getImage());
-        assertThat(response.getDescription()).isEqualTo(description);
-    }
-
     @DisplayName("게스트는 프로필을 수정할 수 없다.")
     @Test
     void editUserProfile_GuestUser_Fail() {

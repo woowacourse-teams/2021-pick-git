@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.user.presentation.dto.request;
 
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 public class ProfileEditRequest {
@@ -11,8 +12,8 @@ public class ProfileEditRequest {
     }
 
     public ProfileEditRequest(
-        MultipartFile image,
-        String description) {
+        @RequestParam(name = "image", required = false) MultipartFile image,
+        @RequestParam(name = "description") String description) {
         this.image = image;
         this.description = description;
     }
