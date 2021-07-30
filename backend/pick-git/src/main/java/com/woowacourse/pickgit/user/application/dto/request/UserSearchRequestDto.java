@@ -9,7 +9,7 @@ public class UserSearchRequestDto {
     private Long page;
     private Long limit;
 
-    public UserSearchRequestDto() {
+    private UserSearchRequestDto() {
     }
 
     public UserSearchRequestDto(String keyword, Long page, Long limit) {

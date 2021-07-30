@@ -13,5 +13,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByBasicProfile_Name(String name);
 
     @Query("select u from User u where u.basicProfile.name like %:username%")
-    List<User> findAllByUsername(@Param("username") String username, Pageable pageable);
+    List<User> searchByUsernameLike(@Param("username") String username, Pageable pageable);
 }

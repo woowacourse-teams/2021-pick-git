@@ -359,8 +359,8 @@ class UserAcceptanceTest {
         // given
         authenticatedPostRequest(loginUserAccessToken,
             String.format("/api/profiles/%s/followings", targetUser.getName()), HttpStatus.OK);
-        User unfollweredUser = UserFactory.user("testUser3");
-        로그인_되어있음(unfollweredUser);
+        User unfollowedUser = UserFactory.user("testUser3");
+        로그인_되어있음(unfollowedUser);
 
         // when
         String url = String.format("/api/search?keyword=%s&page=0&limit=5", "testUser");
@@ -368,12 +368,12 @@ class UserAcceptanceTest {
             .as(SearchResponse.class);
 
         // then
-        assertThat(response.getUsers()).hasSize(2);
         assertThat(response.getUsers())
+            .hasSize(2)
             .extracting("username", "following")
             .containsExactly(
                 tuple(targetUser.getName(), true),
-                tuple(unfollweredUser.getName(), false)
+                tuple(unfollowedUser.getName(), false)
             );
     }
 

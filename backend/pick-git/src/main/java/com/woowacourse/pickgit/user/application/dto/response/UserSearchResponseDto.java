@@ -6,7 +6,7 @@ public class UserSearchResponseDto {
     private String username;
     private Boolean following;
 
-    public UserSearchResponseDto() {
+    private UserSearchResponseDto() {
     }
 
     public UserSearchResponseDto(String imageUrl, String username, Boolean following) {

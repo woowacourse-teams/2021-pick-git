@@ -76,7 +76,7 @@ class UserRepositoryTest {
 
         // when
         Pageable pageable = PageRequest.of(0, 3);
-        List<User> searchResult = userRepository.findAllByUsername(searchKeyword, pageable);
+        List<User> searchResult = userRepository.searchByUsernameLike(searchKeyword, pageable);
 
         // then
         assertThat(searchResult).hasSize(3);
@@ -97,7 +97,7 @@ class UserRepositoryTest {
 
         // when
         Pageable pageable = PageRequest.of(1, 3);
-        List<User> searchResult = userRepository.findAllByUsername(seachKeyword, pageable);
+        List<User> searchResult = userRepository.searchByUsernameLike(seachKeyword, pageable);
 
         // then
         assertThat(searchResult).hasSize(2);
@@ -117,7 +117,7 @@ class UserRepositoryTest {
 
         // when
         Pageable pageable = PageRequest.of(0, 3);
-        List<User> searchResult = userRepository.findAllByUsername(searchKeyword, pageable);
+        List<User> searchResult = userRepository.searchByUsernameLike(searchKeyword, pageable);
 
         // then
         assertThat(searchResult).hasSize(0);

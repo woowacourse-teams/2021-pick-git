@@ -307,7 +307,8 @@ class UserServiceTest {
     void searchUser_LoginUser_Success() {
         // given
         String searchKeyword = "bing";
-        int page = 0; int limit = 5;
+        int page = 0;
+        int limit = 5;
         List<User> usersInDb = UserFactory.mockSearchUsersWithId();
         User loginUser = usersInDb.get(0);
         List<User> searchedUser = usersInDb.subList(1, usersInDb.size());
@@ -319,7 +320,7 @@ class UserServiceTest {
             .build();
 
         // mock
-        given(userRepository.findAllByUsername(searchKeyword, PageRequest.of(page, limit)))
+        given(userRepository.searchByUsernameLike(searchKeyword, PageRequest.of(page, limit)))
             .willReturn(searchedUser);
         given(userRepository.findByBasicProfile_Name(loginUser.getName()))
             .willReturn(Optional.ofNullable(loginUser));
@@ -337,7 +338,7 @@ class UserServiceTest {
         assertThat(searchResponses)
             .extracting("following")
             .containsExactly(true, false, false, false);
-        verify(userRepository, times(1)).findAllByUsername(anyString(), any(Pageable.class));
+        verify(userRepository, times(1)).searchByUsernameLike(searchKeyword, PageRequest.of(page, limit));
         verify(userRepository, times(1)).findByBasicProfile_Name(loginUser.getName());
     }
 
@@ -356,7 +357,7 @@ class UserServiceTest {
             .build();
 
         // mock
-        given(userRepository.findAllByUsername(searchKeyword, PageRequest.of(page, limit)))
+        given(userRepository.searchByUsernameLike(searchKeyword, PageRequest.of(page, limit)))
             .willReturn(usersInDb);
 
         // when
@@ -371,7 +372,7 @@ class UserServiceTest {
         assertThat(searchResult)
             .extracting("following")
             .containsExactly(null, null, null, null, null);
-        verify(userRepository, times(1)).findAllByUsername(anyString(), any(Pageable.class));
+        verify(userRepository, times(1)).searchByUsernameLike(searchKeyword, PageRequest.of(page, limit));
         verify(userRepository, times(0)).findByBasicProfile_Name(anyString());
     }
 }

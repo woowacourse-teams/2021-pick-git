@@ -11,6 +11,8 @@ import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -503,6 +505,10 @@ class UserControllerTest {
                 containsInRelativeOrder("bingbingdola", "bing", "bbbbbing")))
             .andExpect(jsonPath("$.users[*].following",
                 containsInRelativeOrder(true, false, false)));
+        verify(oAuthService, times(1))
+            .findRequestUserByToken(any());
+        verify(userService, times(1))
+            .searchUser(any(AppUser.class), any(UserSearchRequestDto.class));
 
         // restdocs
         perform.andDo(document("search-user-LoggedIn",
@@ -559,6 +565,10 @@ class UserControllerTest {
             .andExpect(jsonPath("$.users[*].following",
                 containsInRelativeOrder(nullValue(), nullValue(), nullValue()
             )));
+        verify(oAuthService, times(1))
+            .findRequestUserByToken(any());
+        verify(userService, times(1))
+            .searchUser(any(AppUser.class), any(UserSearchRequestDto.class));
 
         // restdocs
         perform.andDo(document("search-user-unLoggedIn",

@@ -16,6 +16,7 @@ import com.woowacourse.pickgit.user.domain.UserRepository;
 import com.woowacourse.pickgit.user.application.dto.request.UserSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import java.util.List;
+import java.util.function.Predicate;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -150,20 +151,43 @@ public class UserService {
     @Transactional(readOnly = true)
     public List<UserSearchResponseDto> searchUser(AppUser appUser, UserSearchRequestDto request) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getLimit());
-        List<User> users = userRepository.findAllByUsername(request.getKeyword(), pageable);
+        List<User> users = userRepository.searchByUsernameLike(request.getKeyword(), pageable);
 
         if (appUser.isGuest()) {
-            return users.stream()
-                .map(user -> new UserSearchResponseDto(user.getImage(), user.getName(), null))
-                .collect(toList());
+            return convertToUserSearchResponseDtoWithoutFollowing(users);
         }
 
         User loginUser = findUserByName(appUser.getUsername());
 
+        return convertToUserSearchResponseDtoWithFollowing(loginUser, users);
+    }
+
+    private List<UserSearchResponseDto> convertToUserSearchResponseDtoWithoutFollowing(
+        List<User> users
+    ) {
+        return users.stream()
+            .map(user -> new UserSearchResponseDto(
+                user.getImage(),
+                user.getName(),
+                null))
+            .collect(toList());
+    }
+
+    private List<UserSearchResponseDto> convertToUserSearchResponseDtoWithFollowing(
+        User loginUser,
+        List<User> users
+    ) {
         return users
             .stream()
-            .filter(user -> !user.equals(loginUser))
-            .map(user -> new UserSearchResponseDto(user.getImage(), user.getName(), loginUser.isFollowing(user)))
+            .filter(isLoginUser(loginUser))
+            .map(user -> new UserSearchResponseDto(
+                user.getImage(),
+                user.getName(),
+                loginUser.isFollowing(user)))
             .collect(toList());
+    }
+
+    private Predicate<User> isLoginUser(User loginUser) {
+        return user -> !user.equals(loginUser);
     }
 }
