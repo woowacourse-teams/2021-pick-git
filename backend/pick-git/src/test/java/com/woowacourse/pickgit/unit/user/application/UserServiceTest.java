@@ -59,6 +59,9 @@ class UserServiceTest {
     @Mock
     private PickGitStorage pickGitStorage;
 
+    @Mock
+    private PlatformContributionCalculator platformContributionCalculator;
+
     @DisplayName("getMyUserProfile 메서드는")
     @Nested
     class Describe_getMyUserProfile {
@@ -425,50 +428,6 @@ class UserServiceTest {
         }
     }
 
-    @DisplayName("누구든지 활동 통계를 조회할 수 있다.")
-    @Test
-    void calculateContributions_Anyone_Success() {
-        // given
-        User user = UserFactory.user();
-
-        Contribution contribution = new Contribution(11, 48, 48, 48, 48);
-
-        given(userRepository.findByBasicProfile_Name(anyString()))
-            .willReturn(Optional.of(user));
-        given(platformContributionCalculator.calculate(anyString()))
-            .willReturn(contribution);
-
-        ContributionResponseDto responseDto = UserFactory.mockContributionResponseDto();
-
-        // when
-        ContributionResponseDto contributions = userService.calculateContributions("testUser");
-
-        // then
-        assertThat(contributions)
-            .usingRecursiveComparison()
-            .isEqualTo(responseDto);
-
-        verify(userRepository, times(1))
-            .findByBasicProfile_Name(anyString());
-        verify(platformContributionCalculator, times(1))
-            .calculate(anyString());
-    }
-
-    @DisplayName("존재하지 않는 유저 이름으로 활동 통계를 조회할 수 없다. - 400 예외")
-    @Test
-    void calculateContributions_InvalidUsername_400Exception() {
-        // when
-        assertThatThrownBy(() -> {
-            userService.calculateContributions("invalidName");
-        }).isInstanceOf(InvalidUserException.class)
-            .hasFieldOrPropertyWithValue("errorCode", "U0001")
-            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
-            .hasMessage("유효하지 않은 유저입니다.");
-
-        // then
-        verify(userRepository, times(1))
-            .findByBasicProfile_Name(anyString());
-    }
 
     @DisplayName("자신의 프로필(이미지, 한 줄 소개 포함)을 수정할 수 있다.")
     @Test
@@ -758,6 +717,51 @@ class UserServiceTest {
         verify(userRepository, times(1))
             .searchByUsernameLike(searchKeyword, PageRequest.of(page, limit));
         verify(userRepository, times(0)).findByBasicProfile_Name(anyString());
+    }
+
+    @DisplayName("누구든지 활동 통계를 조회할 수 있다.")
+    @Test
+    void calculateContributions_Anyone_Success() {
+        // given
+        User user = UserFactory.user();
+
+        Contribution contribution = new Contribution(11, 48, 48, 48, 48);
+
+        given(userRepository.findByBasicProfile_Name("testUser"))
+            .willReturn(Optional.of(user));
+        given(platformContributionCalculator.calculate("testUser"))
+            .willReturn(contribution);
+
+        ContributionResponseDto responseDto = UserFactory.mockContributionResponseDto();
+
+        // when
+        ContributionResponseDto contributions = userService.calculateContributions("testUser");
+
+        // then
+        assertThat(contributions)
+            .usingRecursiveComparison()
+            .isEqualTo(responseDto);
+
+        verify(userRepository, times(1))
+            .findByBasicProfile_Name("testUser");
+        verify(platformContributionCalculator, times(1))
+            .calculate("testUser");
+    }
+
+    @DisplayName("존재하지 않는 유저 이름으로 활동 통계를 조회할 수 없다. - 400 예외")
+    @Test
+    void calculateContributions_InvalidUsername_400Exception() {
+        // when
+        assertThatThrownBy(() -> {
+            userService.calculateContributions("invalidName");
+        }).isInstanceOf(InvalidUserException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "U0001")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
+            .hasMessage("유효하지 않은 유저입니다.");
+
+        // then
+        verify(userRepository, times(1))
+            .findByBasicProfile_Name("invalidName");
     }
 
     private AuthUserRequestDto createLoginAuthUserRequestDto(String username) {

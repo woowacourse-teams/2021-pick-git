@@ -85,20 +85,6 @@ public class UserService {
             .build();
     }
 
-    public ContributionResponseDto calculateContributions(String username) {
-        User user = findUserByName(username);
-
-        Contribution contribution = platformContributionCalculator.calculate(user.getName());
-
-        return ContributionResponseDto.builder()
-            .starsCount(contribution.getStarsCount())
-            .commitsCount(contribution.getCommitsCount())
-            .prsCount(contribution.getPrsCount())
-            .issuesCount(contribution.getIssuesCount())
-            .reposCount(contribution.getReposCount())
-            .build();
-    }
-
     public ProfileEditResponseDto editProfile(AppUser appUser, ProfileEditRequestDto requestDto) {
         User user = findUserByName(appUser.getUsername());
 
@@ -171,6 +157,20 @@ public class UserService {
         return FollowResponseDto.builder()
             .followerCount(target.getFollowerCount())
             .isFollowing(isFollowing)
+            .build();
+    }
+
+    public ContributionResponseDto calculateContributions(String username) {
+        User user = findUserByName(username);
+
+        Contribution contribution = platformContributionCalculator.calculate(user.getName());
+
+        return ContributionResponseDto.builder()
+            .starsCount(contribution.getStarsCount())
+            .commitsCount(contribution.getCommitsCount())
+            .prsCount(contribution.getPrsCount())
+            .issuesCount(contribution.getIssuesCount())
+            .reposCount(contribution.getReposCount())
             .build();
     }
 

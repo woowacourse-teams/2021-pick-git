@@ -76,23 +76,6 @@ public class UserController {
             .build();
     }
 
-    @GetMapping("/{username}/contributions")
-    public ResponseEntity<ContributionResponse> getContributions(@PathVariable String username) {
-        ContributionResponseDto responseDto = userService.calculateContributions(username);
-
-        return ResponseEntity.ok(createContributionResponse(responseDto));
-    }
-
-    private ContributionResponse createContributionResponse(ContributionResponseDto responseDto) {
-        return ContributionResponse.builder()
-            .starsCount(responseDto.getStarsCount())
-            .commitsCount(responseDto.getCommitsCount())
-            .prsCount(responseDto.getPrsCount())
-            .issuesCount(responseDto.getIssuesCount())
-            .reposCount(responseDto.getReposCount())
-            .build();
-    }
-
     @PostMapping("/{username}/followings")
     public ResponseEntity<FollowResponse> followUser(
         @Authenticated AppUser appUser,
@@ -141,6 +124,23 @@ public class UserController {
         return FollowResponse.builder()
             .followerCount(followResponseDto.getFollowerCount())
             .following(followResponseDto.isFollowing())
+            .build();
+    }
+
+    @GetMapping("/{username}/contributions")
+    public ResponseEntity<ContributionResponse> getContributions(@PathVariable String username) {
+        ContributionResponseDto responseDto = userService.calculateContributions(username);
+
+        return ResponseEntity.ok(createContributionResponse(responseDto));
+    }
+
+    private ContributionResponse createContributionResponse(ContributionResponseDto responseDto) {
+        return ContributionResponse.builder()
+            .starsCount(responseDto.getStarsCount())
+            .commitsCount(responseDto.getCommitsCount())
+            .prsCount(responseDto.getPrsCount())
+            .issuesCount(responseDto.getIssuesCount())
+            .reposCount(responseDto.getReposCount())
             .build();
     }
 }

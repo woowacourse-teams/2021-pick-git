@@ -235,35 +235,6 @@ class UserAcceptanceTest {
         assertThat(response.getErrorCode()).isEqualTo("A0001");
     }
 
-    @DisplayName("누구든지 활동 통계를 조회할 수 있다.")
-    @Test
-    void getContributions_Anyone_Success() {
-        // given
-        ContributionResponseDto contributions = UserFactory.mockContributionResponseDto();
-
-        // when
-        ContributionResponse response = unauthenticatedGetRequest(
-            String.format("/api/profiles/%s/contributions", "testUser"), HttpStatus.OK)
-            .as(ContributionResponse.class);
-
-        // then
-        assertThat(response)
-            .usingRecursiveComparison()
-            .isEqualTo(contributions);
-    }
-
-    @DisplayName("유효하지 않은 유저 이름으로 활동 통계를 조회할 수 없다. - 400 예외")
-    @Test
-    void getContributions_invalidUsername_400Exception() {
-        // when
-        ApiErrorResponse response = unauthenticatedGetRequest(
-            String.format("/api/profiles/%s/contributions", "invalidName"), HttpStatus.BAD_REQUEST)
-            .as(ApiErrorResponse.class);
-
-        // then
-        assertThat(response.getErrorCode()).isEqualTo("U0001");
-    }
-
     @DisplayName("사용자는 자신의 프로필(이미지, 한 줄 소개 포함)을 수정할 수 있다.")
     @Test
     void editUserProfile_LoginUserWithImageAndDescription_Success() {
@@ -533,6 +504,39 @@ class UserAcceptanceTest {
                 tuple(loginUser.getName(), null),
                 tuple(targetUser.getName(), null)
             );
+    }
+
+    @DisplayName("누구든지 활동 통계를 조회할 수 있다.")
+    @Test
+    void getContributions_Anyone_Success() {
+        // given
+        ContributionResponseDto contributions = UserFactory.mockContributionResponseDto();
+
+        // when
+        ContributionResponse response = unauthenticatedRequest(
+            String.format("/api/profiles/%s/contributions", "testUser"),
+            Method.GET,
+            HttpStatus.OK
+        ).as(ContributionResponse.class);
+
+        // then
+        assertThat(response)
+            .usingRecursiveComparison()
+            .isEqualTo(contributions);
+    }
+
+    @DisplayName("유효하지 않은 유저 이름으로 활동 통계를 조회할 수 없다. - 400 예외")
+    @Test
+    void getContributions_invalidUsername_400Exception() {
+        // when
+        ApiErrorResponse response = unauthenticatedRequest(
+            String.format("/api/profiles/%s/contributions", "invalidName"),
+            Method.GET,
+            HttpStatus.BAD_REQUEST
+        ).as(ApiErrorResponse.class);
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("U0001");
     }
 
     private ExtractableResponse<Response> authenticatedRequest(
