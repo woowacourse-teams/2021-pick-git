@@ -740,7 +740,7 @@ class PostServiceTest {
             .usingRecursiveComparison()
             .isEqualTo(responseDto);
 
-        verify(postRepository, times(1))
+        verify(postRepository, times(2))
             .findById(anyLong());
         verify(tagService, times(1))
             .findOrCreateTags(any(TagsDto.class));
@@ -783,7 +783,7 @@ class PostServiceTest {
             .usingRecursiveComparison()
             .isEqualTo(responseDto);
 
-        verify(postRepository, times(1))
+        verify(postRepository, times(2))
             .findById(anyLong());
         verify(tagService, times(1))
             .findOrCreateTags(any(TagsDto.class));
@@ -826,7 +826,7 @@ class PostServiceTest {
             .usingRecursiveComparison()
             .isEqualTo(responseDto);
 
-        verify(postRepository, times(1))
+        verify(postRepository, times(2))
             .findById(anyLong());
         verify(tagService, times(1))
             .findOrCreateTags(any(TagsDto.class));

@@ -205,25 +205,13 @@ public class PostService {
         return new LikeResponseDto(target.getLikeCounts(), false);
     }
 
-    private Post findPostById(Long id) {
-        return postRepository.findById(id)
-            .orElseThrow(() -> new PostNotFoundException(
-                "P0002",
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "해당하는 게시물을 찾을 수 없습니다.")
-            );
-    }
-
     public PostUpdateResponseDto update(PostUpdateRequestDto updateRequestDto) {
-        Post post = postRepository.findById(updateRequestDto.getPostId())
-            .orElseThrow(() -> new PostNotFoundException(
-                "P0002",
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "해당하는 게시물을 찾을 수 없습니다."
-            ));
+        Post post = findPostById(updateRequestDto.getPostId());
         List<Tag> tags = tagService.findOrCreateTags(new TagsDto(updateRequestDto.getTags()));
 
-        Post updatedPost = post.update(updateRequestDto.getContent(), tags);
+        post.update(updateRequestDto.getContent(), tags);
+
+        Post updatedPost = findPostById(updateRequestDto.getPostId());
 
         return PostUpdateResponseDto.builder()
             .content(updatedPost.getContent())
@@ -232,13 +220,17 @@ public class PostService {
     }
 
     public void delete(PostDeleteRequestDto deleteRequestDto) {
-        Post post = postRepository.findById(deleteRequestDto.getPostId())
+        Post post = findPostById(deleteRequestDto.getPostId());
+
+        postRepository.delete(post);
+    }
+
+    private Post findPostById(Long id) {
+        return postRepository.findById(id)
             .orElseThrow(() -> new PostNotFoundException(
                 "P0002",
                 HttpStatus.INTERNAL_SERVER_ERROR,
-                "해당하는 게시물을 찾을 수 없습니다."
-            ));
-
-        postRepository.delete(post);
+                "해당하는 게시물을 찾을 수 없습니다.")
+            );
     }
 }

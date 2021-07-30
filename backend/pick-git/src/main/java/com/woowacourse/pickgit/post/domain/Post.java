@@ -159,13 +159,11 @@ public class Post {
         return id;
     }
 
-    public Post update(String content, List<Tag> tags) {
+    public void update(String content, List<Tag> tags) {
         postTags.clear();
 
         this.content = new PostContent(content);
         addTags(tags);
-
-        return this;
     }
 
     public List<String> getImageUrls() {
