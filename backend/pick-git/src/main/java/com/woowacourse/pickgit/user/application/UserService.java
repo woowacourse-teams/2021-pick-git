@@ -1,5 +1,7 @@
 package com.woowacourse.pickgit.user.application;
 
+import static java.util.stream.Collectors.toList;
+
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
 import com.woowacourse.pickgit.exception.user.SameSourceTargetUserException;
@@ -11,6 +13,11 @@ import com.woowacourse.pickgit.user.domain.Contribution;
 import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.application.dto.request.UserSearchRequestDto;
+import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
+import java.util.List;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -138,5 +145,25 @@ public class UserService {
         if (source.getId().equals(target.getId())) {
             throw new SameSourceTargetUserException();
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserSearchResponseDto> searchUser(AppUser appUser, UserSearchRequestDto request) {
+        Pageable pageable = PageRequest.of(request.getPage(), request.getLimit());
+        List<User> users = userRepository.findAllByUsername(request.getKeyword(), pageable);
+
+        if (appUser.isGuest()) {
+            return users.stream()
+                .map(user -> new UserSearchResponseDto(user.getImage(), user.getName(), null))
+                .collect(toList());
+        }
+
+        User loginUser = findUserByName(appUser.getUsername());
+
+        return users
+            .stream()
+            .filter(user -> !user.equals(loginUser))
+            .map(user -> new UserSearchResponseDto(user.getImage(), user.getName(), loginUser.isFollowing(user)))
+            .collect(toList());
     }
 }

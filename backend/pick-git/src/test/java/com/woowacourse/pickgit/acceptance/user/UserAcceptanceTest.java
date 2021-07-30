@@ -1,6 +1,7 @@
 package com.woowacourse.pickgit.acceptance.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.groups.Tuple.tuple;
 import static org.mockito.Mockito.when;
 
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
@@ -14,10 +15,12 @@ import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponse
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.presentation.dto.response.ContributionResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.FollowResponse;
+import com.woowacourse.pickgit.user.presentation.dto.response.SearchResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.UserProfileResponse;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -348,6 +351,48 @@ class UserAcceptanceTest {
 
         //then
         assertThat(response.getErrorCode()).isEqualTo("U0003");
+    }
+
+    @DisplayName("로그인 - 저장된 유저중 유사한 이름을 가진 유저를 검색할 수 있다. 단, 자기 자신은 검색되지 않는다.(팔로잉 여부 true/false)")
+    @Test
+    void searchUser_LoginUser_Success() {
+        // given
+        authenticatedPostRequest(loginUserAccessToken,
+            String.format("/api/profiles/%s/followings", targetUser.getName()), HttpStatus.OK);
+        User unfollweredUser = UserFactory.user("testUser3");
+        로그인_되어있음(unfollweredUser);
+
+        // when
+        String url = String.format("/api/search?keyword=%s&page=0&limit=5", "testUser");
+        SearchResponse response = authenticatedGetRequest(loginUserAccessToken, url, HttpStatus.OK)
+            .as(SearchResponse.class);
+
+        // then
+        assertThat(response.getUsers()).hasSize(2);
+        assertThat(response.getUsers())
+            .extracting("username", "following")
+            .containsExactly(
+                tuple(targetUser.getName(), true),
+                tuple(unfollweredUser.getName(), false)
+            );
+    }
+
+    @DisplayName("비 로그인 - 저장된 유저중 유사한 이름을 가진 유저를 검색할 수 있다. (팔로잉 필드 null)")
+    @Test
+    void searchUser_GuestUser_Success() {
+        // when
+        String url = String.format("/api/search?keyword=%s&page=0&limit=5", "testUser");
+        SearchResponse response = unauthenticatedGetRequest(url, HttpStatus.OK)
+            .as(SearchResponse.class);
+
+        // then
+        assertThat(response.getUsers()).hasSize(2);
+        assertThat(response.getUsers())
+            .extracting("username", "following")
+            .containsExactly(
+                tuple(loginUser.getName(), null),
+                tuple(targetUser.getName(), null)
+            );
     }
 
     private ExtractableResponse<Response> authenticatedGetRequest(
