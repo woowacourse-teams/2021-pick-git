@@ -17,7 +17,9 @@ import com.woowacourse.pickgit.post.application.dto.CommentResponse;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.presentation.dto.request.ContentRequest;
+import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
 import com.woowacourse.pickgit.post.presentation.dto.response.LikeResponse;
+import com.woowacourse.pickgit.post.presentation.dto.response.PostUpdateResponse;
 import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.ExtractableResponse;
@@ -680,6 +682,159 @@ class PostAcceptanceTest {
             .get("/api/github/{username}/repositories", username)
             .then().log().all()
             .statusCode(statusCode)
+            .extract();
+    }
+
+    @DisplayName("사용자는 게시물을 수정한다.")
+    @Test
+    void update_LoginUser_Success() {
+        // given
+        String token = 로그인_되어있음(USERNAME).getToken();
+
+        requestWrite(token);
+
+        PostUpdateRequest updateRequest = PostUpdateRequest.builder()
+            .tags(List.of("java", "spring"))
+            .content("hello")
+            .build();
+
+        PostUpdateResponse response = PostUpdateResponse.builder()
+            .tags(List.of("java", "spring"))
+            .content("hello")
+            .build();
+
+        // when
+        PostUpdateResponse updateResponse =
+            putApiForUpdate(token, updateRequest, HttpStatus.CREATED)
+                .as(PostUpdateResponse.class);
+
+        // then
+        assertThat(updateResponse)
+            .usingRecursiveComparison()
+            .isEqualTo(response);
+    }
+
+    @DisplayName("유효하지 않은 내용(null)의 게시물은 수정할 수 없다. - 400 예외")
+    @Test
+    void update_NullContent_400Exception() {
+        // given
+        String token = 로그인_되어있음(USERNAME).getToken();
+
+        requestWrite(token);
+
+        PostUpdateRequest updateRequest = PostUpdateRequest.builder()
+            .tags(List.of("java", "spring"))
+            .content(null)
+            .build();
+
+        // when
+        ApiErrorResponse response =
+            putApiForUpdate(token, updateRequest, HttpStatus.BAD_REQUEST)
+                .as(ApiErrorResponse.class);
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("F0001");
+    }
+
+    @DisplayName("유효하지 않은 내용(500자 초과)의 게시물은 수정할 수 없다. - 400 예외")
+    @Test
+    void update_Over500Content_400Exception() {
+        // given
+        String token = 로그인_되어있음(USERNAME).getToken();
+
+        requestWrite(token);
+
+        PostUpdateRequest updateRequest = PostUpdateRequest.builder()
+            .tags(List.of("java", "spring"))
+            .content("a".repeat(501))
+            .build();
+
+        // when
+        ApiErrorResponse response =
+            putApiForUpdate(token, updateRequest, HttpStatus.BAD_REQUEST)
+                .as(ApiErrorResponse.class);
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("F0004");
+    }
+
+    @DisplayName("유효하지 않은 토큰으로 게시물을 수정할 수 없다. - 401 예외")
+    @Test
+    void update_InvalidToken_401Exception() {
+        // given
+        String token = 로그인_되어있음(USERNAME).getToken();
+
+        requestWrite(token);
+
+        PostUpdateRequest updateRequest = PostUpdateRequest.builder()
+            .tags(List.of("java", "spring"))
+            .content("hello")
+            .build();
+
+        // when
+        ApiErrorResponse response =
+            putApiForUpdate("invalidToken", updateRequest, HttpStatus.UNAUTHORIZED)
+                .as(ApiErrorResponse.class);
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("A0001");
+    }
+
+    private ExtractableResponse<Response> putApiForUpdate(
+        String token,
+        PostUpdateRequest updateRequest,
+        HttpStatus httpStatus
+    ) {
+        return given().log().all()
+            .auth().oauth2(token)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(updateRequest)
+            .when()
+            .put("/api/posts/{postId}", 1L)
+            .then().log().all()
+            .statusCode(httpStatus.value())
+            .extract();
+    }
+
+    @DisplayName("사용자는 게시물을 삭제한다.")
+    @Test
+    void delete_LoginUser_Success() {
+        // given
+        String token = 로그인_되어있음(USERNAME).getToken();
+
+        requestWrite(token);
+
+        // when
+        deleteApiForUpdate(token, HttpStatus.NO_CONTENT);
+    }
+
+    @DisplayName("유효하지 않은 토큰으로 게시물을 삭제할 수 없다. - 401 예외")
+    @Test
+    void delete_invalidToken_401Exception() {
+        // given
+        String token = 로그인_되어있음(USERNAME).getToken();
+
+        requestWrite(token);
+
+        // when
+        ApiErrorResponse response =
+            deleteApiForUpdate("invalidToken", HttpStatus.UNAUTHORIZED)
+                .as(ApiErrorResponse.class);
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("A0001");
+    }
+
+    private ExtractableResponse<Response> deleteApiForUpdate(
+        String token,
+        HttpStatus httpStatus) {
+        return given().log().all()
+            .auth().oauth2(token)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .delete("/api/posts/{postId}", 1L)
+            .then().log().all()
+            .statusCode(httpStatus.value())
             .extract();
     }
 

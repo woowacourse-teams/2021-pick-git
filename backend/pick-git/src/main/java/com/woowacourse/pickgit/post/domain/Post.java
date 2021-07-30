@@ -60,7 +60,11 @@ public class Post {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @OneToMany(
+        mappedBy = "post",
+        fetch = FetchType.LAZY,
+        cascade = {CascadeType.PERSIST, CascadeType.REMOVE}
+    )
     private List<PostTag> postTags = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -100,35 +104,16 @@ public class Post {
         comments.addComment(comment);
     }
 
-    public void addTags(List<Tag> tags) {
-        validateDuplicateTag(tags);
-        List<Tag> existingTags = getTags();
-        for (Tag tag : tags) {
-            validateDuplicateTagAlreadyExistsInPost(existingTags, tag);
-            PostTag postTag = new PostTag(this, tag);
-            postTags.add(postTag);
-        }
-    }
-
-    private void validateDuplicateTag(List<Tag> tags) {
-        Set<String> nonDuplicatetagNames = tags.stream()
-            .map(Tag::getName)
-            .collect(toSet());
-        if (nonDuplicatetagNames.size() != tags.size()) {
-            throw new CannotAddTagException();
-        }
-    }
-
     public List<Tag> getTags() {
         return postTags.stream()
             .map(PostTag::getTag)
             .collect(toList());
     }
 
-    private void validateDuplicateTagAlreadyExistsInPost(List<Tag> existingTags, Tag tag) {
-        if (existingTags.contains(tag)) {
-            throw new CannotAddTagException();
-        }
+    public List<String> getTagNames() {
+        return postTags.stream()
+            .map(PostTag::getTagName)
+            .collect(toList());
     }
 
     public void like(User user) {
@@ -143,6 +128,40 @@ public class Post {
 
     public boolean isLikedBy(String userName) {
         return likes.contains(userName);
+    }
+
+    public void updateContent(String content) {
+        this.content = new PostContent(content);
+    }
+
+    public void updateTags(List<Tag> tags) {
+        postTags.clear();
+        addTags(tags);
+    }
+
+    public void addTags(List<Tag> tags) {
+        validateDuplicateTag(tags);
+        List<Tag> existingTags = getTags();
+        for (Tag tag : tags) {
+            validateDuplicateTagAlreadyExistsInPost(existingTags, tag);
+            PostTag postTag = new PostTag(this, tag);
+            postTags.add(postTag);
+        }
+    }
+
+    private void validateDuplicateTag(List<Tag> tags) {
+        Set<String> nonDuplicateTagNames = tags.stream()
+            .map(Tag::getName)
+            .collect(toSet());
+        if (nonDuplicateTagNames.size() != tags.size()) {
+            throw new CannotAddTagException();
+        }
+    }
+
+    private void validateDuplicateTagAlreadyExistsInPost(List<Tag> existingTags, Tag tag) {
+        if (existingTags.contains(tag)) {
+            throw new CannotAddTagException();
+        }
     }
 
     public Long getId() {

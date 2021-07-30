@@ -14,7 +14,11 @@ import javax.persistence.OneToMany;
 @Embeddable
 public class Images {
 
-    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @OneToMany(
+        mappedBy = "post",
+        fetch = FetchType.LAZY,
+        cascade = {CascadeType.PERSIST, CascadeType.REMOVE}
+    )
     private List<Image> images = new ArrayList<>();
 
     protected Images() {

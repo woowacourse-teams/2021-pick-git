@@ -4,14 +4,18 @@ import static java.util.stream.Collectors.toList;
 
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
+import com.woowacourse.pickgit.exception.post.PostNotBelongToUserException;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
+import com.woowacourse.pickgit.post.application.dto.request.PostDeleteRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
 import com.woowacourse.pickgit.post.domain.PickGitStorage;
 import com.woowacourse.pickgit.post.domain.PlatformRepositoryExtractor;
@@ -83,15 +87,6 @@ public class PostService {
 
         Post findPost = postRepository.save(post);
         return new PostImageUrlResponseDto(findPost.getId(), findPost.getImageUrls());
-    }
-
-    private User findUserByName(String username) {
-        return userRepository
-            .findByBasicProfile_Name(username)
-            .orElseThrow(() -> new UserNotFoundException(
-                "U0001",
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "해당하는 사용자를 찾을 수 없습니다."));
     }
 
     private Images getImagesFrom(PostRequestDto postRequestDto) {
@@ -209,5 +204,43 @@ public class PostService {
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "해당하는 게시물을 찾을 수 없습니다.")
             );
+    }
+
+    public PostUpdateResponseDto update(PostUpdateRequestDto updateRequestDto) {
+        User user = findUserByName(updateRequestDto.getUsername());
+        Post post = findPostByUser(user);
+
+        List<Tag> tags = tagService.findOrCreateTags(new TagsDto(updateRequestDto.getTags()));
+
+        post.updateContent(updateRequestDto.getContent());
+        post.updateTags(tags);
+
+        Post updatedPost = findPostByUser(user);
+
+        return PostUpdateResponseDto.builder()
+            .content(updatedPost.getContent())
+            .tags(updatedPost.getTagNames())
+            .build();
+    }
+
+    public void delete(PostDeleteRequestDto deleteRequestDto) {
+        User user = findUserByName(deleteRequestDto.getUsername());
+        Post post = findPostByUser(user);
+
+        postRepository.delete(post);
+    }
+
+    private User findUserByName(String username) {
+        return userRepository
+            .findByBasicProfile_Name(username)
+            .orElseThrow(() -> new UserNotFoundException(
+                "U0001",
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "해당하는 사용자를 찾을 수 없습니다."));
+    }
+
+    private Post findPostByUser(User user) {
+        return postRepository.findByUser(user)
+            .orElseThrow(PostNotBelongToUserException::new);
     }
 }

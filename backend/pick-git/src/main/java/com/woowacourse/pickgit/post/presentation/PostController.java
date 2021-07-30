@@ -5,23 +5,26 @@ import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
-import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
-import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
+import com.woowacourse.pickgit.post.application.dto.request.PostDeleteRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
+import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
 import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.presentation.dto.request.CommentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.ContentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.HomeFeedRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.PostRequest;
-
+import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
 import com.woowacourse.pickgit.post.presentation.dto.response.LikeResponse;
+import com.woowacourse.pickgit.post.presentation.dto.response.PostUpdateResponse;
 import java.net.URI;
 import java.util.List;
 import javax.validation.Valid;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -54,8 +57,8 @@ public class PostController {
         @RequestParam Long limit
     ) {
         HomeFeedRequest homeFeedRequest = new HomeFeedRequest(appUser, page, limit);
-        List<PostResponseDto> postResponseDtos = postService.readHomeFeed(homeFeedRequest);
-        return ResponseEntity.ok(postResponseDtos);
+        List<PostResponseDto> postResponsesDto = postService.readHomeFeed(homeFeedRequest);
+        return ResponseEntity.ok(postResponsesDto);
     }
 
     @GetMapping("/posts/me")
@@ -77,9 +80,9 @@ public class PostController {
         @RequestParam Long limit
     ) {
         HomeFeedRequest homeFeedRequest = new HomeFeedRequest(appUser, page, limit);
-        List<PostResponseDto> postResponseDtos = postService
+        List<PostResponseDto> postResponsesDto = postService
             .readUserFeed(homeFeedRequest, username);
-        return ResponseEntity.ok(postResponseDtos);
+        return ResponseEntity.ok(postResponsesDto);
     }
 
     @PostMapping("/posts")
@@ -93,12 +96,8 @@ public class PostController {
             .write(createPostRequestDto(user, request));
 
         return ResponseEntity
-            .created(redirectUrl(user, responseDto))
+            .created(redirectUrl(user.getUsername(), responseDto.getId()))
             .build();
-    }
-
-    private URI redirectUrl(AppUser user, PostImageUrlResponseDto responseDto) {
-        return URI.create(String.format(REDIRECT_URL, user.getUsername(), responseDto.getId()));
     }
 
     private PostRequestDto createPostRequestDto(AppUser user, PostRequest request) {
@@ -171,5 +170,58 @@ public class PostController {
         if (user.isGuest()) {
             throw new UnauthorizedException();
         }
+    }
+
+    @PutMapping("/posts/{postId}")
+    public ResponseEntity<PostUpdateResponse> update(
+        @Authenticated AppUser user,
+        @PathVariable Long postId,
+        @Valid @RequestBody PostUpdateRequest updateRequest
+    ) {
+        PostUpdateResponseDto updateResponseDto = postService
+            .update(createPostUpdateRequestDto(user, postId, updateRequest));
+
+        return ResponseEntity
+            .created(redirectUrl(user.getUsername(), postId))
+            .body(createPostUpdateResponse(updateResponseDto));
+    }
+
+    private PostUpdateRequestDto createPostUpdateRequestDto(
+        AppUser user,
+        Long postId,
+        PostUpdateRequest updateRequest) {
+        return new PostUpdateRequestDto(
+            user,
+            postId,
+            updateRequest.getTags(),
+            updateRequest.getContent()
+        );
+    }
+
+    private PostUpdateResponse createPostUpdateResponse(PostUpdateResponseDto updateResponseDto) {
+        return PostUpdateResponse.builder()
+            .tags(updateResponseDto.getTags())
+            .content(updateResponseDto.getContent())
+            .build();
+    }
+
+    private URI redirectUrl(String username, Long postId) {
+        return URI.create(String.format(REDIRECT_URL, username, postId));
+    }
+
+    @DeleteMapping("/posts/{postId}")
+    public ResponseEntity<Void> delete(
+        @Authenticated AppUser user,
+        @PathVariable Long postId
+    ) {
+        postService.delete(createPostDeleteRequestDto(user, postId));
+
+        return ResponseEntity
+            .noContent()
+            .build();
+    }
+
+    private PostDeleteRequestDto createPostDeleteRequestDto(AppUser user, Long postId) {
+        return new PostDeleteRequestDto(user, postId);
     }
 }

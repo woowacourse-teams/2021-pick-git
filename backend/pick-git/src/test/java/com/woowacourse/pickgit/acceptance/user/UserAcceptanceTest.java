@@ -418,7 +418,8 @@ class UserAcceptanceTest {
         String url = String.format("/api/search/users?keyword=%s&page=0&limit=5", "testUser");
         List<UserSearchResponseDto> response =
             authenticatedGetRequest(loginUserAccessToken, url, HttpStatus.OK)
-            .as(new TypeRef<List<UserSearchResponseDto>>() {});
+                .as(new TypeRef<List<UserSearchResponseDto>>() {
+                });
 
         // then
         assertThat(response)
@@ -436,7 +437,8 @@ class UserAcceptanceTest {
         // when
         String url = String.format("/api/search/users?keyword=%s&page=0&limit=5", "testUser");
         List<UserSearchResponseDto> response = unauthenticatedGetRequest(url, HttpStatus.OK)
-            .as(new TypeRef<List<UserSearchResponseDto>>() {});
+            .as(new TypeRef<List<UserSearchResponseDto>>() {
+            });
 
         // then
         assertThat(response)
