@@ -7,11 +7,14 @@ import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
+import com.woowacourse.pickgit.post.application.dto.request.PostDeleteRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
 import com.woowacourse.pickgit.post.domain.PickGitStorage;
 import com.woowacourse.pickgit.post.domain.PlatformRepositoryExtractor;
@@ -209,5 +212,29 @@ public class PostService {
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "해당하는 게시물을 찾을 수 없습니다.")
             );
+    }
+
+    public PostUpdateResponseDto update(PostUpdateRequestDto updateRequestDto) {
+        Post post = postRepository.findById(updateRequestDto.getPostId())
+            .orElseThrow(() -> new PostNotFoundException(
+                "P0002",
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "해당하는 게시물을 찾을 수 없습니다."
+            ));
+
+        post.update(updateRequestDto.getContent(), updateRequestDto.getTags());
+
+        return PostUpdateResponseDto.toPostUpdateResponseDto(updateRequestDto);
+    }
+
+    public void delete(PostDeleteRequestDto deleteRequestDto) {
+        Post post = postRepository.findById(deleteRequestDto.getPostId())
+            .orElseThrow(() -> new PostNotFoundException(
+                "P0002",
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "해당하는 게시물을 찾을 수 없습니다."
+            ));
+
+        postRepository.delete(post);
     }
 }

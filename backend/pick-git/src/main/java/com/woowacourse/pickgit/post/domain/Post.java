@@ -111,10 +111,10 @@ public class Post {
     }
 
     private void validateDuplicateTag(List<Tag> tags) {
-        Set<String> nonDuplicatetagNames = tags.stream()
+        Set<String> nonDuplicateTagNames = tags.stream()
             .map(Tag::getName)
             .collect(toSet());
-        if (nonDuplicatetagNames.size() != tags.size()) {
+        if (nonDuplicateTagNames.size() != tags.size()) {
             throw new CannotAddTagException();
         }
     }
@@ -147,6 +147,19 @@ public class Post {
 
     public Long getId() {
         return id;
+    }
+
+    public void update(String content, List<String> tags) {
+        postTags.clear();
+
+        this.content = new PostContent(content);
+        addTags(convertToTag(tags));
+    }
+
+    private List<Tag> convertToTag(List<String> tags) {
+        return tags.stream()
+            .map(Tag::new)
+            .collect(toList());
     }
 
     public List<String> getImageUrls() {

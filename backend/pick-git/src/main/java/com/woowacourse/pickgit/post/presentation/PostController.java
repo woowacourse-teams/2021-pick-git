@@ -5,23 +5,26 @@ import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
-import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
-import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
+import com.woowacourse.pickgit.post.application.dto.request.PostDeleteRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
+import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
 import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.presentation.dto.request.CommentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.ContentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.HomeFeedRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.PostRequest;
-
+import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
 import com.woowacourse.pickgit.post.presentation.dto.response.LikeResponse;
+import com.woowacourse.pickgit.post.presentation.dto.response.PostUpdateResponse;
 import java.net.URI;
 import java.util.List;
 import javax.validation.Valid;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -93,7 +96,7 @@ public class PostController {
             .write(createPostRequestDto(user, request));
 
         return ResponseEntity
-            .created(redirectUrl(user, responseDto))
+            .created(redirectUrl(user.getUsername(), responseDto.getId()))
             .build();
     }
 
@@ -171,5 +174,35 @@ public class PostController {
         if (user.isGuest()) {
             throw new UnauthorizedException();
         }
+    }
+
+    @PutMapping("/posts/{postId}")
+    public ResponseEntity<PostUpdateResponse> update(
+        @Authenticated AppUser user,
+        @PathVariable Long postId,
+        @Valid @RequestBody PostUpdateRequest updateRequest
+    ) {
+        PostUpdateResponseDto responseDto =
+            postService.update(PostUpdateRequestDto.toUpdateRequestDto(postId, updateRequest));
+
+        return ResponseEntity
+            .created(redirectUrl(user.getUsername(), postId))
+            .body(PostUpdateResponse.toPostUpdateResponse(responseDto));
+    }
+
+    private URI redirectUrl(String username, Long postId) {
+        return URI.create(String.format(REDIRECT_URL, username, postId));
+    }
+
+    @DeleteMapping("/posts/{postId}")
+    public ResponseEntity<Void> delete(
+        @Authenticated AppUser user,
+        @PathVariable Long postId
+    ) {
+        postService.delete(PostDeleteRequestDto.toPostDeleteRequestDto(postId));
+
+        return ResponseEntity
+            .noContent()
+            .build();
     }
 }
