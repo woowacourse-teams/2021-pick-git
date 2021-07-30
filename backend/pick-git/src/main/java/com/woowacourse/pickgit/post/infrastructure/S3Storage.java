@@ -3,6 +3,7 @@ package com.woowacourse.pickgit.post.infrastructure;
 import com.woowacourse.pickgit.post.domain.PickGitStorage;
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.FileSystemResource;
@@ -33,6 +34,19 @@ public class S3Storage implements PickGitStorage {
             .getBody();
 
         return response.getUrls();
+    }
+
+    @Override
+    public Optional<String> store(File file, String userName) {
+        List<String> imageUrls = restClient
+            .postForEntity(s3ProxyUrl, createBody(List.of(file), userName), StorageDto.class)
+            .getBody()
+            .getUrls();
+
+        if (imageUrls.size() == 0) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(imageUrls.get(0));
     }
 
     private MultiValueMap<String, Object> createBody(
