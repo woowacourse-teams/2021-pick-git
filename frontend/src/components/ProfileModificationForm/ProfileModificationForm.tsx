@@ -15,7 +15,7 @@ import TextEditor from "../@shared/TextEditor/TextEditor";
 import { Container, Heading, Label, TextEditorWrapper } from "./ProfileModificationForm.style";
 
 export interface Props {
-  username?: string;
+  username: string;
   profileImageUrl?: string;
   prevDescription?: string;
   onTerminate: () => void;
@@ -27,7 +27,7 @@ const ProfileModificationForm = ({ username, profileImageUrl, prevDescription, o
   const [description, setDescription] = useState(prevDescription ?? "");
 
   const theme = useContext(ThemeContext);
-  const { mutate, isLoading, isSuccess } = useProfileMutation(username ?? null);
+  const { mutate, isLoading, isSuccess } = useProfileMutation(username);
   const { modalMessage, isModalShown, hideMessageModal, showAlertModal } = useMessageModal();
 
   const handleImageChange: React.ChangeEventHandler<HTMLInputElement> = ({ currentTarget: { files } }) => {

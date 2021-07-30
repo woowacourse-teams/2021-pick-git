@@ -28,7 +28,7 @@ type ProfileQueryKey = readonly [
 
 interface SetProfileVariable {
   image: File | null;
-  description: string | null;
+  description: string;
 }
 
 interface SetProfileResponse {
@@ -68,7 +68,7 @@ export const useUnfollowingMutation = () =>
     requestDeleteFollow(username, getAccessToken())
   );
 
-export const useProfileMutation = (username: string | null) => {
+export const useProfileMutation = (username: string) => {
   const queryClient = useQueryClient();
   const currentProfileQueryKey = [QUERY.GET_PROFILE, { isMyProfile: false, username }];
   const currentProfileQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);

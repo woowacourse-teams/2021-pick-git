@@ -3,6 +3,8 @@ import { getMBFromBite } from "../utils/postUpload";
 import { LIMIT } from "./limits";
 
 export const SUCCESS_MESSAGE = {
+  LOGIN: "로그인 되었습니다.",
+  LOGOUT: "로그아웃 되었습니다.",
   SET_PROFILE: "프로필을 수정했습니다.",
 };
 

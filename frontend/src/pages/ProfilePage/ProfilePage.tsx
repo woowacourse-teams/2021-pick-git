@@ -23,6 +23,8 @@ const ProfilePage = ({ isMyProfile }: Props) => {
   const fixedUsername = isMyProfile ? currentUsername : username;
   const tabItems: TabItem[] = tabNames.map((name, index) => ({ name, onTabChange: () => setTabIndex(index) }));
 
+  if (currentUsername === username) return <Redirect to={PAGE_URL.MY_PROFILE} />;
+
   if (!fixedUsername) return <Redirect to={PAGE_URL.HOME} />;
 
   return (

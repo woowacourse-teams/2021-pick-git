@@ -1,6 +1,5 @@
-import { createContext, useEffect, useState } from "react";
-import { requestGetSelfProfile } from "../services/requests";
-import { getAccessToken, getUsername, setAccessToken, setUsername } from "../storage/storage";
+import { createContext, useState } from "react";
+import { getUsername, setAccessToken, setUsername } from "../storage/storage";
 
 interface Props {
   children: React.ReactNode;
@@ -22,41 +21,23 @@ const UserContext = createContext<Value>({
 
 export const UserContextProvider = ({ children }: Props) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const accessToken = getAccessToken();
-  const username = getUsername();
+  const [currentUsername, setCurrentUsername] = useState(getUsername() ?? "");
 
   const login = (accessToken: string, username: string) => {
     setAccessToken(accessToken);
     setUsername(username);
     setIsLoggedIn(true);
+    setCurrentUsername(username);
   };
 
   const logout = () => {
     setAccessToken("");
     setUsername("");
     setIsLoggedIn(false);
+    setCurrentUsername("");
   };
 
-  useEffect(() => {
-    if (!accessToken || !username) return;
-
-    (async () => {
-      try {
-        const { name } = await requestGetSelfProfile(accessToken);
-
-        setIsLoggedIn(true);
-        setUsername(name);
-      } catch (error) {
-        console.error(error);
-      }
-    })();
-  }, []);
-
-  return (
-    <UserContext.Provider value={{ currentUsername: username ?? "", isLoggedIn, login, logout }}>
-      {children}
-    </UserContext.Provider>
-  );
+  return <UserContext.Provider value={{ currentUsername, isLoggedIn, login, logout }}>{children}</UserContext.Provider>;
 };
 
 export default UserContext;
