@@ -7,7 +7,8 @@ import { UNKNOWN_ERROR_MESSAGE } from "../../constants/messages";
 import { QUERY } from "../../constants/queries";
 import SnackBarContext from "../../contexts/SnackbarContext";
 import UserContext from "../../contexts/UserContext";
-import { handleHTTPError } from "../../utils/api";
+import { getAPIErrorMessage, getClientErrorMessage, handleClientError, handleHTTPError } from "../../utils/error";
+import { isHttpErrorStatus, isClientErrorCode } from "../../utils/typeGuard";
 import { useFollowingMutation, useUnfollowingMutation } from "../queries";
 
 const useFollow = () => {
@@ -35,15 +36,26 @@ const useFollow = () => {
     if (axios.isAxiosError(error)) {
       const { status, data } = error.response ?? {};
 
-      if (status) {
+      if (status && isHttpErrorStatus(status)) {
         handleHTTPError(status, {
           unauthorized: () => logout(),
         });
       }
 
-      pushSnackbarMessage(data.errorCode);
+      pushSnackbarMessage(data ? getAPIErrorMessage(data.errorCode) : UNKNOWN_ERROR_MESSAGE);
     } else {
-      pushSnackbarMessage(UNKNOWN_ERROR_MESSAGE);
+      const { message } = error;
+
+      if (isClientErrorCode(message)) {
+        handleClientError(message, {
+          noAccessToken: () => {
+            pushSnackbarMessage(getClientErrorMessage(message));
+            logout();
+          },
+        });
+      } else {
+        pushSnackbarMessage(UNKNOWN_ERROR_MESSAGE);
+      }
     }
   };
 

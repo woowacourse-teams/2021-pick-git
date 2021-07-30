@@ -15,7 +15,8 @@ import { useContext } from "react";
 import { getAccessToken } from "../../storage/storage";
 import SnackBarContext from "../../contexts/SnackbarContext";
 import { SUCCESS_MESSAGE, UNKNOWN_ERROR_MESSAGE } from "../../constants/messages";
-import { handleHTTPError } from "../../utils/api";
+import { customError, handleHTTPError } from "../../utils/error";
+import { isHttpErrorStatus } from "../../utils/typeGuard";
 
 type ProfileQueryKey = readonly [
   typeof QUERY.GET_PROFILE,
@@ -41,7 +42,7 @@ export const useProfileQuery = (isMyProfile: boolean, username: string | null) =
     const accessToken = getAccessToken();
 
     if (isMyProfile) {
-      if (!accessToken) throw Error("no accessToken");
+      if (!accessToken) throw customError.noAccessToken;
 
       return await requestGetSelfProfile(accessToken);
     } else {
@@ -92,7 +93,7 @@ export const useProfileMutation = (username: string | null) => {
         if (axios.isAxiosError(error)) {
           const { status, data } = error.response ?? {};
 
-          if (status) {
+          if (status && isHttpErrorStatus(status)) {
             handleHTTPError(status, {
               unauthorized: () => logout(),
               notFound: () => pushSnackbarMessage("아직 준비되지 않은 서비스입니다."),

@@ -3,6 +3,7 @@ import axios from "axios";
 import { Post, PostUploadData } from "../../@types";
 import { LIMIT } from "../../constants/limits";
 import { API_URL } from "../../constants/urls";
+import { customError } from "../../utils/error";
 
 export const requestGetHomeFeedPosts = async (pageParam: number, accessToken: string | null) => {
   const config = accessToken
@@ -43,7 +44,7 @@ export const requestGetUserFeedPosts = async (username: string, pageParam: numbe
 
 export const requestAddPostLike = async (postId: Post["id"], accessToken: string | null) => {
   if (!accessToken) {
-    throw Error("no accessToken");
+    throw customError.noAccessToken;
   }
 
   const response = await axios.post<{ likesCount: number; isLiked: boolean }>(API_URL.POSTS_LIKES(postId), {
@@ -57,7 +58,7 @@ export const requestAddPostLike = async (postId: Post["id"], accessToken: string
 
 export const requestDeletePost = async (postId: Post["id"], accessToken: string | null) => {
   if (!accessToken) {
-    throw Error("no accessToken");
+    throw customError.noAccessToken;
   }
 
   await axios.delete(API_URL.POST(postId), {
@@ -69,7 +70,7 @@ export const requestDeletePost = async (postId: Post["id"], accessToken: string 
 
 export const requestDeletePostLike = async (postId: Post["id"], accessToken: string | null) => {
   if (!accessToken) {
-    throw Error("no accessToken");
+    throw customError.noAccessToken;
   }
 
   const response = await axios.delete<{ likesCount: number; isLiked: boolean }>(API_URL.POSTS_LIKES(postId), {
@@ -87,7 +88,7 @@ export const requestAddPost = async (
   accessToken: string | null
 ) => {
   if (!accessToken) {
-    throw Error("no accessToken");
+    throw customError.noAccessToken;
   }
 
   const formData = new FormData();

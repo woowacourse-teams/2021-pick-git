@@ -1,3 +1,6 @@
+import { clientErrorCodeName, httpErrorStatus, httpErrorStatusName } from "../constants/error";
+import { API_ERROR_MESSAGE, CLIENT_ERROR_MESSAGE } from "../constants/messages";
+
 export interface ProfileData {
   name: string;
   imageUrl: string;
@@ -91,21 +94,26 @@ export type Step = {
   path: string;
 };
 
+export type TabIndicatorKind = "line" | "pill";
+
+export type APIErrorCode = keyof typeof API_ERROR_MESSAGE;
+
 export type ErrorResponse = {
-  errorCode:
-    | "A0001"
-    | "A0002"
-    | "F0001"
-    | "F0002"
-    | "F0003"
-    | "U0001"
-    | "U0002"
-    | "U0003"
-    | "U0004"
-    | "V0001"
-    | "P0001"
-    | "P0002"
-    | "S0001";
+  errorCode: APIErrorCode;
 };
 
-export type TabIndicatorKind = "line" | "pill";
+export type HTTPErrorStatus = keyof typeof httpErrorStatus;
+
+export type HTTPErrorStatusName = typeof httpErrorStatusName[number];
+
+export type HTTPErrorHandler = {
+  [V in HTTPErrorStatusName]?: () => void;
+};
+
+export type ClientErrorCode = keyof typeof CLIENT_ERROR_MESSAGE;
+
+export type ClientErrorCodeName = typeof clientErrorCodeName[number];
+
+export type ClientErrorHandler = {
+  [V in ClientErrorCodeName]?: () => void;
+};

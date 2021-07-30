@@ -3,13 +3,14 @@ import { useContext, useEffect, useState } from "react";
 import { InfiniteData, useQueryClient } from "react-query";
 import { useHistory } from "react-router-dom";
 
-import { Post } from "../../@types";
+import { HTTPErrorHandler, Post } from "../../@types";
 import { QUERY } from "../../constants/queries";
 import { PAGE_URL } from "../../constants/urls";
 import SnackBarContext from "../../contexts/SnackbarContext";
 import UserContext from "../../contexts/UserContext";
-import { handleHTTPError, HTTPErrorHandler } from "../../utils/api";
 import { removeDuplicatedData } from "../../utils/data";
+import { handleHTTPError } from "../../utils/error";
+import { isHttpErrorStatus } from "../../utils/typeGuard";
 import { useUserPostsQuery } from "../queries";
 
 const useUserFeed = (isMyFeed: boolean, username: string | null, prevData?: InfiniteData<Post[]>) => {
@@ -63,7 +64,7 @@ const useUserFeed = (isMyFeed: boolean, username: string | null, prevData?: Infi
         },
       };
 
-      if (status) {
+      if (status && isHttpErrorStatus(status)) {
         handleHTTPError(status, errorHandler);
       }
 
