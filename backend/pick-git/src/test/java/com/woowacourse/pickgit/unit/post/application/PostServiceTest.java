@@ -741,7 +741,7 @@ class PostServiceTest {
             .isEqualTo(responseDto);
 
         verify(postRepository, times(2))
-            .findById(anyLong());
+            .findById(1L);
         verify(tagService, times(1))
             .findOrCreateTags(any(TagsDto.class));
     }
@@ -784,7 +784,7 @@ class PostServiceTest {
             .isEqualTo(responseDto);
 
         verify(postRepository, times(2))
-            .findById(anyLong());
+            .findById(1L);
         verify(tagService, times(1))
             .findOrCreateTags(any(TagsDto.class));
     }
@@ -827,7 +827,7 @@ class PostServiceTest {
             .isEqualTo(responseDto);
 
         verify(postRepository, times(2))
-            .findById(anyLong());
+            .findById(1L);
         verify(tagService, times(1))
             .findOrCreateTags(any(TagsDto.class));
     }
@@ -880,7 +880,7 @@ class PostServiceTest {
 
         // then
         verify(postRepository, times(1))
-            .findById(anyLong());
+            .findById(1L);
     }
 
     @DisplayName("사용자는 게시물을 삭제한다.")
@@ -905,7 +905,7 @@ class PostServiceTest {
 
         // then
         verify(postRepository, times(1))
-            .findById(anyLong());
+            .findById(1L);
     }
 
     @DisplayName("게스트는 게시물을 삭제할 수 없다. - 401 예외")
@@ -937,6 +937,6 @@ class PostServiceTest {
 
         // then
         verify(postRepository, times(1))
-            .findById(anyLong());
+            .findById(1L);
     }
 }
