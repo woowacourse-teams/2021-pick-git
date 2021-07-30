@@ -4,8 +4,11 @@ import org.springframework.http.HttpStatus;
 
 public class PostNotFoundException extends PostException {
 
-    public PostNotFoundException(String errorCode, HttpStatus httpStatus,
-        String message) {
+    public PostNotFoundException(
+        String errorCode,
+        HttpStatus httpStatus,
+        String message)
+    {
         super(errorCode, httpStatus, message);
     }
 }

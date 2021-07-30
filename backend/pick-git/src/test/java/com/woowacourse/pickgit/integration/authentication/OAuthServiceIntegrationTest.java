@@ -51,11 +51,17 @@ class OAuthServiceIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        this.jwtTokenProvider = new JwtTokenProviderImpl(SECRET_KEY,
-            EXPIRATION_TIME_IN_MILLISECONDS);
+        this.jwtTokenProvider = new JwtTokenProviderImpl(
+            SECRET_KEY,
+            EXPIRATION_TIME_IN_MILLISECONDS
+        );
         this.oAuthAccessTokenDao = new CollectionOAuthAccessTokenDao();
-        this.oAuthService = new OAuthService(oAuthClient, jwtTokenProvider, oAuthAccessTokenDao,
-            userRepository);
+        this.oAuthService = new OAuthService(
+            oAuthClient,
+            jwtTokenProvider,
+            oAuthAccessTokenDao,
+            userRepository
+        );
     }
 
     @DisplayName("Github 로그인 URL을 반환한다.")

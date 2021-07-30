@@ -38,6 +38,10 @@ public class PostTag {
         return tag;
     }
 
+    public String getTagName() {
+        return tag.getName();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
