@@ -126,7 +126,7 @@ public class PostFactory {
             .profileImageUrl("commentAuthorProfileImageUrl")
             .authorName("commentAuthorName1")
             .content("commentContent1")
-            .isLiked(false)
+            .liked(false)
             .build();
 
         CommentResponse commentFixture2 = CommentResponse.builder()
@@ -134,7 +134,7 @@ public class PostFactory {
             .profileImageUrl("commentAuthorProfileImageUrl")
             .authorName("commentAuthorName2")
             .content("commentContent2")
-            .isLiked(false)
+            .liked(false)
             .build();
 
         PostResponseDto fixture1 = PostResponseDto.builder()
@@ -149,7 +149,7 @@ public class PostFactory {
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
             .comments(List.of(commentFixture1, commentFixture2))
-            .isLiked(false)
+            .liked(false)
             .build();
 
         return List.of(fixture1);
