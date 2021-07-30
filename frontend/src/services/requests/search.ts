@@ -17,8 +17,7 @@ export const requestGetSearchResult = async (keyword: string, pageParam: number,
       }
     : {};
   const response = await axios.get<SearchResult>(
-    // API_URL.SEARCH(keyword, pageParam, LIMIT.SEARCH_RESULT_COUNT_PER_FETCH),
-    "http://localhost:3001/api/search",
+    API_URL.SEARCH(keyword, pageParam, LIMIT.SEARCH_RESULT_COUNT_PER_FETCH),
     config
   );
 
