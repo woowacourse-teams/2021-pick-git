@@ -19,8 +19,8 @@ import com.woowacourse.pickgit.common.factory.PostBuilder;
 import com.woowacourse.pickgit.common.factory.PostFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
-import com.woowacourse.pickgit.exception.post.CommentFormatException;
 import com.woowacourse.pickgit.exception.post.CannotUnlikeException;
+import com.woowacourse.pickgit.exception.post.CommentFormatException;
 import com.woowacourse.pickgit.exception.post.DuplicatedLikeException;
 import com.woowacourse.pickgit.exception.post.PostFormatException;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
@@ -29,10 +29,12 @@ import com.woowacourse.pickgit.exception.user.UserNotFoundException;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
 import com.woowacourse.pickgit.post.domain.PickGitStorage;
 import com.woowacourse.pickgit.post.domain.PlatformRepositoryExtractor;
@@ -41,6 +43,7 @@ import com.woowacourse.pickgit.post.domain.PostRepository;
 import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.presentation.dto.request.CommentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.HomeFeedRequest;
+import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
 import com.woowacourse.pickgit.tag.application.TagService;
 import com.woowacourse.pickgit.tag.application.TagsDto;
 import com.woowacourse.pickgit.tag.domain.Tag;
@@ -697,5 +700,180 @@ class PostServiceTest {
             .findByBasicProfile_Name(appUser.getUsername());
         verify(postRepository, times(1))
             .findById(postId);
+    }
+
+    @DisplayName("사용자는 게시물의 태그, 내용을 수정한다.")
+    @Test
+    void update_TagsAndContentInCaseOfLoginUser_Success() {
+        // given
+        User user = UserFactory.user(1L, "testUser");
+        Post post = new PostBuilder()
+            .id(1L)
+            .content("testContent")
+            .user(user)
+            .build();
+
+        PostUpdateRequest updateRequest = PostUpdateRequest.builder()
+            .tags(List.of("java", "spring"))
+            .content("hello")
+            .build();
+        PostUpdateRequestDto updateRequestDto = PostUpdateRequestDto
+            .toUpdateRequestDto(new LoginUser("testUser", "Bearer testToken"), 1L, updateRequest);
+
+        given(postRepository.findById(anyLong()))
+            .willReturn(Optional.of(post));
+        given(tagService.findOrCreateTags(any(TagsDto.class)))
+            .willReturn(List.of(new Tag("java"), new Tag("spring")));
+
+        PostUpdateResponseDto responseDto = PostUpdateResponseDto.builder()
+            .tags(List.of("java", "spring"))
+            .content("hello")
+            .build();
+
+        // when
+        PostUpdateResponseDto updateResponseDto = postService.update(updateRequestDto);
+
+        // then
+        assertThat(updateResponseDto)
+            .usingRecursiveComparison()
+            .isEqualTo(responseDto);
+
+        verify(postRepository, times(1))
+            .findById(anyLong());
+        verify(tagService, times(1))
+            .findOrCreateTags(any(TagsDto.class));
+    }
+
+    @DisplayName("사용자는 게시물의 태그를 수정한다.")
+    @Test
+    void update_TagsInCaseOfLoginUser_Success() {
+        // given
+        User user = UserFactory.user(1L, "testUser");
+        Post post = new PostBuilder()
+            .id(1L)
+            .content("testContent")
+            .user(user)
+            .build();
+
+        PostUpdateRequest updateRequest = PostUpdateRequest.builder()
+            .tags(List.of())
+            .content("hello")
+            .build();
+        PostUpdateRequestDto updateRequestDto = PostUpdateRequestDto
+            .toUpdateRequestDto(new LoginUser("testUser", "Bearer testToken"), 1L, updateRequest);
+
+        given(postRepository.findById(anyLong()))
+            .willReturn(Optional.of(post));
+        given(tagService.findOrCreateTags(any(TagsDto.class)))
+            .willReturn(List.of());
+
+        PostUpdateResponseDto responseDto = PostUpdateResponseDto.builder()
+            .tags(List.of())
+            .content("hello")
+            .build();
+
+        // when
+        PostUpdateResponseDto updateResponseDto = postService.update(updateRequestDto);
+
+        // then
+        assertThat(updateResponseDto)
+            .usingRecursiveComparison()
+            .isEqualTo(responseDto);
+
+        verify(postRepository, times(1))
+            .findById(anyLong());
+        verify(tagService, times(1))
+            .findOrCreateTags(any(TagsDto.class));
+    }
+
+    @DisplayName("사용자는 게시물의 내용을 수정한다.")
+    @Test
+    void update_ContentInCaseOfLoginUser_Success() {
+        // given
+        User user = UserFactory.user(1L, "testUser");
+        Post post = new PostBuilder()
+            .id(1L)
+            .content("testContent")
+            .user(user)
+            .build();
+
+        PostUpdateRequest updateRequest = PostUpdateRequest.builder()
+            .tags(List.of("java", "spring"))
+            .content("testContent")
+            .build();
+        PostUpdateRequestDto updateRequestDto = PostUpdateRequestDto
+            .toUpdateRequestDto(new LoginUser("testUser", "Bearer testToken"), 1L, updateRequest);
+
+        given(postRepository.findById(anyLong()))
+            .willReturn(Optional.of(post));
+        given(tagService.findOrCreateTags(any(TagsDto.class)))
+            .willReturn(List.of(new Tag("java"), new Tag("spring")));
+
+        PostUpdateResponseDto responseDto = PostUpdateResponseDto.builder()
+            .tags(List.of("java", "spring"))
+            .content("testContent")
+            .build();
+
+        // when
+        PostUpdateResponseDto updateResponseDto = postService.update(updateRequestDto);
+
+        // then
+        assertThat(updateResponseDto)
+            .usingRecursiveComparison()
+            .isEqualTo(responseDto);
+
+        verify(postRepository, times(1))
+            .findById(anyLong());
+        verify(tagService, times(1))
+            .findOrCreateTags(any(TagsDto.class));
+    }
+
+    @DisplayName("게스트는 게시물의 내용을 수정할 수 없다.")
+    @Test
+    void update_GuestUser_401Exception() {
+        // given
+        PostUpdateRequest updateRequest = PostUpdateRequest.builder()
+            .tags(List.of("java", "spring"))
+            .content("testContent")
+            .build();
+
+        // when
+        assertThatThrownBy(() -> {
+            PostUpdateRequestDto.toUpdateRequestDto(new GuestUser(), 1L, updateRequest);
+        }).isInstanceOf(UnauthorizedException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "A0002")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)
+            .hasMessage("권한 에러");
+    }
+
+    @DisplayName("등록되지 않은 게시물의 내용을 수정할 수 없다. - 500 예외")
+    @Test
+    void update_InvalidPost_500Exception() {
+        // given
+        PostUpdateRequest updateRequest = PostUpdateRequest.builder()
+            .tags(List.of("java", "spring"))
+            .content("testContent")
+            .build();
+        PostUpdateRequestDto updateRequestDto = PostUpdateRequestDto
+            .toUpdateRequestDto(new LoginUser("testUser", "Bearer testToken"), 1L, updateRequest);
+
+        given(postRepository.findById(anyLong()))
+            .willThrow(new PostNotFoundException(
+                "P0002",
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "해당하는 게시물을 찾을 수 없습니다."
+            ));
+
+        // when
+        assertThatThrownBy(() -> {
+            postService.update(updateRequestDto);
+        }).isInstanceOf(PostNotFoundException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "P0002")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
+            .hasMessage("해당하는 게시물을 찾을 수 없습니다.");
+
+        // then
+        verify(postRepository, times(1))
+            .findById(anyLong());
     }
 }
