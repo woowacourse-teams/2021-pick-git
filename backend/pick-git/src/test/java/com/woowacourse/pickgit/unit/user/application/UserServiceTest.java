@@ -22,6 +22,7 @@ import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponse
 import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.domain.dto.ContributionDto;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -159,18 +160,20 @@ class UserServiceTest {
     void calculateContributions_Anyone_Success() {
         // given
         User user = UserFactory.user();
-        ContributionResponseDto responseDto = UserFactory.mockContributionResponseDto();
+        ContributionDto contribution = UserFactory.mockContributionDto();
 
         given(userRepository.findByBasicProfile_Name(anyString()))
             .willReturn(Optional.of(user));
         given(platformContributionCalculator.calculate(anyString()))
-            .willReturn(responseDto);
+            .willReturn(contribution);
+
+        ContributionResponseDto responseDto = UserFactory.mockContributionResponseDto();
 
         // when
-        ContributionResponseDto contribution = userService.calculateContributions("testUser");
+        ContributionResponseDto contributions = userService.calculateContributions("testUser");
 
         // then
-        assertThat(contribution)
+        assertThat(contributions)
             .usingRecursiveComparison()
             .isEqualTo(responseDto);
 

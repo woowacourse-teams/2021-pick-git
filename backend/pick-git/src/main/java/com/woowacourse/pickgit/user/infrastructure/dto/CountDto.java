@@ -1,18 +1,18 @@
-package com.woowacourse.pickgit.user.domain.dto;
+package com.woowacourse.pickgit.user.infrastructure.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 
 @Builder
-public class CountResponseDto {
+public class CountDto {
 
     @JsonProperty("total_count")
     private int count;
 
-    private CountResponseDto() {
+    private CountDto() {
     }
 
-    public CountResponseDto(int count) {
+    public CountDto(int count) {
         this.count = count;
     }
 

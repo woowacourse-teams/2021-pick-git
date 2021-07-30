@@ -7,10 +7,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.common.mockapi.MockContributionApiRequester;
 import com.woowacourse.pickgit.exception.user.ContributionParseException;
-import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
-import com.woowacourse.pickgit.user.infrastructure.calculator.GithubContributionCalculator;
 import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
 import com.woowacourse.pickgit.user.domain.PlatformContributionExtractor;
+import com.woowacourse.pickgit.user.domain.dto.ContributionDto;
+import com.woowacourse.pickgit.user.infrastructure.calculator.GithubContributionCalculator;
 import com.woowacourse.pickgit.user.infrastructure.extractor.GithubContributionExtractor;
 import com.woowacourse.pickgit.user.infrastructure.requester.PlatformContributionApiRequester;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,15 +44,15 @@ class GithubContributionCalculatorTest {
     @Test
     void calculate_Valid_Success() {
         // given
-        ContributionResponseDto responseDto = UserFactory.mockContributionResponseDto();
+        ContributionDto contribution = UserFactory.mockContributionDto();
 
         // when
-        ContributionResponseDto contribution = platformContributionCalculator.calculate("testUser");
+        ContributionDto result = platformContributionCalculator.calculate("testUser");
 
         // then
-        assertThat(contribution)
+        assertThat(result)
             .usingRecursiveComparison()
-            .isEqualTo(responseDto);
+            .isEqualTo(contribution);
     }
 
     @DisplayName("스타 개수를 조회할 수 없다. - 500 예외")

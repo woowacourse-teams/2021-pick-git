@@ -1,8 +1,8 @@
 package com.woowacourse.pickgit.user.domain;
 
-import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
+import com.woowacourse.pickgit.user.domain.dto.ContributionDto;
 
 public interface PlatformContributionCalculator {
 
-    ContributionResponseDto calculate(String username);
+    ContributionDto calculate(String username);
 }

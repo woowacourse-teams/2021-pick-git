@@ -5,8 +5,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woowacourse.pickgit.exception.user.ContributionParseException;
 import com.woowacourse.pickgit.user.domain.PlatformContributionExtractor;
-import com.woowacourse.pickgit.user.domain.dto.CountResponseDto;
-import com.woowacourse.pickgit.user.domain.dto.StarsResponseDto;
+import com.woowacourse.pickgit.user.infrastructure.dto.CountDto;
+import com.woowacourse.pickgit.user.infrastructure.dto.StarsDto;
 import com.woowacourse.pickgit.user.infrastructure.requester.PlatformContributionApiRequester;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,7 +34,7 @@ public class GithubContributionExtractor implements PlatformContributionExtracto
     }
 
     @Override
-    public List<StarsResponseDto> extractStars(String username) {
+    public List<StarsDto> extractStars(String username) {
         String apiUrl = generateUrl(username);
         String response = platformContributionApiRequester.request(apiUrl);
 
@@ -45,7 +45,7 @@ public class GithubContributionExtractor implements PlatformContributionExtracto
         return String.format(apiUrlFormatForStar, username);
     }
 
-    private List<StarsResponseDto> parseToStars(String response) {
+    private List<StarsDto> parseToStars(String response) {
         try {
             return objectMapper.readValue(response, new TypeReference<>() {
             });
@@ -59,7 +59,7 @@ public class GithubContributionExtractor implements PlatformContributionExtracto
     }
 
     @Override
-    public CountResponseDto extractCount(String restUrl, String username) {
+    public CountDto extractCount(String restUrl, String username) {
         String apiUrl = generateUrl(restUrl, username);
         String response = platformContributionApiRequester.request(apiUrl);
 
@@ -70,7 +70,7 @@ public class GithubContributionExtractor implements PlatformContributionExtracto
         return apiUrlFormatForCount + String.format(restUrl, username);
     }
 
-    private CountResponseDto parseToCount(String response) {
+    private CountDto parseToCount(String response) {
         try {
             return objectMapper.readValue(response, new TypeReference<>() {
             });

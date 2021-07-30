@@ -1,12 +1,12 @@
 package com.woowacourse.pickgit.user.domain;
 
-import com.woowacourse.pickgit.user.domain.dto.CountResponseDto;
-import com.woowacourse.pickgit.user.domain.dto.StarsResponseDto;
+import com.woowacourse.pickgit.user.infrastructure.dto.CountDto;
+import com.woowacourse.pickgit.user.infrastructure.dto.StarsDto;
 import java.util.List;
 
 public interface PlatformContributionExtractor {
 
-    List<StarsResponseDto> extractStars(String username);
+    List<StarsDto> extractStars(String username);
 
-    CountResponseDto extractCount(String restUrl, String username);
+    CountDto extractCount(String restUrl, String username);
 }
