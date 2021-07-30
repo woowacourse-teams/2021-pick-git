@@ -3,6 +3,7 @@ package com.woowacourse.pickgit.unit.post.presentation;
 import static com.woowacourse.pickgit.docs.ApiDocumentUtils.getDocumentRequest;
 import static com.woowacourse.pickgit.docs.ApiDocumentUtils.getDocumentResponse;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
@@ -12,8 +13,10 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.headerWit
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
@@ -32,15 +35,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woowacourse.pickgit.authentication.application.OAuthService;
+import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.PostFactory;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
+import com.woowacourse.pickgit.exception.post.CannotUnlikeException;
 import com.woowacourse.pickgit.exception.post.CommentFormatException;
+import com.woowacourse.pickgit.exception.post.DuplicatedLikeException;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
+import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
 import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
@@ -48,6 +55,7 @@ import com.woowacourse.pickgit.post.presentation.PostController;
 import com.woowacourse.pickgit.post.presentation.dto.request.CommentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.ContentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.HomeFeedRequest;
+import com.woowacourse.pickgit.post.presentation.dto.response.LikeResponse;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -132,9 +140,7 @@ class PostControllerTest {
     void write_GuestUser_Fail() throws Exception {
         // given
         given(oAuthService.validateToken(any()))
-            .willReturn(true);
-        given(oAuthService.findRequestUserByToken(any()))
-            .willCallRealMethod();
+            .willReturn(false);
 
         // when
         ResultActions perform = mockMvc.perform(multipart("/api/posts")
@@ -142,26 +148,25 @@ class PostControllerTest {
             .file(FileFactory.getTestImage2())
             .param(PickGit.GITHUB_REPO_URL, "https://github.com/bperhaps")
             .param(PickGit.CONTENT, "content")
-            .param(PickGit.TAGS, new String[]{"tag1", "tag2"})
-            .header(HttpHeaders.AUTHORIZATION, "invalid AccessToken"));
+            .param(PickGit.TAGS, new String[]{"tag1", "tag2"}));
 
         // then
         perform
             .andExpect(status().isUnauthorized())
-            .andExpect(jsonPath("errorCode").value("A0002"));
+            .andExpect(jsonPath("errorCode").value("A0001"));
 
         //documentation
         perform.andDo(document("posts-post-guest",
             getDocumentRequest(),
             getDocumentResponse(),
-            requestHeaders(
-                headerWithName(HttpHeaders.AUTHORIZATION).description("Bad Bearer token")
-            ),
             requestPartBody("images"),
             responseFields(
                 fieldWithPath("errorCode").type(STRING).description("에러 코드")
             )
         ));
+
+        verify(oAuthService, times(1))
+            .validateToken(null);
     }
 
     @DisplayName("특정 Post에 Comment을 추가한다.")
@@ -362,7 +367,6 @@ class PostControllerTest {
         );
     }
 
-
     @DisplayName("로그인 유저는 홈피드를 조회할 수 있다.")
     @Test
     void readHomeFeed_LoginUser_Success() throws Exception {
@@ -415,6 +419,272 @@ class PostControllerTest {
             )
             )
         );
+    }
+
+    @DisplayName("로그인 한 사용자는 게시물을 좋아요 할 수 있다. - 성공")
+    @Test
+    void likePost_LoginUser_Success() throws Exception {
+        // given
+        LoginUser loginUser = new LoginUser("testUser", "at");
+        LikeResponseDto likeResponseDto = new LikeResponseDto(1, true);
+        Long postId = 1L;
+
+        given(oAuthService.validateToken(anyString()))
+            .willReturn(true);
+        given(oAuthService.findRequestUserByToken(anyString()))
+            .willReturn(loginUser);
+        given(postService.like(any(AppUser.class), anyLong()))
+            .willReturn(likeResponseDto);
+
+        String likeResponse =
+            objectMapper.writeValueAsString(
+                new LikeResponse(likeResponseDto.getLikeCount(), likeResponseDto.isLiked())
+            );
+
+        // when
+        ResultActions perform =
+            mockMvc.perform(put("/api/posts/{postId}/likes", postId)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + ACCESS_TOKEN));
+
+        // then
+        perform
+            .andExpect(status().isOk())
+            .andExpect(content().string(likeResponse));
+
+        // documentation
+        perform.andDo(document("post-likePost-LoggedIn",
+            getDocumentRequest(),
+            getDocumentResponse(),
+            requestHeaders(
+                headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer " + ACCESS_TOKEN)
+            ),
+            pathParameters(
+                parameterWithName("postId").description("포스트 id")
+            ),
+            responseFields(
+                fieldWithPath("likeCount").type(NUMBER).description("게시물 좋아요 개수"),
+                fieldWithPath("liked").type(BOOLEAN).description("게시물 좋아요 여부")
+            )
+        ));
+
+        verify(oAuthService, times(1))
+            .validateToken(ACCESS_TOKEN);
+        verify(oAuthService, times(1))
+            .findRequestUserByToken(ACCESS_TOKEN);
+        verify(postService, times(1))
+            .like(loginUser, postId);
+    }
+
+    @DisplayName("로그인 한 사용자는 게시물을 좋아요 취소 할 수 있다. - 성공")
+    @Test
+    void unlikePost_LoginUser_Success() throws Exception {
+        // given
+        LoginUser loginUser = new LoginUser("testUser", "at");
+        LikeResponseDto likeResponseDto = new LikeResponseDto(0, false);
+        Long postId = 1L;
+
+        given(oAuthService.validateToken(any()))
+            .willReturn(true);
+        given(oAuthService.findRequestUserByToken(any()))
+            .willReturn(loginUser);
+        given(postService.unlike(any(AppUser.class), anyLong()))
+            .willReturn(likeResponseDto);
+
+        String likeResponse =
+            objectMapper.writeValueAsString(
+                new LikeResponse(likeResponseDto.getLikeCount(), likeResponseDto.isLiked())
+            );
+
+        // when
+        ResultActions perform =
+            mockMvc.perform(delete("/api/posts/{postId}/likes", postId)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + ACCESS_TOKEN));
+
+        // then
+        perform
+            .andExpect(status().isOk())
+            .andExpect(content().string(likeResponse));
+
+        // documentation
+        perform.andDo(document("post-unlikePost-LoggedIn",
+            getDocumentRequest(),
+            getDocumentResponse(),
+            requestHeaders(
+                headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer " + ACCESS_TOKEN)
+            ),
+            pathParameters(
+                parameterWithName("postId").description("포스트 id")
+            ),
+            responseFields(
+                fieldWithPath("likeCount").type(NUMBER).description("게시물 좋아요 개수"),
+                fieldWithPath("liked").type(BOOLEAN).description("게시물 좋아요 여부")
+            )
+        ));
+
+        verify(oAuthService, times(1))
+            .validateToken(ACCESS_TOKEN);
+        verify(oAuthService, times(1))
+            .findRequestUserByToken(ACCESS_TOKEN);
+        verify(postService, times(1))
+            .unlike(loginUser, postId);
+    }
+
+    @DisplayName("사용자는 좋아요한 게시물을 중복 좋아요 추가 할 수 없다. - 실패")
+    @Test
+    void likePost_DuplicatedLike_ExceptionThrown() throws Exception {
+        // given
+        LoginUser loginUser = new LoginUser("testUser", "at");
+        Long postId = 1L;
+
+        given(oAuthService.validateToken(any()))
+            .willReturn(true);
+        given(oAuthService.findRequestUserByToken(any()))
+            .willReturn(loginUser);
+        given(postService.like(any(AppUser.class), anyLong()))
+            .willThrow(new DuplicatedLikeException());
+
+        // when
+        ResultActions perform =
+            mockMvc.perform(put("/api/posts/{postId}/likes", postId)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + ACCESS_TOKEN));
+
+        // then
+        perform
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("errorCode").value("P0003"));
+
+        // documentation
+        perform.andDo(document("post-likePost-duplicatedLike",
+            getDocumentRequest(),
+            getDocumentResponse(),
+            requestHeaders(
+                headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer " + ACCESS_TOKEN)
+            ),
+            pathParameters(
+                parameterWithName("postId").description("포스트 id")
+            ),
+            responseFields(
+                fieldWithPath("errorCode").type(STRING).description("에러 코드")
+            )
+        ));
+
+        verify(oAuthService, times(1))
+            .validateToken(ACCESS_TOKEN);
+        verify(oAuthService, times(1))
+            .findRequestUserByToken(ACCESS_TOKEN);
+        verify(postService, times(1))
+            .like(loginUser, postId);
+    }
+
+    @DisplayName("사용자는 좋아요 하지 않은 게시물을 좋아요 취소 할 수 없다. - 실패")
+    @Test
+    void unlikePost_unlikePost_ExceptionThrown() throws Exception {
+        // given
+        LoginUser loginUser = new LoginUser("testUser", "at");
+        Long postId = 1L;
+
+        given(oAuthService.validateToken(any()))
+            .willReturn(true);
+        given(oAuthService.findRequestUserByToken(any()))
+            .willReturn(loginUser);
+        given(postService.unlike(any(AppUser.class), anyLong()))
+            .willThrow(new CannotUnlikeException());
+
+        // when
+        ResultActions perform =
+            mockMvc.perform(delete("/api/posts/{postId}/likes", postId)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + ACCESS_TOKEN));
+
+        // then
+        perform
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("errorCode").value("P0004"));
+
+        // documentation
+        perform.andDo(document("post-unlikePost-unlikedPost",
+            getDocumentRequest(),
+            getDocumentResponse(),
+            requestHeaders(
+                headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer " + ACCESS_TOKEN)
+            ),
+            pathParameters(
+                parameterWithName("postId").description("포스트 id")
+            ),
+            responseFields(
+                fieldWithPath("errorCode").type(STRING).description("에러 코드")
+            )
+        ));
+
+        verify(oAuthService, times(1))
+            .validateToken(ACCESS_TOKEN);
+        verify(oAuthService, times(1))
+            .findRequestUserByToken(ACCESS_TOKEN);
+        verify(postService, times(1))
+            .unlike(loginUser, postId);
+    }
+
+    @DisplayName("게스트는 게시물을 좋아요 할 수 없다. - 실패")
+    @Test
+    void like_GuestUser_ExceptionThrown() throws Exception {
+        // given
+        given(oAuthService.validateToken(any()))
+            .willReturn(false);
+
+        // when
+        ResultActions perform =
+            mockMvc.perform(put("/api/posts/{postId}/likes", 1L));
+
+        // then
+        perform
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("errorCode").value("A0001"));
+
+        // documentation
+        perform.andDo(document("post-likePost-unLoggedIn",
+            getDocumentRequest(),
+            getDocumentResponse(),
+            pathParameters(
+                parameterWithName("postId").description("포스트 id")
+            ),
+            responseFields(
+                fieldWithPath("errorCode").type(STRING).description("에러 코드")
+            )
+        ));
+
+        verify(oAuthService, times(1))
+            .validateToken(any());
+    }
+
+    @DisplayName("게스트는 게시물을 좋아요 취소 할 수 없다. - 실패")
+    @Test
+    void unlike_GuestUser_ExceptionThrown() throws Exception {
+        // given
+        given(oAuthService.validateToken(any()))
+            .willReturn(false);
+
+        // when
+        ResultActions perform =
+            mockMvc.perform(delete("/api/posts/{postId}/likes", 1L));
+
+        // then
+        perform
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("errorCode").value("A0001"));
+
+        // documentation
+        perform.andDo(document("post-unlikePost-unLoggedIn",
+            getDocumentRequest(),
+            getDocumentResponse(),
+            pathParameters(
+                parameterWithName("postId").description("포스트 id")
+            ),
+            responseFields(
+                fieldWithPath("errorCode").type(STRING).description("에러 코드")
+            )
+        ));
+
+        verify(oAuthService, times(1))
+            .validateToken(any());
     }
 
     private static class PickGit {

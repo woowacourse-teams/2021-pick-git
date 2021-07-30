@@ -9,11 +9,15 @@ import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
+import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
+import com.woowacourse.pickgit.exception.post.CannotUnlikeException;
+import com.woowacourse.pickgit.exception.post.DuplicatedLikeException;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.presentation.dto.request.ContentRequest;
+import com.woowacourse.pickgit.post.presentation.dto.response.LikeResponse;
 import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.ExtractableResponse;
@@ -493,6 +497,180 @@ class PostAcceptanceTest {
 
         // then
         assertThat(response.getErrorCode()).isEqualTo("V0001");
+    }
+
+    @DisplayName("로그인 사용자는 게시물을 좋아요 할 수 있다. - 성공")
+    @Test
+    void likePost_LoginUser_Success() {
+        // given
+        String loginUserToken = 로그인_되어있음(USERNAME).getToken();
+        String targetUserToken = 로그인_되어있음(ANOTHER_USERNAME).getToken();
+        Long postId = 1L;
+
+        requestToWritePostApi(targetUserToken, HttpStatus.CREATED);
+
+        // when
+        LikeResponse response = given().log().all()
+            .auth().oauth2(loginUserToken)
+            .when()
+            .put("/api/posts/{postId}/likes", postId)
+            .then().log().all()
+            .statusCode(HttpStatus.OK.value())
+            .extract()
+            .as(new TypeRef<>() {
+            });
+
+        // then
+        assertThat(response.getLikeCount()).isEqualTo(1);
+        assertThat(response.isLiked()).isTrue();
+    }
+
+    @DisplayName("로그인 사용자는 게시물을 좋아요 취소 할 수 있다. - 성공")
+    @Test
+    void unlikePost_LoginUser_Success() {
+        // given
+        String loginUserToken = 로그인_되어있음(USERNAME).getToken();
+        String targetUserToken = 로그인_되어있음(ANOTHER_USERNAME).getToken();
+        Long postId = 1L;
+
+        requestToWritePostApi(targetUserToken, HttpStatus.CREATED);
+
+        LikeResponse likePostResponse = given().log().all()
+            .auth().oauth2(loginUserToken)
+            .when()
+            .put("/api/posts/{postId}/likes", postId)
+            .then().log().all()
+            .statusCode(HttpStatus.OK.value())
+            .extract()
+            .as(new TypeRef<>() {
+            });
+
+        assertThat(likePostResponse.getLikeCount()).isEqualTo(1);
+        assertThat(likePostResponse.isLiked()).isTrue();
+
+        // when
+        LikeResponse unlikePostResponse = given().log().all()
+            .auth().oauth2(loginUserToken)
+            .when()
+            .delete("/api/posts/{postId}/likes", postId)
+            .then().log().all()
+            .statusCode(HttpStatus.OK.value())
+            .extract()
+            .as(new TypeRef<>() {
+            });
+
+        // then
+        assertThat(unlikePostResponse.getLikeCount()).isEqualTo(0);
+        assertThat(unlikePostResponse.isLiked()).isFalse();
+    }
+
+    @DisplayName("게스트는 게시물을 좋아요 할 수 없다. - 실패")
+    @Test
+    void likePost_GuestUser_401ExceptionThrown() {
+        // given
+        String targetUserToken = 로그인_되어있음(ANOTHER_USERNAME).getToken();
+        Long postId = 1L;
+
+        requestToWritePostApi(targetUserToken, HttpStatus.CREATED);
+
+        // when
+        UnauthorizedException response = given().log().all()
+            .when()
+            .put("/api/posts/{postId}/likes", postId)
+            .then().log().all()
+            .statusCode(HttpStatus.UNAUTHORIZED.value())
+            .extract()
+            .as(new TypeRef<>() {
+            });
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("A0001");
+    }
+
+    @DisplayName("게스트는 게시물을 좋아요 취소 할 수 없다. - 실패")
+    @Test
+    void unlikePost_GuestUser_401ExceptionThrown() {
+        // given
+        String targetUserToken = 로그인_되어있음(ANOTHER_USERNAME).getToken();
+        Long postId = 1L;
+
+        requestToWritePostApi(targetUserToken, HttpStatus.CREATED);
+
+        // when
+        UnauthorizedException response = given().log().all()
+            .when()
+            .delete("/api/posts/{postId}/likes", postId)
+            .then().log().all()
+            .statusCode(HttpStatus.UNAUTHORIZED.value())
+            .extract()
+            .as(new TypeRef<>() {
+            });
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("A0001");
+    }
+
+    @DisplayName("로그인 사용자는 이미 좋아요한 게시물을 좋아요 할 수 없다. - 실패")
+    @Test
+    void likePost_DuplicatedLike_400ExceptionThrown() {
+        // given
+        String loginUserToken = 로그인_되어있음(USERNAME).getToken();
+        String targetUserToken = 로그인_되어있음(ANOTHER_USERNAME).getToken();
+        Long postId = 1L;
+
+        requestToWritePostApi(targetUserToken, HttpStatus.CREATED);
+
+        LikeResponse likePostResponse = given().log().all()
+            .auth().oauth2(loginUserToken)
+            .when()
+            .put("/api/posts/{postId}/likes", postId)
+            .then().log().all()
+            .statusCode(HttpStatus.OK.value())
+            .extract()
+            .as(new TypeRef<>() {
+            });
+
+        assertThat(likePostResponse.getLikeCount()).isEqualTo(1);
+        assertThat(likePostResponse.isLiked()).isTrue();
+
+        // when
+        DuplicatedLikeException secondLikeResponse = given().log().all()
+            .auth().oauth2(loginUserToken)
+            .when()
+            .put("/api/posts/{postId}/likes", postId)
+            .then().log().all()
+            .statusCode(HttpStatus.BAD_REQUEST.value())
+            .extract()
+            .as(new TypeRef<>() {
+            });
+
+        // then
+        assertThat(secondLikeResponse.getErrorCode()).isEqualTo("P0003");
+    }
+
+    @DisplayName("로그인 사용자는 좋아요 하지 않은 게시물을 좋아요 취소 할 수 없다. - 실패")
+    @Test
+    void unlikePost_cannotUnlike_400ExceptionThrown() {
+        // given
+        String loginUserToken = 로그인_되어있음(USERNAME).getToken();
+        String targetUserToken = 로그인_되어있음(ANOTHER_USERNAME).getToken();
+        Long postId = 1L;
+
+        requestToWritePostApi(targetUserToken, HttpStatus.CREATED);
+
+        // when
+        CannotUnlikeException unlikeResponse = given().log().all()
+            .auth().oauth2(loginUserToken)
+            .when()
+            .delete("/api/posts/{postId}/likes", postId)
+            .then().log().all()
+            .statusCode(HttpStatus.BAD_REQUEST.value())
+            .extract()
+            .as(new TypeRef<>() {
+            });
+
+        // then
+        assertThat(unlikeResponse.getErrorCode()).isEqualTo("P0004");
     }
 
     private ExtractableResponse<Response> request(String token, String username, int statusCode) {

@@ -7,20 +7,21 @@ import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
-import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
+import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
+import com.woowacourse.pickgit.post.domain.PickGitStorage;
 import com.woowacourse.pickgit.post.domain.PlatformRepositoryExtractor;
 import com.woowacourse.pickgit.post.domain.Post;
-import com.woowacourse.pickgit.post.domain.content.PostContent;
 import com.woowacourse.pickgit.post.domain.PostRepository;
 import com.woowacourse.pickgit.post.domain.comment.Comment;
 import com.woowacourse.pickgit.post.domain.content.Image;
 import com.woowacourse.pickgit.post.domain.content.Images;
+import com.woowacourse.pickgit.post.domain.content.PostContent;
 import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
-import com.woowacourse.pickgit.post.domain.PickGitStorage;
 import com.woowacourse.pickgit.post.presentation.dto.request.CommentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.HomeFeedRequest;
 import com.woowacourse.pickgit.tag.application.TagService;
@@ -183,5 +184,30 @@ public class PostService {
         Pageable pageable = PageRequest.of(homeFeedRequest.getPage(), homeFeedRequest.getLimit());
         List<Post> result = postRepository.findAllPostsByUser(target, pageable);
         return PostDtoAssembler.assembleFrom(appUser, result);
+    }
+
+    public LikeResponseDto like(AppUser user, Long postId) {
+        User source = findUserByName(user.getUsername());
+        Post target = findPostById(postId);
+
+        target.like(source);
+        return new LikeResponseDto(target.getLikeCounts(), true);
+    }
+
+    public LikeResponseDto unlike(AppUser user, Long postId) {
+        User source = findUserByName(user.getUsername());
+        Post target = findPostById(postId);
+
+        target.unlike(source);
+        return new LikeResponseDto(target.getLikeCounts(), false);
+    }
+
+    private Post findPostById(Long id) {
+        return postRepository.findById(id)
+            .orElseThrow(() -> new PostNotFoundException(
+                "P0002",
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "해당하는 게시물을 찾을 수 없습니다.")
+            );
     }
 }

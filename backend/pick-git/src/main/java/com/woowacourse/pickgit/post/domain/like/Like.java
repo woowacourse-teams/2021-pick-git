@@ -53,11 +53,11 @@ public class Like {
             return false;
         }
         Like like = (Like) o;
-        return Objects.equals(id, like.id);
+        return Objects.equals(post, like.post) && Objects.equals(user, like.user);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(post, user);
     }
 }
