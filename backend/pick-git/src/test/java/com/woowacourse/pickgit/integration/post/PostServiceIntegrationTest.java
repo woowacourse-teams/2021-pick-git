@@ -23,6 +23,7 @@ import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
+import com.woowacourse.pickgit.post.application.dto.request.PostDeleteRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
@@ -553,7 +554,7 @@ class PostServiceIntegrationTest {
             .hasMessage("권한 에러");
     }
 
-    @DisplayName("게시물의 태그, 내용을 수정한다.")
+    @DisplayName("사용자는 게시물의 태그, 내용을 수정한다.")
     @Test
     void update_TagsAndContentInCaseOfLoginUser_Success() {
         // given
@@ -591,7 +592,7 @@ class PostServiceIntegrationTest {
             .isEqualTo(responseDto);
     }
 
-    @DisplayName("게시물의 태그를 수정한다.")
+    @DisplayName("사용자는 게시물의 태그를 수정한다.")
     @Test
     void update_TagsInCaseOfLoginUser_Success() {
         // given
@@ -629,7 +630,7 @@ class PostServiceIntegrationTest {
             .isEqualTo(responseDto);
     }
 
-    @DisplayName("게시물의 내용을 수정한다.")
+    @DisplayName("사용자는 게시물의 내용을 수정한다.")
     @Test
     void update_ContentInCaseOfLoginUser_Success() {
         // given
@@ -700,6 +701,79 @@ class PostServiceIntegrationTest {
         // when
         assertThatThrownBy(() -> {
             postService.update(updateRequestDto);
+        }).isInstanceOf(PostNotFoundException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "P0002")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
+            .hasMessage("해당하는 게시물을 찾을 수 없습니다.");
+    }
+
+    @DisplayName("사용자는 게시물을 삭제한다.")
+    @Test
+    void delete_LoginUser_Success() {
+        // given
+        userRepository.save(UserFactory.user(USERNAME));
+        LoginUser user = new LoginUser(USERNAME, ACCESS_TOKEN);
+
+        PostRequestDto requestDto = PostRequestDto.builder()
+            .token(ACCESS_TOKEN)
+            .username(USERNAME)
+            .images(List.of(
+                FileFactory.getTestImage1(),
+                FileFactory.getTestImage2()))
+            .githubRepoUrl("https://github.com/da-nyee/woowacourse-projects")
+            .tags(List.of("java", "spring"))
+            .content("testContent")
+            .build();
+
+        postService.write(requestDto);
+
+        PostDeleteRequestDto deleteRequestDto =
+            PostDeleteRequestDto.toPostDeleteRequestDto(user, 1L);
+
+        // when
+        postService.delete(deleteRequestDto);
+
+        // then
+        assertThatThrownBy(() -> {
+            postRepository.findById(1L)
+                .orElseThrow(() -> new PostNotFoundException(
+                    "P0002",
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "해당하는 게시물을 찾을 수 없습니다."
+                ));
+        }).isInstanceOf(PostNotFoundException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "P0002")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
+            .hasMessage("해당하는 게시물을 찾을 수 없습니다.");
+    }
+
+    @DisplayName("게스트는 게시물을 삭제할 수 없다. - 401 예외")
+    @Test
+    void delete_GuestUser_401Exception() {
+        // given
+        GuestUser user = new GuestUser();
+
+        // when
+        assertThatThrownBy(() -> {
+            PostDeleteRequestDto.toPostDeleteRequestDto(user, 1L);
+        }).isInstanceOf(UnauthorizedException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "A0002")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)
+            .hasMessage("권한 에러");
+    }
+
+    @DisplayName("등록되지 않은 게시물은 삭제할 수 없다. - 500 예외")
+    @Test
+    void delete_InvalidPost_500Exception() {
+        // given
+        LoginUser user = new LoginUser(USERNAME, ACCESS_TOKEN);
+
+        PostDeleteRequestDto deleteRequestDto =
+            PostDeleteRequestDto.toPostDeleteRequestDto(user, 1L);
+
+        // when
+        assertThatThrownBy(() -> {
+            postService.delete(deleteRequestDto);
         }).isInstanceOf(PostNotFoundException.class)
             .hasFieldOrPropertyWithValue("errorCode", "P0002")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
