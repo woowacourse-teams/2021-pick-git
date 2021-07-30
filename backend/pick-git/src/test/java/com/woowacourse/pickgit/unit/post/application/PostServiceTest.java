@@ -579,11 +579,11 @@ class PostServiceTest {
     @Test
     void like_ValidUser_Success() {
         // given
-        AppUser user = new LoginUser("test user", "token");
+        AppUser appUser = new LoginUser("test user", "token");
         Long postId = 1L;
 
         given(userRepository.findByBasicProfile_Name(anyString()))
-            .willReturn(Optional.of(UserFactory.user(1L, user.getUsername())));
+            .willReturn(Optional.of(UserFactory.user(1L, appUser.getUsername())));
         given(postRepository.findById(anyLong()))
             .willReturn(Optional.of(
                 new PostBuilder()
@@ -593,16 +593,16 @@ class PostServiceTest {
             );
 
         // when
-        LikeResponseDto likeResponseDto = postService.like(user, postId);
+        LikeResponseDto likeResponseDto = postService.like(appUser, postId);
 
         // then
         assertThat(likeResponseDto.getLikeCount()).isEqualTo(1);
         assertThat(likeResponseDto.isLiked()).isTrue();
 
         verify(userRepository, times(1))
-            .findByBasicProfile_Name(anyString());
+            .findByBasicProfile_Name(appUser.getUsername());
         verify(postRepository, times(1))
-            .findById(anyLong());
+            .findById(postId);
     }
 
     @DisplayName("사용자는 특정 게시물을 좋아요 취소 할 수 있다.")
@@ -619,9 +619,9 @@ class PostServiceTest {
 
         post.like(user);
 
-        given(userRepository.findByBasicProfile_Name(anyString()))
+        given(userRepository.findByBasicProfile_Name(appUser.getUsername()))
             .willReturn(Optional.of(user));
-        given(postRepository.findById(anyLong()))
+        given(postRepository.findById(postId))
             .willReturn(Optional.of(post));
 
         // when
@@ -632,12 +632,12 @@ class PostServiceTest {
         assertThat(likeResponseDto.isLiked()).isFalse();
 
         verify(userRepository, times(1))
-            .findByBasicProfile_Name(anyString());
+            .findByBasicProfile_Name(appUser.getUsername());
         verify(postRepository, times(1))
             .findById(anyLong());
     }
 
-    @DisplayName("사용자는 이미 좋아요 한 게시물을 좋아요 할 수 없다.")
+    @DisplayName("사용자는 이미 좋아요 한 게시물을 좋아요 추가 할 수 없다.")
     @Test
     void like_DuplicatedLike_400ExceptionThrown() {
         // given
@@ -664,9 +664,9 @@ class PostServiceTest {
             .hasMessage("이미 좋아요한 게시물 중복 좋아요 에러");
 
         verify(userRepository, times(1))
-            .findByBasicProfile_Name(anyString());
+            .findByBasicProfile_Name(appUser.getUsername());
         verify(postRepository, times(1))
-            .findById(anyLong());
+            .findById(postId);
     }
 
     @DisplayName("사용자는 좋아요 누르지 않은 게시물을 좋아요 취소 할 수 없다.")
@@ -694,8 +694,8 @@ class PostServiceTest {
             .hasMessage("좋아요 하지 않은 게시물 좋아요 취소 에러");
 
         verify(userRepository, times(1))
-            .findByBasicProfile_Name(anyString());
+            .findByBasicProfile_Name(appUser.getUsername());
         verify(postRepository, times(1))
-            .findById(anyLong());
+            .findById(postId);
     }
 }

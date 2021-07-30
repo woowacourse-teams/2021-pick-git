@@ -438,12 +438,11 @@ class PostServiceIntegrationTest {
         User loginUser = userRepository.save(UserFactory.user(postRequestDtos.getUsername()));
 
         AppUser appUser = new LoginUser(loginUser.getName(), "token");
-        Long postId = 1L;
 
-        postService.write(postRequestDtos);
+        PostImageUrlResponseDto writtenPost = postService.write(postRequestDtos);
 
         // when
-        LikeResponseDto likeResponseDto = postService.like(appUser, postId);
+        LikeResponseDto likeResponseDto = postService.like(appUser, writtenPost.getId());
 
         // then
         assertThat(likeResponseDto.getLikeCount()).isEqualTo(1);
@@ -458,20 +457,19 @@ class PostServiceIntegrationTest {
         User loginUser = userRepository.save(UserFactory.user(postRequestDtos.getUsername()));
 
         AppUser appUser = new LoginUser(loginUser.getName(), "token");
-        Long postId = 1L;
 
-        postService.write(postRequestDtos);
-        postService.like(appUser, postId);
+        PostImageUrlResponseDto writtenPost = postService.write(postRequestDtos);
+        postService.like(appUser, writtenPost.getId());
 
         // when
-        LikeResponseDto likeResponseDto = postService.unlike(appUser, postId);
+        LikeResponseDto likeResponseDto = postService.unlike(appUser, writtenPost.getId());
 
         // then
         assertThat(likeResponseDto.getLikeCount()).isEqualTo(0);
         assertThat(likeResponseDto.isLiked()).isFalse();
     }
 
-    @DisplayName("사용자는 이미 좋아요 한 게시물을 좋아요 할 수 없다. - 실패")
+    @DisplayName("사용자는 이미 좋아요 한 게시물을 좋아요 추가 할 수 없다. - 실패")
     @Test
     void like_DuplicatedLike_400ExceptionThrown() {
         // given
@@ -479,13 +477,12 @@ class PostServiceIntegrationTest {
         User loginUser = userRepository.save(UserFactory.user(postRequestDtos.getUsername()));
 
         AppUser appUser = new LoginUser(loginUser.getName(), "token");
-        Long postId = 1L;
 
-        postService.write(postRequestDtos);
-        postService.like(appUser, postId);
+        PostImageUrlResponseDto writtenPost = postService.write(postRequestDtos);
+        postService.like(appUser, writtenPost.getId());
 
         // when then
-        assertThatThrownBy(() -> postService.like(appUser, postId))
+        assertThatThrownBy(() -> postService.like(appUser, writtenPost.getId()))
             .isInstanceOf(DuplicatedLikeException.class)
             .hasFieldOrPropertyWithValue("errorCode", "P0003")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
@@ -501,12 +498,11 @@ class PostServiceIntegrationTest {
         User loginUser = userRepository.save(UserFactory.user(postRequestDtos.getUsername()));
 
         AppUser appUser = new LoginUser(loginUser.getName(), "token");
-        Long postId = 1L;
 
-        postService.write(postRequestDtos);
+        PostImageUrlResponseDto writtenPost = postService.write(postRequestDtos);
 
         // when then
-        assertThatThrownBy(() -> postService.unlike(appUser, postId))
+        assertThatThrownBy(() -> postService.unlike(appUser, writtenPost.getId()))
             .isInstanceOf(CannotUnlikeException.class)
             .hasFieldOrPropertyWithValue("errorCode", "P0004")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
@@ -521,12 +517,11 @@ class PostServiceIntegrationTest {
         userRepository.save(UserFactory.user(postRequestDtos.getUsername()));
 
         AppUser appUser = new GuestUser();
-        Long postId = 1L;
 
-        postService.write(postRequestDtos);
+        PostImageUrlResponseDto writtenPost = postService.write(postRequestDtos);
 
         // when then
-        assertThatThrownBy(() -> postService.like(appUser, postId))
+        assertThatThrownBy(() -> postService.like(appUser, writtenPost.getId()))
             .isInstanceOf(UnauthorizedException.class)
             .hasFieldOrPropertyWithValue("errorCode", "A0002")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)
@@ -543,13 +538,12 @@ class PostServiceIntegrationTest {
 
         AppUser loginUser = new LoginUser(likeUser.getName(), "token");
         AppUser guestUser = new GuestUser();
-        Long postId = 1L;
 
-        postService.write(postRequestDtos);
-        postService.like(loginUser, postId);
+        PostImageUrlResponseDto writtenPost = postService.write(postRequestDtos);
+        postService.like(loginUser, writtenPost.getId());
 
         // when then
-        assertThatThrownBy(() -> postService.unlike(guestUser, postId))
+        assertThatThrownBy(() -> postService.unlike(guestUser, writtenPost.getId()))
             .isInstanceOf(UnauthorizedException.class)
             .hasFieldOrPropertyWithValue("errorCode", "A0002")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)

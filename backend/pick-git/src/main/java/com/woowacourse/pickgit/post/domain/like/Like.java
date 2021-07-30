@@ -27,19 +27,17 @@ public class Like {
     @JoinColumn(name = "user_id")
     private User user;
 
+    protected Like() {
+    }
+
+    public Like(Post post, User user) {
+        this(null, post, user);
+    }
+
     public Like(Long id, Post post, User user) {
         this.id = id;
         this.post = post;
         this.user = user;
-    }
-
-    public Like(Post post, User user) {
-        this.id = null;
-        this.post = post;
-        this.user = user;
-    }
-
-    protected Like() {
     }
 
     public boolean isOwnedBy(String userName) {

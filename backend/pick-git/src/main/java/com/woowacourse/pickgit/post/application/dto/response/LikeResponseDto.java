@@ -5,12 +5,12 @@ public class LikeResponseDto {
     private int likeCount;
     private boolean isLiked;
 
+    private LikeResponseDto() {
+    }
+
     public LikeResponseDto(int likeCount, boolean isLiked) {
         this.likeCount = likeCount;
         this.isLiked = isLiked;
-    }
-
-    public LikeResponseDto() {
     }
 
     public int getLikeCount() {

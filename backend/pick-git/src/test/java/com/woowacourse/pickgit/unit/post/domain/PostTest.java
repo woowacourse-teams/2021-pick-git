@@ -102,7 +102,7 @@ class PostTest {
         assertThat(post.isLikedBy(user2.getName())).isFalse();
     }
 
-    @DisplayName("사용자는 이미 좋아요한 게시물을 좋아요 할 수 없다.")
+    @DisplayName("사용자는 이미 좋아요한 게시물을 좋아요 추가 할 수 없다.")
     @Test
     void like_AlreadyLikePost_ExceptionThrown() {
         Post post = new PostBuilder()

@@ -4,8 +4,6 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import com.woowacourse.pickgit.exception.post.CannotAddTagException;
-import com.woowacourse.pickgit.exception.post.CannotUnlikeException;
-import com.woowacourse.pickgit.exception.post.DuplicatedLikeException;
 import com.woowacourse.pickgit.post.domain.comment.Comment;
 import com.woowacourse.pickgit.post.domain.comment.Comments;
 import com.woowacourse.pickgit.post.domain.content.Images;
@@ -134,19 +132,11 @@ public class Post {
     }
 
     public void like(User user) {
-        if (likes.contains(user.getName())) {
-            throw new DuplicatedLikeException();
-        }
-
         Like like = new Like(this, user);
         likes.add(like);
     }
 
     public void unlike(User user) {
-        if (!likes.contains(user.getName())) {
-            throw new CannotUnlikeException();
-        }
-
         Like like = new Like(this, user);
         likes.remove(like);
     }
