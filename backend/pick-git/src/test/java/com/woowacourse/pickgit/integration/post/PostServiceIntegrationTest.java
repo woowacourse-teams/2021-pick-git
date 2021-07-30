@@ -74,7 +74,6 @@ class PostServiceIntegrationTest {
     @Autowired
     private UserRepository userRepository;
 
-
     @DisplayName("게시물에 댓글을 정상 등록한다.")
     @Test
     void addComment_ValidContent_Success() {
@@ -668,24 +667,6 @@ class PostServiceIntegrationTest {
             .isEqualTo(responseDto);
     }
 
-    @DisplayName("게스트는 게시물을 수정할 수 없다. - 401 예외")
-    @Test
-    void update_GuestUser_401Exception() {
-        // given
-        GuestUser user = new GuestUser();
-
-        PostUpdateRequest updateRequest =
-            new PostUpdateRequest(List.of("java", "spring"), "hello");
-
-        // when
-        assertThatThrownBy(() -> {
-            new PostUpdateRequestDto(user, 1L, updateRequest.getTags(), updateRequest.getContent());
-        }).isInstanceOf(UnauthorizedException.class)
-            .hasFieldOrPropertyWithValue("errorCode", "A0002")
-            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)
-            .hasMessage("권한 에러");
-    }
-
     @DisplayName("등록되지 않은 게시물을 수정할 수 없다. - 500 예외")
     @Test
     void update_InvalidPost_500Exception() {
@@ -744,21 +725,6 @@ class PostServiceIntegrationTest {
             .hasFieldOrPropertyWithValue("errorCode", "P0002")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
             .hasMessage("해당하는 게시물을 찾을 수 없습니다.");
-    }
-
-    @DisplayName("게스트는 게시물을 삭제할 수 없다. - 401 예외")
-    @Test
-    void delete_GuestUser_401Exception() {
-        // given
-        GuestUser user = new GuestUser();
-
-        // when
-        assertThatThrownBy(() -> {
-            new PostDeleteRequestDto(user, 1L);
-        }).isInstanceOf(UnauthorizedException.class)
-            .hasFieldOrPropertyWithValue("errorCode", "A0002")
-            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)
-            .hasMessage("권한 에러");
     }
 
     @DisplayName("등록되지 않은 게시물은 삭제할 수 없다. - 500 예외")
