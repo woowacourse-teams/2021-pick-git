@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.FileFactory;
@@ -12,15 +13,19 @@ import com.woowacourse.pickgit.common.factory.PostBuilder;
 import com.woowacourse.pickgit.common.factory.PostFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
+import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.post.CannotAddTagException;
+import com.woowacourse.pickgit.exception.post.CannotUnlikeException;
 import com.woowacourse.pickgit.exception.post.CommentFormatException;
+import com.woowacourse.pickgit.exception.post.DuplicatedLikeException;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
+import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
@@ -423,5 +428,125 @@ class PostServiceIntegrationTest {
 
                 throw new IllegalArgumentException();
             }).collect(toList());
+    }
+
+    @DisplayName("사용자는 특정 게시물을 좋아요 할 수 있다. - 성공")
+    @Test
+    void like_ValidUser_Success() {
+        // given
+        PostRequestDto postRequestDtos = PostFactory.mockPostRequestDtos().get(0);
+        User loginUser = userRepository.save(UserFactory.user(postRequestDtos.getUsername()));
+
+        AppUser appUser = new LoginUser(loginUser.getName(), "token");
+
+        PostImageUrlResponseDto writtenPost = postService.write(postRequestDtos);
+
+        // when
+        LikeResponseDto likeResponseDto = postService.like(appUser, writtenPost.getId());
+
+        // then
+        assertThat(likeResponseDto.getLikeCount()).isEqualTo(1);
+        assertThat(likeResponseDto.isLiked()).isTrue();
+    }
+
+    @DisplayName("사용자는 특정 게시물을 좋아요 취소 할 수 있다. - 성공")
+    @Test
+    void unlike_ValidUser_Success() {
+        // given
+        PostRequestDto postRequestDtos = PostFactory.mockPostRequestDtos().get(0);
+        User loginUser = userRepository.save(UserFactory.user(postRequestDtos.getUsername()));
+
+        AppUser appUser = new LoginUser(loginUser.getName(), "token");
+
+        PostImageUrlResponseDto writtenPost = postService.write(postRequestDtos);
+        postService.like(appUser, writtenPost.getId());
+
+        // when
+        LikeResponseDto likeResponseDto = postService.unlike(appUser, writtenPost.getId());
+
+        // then
+        assertThat(likeResponseDto.getLikeCount()).isEqualTo(0);
+        assertThat(likeResponseDto.isLiked()).isFalse();
+    }
+
+    @DisplayName("사용자는 이미 좋아요 한 게시물을 좋아요 추가 할 수 없다. - 실패")
+    @Test
+    void like_DuplicatedLike_400ExceptionThrown() {
+        // given
+        PostRequestDto postRequestDtos = PostFactory.mockPostRequestDtos().get(0);
+        User loginUser = userRepository.save(UserFactory.user(postRequestDtos.getUsername()));
+
+        AppUser appUser = new LoginUser(loginUser.getName(), "token");
+
+        PostImageUrlResponseDto writtenPost = postService.write(postRequestDtos);
+        postService.like(appUser, writtenPost.getId());
+
+        // when then
+        assertThatThrownBy(() -> postService.like(appUser, writtenPost.getId()))
+            .isInstanceOf(DuplicatedLikeException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "P0003")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
+            .hasMessage("이미 좋아요한 게시물 중복 좋아요 에러");
+    }
+
+
+    @DisplayName("사용자는 좋아요 누르지 않은 게시물을 좋아요 취소 할 수 없다. - 실패")
+    @Test
+    void unlike_UnlikePost_400ExceptionThrown() {
+        // given
+        PostRequestDto postRequestDtos = PostFactory.mockPostRequestDtos().get(0);
+        User loginUser = userRepository.save(UserFactory.user(postRequestDtos.getUsername()));
+
+        AppUser appUser = new LoginUser(loginUser.getName(), "token");
+
+        PostImageUrlResponseDto writtenPost = postService.write(postRequestDtos);
+
+        // when then
+        assertThatThrownBy(() -> postService.unlike(appUser, writtenPost.getId()))
+            .isInstanceOf(CannotUnlikeException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "P0004")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
+            .hasMessage("좋아요 하지 않은 게시물 좋아요 취소 에러");
+    }
+
+    @DisplayName("게스트는 게시물을 좋아요 할 수 없다. - 실패")
+    @Test
+    void like_GuestUser_401ExceptionThrown() {
+        // given
+        PostRequestDto postRequestDtos = PostFactory.mockPostRequestDtos().get(0);
+        userRepository.save(UserFactory.user(postRequestDtos.getUsername()));
+
+        AppUser appUser = new GuestUser();
+
+        PostImageUrlResponseDto writtenPost = postService.write(postRequestDtos);
+
+        // when then
+        assertThatThrownBy(() -> postService.like(appUser, writtenPost.getId()))
+            .isInstanceOf(UnauthorizedException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "A0002")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)
+            .hasMessage("권한 에러");
+    }
+
+    @DisplayName("게스트는 게시물을 좋아요 취소 할 수 없다. - 실패")
+    @Test
+    void unlike_GuestUser_401ExceptionThrown() {
+        // given
+        PostRequestDto postRequestDtos = PostFactory.mockPostRequestDtos().get(0);
+        userRepository.save(UserFactory.user(postRequestDtos.getUsername()));
+        User likeUser = userRepository.save(UserFactory.user());
+
+        AppUser loginUser = new LoginUser(likeUser.getName(), "token");
+        AppUser guestUser = new GuestUser();
+
+        PostImageUrlResponseDto writtenPost = postService.write(postRequestDtos);
+        postService.like(loginUser, writtenPost.getId());
+
+        // when then
+        assertThatThrownBy(() -> postService.unlike(guestUser, writtenPost.getId()))
+            .isInstanceOf(UnauthorizedException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "A0002")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)
+            .hasMessage("권한 에러");
     }
 }

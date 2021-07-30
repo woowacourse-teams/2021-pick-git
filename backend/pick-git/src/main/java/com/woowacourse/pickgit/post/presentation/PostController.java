@@ -5,6 +5,7 @@ import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
+import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
@@ -16,15 +17,18 @@ import com.woowacourse.pickgit.post.presentation.dto.request.ContentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.HomeFeedRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.PostRequest;
 
+import com.woowacourse.pickgit.post.presentation.dto.response.LikeResponse;
 import java.net.URI;
 import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -93,6 +97,21 @@ public class PostController {
             .build();
     }
 
+    private URI redirectUrl(AppUser user, PostImageUrlResponseDto responseDto) {
+        return URI.create(String.format(REDIRECT_URL, user.getUsername(), responseDto.getId()));
+    }
+
+    private PostRequestDto createPostRequestDto(AppUser user, PostRequest request) {
+        return new PostRequestDto(
+            user.getAccessToken(),
+            user.getUsername(),
+            request.getImages(),
+            request.getGithubRepoUrl(),
+            request.getTags(),
+            request.getContent()
+        );
+    }
+
     @PostMapping("/posts/{postId}/comments")
     public ResponseEntity<CommentResponse> addComment(
         @Authenticated AppUser user,
@@ -108,27 +127,6 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
-    private void validateIsGuest(AppUser user) {
-        if (user.isGuest()) {
-            throw new UnauthorizedException();
-        }
-    }
-
-    private PostRequestDto createPostRequestDto(AppUser user, PostRequest request) {
-        return new PostRequestDto(
-            user.getAccessToken(),
-            user.getUsername(),
-            request.getImages(),
-            request.getGithubRepoUrl(),
-            request.getTags(),
-            request.getContent()
-        );
-    }
-
-    private URI redirectUrl(AppUser user, PostImageUrlResponseDto responseDto) {
-        return URI.create(String.format(REDIRECT_URL, user.getUsername(), responseDto.getId()));
-    }
-
     @GetMapping("/github/{username}/repositories")
     public ResponseEntity<List<RepositoryResponseDto>> showRepositories(
         @Authenticated AppUser user,
@@ -139,5 +137,39 @@ public class PostController {
             .showRepositories(new RepositoryRequestDto(token, username));
 
         return ResponseEntity.ok(responseDto.getRepositories());
+    }
+
+    @PutMapping("/posts/{postId}/likes")
+    public ResponseEntity<LikeResponse> likePost(
+        @Authenticated AppUser user,
+        @PathVariable Long postId
+    ) {
+        validateIsGuest(user);
+        LikeResponseDto likeResponseDto = postService.like(user, postId);
+
+        LikeResponse likeResponse =
+            new LikeResponse(likeResponseDto.getLikeCount(), likeResponseDto.isLiked());
+
+        return ResponseEntity.ok(likeResponse);
+    }
+
+    @DeleteMapping("/posts/{postId}/likes")
+    public ResponseEntity<LikeResponse> unlikePost(
+        @Authenticated AppUser user,
+        @PathVariable Long postId
+    ) {
+        validateIsGuest(user);
+        LikeResponseDto likeResponseDto = postService.unlike(user, postId);
+
+        LikeResponse likeResponse =
+            new LikeResponse(likeResponseDto.getLikeCount(), likeResponseDto.isLiked());
+
+        return ResponseEntity.ok(likeResponse);
+    }
+
+    private void validateIsGuest(AppUser user) {
+        if (user.isGuest()) {
+            throw new UnauthorizedException();
+        }
     }
 }
