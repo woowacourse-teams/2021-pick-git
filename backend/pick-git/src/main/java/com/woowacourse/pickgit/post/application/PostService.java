@@ -221,10 +221,11 @@ public class PostService {
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "해당하는 게시물을 찾을 수 없습니다."
             ));
+        List<Tag> tags = tagService.findOrCreateTags(new TagsDto(updateRequestDto.getTags()));
 
-        post.update(updateRequestDto.getContent(), updateRequestDto.getTags());
+        Post updatedPost = post.update(updateRequestDto.getContent(), tags);
 
-        return PostUpdateResponseDto.toPostUpdateResponseDto(updateRequestDto);
+        return PostUpdateResponseDto.toPostUpdateResponseDto(updatedPost);
     }
 
     public void delete(PostDeleteRequestDto deleteRequestDto) {

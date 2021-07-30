@@ -125,6 +125,12 @@ public class Post {
             .collect(toList());
     }
 
+    public List<String> getTagNames() {
+        return postTags.stream()
+            .map(PostTag::getTagName)
+            .collect(toList());
+    }
+
     private void validateDuplicateTagAlreadyExistsInPost(List<Tag> existingTags, Tag tag) {
         if (existingTags.contains(tag)) {
             throw new CannotAddTagException();
@@ -149,17 +155,13 @@ public class Post {
         return id;
     }
 
-    public void update(String content, List<String> tags) {
+    public Post update(String content, List<Tag> tags) {
         postTags.clear();
 
         this.content = new PostContent(content);
-        addTags(convertToTag(tags));
-    }
+        addTags(tags);
 
-    private List<Tag> convertToTag(List<String> tags) {
-        return tags.stream()
-            .map(Tag::new)
-            .collect(toList());
+        return this;
     }
 
     public List<String> getImageUrls() {

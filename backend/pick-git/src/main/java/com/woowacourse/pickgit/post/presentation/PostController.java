@@ -182,8 +182,8 @@ public class PostController {
         @PathVariable Long postId,
         @Valid @RequestBody PostUpdateRequest updateRequest
     ) {
-        PostUpdateResponseDto responseDto =
-            postService.update(PostUpdateRequestDto.toUpdateRequestDto(postId, updateRequest));
+        PostUpdateResponseDto responseDto = postService
+            .update(PostUpdateRequestDto.toUpdateRequestDto(user, postId, updateRequest));
 
         return ResponseEntity
             .created(redirectUrl(user.getUsername(), postId))
