@@ -5,7 +5,7 @@ import Tabs from "../../components/@shared/Tabs/Tabs";
 import SearchListUser from "../../components/SearchListUser/SearchListUser";
 import useFollow from "../../services/hooks/useFollow";
 import useSearchData from "../../services/hooks/useSearchData";
-import { Container } from "./SearchPage.style";
+import { Container, Empty } from "./SearchPage.style";
 
 const tabNames = ["계정", "태그"];
 
@@ -24,27 +24,25 @@ const SearchPage = () => {
       follow={follow}
       refetch={refetch}
     />,
-    <div style={{ height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }} key="tag">
-      서비스 준비중입니다.
-    </div>,
+    <Empty key="tag">서비스 준비중입니다.</Empty>,
   ];
 
-  if (isLoading) {
-    return <PageLoading />;
-  }
+  const Content = ({ tabIndex }: { tabIndex: number }) => {
+    if (isLoading) {
+      return <PageLoading />;
+    }
 
-  if (isError) {
-    return (
-      <div style={{ height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }} key="tag">
-        검색결과를 표시할 수 없습니다.
-      </div>
-    );
-  }
+    if (isError) {
+      return <Empty key="tag">검색결과를 표시할 수 없습니다.</Empty>;
+    }
+
+    return tabContents[tabIndex];
+  };
 
   return (
     <Container>
       <Tabs tabItems={tabItems} tabIndicatorKind="line" />
-      {tabContents[tabIndex]}
+      <Content tabIndex={tabIndex} />
     </Container>
   );
 };

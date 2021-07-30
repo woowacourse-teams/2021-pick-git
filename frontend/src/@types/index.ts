@@ -70,11 +70,11 @@ export interface PostUploadData {
 }
 
 export interface GithubStats {
-  stars: string;
-  commits: string;
-  prs: string;
-  issues: string;
-  contributes: string;
+  starsCount: number;
+  commitsCount: number;
+  prsCount: number;
+  issuesCount: number;
+  reposCount: number;
 }
 
 export interface GithubRepository {

@@ -34,6 +34,7 @@ import TextEditor from "../TextEditor/TextEditor";
 import { getTimeDiffFromCurrent } from "../../../utils/date";
 import EmptyPostImage from "../../../assets/images/empty-post-image.png";
 import ButtonDrawer from "../ButtonDrawer/ButtonDrawer";
+import UserContext from "../../../contexts/UserContext";
 
 export interface Props {
   authorName: string;

@@ -7,3 +7,10 @@ export const Container = styled(Page)<React.CSSProperties>`
   padding-right: 1.4375rem;
   height: 100vh;
 `;
+
+export const Empty = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+`;
