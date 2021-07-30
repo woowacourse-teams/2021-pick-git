@@ -19,6 +19,7 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
+import static org.springframework.restdocs.payload.JsonFieldType.NULL;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -46,16 +47,20 @@ import com.woowacourse.pickgit.exception.post.DuplicatedLikeException;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
 import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.presentation.PostController;
 import com.woowacourse.pickgit.post.presentation.dto.request.CommentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.ContentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.HomeFeedRequest;
+import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
 import com.woowacourse.pickgit.post.presentation.dto.response.LikeResponse;
+import com.woowacourse.pickgit.post.presentation.dto.response.PostUpdateResponse;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -80,7 +85,7 @@ import org.springframework.test.web.servlet.ResultActions;
 class PostControllerTest {
 
     private static final String USERNAME = "jipark3";
-    private static final String ACCESS_TOKEN = "pickgit";
+    private static final String ACCESS_TOKEN = "testToken";
     private static final String API_ACCESS_TOKEN = "oauth.access.token";
 
     @Autowired
@@ -94,7 +99,6 @@ class PostControllerTest {
 
     @MockBean
     private OAuthService oAuthService;
-
 
     @DisplayName("게시물을 작성할 수 있다. - 사용자")
     @Test
@@ -692,6 +696,171 @@ class PostControllerTest {
         public static final String GITHUB_REPO_URL = "githubRepoUrl";
         public static final String CONTENT = "content";
         public static final String TAGS = "tags";
-        public static final String IMAGES = "images";
+    }
+
+    @DisplayName("사용자는 게시물을 수정한다.")
+    @Test
+    void update_LoginUser_Success() throws Exception {
+        // given
+        LoginUser user = new LoginUser("testUser", "Bearer testToken");
+
+        PostUpdateResponseDto updateResponseDto = PostUpdateResponseDto.builder()
+            .tags(List.of("java", "spring"))
+            .content("hello")
+            .build();
+
+        given(oAuthService.validateToken(any()))
+            .willReturn(true);
+        given(oAuthService.findRequestUserByToken(any()))
+            .willReturn(user);
+        given(postService.update(any(PostUpdateRequestDto.class)))
+            .willReturn(updateResponseDto);
+
+        PostUpdateRequest updateRequest = PostUpdateRequest.builder()
+            .tags(List.of("java", "spring"))
+            .content("hello")
+            .build();
+        PostUpdateResponse updateResponse = PostUpdateResponse.builder()
+            .tags(List.of("java", "spring"))
+            .content("hello")
+            .build();
+
+        String requestBody = objectMapper.writeValueAsString(updateRequest);
+        String responseBody = objectMapper.writeValueAsString(updateResponse);
+
+        // when
+        ResultActions perform = mockMvc.perform(put("/api/posts/{postId}", 1L)
+            .header(HttpHeaders.AUTHORIZATION, "Bearer testToken")
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .content(requestBody));
+
+        // then
+        perform
+            .andExpect(status().isCreated())
+            .andExpect(content().string(responseBody));
+
+        verify(postService, times(1))
+            .update(any(PostUpdateRequestDto.class));
+
+        perform.andDo(document("post-update",
+            getDocumentRequest(),
+            getDocumentResponse(),
+            requestHeaders(
+                headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer token")
+            ),
+            pathParameters(
+                parameterWithName("postId").description("게시물 id")
+            ),
+            requestFields(
+                fieldWithPath("tags").type(ARRAY).description("수정할 태그들"),
+                fieldWithPath("content").type(STRING).description("수정할 내용")
+            ),
+            responseFields(
+                fieldWithPath("tags").type(ARRAY).description("수정된 태그들"),
+                fieldWithPath("content").type(STRING).description("수정된 내용")
+            )
+        ));
+    }
+
+    @DisplayName("유효하지 않은 내용(null)으로 게시물을 수정할 수 없다. - 400 예외")
+    @Test
+    void update_NullContent_400Exception() throws Exception {
+        // given
+        LoginUser user = new LoginUser("testUser", "Bearer testToken");
+
+        given(oAuthService.validateToken(any()))
+            .willReturn(true);
+        given(oAuthService.findRequestUserByToken(any()))
+            .willReturn(user);
+
+        PostUpdateRequest updateRequest = PostUpdateRequest.builder()
+            .tags(List.of("java", "spring"))
+            .content(null)
+            .build();
+
+        String requestBody = objectMapper.writeValueAsString(updateRequest);
+
+        // when
+        ResultActions perform = mockMvc.perform(put("/api/posts/{postId}", 1L)
+            .header(HttpHeaders.AUTHORIZATION, "Bearer testToken")
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .content(requestBody));
+
+        // then
+        perform
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("errorCode").value("F0001"));
+
+        verify(postService, never())
+            .update(any(PostUpdateRequestDto.class));
+
+        perform.andDo(document("post-update-nullContent",
+            getDocumentRequest(),
+            getDocumentResponse(),
+            requestHeaders(
+                headerWithName(HttpHeaders.AUTHORIZATION).description("bearer token")
+            ),
+            pathParameters(
+                parameterWithName("postId").description("게시물 id")
+            ),
+            requestFields(
+                fieldWithPath("tags").type(ARRAY).description("수정할 태그들"),
+                fieldWithPath("content").type(NULL).description("수정할 내용(null)")
+            ),
+            responseFields(
+                fieldWithPath("errorCode").type(STRING).description("에러 코드")
+            )
+        ));
+    }
+
+    @DisplayName("유효하지 않은 내용(500자 초)으로 게시물을 수정할 수 없다. - 400 예외")
+    @Test
+    void update_Over500Content_400Exception() throws Exception {
+        // given
+        LoginUser user = new LoginUser("testUser", "Bearer testToken");
+
+        given(oAuthService.validateToken(any()))
+            .willReturn(true);
+        given(oAuthService.findRequestUserByToken(any()))
+            .willReturn(user);
+
+        PostUpdateRequest updateRequest = PostUpdateRequest.builder()
+            .tags(List.of("java", "spring"))
+            .content("a".repeat(501))
+            .build();
+
+        String requestBody = objectMapper.writeValueAsString(updateRequest);
+
+        // when
+        ResultActions perform = mockMvc.perform(put("/api/posts/{postId}", 1L)
+            .header(HttpHeaders.AUTHORIZATION, "Bearer testToken")
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .content(requestBody));
+
+        // then
+        perform
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("errorCode").value("F0004"));
+
+        verify(postService, never())
+            .update(any(PostUpdateRequestDto.class));
+
+        perform.andDo(document("post-update-Over500Content",
+            getDocumentRequest(),
+            getDocumentResponse(),
+            requestHeaders(
+                headerWithName(HttpHeaders.AUTHORIZATION).description("bearer token")
+            ),
+            pathParameters(
+                parameterWithName("postId").description("게시물 id")
+            ),
+            requestFields(
+                fieldWithPath("tags").type(ARRAY).description("수정할 태그들"),
+                fieldWithPath("content").type(STRING).description("수정할 내용(500자 초과)")
+            ),
+            responseFields(
+                fieldWithPath("errorCode").type(STRING).description("에러 코드")
+            )
+        ));
     }
 }
