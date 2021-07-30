@@ -33,11 +33,14 @@ export const API_URL = {
   USER_PROFILE_FOLLOW: (username: string) => `/profiles/${username}/followings`,
   MY_POSTS: (page: number, limit: number) => `/posts/me?page=${page}&limit=${limit}`,
   USER_POSTS: (username: string, page: number, limit: number) => `/posts/${username}?page=${page}&limit=${limit}`,
+  SEARCH_USER: (keyword: string, page: number, limit: number) =>
+    `/search/users?keyword=${keyword}&page=${page}&limit=${limit}`,
   AFTER_LOGIN: (code: string) => `afterlogin?code=${code}`,
   POST: (postId: number) => `/posts/${postId}`,
   POSTS: (page: number, limit: number) => `/posts?page=${page}&limit=${limit}`,
   POSTS_LIKES: (postId: number) => `/posts/${postId}/likes`,
   POSTS_COMMENTS: (postId: number) => `/posts/${postId}/comments`,
+  GITHUB_STATS: (username: string) => `/profiles/${username}/contributions`,
   GITHUB_REPOSITORIES: "/github/swon3210/repositories",
   GITHUB_TAGS: (repositoryName: string) => `/github/repositories/${repositoryName}/tags/languages`,
 };

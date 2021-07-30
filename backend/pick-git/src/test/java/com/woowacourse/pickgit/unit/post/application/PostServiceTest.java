@@ -3,62 +3,62 @@ package com.woowacourse.pickgit.unit.post.application;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
-import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.PostBuilder;
 import com.woowacourse.pickgit.common.factory.PostFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
+import com.woowacourse.pickgit.exception.post.CannotUnlikeException;
+import com.woowacourse.pickgit.exception.post.CommentFormatException;
+import com.woowacourse.pickgit.exception.post.DuplicatedLikeException;
 import com.woowacourse.pickgit.exception.post.PostFormatException;
+import com.woowacourse.pickgit.exception.post.PostNotBelongToUserException;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.post.RepositoryParseException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
 import com.woowacourse.pickgit.post.application.PostService;
+import com.woowacourse.pickgit.post.application.dto.CommentResponse;
+import com.woowacourse.pickgit.post.application.dto.request.PostDeleteRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
+import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
-import com.woowacourse.pickgit.post.domain.PlatformRepositoryExtractor;
-import com.woowacourse.pickgit.post.application.dto.CommentResponse;
-import com.woowacourse.pickgit.post.domain.Post;
-import com.woowacourse.pickgit.post.domain.content.PostContent;
-import com.woowacourse.pickgit.post.domain.PostRepository;
-import com.woowacourse.pickgit.exception.post.CommentFormatException;
-import com.woowacourse.pickgit.post.domain.comment.Comments;
-import com.woowacourse.pickgit.post.domain.content.Image;
-import com.woowacourse.pickgit.post.domain.content.Images;
-import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.domain.PickGitStorage;
+import com.woowacourse.pickgit.post.domain.PlatformRepositoryExtractor;
+import com.woowacourse.pickgit.post.domain.Post;
+import com.woowacourse.pickgit.post.domain.PostRepository;
+import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.presentation.dto.request.CommentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.HomeFeedRequest;
+import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
 import com.woowacourse.pickgit.tag.application.TagService;
 import com.woowacourse.pickgit.tag.application.TagsDto;
 import com.woowacourse.pickgit.tag.domain.Tag;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
-import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
-import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import javax.persistence.EntityManager;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -579,5 +579,403 @@ class PostServiceTest {
         assertThat(actual).containsAll(expected);
 
         verify(userRepository, times(1)).findByBasicProfile_Name(anyString());
+    }
+
+    @DisplayName("사용자는 특정 게시물을 좋아요 할 수 있다.")
+    @Test
+    void like_ValidUser_Success() {
+        // given
+        AppUser appUser = new LoginUser("test user", "token");
+        Long postId = 1L;
+
+        given(userRepository.findByBasicProfile_Name(anyString()))
+            .willReturn(Optional.of(UserFactory.user(1L, appUser.getUsername())));
+        given(postRepository.findById(anyLong()))
+            .willReturn(Optional.of(
+                new PostBuilder()
+                    .id(postId)
+                    .content("abc")
+                    .build())
+            );
+
+        // when
+        LikeResponseDto likeResponseDto = postService.like(appUser, postId);
+
+        // then
+        assertThat(likeResponseDto.getLikeCount()).isEqualTo(1);
+        assertThat(likeResponseDto.isLiked()).isTrue();
+
+        verify(userRepository, times(1))
+            .findByBasicProfile_Name(appUser.getUsername());
+        verify(postRepository, times(1))
+            .findById(postId);
+    }
+
+    @DisplayName("사용자는 특정 게시물을 좋아요 취소 할 수 있다.")
+    @Test
+    void unlike_ValidUser_Success() {
+        // given
+        AppUser appUser = new LoginUser("test user", "token");
+        Long postId = 1L;
+        User user = UserFactory.user(1L, appUser.getUsername());
+        Post post = new PostBuilder()
+            .id(postId)
+            .content("abc")
+            .build();
+
+        post.like(user);
+
+        given(userRepository.findByBasicProfile_Name(appUser.getUsername()))
+            .willReturn(Optional.of(user));
+        given(postRepository.findById(postId))
+            .willReturn(Optional.of(post));
+
+        // when
+        LikeResponseDto likeResponseDto = postService.unlike(appUser, postId);
+
+        // then
+        assertThat(likeResponseDto.getLikeCount()).isEqualTo(0);
+        assertThat(likeResponseDto.isLiked()).isFalse();
+
+        verify(userRepository, times(1))
+            .findByBasicProfile_Name(appUser.getUsername());
+        verify(postRepository, times(1))
+            .findById(anyLong());
+    }
+
+    @DisplayName("사용자는 이미 좋아요 한 게시물을 좋아요 추가 할 수 없다.")
+    @Test
+    void like_DuplicatedLike_400ExceptionThrown() {
+        // given
+        AppUser appUser = new LoginUser("test user", "token");
+        Long postId = 1L;
+        User user = UserFactory.user(1L, appUser.getUsername());
+        Post post = new PostBuilder()
+            .id(postId)
+            .content("abc")
+            .build();
+
+        post.like(user);
+
+        given(userRepository.findByBasicProfile_Name(anyString()))
+            .willReturn(Optional.of(user));
+        given(postRepository.findById(anyLong()))
+            .willReturn(Optional.of(post));
+
+        // when then
+        assertThatThrownBy(() -> postService.like(appUser, postId))
+            .isInstanceOf(DuplicatedLikeException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "P0003")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
+            .hasMessage("이미 좋아요한 게시물 중복 좋아요 에러");
+
+        verify(userRepository, times(1))
+            .findByBasicProfile_Name(appUser.getUsername());
+        verify(postRepository, times(1))
+            .findById(postId);
+    }
+
+    @DisplayName("사용자는 좋아요 누르지 않은 게시물을 좋아요 취소 할 수 없다.")
+    @Test
+    void unlike_UnlikePost_400ExceptionThrown() {
+        // given
+        AppUser appUser = new LoginUser("test user", "token");
+        Long postId = 1L;
+        User user = UserFactory.user(1L, appUser.getUsername());
+        Post post = new PostBuilder()
+            .id(postId)
+            .content("abc")
+            .build();
+
+        given(userRepository.findByBasicProfile_Name(anyString()))
+            .willReturn(Optional.of(user));
+        given(postRepository.findById(anyLong()))
+            .willReturn(Optional.of(post));
+
+        // when then
+        assertThatThrownBy(() -> postService.unlike(appUser, postId))
+            .isInstanceOf(CannotUnlikeException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "P0004")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
+            .hasMessage("좋아요 하지 않은 게시물 좋아요 취소 에러");
+
+        verify(userRepository, times(1))
+            .findByBasicProfile_Name(appUser.getUsername());
+        verify(postRepository, times(1))
+            .findById(postId);
+    }
+
+    @DisplayName("사용자는 게시물의 태그, 내용을 수정한다.")
+    @Test
+    void update_TagsAndContentInCaseOfLoginUser_Success() {
+        // given
+        LoginUser loginUser = new LoginUser("testUser", "Bearer testToken");
+        User user = UserFactory.user(1L, loginUser.getUsername());
+        Post post = new PostBuilder()
+            .id(1L)
+            .content("testContent")
+            .user(user)
+            .build();
+
+        PostUpdateRequest updateRequest = PostUpdateRequest.builder()
+            .tags(List.of("java", "spring"))
+            .content("hello")
+            .build();
+        PostUpdateRequestDto updateRequestDto = new PostUpdateRequestDto(loginUser, 1L,
+            updateRequest.getTags(), updateRequest.getContent());
+
+        given(userRepository.findByBasicProfile_Name(anyString()))
+            .willReturn(Optional.of(user));
+        given(postRepository.findByUser(any(User.class)))
+            .willReturn(Optional.of(post));
+        given(tagService.findOrCreateTags(any(TagsDto.class)))
+            .willReturn(List.of(new Tag("java"), new Tag("spring")));
+
+        PostUpdateResponseDto responseDto = PostUpdateResponseDto.builder()
+            .tags(List.of("java", "spring"))
+            .content("hello")
+            .build();
+
+        // when
+        PostUpdateResponseDto updateResponseDto = postService.update(updateRequestDto);
+
+        // then
+        assertThat(updateResponseDto)
+            .usingRecursiveComparison()
+            .isEqualTo(responseDto);
+
+        verify(userRepository, times(1))
+            .findByBasicProfile_Name("testUser");
+        verify(postRepository, times(2))
+            .findByUser(any(User.class));
+        verify(tagService, times(1))
+            .findOrCreateTags(any(TagsDto.class));
+    }
+
+    @DisplayName("사용자는 게시물의 태그를 수정한다.")
+    @Test
+    void update_TagsInCaseOfLoginUser_Success() {
+        // given
+        LoginUser loginUser = new LoginUser("testUser", "Bearer testToken");
+        User user = UserFactory.user(1L, loginUser.getUsername());
+        Post post = new PostBuilder()
+            .id(1L)
+            .content("testContent")
+            .user(user)
+            .build();
+
+        PostUpdateRequest updateRequest = PostUpdateRequest.builder()
+            .tags(List.of())
+            .content("hello")
+            .build();
+        PostUpdateRequestDto updateRequestDto = new PostUpdateRequestDto(loginUser, 1L,
+            updateRequest.getTags(), updateRequest.getContent());
+
+        given(userRepository.findByBasicProfile_Name(anyString()))
+            .willReturn(Optional.of(user));
+        given(postRepository.findByUser(any(User.class)))
+            .willReturn(Optional.of(post));
+        given(tagService.findOrCreateTags(any(TagsDto.class)))
+            .willReturn(List.of());
+
+        PostUpdateResponseDto responseDto = PostUpdateResponseDto.builder()
+            .tags(List.of())
+            .content("hello")
+            .build();
+
+        // when
+        PostUpdateResponseDto updateResponseDto = postService.update(updateRequestDto);
+
+        // then
+        assertThat(updateResponseDto)
+            .usingRecursiveComparison()
+            .isEqualTo(responseDto);
+
+        verify(userRepository, times(1))
+            .findByBasicProfile_Name("testUser");
+        verify(postRepository, times(2))
+            .findByUser(any(User.class));
+        verify(tagService, times(1))
+            .findOrCreateTags(any(TagsDto.class));
+    }
+
+    @DisplayName("사용자는 게시물의 내용을 수정한다.")
+    @Test
+    void update_ContentInCaseOfLoginUser_Success() {
+        // given
+        LoginUser loginUser = new LoginUser("testUser", "Bearer testToken");
+        User user = UserFactory.user(1L, loginUser.getUsername());
+        Post post = new PostBuilder()
+            .id(1L)
+            .content("testContent")
+            .user(user)
+            .build();
+
+        PostUpdateRequest updateRequest = PostUpdateRequest.builder()
+            .tags(List.of("java", "spring"))
+            .content("testContent")
+            .build();
+        PostUpdateRequestDto updateRequestDto = new PostUpdateRequestDto(loginUser, 1L,
+            updateRequest.getTags(), updateRequest.getContent());
+
+        given(userRepository.findByBasicProfile_Name(anyString()))
+            .willReturn(Optional.of(user));
+        given(postRepository.findByUser(any(User.class)))
+            .willReturn(Optional.of(post));
+        given(tagService.findOrCreateTags(any(TagsDto.class)))
+            .willReturn(List.of(new Tag("java"), new Tag("spring")));
+
+        PostUpdateResponseDto responseDto = PostUpdateResponseDto.builder()
+            .tags(List.of("java", "spring"))
+            .content("testContent")
+            .build();
+
+        // when
+        PostUpdateResponseDto updateResponseDto = postService.update(updateRequestDto);
+
+        // then
+        assertThat(updateResponseDto)
+            .usingRecursiveComparison()
+            .isEqualTo(responseDto);
+
+        verify(userRepository, times(1))
+            .findByBasicProfile_Name("testUser");
+        verify(postRepository, times(2))
+            .findByUser(any(User.class));
+        verify(tagService, times(1))
+            .findOrCreateTags(any(TagsDto.class));
+    }
+
+    @DisplayName("게스트는 게시물의 내용을 수정할 수 없다.")
+    @Test
+    void update_GuestUser_401Exception() {
+        // given
+        GuestUser guestUser = new GuestUser();
+
+        PostUpdateRequest updateRequest = PostUpdateRequest.builder()
+            .tags(List.of("java", "spring"))
+            .content("testContent")
+            .build();
+
+        // when
+        assertThatThrownBy(() -> {
+            new PostUpdateRequestDto(guestUser, 1L,
+                updateRequest.getTags(), updateRequest.getContent());
+        }).isInstanceOf(UnauthorizedException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "A0002")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)
+            .hasMessage("권한 에러");
+    }
+
+    @DisplayName("해당하는 사용자의 게시물이 아닌 경우 수정할 수 없다. - 400 예외")
+    @Test
+    void update_PostNotBelongToUser_400Exception() {
+        // given
+        LoginUser loginUser = new LoginUser("testUser", "Bearer testToken");
+        User user = UserFactory.user(1L, loginUser.getUsername());
+
+        given(userRepository.findByBasicProfile_Name(anyString()))
+            .willReturn(Optional.of(user));
+        given(postRepository.findByUser(any(User.class)))
+            .willThrow(new PostNotBelongToUserException());
+
+        PostUpdateRequest updateRequest = PostUpdateRequest.builder()
+            .tags(List.of("java", "spring"))
+            .content("testContent")
+            .build();
+        PostUpdateRequestDto updateRequestDto = new PostUpdateRequestDto(loginUser, 1L,
+            updateRequest.getTags(), updateRequest.getContent());
+
+        // when
+        assertThatThrownBy(() -> {
+            postService.update(updateRequestDto);
+        }).isInstanceOf(PostNotBelongToUserException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "P0005")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
+            .hasMessage("해당하는 사용자의 게시물이 아닌 에러");
+
+        // then
+        verify(userRepository, times(1))
+            .findByBasicProfile_Name("testUser");
+        verify(postRepository, times(1))
+            .findByUser(any(User.class));
+    }
+
+    @DisplayName("사용자는 게시물을 삭제한다.")
+    @Test
+    void delete_LoginUser_Success() {
+        // given
+        LoginUser loginUser = new LoginUser("testUser", "Bearer testToken");
+        User user = UserFactory.user(1L, loginUser.getUsername());
+        Post post = new PostBuilder()
+            .id(1L)
+            .content("testContent")
+            .user(user)
+            .build();
+
+        given(userRepository.findByBasicProfile_Name(anyString()))
+            .willReturn(Optional.of(user));
+        given(postRepository.findByUser(any(User.class)))
+            .willReturn(Optional.of(post));
+        willDoNothing()
+            .given(postRepository)
+            .delete(any(Post.class));
+
+        PostDeleteRequestDto deleteRequestDto = new PostDeleteRequestDto(loginUser, 1L);
+
+        // when
+        postService.delete(deleteRequestDto);
+
+        // then
+        verify(userRepository, times(1))
+            .findByBasicProfile_Name("testUser");
+        verify(postRepository, times(1))
+            .findByUser(any(User.class));
+        verify(postRepository, times(1))
+            .delete(any(Post.class));
+    }
+
+    @DisplayName("게스트는 게시물을 삭제할 수 없다. - 401 예외")
+    @Test
+    void delete_GuestUser_401Exception() {
+        // given
+        GuestUser guestUser = new GuestUser();
+
+        // when
+        assertThatThrownBy(() -> {
+            new PostDeleteRequestDto(guestUser, 1L);
+        }).isInstanceOf(UnauthorizedException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "A0002")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)
+            .hasMessage("권한 에러");
+    }
+
+    @DisplayName("해당하는 사용자의 게시물이 아닌 경우 삭제할 수 없다. - 400 예외")
+    @Test
+    void delete_PostNotBelongToUser_400Exception() {
+        // given
+        LoginUser loginUser = new LoginUser("testUser", "Bearer testToken");
+        User user = UserFactory.user(1L, loginUser.getUsername());
+
+        given(userRepository.findByBasicProfile_Name(anyString()))
+            .willReturn(Optional.of(user));
+        given(postRepository.findByUser(any(User.class)))
+            .willThrow(new PostNotBelongToUserException());
+
+        PostDeleteRequestDto deleteRequestDto = new PostDeleteRequestDto(loginUser, 1L);
+
+        // when
+        assertThatThrownBy(() -> {
+            postService.delete(deleteRequestDto);
+        }).isInstanceOf(PostNotBelongToUserException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "P0005")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
+            .hasMessage("해당하는 사용자의 게시물이 아닌 에러");
+
+        // then
+        verify(userRepository, times(1))
+            .findByBasicProfile_Name("testUser");
+        verify(postRepository, times(1))
+            .findByUser(any(User.class));
     }
 }

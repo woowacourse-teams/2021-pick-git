@@ -8,6 +8,7 @@ import com.woowacourse.pickgit.post.domain.comment.Comment;
 import com.woowacourse.pickgit.post.domain.comment.Comments;
 import com.woowacourse.pickgit.post.domain.content.Images;
 import com.woowacourse.pickgit.post.domain.content.PostContent;
+import com.woowacourse.pickgit.post.domain.like.Like;
 import com.woowacourse.pickgit.post.domain.like.Likes;
 import com.woowacourse.pickgit.tag.domain.Tag;
 import com.woowacourse.pickgit.user.domain.User;
@@ -59,7 +60,11 @@ public class Post {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @OneToMany(
+        mappedBy = "post",
+        fetch = FetchType.LAZY,
+        cascade = {CascadeType.PERSIST, CascadeType.REMOVE}
+    )
     private List<PostTag> postTags = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -99,6 +104,41 @@ public class Post {
         comments.addComment(comment);
     }
 
+    public List<Tag> getTags() {
+        return postTags.stream()
+            .map(PostTag::getTag)
+            .collect(toList());
+    }
+
+    public List<String> getTagNames() {
+        return postTags.stream()
+            .map(PostTag::getTagName)
+            .collect(toList());
+    }
+
+    public void like(User user) {
+        Like like = new Like(this, user);
+        likes.add(like);
+    }
+
+    public void unlike(User user) {
+        Like like = new Like(this, user);
+        likes.remove(like);
+    }
+
+    public boolean isLikedBy(String userName) {
+        return likes.contains(userName);
+    }
+
+    public void updateContent(String content) {
+        this.content = new PostContent(content);
+    }
+
+    public void updateTags(List<Tag> tags) {
+        postTags.clear();
+        addTags(tags);
+    }
+
     public void addTags(List<Tag> tags) {
         validateDuplicateTag(tags);
         List<Tag> existingTags = getTags();
@@ -110,28 +150,18 @@ public class Post {
     }
 
     private void validateDuplicateTag(List<Tag> tags) {
-        Set<String> nonDuplicatetagNames = tags.stream()
+        Set<String> nonDuplicateTagNames = tags.stream()
             .map(Tag::getName)
             .collect(toSet());
-        if (nonDuplicatetagNames.size() != tags.size()) {
+        if (nonDuplicateTagNames.size() != tags.size()) {
             throw new CannotAddTagException();
         }
-    }
-
-    public List<Tag> getTags() {
-        return postTags.stream()
-            .map(PostTag::getTag)
-            .collect(toList());
     }
 
     private void validateDuplicateTagAlreadyExistsInPost(List<Tag> existingTags, Tag tag) {
         if (existingTags.contains(tag)) {
             throw new CannotAddTagException();
         }
-    }
-
-    public boolean isLikedBy(String userName) {
-        return likes.contains(userName);
     }
 
     public Long getId() {

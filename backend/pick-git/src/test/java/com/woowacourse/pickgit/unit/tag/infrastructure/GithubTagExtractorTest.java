@@ -21,7 +21,7 @@ class GithubTagExtractorTest {
     private static final String REPOSITORY_NAME = "doms-react";
 
     private PlatformTagExtractor platformTagExtractor;
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() {

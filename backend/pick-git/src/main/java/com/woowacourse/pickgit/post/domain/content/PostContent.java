@@ -8,6 +8,7 @@ import javax.persistence.Lob;
 public class PostContent {
 
     public static final int MAXIMUM_CONTENT_LENGTH = 500;
+
     @Lob
     private String content;
 

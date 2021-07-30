@@ -3,6 +3,8 @@ import { getMBFromBite } from "../utils/postUpload";
 import { LIMIT } from "./limits";
 
 export const SUCCESS_MESSAGE = {
+  LOGIN: "로그인 되었습니다.",
+  LOGOUT: "로그아웃 되었습니다.",
   SET_PROFILE: "프로필을 수정했습니다.",
 };
 
@@ -30,7 +32,7 @@ export const REDIRECT_MESSAGE = {
   NO_REPOSITORY_EXIST: "공개된 깃허브 Repository가 존재하지 않습니다. 이전 페이지로 돌아갑니다.",
 };
 
-export const API_ERROR_MESSAGE: { [key in ErrorResponse["errorCode"]]: string } = {
+export const API_ERROR_MESSAGE = {
   A0001: "로그인이 만료되었습니다",
   A0002: "로그인 후 이용할 수 있습니다",
   F0001: "필요한 입력값이 입력되지 않았습니다",
@@ -44,6 +46,10 @@ export const API_ERROR_MESSAGE: { [key in ErrorResponse["errorCode"]]: string } 
   P0001: "중복되는 태그가 존재합니다",
   P0002: "게시된 게시글이 없습니다",
   S0001: "서버 상의 에러가 발생하였습니다.",
+};
+
+export const CLIENT_ERROR_MESSAGE = {
+  C0001: "로그인이 만료되었습니다",
 };
 
 export const UNKNOWN_ERROR_MESSAGE = "알 수 없는 에러가 발생하였습니다.";

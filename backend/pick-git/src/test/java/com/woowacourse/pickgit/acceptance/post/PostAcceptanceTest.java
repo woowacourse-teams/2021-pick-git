@@ -9,11 +9,17 @@ import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
+import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
+import com.woowacourse.pickgit.exception.post.CannotUnlikeException;
+import com.woowacourse.pickgit.exception.post.DuplicatedLikeException;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.presentation.dto.request.ContentRequest;
+import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
+import com.woowacourse.pickgit.post.presentation.dto.response.LikeResponse;
+import com.woowacourse.pickgit.post.presentation.dto.response.PostUpdateResponse;
 import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.ExtractableResponse;
@@ -396,7 +402,8 @@ class PostAcceptanceTest {
         ContentRequest request = new ContentRequest(content);
 
         // when
-        ApiErrorResponse response = requestAddComment(token, postId, request, HttpStatus.BAD_REQUEST)
+        ApiErrorResponse response = requestAddComment(token, postId, request,
+            HttpStatus.BAD_REQUEST)
             .as(ApiErrorResponse.class);
 
         // then
@@ -412,7 +419,8 @@ class PostAcceptanceTest {
         ContentRequest request = new ContentRequest("a");
 
         // when
-        ApiErrorResponse response = requestAddComment(token, postId, request, HttpStatus.INTERNAL_SERVER_ERROR)
+        ApiErrorResponse response = requestAddComment(token, postId, request,
+            HttpStatus.INTERNAL_SERVER_ERROR)
             .as(ApiErrorResponse.class);
 
         // then
@@ -428,7 +436,8 @@ class PostAcceptanceTest {
         ContentRequest request = new ContentRequest("a".repeat(101));
 
         // when
-        ApiErrorResponse response = requestAddComment(token, postId, request, HttpStatus.BAD_REQUEST)
+        ApiErrorResponse response = requestAddComment(token, postId, request,
+            HttpStatus.BAD_REQUEST)
             .as(ApiErrorResponse.class);
 
         // then
@@ -492,6 +501,180 @@ class PostAcceptanceTest {
         assertThat(response.getErrorCode()).isEqualTo("V0001");
     }
 
+    @DisplayName("로그인 사용자는 게시물을 좋아요 할 수 있다. - 성공")
+    @Test
+    void likePost_LoginUser_Success() {
+        // given
+        String loginUserToken = 로그인_되어있음(USERNAME).getToken();
+        String targetUserToken = 로그인_되어있음(ANOTHER_USERNAME).getToken();
+        Long postId = 1L;
+
+        requestToWritePostApi(targetUserToken, HttpStatus.CREATED);
+
+        // when
+        LikeResponse response = given().log().all()
+            .auth().oauth2(loginUserToken)
+            .when()
+            .put("/api/posts/{postId}/likes", postId)
+            .then().log().all()
+            .statusCode(HttpStatus.OK.value())
+            .extract()
+            .as(new TypeRef<>() {
+            });
+
+        // then
+        assertThat(response.getLikeCount()).isEqualTo(1);
+        assertThat(response.isLiked()).isTrue();
+    }
+
+    @DisplayName("로그인 사용자는 게시물을 좋아요 취소 할 수 있다. - 성공")
+    @Test
+    void unlikePost_LoginUser_Success() {
+        // given
+        String loginUserToken = 로그인_되어있음(USERNAME).getToken();
+        String targetUserToken = 로그인_되어있음(ANOTHER_USERNAME).getToken();
+        Long postId = 1L;
+
+        requestToWritePostApi(targetUserToken, HttpStatus.CREATED);
+
+        LikeResponse likePostResponse = given().log().all()
+            .auth().oauth2(loginUserToken)
+            .when()
+            .put("/api/posts/{postId}/likes", postId)
+            .then().log().all()
+            .statusCode(HttpStatus.OK.value())
+            .extract()
+            .as(new TypeRef<>() {
+            });
+
+        assertThat(likePostResponse.getLikeCount()).isEqualTo(1);
+        assertThat(likePostResponse.isLiked()).isTrue();
+
+        // when
+        LikeResponse unlikePostResponse = given().log().all()
+            .auth().oauth2(loginUserToken)
+            .when()
+            .delete("/api/posts/{postId}/likes", postId)
+            .then().log().all()
+            .statusCode(HttpStatus.OK.value())
+            .extract()
+            .as(new TypeRef<>() {
+            });
+
+        // then
+        assertThat(unlikePostResponse.getLikeCount()).isEqualTo(0);
+        assertThat(unlikePostResponse.isLiked()).isFalse();
+    }
+
+    @DisplayName("게스트는 게시물을 좋아요 할 수 없다. - 실패")
+    @Test
+    void likePost_GuestUser_401ExceptionThrown() {
+        // given
+        String targetUserToken = 로그인_되어있음(ANOTHER_USERNAME).getToken();
+        Long postId = 1L;
+
+        requestToWritePostApi(targetUserToken, HttpStatus.CREATED);
+
+        // when
+        UnauthorizedException response = given().log().all()
+            .when()
+            .put("/api/posts/{postId}/likes", postId)
+            .then().log().all()
+            .statusCode(HttpStatus.UNAUTHORIZED.value())
+            .extract()
+            .as(new TypeRef<>() {
+            });
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("A0001");
+    }
+
+    @DisplayName("게스트는 게시물을 좋아요 취소 할 수 없다. - 실패")
+    @Test
+    void unlikePost_GuestUser_401ExceptionThrown() {
+        // given
+        String targetUserToken = 로그인_되어있음(ANOTHER_USERNAME).getToken();
+        Long postId = 1L;
+
+        requestToWritePostApi(targetUserToken, HttpStatus.CREATED);
+
+        // when
+        UnauthorizedException response = given().log().all()
+            .when()
+            .delete("/api/posts/{postId}/likes", postId)
+            .then().log().all()
+            .statusCode(HttpStatus.UNAUTHORIZED.value())
+            .extract()
+            .as(new TypeRef<>() {
+            });
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("A0001");
+    }
+
+    @DisplayName("로그인 사용자는 이미 좋아요한 게시물을 좋아요 할 수 없다. - 실패")
+    @Test
+    void likePost_DuplicatedLike_400ExceptionThrown() {
+        // given
+        String loginUserToken = 로그인_되어있음(USERNAME).getToken();
+        String targetUserToken = 로그인_되어있음(ANOTHER_USERNAME).getToken();
+        Long postId = 1L;
+
+        requestToWritePostApi(targetUserToken, HttpStatus.CREATED);
+
+        LikeResponse likePostResponse = given().log().all()
+            .auth().oauth2(loginUserToken)
+            .when()
+            .put("/api/posts/{postId}/likes", postId)
+            .then().log().all()
+            .statusCode(HttpStatus.OK.value())
+            .extract()
+            .as(new TypeRef<>() {
+            });
+
+        assertThat(likePostResponse.getLikeCount()).isEqualTo(1);
+        assertThat(likePostResponse.isLiked()).isTrue();
+
+        // when
+        DuplicatedLikeException secondLikeResponse = given().log().all()
+            .auth().oauth2(loginUserToken)
+            .when()
+            .put("/api/posts/{postId}/likes", postId)
+            .then().log().all()
+            .statusCode(HttpStatus.BAD_REQUEST.value())
+            .extract()
+            .as(new TypeRef<>() {
+            });
+
+        // then
+        assertThat(secondLikeResponse.getErrorCode()).isEqualTo("P0003");
+    }
+
+    @DisplayName("로그인 사용자는 좋아요 하지 않은 게시물을 좋아요 취소 할 수 없다. - 실패")
+    @Test
+    void unlikePost_cannotUnlike_400ExceptionThrown() {
+        // given
+        String loginUserToken = 로그인_되어있음(USERNAME).getToken();
+        String targetUserToken = 로그인_되어있음(ANOTHER_USERNAME).getToken();
+        Long postId = 1L;
+
+        requestToWritePostApi(targetUserToken, HttpStatus.CREATED);
+
+        // when
+        CannotUnlikeException unlikeResponse = given().log().all()
+            .auth().oauth2(loginUserToken)
+            .when()
+            .delete("/api/posts/{postId}/likes", postId)
+            .then().log().all()
+            .statusCode(HttpStatus.BAD_REQUEST.value())
+            .extract()
+            .as(new TypeRef<>() {
+            });
+
+        // then
+        assertThat(unlikeResponse.getErrorCode()).isEqualTo("P0004");
+    }
+
     private ExtractableResponse<Response> request(String token, String username, int statusCode) {
         return given().log().all()
             .auth().oauth2(token)
@@ -499,6 +682,159 @@ class PostAcceptanceTest {
             .get("/api/github/{username}/repositories", username)
             .then().log().all()
             .statusCode(statusCode)
+            .extract();
+    }
+
+    @DisplayName("사용자는 게시물을 수정한다.")
+    @Test
+    void update_LoginUser_Success() {
+        // given
+        String token = 로그인_되어있음(USERNAME).getToken();
+
+        requestWrite(token);
+
+        PostUpdateRequest updateRequest = PostUpdateRequest.builder()
+            .tags(List.of("java", "spring"))
+            .content("hello")
+            .build();
+
+        PostUpdateResponse response = PostUpdateResponse.builder()
+            .tags(List.of("java", "spring"))
+            .content("hello")
+            .build();
+
+        // when
+        PostUpdateResponse updateResponse =
+            putApiForUpdate(token, updateRequest, HttpStatus.CREATED)
+                .as(PostUpdateResponse.class);
+
+        // then
+        assertThat(updateResponse)
+            .usingRecursiveComparison()
+            .isEqualTo(response);
+    }
+
+    @DisplayName("유효하지 않은 내용(null)의 게시물은 수정할 수 없다. - 400 예외")
+    @Test
+    void update_NullContent_400Exception() {
+        // given
+        String token = 로그인_되어있음(USERNAME).getToken();
+
+        requestWrite(token);
+
+        PostUpdateRequest updateRequest = PostUpdateRequest.builder()
+            .tags(List.of("java", "spring"))
+            .content(null)
+            .build();
+
+        // when
+        ApiErrorResponse response =
+            putApiForUpdate(token, updateRequest, HttpStatus.BAD_REQUEST)
+                .as(ApiErrorResponse.class);
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("F0001");
+    }
+
+    @DisplayName("유효하지 않은 내용(500자 초과)의 게시물은 수정할 수 없다. - 400 예외")
+    @Test
+    void update_Over500Content_400Exception() {
+        // given
+        String token = 로그인_되어있음(USERNAME).getToken();
+
+        requestWrite(token);
+
+        PostUpdateRequest updateRequest = PostUpdateRequest.builder()
+            .tags(List.of("java", "spring"))
+            .content("a".repeat(501))
+            .build();
+
+        // when
+        ApiErrorResponse response =
+            putApiForUpdate(token, updateRequest, HttpStatus.BAD_REQUEST)
+                .as(ApiErrorResponse.class);
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("F0004");
+    }
+
+    @DisplayName("유효하지 않은 토큰으로 게시물을 수정할 수 없다. - 401 예외")
+    @Test
+    void update_InvalidToken_401Exception() {
+        // given
+        String token = 로그인_되어있음(USERNAME).getToken();
+
+        requestWrite(token);
+
+        PostUpdateRequest updateRequest = PostUpdateRequest.builder()
+            .tags(List.of("java", "spring"))
+            .content("hello")
+            .build();
+
+        // when
+        ApiErrorResponse response =
+            putApiForUpdate("invalidToken", updateRequest, HttpStatus.UNAUTHORIZED)
+                .as(ApiErrorResponse.class);
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("A0001");
+    }
+
+    private ExtractableResponse<Response> putApiForUpdate(
+        String token,
+        PostUpdateRequest updateRequest,
+        HttpStatus httpStatus
+    ) {
+        return given().log().all()
+            .auth().oauth2(token)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(updateRequest)
+            .when()
+            .put("/api/posts/{postId}", 1L)
+            .then().log().all()
+            .statusCode(httpStatus.value())
+            .extract();
+    }
+
+    @DisplayName("사용자는 게시물을 삭제한다.")
+    @Test
+    void delete_LoginUser_Success() {
+        // given
+        String token = 로그인_되어있음(USERNAME).getToken();
+
+        requestWrite(token);
+
+        // when
+        deleteApiForUpdate(token, HttpStatus.NO_CONTENT);
+    }
+
+    @DisplayName("유효하지 않은 토큰으로 게시물을 삭제할 수 없다. - 401 예외")
+    @Test
+    void delete_invalidToken_401Exception() {
+        // given
+        String token = 로그인_되어있음(USERNAME).getToken();
+
+        requestWrite(token);
+
+        // when
+        ApiErrorResponse response =
+            deleteApiForUpdate("invalidToken", HttpStatus.UNAUTHORIZED)
+                .as(ApiErrorResponse.class);
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("A0001");
+    }
+
+    private ExtractableResponse<Response> deleteApiForUpdate(
+        String token,
+        HttpStatus httpStatus) {
+        return given().log().all()
+            .auth().oauth2(token)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .delete("/api/posts/{postId}", 1L)
+            .then().log().all()
+            .statusCode(httpStatus.value())
             .extract();
     }
 

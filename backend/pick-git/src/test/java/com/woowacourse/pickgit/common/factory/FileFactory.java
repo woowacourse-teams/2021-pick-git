@@ -9,6 +9,7 @@ import org.apache.http.entity.ContentType;
 import org.springframework.mock.web.MockMultipartFile;
 
 public class FileFactory {
+
     private static final ClassLoader CLASS_LOADER = FileFactory.class.getClassLoader();
     private static final String FILE_KEY = "images";
 
@@ -19,6 +20,8 @@ public class FileFactory {
     public static MockMultipartFile getTestImage2() {
         return createImageFile("testImage2.png");
     }
+
+    public static MockMultipartFile getEmptyTestFile() { return createEmptyImageFile();}
 
     public static File getTestImage1File() {
         return createFile("testImage1.png");
@@ -41,6 +44,15 @@ public class FileFactory {
         } catch (IOException e) {
             throw new RuntimeException();
         }
+    }
+
+    private static MockMultipartFile createEmptyImageFile() {
+        return new MockMultipartFile(
+            "images",
+            "",
+            null,
+            new byte[] {}
+        );
     }
 
     private static File createFile(String fileName) {

@@ -2,8 +2,8 @@ package com.woowacourse.pickgit.unit.authentication.presentation;
 
 import static com.woowacourse.pickgit.docs.ApiDocumentUtils.getDocumentRequest;
 import static com.woowacourse.pickgit.docs.ApiDocumentUtils.getDocumentResponse;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
@@ -17,13 +17,11 @@ import com.woowacourse.pickgit.authentication.application.dto.TokenDto;
 import com.woowacourse.pickgit.authentication.presentation.OAuthController;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 

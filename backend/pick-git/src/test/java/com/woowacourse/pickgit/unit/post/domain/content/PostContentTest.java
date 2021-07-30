@@ -19,6 +19,6 @@ class PostContentTest {
         assertThatThrownBy(() -> new PostContent(content))
             .isInstanceOf(PostFormatException.class)
             .extracting("errorCode")
-            .isEqualTo("F0001");
+            .isEqualTo("F0004");
     }
 }

@@ -1,7 +1,9 @@
 package com.woowacourse.pickgit.common.factory;
 
+import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
+import java.util.List;
 
 public class UserFactory {
 
@@ -17,7 +19,7 @@ public class UserFactory {
     }
 
     public static User user() {
-        return createUser(null,"testUser");
+        return createUser(null, "testUser");
     }
 
     public static User createUser(Long id, String name) {
@@ -93,5 +95,39 @@ public class UserFactory {
             .twitter("pick-git twitter")
             .following(null)
             .build();
+    }
+
+    public static ContributionResponseDto mockContributionResponseDto() {
+        return ContributionResponseDto.builder()
+            .starsCount(11)
+            .commitsCount(48)
+            .prsCount(48)
+            .issuesCount(48)
+            .reposCount(48)
+            .build();
+    }
+
+    public static List<User> mockSearchUsers() {
+        User user1 = user( "binghe");
+        User user2 = user( "bing");
+        User user3 = user( "jinbinghe");
+        User user4 = user( "bbbbinghe");
+        User user5 = user( "bingbing");
+
+        return List.of(
+            user1, user2, user3, user4, user5
+        );
+    }
+
+    public static List<User> mockSearchUsersWithId() {
+        User user1 = user(1L, "binghe");
+        User user2 = user(2L,"bing");
+        User user3 = user(3L,"jinbinghe");
+        User user4 = user(4L,"bbbbinghe");
+        User user5 = user(5L,"bingbing");
+
+        return List.of(
+            user1, user2, user3, user4, user5
+        );
     }
 }

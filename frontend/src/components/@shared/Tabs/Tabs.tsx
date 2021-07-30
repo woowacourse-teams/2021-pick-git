@@ -1,6 +1,5 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 
-import { ThemeContext } from "styled-components";
 import { TabIndicatorKind, TabItem } from "../../../@types";
 import { getTabTextColor } from "../../../utils/tabs";
 import { Container, TabIndicator, TabButton, TabButtonWrapper } from "./Tabs.style";

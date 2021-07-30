@@ -5,8 +5,9 @@ import { useQueryClient } from "react-query";
 import { Post } from "../../@types";
 import { QUERY } from "../../constants/queries";
 import UserContext from "../../contexts/UserContext";
-import { handleHTTPError } from "../../utils/api";
 import { removeDuplicatedData } from "../../utils/data";
+import { handleHTTPError } from "../../utils/error";
+import { isHttpErrorStatus } from "../../utils/typeGuard";
 import { useHomeFeedPostsQuery } from "../queries";
 
 const useHomeFeed = () => {
@@ -25,7 +26,7 @@ const useHomeFeed = () => {
     if (axios.isAxiosError(error)) {
       const { status } = error.response ?? {};
 
-      if (status) {
+      if (status && isHttpErrorStatus(status)) {
         handleHTTPError(status, {
           unauthorized: () => {
             logout();

@@ -1,7 +1,7 @@
 import { QueryFunction, useMutation, useQuery, useQueryClient } from "react-query";
 import axios, { AxiosError } from "axios";
 
-import { ErrorResponse, ProfileData } from "../../@types";
+import { ErrorResponse, MutateResponseFollow, ProfileData } from "../../@types";
 import { QUERY } from "../../constants/queries";
 import {
   requestAddFollow,
@@ -15,7 +15,8 @@ import { useContext } from "react";
 import { getAccessToken } from "../../storage/storage";
 import SnackBarContext from "../../contexts/SnackbarContext";
 import { SUCCESS_MESSAGE, UNKNOWN_ERROR_MESSAGE } from "../../constants/messages";
-import { handleHTTPError } from "../../utils/api";
+import { customError, handleHTTPError } from "../../utils/error";
+import { isHttpErrorStatus } from "../../utils/typeGuard";
 
 type ProfileQueryKey = readonly [
   typeof QUERY.GET_PROFILE,
@@ -27,7 +28,7 @@ type ProfileQueryKey = readonly [
 
 interface SetProfileVariable {
   image: File | null;
-  description: string | null;
+  description: string;
 }
 
 interface SetProfileResponse {
@@ -41,7 +42,7 @@ export const useProfileQuery = (isMyProfile: boolean, username: string | null) =
     const accessToken = getAccessToken();
 
     if (isMyProfile) {
-      if (!accessToken) throw Error("no accessToken");
+      if (!accessToken) throw customError.noAccessToken;
 
       return await requestGetSelfProfile(accessToken);
     } else {
@@ -57,51 +58,17 @@ export const useProfileQuery = (isMyProfile: boolean, username: string | null) =
   );
 };
 
-const useFollowMutation = (
-  username: string | undefined,
-  callback: (userName: string | undefined, accessToken: string | null) => Promise<any>
-) => {
-  const queryClient = useQueryClient();
-  const currentProfileQueryKey = [QUERY.GET_PROFILE, { isMyProfile: false, username }];
-  const currentProfileQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
-  const { logout } = useContext(UserContext);
-  const { pushSnackbarMessage } = useContext(SnackBarContext);
+export const useFollowingMutation = () =>
+  useMutation<MutateResponseFollow, AxiosError<ErrorResponse>, string>((username) =>
+    requestAddFollow(username, getAccessToken())
+  );
 
-  return useMutation(() => callback(username, getAccessToken()), {
-    onSuccess: ({ followerCount, following }) => {
-      if (!currentProfileQueryData) return;
+export const useUnfollowingMutation = () =>
+  useMutation<MutateResponseFollow, AxiosError<ErrorResponse>, string>((username) =>
+    requestDeleteFollow(username, getAccessToken())
+  );
 
-      queryClient.setQueryData<ProfileData>(currentProfileQueryKey, {
-        ...currentProfileQueryData,
-        followerCount,
-        following,
-      });
-    },
-
-    onError: (error) => {
-      if (axios.isAxiosError(error)) {
-        const { status, data } = error.response ?? {};
-
-        if (status) {
-          handleHTTPError(status, {
-            unauthorized: () => logout(),
-          });
-        }
-
-        pushSnackbarMessage(data.errorCode);
-      } else {
-        pushSnackbarMessage(UNKNOWN_ERROR_MESSAGE);
-      }
-    },
-  });
-};
-
-export const useFollowingMutation = (username: string | undefined) => useFollowMutation(username, requestAddFollow);
-
-export const useUnfollowingMutation = (username: string | undefined) =>
-  useFollowMutation(username, requestDeleteFollow);
-
-export const useProfileMutation = (username: string | null) => {
+export const useProfileMutation = (username: string) => {
   const queryClient = useQueryClient();
   const currentProfileQueryKey = [QUERY.GET_PROFILE, { isMyProfile: false, username }];
   const currentProfileQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
@@ -126,7 +93,7 @@ export const useProfileMutation = (username: string | null) => {
         if (axios.isAxiosError(error)) {
           const { status, data } = error.response ?? {};
 
-          if (status) {
+          if (status && isHttpErrorStatus(status)) {
             handleHTTPError(status, {
               unauthorized: () => logout(),
               notFound: () => pushSnackbarMessage("아직 준비되지 않은 서비스입니다."),

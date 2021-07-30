@@ -1,11 +1,13 @@
 import axios from "axios";
 import { useContext, useEffect } from "react";
 import { useHistory } from "react-router-dom";
+import { HTTPErrorHandler } from "../../@types";
 import { PAGE_URL } from "../../constants/urls";
 
 import SnackBarContext from "../../contexts/SnackbarContext";
 import UserContext from "../../contexts/UserContext";
-import { handleHTTPError, HTTPErrorHandler } from "../../utils/api";
+import { handleHTTPError } from "../../utils/error";
+import { isHttpErrorStatus } from "../../utils/typeGuard";
 import { useProfileQuery } from "../queries";
 
 const useProfile = (isMyProfile: boolean, username: string | null) => {
@@ -33,7 +35,7 @@ const useProfile = (isMyProfile: boolean, username: string | null) => {
         },
       };
 
-      if (status) {
+      if (status && isHttpErrorStatus(status)) {
         handleHTTPError(status, errorHandler);
       }
     } else {

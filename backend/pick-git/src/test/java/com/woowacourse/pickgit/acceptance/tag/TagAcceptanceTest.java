@@ -40,7 +40,7 @@ class TagAcceptanceTest {
     private OAuthClient oAuthClient;
 
     private String accessToken;
-    private String repositoryName = "doms-react";
+    private final String repositoryName = "doms-react";
 
     @BeforeEach
     void setUp() {
@@ -68,7 +68,8 @@ class TagAcceptanceTest {
 
         // when
         List<String> response = requestTags(accessToken, url, HttpStatus.OK)
-            .as(new TypeRef<List<String>>() {});
+            .as(new TypeRef<List<String>>() {
+            });
 
         // then
         assertThat(response).containsExactly("javascript", "html", "css");
@@ -99,7 +100,7 @@ class TagAcceptanceTest {
         // when
         ApiErrorResponse response =
             requestTags("invalidtoken", url, HttpStatus.UNAUTHORIZED)
-            .as(ApiErrorResponse.class);
+                .as(ApiErrorResponse.class);
 
         // then
         assertThat(response.getErrorCode()).isEqualTo("A0001");

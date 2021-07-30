@@ -45,19 +45,23 @@ public class OAuthConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        HandlerInterceptor authenticationInterceptor = new PathMatchInterceptor(authenticationInterceptor())
+        HandlerInterceptor authenticationInterceptor = new PathMatchInterceptor(
+            authenticationInterceptor())
             .addPathPatterns("/api/posts/me", HttpMethod.GET)
             .addPathPatterns("/api/github/*/repositories", HttpMethod.GET)
             .addPathPatterns("/api/github/repositories/*/tags/languages", HttpMethod.GET)
             .addPathPatterns("/api/posts", HttpMethod.POST)
-            .addPathPatterns("/api/posts/*/likes", HttpMethod.POST, HttpMethod.DELETE)
+            .addPathPatterns("/api/posts/*/likes", HttpMethod.PUT, HttpMethod.DELETE)
             .addPathPatterns("/api/posts/*/comments", HttpMethod.POST)
-            .addPathPatterns("/api/profiles/me", HttpMethod.GET)
-            .addPathPatterns("/api/profiles/*/followings", HttpMethod.POST, HttpMethod.DELETE);
+            .addPathPatterns("/api/profiles/me", HttpMethod.GET, HttpMethod.POST)
+            .addPathPatterns("/api/profiles/*/followings", HttpMethod.POST, HttpMethod.DELETE)
+            .addPathPatterns("/api/posts/*", HttpMethod.PUT, HttpMethod.DELETE);
 
-        HandlerInterceptor ignoreAuthenticationInterceptor = new PathMatchInterceptor(ignoreAuthenticationInterceptor())
+        HandlerInterceptor ignoreAuthenticationInterceptor = new PathMatchInterceptor(
+            ignoreAuthenticationInterceptor())
             .addPathPatterns("/api/profiles/*", HttpMethod.GET)
             .addPathPatterns("/api/posts/*", HttpMethod.GET)
+            .addPathPatterns("/api/search/**", HttpMethod.GET)
             .excludePatterns("/api/profiles/*/followings", HttpMethod.POST, HttpMethod.DELETE)
             .excludePatterns("/api/profiles/me", HttpMethod.GET)
             .excludePatterns("/api/posts/me", HttpMethod.GET);

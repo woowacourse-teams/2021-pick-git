@@ -16,9 +16,11 @@ import static org.springframework.restdocs.payload.JsonFieldType.NULL;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestPartBody;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -26,10 +28,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
+import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
+import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
+import com.woowacourse.pickgit.user.application.dto.response.ProfileEditResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.presentation.UserController;
 import org.apache.http.HttpHeaders;
@@ -40,6 +46,7 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -250,6 +257,116 @@ class UserControllerTest {
                 fieldWithPath("following").type(NULL).description("팔로잉 여부")
             )
         ));
+    }
+
+    @DisplayName("누구든지 활동 통계를 조회할 수 있다.")
+    @Test
+    void getContributions_Anyone_Success() throws Exception {
+        // given
+        ContributionResponseDto responseDto = UserFactory.mockContributionResponseDto();
+
+        given(userService.calculateContributions(anyString()))
+            .willReturn(responseDto);
+
+        // when
+        ResultActions perform = mockMvc
+            .perform(get("/api/profiles/{username}/contributions", "testUser")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.ALL));
+
+        // then
+        String body = perform
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+        assertThat(body).isEqualTo(objectMapper.writeValueAsString(responseDto));
+
+        perform.andDo(document("contributions-LoggedIn",
+            getDocumentRequest(),
+            getDocumentResponse(),
+            pathParameters(
+                parameterWithName("username").description("사용자 이름")
+            ),
+            responseFields(
+                fieldWithPath("starsCount").description("스타 개수"),
+                fieldWithPath("commitsCount").description("커밋 개수"),
+                fieldWithPath("prsCount").description("PR 개수"),
+                fieldWithPath("issuesCount").description("이슈 개수"),
+                fieldWithPath("reposCount").description("퍼블릭 레포지토리 개수")
+            )
+        ));
+    }
+
+    @DisplayName("사용자는 자신의 프로필을 수정할 수 있다.")
+    @Test
+    void editUserProfile_LoginUserWithImageAndDescription_Success() throws Exception {
+        // given
+        AppUser loginUser = new LoginUser("testUser", "token");
+        String description = "updated description";
+        MockMultipartFile image = FileFactory.getTestImage1();
+        ProfileEditResponseDto responseDto = ProfileEditResponseDto.builder()
+            .imageUrl(image.getOriginalFilename())
+            .description(description)
+            .build();
+
+        // mock
+        given(oAuthService.validateToken(any()))
+            .willReturn(true);
+        given(oAuthService.findRequestUserByToken(any()))
+            .willReturn(loginUser);
+        given(userService.editProfile(any(AppUser.class), any(ProfileEditRequestDto.class)))
+            .willReturn(responseDto);
+
+        // when
+        ResultActions perform = mockMvc.perform(multipart("/api/profiles/me")
+            .file(image)
+            .param("description", description)
+            .header(HttpHeaders.AUTHORIZATION, "token")
+        );
+
+        // then
+        perform
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("imageUrl").value(image.getOriginalFilename()))
+            .andExpect(jsonPath("description").value(description));
+
+        // restdocs
+        perform.andDo(document("edit-profile",
+            getDocumentRequest(),
+            getDocumentResponse(),
+            requestHeaders(
+                headerWithName(HttpHeaders.AUTHORIZATION).description("bearer token")
+            ),
+            requestPartBody("images"),
+            responseFields(
+                fieldWithPath("imageUrl").type(STRING).description("변경된 프로필 이미지 url"),
+                fieldWithPath("description").type(STRING).description("변경된 한 줄 소개")
+            ))
+        );
+    }
+
+    @DisplayName("유효하지 않는 토큰의 사용자는 프로필을 수정할 수 없다.")
+    @Test
+    void editUserProfile_GuestUser_Fail() throws Exception {
+        // given
+        MockMultipartFile image = FileFactory.getTestImage1();
+
+        // mock
+        given(oAuthService.validateToken(any()))
+            .willReturn(false);
+
+        // when
+        ResultActions perform = mockMvc.perform(multipart("/api/profiles/me")
+            .file(image)
+            .param("description", "updated description")
+            .header(HttpHeaders.AUTHORIZATION, "token")
+        );
+
+        perform
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("errorCode").value("A0001"));
     }
 
     @DisplayName("사용자는 팔로우를 할 수 있다.")

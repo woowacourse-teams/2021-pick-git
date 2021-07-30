@@ -1,21 +1,31 @@
 package com.woowacourse.pickgit.acceptance.user;
 
+import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.groups.Tuple.tuple;
 import static org.mockito.Mockito.when;
 
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
+import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
+import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
+import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
+import com.woowacourse.pickgit.user.presentation.dto.response.ContributionResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.FollowResponse;
+import com.woowacourse.pickgit.user.presentation.dto.response.ProfileEditResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.UserProfileResponse;
 import io.restassured.RestAssured;
+import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.io.File;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -182,6 +192,82 @@ class UserAcceptanceTest {
         assertThat(response.getErrorCode()).isEqualTo("U0001");
     }
 
+    @DisplayName("누구든지 활동 통계를 조회할 수 있다.")
+    @Test
+    void getContributions_Anyone_Success() {
+        // given
+        ContributionResponseDto contributions = UserFactory.mockContributionResponseDto();
+
+        // when
+        ContributionResponse response = unauthenticatedGetRequest(
+            String.format("/api/profiles/%s/contributions", "testUser"), HttpStatus.OK)
+            .as(ContributionResponse.class);
+
+        // then
+        assertThat(response)
+            .usingRecursiveComparison()
+            .isEqualTo(contributions);
+    }
+
+    @DisplayName("유효하지 않은 유저 이름으로 활동 통계를 조회할 수 없다. - 400 예외")
+    @Test
+    void getContributions_invalidUsername_400Exception() {
+        // when
+        ApiErrorResponse response = unauthenticatedGetRequest(
+            String.format("/api/profiles/%s/contributions", "invalidName"), HttpStatus.BAD_REQUEST)
+            .as(ApiErrorResponse.class);
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("U0001");
+    }
+
+    @DisplayName("사용자는 자신의 프로필(이미지, 한 줄 소개 포함)을 수정할 수 있다.")
+    @Test
+    void editUserProfile_LoginUserWithImageAndDescription_Success() {
+        // given
+        String description = "updated profile description";
+        File imageFile = FileFactory.getTestImage1File();
+
+        // when
+        ProfileEditResponse response = given().log().all()
+            .auth().oauth2(loginUserAccessToken)
+            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+            .formParams("description", description)
+            .multiPart("image", imageFile)
+            .when()
+            .post("/api/profiles/me")
+            .then().log().all()
+            .extract()
+            .as(ProfileEditResponse.class);
+
+        // then
+        assertThat(response.getImageUrl()).isNotBlank();
+        assertThat(response.getDescription()).isEqualTo(description);
+    }
+
+    @DisplayName("게스트는 프로필을 수정할 수 없다.")
+    @Test
+    void editUserProfile_GuestUser_Fail() {
+        // given
+        String description = "updated profile description";
+
+        // when
+        ApiErrorResponse response = given().log().all()
+            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+            .formParams("description", description)
+            .multiPart("image", "")
+            .when()
+            .post("/api/profiles/me")
+            .then().log().all()
+            .extract()
+            .as(ApiErrorResponse.class);
+
+        // then
+        assertThat(response)
+            .extracting("errorCode")
+            .isEqualTo("A0001");
+    }
+
     @DisplayName("source 유저는 target 유저를 팔로우할 수 있다.")
     @Test
     void followUser_SourceToTarget_Success() {
@@ -317,6 +403,51 @@ class UserAcceptanceTest {
 
         //then
         assertThat(response.getErrorCode()).isEqualTo("U0003");
+    }
+
+    @DisplayName("로그인 - 저장된 유저중 유사한 이름을 가진 유저를 검색할 수 있다. 단, 자기 자신은 검색되지 않는다.(팔로잉 여부 true/false)")
+    @Test
+    void searchUser_LoginUser_Success() {
+        // given
+        authenticatedPostRequest(loginUserAccessToken,
+            String.format("/api/profiles/%s/followings", targetUser.getName()), HttpStatus.OK);
+        User unfollowedUser = UserFactory.user("testUser3");
+        로그인_되어있음(unfollowedUser);
+
+        // when
+        String url = String.format("/api/search/users?keyword=%s&page=0&limit=5", "testUser");
+        List<UserSearchResponseDto> response =
+            authenticatedGetRequest(loginUserAccessToken, url, HttpStatus.OK)
+                .as(new TypeRef<List<UserSearchResponseDto>>() {
+                });
+
+        // then
+        assertThat(response)
+            .hasSize(2)
+            .extracting("username", "following")
+            .containsExactly(
+                tuple(targetUser.getName(), true),
+                tuple(unfollowedUser.getName(), false)
+            );
+    }
+
+    @DisplayName("비 로그인 - 저장된 유저중 유사한 이름을 가진 유저를 검색할 수 있다. (팔로잉 필드 null)")
+    @Test
+    void searchUser_GuestUser_Success() {
+        // when
+        String url = String.format("/api/search/users?keyword=%s&page=0&limit=5", "testUser");
+        List<UserSearchResponseDto> response = unauthenticatedGetRequest(url, HttpStatus.OK)
+            .as(new TypeRef<List<UserSearchResponseDto>>() {
+            });
+
+        // then
+        assertThat(response)
+            .hasSize(2)
+            .extracting("username", "following")
+            .containsExactly(
+                tuple(loginUser.getName(), null),
+                tuple(targetUser.getName(), null)
+            );
     }
 
     private ExtractableResponse<Response> authenticatedGetRequest(

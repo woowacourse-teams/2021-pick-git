@@ -4,6 +4,7 @@ import { QueryFunction, useInfiniteQuery, useMutation } from "react-query";
 import { ErrorResponse, Post } from "../../@types";
 import { QUERY } from "../../constants/queries";
 import { getAccessToken } from "../../storage/storage";
+import { customError } from "../../utils/error";
 import {
   requestAddPostLike,
   requestGetHomeFeedPosts,
@@ -26,7 +27,7 @@ const userPostsQueryFunction: QueryFunction<Post[]> = async ({ queryKey, pagePar
   const accessToken = getAccessToken();
 
   if (isMyFeed) {
-    if (!accessToken) throw Error("no accessToken");
+    if (!accessToken) throw customError.noAccessToken;
 
     return await requestGetMyFeedPosts(pageParam, accessToken);
   } else {
