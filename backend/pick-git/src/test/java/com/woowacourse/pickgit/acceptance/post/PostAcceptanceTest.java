@@ -396,7 +396,8 @@ class PostAcceptanceTest {
         ContentRequest request = new ContentRequest(content);
 
         // when
-        ApiErrorResponse response = requestAddComment(token, postId, request, HttpStatus.BAD_REQUEST)
+        ApiErrorResponse response = requestAddComment(token, postId, request,
+            HttpStatus.BAD_REQUEST)
             .as(ApiErrorResponse.class);
 
         // then
@@ -412,7 +413,8 @@ class PostAcceptanceTest {
         ContentRequest request = new ContentRequest("a");
 
         // when
-        ApiErrorResponse response = requestAddComment(token, postId, request, HttpStatus.INTERNAL_SERVER_ERROR)
+        ApiErrorResponse response = requestAddComment(token, postId, request,
+            HttpStatus.INTERNAL_SERVER_ERROR)
             .as(ApiErrorResponse.class);
 
         // then
@@ -428,7 +430,8 @@ class PostAcceptanceTest {
         ContentRequest request = new ContentRequest("a".repeat(101));
 
         // when
-        ApiErrorResponse response = requestAddComment(token, postId, request, HttpStatus.BAD_REQUEST)
+        ApiErrorResponse response = requestAddComment(token, postId, request,
+            HttpStatus.BAD_REQUEST)
             .as(ApiErrorResponse.class);
 
         // then

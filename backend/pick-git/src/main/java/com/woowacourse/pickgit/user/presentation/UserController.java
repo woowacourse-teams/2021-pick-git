@@ -5,8 +5,10 @@ import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
+import com.woowacourse.pickgit.user.presentation.dto.response.ContributionResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.FollowResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.UserProfileResponse;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +33,8 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<UserProfileResponse> getAuthenticatedUserProfile(
-        @Authenticated AppUser user) {
+        @Authenticated AppUser user
+    ) {
         validateIsGuest(user);
 
         UserProfileResponseDto responseDto =
@@ -43,7 +46,8 @@ public class UserController {
     @GetMapping("/{username}")
     public ResponseEntity<UserProfileResponse> getUserProfile(
         @Authenticated AppUser appUser,
-        @PathVariable String username) {
+        @PathVariable String username
+    ) {
         UserProfileResponseDto responseDto = userService.getUserProfile(appUser, username);
 
         return ResponseEntity.ok(createUserProfileResponse(responseDto));
@@ -67,10 +71,28 @@ public class UserController {
             .build();
     }
 
+    @GetMapping("/{username}/contributions")
+    public ResponseEntity<ContributionResponse> getContributions(@PathVariable String username) {
+        ContributionResponseDto responseDto = userService.calculateContributions(username);
+
+        return ResponseEntity.ok(createContributionResponse(responseDto));
+    }
+
+    private ContributionResponse createContributionResponse(ContributionResponseDto responseDto) {
+        return ContributionResponse.builder()
+            .starsCount(responseDto.getStarsCount())
+            .commitsCount(responseDto.getCommitsCount())
+            .prsCount(responseDto.getPrsCount())
+            .issuesCount(responseDto.getIssuesCount())
+            .reposCount(responseDto.getReposCount())
+            .build();
+    }
+
     @PostMapping("/{username}/followings")
     public ResponseEntity<FollowResponse> followUser(
         @Authenticated AppUser user,
-        @PathVariable String username) {
+        @PathVariable String username
+    ) {
         validateIsGuest(user);
 
         AuthUserRequestDto authUserRequestDto = new AuthUserRequestDto(user.getUsername());
@@ -83,7 +105,8 @@ public class UserController {
     @DeleteMapping("/{username}/followings")
     public ResponseEntity<FollowResponse> unfollowUser(
         @Authenticated AppUser user,
-        @PathVariable String username) {
+        @PathVariable String username
+    ) {
         validateIsGuest(user);
 
         AuthUserRequestDto authUserRequestDto = new AuthUserRequestDto(user.getUsername());

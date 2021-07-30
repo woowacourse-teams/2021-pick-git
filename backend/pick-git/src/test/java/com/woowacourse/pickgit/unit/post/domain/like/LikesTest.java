@@ -1,7 +1,6 @@
 package com.woowacourse.pickgit.unit.post.domain.like;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 import com.woowacourse.pickgit.common.factory.PostBuilder;
 import com.woowacourse.pickgit.common.factory.UserFactory;
@@ -29,10 +28,10 @@ class LikesTest {
         User testUser3 = UserFactory.user("testUser3");
 
         likes = new Likes(List.of(
-                new Like(post, testUser1),
-                new Like(post, testUser2),
-                new Like(post, testUser3)
-            ));
+            new Like(post, testUser1),
+            new Like(post, testUser2),
+            new Like(post, testUser3)
+        ));
     }
 
     @DisplayName("like의 개수를 확인한다.")

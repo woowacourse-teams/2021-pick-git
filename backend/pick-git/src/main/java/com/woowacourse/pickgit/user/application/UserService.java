@@ -4,8 +4,11 @@ import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
 import com.woowacourse.pickgit.exception.user.SameSourceTargetUserException;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
+import com.woowacourse.pickgit.user.domain.Contribution;
+import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import org.springframework.stereotype.Service;
@@ -16,9 +19,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PlatformContributionCalculator platformContributionCalculator;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(
+        UserRepository userRepository,
+        PlatformContributionCalculator platformContributionCalculator
+    ) {
         this.userRepository = userRepository;
+        this.platformContributionCalculator = platformContributionCalculator;
     }
 
     @Transactional(readOnly = true)
@@ -77,6 +85,20 @@ public class UserService {
             .website(target.getWebsite())
             .twitter(target.getTwitter())
             .following(source.isFollowing(target))
+            .build();
+    }
+
+    public ContributionResponseDto calculateContributions(String username) {
+        User user = findUserByName(username);
+
+        Contribution contribution = platformContributionCalculator.calculate(user.getName());
+
+        return ContributionResponseDto.builder()
+            .starsCount(contribution.getStarsCount())
+            .commitsCount(contribution.getCommitsCount())
+            .prsCount(contribution.getPrsCount())
+            .issuesCount(contribution.getIssuesCount())
+            .reposCount(contribution.getReposCount())
             .build();
     }
 

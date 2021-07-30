@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.common.factory;
 
+import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
 
@@ -17,7 +18,7 @@ public class UserFactory {
     }
 
     public static User user() {
-        return createUser(null,"testUser");
+        return createUser(null, "testUser");
     }
 
     public static User createUser(Long id, String name) {
@@ -92,6 +93,16 @@ public class UserFactory {
             .website("www.pick-git.com")
             .twitter("pick-git twitter")
             .following(null)
+            .build();
+    }
+
+    public static ContributionResponseDto mockContributionResponseDto() {
+        return ContributionResponseDto.builder()
+            .starsCount(11)
+            .commitsCount(48)
+            .prsCount(48)
+            .issuesCount(48)
+            .reposCount(48)
             .build();
     }
 }

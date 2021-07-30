@@ -27,6 +27,7 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 @Import(JpaTestConfiguration.class)
 @DataJpaTest
 class PostRepositoryTest {
+
     @Autowired
     private UserRepository userRepository;
 

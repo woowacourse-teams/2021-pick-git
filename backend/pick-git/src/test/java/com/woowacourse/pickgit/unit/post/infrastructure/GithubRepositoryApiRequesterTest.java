@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientException;
 
 class GithubRepositoryApiRequesterTest {
+
     private static final String BEARER_TOKEN = "rightToken";
     private static final String RIGHT_RESPONSE = "[{\"name\": \"binghe-hi\" }, {\"name\": \"doms-react\" }]";
     private static final String BAD_CREDENTIAL = "{\n"
@@ -26,22 +27,22 @@ class GithubRepositoryApiRequesterTest {
     @BeforeEach
     void setUp() {
         setUpGithubRepositoryApiRequester((requestEntity, responseType) -> {
-            HttpHeaders headers = requestEntity.getHeaders();
+                HttpHeaders headers = requestEntity.getHeaders();
 
-            List<String> authorizations = Optional.ofNullable(
-                headers.get(HttpHeaders.AUTHORIZATION)
-            ).orElse(List.of());
+                List<String> authorizations = Optional.ofNullable(
+                    headers.get(HttpHeaders.AUTHORIZATION)
+                ).orElse(List.of());
 
-            boolean hasRightToken = authorizations.stream()
-                .anyMatch(authorization -> authorization.contains(BEARER_TOKEN));
+                boolean hasRightToken = authorizations.stream()
+                    .anyMatch(authorization -> authorization.contains(BEARER_TOKEN));
 
-            if(!hasRightToken) {
+                if (!hasRightToken) {
+                    return ResponseEntity.ok(
+                        responseType.cast(BAD_CREDENTIAL)
+                    );
+                }
+
                 return ResponseEntity.ok(
-                    responseType.cast(BAD_CREDENTIAL)
-                );
-            }
-
-            return ResponseEntity.ok(
                     responseType.cast(RIGHT_RESPONSE)
                 );
             }

@@ -4,7 +4,6 @@ import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyString;
 
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
@@ -50,9 +49,10 @@ import org.springframework.test.context.ActiveProfiles;
 
 @Import(InfrastructureTestConfiguration.class)
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
-@ActiveProfiles("test")
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
+@ActiveProfiles("test")
 class PostServiceIntegrationTest {
+
     private static final String USERNAME = "jipark3";
     private static final String ACCESS_TOKEN = "oauth.access.token";
 
