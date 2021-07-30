@@ -901,44 +901,6 @@ class PostServiceTest {
             .findByUser(any(User.class));
     }
 
-    @DisplayName("등록되지 않은 게시물의 내용을 수정할 수 없다. - 500 예외")
-    @Test
-    void update_InvalidPost_500Exception() {
-        // given
-        LoginUser loginUser = new LoginUser("testUser", "Bearer testToken");
-        User user = UserFactory.user(1L, loginUser.getUsername());
-
-        PostUpdateRequest updateRequest = PostUpdateRequest.builder()
-            .tags(List.of("java", "spring"))
-            .content("testContent")
-            .build();
-        PostUpdateRequestDto updateRequestDto = new PostUpdateRequestDto(loginUser, 1L,
-            updateRequest.getTags(), updateRequest.getContent());
-
-        given(userRepository.findByBasicProfile_Name(anyString()))
-            .willReturn(Optional.of(user));
-        given(postRepository.findByUser(any(User.class)))
-            .willThrow(new PostNotFoundException(
-                "P0002",
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "해당하는 게시물을 찾을 수 없습니다."
-            ));
-
-        // when
-        assertThatThrownBy(() -> {
-            postService.update(updateRequestDto);
-        }).isInstanceOf(PostNotFoundException.class)
-            .hasFieldOrPropertyWithValue("errorCode", "P0002")
-            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
-            .hasMessage("해당하는 게시물을 찾을 수 없습니다.");
-
-        // then
-        verify(userRepository, times(1))
-            .findByBasicProfile_Name("testUser");
-        verify(postRepository, times(1))
-            .findByUser(any(User.class));
-    }
-
     @DisplayName("사용자는 게시물을 삭제한다.")
     @Test
     void delete_LoginUser_Success() {
@@ -1009,39 +971,6 @@ class PostServiceTest {
             .hasFieldOrPropertyWithValue("errorCode", "P0005")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
             .hasMessage("해당하는 사용자의 게시물이 아닌 에러");
-
-        // then
-        verify(userRepository, times(1))
-            .findByBasicProfile_Name("testUser");
-        verify(postRepository, times(1))
-            .findByUser(any(User.class));
-    }
-
-    @DisplayName("등록되지 않은 게시물을 삭제할 수 없다. - 500 예외")
-    @Test
-    void delete_InvalidPost_500Exception() {
-        // given
-        LoginUser loginUser = new LoginUser("testUser", "Bearer testToken");
-        User user = UserFactory.user(1L, loginUser.getUsername());
-
-        PostDeleteRequestDto deleteRequestDto = new PostDeleteRequestDto(loginUser, 1L);
-
-        given(userRepository.findByBasicProfile_Name(anyString()))
-            .willReturn(Optional.of(user));
-        given(postRepository.findByUser(any(User.class)))
-            .willThrow(new PostNotFoundException(
-                "P0002",
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "해당하는 게시물을 찾을 수 없습니다."
-            ));
-
-        // when
-        assertThatThrownBy(() -> {
-            postService.delete(deleteRequestDto);
-        }).isInstanceOf(PostNotFoundException.class)
-            .hasFieldOrPropertyWithValue("errorCode", "P0002")
-            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
-            .hasMessage("해당하는 게시물을 찾을 수 없습니다.");
 
         // then
         verify(userRepository, times(1))
