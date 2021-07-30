@@ -34,6 +34,7 @@ import TextEditor from "../TextEditor/TextEditor";
 import { getTimeDiffFromCurrent } from "../../../utils/date";
 import EmptyPostImage from "../../../assets/images/empty-post-image.png";
 import ButtonDrawer from "../ButtonDrawer/ButtonDrawer";
+import UserContext from "../../../contexts/UserContext";
 
 export interface Props {
   authorName: string;
@@ -83,6 +84,7 @@ const PostItem = ({
 }: Props) => {
   const [shouldHideContent, setShouldHideContent] = useState(content.length > LIMIT.POST_CONTENT_HIDE_LENGTH);
   const { color } = useContext(ThemeContext);
+  const { isLoggedIn, currentUsername } = useContext(UserContext);
 
   const { min, hour, day } = getTimeDiffFromCurrent(createdAt);
   const currentTimeDiffText = day
@@ -124,7 +126,9 @@ const PostItem = ({
   return (
     <Container>
       <PostHeader>
-        <PostAuthorInfoLink to={PAGE_URL.USER_PROFILE(authorName)}>
+        <PostAuthorInfoLink
+          to={isLoggedIn && currentUsername === authorName ? PAGE_URL.MY_PROFILE : PAGE_URL.USER_PROFILE(authorName)}
+        >
           <Avatar diameter="1.9375rem" imageUrl={authorImageUrl} />
           <PostAuthorName>{authorName}</PostAuthorName>
         </PostAuthorInfoLink>
