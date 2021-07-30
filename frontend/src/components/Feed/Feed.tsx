@@ -9,6 +9,9 @@ import CommentSlider from "../CommentSlider/CommentSlider";
 import useFeedMutation from "../../services/hooks/useFeedMutation";
 import { FAILURE_MESSAGE } from "../../constants/messages";
 import { getAPIErrorMessage } from "../../utils/error";
+import { useHistory } from "react-router-dom";
+import { PAGE_URL } from "../../constants/urls";
+import usePostEdit from "../../services/hooks/usePostEdit";
 
 interface Props {
   posts: Post[];
@@ -19,9 +22,11 @@ const Feed = ({ posts, queryKey }: Props) => {
   const [selectedPostId, setSelectedPostId] = useState<Post["id"]>();
   const { pushSnackbarMessage } = useContext(SnackBarContext);
   const { setPosts, deletePostLike, addPostLike, mutateAddComment, mutateDeletePost } = useFeedMutation(queryKey);
+  const { setPostEditData } = usePostEdit();
   const { isBottomSliderShown, showBottomSlider, hideBottomSlider, removeSlideEventHandler, setSlideEventHandler } =
     useBottomSlider();
   const { isLoggedIn, currentUsername } = useContext(UserContext);
+  const history = useHistory();
 
   const selectedPost = posts.find((post) => post.id === selectedPostId);
 
@@ -30,11 +35,15 @@ const Feed = ({ posts, queryKey }: Props) => {
     return removeSlideEventHandler;
   }, []);
 
+  const handlePostEdit = async (post: Post) => {
+    setPostEditData({ content: post.content, postId: post.id, tags: JSON.parse(post.tags.join(",")) });
+    history.push(PAGE_URL.EDIT_POST_FIRST_STEP);
+  };
+
   const handlePostDelete = async (postId: Post["id"]) => {
     try {
       await mutateDeletePost(postId);
     } catch (error) {
-      console.dir(error);
       pushSnackbarMessage(getAPIErrorMessage(error.response?.data.errorCode));
     }
   };
@@ -110,6 +119,7 @@ const Feed = ({ posts, queryKey }: Props) => {
             likeCount={post.likesCount}
             tags={post.tags}
             onPostDelete={() => handlePostDelete(post.id)}
+            onPostEdit={() => handlePostEdit(post)}
             onPostLike={() => handlePostLike(post.id)}
             onCommentClick={() => handleCommentsClick(post.id)}
             onCommentInputClick={() => handleCommentsClick(post.id)}

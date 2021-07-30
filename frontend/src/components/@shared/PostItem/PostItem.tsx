@@ -4,7 +4,6 @@ import {
   CommentInputWrapper,
   CommentsWrapper,
   CommentWrapper,
-  IconLinkButton,
   IconLink,
   IconLinkButtonsWrapper,
   LikeCountText,
@@ -51,6 +50,7 @@ export interface Props {
   createdAt: string;
   onCommentClick: () => void;
   onCommentInputClick: () => void;
+  onPostEdit: () => void;
   onPostDelete: () => void;
   onPostLike: () => void;
   onCommentLike: (commentId: CommentData["id"]) => void;
@@ -79,6 +79,7 @@ const PostItem = ({
   onCommentClick,
   onCommentInputClick,
   onCommentLike,
+  onPostEdit,
   onPostDelete,
   onPostLike,
 }: Props) => {
@@ -95,7 +96,7 @@ const PostItem = ({
     : timeDiffTextTable.sec();
 
   const circleButtons = [
-    { node: <EditIcon />, onClick: () => alert("click!") },
+    { node: <EditIcon />, onClick: onPostEdit },
     { node: <TrashIcon />, onClick: onPostDelete },
   ];
 

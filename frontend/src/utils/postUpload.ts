@@ -1,4 +1,4 @@
-import { PostUploadData } from "../@types";
+import { PostEditData, PostUploadData } from "../@types";
 import { LIMIT } from "../constants/limits";
 import { FAILURE_MESSAGE } from "../constants/messages";
 
@@ -66,7 +66,11 @@ export const isValidPostUploadData = ({ content, tags, files, githubRepositoryNa
   );
 };
 
-export const getFailedValidationMessage = ({ content, tags, files, githubRepositoryName }: PostUploadData) => {
+export const isValidPostEditData = ({ postId, content, tags }: PostEditData) => {
+  return isValidContentLength(content) && isValidTagLengths(tags) && !isContentEmpty(content) && postId !== 0;
+};
+
+export const getPostAddValidationMessage = ({ content, tags, files, githubRepositoryName }: PostUploadData) => {
   if (!isGithubRepositoryEmpty(githubRepositoryName)) {
     return FAILURE_MESSAGE.POST_REPOSITORY_NOT_SELECTED;
   }
@@ -85,6 +89,26 @@ export const getFailedValidationMessage = ({ content, tags, files, githubReposit
 
   if (isContentEmpty(content) && isFilesEmpty(files)) {
     return FAILURE_MESSAGE.POST_FILE_AND_CONTENT_EMPTY;
+  }
+
+  if (!isValidTagsFormat(tags)) {
+    return FAILURE_MESSAGE.POST_TAG_SPECIAL_SYMBOL_EXIST;
+  }
+
+  if (hasDuplicatedTag(tags)) {
+    return FAILURE_MESSAGE.POST_DUPLICATED_TAG_EXIST;
+  }
+
+  if (!isValidTagLengths(tags)) {
+    return FAILURE_MESSAGE.POST_TAG_LENGTH_LIMIT_EXCEEDED;
+  }
+
+  return "";
+};
+
+export const getPostEditValidationMessage = ({ content, tags }: PostEditData) => {
+  if (!isValidContentLength(content)) {
+    return FAILURE_MESSAGE.POST_CONTENT_LENGTH_LIMIT_EXCEEDED;
   }
 
   if (!isValidTagsFormat(tags)) {
