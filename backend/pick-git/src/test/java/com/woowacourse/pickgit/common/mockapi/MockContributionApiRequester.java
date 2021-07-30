@@ -14,7 +14,7 @@ public class MockContributionApiRequester implements PlatformContributionApiRequ
         }
 
         if (url.contains("stars")) {
-            return "[{\"stargazers_count\": \"5\"}, {\"stargazers_count\": \"6\"}]";
+            return "{\"items\": [{\"stargazers_count\": \"5\"}, {\"stargazers_count\": \"6\"}]}";
         }
         return "{\"total_count\": \"48\"}";
     }

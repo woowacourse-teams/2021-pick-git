@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woowacourse.pickgit.exception.user.ContributionParseException;
 import com.woowacourse.pickgit.user.domain.PlatformContributionExtractor;
 import com.woowacourse.pickgit.user.infrastructure.dto.CountDto;
+import com.woowacourse.pickgit.user.infrastructure.dto.ItemDto;
 import com.woowacourse.pickgit.user.infrastructure.dto.StarsDto;
 import com.woowacourse.pickgit.user.infrastructure.requester.PlatformContributionApiRequester;
 import java.util.List;
@@ -34,7 +35,7 @@ public class GithubContributionExtractor implements PlatformContributionExtracto
     }
 
     @Override
-    public List<StarsDto> extractStars(String username) {
+    public ItemDto extractStars(String username) {
         String apiUrl = generateUrl(username);
         String response = platformContributionApiRequester.request(apiUrl);
 
@@ -45,10 +46,9 @@ public class GithubContributionExtractor implements PlatformContributionExtracto
         return String.format(apiUrlFormatForStar, username);
     }
 
-    private List<StarsDto> parseToStars(String response) {
+    private ItemDto parseToStars(String response) {
         try {
-            return objectMapper.readValue(response, new TypeReference<>() {
-            });
+            return objectMapper.readValue(response, new TypeReference<>() {});
         } catch (JsonProcessingException e) {
             throw new ContributionParseException(
                 "V0001",
@@ -72,8 +72,7 @@ public class GithubContributionExtractor implements PlatformContributionExtracto
 
     private CountDto parseToCount(String response) {
         try {
-            return objectMapper.readValue(response, new TypeReference<>() {
-            });
+            return objectMapper.readValue(response, new TypeReference<>() {});
         } catch (JsonProcessingException e) {
             throw new ContributionParseException(
                 "V0001",

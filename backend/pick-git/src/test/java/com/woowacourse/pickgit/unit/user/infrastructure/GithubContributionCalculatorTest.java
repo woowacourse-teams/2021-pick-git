@@ -118,7 +118,7 @@ class GithubContributionCalculatorTest {
         @Override
         public String request(String url) {
             if (url.contains("stars")) {
-                return "[{\"stargazers_count\": \"5\"}, {\"stargazers_count\": \"6\"}]";
+                return "{\"items\": [{\"stargazers\": \"5\"}, {\"stargazers\": \"6\"}]}";
             }
             return "{\"total\": \"48\"}";
         }
