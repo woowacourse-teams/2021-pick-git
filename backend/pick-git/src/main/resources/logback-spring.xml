@@ -3,8 +3,43 @@
   <include resource="org/springframework/boot/logging/logback/base.xml"/>
 
   <springProfile name="prod, local">
-    <include resource="./logback/db-logger.xml"/>
-    <include resource="./logback/error-logger.xml"/>
+    <property name="home" value="logs/"/>
+
+    <appender name="db-logger" class="ch.qos.logback.core.rolling.RollingFileAppender">
+      <file>${home}db.log</file>
+      <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <fileNamePattern>${home}db-%d{yyyyMMdd}-%i.log</fileNamePattern>
+        <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+          <maxFileSize>15MB</maxFileSize>
+        </timeBasedFileNamingAndTriggeringPolicy>
+        <maxHistory>30</maxHistory>
+      </rollingPolicy>
+      <encoder>
+        <charset>utf8</charset>
+        <Pattern>
+          %d{yyyy-MM-dd HH:mm:ss.SSS} %boldGreen(%-5level) %boldCyan(%t) %boldYellow(%class{36}).%boldMagenta(%M) %boldWhite(L:%L) %n %boldRed(     >) %m%n
+        </Pattern>
+      </encoder>
+    </appender>
+
+    <property name="home" value="logs/"/>
+    <appender name="error-logger" class="ch.qos.logback.core.rolling.RollingFileAppender">
+      <file>${home}error.log</file>
+      <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <fileNamePattern>${home}error-%d{yyyyMMdd}-%i.log</fileNamePattern>
+        <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+          <maxFileSize>15MB</maxFileSize>
+        </timeBasedFileNamingAndTriggeringPolicy>
+        <maxHistory>30</maxHistory>
+      </rollingPolicy>
+      <encoder>
+        <charset>utf8</charset>
+        <Pattern>
+          %d{yyyy-MM-dd HH:mm:ss.SSS} %boldGreen(%-5level) %boldCyan(%t) %boldYellow(%class{36}).%boldMagenta(%M) %boldWhite(L:%L) %n %boldRed(     >) %m%n
+        </Pattern>
+      </encoder>
+    </appender>
+
     <logger name="com.woowacourse.pickgit" level="INFO">
       <appender-ref ref="error-logger"/>
     </logger>
@@ -27,7 +62,15 @@
   </springProfile>
 
   <springProfile name="test">
-    <include resource="./logback/test/test-basic-logger.xml"/>
+    <appender name="test-basic-logger" class="ch.qos.logback.core.ConsoleAppender">
+      <encoder>
+        <charset>utf8</charset>
+        <Pattern>
+          %d{yyyy-MM-dd HH:mm:ss.SSS} %boldGreen(%-5level) %boldCyan(%t) %boldYellow(%class{36}).%boldMagenta(%M) %boldWhite(L:%L) %n %boldRed(     >) %m%n
+        </Pattern>
+      </encoder>
+    </appender>
+
     <logger name="com.woowacourse.pickgit" level="TRACE">
       <appender-ref ref="test-basic-logger"/>
     </logger>

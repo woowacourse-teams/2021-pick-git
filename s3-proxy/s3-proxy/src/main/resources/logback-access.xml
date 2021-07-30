@@ -1,12 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
   <springProfile name="prod, local">
-    <include resource="./logback/access-logger.xml"/>
+    <property name="home" value="logs/"/>
+
+    <appender name="access-logger" class="ch.qos.logback.core.rolling.RollingFileAppender">
+      <file>${home}access.log</file>
+      <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <fileNamePattern>${home}access-%d{yyyyMMdd}-%i.log</fileNamePattern>
+        <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+          <maxFileSize>15MB</maxFileSize>
+        </timeBasedFileNamingAndTriggeringPolicy>
+        <maxHistory>30</maxHistory>
+      </rollingPolicy>
+      <encoder>
+        <charset>utf8</charset>
+        <Pattern>
+          %n%boldGreen(###### HTTP Request ######) %n%fullRequest%boldCyan(###### HTTP Response ######) %n%fullResponse
+        </Pattern>
+      </encoder>
+    </appender>
+
     <appender-ref ref="access-logger"/>
   </springProfile>
 
   <springProfile name="test">
-    <include resource="./logback/test/test-access-logger.xml"/>
+    <appender name="test-access-logger" class="ch.qos.logback.core.ConsoleAppender">
+      <encoder>
+        <charset>utf8</charset>
+        <pattern>
+          %n%boldGreen(###### HTTP Request ######) %n%fullRequest%boldCyan(###### HTTP Response ######) %n%fullResponse
+        </pattern>
+      </encoder>
+    </appender>
+
     <appender-ref ref="test-access-logger"/>
   </springProfile>
 </configuration>
