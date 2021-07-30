@@ -2,7 +2,7 @@ import { AxiosError } from "axios";
 import { useContext } from "react";
 import { InfiniteData, QueryObserverResult, RefetchOptions } from "react-query";
 
-import { ErrorResponse, SearchResult, SearchResultUser } from "../../@types";
+import { ErrorResponse, SearchResultUser } from "../../@types";
 import UserContext from "../../contexts/UserContext";
 import useFollow from "../../services/hooks/useFollow";
 import Avatar from "../@shared/Avatar/Avatar";
@@ -16,7 +16,7 @@ export interface Props {
   follow: ReturnType<typeof useFollow>;
   refetch: (
     options?: RefetchOptions | undefined
-  ) => Promise<QueryObserverResult<InfiniteData<SearchResult | null>, AxiosError<ErrorResponse>>>;
+  ) => Promise<QueryObserverResult<InfiniteData<SearchResultUser[] | null>, AxiosError<ErrorResponse>>>;
 }
 
 const SearchListUser = ({ isFetchingNextPage, onIntersect, users, follow, refetch }: Props) => {
