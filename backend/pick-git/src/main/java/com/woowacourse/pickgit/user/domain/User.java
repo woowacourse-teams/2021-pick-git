@@ -61,6 +61,14 @@ public class User {
         this.githubProfile = githubProfile;
     }
 
+    public void updateDescription(String description) {
+        this.basicProfile.setDescription(description);
+    }
+
+    public void updateProfileImage(String imageUrl) {
+        this.basicProfile.setImage(imageUrl);
+    }
+
     public void follow(User target) {
         Follow follow = new Follow(this, target);
 

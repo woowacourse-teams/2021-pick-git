@@ -21,6 +21,8 @@ public class FileFactory {
         return createImageFile("testImage2.png");
     }
 
+    public static MockMultipartFile getEmptyTestFile() { return createEmptyImageFile();}
+
     public static File getTestImage1File() {
         return createFile("testImage1.png");
     }
@@ -42,6 +44,15 @@ public class FileFactory {
         } catch (IOException e) {
             throw new RuntimeException();
         }
+    }
+
+    private static MockMultipartFile createEmptyImageFile() {
+        return new MockMultipartFile(
+            "images",
+            "",
+            null,
+            new byte[] {}
+        );
     }
 
     private static File createFile(String fileName) {

@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.toList;
 import com.woowacourse.pickgit.post.domain.PickGitStorage;
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 
 public class MockPickGitStorage implements PickGitStorage {
 
@@ -13,5 +14,10 @@ public class MockPickGitStorage implements PickGitStorage {
         return files.stream()
             .map(File::getName)
             .collect(toList());
+    }
+
+    @Override
+    public Optional<String> store(File file, String userName) {
+        return Optional.ofNullable(file.getName());
     }
 }

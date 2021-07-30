@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.acceptance.user;
 
+import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
 import static org.mockito.Mockito.when;
@@ -7,27 +8,24 @@ import static org.mockito.Mockito.when;
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
+import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
-<<<<<<< HEAD
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
-=======
-import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
->>>>>>> 1102161... refactor: 프론트측과 협의한 부분 리팩토링
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.presentation.dto.response.ContributionResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.FollowResponse;
-import com.woowacourse.pickgit.user.presentation.dto.response.SearchResponse;
+import com.woowacourse.pickgit.user.presentation.dto.response.ProfileEditResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.UserProfileResponse;
 import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.io.File;
 import java.util.List;
-import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -221,6 +219,53 @@ class UserAcceptanceTest {
 
         // then
         assertThat(response.getErrorCode()).isEqualTo("U0001");
+    }
+
+    @DisplayName("사용자는 자신의 프로필(이미지, 한 줄 소개 포함)을 수정할 수 있다.")
+    @Test
+    void editUserProfile_LoginUserWithImageAndDescription_Success() {
+        // given
+        String description = "updated profile description";
+        File imageFile = FileFactory.getTestImage1File();
+
+        // when
+        ProfileEditResponse response = given().log().all()
+            .auth().oauth2(loginUserAccessToken)
+            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+            .formParams("description", description)
+            .multiPart("image", imageFile)
+            .when()
+            .post("/api/profiles/me")
+            .then().log().all()
+            .extract()
+            .as(ProfileEditResponse.class);
+
+        // then
+        assertThat(response.getImageUrl()).isNotBlank();
+        assertThat(response.getDescription()).isEqualTo(description);
+    }
+
+    @DisplayName("게스트는 프로필을 수정할 수 없다.")
+    @Test
+    void editUserProfile_GuestUser_Fail() {
+        // given
+        String description = "updated profile description";
+
+        // when
+        ApiErrorResponse response = given().log().all()
+            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+            .formParams("description", description)
+            .multiPart("image", "")
+            .when()
+            .post("/api/profiles/me")
+            .then().log().all()
+            .extract()
+            .as(ApiErrorResponse.class);
+
+        // then
+        assertThat(response)
+            .extracting("errorCode")
+            .isEqualTo("A0001");
     }
 
     @DisplayName("source 유저는 target 유저를 팔로우할 수 있다.")
