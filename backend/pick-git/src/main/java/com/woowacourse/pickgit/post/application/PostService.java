@@ -209,7 +209,8 @@ public class PostService {
         Post post = findPostById(updateRequestDto.getPostId());
         List<Tag> tags = tagService.findOrCreateTags(new TagsDto(updateRequestDto.getTags()));
 
-        post.update(updateRequestDto.getContent(), tags);
+        post.updateContent(updateRequestDto.getContent());
+        post.updateTags(tags);
 
         Post updatedPost = findPostById(updateRequestDto.getPostId());
 

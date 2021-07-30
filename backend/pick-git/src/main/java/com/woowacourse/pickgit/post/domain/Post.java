@@ -104,6 +104,41 @@ public class Post {
         comments.addComment(comment);
     }
 
+    public List<Tag> getTags() {
+        return postTags.stream()
+            .map(PostTag::getTag)
+            .collect(toList());
+    }
+
+    public List<String> getTagNames() {
+        return postTags.stream()
+            .map(PostTag::getTagName)
+            .collect(toList());
+    }
+
+    public void like(User user) {
+        Like like = new Like(this, user);
+        likes.add(like);
+    }
+
+    public void unlike(User user) {
+        Like like = new Like(this, user);
+        likes.remove(like);
+    }
+
+    public boolean isLikedBy(String userName) {
+        return likes.contains(userName);
+    }
+
+    public void updateContent(String content) {
+        this.content = new PostContent(content);
+    }
+
+    public void updateTags(List<Tag> tags) {
+        postTags.clear();
+        addTags(tags);
+    }
+
     public void addTags(List<Tag> tags) {
         validateDuplicateTag(tags);
         List<Tag> existingTags = getTags();
@@ -123,47 +158,14 @@ public class Post {
         }
     }
 
-    public List<Tag> getTags() {
-        return postTags.stream()
-            .map(PostTag::getTag)
-            .collect(toList());
-    }
-
-    public List<String> getTagNames() {
-        return postTags.stream()
-            .map(PostTag::getTagName)
-            .collect(toList());
-    }
-
     private void validateDuplicateTagAlreadyExistsInPost(List<Tag> existingTags, Tag tag) {
         if (existingTags.contains(tag)) {
             throw new CannotAddTagException();
         }
     }
 
-    public void like(User user) {
-        Like like = new Like(this, user);
-        likes.add(like);
-    }
-
-    public void unlike(User user) {
-        Like like = new Like(this, user);
-        likes.remove(like);
-    }
-
-    public boolean isLikedBy(String userName) {
-        return likes.contains(userName);
-    }
-
     public Long getId() {
         return id;
-    }
-
-    public void update(String content, List<Tag> tags) {
-        postTags.clear();
-
-        this.content = new PostContent(content);
-        addTags(tags);
     }
 
     public List<String> getImageUrls() {
