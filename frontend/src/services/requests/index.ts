@@ -16,3 +16,4 @@ export * from "./account";
 export * from "./posts";
 export * from "./githubStats";
 export * from "./github";
+export * from "./search";

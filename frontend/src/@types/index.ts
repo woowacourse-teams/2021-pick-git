@@ -29,11 +29,6 @@ export interface SearchResultUser {
 
 export interface SearchResultTag {}
 
-export interface SearchResult {
-  users: SearchResultUser[];
-  tags: SearchResultTag[];
-}
-
 export interface CommentData {
   id: number;
   profileImageUrl: string;

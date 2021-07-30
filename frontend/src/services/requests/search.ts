@@ -1,10 +1,10 @@
 import axios from "axios";
 
-import { SearchResult } from "../../@types";
+import { SearchResultUser } from "../../@types";
 import { LIMIT } from "../../constants/limits";
 import { API_URL } from "../../constants/urls";
 
-export const requestGetSearchResult = async (keyword: string, pageParam: number, accessToken: string | null) => {
+export const requestGetSearchUserResult = async (keyword: string, pageParam: number, accessToken: string | null) => {
   if (keyword === "") {
     return null;
   }
@@ -16,8 +16,8 @@ export const requestGetSearchResult = async (keyword: string, pageParam: number,
         },
       }
     : {};
-  const response = await axios.get<SearchResult>(
-    API_URL.SEARCH(keyword, pageParam, LIMIT.SEARCH_RESULT_COUNT_PER_FETCH),
+  const response = await axios.get<SearchResultUser[]>(
+    API_URL.SEARCH_USER(keyword, pageParam, LIMIT.SEARCH_RESULT_COUNT_PER_FETCH),
     config
   );
 
