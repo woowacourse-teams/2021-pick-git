@@ -10,16 +10,23 @@ import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenRespons
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
+<<<<<<< HEAD
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
+=======
+import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
+>>>>>>> 1102161... refactor: 프론트측과 협의한 부분 리팩토링
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
+import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.presentation.dto.response.ContributionResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.FollowResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.SearchResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.UserProfileResponse;
 import io.restassured.RestAssured;
+import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.List;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -363,12 +370,13 @@ class UserAcceptanceTest {
         로그인_되어있음(unfollowedUser);
 
         // when
-        String url = String.format("/api/search?keyword=%s&page=0&limit=5", "testUser");
-        SearchResponse response = authenticatedGetRequest(loginUserAccessToken, url, HttpStatus.OK)
-            .as(SearchResponse.class);
+        String url = String.format("/api/search/users?keyword=%s&page=0&limit=5", "testUser");
+        List<UserSearchResponseDto> response =
+            authenticatedGetRequest(loginUserAccessToken, url, HttpStatus.OK)
+            .as(new TypeRef<List<UserSearchResponseDto>>() {});
 
         // then
-        assertThat(response.getUsers())
+        assertThat(response)
             .hasSize(2)
             .extracting("username", "following")
             .containsExactly(
@@ -381,13 +389,13 @@ class UserAcceptanceTest {
     @Test
     void searchUser_GuestUser_Success() {
         // when
-        String url = String.format("/api/search?keyword=%s&page=0&limit=5", "testUser");
-        SearchResponse response = unauthenticatedGetRequest(url, HttpStatus.OK)
-            .as(SearchResponse.class);
+        String url = String.format("/api/search/users?keyword=%s&page=0&limit=5", "testUser");
+        List<UserSearchResponseDto> response = unauthenticatedGetRequest(url, HttpStatus.OK)
+            .as(new TypeRef<List<UserSearchResponseDto>>() {});
 
         // then
-        assertThat(response.getUsers()).hasSize(2);
-        assertThat(response.getUsers())
+        assertThat(response)
+            .hasSize(2)
             .extracting("username", "following")
             .containsExactly(
                 tuple(loginUser.getName(), null),

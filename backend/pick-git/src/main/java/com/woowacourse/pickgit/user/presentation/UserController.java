@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/profiles")
 @CrossOrigin(value = "*")
 public class UserController {
 
@@ -31,7 +31,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/profiles/me")
+    @GetMapping("/me")
     public ResponseEntity<UserProfileResponse> getAuthenticatedUserProfile(
         @Authenticated AppUser user
     ) {
@@ -43,7 +43,7 @@ public class UserController {
         return ResponseEntity.ok(createUserProfileResponse(responseDto));
     }
 
-    @GetMapping("/profiles/{username}")
+    @GetMapping("/{username}")
     public ResponseEntity<UserProfileResponse> getUserProfile(
         @Authenticated AppUser appUser,
         @PathVariable String username
@@ -102,7 +102,7 @@ public class UserController {
         return ResponseEntity.ok(createFollowResponse(followResponseDto));
     }
 
-    @DeleteMapping("/profiles/{username}/followings")
+    @DeleteMapping("/{username}/followings")
     public ResponseEntity<FollowResponse> unfollowUser(
         @Authenticated AppUser user,
         @PathVariable String username
