@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.unit.user.domain;
+package com.woowacourse.pickgit.unit.user.infrastructure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -8,7 +8,7 @@ import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.common.mockapi.MockContributionApiRequester;
 import com.woowacourse.pickgit.exception.user.ContributionParseException;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
-import com.woowacourse.pickgit.user.domain.GithubContributionCalculator;
+import com.woowacourse.pickgit.user.infrastructure.calculator.GithubContributionCalculator;
 import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
 import com.woowacourse.pickgit.user.domain.PlatformContributionExtractor;
 import com.woowacourse.pickgit.user.infrastructure.extractor.GithubContributionExtractor;

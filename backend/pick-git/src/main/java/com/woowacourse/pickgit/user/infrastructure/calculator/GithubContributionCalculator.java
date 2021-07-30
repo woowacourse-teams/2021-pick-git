@@ -1,6 +1,8 @@
-package com.woowacourse.pickgit.user.domain;
+package com.woowacourse.pickgit.user.infrastructure.calculator;
 
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
+import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
+import com.woowacourse.pickgit.user.domain.PlatformContributionExtractor;
 import com.woowacourse.pickgit.user.domain.dto.CountResponseDto;
 import com.woowacourse.pickgit.user.domain.dto.StarsResponseDto;
 import java.util.List;
