@@ -43,9 +43,6 @@ public class S3Storage implements PickGitStorage {
             .getBody()
             .getUrls();
 
-        if (imageUrls.size() == 0) {
-            return Optional.empty();
-        }
         return Optional.ofNullable(imageUrls.get(0));
     }
 

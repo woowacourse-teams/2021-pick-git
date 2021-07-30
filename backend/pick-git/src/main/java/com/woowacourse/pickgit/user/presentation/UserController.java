@@ -113,8 +113,12 @@ public class UserController {
         @RequestParam(value = "image", required = false) MultipartFile image,
         @RequestParam(value = "description") String description
     ) {
-        ProfileEditResponseDto responseDto = userService
-            .editProfile(appUser, new ProfileEditRequestDto(image, description));
+        ProfileEditRequestDto requestDto = ProfileEditRequestDto
+            .builder()
+            .image(image)
+            .decription(description)
+            .build();
+        ProfileEditResponseDto responseDto = userService.editProfile(appUser, requestDto);
 
         return ResponseEntity.ok(
             new ProfileEditResponse(

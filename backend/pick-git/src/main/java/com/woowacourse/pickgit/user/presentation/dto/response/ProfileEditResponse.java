@@ -5,7 +5,7 @@ public class ProfileEditResponse {
     private String imageUrl;
     private String description;
 
-    public ProfileEditResponse() {
+    private ProfileEditResponse() {
     }
 
     public ProfileEditResponse(String imageUrl, String description) {

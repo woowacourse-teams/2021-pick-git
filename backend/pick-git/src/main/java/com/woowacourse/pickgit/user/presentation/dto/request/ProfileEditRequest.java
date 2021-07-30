@@ -7,10 +7,12 @@ public class ProfileEditRequest {
     private MultipartFile image;
     private String description;
 
-    public ProfileEditRequest() {
+    private ProfileEditRequest() {
     }
 
-    public ProfileEditRequest(MultipartFile image, String description) {
+    public ProfileEditRequest(
+        MultipartFile image,
+        String description) {
         this.image = image;
         this.description = description;
     }

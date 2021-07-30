@@ -252,7 +252,6 @@ class UserAcceptanceTest {
         String description = "updated profile description";
 
         // when
-
         ProfileEditResponse response = given().log().all()
             .auth().oauth2(loginUserAccessToken)
             .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)

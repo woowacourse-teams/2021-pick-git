@@ -4,12 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Objects;
 import org.apache.http.entity.ContentType;
-import org.mockito.Mock;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 
 public class FileFactory {
 
@@ -24,7 +21,7 @@ public class FileFactory {
         return createImageFile("testImage2.png");
     }
 
-    public static MockMultipartFile getEmptyTestImage() { return createEmptyImageFile();}
+    public static MockMultipartFile getEmptyTestFile() { return createEmptyImageFile();}
 
     public static File getTestImage1File() {
         return createFile("testImage1.png");

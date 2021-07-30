@@ -3,12 +3,10 @@ package com.woowacourse.pickgit.unit.user.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
@@ -33,7 +31,6 @@ import com.woowacourse.pickgit.user.domain.UserRepository;
 import com.woowacourse.pickgit.user.application.dto.request.UserSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import java.io.File;
-import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -263,7 +260,7 @@ class UserServiceTest {
         // when
         ProfileEditRequestDto requestDto = ProfileEditRequestDto
             .builder()
-            .image(FileFactory.getEmptyTestImage())
+            .image(FileFactory.getEmptyTestFile())
             .decription(updatedDescription)
             .build();
         ProfileEditResponseDto responseDto = userService.editProfile(loginUser, requestDto);

@@ -230,7 +230,7 @@ class UserServiceIntegrationTest {
         // when
         ProfileEditRequestDto requestDto = ProfileEditRequestDto
             .builder()
-            .image(FileFactory.getEmptyTestImage())
+            .image(FileFactory.getEmptyTestFile())
             .decription(updatedDescription)
             .build();
         ProfileEditResponseDto responseDto =

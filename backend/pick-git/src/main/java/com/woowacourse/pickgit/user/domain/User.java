@@ -61,11 +61,11 @@ public class User {
         this.githubProfile = githubProfile;
     }
 
-    public void changeDescription(String description) {
+    public void updateDescription(String description) {
         this.basicProfile.setDescription(description);
     }
 
-    public void changeProfileImage(String imageUrl) {
+    public void updateProfileImage(String imageUrl) {
         this.basicProfile.setImage(imageUrl);
     }
 

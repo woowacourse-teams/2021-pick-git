@@ -130,10 +130,10 @@ public class UserService {
         String userImageUrl = user.getImage();
         if (doesContainProfileImage(requestDto.getImage())) {
             userImageUrl = saveImageAndGetUrl(requestDto.getImage(), user.getName());
-            user.changeProfileImage(userImageUrl);
+            user.updateProfileImage(userImageUrl);
         }
 
-        user.changeDescription(requestDto.getDecription());
+        user.updateDescription(requestDto.getDecription());
 
         return new ProfileEditResponseDto(userImageUrl, requestDto.getDecription());
     }
