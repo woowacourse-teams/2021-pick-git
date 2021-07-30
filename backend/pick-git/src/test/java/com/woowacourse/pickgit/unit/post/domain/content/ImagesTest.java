@@ -1,22 +1,17 @@
 package com.woowacourse.pickgit.unit.post.domain.content;
 
+import static java.util.stream.Collectors.toList;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.woowacourse.pickgit.common.factory.PostBuilder;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.content.Image;
 import com.woowacourse.pickgit.post.domain.content.Images;
+import java.lang.reflect.Field;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledForJreRange;
-
-import java.lang.reflect.Field;
-import java.util.List;
-
-import static io.restassured.RestAssured.given;
-import static io.restassured.RestAssured.post;
-import static java.util.stream.Collectors.toList;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class ImagesTest {
 
@@ -26,9 +21,9 @@ class ImagesTest {
     @BeforeEach
     void setUp() {
         imageObjects = List.of(new Image("imageUrl1"),
-                new Image("imageUrl2"),
-                new Image("imageUrl3"),
-                new Image("imageUrl4"));
+            new Image("imageUrl2"),
+            new Image("imageUrl3"),
+            new Image("imageUrl4"));
 
         images = new Images(imageObjects);
     }
@@ -41,8 +36,8 @@ class ImagesTest {
 
         //then
         List<String> expected = imageObjects.stream()
-                .map(Image::getUrl)
-                .collect(toList());
+            .map(Image::getUrl)
+            .collect(toList());
 
         assertThat(expected).containsAll(actual);
     }
@@ -60,15 +55,16 @@ class ImagesTest {
     }
 
     @SuppressWarnings("unchecked")
-    private List<Post> getMappedPostsOf(Images images) throws NoSuchFieldException, IllegalAccessException {
+    private List<Post> getMappedPostsOf(Images images)
+        throws NoSuchFieldException, IllegalAccessException {
         Field imagesField = Images.class.getDeclaredField("images");
         imagesField.setAccessible(true);
 
         List<Image> imageObjects = (List<Image>) imagesField.get(images);
 
         return imageObjects.stream()
-                .map(this::getPostFrom)
-                .collect(toList());
+            .map(this::getPostFrom)
+            .collect(toList());
     }
 
     private Post getPostFrom(Image image) {
@@ -77,7 +73,7 @@ class ImagesTest {
             postField.setAccessible(true);
 
             return (Post) postField.get(image);
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

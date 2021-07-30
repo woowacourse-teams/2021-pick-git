@@ -9,8 +9,10 @@ import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenRespons
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
+import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
+import com.woowacourse.pickgit.user.presentation.dto.response.ContributionResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.FollowResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.UserProfileResponse;
 import io.restassured.RestAssured;
@@ -177,6 +179,35 @@ class UserAcceptanceTest {
             authenticatedGetRequest(loginUserAccessToken,
                 String.format("/api/profiles/%s", "invalidName"), HttpStatus.BAD_REQUEST)
                 .as(ApiErrorResponse.class);
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("U0001");
+    }
+
+    @DisplayName("누구든지 활동 통계를 조회할 수 있다.")
+    @Test
+    void getContributions_Anyone_Success() {
+        // given
+        ContributionResponseDto contributions = UserFactory.mockContributionResponseDto();
+
+        // when
+        ContributionResponse response = unauthenticatedGetRequest(
+            String.format("/api/profiles/%s/contributions", "testUser"), HttpStatus.OK)
+            .as(ContributionResponse.class);
+
+        // then
+        assertThat(response)
+            .usingRecursiveComparison()
+            .isEqualTo(contributions);
+    }
+
+    @DisplayName("유효하지 않은 유저 이름으로 활동 통계를 조회할 수 없다. - 400 예외")
+    @Test
+    void getContributions_invalidUsername_400Exception() {
+        // when
+        ApiErrorResponse response = unauthenticatedGetRequest(
+            String.format("/api/profiles/%s/contributions", "invalidName"), HttpStatus.BAD_REQUEST)
+            .as(ApiErrorResponse.class);
 
         // then
         assertThat(response.getErrorCode()).isEqualTo("U0001");

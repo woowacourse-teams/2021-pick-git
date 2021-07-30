@@ -16,10 +16,14 @@ import com.woowacourse.pickgit.exception.user.InvalidFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
+import com.woowacourse.pickgit.user.domain.Contribution;
+import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.domain.dto.ContributionDto;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,6 +41,9 @@ class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private PlatformContributionCalculator platformContributionCalculator;
 
     @DisplayName("사용자는 내 이름으로 내 프로필을 조회할 수 있다.")
     @Test
@@ -140,6 +147,51 @@ class UserServiceTest {
         assertThatThrownBy(
             () -> userService.getUserProfile(loginUser, "InvalidName")
         ).isInstanceOf(InvalidUserException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "U0001")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
+            .hasMessage("유효하지 않은 유저입니다.");
+
+        // then
+        verify(userRepository, times(1))
+            .findByBasicProfile_Name(anyString());
+    }
+
+    @DisplayName("누구든지 활동 통계를 조회할 수 있다.")
+    @Test
+    void calculateContributions_Anyone_Success() {
+        // given
+        User user = UserFactory.user();
+
+        Contribution contribution = new Contribution(11, 48, 48, 48, 48);
+
+        given(userRepository.findByBasicProfile_Name(anyString()))
+            .willReturn(Optional.of(user));
+        given(platformContributionCalculator.calculate(anyString()))
+            .willReturn(contribution);
+
+        ContributionResponseDto responseDto = UserFactory.mockContributionResponseDto();
+
+        // when
+        ContributionResponseDto contributions = userService.calculateContributions("testUser");
+
+        // then
+        assertThat(contributions)
+            .usingRecursiveComparison()
+            .isEqualTo(responseDto);
+
+        verify(userRepository, times(1))
+            .findByBasicProfile_Name(anyString());
+        verify(platformContributionCalculator, times(1))
+            .calculate(anyString());
+    }
+
+    @DisplayName("존재하지 않는 유저 이름으로 활동 통계를 조회할 수 없다. - 400 예외")
+    @Test
+    void calculateContributions_InvalidUsername_400Exception() {
+        // when
+        assertThatThrownBy(() -> {
+            userService.calculateContributions("invalidName");
+        }).isInstanceOf(InvalidUserException.class)
             .hasFieldOrPropertyWithValue("errorCode", "U0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
             .hasMessage("유효하지 않은 유저입니다.");
