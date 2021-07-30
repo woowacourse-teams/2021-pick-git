@@ -42,7 +42,7 @@ class GithubContributionCalculatorTest {
 
     @DisplayName("활동 통계를 조회할 수 있다.")
     @Test
-    void calculate_Valid_Success() {
+    void calculate_ValidCalculation_Success() {
         // given
         ContributionDto contribution = UserFactory.mockContributionDto();
 
@@ -55,13 +55,13 @@ class GithubContributionCalculatorTest {
             .isEqualTo(contribution);
     }
 
-    @DisplayName("스타 개수를 조회할 수 없다. - 500 예외")
+    @DisplayName("JSON key 값이 다른 경우 스타 개수를 조회할 수 없다. - 500 예외")
     @Test
-    void calculate_InvalidStars_500Exception() {
+    void calculate_InvalidCalculationInCaseOfStars_500Exception() {
         // given
         platformContributionExtractor = new GithubContributionExtractor(
             objectMapper,
-            new MockContributionApiErrorRequester(),
+            new MockStarsContributionApiErrorRequester(),
             apiUrlFormatForStar,
             apiUrlFormatForCount
         );
@@ -71,114 +71,55 @@ class GithubContributionCalculatorTest {
 
         // when
         assertThatThrownBy(() -> {
-            platformContributionExtractor.extractStars("testUser");
+            platformContributionCalculator.calculate("testUser");
         }).isInstanceOf(ContributionParseException.class)
             .hasFieldOrPropertyWithValue("errorCode", "V0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
             .hasMessage("활동 통계를 조회할 수 없습니다.");
     }
 
-    @DisplayName("커밋 개수를 조회할 수 없다. - 500 예외")
-    @Test
-    void calculate_InvalidCommits_500Exception() {
-        // given
-        platformContributionExtractor = new GithubContributionExtractor(
-            objectMapper,
-            new MockContributionApiErrorRequester(),
-            apiUrlFormatForStar,
-            apiUrlFormatForCount
-        );
-        platformContributionCalculator = new GithubContributionCalculator(
-            platformContributionExtractor
-        );
-
-        // when
-        assertThatThrownBy(() -> {
-            platformContributionExtractor.extractCount("/commits?q=committer:%s", "testUser");
-        }).isInstanceOf(ContributionParseException.class)
-            .hasFieldOrPropertyWithValue("errorCode", "V0001")
-            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
-            .hasMessage("활동 통계를 조회할 수 없습니다.");
-    }
-
-    @DisplayName("PR 개수를 조회할 수 없다. - 500 예외")
-    @Test
-    void calculate_InvalidPRs_500Exception() {
-        // given
-        platformContributionExtractor = new GithubContributionExtractor(
-            objectMapper,
-            new MockContributionApiErrorRequester(),
-            apiUrlFormatForStar,
-            apiUrlFormatForCount
-        );
-        platformContributionCalculator = new GithubContributionCalculator(
-            platformContributionExtractor
-        );
-
-        // when
-        assertThatThrownBy(() -> {
-            platformContributionExtractor.extractCount("/issues?q=author:%s type:pr", "testUser");
-        }).isInstanceOf(ContributionParseException.class)
-            .hasFieldOrPropertyWithValue("errorCode", "V0001")
-            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
-            .hasMessage("활동 통계를 조회할 수 없습니다.");
-    }
-
-    @DisplayName("이슈 개수를 조회할 수 없다. - 500 예외")
-    @Test
-    void calculate_InvalidIssues_500Exception() {
-        // given
-        platformContributionExtractor = new GithubContributionExtractor(
-            objectMapper,
-            new MockContributionApiErrorRequester(),
-            apiUrlFormatForStar,
-            apiUrlFormatForCount
-        );
-        platformContributionCalculator = new GithubContributionCalculator(
-            platformContributionExtractor
-        );
-
-        // when
-        assertThatThrownBy(() -> {
-            platformContributionExtractor
-                .extractCount("/issues?q=author:%s type:issue", "testUser");
-        }).isInstanceOf(ContributionParseException.class)
-            .hasFieldOrPropertyWithValue("errorCode", "V0001")
-            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
-            .hasMessage("활동 통계를 조회할 수 없습니다.");
-    }
-
-    @DisplayName("퍼블릭 레포지토리 개수를 조회할 수 없다. - 500 예외")
-    @Test
-    void calculate_InvalidRepos_500Exception() {
-        // given
-        platformContributionExtractor = new GithubContributionExtractor(
-            objectMapper,
-            new MockContributionApiErrorRequester(),
-            apiUrlFormatForStar,
-            apiUrlFormatForCount
-        );
-        platformContributionCalculator = new GithubContributionCalculator(
-            platformContributionExtractor
-        );
-
-        // when
-        assertThatThrownBy(() -> {
-            platformContributionExtractor
-                .extractCount("/repositories?q=user:%s is:public", "testUser");
-        }).isInstanceOf(ContributionParseException.class)
-            .hasFieldOrPropertyWithValue("errorCode", "V0001")
-            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
-            .hasMessage("활동 통계를 조회할 수 없습니다.");
-    }
-
-    private static class MockContributionApiErrorRequester
+    private static class MockStarsContributionApiErrorRequester
         implements PlatformContributionApiRequester {
 
         @Override
         public String request(String url) {
             if (url.contains("stars")) {
                 return "[{\"stargazers\": \"5\"}, {\"stargazers\": \"6\"}]";
+            }
+            return "{\"total_count\": \"48\"}";
+        }
+    }
+
+    @DisplayName("JSON key 값이 다른 경우 커밋, PR, 이슈, 퍼블릭 레포지토리 개수를 조회할 수 없다. - 500 예외")
+    @Test
+    void calculate_InvalidCalculationInCaseOfCount_500Exception() {
+        // given
+        platformContributionExtractor = new GithubContributionExtractor(
+            objectMapper,
+            new MockCountContributionApiErrorRequester(),
+            apiUrlFormatForStar,
+            apiUrlFormatForCount
+        );
+        platformContributionCalculator = new GithubContributionCalculator(
+            platformContributionExtractor
+        );
+
+        // when
+        assertThatThrownBy(() -> {
+            platformContributionCalculator.calculate("testUser");
+        }).isInstanceOf(ContributionParseException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "V0001")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
+            .hasMessage("활동 통계를 조회할 수 없습니다.");
+    }
+
+    private static class MockCountContributionApiErrorRequester
+        implements PlatformContributionApiRequester {
+
+        @Override
+        public String request(String url) {
+            if (url.contains("stars")) {
+                return "[{\"stargazers_count\": \"5\"}, {\"stargazers_count\": \"6\"}]";
             }
             return "{\"total\": \"48\"}";
         }
