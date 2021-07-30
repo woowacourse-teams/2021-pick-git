@@ -4,7 +4,7 @@ import static com.woowacourse.pickgit.docs.ApiDocumentUtils.getDocumentRequest;
 import static com.woowacourse.pickgit.docs.ApiDocumentUtils.getDocumentResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -192,9 +192,9 @@ class UserControllerTest {
             // given
             UserProfileResponseDto responseDto = UserFactory.mockLoginUserProfileResponseDto();
 
-            given(oAuthService.validateToken(anyString()))
+            given(oAuthService.validateToken("testToken"))
                 .willReturn(true);
-            given(oAuthService.findRequestUserByToken(anyString()))
+            given(oAuthService.findRequestUserByToken("testToken"))
                 .willReturn(new LoginUser("loginUser", "testToken"));
             given(userService.getMyUserProfile(any(AuthUserRequestDto.class)))
                 .willReturn(responseDto);
@@ -215,9 +215,9 @@ class UserControllerTest {
             assertThat(body).isEqualTo(objectMapper.writeValueAsString(responseDto));
 
             verify(oAuthService, times(1))
-                .validateToken(anyString());
+                .validateToken("testToken");
             verify(oAuthService, times(1))
-                .findRequestUserByToken(anyString());
+                .findRequestUserByToken("testToken");
             verify(userService, times(1))
                 .getMyUserProfile(any(AuthUserRequestDto.class));
 
@@ -251,15 +251,15 @@ class UserControllerTest {
             UserProfileResponseDto responseDto =
                 UserFactory.mockLoginUserProfileIsFollowingResponseDto();
 
-            given(oAuthService.validateToken(anyString()))
+            given(oAuthService.validateToken("testToken"))
                 .willReturn(true);
-            given(oAuthService.findRequestUserByToken(anyString()))
+            given(oAuthService.findRequestUserByToken("testToken"))
                 .willReturn(new LoginUser("loginUser", "Bearer testToken"));
-            given(userService.getUserProfile(any(AuthUserRequestDto.class), anyString()))
+            given(userService.getUserProfile(any(AuthUserRequestDto.class), eq("testUser2")))
                 .willReturn(responseDto);
 
             // when
-            ResultActions perform = mockMvc.perform(get("/api/profiles/{userName}}", "testUser2")
+            ResultActions perform = mockMvc.perform(get("/api/profiles/{userName}", "testUser2")
                 .header(HttpHeaders.AUTHORIZATION, "Bearer testToken")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.ALL));
@@ -274,11 +274,11 @@ class UserControllerTest {
             assertThat(body).isEqualTo(objectMapper.writeValueAsString(responseDto));
 
             verify(oAuthService, times(1))
-                .validateToken(anyString());
+                .validateToken("testToken");
             verify(oAuthService, times(1))
-                .findRequestUserByToken(anyString());
+                .findRequestUserByToken("testToken");
             verify(userService, times(1))
-                .getUserProfile(any(AuthUserRequestDto.class), anyString());
+                .getUserProfile(any(AuthUserRequestDto.class),eq("testUser2"));
 
             perform.andDo(document("profiles-LoggedIn",
                 getDocumentRequest(),
@@ -312,11 +312,11 @@ class UserControllerTest {
             // given
             FollowResponseDto responseDto = new FollowResponseDto(1, true);
 
-            given(oAuthService.validateToken(anyString()))
+            given(oAuthService.validateToken("testToken"))
                 .willReturn(true);
-            given(oAuthService.findRequestUserByToken(anyString()))
+            given(oAuthService.findRequestUserByToken("testToken"))
                 .willReturn(new LoginUser("loginUser", "Bearer testToken"));
-            given(userService.followUser(any(AuthUserRequestDto.class), anyString()))
+            given(userService.followUser(any(AuthUserRequestDto.class), eq("testUser")))
                 .willReturn(responseDto);
 
             // when
@@ -336,11 +336,11 @@ class UserControllerTest {
             assertThat(body).isEqualTo(objectMapper.writeValueAsString(responseDto));
 
             verify(oAuthService, times(1))
-                .validateToken(anyString());
+                .validateToken("testToken");
             verify(oAuthService, times(1))
-                .findRequestUserByToken(anyString());
+                .findRequestUserByToken("testToken");
             verify(userService, times(1))
-                .followUser(any(AuthUserRequestDto.class), anyString());
+                .followUser(any(AuthUserRequestDto.class),  eq("testUser"));
 
             perform.andDo(document("following-LoggedIn",
                 getDocumentRequest(),
@@ -364,11 +364,11 @@ class UserControllerTest {
             // given
             FollowResponseDto followResponseDto = new FollowResponseDto(1, false);
 
-            given(oAuthService.validateToken(anyString()))
+            given(oAuthService.validateToken("testToken"))
                 .willReturn(true);
-            given(oAuthService.findRequestUserByToken(anyString()))
+            given(oAuthService.findRequestUserByToken("testToken"))
                 .willReturn(new LoginUser("loginUser", "Bearer testToken"));
-            given(userService.unfollowUser(any(AuthUserRequestDto.class), anyString()))
+            given(userService.unfollowUser(any(AuthUserRequestDto.class), eq("testUser")))
                 .willReturn(followResponseDto);
 
             // when
@@ -389,11 +389,11 @@ class UserControllerTest {
             assertThat(body).isEqualTo(objectMapper.writeValueAsString(followResponseDto));
 
             verify(oAuthService, times(1))
-                .validateToken(anyString());
+                .validateToken("testToken");
             verify(oAuthService, times(1))
-                .findRequestUserByToken(anyString());
+                .findRequestUserByToken("testToken");
             verify(userService, times(1))
-                .unfollowUser(any(AuthUserRequestDto.class), anyString());
+                .unfollowUser(any(AuthUserRequestDto.class), eq("testUser"));
 
             perform.andDo(document("unfollowing-LoggedIn",
                 getDocumentRequest(),
@@ -457,11 +457,11 @@ class UserControllerTest {
 
             given(oAuthService.findRequestUserByToken(any()))
                 .willCallRealMethod();
-            given(userService.getUserProfile(any(AuthUserRequestDto.class), anyString()))
+            given(userService.getUserProfile(any(AuthUserRequestDto.class), eq("testUser")))
                 .willReturn(responseDto);
 
             // when
-            ResultActions perform = mockMvc.perform(get("/api/profiles/{userName}}", "testUser")
+            ResultActions perform = mockMvc.perform(get("/api/profiles/{userName}", "testUser")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.ALL));
 
@@ -477,7 +477,7 @@ class UserControllerTest {
             verify(oAuthService, times(1))
                 .findRequestUserByToken(any());
             verify(userService, times(1))
-                .getUserProfile(any(AuthUserRequestDto.class), anyString());
+                .getUserProfile(any(AuthUserRequestDto.class), eq("testUser"));
 
             perform.andDo(document("profiles-unLoggedIn",
                 getDocumentRequest(),
