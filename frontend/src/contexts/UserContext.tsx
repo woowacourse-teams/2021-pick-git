@@ -47,7 +47,7 @@ export const UserContextProvider = ({ children }: Props) => {
         setIsLoggedIn(true);
         setUsername(name);
       } catch (error) {
-        console.error(error);
+        logout();
       }
     })();
   }, []);
