@@ -11,14 +11,18 @@ import static org.mockito.Mockito.verify;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
+import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.exception.user.DuplicateFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
+import com.woowacourse.pickgit.post.domain.PickGitStorage;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
+import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
+import com.woowacourse.pickgit.user.application.dto.response.ProfileEditResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.domain.Contribution;
 import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
@@ -26,6 +30,7 @@ import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import com.woowacourse.pickgit.user.application.dto.request.UserSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
+import java.io.File;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -37,6 +42,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -49,6 +55,9 @@ class UserServiceTest {
 
     @Mock
     private PlatformContributionCalculator platformContributionCalculator;
+
+    @Mock
+    private PickGitStorage pickGitStorage;
 
     @DisplayName("사용자는 내 이름으로 내 프로필을 조회할 수 있다.")
     @Test
@@ -204,6 +213,64 @@ class UserServiceTest {
         // then
         verify(userRepository, times(1))
             .findByBasicProfile_Name(anyString());
+    }
+
+    @DisplayName("자신의 프로필(이미지, 한 줄 소개 포함)을 수정할 수 있다.")
+    @Test
+    void editUserProfile_WithImageAndDescription_Success() {
+        // given
+        LoginUser loginUser = new LoginUser("testUser", "token");
+        MultipartFile image = FileFactory.getTestImage1();
+        String updatedDescription = "updated description";
+
+        // mock
+        given(userRepository.findByBasicProfile_Name("testUser"))
+            .willReturn(Optional.of(UserFactory.user(1L, "testUser")));
+        given(pickGitStorage.store(any(File.class), anyString()))
+            .willReturn(Optional.ofNullable(image.getName()));
+
+        // when
+        ProfileEditRequestDto requestDto = ProfileEditRequestDto
+            .builder()
+            .image(image)
+            .decription(updatedDescription)
+            .build();
+        ProfileEditResponseDto responseDto = userService.editProfile(loginUser, requestDto);
+
+        // then
+        assertThat(responseDto.getImageUrl()).isEqualTo(image.getName());
+        assertThat(responseDto.getDescription()).isEqualTo(updatedDescription);
+        verify(userRepository, times(1))
+            .findByBasicProfile_Name("testUser");
+        verify(pickGitStorage, times(1))
+            .store(any(File.class), anyString());
+    }
+
+    @DisplayName("자신의 프로필(한 줄 소개만 포함)을 수정할 수 있다.")
+    @Test
+    void editUserProfile_WithDescrption_Success() {
+        // given
+        LoginUser loginUser = new LoginUser("testUser", "token");
+        User user = UserFactory.user(1L, "testUser");
+        String updatedDescription = "updated descrption";
+
+        // mock
+        given(userRepository.findByBasicProfile_Name("testUser"))
+            .willReturn(Optional.of(user));
+
+        // when
+        ProfileEditRequestDto requestDto = ProfileEditRequestDto
+            .builder()
+            .image(FileFactory.getEmptyTestFile())
+            .decription(updatedDescription)
+            .build();
+        ProfileEditResponseDto responseDto = userService.editProfile(loginUser, requestDto);
+
+        // then
+        assertThat(responseDto.getImageUrl()).isEqualTo(user.getImage());
+        assertThat(responseDto.getDescription()).isEqualTo(updatedDescription);
+        verify(userRepository, times(1))
+            .findByBasicProfile_Name(user.getName());
     }
 
     @DisplayName("source 유저는 target 유저를 팔로우할 수 있다.")

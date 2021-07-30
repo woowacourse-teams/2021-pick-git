@@ -7,16 +7,20 @@ import static org.assertj.core.groups.Tuple.tuple;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
+import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.exception.user.DuplicateFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
+import com.woowacourse.pickgit.post.domain.PickGitStorage;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.UserSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
+import com.woowacourse.pickgit.user.application.dto.response.ProfileEditResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
@@ -25,8 +29,6 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Import;
@@ -46,6 +48,9 @@ class UserServiceIntegrationTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PickGitStorage pickGitStorage;
 
     @DisplayName("사용자는 자신의 프로필을 조회할 수 있다.")
     @Test
@@ -188,6 +193,54 @@ class UserServiceIntegrationTest {
             .hasMessage("유효하지 않은 유저입니다.");
     }
 
+    @DisplayName("자신의 프로필(이미지, 한 줄 소개 포함)을 수정할 수 있다.")
+    @Test
+    void editUserProfile_WithImageAndDescription_Success() {
+        // given
+        String updatedDescription = "updated description";
+        LoginUser loginUser = new LoginUser("testUser", "token");
+        User user = UserFactory.user("testUser");
+
+        userRepository.save(user);
+
+        // when
+        ProfileEditRequestDto requestDto = ProfileEditRequestDto
+            .builder()
+            .image(FileFactory.getTestImage1())
+            .decription(updatedDescription)
+            .build();
+        ProfileEditResponseDto responseDto =
+            userService.editProfile(loginUser, requestDto);
+
+        // then
+        assertThat(responseDto.getImageUrl()).isNotBlank();
+        assertThat(responseDto.getDescription()).isEqualTo(updatedDescription);
+    }
+
+    @DisplayName("자신의 프로필(한 줄 소개만 포함)을 수정할 수 있다.")
+    @Test
+    void editUserProfile_WithDescription_Success() {
+        // given
+        String updatedDescription = "updated description";
+        LoginUser loginUser = new LoginUser("testUser", "token");
+        User user = UserFactory.user("testUser");
+
+        userRepository.save(user);
+
+        // when
+        ProfileEditRequestDto requestDto = ProfileEditRequestDto
+            .builder()
+            .image(FileFactory.getEmptyTestFile())
+            .decription(updatedDescription)
+            .build();
+        ProfileEditResponseDto responseDto =
+            userService.editProfile(loginUser, requestDto);
+
+        // then
+        assertThat(responseDto.getImageUrl()).isEqualTo(user.getImage());
+        assertThat(responseDto.getDescription()).isEqualTo(updatedDescription);
+    }
+
     @DisplayName("source 유저는 target 유저를 팔로우할 수 있다.")
     @Test
     void followUser_SourceToTarget_Success() {
@@ -281,13 +334,7 @@ class UserServiceIntegrationTest {
         searchedUsers.forEach(user -> userRepository.save(user));
 
         // when
-        User source = userRepository.findByBasicProfile_Name(loginUser.getName())
-            .orElseThrow();
-        User target = userRepository.findByBasicProfile_Name(searchedUsers.get(0).getName())
-            .orElseThrow();
-        source.follow(target);
-
-        userRepository.flush();
+        userService.followUser(new AuthUserRequestDto(loginUser.getName()), searchedUsers.get(0).getName());
 
         List<UserSearchResponseDto> searchResult =
             userService.searchUser(new LoginUser(loginUser.getName(), "token"),

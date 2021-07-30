@@ -5,11 +5,15 @@ import com.woowacourse.pickgit.authentication.presentation.AuthenticationPrincip
 import com.woowacourse.pickgit.authentication.presentation.interceptor.AuthenticationInterceptor;
 import com.woowacourse.pickgit.authentication.presentation.interceptor.IgnoreAuthenticationInterceptor;
 import com.woowacourse.pickgit.authentication.presentation.interceptor.PathMatchInterceptor;
+import java.util.Arrays;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -52,7 +56,7 @@ public class OAuthConfiguration implements WebMvcConfigurer {
             .addPathPatterns("/api/posts", HttpMethod.POST)
             .addPathPatterns("/api/posts/*/likes", HttpMethod.PUT, HttpMethod.DELETE)
             .addPathPatterns("/api/posts/*/comments", HttpMethod.POST)
-            .addPathPatterns("/api/profiles/me", HttpMethod.GET)
+            .addPathPatterns("/api/profiles/me", HttpMethod.GET, HttpMethod.POST)
             .addPathPatterns("/api/profiles/*/followings", HttpMethod.POST, HttpMethod.DELETE);
 
         HandlerInterceptor ignoreAuthenticationInterceptor = new PathMatchInterceptor(ignoreAuthenticationInterceptor())
