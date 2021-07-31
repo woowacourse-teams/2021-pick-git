@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import { Post, PostUploadData } from "../../@types";
+import { Post, PostEditData, PostUploadData } from "../../@types";
 import { LIMIT } from "../../constants/limits";
 import { API_URL } from "../../constants/urls";
 import { customError } from "../../utils/error";
@@ -102,4 +102,20 @@ export const requestAddPost = async (
       Authorization: `Bearer ${accessToken}`,
     },
   });
+};
+
+export const requestEditPost = async ({ postId, tags, content }: PostEditData, accessToken: string | null) => {
+  if (!accessToken) {
+    throw Error("no accessToken");
+  }
+
+  await axios.put(
+    API_URL.POST(postId),
+    { tags, content },
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
 };

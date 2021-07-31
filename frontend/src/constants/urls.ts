@@ -1,4 +1,4 @@
-import { POST_ADD_STEPS } from "./steps";
+import { POST_ADD_STEPS, POST_EDIT_STEPS } from "./steps";
 
 export const URL_PARAMS = {
   ME: "me",
@@ -16,6 +16,7 @@ export const PAGE_URL = {
   ADD_POST: "/add-post",
   ADD_POST_FIRST_STEP: `/add-post/${POST_ADD_STEPS[0].path}`,
   EDIT_POST: "/edit-post",
+  EDIT_POST_FIRST_STEP: `/edit-post/${POST_EDIT_STEPS[0].path}`,
   SEARCH: "/search",
   PROFILE: "/profile",
   MY_PROFILE: "/profile/me",

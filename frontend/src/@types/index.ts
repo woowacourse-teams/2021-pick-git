@@ -64,6 +64,12 @@ export interface PostUploadData {
   content: string;
 }
 
+export interface PostEditData {
+  postId: Post["id"];
+  tags: string[];
+  content: string;
+}
+
 export interface GithubStats {
   starsCount: number;
   commitsCount: number;

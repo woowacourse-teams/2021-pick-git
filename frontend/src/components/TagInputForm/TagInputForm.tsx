@@ -1,10 +1,11 @@
-import { useEffect } from "react";
+import { AxiosError } from "axios";
+import { Dispatch, SetStateAction, useEffect } from "react";
+import { UseQueryResult } from "react-query";
 import { useHistory } from "react-router-dom";
+import { ErrorResponse, Tags } from "../../@types";
 import { FAILURE_MESSAGE } from "../../constants/messages";
 import { PAGE_URL } from "../../constants/urls";
 import useMessageModal from "../../services/hooks/@common/useMessageModal";
-import usePostUpload from "../../services/hooks/usePostUpload";
-import { useGithubTagsQuery } from "../../services/queries";
 import { getAPIErrorMessage } from "../../utils/error";
 import { hasDuplicatedTag, isGithubRepositoryEmpty, isValidTagFormat, isValidTagLength } from "../../utils/postUpload";
 import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
@@ -13,19 +14,24 @@ import Chip from "../@shared/Chip/Chip";
 import Input from "../@shared/Input/Input";
 import { Container, Form, TagList, TagListItem } from "./TagInputForm.style";
 
-const TagInputForm = () => {
-  const { githubRepositoryName, tags, setTags } = usePostUpload();
-  const { data: defaultTags, isLoading, error, refetch } = useGithubTagsQuery(githubRepositoryName);
+interface Props {
+  githubRepositoryName: string;
+  tags: string[];
+  tagsQueryResult?: UseQueryResult<Tags, AxiosError<ErrorResponse>>;
+  setTags: Dispatch<SetStateAction<string[]>>;
+}
+
+const TagInputForm = ({ githubRepositoryName, tags, tagsQueryResult, setTags }: Props) => {
   const { modalMessage, isModalShown, hideMessageModal, showAlertModal } = useMessageModal();
   const history = useHistory();
 
   useEffect(() => {
-    defaultTags && setTags((state) => [...defaultTags, ...state]);
-  }, [defaultTags]);
+    tagsQueryResult?.data && setTags((state) => [...tagsQueryResult.data, ...state]);
+  }, [tagsQueryResult?.data]);
 
   useEffect(() => {
     if (isGithubRepositoryEmpty(githubRepositoryName)) {
-      refetch();
+      tagsQueryResult && tagsQueryResult.refetch();
       setTags([]);
     }
   }, [githubRepositoryName]);
@@ -56,7 +62,8 @@ const TagInputForm = () => {
       return;
     }
 
-    setTags((state) => [...state, newTag]);
+    setTags([...tags, newTag]);
+
     event.currentTarget["tag-input"].value = "";
   };
 
@@ -75,14 +82,15 @@ const TagInputForm = () => {
     history.push(PAGE_URL.HOME);
   };
 
-  if (error) {
-    error.response && showAlertModal(getAPIErrorMessage(error.response?.data.errorCode));
+  if (tagsQueryResult && tagsQueryResult.error) {
+    tagsQueryResult.error.response &&
+      showAlertModal(getAPIErrorMessage(tagsQueryResult.error.response?.data.errorCode));
 
     // TODO : MessageModal 이 confirmText 와 cancelText 모두 받을 수 있게 되어야 함
     return <MessageModalPortal heading={modalMessage} onConfirm={handleErrorConfirm} onClose={hideMessageModal} />;
   }
 
-  if (isLoading) {
+  if (tagsQueryResult?.isLoading) {
     return <PageLoading />;
   }
 
