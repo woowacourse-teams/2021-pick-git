@@ -31,6 +31,7 @@ const App = () => {
 
     // haha
     // haha 2
+    // haha 3
 
     (async () => {
       try {
