@@ -1,6 +1,7 @@
 package com.woowacourse.pickgit.user.domain.follow;
 
-import java.util.ArrayList;
+import com.woowacourse.pickgit.exception.user.DuplicateFollowException;
+import com.woowacourse.pickgit.exception.user.InvalidFollowException;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
@@ -16,24 +17,30 @@ public class Followers {
         cascade = CascadeType.PERSIST,
         orphanRemoval = true
     )
-    private List<Follow> followers = new ArrayList<>();
+    private List<Follow> followers;
 
-    public Followers() {
+    protected Followers() {
     }
 
-    public int count() {
-        return followers.size();
+    public Followers(List<Follow> followers) {
+        this.followers = followers;
     }
 
     public void add(Follow follow) {
+        if (this.followers.contains(follow)) {
+            throw new DuplicateFollowException();
+        }
         followers.add(follow);
     }
 
     public void remove(Follow follow) {
+        if (!this.followers.contains(follow)) {
+            throw new InvalidFollowException();
+        }
         followers.remove(follow);
     }
 
-    public List<Follow> getFollowers() {
-        return followers;
+    public int count() {
+        return followers.size();
     }
 }

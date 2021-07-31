@@ -42,7 +42,7 @@ public class UserFactory {
             .location("Seoul")
             .website("www.pick-git.com")
             .twitter("pick-git twitter")
-            .following(false)
+            .following(null)
             .build();
     }
 

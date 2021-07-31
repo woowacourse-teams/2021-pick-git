@@ -1,20 +1,28 @@
 package com.woowacourse.pickgit.user.application.dto.request;
 
+import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import lombok.Builder;
+import lombok.Getter;
 
 @Builder
+@Getter
 public class AuthUserRequestDto {
 
-    private String githubName;
+    private String username;
+    private boolean isGuest;
 
     private AuthUserRequestDto() {
     }
 
-    public AuthUserRequestDto(String githubName) {
-        this.githubName = githubName;
+    private AuthUserRequestDto(String username, boolean isGuest) {
+        this.username = username;
+        this.isGuest = isGuest;
     }
 
-    public String getGithubName() {
-        return githubName;
+    public static AuthUserRequestDto from(AppUser appUser) {
+        if (appUser.isGuest()) {
+            return new AuthUserRequestDto(null, true);
+        }
+        return new AuthUserRequestDto(appUser.getUsername(), false);
     }
 }

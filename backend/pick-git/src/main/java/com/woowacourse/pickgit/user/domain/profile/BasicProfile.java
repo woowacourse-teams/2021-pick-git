@@ -26,16 +26,8 @@ public class BasicProfile {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getImage() {
         return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
     }
 
     public String getDescription() {
@@ -44,5 +36,9 @@ public class BasicProfile {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }
