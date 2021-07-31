@@ -29,6 +29,8 @@ const App = () => {
 
     if (!accessToken || !currentUsername) return;
 
+    // haha
+
     (async () => {
       try {
         const { name } = await requestGetSelfProfile(accessToken);
