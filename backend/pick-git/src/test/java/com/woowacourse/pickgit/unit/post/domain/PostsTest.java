@@ -19,6 +19,6 @@ class PostsTest {
             new PostBuilder().build()
         ));
 
-        assertThat(posts.getCounts()).isEqualTo(3);
+        assertThat(posts.count()).isEqualTo(3);
     }
 }

@@ -23,14 +23,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.woowacourse.pickgit.authentication.application.OAuthService;
-import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.user.application.UserService;
+import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.UserSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import com.woowacourse.pickgit.user.presentation.UserSearchController;
 import java.util.List;
+import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,7 @@ import org.springframework.test.web.servlet.ResultActions;
 @AutoConfigureRestDocs
 @WebMvcTest(UserSearchController.class)
 @ActiveProfiles("test")
-public class UserSearchControllerTest {
+class UserSearchControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -68,9 +69,10 @@ public class UserSearchControllerTest {
         );
 
         // mock
-        given(oAuthService.findRequestUserByToken(any()))
+        given(oAuthService.validateToken("token")).willReturn(true);
+        given(oAuthService.findRequestUserByToken("token"))
             .willReturn(new LoginUser("pick-git", "token"));
-        given(userService.searchUser(any(LoginUser.class), any(UserSearchRequestDto.class)))
+        given(userService.searchUser(any(AuthUserRequestDto.class), any(UserSearchRequestDto.class)))
             .willReturn(userSearchRespons);
 
         // when
@@ -81,7 +83,8 @@ public class UserSearchControllerTest {
                     .param("page", "0")
                     .param("limit", "5")
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .accept(MediaType.ALL));
+                    .accept(MediaType.ALL)
+            .header(HttpHeaders.AUTHORIZATION, "Bearer token"));
 
         // then
         perform
@@ -93,10 +96,12 @@ public class UserSearchControllerTest {
                 containsInRelativeOrder("bingbingdola", "bing", "bbbbbing")))
             .andExpect(jsonPath("$[*].following",
                 containsInRelativeOrder(true, false, false)));
+
+        verify(oAuthService, times(1)).validateToken("token");
         verify(oAuthService, times(1))
-            .findRequestUserByToken(any());
+            .findRequestUserByToken("token");
         verify(userService, times(1))
-            .searchUser(any(AppUser.class), any(UserSearchRequestDto.class));
+            .searchUser(any(AuthUserRequestDto.class), any(UserSearchRequestDto.class));
 
         // restdocs
         perform.andDo(document("search-user-LoggedIn",
@@ -129,7 +134,7 @@ public class UserSearchControllerTest {
         // mock
         given(oAuthService.findRequestUserByToken(any()))
             .willReturn(new GuestUser());
-        given(userService.searchUser(any(GuestUser.class), any(UserSearchRequestDto.class)))
+        given(userService.searchUser(any(AuthUserRequestDto.class), any(UserSearchRequestDto.class)))
             .willReturn(userSearchRespons);
 
         // when
@@ -156,7 +161,7 @@ public class UserSearchControllerTest {
         verify(oAuthService, times(1))
             .findRequestUserByToken(any());
         verify(userService, times(1))
-            .searchUser(any(AppUser.class), any(UserSearchRequestDto.class));
+            .searchUser(any(AuthUserRequestDto.class), any(UserSearchRequestDto.class));
 
         // restdocs
         perform.andDo(document("search-user-unLoggedIn",

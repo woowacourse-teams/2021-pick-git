@@ -1,8 +1,10 @@
 package com.woowacourse.pickgit.user.presentation.dto.response;
 
 import lombok.Builder;
+import lombok.Getter;
 
 @Builder
+@Getter
 public class FollowResponse {
 
     private int followerCount;
@@ -14,13 +16,5 @@ public class FollowResponse {
     public FollowResponse(int followerCount, boolean isFollowing) {
         this.followerCount = followerCount;
         this.following = isFollowing;
-    }
-
-    public int getFollowerCount() {
-        return followerCount;
-    }
-
-    public boolean isFollowing() {
-        return following;
     }
 }

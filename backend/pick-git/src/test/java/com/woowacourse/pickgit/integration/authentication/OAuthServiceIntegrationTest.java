@@ -107,9 +107,9 @@ class OAuthServiceIntegrationTest {
 
         User user = userRepository.findByBasicProfile_Name(token.getUsername()).orElse(null);
         assertThat(user).isNotNull();
-        assertThat(user.getBasicProfile().getName()).isEqualTo("binghe");
+        assertThat(user.getName()).isEqualTo("binghe");
         assertThat(user.getImage()).isEqualTo("image");
-        assertThat(user.getGithubProfile().getGithubUrl()).isEqualTo("github.com/");
+        assertThat(user.getGithubUrl()).isEqualTo("github.com/");
     }
 
     @DisplayName("로그인(첫 로그인이 아닌경우)시 Github Profile을 가져와서 DB에 저장된 기존 정보를 update한다.")
@@ -149,10 +149,10 @@ class OAuthServiceIntegrationTest {
 
         User user = userRepository.findByBasicProfile_Name(token.getUsername()).orElse(null);
         assertThat(user).isNotNull();
-        assertThat(user.getBasicProfile().getName()).isEqualTo("binghe");
+        assertThat(user.getName()).isEqualTo("binghe");
         assertThat(user.getImage()).isEqualTo("image");
-        assertThat(user.getGithubProfile().getGithubUrl()).isEqualTo("github.com/");
-        assertThat(user.getGithubProfile().getCompany()).isEqualTo("@woowabros");
+        assertThat(user.getGithubUrl()).isEqualTo("github.com/");
+        assertThat(user.getCompany()).isEqualTo("@woowabros");
     }
 
     @DisplayName("JWT 토큰을 통해 AccessTokenDB에서 LoginUser에 대한 정보를 가져온다.")
