@@ -15,7 +15,6 @@ import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.user.DuplicateFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
-import com.woowacourse.pickgit.post.domain.PickGitStorage;
 import com.woowacourse.pickgit.exception.user.SameSourceTargetUserException;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
@@ -51,9 +50,6 @@ class UserServiceIntegrationTest {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private PickGitStorage pickGitStorage;
 
     @DisplayName("비로그인 유저는 내 프로필을 조회할 수 없다.")
     @Test

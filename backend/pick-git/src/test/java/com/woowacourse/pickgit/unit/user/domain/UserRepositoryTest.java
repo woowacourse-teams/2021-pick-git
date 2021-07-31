@@ -21,7 +21,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 
 @DataJpaTest
 class UserRepositoryTest {
@@ -41,9 +40,7 @@ class UserRepositoryTest {
     void setUp() {
         // given
         users = UserFactory.mockSearchUsersWithId();
-        users
-            .stream()
-            .forEach(user -> userRepository.save(user));
+        users.forEach(user -> userRepository.save(user));
         userRepository.save(UserFactory.user());
 
         testEntityManager.flush();

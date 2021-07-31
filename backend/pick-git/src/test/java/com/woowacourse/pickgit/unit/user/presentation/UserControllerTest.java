@@ -72,76 +72,6 @@ class UserControllerTest {
     @MockBean
     private UserService userService;
 
-    @DisplayName("사용자는 자신의 프로필을 수정할 수 있다.")
-    @Test
-    void editUserProfile_LoginUserWithImageAndDescription_Success() throws Exception {
-        // given
-        AppUser loginUser = new LoginUser("testUser", "token");
-        String description = "updated description";
-        MockMultipartFile image = FileFactory.getTestImage1();
-        ProfileEditResponseDto responseDto = ProfileEditResponseDto.builder()
-            .imageUrl(image.getOriginalFilename())
-            .description(description)
-            .build();
-
-        // mock
-        given(oAuthService.validateToken(any()))
-            .willReturn(true);
-        given(oAuthService.findRequestUserByToken(any()))
-            .willReturn(loginUser);
-        given(userService.editProfile(any(AuthUserRequestDto.class), any(ProfileEditRequestDto.class)))
-            .willReturn(responseDto);
-
-        // when
-        ResultActions perform = mockMvc.perform(multipart("/api/profiles/me")
-            .file(image)
-            .param("description", description)
-            .header(HttpHeaders.AUTHORIZATION, "token")
-        );
-
-        // then
-        perform
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("imageUrl").value(image.getOriginalFilename()))
-            .andExpect(jsonPath("description").value(description));
-
-        // restdocs
-        perform.andDo(document("edit-profile",
-            getDocumentRequest(),
-            getDocumentResponse(),
-            requestHeaders(
-                headerWithName(HttpHeaders.AUTHORIZATION).description("bearer token")
-            ),
-            requestPartBody("images"),
-            responseFields(
-                fieldWithPath("imageUrl").type(STRING).description("변경된 프로필 이미지 url"),
-                fieldWithPath("description").type(STRING).description("변경된 한 줄 소개")
-            ))
-        );
-    }
-
-    @DisplayName("유효하지 않는 토큰의 사용자는 프로필을 수정할 수 없다.")
-    @Test
-    void editUserProfile_GuestUser_Fail() throws Exception {
-        // given
-        MockMultipartFile image = FileFactory.getTestImage1();
-
-        // mock
-        given(oAuthService.validateToken(any()))
-            .willReturn(false);
-
-        // when
-        ResultActions perform = mockMvc.perform(multipart("/api/profiles/me")
-            .file(image)
-            .param("description", "updated description")
-            .header(HttpHeaders.AUTHORIZATION, "token")
-        );
-
-        perform
-            .andExpect(status().isUnauthorized())
-            .andExpect(jsonPath("errorCode").value("A0001"));
-    }
-
     @DisplayName("로그인 되어있을 때")
     @Nested
     class Describe_UnderLoginCondition {
@@ -238,7 +168,7 @@ class UserControllerTest {
             verify(oAuthService, times(1))
                 .findRequestUserByToken("testToken");
             verify(userService, times(1))
-                .getUserProfile(any(AuthUserRequestDto.class),eq("testUser2"));
+                .getUserProfile(any(AuthUserRequestDto.class), eq("testUser2"));
 
             perform.andDo(document("profiles-LoggedIn",
                 getDocumentRequest(),
@@ -300,7 +230,7 @@ class UserControllerTest {
             verify(oAuthService, times(1))
                 .findRequestUserByToken("testToken");
             verify(userService, times(1))
-                .followUser(any(AuthUserRequestDto.class),  eq("testUser"));
+                .followUser(any(AuthUserRequestDto.class), eq("testUser"));
 
             perform.andDo(document("following-LoggedIn",
                 getDocumentRequest(),
@@ -369,6 +299,60 @@ class UserControllerTest {
                     fieldWithPath("following").description("팔로잉 여부")
                 )
             ));
+        }
+
+        @DisplayName("사용자는 자신의 프로필을 수정할 수 있다.")
+        @Test
+        void editUserProfile_LoginUserWithImageAndDescription_Success() throws Exception {
+            // given
+            AppUser loginUser = new LoginUser("testUser", "token");
+            String description = "updated description";
+            MockMultipartFile image = FileFactory.getTestImage1();
+            ProfileEditResponseDto responseDto = ProfileEditResponseDto.builder()
+                .imageUrl(image.getOriginalFilename())
+                .description(description)
+                .build();
+
+            // mock
+            given(oAuthService.validateToken("token"))
+                .willReturn(true);
+            given(oAuthService.findRequestUserByToken("token"))
+                .willReturn(loginUser);
+            given(userService
+                .editProfile(any(AuthUserRequestDto.class), any(ProfileEditRequestDto.class)))
+                .willReturn(responseDto);
+
+            // when
+            ResultActions perform = mockMvc.perform(multipart("/api/profiles/me")
+                .file(image)
+                .param("description", description)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer token")
+            );
+
+            // then
+            perform
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("imageUrl").value(image.getOriginalFilename()))
+                .andExpect(jsonPath("description").value(description));
+
+            verify(oAuthService, times(1)).validateToken("token");
+            verify(oAuthService, times(1)).findRequestUserByToken("token");
+            verify(userService, times(1))
+                .editProfile(any(AuthUserRequestDto.class), any(ProfileEditRequestDto.class));
+
+            // restdocs
+            perform.andDo(document("edit-profile",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                requestHeaders(
+                    headerWithName(HttpHeaders.AUTHORIZATION).description("bearer token")
+                ),
+                requestPartBody("images"),
+                responseFields(
+                    fieldWithPath("imageUrl").type(STRING).description("변경된 프로필 이미지 url"),
+                    fieldWithPath("description").type(STRING).description("변경된 한 줄 소개")
+                ))
+            );
         }
     }
 
@@ -527,6 +511,30 @@ class UserControllerTest {
                     fieldWithPath("errorCode").description("에러 코드")
                 )
             ));
+        }
+
+        @DisplayName("게스트는 프로필을 수정할 수 없다.")
+        @Test
+        void editUserProfile_GuestUser_Fail() throws Exception {
+            // given
+            MockMultipartFile image = FileFactory.getTestImage1();
+
+            // mock
+            given(oAuthService.validateToken(any()))
+                .willReturn(false);
+
+            // when
+            ResultActions perform = mockMvc.perform(multipart("/api/profiles/me")
+                .file(image)
+                .param("description", "updated description")
+            );
+
+            // then
+            perform
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("errorCode").value("A0001"));
+
+            verify(oAuthService, times(1)).validateToken(any());
         }
     }
 
