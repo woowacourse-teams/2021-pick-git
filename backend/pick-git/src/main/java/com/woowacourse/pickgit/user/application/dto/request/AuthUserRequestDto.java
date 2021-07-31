@@ -8,14 +8,14 @@ import lombok.Getter;
 @Getter
 public class AuthUserRequestDto {
 
-    private String githubName;
+    private String username;
     private boolean isGuest;
 
     private AuthUserRequestDto() {
     }
 
-    private AuthUserRequestDto(String githubName, boolean isGuest) {
-        this.githubName = githubName;
+    private AuthUserRequestDto(String username, boolean isGuest) {
+        this.username = username;
         this.isGuest = isGuest;
     }
 

@@ -88,27 +88,6 @@ public class UserController {
         return ResponseEntity.ok(createFollowResponse(followResponseDto));
     }
 
-    @PostMapping("/me")
-    public ResponseEntity<ProfileEditResponse> editProfile(
-        @Authenticated AppUser appUser,
-        @ModelAttribute ProfileEditRequest request
-    ) {
-        AuthUserRequestDto authUserRequestDto = AuthUserRequestDto.from(appUser);
-        ProfileEditRequestDto profileEditRequestDto = ProfileEditRequestDto
-            .builder()
-            .image(request.getImage())
-            .decription(request.getDescription())
-            .build();
-        ProfileEditResponseDto responseDto = userService.editProfile(authUserRequestDto, profileEditRequestDto);
-
-        return ResponseEntity.ok(
-            new ProfileEditResponse(
-                responseDto.getImageUrl(),
-                responseDto.getDescription()
-            )
-        );
-    }
-
     @DeleteMapping("/{username}/followings")
     public ResponseEntity<FollowResponse> unfollowUser(
         @Authenticated AppUser appUser,
@@ -126,6 +105,28 @@ public class UserController {
             .followerCount(followResponseDto.getFollowerCount())
             .following(followResponseDto.isFollowing())
             .build();
+    }
+
+    @PostMapping("/me")
+    public ResponseEntity<ProfileEditResponse> editProfile(
+        @Authenticated AppUser appUser,
+        @ModelAttribute ProfileEditRequest request
+    ) {
+        AuthUserRequestDto authUserRequestDto = AuthUserRequestDto.from(appUser);
+        ProfileEditRequestDto profileEditRequestDto = ProfileEditRequestDto
+            .builder()
+            .image(request.getImage())
+            .decription(request.getDescription())
+            .build();
+        ProfileEditResponseDto responseDto =
+            userService.editProfile(authUserRequestDto, profileEditRequestDto);
+
+        return ResponseEntity.ok(
+            new ProfileEditResponse(
+                responseDto.getImageUrl(),
+                responseDto.getDescription()
+            )
+        );
     }
 
     @GetMapping("/{username}/contributions")

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin(value = "*")
 public class UserSearchController {
 
-    private UserService userService;
+    private final UserService userService;
 
     public UserSearchController(UserService userService) {
         this.userService = userService;

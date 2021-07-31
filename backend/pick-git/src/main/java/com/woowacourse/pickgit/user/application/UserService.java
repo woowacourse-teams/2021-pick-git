@@ -49,11 +49,10 @@ public class UserService {
         this.platformContributionCalculator = platformContributionCalculator;
     }
 
-
     @Transactional(readOnly = true)
     public UserProfileResponseDto getMyUserProfile(AuthUserRequestDto requestDto) {
         validateIsGuest(requestDto);
-        User user = findUserByName(requestDto.getGithubName());
+        User user = findUserByName(requestDto.getUsername());
         return generateUserProfileResponse(user, null);
     }
 
@@ -63,7 +62,7 @@ public class UserService {
         if (requestDto.isGuest()) {
             return generateUserProfileResponse(target, null);
         }
-        User source = findUserByName(requestDto.getGithubName());
+        User source = findUserByName(requestDto.getUsername());
         return generateUserProfileResponse(target, source.isFollowing(target));
     }
 
@@ -89,7 +88,7 @@ public class UserService {
         ProfileEditRequestDto profileEditRequestDto
     ) {
         validateIsGuest(authUserRequestDto);
-        User user = findUserByName(authUserRequestDto.getGithubName());
+        User user = findUserByName(authUserRequestDto.getUsername());
 
         String userImageUrl = user.getImage();
         if (doesContainProfileImage(profileEditRequestDto.getImage())) {
@@ -142,7 +141,7 @@ public class UserService {
 
     public FollowResponseDto followUser(AuthUserRequestDto requestDto, String targetName) {
         validateIsGuest(requestDto);
-        User source = findUserByName(requestDto.getGithubName());
+        User source = findUserByName(requestDto.getUsername());
         User target = findUserByName(targetName);
         source.follow(target);
         return generateFollowResponse(target, true);
@@ -150,7 +149,7 @@ public class UserService {
 
     public FollowResponseDto unfollowUser(AuthUserRequestDto requestDto, String targetName) {
         validateIsGuest(requestDto);
-        User source = findUserByName(requestDto.getGithubName());
+        User source = findUserByName(requestDto.getUsername());
         User target = findUserByName(targetName);
         source.unfollow(target);
         return generateFollowResponse(target, false);
@@ -177,11 +176,6 @@ public class UserService {
             .build();
     }
 
-    private User findUserByName(String githubName) {
-        return userRepository.findByBasicProfile_Name(githubName)
-            .orElseThrow(InvalidUserException::new);
-    }
-
     @Transactional(readOnly = true)
     public List<UserSearchResponseDto> searchUser(
         AuthUserRequestDto authUserRequestDto,
@@ -200,7 +194,7 @@ public class UserService {
             return convertToUserSearchResponseDtoWithoutFollowing(users);
         }
 
-        User loginUser = findUserByName(authUserRequestDto.getGithubName());
+        User loginUser = findUserByName(authUserRequestDto.getUsername());
 
         return convertToUserSearchResponseDtoWithFollowing(loginUser, users);
     }
@@ -238,5 +232,10 @@ public class UserService {
         if (requestDto.isGuest()) {
             throw new UnauthorizedException();
         }
+    }
+
+    private User findUserByName(String githubName) {
+        return userRepository.findByBasicProfile_Name(githubName)
+            .orElseThrow(InvalidUserException::new);
     }
 }
