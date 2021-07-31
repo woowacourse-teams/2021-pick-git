@@ -3,8 +3,8 @@
   <include resource="org/springframework/boot/logging/logback/base.xml"/>
 
   <springProfile name="prod, local">
-    <include resource="./logback/db-logger.xml"/>
-    <include resource="./logback/error-logger.xml"/>
+    <include resource="logback/db-logger.xml"/>
+    <include resource="logback/error-logger.xml"/>
     <logger name="com.woowacourse.pickgit" level="INFO">
       <appender-ref ref="error-logger"/>
     </logger>
@@ -27,7 +27,7 @@
   </springProfile>
 
   <springProfile name="test">
-    <include resource="./logback/test/test-basic-logger.xml"/>
+    <include resource="logback/test/test-basic-logger.xml"/>
     <logger name="com.woowacourse.pickgit" level="TRACE">
       <appender-ref ref="test-basic-logger"/>
     </logger>
