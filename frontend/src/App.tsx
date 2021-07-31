@@ -30,6 +30,7 @@ const App = () => {
     if (!accessToken || !currentUsername) return;
 
     // haha 1
+    // haha 2
 
     (async () => {
       try {
