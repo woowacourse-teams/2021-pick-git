@@ -1,68 +1,43 @@
 import { useEffect } from "react";
-import { Container, StepSlider, StepContainer, NextStepButtonWrapper } from "./AddPostPage.style";
-import { POST_ADD_STEPS } from "../../constants/steps";
-import RepositorySelector from "../../components/RepositorySelector/RepositorySelector";
+import { Container, StepSlider, StepContainer, NextStepButtonWrapper } from "./EditPostPage.style";
+import { POST_EDIT_STEPS } from "../../constants/steps";
 import PostContentUploader from "../../components/PostContentUploader/PostContentUploader";
 import TagInputForm from "../../components/TagInputForm/TagInputForm";
 import Button from "../../components/@shared/Button/Button";
 import { PAGE_URL } from "../../constants/urls";
-import usePostUpload from "../../services/hooks/usePostUpload";
 import useMessageModal from "../../services/hooks/@common/useMessageModal";
 import MessageModalPortal from "../../components/@layout/MessageModalPortal/MessageModalPortal";
 import { FAILURE_MESSAGE, WARNING_MESSAGE } from "../../constants/messages";
 import {
-  getPostAddValidationMessage,
+  getPostEditValidationMessage,
   isContentEmpty,
-  isFilesEmpty,
   isValidContentLength,
-  isGithubRepositoryEmpty,
-  isValidPostUploadData,
+  isValidPostEditData,
 } from "../../utils/postUpload";
 import { getAPIErrorMessage } from "../../utils/error";
-import usePostAddStep from "../../services/hooks/usePostAddStep";
-import { useGithubTagsQuery } from "../../services/queries";
+import usePostEdit from "../../services/hooks/usePostEdit";
+import { useLocation } from "react-router-dom";
+import usePostEditStep from "../../services/hooks/usePostEditStep";
 
-const AddPostPage = () => {
-  const { stepIndex, goNextStep, setStepMoveEventHandler, removeStepMoveEventHandler, completeStep } = usePostAddStep(
-    POST_ADD_STEPS,
+const EditPostPage = () => {
+  const { search } = useLocation();
+  const { stepIndex, goNextStep, setStepMoveEventHandler, removeStepMoveEventHandler, completeStep } = usePostEditStep(
+    POST_EDIT_STEPS,
     PAGE_URL.HOME
   );
-  const {
-    content,
-    githubRepositoryName,
-    tags,
-    files,
-    setContent,
-    setFiles,
-    setGithubRepositoryName,
-    setTags,
-    uploadPost,
-    resetPostUploadData,
-  } = usePostUpload();
+
+  const { postId, content, tags, setTags, setContent, editPost, resetPostEditData } = usePostEdit();
   const { modalMessage, isModalShown, isCancelButtonShown, showAlertModal, showConfirmModal, hideMessageModal } =
     useMessageModal();
-  const tagsQueryResult = useGithubTagsQuery(githubRepositoryName);
 
   const stepComponents = [
-    <RepositorySelector
-      key="repository-selector"
-      setGithubRepositoryName={setGithubRepositoryName}
-      goNextStep={goNextStep}
-    />,
     <PostContentUploader
       key="post-content-uploader"
-      isImageUploaderShown={true}
+      isImageUploaderShown={false}
       content={content}
       setContent={setContent}
-      setFiles={setFiles}
     />,
-    <TagInputForm
-      key="tag-input-form"
-      tagsQueryResult={tagsQueryResult}
-      githubRepositoryName={githubRepositoryName}
-      tags={tags}
-      setTags={setTags}
-    />,
+    <TagInputForm key="tag-input-form" githubRepositoryName={search} tags={tags} setTags={setTags} />,
   ];
 
   useEffect(() => {
@@ -71,14 +46,14 @@ const AddPostPage = () => {
   }, [stepIndex]);
 
   const handlePostAddComplete = async () => {
-    if (!isValidPostUploadData({ content, githubRepositoryName, tags, files })) {
-      showAlertModal(getPostAddValidationMessage({ content, githubRepositoryName, tags, files }));
+    if (!isValidPostEditData({ postId, content, tags })) {
+      showAlertModal(getPostEditValidationMessage({ postId, content, tags }));
       return;
     }
 
     try {
-      await uploadPost();
-      resetPostUploadData();
+      await editPost();
+      resetPostEditData();
       completeStep();
     } catch (error) {
       showAlertModal(getAPIErrorMessage(error.response?.data.errorCode));
@@ -86,27 +61,12 @@ const AddPostPage = () => {
   };
 
   const handleNextButtonClick = () => {
-    if (stepIndex === 0 && !isGithubRepositoryEmpty(githubRepositoryName)) {
-      showAlertModal(FAILURE_MESSAGE.POST_REPOSITORY_NOT_SELECTED);
-      return;
-    }
-
-    if (stepIndex === 1 && !isValidContentLength(content)) {
+    if (stepIndex === 0 && !isValidContentLength(content)) {
       showAlertModal(FAILURE_MESSAGE.POST_CONTENT_LENGTH_LIMIT_EXCEEDED);
       return;
     }
 
-    if (stepIndex === 1 && isContentEmpty(content) && isFilesEmpty(files)) {
-      showAlertModal(FAILURE_MESSAGE.POST_FILE_AND_CONTENT_EMPTY);
-      return;
-    }
-
-    if (stepIndex === 1 && isFilesEmpty(files)) {
-      showConfirmModal(WARNING_MESSAGE.POST_FILE_NOT_UPLOADED);
-      return;
-    }
-
-    if (stepIndex === 1 && isContentEmpty(content)) {
+    if (stepIndex === 0 && isContentEmpty(content)) {
       showConfirmModal(WARNING_MESSAGE.POST_CONTENT_EMPTY);
       return;
     }
@@ -121,15 +81,15 @@ const AddPostPage = () => {
 
   return (
     <Container>
-      <StepSlider stepCount={POST_ADD_STEPS.length} stepIndex={stepIndex}>
-        {POST_ADD_STEPS.map((STEP, index) => (
-          <StepContainer key={STEP.title} stepCount={POST_ADD_STEPS.length} isShown={stepIndex === index}>
+      <StepSlider stepCount={POST_EDIT_STEPS.length} stepIndex={stepIndex}>
+        {POST_EDIT_STEPS.map((STEP, index) => (
+          <StepContainer key={STEP.title} stepCount={POST_EDIT_STEPS.length} isShown={stepIndex === index}>
             {stepComponents[index]}
           </StepContainer>
         ))}
       </StepSlider>
       <NextStepButtonWrapper>
-        {stepIndex < POST_ADD_STEPS.length - 1 ? (
+        {stepIndex < POST_EDIT_STEPS.length - 1 ? (
           <Button kind="roundedBlock" onClick={handleNextButtonClick}>
             다음
           </Button>
@@ -154,4 +114,4 @@ const AddPostPage = () => {
   );
 };
 
-export default AddPostPage;
+export default EditPostPage;

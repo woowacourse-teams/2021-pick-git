@@ -6,9 +6,10 @@ import { ThemeProvider } from "styled-components";
 import App from "./App";
 import { theme, GlobalStyle } from "./App.style";
 import { UserContextProvider } from "./contexts/UserContext";
-import { PostAddStepContextProvider } from "./contexts/PostAddStepContext";
 import { SnackBarContextProvider } from "./contexts/SnackbarContext";
 import { SearchContextProvider } from "./contexts/SearchContext";
+import { PostEditDataContextProvider } from "./contexts/PostEditDataContext";
+import { PostAddStepContextProvider } from "./contexts/PostAddStepContext";
 
 const queryClient = new QueryClient();
 
@@ -18,10 +19,12 @@ ReactDOM.render(
       <UserContextProvider>
         <PostAddStepContextProvider>
           <SearchContextProvider>
-            <SnackBarContextProvider>
-              <GlobalStyle />
-              <App />
-            </SnackBarContextProvider>
+            <PostEditDataContextProvider>
+              <SnackBarContextProvider>
+                <GlobalStyle />
+                <App />
+              </SnackBarContextProvider>
+            </PostEditDataContextProvider>
           </SearchContextProvider>
         </PostAddStepContextProvider>
       </UserContextProvider>

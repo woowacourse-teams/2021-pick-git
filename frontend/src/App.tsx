@@ -19,6 +19,8 @@ import { getAccessToken } from "./storage/storage";
 import { requestGetSelfProfile } from "./services/requests";
 import SnackBarContext from "./contexts/SnackbarContext";
 import { SUCCESS_MESSAGE } from "./constants/messages";
+import EditPostPage from "./pages/EditPostPage/EditPostPage";
+import { PostEditStepContextProvider } from "./contexts/PostEditStepContext";
 
 const App = () => {
   const { currentUsername, login, logout } = useContext(UserContext);
@@ -85,7 +87,12 @@ const App = () => {
             <AddPostPage />
           </PostAddDataContextProvider>
         </Route>
-        <Redirect to="/" />
+        <Route path={PAGE_URL.EDIT_POST}>
+          <PostEditStepContextProvider>
+            <EditPostPage />
+          </PostEditStepContextProvider>
+        </Route>
+        {/* <Redirect to="/" /> */}
       </Switch>
     </BrowserRouter>
   );

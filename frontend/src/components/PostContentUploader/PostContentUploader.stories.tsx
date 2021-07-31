@@ -7,7 +7,16 @@ export default {
   component: PostContentUploader,
 };
 
-const Template: Story = (args) => <PostContentUploader {...args} />;
+const Template: Story = (args) => (
+  <PostContentUploader
+    key="test"
+    content="테스트"
+    setContent={() => {}}
+    setFiles={() => {}}
+    isImageUploaderShown={true}
+    {...args}
+  />
+);
 
 export const Default = Template.bind({});
 Default.args = {};

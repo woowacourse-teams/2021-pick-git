@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { FAILURE_MESSAGE } from "../../constants/messages";
 import useMessageModal from "../../services/hooks/@common/useMessageModal";
-import usePostUpload from "../../services/hooks/usePostUpload";
 import { isValidFilesSize, isValidFilesSizeCount } from "../../utils/postUpload";
 import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
 import ImageSlider from "../@shared/ImageSlider/ImageSlider";
@@ -9,9 +8,16 @@ import ImageUploader from "../@shared/ImageUploader/ImageUploader";
 import TextEditor from "../@shared/TextEditor/TextEditor";
 import { Container, ImageUploaderWrapper, TextEditorWrapper } from "./PostContentUploader.style";
 
-const PostContentUploader = () => {
+interface Props {
+  isImageUploaderShown: boolean;
+  content: string;
+  setFiles?: Dispatch<SetStateAction<File[]>>;
+  setContent: Dispatch<SetStateAction<string>>;
+}
+
+// TODO : key 를 넣지 않는 방법 생각해보기
+const PostContentUploader = ({ isImageUploaderShown, content, setFiles, setContent }: Props) => {
   const [imageUrls, setImageUrls] = useState<string[]>([]);
-  const { content, setFiles, setContent } = usePostUpload();
   const { modalMessage, isModalShown, hideMessageModal, showAlertModal } = useMessageModal();
 
   const handlePostContentChange: React.ChangeEventHandler<HTMLTextAreaElement> = (event) => {
@@ -37,14 +43,15 @@ const PostContentUploader = () => {
       setImageUrls((state) => [...state, imageUrl]);
     });
 
-    setFiles(files);
+    setFiles && setFiles(files);
   };
 
   return (
     <Container>
-      {imageUrls.length > 0 ? (
+      {isImageUploaderShown && imageUrls.length > 0 && (
         <ImageSlider imageUrls={imageUrls} slideButtonKind="stick-out" />
-      ) : (
+      )}
+      {isImageUploaderShown && imageUrls.length === 0 && (
         <ImageUploaderWrapper>
           <ImageUploader onFileListSave={handleFileListSave} />
         </ImageUploaderWrapper>
