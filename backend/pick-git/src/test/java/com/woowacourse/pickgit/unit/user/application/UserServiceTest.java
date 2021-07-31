@@ -433,9 +433,9 @@ class UserServiceTest {
     @Test
     void editUserProfile_WithImageAndDescription_Success() {
         // given
-        LoginUser loginUser = new LoginUser("testUser", "token");
         MultipartFile image = FileFactory.getTestImage1();
         String updatedDescription = "updated description";
+        AuthUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
 
         // mock
         given(userRepository.findByBasicProfile_Name("testUser"))
@@ -444,12 +444,13 @@ class UserServiceTest {
             .willReturn(Optional.ofNullable(image.getName()));
 
         // when
-        ProfileEditRequestDto requestDto = ProfileEditRequestDto
+        ProfileEditRequestDto profileEditRequestDto = ProfileEditRequestDto
             .builder()
             .image(image)
             .decription(updatedDescription)
             .build();
-        ProfileEditResponseDto responseDto = userService.editProfile(loginUser, requestDto);
+        ProfileEditResponseDto responseDto =
+            userService.editProfile(authUserRequestDto, profileEditRequestDto);
 
         // then
         assertThat(responseDto.getImageUrl()).isEqualTo(image.getName());
@@ -464,21 +465,22 @@ class UserServiceTest {
     @Test
     void editUserProfile_WithDescrption_Success() {
         // given
-        LoginUser loginUser = new LoginUser("testUser", "token");
         User user = UserFactory.user(1L, "testUser");
         String updatedDescription = "updated descrption";
+        AuthUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
 
         // mock
         given(userRepository.findByBasicProfile_Name("testUser"))
             .willReturn(Optional.of(user));
 
         // when
-        ProfileEditRequestDto requestDto = ProfileEditRequestDto
+        ProfileEditRequestDto profileEditRequestDto = ProfileEditRequestDto
             .builder()
             .image(FileFactory.getEmptyTestFile())
             .decription(updatedDescription)
             .build();
-        ProfileEditResponseDto responseDto = userService.editProfile(loginUser, requestDto);
+        ProfileEditResponseDto responseDto =
+            userService.editProfile(authUserRequestDto, profileEditRequestDto);
 
         // then
         assertThat(responseDto.getImageUrl()).isEqualTo(user.getImage());
@@ -659,6 +661,7 @@ class UserServiceTest {
             .page(0L)
             .limit(5L)
             .build();
+        AuthUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto(loginUser.getName());
 
         // mock
         given(userRepository.searchByUsernameLike(searchKeyword, PageRequest.of(page, limit)))
@@ -669,7 +672,7 @@ class UserServiceTest {
         // when
         loginUser.follow(searchedUser.get(0));
         List<UserSearchResponseDto> searchResponses = userService
-            .searchUser(new LoginUser(loginUser.getName(), "token"), userSearchRequestDto);
+            .searchUser(authUserRequestDto, userSearchRequestDto);
 
         // then
         assertThat(searchResponses).hasSize(4);
@@ -697,6 +700,7 @@ class UserServiceTest {
             .page(0L)
             .limit(5L)
             .build();
+        AuthUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
 
         // mock
         given(userRepository.searchByUsernameLike(searchKeyword, PageRequest.of(page, limit)))
@@ -704,7 +708,7 @@ class UserServiceTest {
 
         // when
         List<UserSearchResponseDto> searchResult =
-            userService.searchUser(new GuestUser(), userSearchRequestDto);
+            userService.searchUser(authUserRequestDto, userSearchRequestDto);
 
         // then
         assertThat(searchResult).hasSize(5);

@@ -465,15 +465,15 @@ class UserAcceptanceTest {
     @Test
     void searchUser_LoginUser_Success() {
         // given
-        authenticatedPostRequest(loginUserAccessToken,
-            String.format("/api/profiles/%s/followings", targetUser.getName()), HttpStatus.OK);
+        authenticatedRequest(loginUserAccessToken,
+            String.format("/api/profiles/%s/followings", targetUser.getName()), Method.POST, HttpStatus.OK);
         User unfollowedUser = UserFactory.user("testUser3");
         로그인_되어있음(unfollowedUser);
 
         // when
         String url = String.format("/api/search/users?keyword=%s&page=0&limit=5", "testUser");
         List<UserSearchResponseDto> response =
-            authenticatedGetRequest(loginUserAccessToken, url, HttpStatus.OK)
+            authenticatedRequest(loginUserAccessToken, url,Method.GET, HttpStatus.OK)
                 .as(new TypeRef<List<UserSearchResponseDto>>() {
                 });
 
@@ -492,7 +492,8 @@ class UserAcceptanceTest {
     void searchUser_GuestUser_Success() {
         // when
         String url = String.format("/api/search/users?keyword=%s&page=0&limit=5", "testUser");
-        List<UserSearchResponseDto> response = unauthenticatedGetRequest(url, HttpStatus.OK)
+        List<UserSearchResponseDto> response =
+            unauthenticatedRequest(url, Method.GET, HttpStatus.OK)
             .as(new TypeRef<List<UserSearchResponseDto>>() {
             });
 

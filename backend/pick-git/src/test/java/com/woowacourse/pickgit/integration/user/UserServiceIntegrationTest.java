@@ -376,19 +376,19 @@ class UserServiceIntegrationTest {
     void editUserProfile_WithImageAndDescription_Success() {
         // given
         String updatedDescription = "updated description";
-        LoginUser loginUser = new LoginUser("testUser", "token");
         User user = UserFactory.user("testUser");
+        AuthUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
 
         userRepository.save(user);
 
         // when
-        ProfileEditRequestDto requestDto = ProfileEditRequestDto
+        ProfileEditRequestDto profileEditRequestDto = ProfileEditRequestDto
             .builder()
             .image(FileFactory.getTestImage1())
             .decription(updatedDescription)
             .build();
         ProfileEditResponseDto responseDto =
-            userService.editProfile(loginUser, requestDto);
+            userService.editProfile(authUserRequestDto, profileEditRequestDto);
 
         // then
         assertThat(responseDto.getImageUrl()).isNotBlank();
@@ -400,19 +400,19 @@ class UserServiceIntegrationTest {
     void editUserProfile_WithDescription_Success() {
         // given
         String updatedDescription = "updated description";
-        LoginUser loginUser = new LoginUser("testUser", "token");
         User user = UserFactory.user("testUser");
+        AuthUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
 
         userRepository.save(user);
 
         // when
-        ProfileEditRequestDto requestDto = ProfileEditRequestDto
+        ProfileEditRequestDto profileEditRequestDto = ProfileEditRequestDto
             .builder()
             .image(FileFactory.getEmptyTestFile())
             .decription(updatedDescription)
             .build();
         ProfileEditResponseDto responseDto =
-            userService.editProfile(loginUser, requestDto);
+            userService.editProfile(authUserRequestDto, profileEditRequestDto);
 
         // then
         assertThat(responseDto.getImageUrl()).isEqualTo(user.getImage());
@@ -433,16 +433,16 @@ class UserServiceIntegrationTest {
         List<User> usersInDb = UserFactory.mockSearchUsers();
         User loginUser = usersInDb.get(0);
         List<User> searchedUsers = usersInDb.subList(1, usersInDb.size());
+        AuthUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto(loginUser.getName());
 
         userRepository.save(loginUser);
         searchedUsers.forEach(user -> userRepository.save(user));
 
         // when
-        userService.followUser(new AuthUserRequestDto(loginUser.getName()), searchedUsers.get(0).getName());
+        userService.followUser(authUserRequestDto, searchedUsers.get(0).getName());
 
         List<UserSearchResponseDto> searchResult =
-            userService.searchUser(new LoginUser(loginUser.getName(), "token"),
-                userSearchRequestDto);
+            userService.searchUser(authUserRequestDto, userSearchRequestDto);
 
         // then
         assertThat(searchResult).hasSize(4);
@@ -467,12 +467,13 @@ class UserServiceIntegrationTest {
             .page(0L)
             .limit(3L)
             .build();
+        AuthUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
         List<User> userInDb = UserFactory.mockSearchUsers();
         userRepository.saveAll(userInDb);
 
         // when
         List<UserSearchResponseDto> searchResult =
-            userService.searchUser(new GuestUser(), userSearchRequestDto);
+            userService.searchUser(authUserRequestDto, userSearchRequestDto);
 
         // then
         assertThat(searchResult)

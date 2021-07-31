@@ -93,12 +93,13 @@ public class UserController {
         @Authenticated AppUser appUser,
         @ModelAttribute ProfileEditRequest request
     ) {
-        ProfileEditRequestDto requestDto = ProfileEditRequestDto
+        AuthUserRequestDto authUserRequestDto = AuthUserRequestDto.from(appUser);
+        ProfileEditRequestDto profileEditRequestDto = ProfileEditRequestDto
             .builder()
             .image(request.getImage())
             .decription(request.getDescription())
             .build();
-        ProfileEditResponseDto responseDto = userService.editProfile(appUser, requestDto);
+        ProfileEditResponseDto responseDto = userService.editProfile(authUserRequestDto, profileEditRequestDto);
 
         return ResponseEntity.ok(
             new ProfileEditResponse(

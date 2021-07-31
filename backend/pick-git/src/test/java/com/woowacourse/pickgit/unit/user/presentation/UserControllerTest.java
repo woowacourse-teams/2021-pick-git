@@ -89,7 +89,7 @@ class UserControllerTest {
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(any()))
             .willReturn(loginUser);
-        given(userService.editProfile(any(AppUser.class), any(ProfileEditRequestDto.class)))
+        given(userService.editProfile(any(AuthUserRequestDto.class), any(ProfileEditRequestDto.class)))
             .willReturn(responseDto);
 
         // when

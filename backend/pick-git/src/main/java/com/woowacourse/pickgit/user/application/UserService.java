@@ -2,32 +2,31 @@ package com.woowacourse.pickgit.user.application;
 
 import static java.util.stream.Collectors.toList;
 
-import com.woowacourse.pickgit.authentication.domain.user.AppUser;
-import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
+import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
 import com.woowacourse.pickgit.post.domain.PickGitStorage;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
-import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.UserSearchRequestDto;
+import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.ProfileEditResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
+import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import com.woowacourse.pickgit.user.domain.Contribution;
 import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
-import com.woowacourse.pickgit.user.application.dto.request.UserSearchRequestDto;
-import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
-import java.util.List;
-import java.util.function.Predicate;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -85,18 +84,22 @@ public class UserService {
             .build();
     }
 
-    public ProfileEditResponseDto editProfile(AppUser appUser, ProfileEditRequestDto requestDto) {
-        User user = findUserByName(appUser.getUsername());
+    public ProfileEditResponseDto editProfile(
+        AuthUserRequestDto authUserRequestDto,
+        ProfileEditRequestDto profileEditRequestDto
+    ) {
+        validateIsGuest(authUserRequestDto);
+        User user = findUserByName(authUserRequestDto.getGithubName());
 
         String userImageUrl = user.getImage();
-        if (doesContainProfileImage(requestDto.getImage())) {
-            userImageUrl = saveImageAndGetUrl(requestDto.getImage(), user.getName());
+        if (doesContainProfileImage(profileEditRequestDto.getImage())) {
+            userImageUrl = saveImageAndGetUrl(profileEditRequestDto.getImage(), user.getName());
             user.updateProfileImage(userImageUrl);
         }
 
-        user.updateDescription(requestDto.getDecription());
+        user.updateDescription(profileEditRequestDto.getDecription());
 
-        return new ProfileEditResponseDto(userImageUrl, requestDto.getDecription());
+        return new ProfileEditResponseDto(userImageUrl, profileEditRequestDto.getDecription());
     }
 
     private boolean doesContainProfileImage(MultipartFile image) {
@@ -180,15 +183,24 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<UserSearchResponseDto> searchUser(AppUser appUser, UserSearchRequestDto request) {
-        Pageable pageable = PageRequest.of(request.getPage(), request.getLimit());
-        List<User> users = userRepository.searchByUsernameLike(request.getKeyword(), pageable);
+    public List<UserSearchResponseDto> searchUser(
+        AuthUserRequestDto authUserRequestDto,
+        UserSearchRequestDto userSearchRequestDto
+    ) {
+        Pageable pageable = PageRequest.of(
+            userSearchRequestDto.getPage(),
+            userSearchRequestDto.getLimit()
+        );
+        List<User> users = userRepository.searchByUsernameLike(
+            userSearchRequestDto.getKeyword(),
+            pageable
+        );
 
-        if (appUser.isGuest()) {
+        if (authUserRequestDto.isGuest()) {
             return convertToUserSearchResponseDtoWithoutFollowing(users);
         }
 
-        User loginUser = findUserByName(appUser.getUsername());
+        User loginUser = findUserByName(authUserRequestDto.getGithubName());
 
         return convertToUserSearchResponseDtoWithFollowing(loginUser, users);
     }
