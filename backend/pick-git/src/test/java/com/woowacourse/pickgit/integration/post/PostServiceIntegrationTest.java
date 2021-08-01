@@ -42,7 +42,6 @@ import com.woowacourse.pickgit.user.domain.UserRepository;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
-import javax.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
