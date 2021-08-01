@@ -8,7 +8,7 @@ const useBottomSlider = () => {
 
   const setSlideEventHandler = () => {
     window.onpopstate = () => {
-      if (getLastHash(history.location.hash) === "slide-up") {
+      if (getLastHash(history.location.hash) === "comment-slider-up") {
         setBottomSliderShown(true);
         return;
       }
@@ -23,7 +23,7 @@ const useBottomSlider = () => {
 
   const showBottomSlider = () => {
     history.push({
-      hash: "#slide-up",
+      hash: "#comment-slider-up",
       search: history.location.search,
       state: history.location.state,
     });

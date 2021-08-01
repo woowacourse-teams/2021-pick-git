@@ -12,16 +12,18 @@ import { getAPIErrorMessage } from "../../utils/error";
 import { useHistory } from "react-router-dom";
 import { PAGE_URL } from "../../constants/urls";
 import usePostEdit from "../../services/hooks/usePostEdit";
+import { QueryKey } from "react-query";
 
 interface Props {
   posts: Post[];
-  queryKey: string;
+  queryKey: QueryKey;
 }
 
 const Feed = ({ posts, queryKey }: Props) => {
   const [selectedPostId, setSelectedPostId] = useState<Post["id"]>();
   const { pushSnackbarMessage } = useContext(SnackBarContext);
-  const { setPosts, deletePostLike, addPostLike, mutateAddComment, mutateDeletePost } = useFeedMutation(queryKey);
+  const { setPosts, mutateAddPostLike, mutateDeletePostLike, mutateAddComment, mutateDeletePost } =
+    useFeedMutation(queryKey);
   const { setPostEditData } = usePostEdit();
   const { isBottomSliderShown, showBottomSlider, hideBottomSlider, removeSlideEventHandler, setSlideEventHandler } =
     useBottomSlider();
@@ -48,7 +50,7 @@ const Feed = ({ posts, queryKey }: Props) => {
     }
   };
 
-  const handlePostLike = (postId: Post["id"]) => {
+  const handlePostLike = async (postId: Post["id"]) => {
     const newPosts = [...posts];
     const targetPost = newPosts.find((post) => post.id === postId);
 
@@ -56,16 +58,19 @@ const Feed = ({ posts, queryKey }: Props) => {
       return;
     }
 
-    if (targetPost.isLiked) {
-      deletePostLike(targetPost);
-      targetPost.isLiked = false;
+    // TODO : setQueryData 로 바꾸기
+    if (targetPost.liked) {
+      const { liked, likesCount } = await mutateDeletePostLike(targetPost.id);
+      targetPost.liked = liked;
+      targetPost.likesCount = likesCount;
       setPosts(newPosts);
       return;
     }
 
-    if (!targetPost.isLiked) {
-      addPostLike(targetPost);
-      targetPost.isLiked = true;
+    if (!targetPost.liked) {
+      const { liked, likesCount } = await mutateAddPostLike(targetPost.id);
+      targetPost.liked = liked;
+      targetPost.likesCount = likesCount;
       setPosts(newPosts);
     }
   };
@@ -104,6 +109,8 @@ const Feed = ({ posts, queryKey }: Props) => {
       {posts?.map((post) => (
         <PostItemWrapper id={`post${post.id}`} key={post.id}>
           <PostItem
+            currentUserName={currentUsername}
+            isLoggedIn={isLoggedIn}
             authorName={post.authorName}
             authorGithubUrl={post.githubRepoUrl}
             authorImageUrl={post.profileImageUrl}
@@ -115,13 +122,13 @@ const Feed = ({ posts, queryKey }: Props) => {
             comments={post.comments}
             content={post.content}
             isEditable={currentUsername === post.authorName && isLoggedIn}
-            isLiked={post.isLiked}
+            liked={post.liked}
             likeCount={post.likesCount}
             tags={post.tags}
             onPostDelete={() => handlePostDelete(post.id)}
             onPostEdit={() => handlePostEdit(post)}
             onPostLike={() => handlePostLike(post.id)}
-            onCommentClick={() => handleCommentsClick(post.id)}
+            onMoreCommentClick={() => handleCommentsClick(post.id)}
             onCommentInputClick={() => handleCommentsClick(post.id)}
             onCommentLike={handleCommentLike}
           />

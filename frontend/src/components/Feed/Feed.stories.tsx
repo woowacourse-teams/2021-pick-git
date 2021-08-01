@@ -6,7 +6,7 @@ import PageLoading from "../@layout/PageLoading/PageLoading";
 import { QUERY } from "../../constants/queries";
 
 export default {
-  title: "Components/HomeFeed",
+  title: "Components/Feed",
   component: Feed,
 };
 
