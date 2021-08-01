@@ -41,12 +41,6 @@ public class Comment {
         this.content = new CommentContent(content);
     }
 
-    //todo must delete this method
-    public Comment writeBy(User user) {
-        this.user = user;
-        return this;
-    }
-
     public void belongTo(Post post) {
         this.post = post;
     }

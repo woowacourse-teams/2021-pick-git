@@ -101,7 +101,7 @@ public class PostService {
 
         User user = findUserByName(userName);
         Post post = findPostById(postId);
-        user.addComment(post, comment);
+        post.addComment(comment);
 
         return createCommentResponseDto(comment);
     }
