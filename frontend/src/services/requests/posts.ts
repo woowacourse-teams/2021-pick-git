@@ -94,8 +94,8 @@ export const requestAddPost = async (
   const formData = new FormData();
   files.forEach((file) => formData.append("images", file));
   formData.append("githubRepoUrl", `https://github.com/${username}/${githubRepositoryName}`);
-  formData.append("tags", JSON.stringify(tags));
   formData.append("content", content);
+  formData.append("tags", tags.join(","));
 
   await axios.post(API_URL.ADD_POSTS, formData, {
     headers: {

@@ -21,3 +21,11 @@ export const TagList = styled.ul`
 export const TagListItem = styled.li`
   margin: 0 0.625rem 0.5625rem 0;
 `;
+
+export const TextLengthIndicator = styled.div<React.CSSProperties>`
+  margin-top: 0.5rem;
+  color: ${({ theme }) => theme.color.lighterTextColor};
+  font-size: 0.8rem;
+  float: right;
+  height: 1rem;
+`;

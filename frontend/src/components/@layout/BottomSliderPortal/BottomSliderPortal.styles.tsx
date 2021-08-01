@@ -10,8 +10,7 @@ export const Container = styled.div<{ isSliderShown: boolean }>`
   border-top-right-radius: 16px;
   background-color: ${({ theme }) => theme.color.white};
 
-  // 딜레이를 어떻게 주지
-  transition: transform 1s;
+  transition: transform 0.75s;
 
   ${({ isSliderShown }) => `
     transform: translateY(${isSliderShown ? "0%" : "100%"});

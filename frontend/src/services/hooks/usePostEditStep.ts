@@ -18,12 +18,7 @@ const usePostEditStep = (steps: Step[], stepCompleteLinkData: StepCompleteLinkDa
 
   const completeStep = () => {
     setStepIndex(0);
-    stepCompleteLinkData &&
-      history.push({
-        pathname: stepCompleteLinkData.pathname,
-        search: stepCompleteLinkData.search,
-        state: stepCompleteLinkData.state,
-      });
+    stepCompleteLinkData && history.push(stepCompleteLinkData.pathname);
   };
 
   return {

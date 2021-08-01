@@ -22,6 +22,7 @@ import {
   CommentText,
   CommentContent,
   CommentTextAreaWrapper,
+  SendIconWrapper,
 } from "./CommentSlider.styles";
 import { Post, TabItem } from "../../@types";
 import { COMMENT_SLIDE_STEPS } from "../../constants/steps";
@@ -33,7 +34,7 @@ export interface Props {
   post?: Post;
   isSliderShown: boolean;
   onSliderClose: () => void;
-  onCommentSave: (value: string) => void;
+  onCommentSave: (value: string) => Promise<void>;
 }
 
 const CommentSlider = ({ post, isSliderShown, onSliderClose, onCommentSave }: Props) => {
@@ -95,7 +96,7 @@ const CommentSlider = ({ post, isSliderShown, onSliderClose, onCommentSave }: Pr
     </CommentListItem>
   ));
 
-  const tagListItems = JSON.parse(sliderPost.tags.join(",")).map((tag: string) => (
+  const tagListItems = sliderPost.tags.map((tag: string) => (
     <TagItemLinkButton key={tag} to={PAGE_URL.TAG_FEED(tag)}>
       <Chip>{tag}</Chip>
     </TagItemLinkButton>
@@ -118,14 +119,14 @@ const CommentSlider = ({ post, isSliderShown, onSliderClose, onCommentSave }: Pr
     </HorizontalSliderItemWrapper>
   ));
 
-  const handleCommentSave = () => {
+  const handleCommentSave = async () => {
     if (!commentTextAreaRef.current || !containerRef.current) {
       return;
     }
 
-    onCommentSave(commentTextAreaRef.current.value);
-    commentTextAreaRef.current.value = "";
+    await onCommentSave(commentTextAreaRef.current.value);
 
+    commentTextAreaRef.current.value = "";
     containerRef.current.scroll({
       top: containerRef.current.offsetHeight,
       behavior: "smooth",
@@ -150,7 +151,9 @@ const CommentSlider = ({ post, isSliderShown, onSliderClose, onCommentSave }: Pr
         {isLoggedIn && (
           <CommentTextAreaWrapper>
             <CommentTextArea placeholder="댓글 입력..." ref={commentTextAreaRef} />
-            <SendIcon onClick={handleCommentSave} />
+            <SendIconWrapper>
+              <SendIcon onClick={handleCommentSave} />
+            </SendIconWrapper>
           </CommentTextAreaWrapper>
         )}
       </Container>

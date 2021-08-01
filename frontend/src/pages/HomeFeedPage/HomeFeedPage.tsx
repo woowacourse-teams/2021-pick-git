@@ -6,9 +6,9 @@ import useHomeFeed from "../../services/hooks/useHomeFeed";
 import { QUERY } from "../../constants/queries";
 
 const HomeFeedPage = () => {
-  const { posts, handlePostsEndIntersect, isLoading, isFetching, isError } = useHomeFeed();
+  const { infinitePostsData, isLoading, isFetching, isError, handlePostsEndIntersect } = useHomeFeed();
 
-  if (isError) {
+  if (isError || !infinitePostsData) {
     return <div>에러!!</div>;
   }
 
@@ -23,7 +23,7 @@ const HomeFeedPage = () => {
   return (
     <Container>
       <InfiniteScrollContainer isLoaderShown={isFetching} onIntersect={handlePostsEndIntersect}>
-        <Feed posts={posts} queryKey={QUERY.GET_HOME_FEED_POSTS} />
+        <Feed infinitePostsData={infinitePostsData} queryKey={[QUERY.GET_HOME_FEED_POSTS]} />
       </InfiniteScrollContainer>
     </Container>
   );
