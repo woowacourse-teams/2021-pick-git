@@ -695,6 +695,39 @@ class PostServiceIntegrationTest {
             .hasMessage("해당하는 사용자의 게시물이 아닙니다.");
     }
 
+    @DisplayName("사용자는 중복되는 태그로 게시물을 수정할 수 없다. - 400 예외")
+    @Test
+    void update_DuplicateTags_400Exception() {
+        // given
+        User user = UserFactory.user(USERNAME);
+        userRepository.save(user);
+        LoginUser loginUser = new LoginUser(USERNAME, ACCESS_TOKEN);
+
+        PostRequestDto requestDto = PostRequestDto.builder()
+            .token(ACCESS_TOKEN)
+            .username(USERNAME)
+            .images(List.of(
+                FileFactory.getTestImage1(),
+                FileFactory.getTestImage2()))
+            .githubRepoUrl("https://github.com/da-nyee/woowacourse-projects")
+            .tags(List.of("java", "spring"))
+            .content("testContent")
+            .build();
+
+        postService.write(requestDto);
+
+        PostUpdateRequestDto updateRequestDto = new PostUpdateRequestDto(loginUser, 1L,
+            List.of("java", "java"), "testContent");
+
+        // when
+        assertThatThrownBy(() -> {
+            postService.update(updateRequestDto);
+        }).isInstanceOf(CannotAddTagException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "P0001")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
+            .hasMessage("태그 추가 에러");
+    }
+
     @DisplayName("사용자는 댓글이 없는 게시물을 삭제한다.")
     @Test
     void delete_PostWithNoCommentInCaseOfLoginUser_Success() {
