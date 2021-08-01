@@ -3,6 +3,7 @@ package com.woowacourse.pickgit.user.presentation;
 import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.user.application.UserService;
+import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.UserSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import java.util.List;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin(value = "*")
 public class UserSearchController {
 
-    private UserService userService;
+    private final UserService userService;
 
     public UserSearchController(UserService userService) {
         this.userService = userService;
@@ -31,12 +32,13 @@ public class UserSearchController {
         @RequestParam Long page,
         @RequestParam Long limit
     ) {
+        AuthUserRequestDto authUserRequestDto = AuthUserRequestDto.from(appUser);
         UserSearchRequestDto userSearchRequestDto = UserSearchRequestDto.builder()
             .keyword(keyword)
             .page(page)
             .limit(limit)
             .build();
         return ResponseEntity
-            .ok(userService.searchUser(appUser, userSearchRequestDto));
+            .ok(userService.searchUser(authUserRequestDto, userSearchRequestDto));
     }
 }

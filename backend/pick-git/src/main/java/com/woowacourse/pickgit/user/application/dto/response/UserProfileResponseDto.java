@@ -1,8 +1,10 @@
 package com.woowacourse.pickgit.user.application.dto.response;
 
 import lombok.Builder;
+import lombok.Getter;
 
 @Builder
+@Getter
 public class UserProfileResponseDto {
 
     private String name;
@@ -22,10 +24,19 @@ public class UserProfileResponseDto {
     }
 
     public UserProfileResponseDto(
-        String name, String imageUrl, String description,
-        int followerCount, int followingCount, int postCount,
-        String githubUrl, String company, String location, String website, String twitter,
-        Boolean following) {
+        String name,
+        String imageUrl,
+        String description,
+        int followerCount,
+        int followingCount,
+        int postCount,
+        String githubUrl,
+        String company,
+        String location,
+        String website,
+        String twitter,
+        Boolean following
+    ) {
         this.name = name;
         this.imageUrl = imageUrl;
         this.description = description;
@@ -38,53 +49,5 @@ public class UserProfileResponseDto {
         this.website = website;
         this.twitter = twitter;
         this.following = following;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public int getFollowerCount() {
-        return followerCount;
-    }
-
-    public int getFollowingCount() {
-        return followingCount;
-    }
-
-    public int getPostCount() {
-        return postCount;
-    }
-
-    public String getGithubUrl() {
-        return githubUrl;
-    }
-
-    public String getCompany() {
-        return company;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public String getWebsite() {
-        return website;
-    }
-
-    public String getTwitter() {
-        return twitter;
-    }
-
-    public Boolean getFollowing() {
-        return following;
     }
 }

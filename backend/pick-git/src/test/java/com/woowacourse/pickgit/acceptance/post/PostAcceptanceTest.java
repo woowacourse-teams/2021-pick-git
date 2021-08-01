@@ -272,6 +272,7 @@ class PostAcceptanceTest {
             });
 
         assertThat(response).hasSize(3);
+        assertThat(response.get(0).getLiked()).isFalse();
     }
 
     @DisplayName("로그인 상태에서 다른 유저 피드 조회가 가능하다.")
@@ -293,6 +294,7 @@ class PostAcceptanceTest {
             });
 
         assertThat(response).hasSize(3);
+        assertThat(response.get(0).getLiked()).isNull();
     }
 
     @DisplayName("게스트는 게시글을 등록할 수 없다. - 유효하지 않은 토큰이 있는 경우 (Authorization header O)")
@@ -523,8 +525,8 @@ class PostAcceptanceTest {
             });
 
         // then
-        assertThat(response.getLikeCount()).isEqualTo(1);
-        assertThat(response.isLiked()).isTrue();
+        assertThat(response.getLikesCount()).isEqualTo(1);
+        assertThat(response.getLiked()).isTrue();
     }
 
     @DisplayName("로그인 사용자는 게시물을 좋아요 취소 할 수 있다. - 성공")
@@ -547,8 +549,8 @@ class PostAcceptanceTest {
             .as(new TypeRef<>() {
             });
 
-        assertThat(likePostResponse.getLikeCount()).isEqualTo(1);
-        assertThat(likePostResponse.isLiked()).isTrue();
+        assertThat(likePostResponse.getLikesCount()).isEqualTo(1);
+        assertThat(likePostResponse.getLiked()).isTrue();
 
         // when
         LikeResponse unlikePostResponse = given().log().all()
@@ -562,8 +564,8 @@ class PostAcceptanceTest {
             });
 
         // then
-        assertThat(unlikePostResponse.getLikeCount()).isEqualTo(0);
-        assertThat(unlikePostResponse.isLiked()).isFalse();
+        assertThat(unlikePostResponse.getLikesCount()).isEqualTo(0);
+        assertThat(unlikePostResponse.getLiked()).isFalse();
     }
 
     @DisplayName("게스트는 게시물을 좋아요 할 수 없다. - 실패")
@@ -632,8 +634,8 @@ class PostAcceptanceTest {
             .as(new TypeRef<>() {
             });
 
-        assertThat(likePostResponse.getLikeCount()).isEqualTo(1);
-        assertThat(likePostResponse.isLiked()).isTrue();
+        assertThat(likePostResponse.getLikesCount()).isEqualTo(1);
+        assertThat(likePostResponse.getLiked()).isTrue();
 
         // when
         DuplicatedLikeException secondLikeResponse = given().log().all()

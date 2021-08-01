@@ -6,6 +6,7 @@ import com.woowacourse.pickgit.user.domain.follow.Followers;
 import com.woowacourse.pickgit.user.domain.follow.Followings;
 import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
 import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
+import java.util.ArrayList;
 
 public class MockUser {
 
@@ -18,10 +19,6 @@ public class MockUser {
 
     public static class Builder {
 
-        private final Followers followers = new Followers();
-        private final Followings followings = new Followings();
-        private final Posts posts = new Posts();
-
         private Long id;
         private String name;
         private String image = "http://img.com";
@@ -31,6 +28,9 @@ public class MockUser {
         private String location = "Seoul";
         private String website = "www.pick-git.com";
         private String twitter = "pick-git twitter";
+        private Followers followers = new Followers(new ArrayList<>());
+        private Followings followings = new Followings(new ArrayList<>());
+        private Posts posts = new Posts(new ArrayList<>());
 
         public Builder id(Long id) {
             this.id = id;
@@ -81,7 +81,10 @@ public class MockUser {
             return new User(
                 id,
                 new BasicProfile(name, image, description),
-                new GithubProfile(githubUrl, company, location, website, twitter)
+                new GithubProfile(githubUrl, company, location, website, twitter),
+                followers,
+                followings,
+                posts
             );
         }
     }

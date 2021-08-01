@@ -7,16 +7,16 @@ public class CommentResponse {
     private Long id;
     private String authorName;
     private String content;
-    private Boolean isLiked;
+    private Boolean liked;
 
     private CommentResponse() {
     }
 
-    public CommentResponse(Long id, String authorName, String content, Boolean isLiked) {
+    public CommentResponse(Long id, String authorName, String content, Boolean liked) {
         this.id = id;
         this.authorName = authorName;
         this.content = content;
-        this.isLiked = isLiked;
+        this.liked = liked;
     }
 
     public static CommentResponse from(Comment comment) {

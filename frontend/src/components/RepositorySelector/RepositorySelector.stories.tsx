@@ -7,7 +7,9 @@ export default {
   component: RepositorySelector,
 };
 
-const Template: Story = (args) => <RepositorySelector {...args} />;
+const Template: Story = (args) => (
+  <RepositorySelector goNextStep={() => {}} setGithubRepositoryName={() => {}} {...args} />
+);
 
 export const Default = Template.bind({});
 Default.args = {};

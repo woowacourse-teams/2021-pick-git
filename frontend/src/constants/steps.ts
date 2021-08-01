@@ -6,6 +6,11 @@ export const POST_ADD_STEPS: Step[] = [
   { title: "태그 입력", path: "tags" },
 ];
 
+export const POST_EDIT_STEPS: Step[] = [
+  { title: "글 수정", path: "content" },
+  { title: "태그 수정", path: "tags" },
+];
+
 export const COMMENT_SLIDE_STEPS: Step[] = [
   { title: "사진/동영상", path: "#files" },
   { title: "작성글", path: "#content" },

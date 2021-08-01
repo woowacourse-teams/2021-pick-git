@@ -7,7 +7,7 @@ export default {
   component: TagInputForm,
 };
 
-const Template: Story = (args) => <TagInputForm {...args} />;
+const Template: Story = (args) => <TagInputForm githubRepositoryName="test" tags={[]} setTags={() => {}} {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {};
