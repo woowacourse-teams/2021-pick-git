@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { Container, StepSlider, StepContainer, NextStepButtonWrapper } from "./EditPostPage.style";
 import { POST_EDIT_STEPS } from "../../constants/steps";
 import PostContentUploader from "../../components/PostContentUploader/PostContentUploader";
@@ -18,15 +18,22 @@ import { getAPIErrorMessage } from "../../utils/error";
 import usePostEdit from "../../services/hooks/usePostEdit";
 import { useLocation } from "react-router-dom";
 import usePostEditStep from "../../services/hooks/usePostEditStep";
+import UserContext from "../../contexts/UserContext";
 
 const EditPostPage = () => {
   const { search } = useLocation();
-  const { stepIndex, goNextStep, setStepMoveEventHandler, removeStepMoveEventHandler, completeStep } = usePostEditStep(
-    POST_EDIT_STEPS,
-    PAGE_URL.HOME
-  );
+  const { currentUsername } = useContext(UserContext);
 
   const { postId, content, tags, setTags, setContent, editPost, resetPostEditData } = usePostEdit();
+
+  const { stepIndex, goNextStep, setStepMoveEventHandler, removeStepMoveEventHandler, completeStep } = usePostEditStep(
+    POST_EDIT_STEPS,
+    {
+      pathname: PAGE_URL.USER_FEED,
+      search: `?username=${currentUsername}`,
+    }
+  );
+
   const { modalMessage, isModalShown, isCancelButtonShown, showAlertModal, showConfirmModal, hideMessageModal } =
     useMessageModal();
 

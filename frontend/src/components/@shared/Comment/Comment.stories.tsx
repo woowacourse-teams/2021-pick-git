@@ -13,5 +13,5 @@ export const Default = Template.bind({});
 Default.args = {
   authorName: "Tanney",
   content: "개발 너무 재미있어 미치겠어",
-  isLiked: false,
+  liked: false,
 };

@@ -6,7 +6,7 @@ import nock from "nock";
 import { ProfileData } from "../../../@types";
 import { QUERY } from "../../../constants/queries";
 import useFollow from "../useFollow";
-import { getAPIErrorMessage, getClientErrorMessage } from "../../../utils/error";
+import { getClientErrorMessage } from "../../../utils/error";
 import UserContext from "../../../contexts/UserContext";
 import SnackBarContext from "../../../contexts/SnackbarContext";
 

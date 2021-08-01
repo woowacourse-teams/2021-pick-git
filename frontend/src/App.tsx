@@ -1,5 +1,5 @@
 import { useContext, useEffect } from "react";
-import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
+import { BrowserRouter, Route, Redirect, Switch } from "react-router-dom";
 
 import { PAGE_URL } from "./constants/urls";
 import LoginPage from "./pages/LoginPage/LoginPage";
@@ -92,7 +92,7 @@ const App = () => {
             <EditPostPage />
           </PostEditStepContextProvider>
         </Route>
-        {/* <Redirect to="/" /> */}
+        <Redirect to="/" />
       </Switch>
     </BrowserRouter>
   );

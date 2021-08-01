@@ -1,17 +1,29 @@
 import { useContext } from "react";
+import { InfiniteData } from "react-query";
 import { useHistory } from "react-router-dom";
-import { Step } from "../../@types";
+import { Post, Step } from "../../@types";
 import PostEditStepContext from "../../contexts/PostEditStepContext";
 import useStep from "./@common/useStep";
 
-const usePostEditStep = (steps: Step[], stepCompleteLink?: string) => {
+interface StepCompleteLinkData {
+  pathname: string;
+  search: string;
+  state?: { prevData: InfiniteData<Post[]>; postId: Post["id"] };
+}
+
+const usePostEditStep = (steps: Step[], stepCompleteLinkData: StepCompleteLinkData) => {
   const history = useHistory();
 
   const { stepIndex, setStepIndex } = useContext(PostEditStepContext);
 
   const completeStep = () => {
     setStepIndex(0);
-    stepCompleteLink && history.push(stepCompleteLink);
+    stepCompleteLinkData &&
+      history.push({
+        pathname: stepCompleteLinkData.pathname,
+        search: stepCompleteLinkData.search,
+        state: stepCompleteLinkData.state,
+      });
   };
 
   return {

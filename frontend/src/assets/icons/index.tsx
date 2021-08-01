@@ -30,3 +30,4 @@ export { ReactComponent as CameraIcon } from "./camera.svg";
 export { ReactComponent as GoDownIcon } from "./go-down.svg";
 export { ReactComponent as VerticalDotsIcon } from "./vertical-dots.svg";
 export { ReactComponent as TrashIcon } from "./trash.svg";
+export { ReactComponent as ArrowRightIcon } from "./arrow-right.svg";

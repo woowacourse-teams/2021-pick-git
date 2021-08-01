@@ -30,7 +30,7 @@ const LoginPage = () => {
         <CircleIcon diameter="10.5rem">
           <GithubLargeIcon />
         </CircleIcon>
-        <Button type="button" kind="roundedBlock" onClick={onRequestGithubLogin}>
+        <Button type="button" kind="roundedBlock" onClick={onRequestGithubLogin} padding="0.875rem">
           깃허브 로그인
         </Button>
         <Link to={PAGE_URL.HOME}>
