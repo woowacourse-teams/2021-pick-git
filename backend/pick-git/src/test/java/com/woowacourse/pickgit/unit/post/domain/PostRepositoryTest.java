@@ -6,6 +6,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.woowacourse.pickgit.common.factory.PostBuilder;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.config.JpaTestConfiguration;
+import com.woowacourse.pickgit.exception.post.PostNotFoundException;
+import com.woowacourse.pickgit.exception.user.UserNotFoundException;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostRepository;
 import com.woowacourse.pickgit.post.domain.comment.Comment;
@@ -23,6 +25,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.http.HttpStatus;
 
 @Import(JpaTestConfiguration.class)
 @DataJpaTest
@@ -35,10 +38,10 @@ class PostRepositoryTest {
     private PostRepository postRepository;
 
     @Autowired
-    private TestEntityManager testEntityManager;
+    private TagRepository tagRepository;
 
     @Autowired
-    private TagRepository tagRepository;
+    private TestEntityManager testEntityManager;
 
     @DisplayName("게시글을 저장한다.")
     @Test
@@ -158,6 +161,67 @@ class PostRepositoryTest {
 
         List<Comment> comments = findPost.getComments();
         assertThat(comments).hasSize(1);
+    }
+
+    @DisplayName("저장되어 있는 게시물 중 2번째 게시물을 조회한다.")
+    @Test
+    void findByIdAndUser_SecondPost_Success() {
+        // given
+        User user = UserFactory.user("testUser");
+        userRepository.save(user);
+
+        Post post1 = postBuilder("testContent1", "https://github.com/da-nyee/1", user);
+        Post post2 = postBuilder("testContent2", "https://github.com/da-nyee/2", user);
+
+        postRepository.save(post1);
+        postRepository.save(post2);
+        flushAndClear();
+
+        // when
+        User findUser = userRepository.findByBasicProfile_Name(user.getName())
+            .orElseThrow(UserNotFoundException::new);
+        Post findPost = postRepository.findByIdAndUser(post2.getId(), findUser)
+            .orElseThrow(PostNotFoundException::new);
+
+        // then
+        assertThat(findPost)
+            .usingRecursiveComparison()
+            .ignoringFields("user")
+            .isNotEqualTo(post1);
+        assertThat(findPost)
+            .usingRecursiveComparison()
+            .ignoringFields("user")
+            .isEqualTo(post2);
+    }
+    
+    @DisplayName("저장되어 있지 않은 게시물은 조회할 수 없다. - 500 예외")
+    @Test
+    void findPostByIdAndUser_unsavedPost_500Exception() {
+        // given
+        User user = UserFactory.user("testUser");
+        User savedUser = userRepository.save(user);
+
+        Post post = postBuilder("testContent1", "https://github.com/da-nyee/1", savedUser);
+
+        postRepository.save(post);
+        flushAndClear();
+
+        // when
+        assertThatThrownBy(() -> {
+            postRepository.findByIdAndUser(2L, savedUser)
+                .orElseThrow(PostNotFoundException::new);
+        }).isInstanceOf(PostNotFoundException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "P0002")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
+            .hasMessage("해당하는 게시물을 찾을 수 없습니다.");
+    }
+
+    private Post postBuilder(String content, String repoUrl, User savedUser) {
+        return new PostBuilder()
+            .content(content)
+            .githubRepoUrl(repoUrl)
+            .user(savedUser)
+            .build();
     }
 
     private void flushAndClear() {
