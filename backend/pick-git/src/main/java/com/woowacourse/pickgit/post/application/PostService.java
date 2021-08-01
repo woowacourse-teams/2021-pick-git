@@ -4,7 +4,6 @@ import static java.util.stream.Collectors.toList;
 
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
-import com.woowacourse.pickgit.exception.post.PostNotBelongToUserException;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
 import com.woowacourse.pickgit.post.application.dto.CommentResponse;
@@ -132,17 +131,9 @@ public class PostService {
 
     public CommentResponse addComment(CommentRequest commentRequest) {
         User user = userRepository.findByBasicProfile_Name(commentRequest.getUserName())
-            .orElseThrow(() -> new UserNotFoundException(
-                "U0001",
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "해당하는 사용자를 찾을 수 없습니다."
-            ));
+            .orElseThrow(UserNotFoundException::new);
         Post post = postRepository.findById(commentRequest.getPostId())
-            .orElseThrow(() -> new PostNotFoundException(
-                "P0002",
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "해당하는 게시물을 찾을 수 없습니다."
-            ));
+            .orElseThrow(PostNotFoundException::new);
         Comment comment = new Comment(commentRequest.getContent());
         user.addComment(post, comment);
         return CommentResponse.from(comment);
@@ -199,23 +190,19 @@ public class PostService {
 
     private Post findPostById(Long id) {
         return postRepository.findById(id)
-            .orElseThrow(() -> new PostNotFoundException(
-                "P0002",
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "해당하는 게시물을 찾을 수 없습니다.")
-            );
+            .orElseThrow(PostNotFoundException::new);
     }
 
     public PostUpdateResponseDto update(PostUpdateRequestDto updateRequestDto) {
         User user = findUserByName(updateRequestDto.getUsername());
-        Post post = findPostByUser(user);
+        Post post = findPostByIdAndUser(updateRequestDto.getPostId(), user);
 
         List<Tag> tags = tagService.findOrCreateTags(new TagsDto(updateRequestDto.getTags()));
 
         post.updateContent(updateRequestDto.getContent());
         post.updateTags(tags);
 
-        Post updatedPost = findPostByUser(user);
+        Post updatedPost = findPostByIdAndUser(updateRequestDto.getPostId(), user);
 
         return PostUpdateResponseDto.builder()
             .content(updatedPost.getContent())
@@ -225,7 +212,7 @@ public class PostService {
 
     public void delete(PostDeleteRequestDto deleteRequestDto) {
         User user = findUserByName(deleteRequestDto.getUsername());
-        Post post = findPostByUser(user);
+        Post post = findPostByIdAndUser(deleteRequestDto.getPostId(), user);
 
         postRepository.delete(post);
     }
@@ -233,14 +220,12 @@ public class PostService {
     private User findUserByName(String username) {
         return userRepository
             .findByBasicProfile_Name(username)
-            .orElseThrow(() -> new UserNotFoundException(
-                "U0001",
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "해당하는 사용자를 찾을 수 없습니다."));
+            .orElseThrow(UserNotFoundException::new);
     }
 
-    private Post findPostByUser(User user) {
-        return postRepository.findByUser(user)
-            .orElseThrow(PostNotBelongToUserException::new);
+    @Transactional(readOnly = true)
+    public Post findPostByIdAndUser(Long postId, User user) {
+        return postRepository.findByIdAndUser(postId, user)
+            .orElseThrow(PostNotFoundException::new);
     }
 }

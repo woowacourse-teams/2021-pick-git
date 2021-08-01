@@ -19,7 +19,6 @@ import com.woowacourse.pickgit.exception.post.CannotAddTagException;
 import com.woowacourse.pickgit.exception.post.CannotUnlikeException;
 import com.woowacourse.pickgit.exception.post.CommentFormatException;
 import com.woowacourse.pickgit.exception.post.DuplicatedLikeException;
-import com.woowacourse.pickgit.exception.post.PostNotBelongToUserException;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
 import com.woowacourse.pickgit.post.application.PostService;
@@ -37,12 +36,12 @@ import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostRepository;
 import com.woowacourse.pickgit.post.presentation.dto.request.CommentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.HomeFeedRequest;
-import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
+import javax.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -493,7 +492,6 @@ class PostServiceIntegrationTest {
             .hasMessage("이미 좋아요한 게시물 중복 좋아요 에러");
     }
 
-
     @DisplayName("게스트는 게시물을 좋아요 할 수 없다. - 실패")
     @Test
     void like_GuestUser_401ExceptionThrown() {
@@ -558,8 +556,9 @@ class PostServiceIntegrationTest {
     @Test
     void update_TagsAndContentInCaseOfLoginUser_Success() {
         // given
-        userRepository.save(UserFactory.user(USERNAME));
-        LoginUser user = new LoginUser(USERNAME, ACCESS_TOKEN);
+        User user = UserFactory.user(USERNAME);
+        userRepository.save(user);
+        LoginUser loginUser = new LoginUser(USERNAME, ACCESS_TOKEN);
 
         PostRequestDto requestDto = PostRequestDto.builder()
             .token(ACCESS_TOKEN)
@@ -574,14 +573,11 @@ class PostServiceIntegrationTest {
 
         postService.write(requestDto);
 
-        PostUpdateRequest updateRequest =
-            new PostUpdateRequest(List.of("java", "spring", "spring-boot"), "hello");
+        PostUpdateRequestDto updateRequestDto = new PostUpdateRequestDto(loginUser, 1L,
+            List.of("java", "spring", "spring-boot"), "hello");
 
-        PostUpdateRequestDto updateRequestDto = new PostUpdateRequestDto(user, 1L,
-            updateRequest.getTags(), updateRequest.getContent());
-
-        PostUpdateResponseDto responseDto =
-            new PostUpdateResponseDto(List.of("java", "spring", "spring-boot"), "hello");
+        PostUpdateResponseDto responseDto = new PostUpdateResponseDto(
+            List.of("java", "spring", "spring-boot"), "hello");
 
         // when
         PostUpdateResponseDto updateResponseDto = postService.update(updateRequestDto);
@@ -596,8 +592,9 @@ class PostServiceIntegrationTest {
     @Test
     void update_TagsInCaseOfLoginUser_Success() {
         // given
-        userRepository.save(UserFactory.user(USERNAME));
-        LoginUser user = new LoginUser(USERNAME, ACCESS_TOKEN);
+        User user = UserFactory.user(USERNAME);
+        userRepository.save(user);
+        LoginUser loginUser = new LoginUser(USERNAME, ACCESS_TOKEN);
 
         PostRequestDto requestDto = PostRequestDto.builder()
             .token(ACCESS_TOKEN)
@@ -612,14 +609,11 @@ class PostServiceIntegrationTest {
 
         postService.write(requestDto);
 
-        PostUpdateRequest updateRequest =
-            new PostUpdateRequest(List.of("java", "spring", "spring-boot"), "testContent");
+        PostUpdateRequestDto updateRequestDto = new PostUpdateRequestDto(loginUser, 1L,
+            List.of("java", "spring", "spring-boot"), "testContent");
 
-        PostUpdateRequestDto updateRequestDto = new PostUpdateRequestDto(user, 1L,
-            updateRequest.getTags(), updateRequest.getContent());
-
-        PostUpdateResponseDto responseDto =
-            new PostUpdateResponseDto(List.of("java", "spring", "spring-boot"), "testContent");
+        PostUpdateResponseDto responseDto = new PostUpdateResponseDto(
+            List.of("java", "spring", "spring-boot"), "testContent");
 
         // when
         PostUpdateResponseDto updateResponseDto = postService.update(updateRequestDto);
@@ -634,8 +628,9 @@ class PostServiceIntegrationTest {
     @Test
     void update_ContentInCaseOfLoginUser_Success() {
         // given
-        userRepository.save(UserFactory.user(USERNAME));
-        LoginUser user = new LoginUser(USERNAME, ACCESS_TOKEN);
+        User user = UserFactory.user(USERNAME);
+        userRepository.save(user);
+        LoginUser loginUser = new LoginUser(USERNAME, ACCESS_TOKEN);
 
         PostRequestDto requestDto = PostRequestDto.builder()
             .token(ACCESS_TOKEN)
@@ -650,14 +645,11 @@ class PostServiceIntegrationTest {
 
         postService.write(requestDto);
 
-        PostUpdateRequest updateRequest =
-            new PostUpdateRequest(List.of("java", "spring"), "hello");
+        PostUpdateRequestDto updateRequestDto = new PostUpdateRequestDto(loginUser, 1L,
+            List.of("java", "spring"), "hello");
 
-        PostUpdateRequestDto updateRequestDto = new PostUpdateRequestDto(user, 1L,
-            updateRequest.getTags(), updateRequest.getContent());
-
-        PostUpdateResponseDto responseDto =
-            new PostUpdateResponseDto(List.of("java", "spring"), "hello");
+        PostUpdateResponseDto responseDto = new PostUpdateResponseDto(
+            List.of("java", "spring"), "hello");
 
         // when
         PostUpdateResponseDto updateResponseDto = postService.update(updateRequestDto);
@@ -668,13 +660,15 @@ class PostServiceIntegrationTest {
             .isEqualTo(responseDto);
     }
 
-    @DisplayName("해당하는 사용자의 게시물이 아닌 경우 수정할 수 없다. - 400 예외")
+    @DisplayName("해당하는 사용자의 게시물이 아닌 경우 수정할 수 없다. - 500 예외")
     @Test
-    void update_PostNotBelongToUser_400Exception() {
+    void update_PostNotBelongToUser_500Exception() {
         // given
-        userRepository.save(UserFactory.user(USERNAME));
-        userRepository.save(UserFactory.user("anotherUser"));
-        LoginUser user = new LoginUser(USERNAME, ACCESS_TOKEN);
+        User user = UserFactory.user(USERNAME);
+        User anotherUser = UserFactory.user("anotherUser");
+        userRepository.save(user);
+        userRepository.save(anotherUser);
+        LoginUser loginUser = new LoginUser(USERNAME, ACCESS_TOKEN);
 
         PostRequestDto requestDto = PostRequestDto.builder()
             .token(ACCESS_TOKEN)
@@ -689,27 +683,25 @@ class PostServiceIntegrationTest {
 
         postService.write(requestDto);
 
-        PostUpdateRequest updateRequest =
-            new PostUpdateRequest(List.of("java", "spring"), "hello");
-
-        PostUpdateRequestDto updateRequestDto = new PostUpdateRequestDto(user, 1L,
-            updateRequest.getTags(), updateRequest.getContent());
+        PostUpdateRequestDto updateRequestDto = new PostUpdateRequestDto(loginUser, 1L,
+            List.of("java", "spring"), "hello");
 
         // when
         assertThatThrownBy(() -> {
             postService.update(updateRequestDto);
-        }).isInstanceOf(PostNotBelongToUserException.class)
-            .hasFieldOrPropertyWithValue("errorCode", "P0005")
-            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
-            .hasMessage("해당하는 사용자의 게시물이 아닌 에러");
+        }).isInstanceOf(PostNotFoundException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "P0002")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
+            .hasMessage("해당하는 게시물을 찾을 수 없습니다.");
     }
 
     @DisplayName("사용자는 게시물을 삭제한다.")
     @Test
     void delete_LoginUser_Success() {
         // given
-        userRepository.save(UserFactory.user(USERNAME));
-        LoginUser user = new LoginUser(USERNAME, ACCESS_TOKEN);
+        User user = UserFactory.user(USERNAME);
+        userRepository.save(user);
+        LoginUser loginUser = new LoginUser(USERNAME, ACCESS_TOKEN);
 
         PostRequestDto requestDto = PostRequestDto.builder()
             .token(ACCESS_TOKEN)
@@ -724,7 +716,7 @@ class PostServiceIntegrationTest {
 
         postService.write(requestDto);
 
-        PostDeleteRequestDto deleteRequestDto = new PostDeleteRequestDto(user, 1L);
+        PostDeleteRequestDto deleteRequestDto = new PostDeleteRequestDto(loginUser, 1L);
 
         // when
         postService.delete(deleteRequestDto);
@@ -732,24 +724,22 @@ class PostServiceIntegrationTest {
         // then
         assertThatThrownBy(() -> {
             postRepository.findById(1L)
-                .orElseThrow(() -> new PostNotFoundException(
-                    "P0002",
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "해당하는 게시물을 찾을 수 없습니다."
-                ));
+                .orElseThrow(PostNotFoundException::new);
         }).isInstanceOf(PostNotFoundException.class)
             .hasFieldOrPropertyWithValue("errorCode", "P0002")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
             .hasMessage("해당하는 게시물을 찾을 수 없습니다.");
     }
 
-    @DisplayName("해당하는 사용자의 게시물이 아닌 경우 삭제할 수 없다. - 400 예외")
+    @DisplayName("해당하는 사용자의 게시물이 아닌 경우 삭제할 수 없다. - 500 예외")
     @Test
-    void delete_PostNotBelongToUser_400Exception() {
+    void delete_PostNotBelongToUser_500Exception() {
         // given
-        userRepository.save(UserFactory.user(USERNAME));
-        userRepository.save(UserFactory.user("anotherUser"));
-        LoginUser user = new LoginUser(USERNAME, ACCESS_TOKEN);
+        User user = UserFactory.user(USERNAME);
+        User anotherUser = UserFactory.user("anotherUser");
+        userRepository.save(user);
+        userRepository.save(anotherUser);
+        LoginUser loginUser = new LoginUser(USERNAME, ACCESS_TOKEN);
 
         PostRequestDto requestDto = PostRequestDto.builder()
             .token(ACCESS_TOKEN)
@@ -764,14 +754,14 @@ class PostServiceIntegrationTest {
 
         postService.write(requestDto);
 
-        PostDeleteRequestDto deleteRequestDto = new PostDeleteRequestDto(user, 1L);
+        PostDeleteRequestDto deleteRequestDto = new PostDeleteRequestDto(loginUser, 1L);
 
         // when
         assertThatThrownBy(() -> {
             postService.delete(deleteRequestDto);
-        }).isInstanceOf(PostNotBelongToUserException.class)
-            .hasFieldOrPropertyWithValue("errorCode", "P0005")
-            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
-            .hasMessage("해당하는 사용자의 게시물이 아닌 에러");
+        }).isInstanceOf(PostNotFoundException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "P0002")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
+            .hasMessage("해당하는 게시물을 찾을 수 없습니다.");
     }
 }
