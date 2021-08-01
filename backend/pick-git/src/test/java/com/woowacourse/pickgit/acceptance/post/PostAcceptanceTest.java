@@ -187,7 +187,10 @@ class PostAcceptanceTest {
             .as(new TypeRef<List<PostResponseDto>>() {
             });
 
-        assertThat(response).hasSize(3);
+        assertThat(response)
+            .hasSize(3)
+            .extracting("liked")
+            .containsExactly(false, false, false);
     }
 
     @DisplayName("비 로그인이어도 게시글 조회가 가능하다. - Comment 및 게시물 좋아요 여부는 항상 false")
@@ -208,7 +211,10 @@ class PostAcceptanceTest {
             .as(new TypeRef<List<PostResponseDto>>() {
             });
 
-        assertThat(response).hasSize(3);
+        assertThat(response)
+            .hasSize(3)
+            .extracting("liked")
+            .containsExactly(null, null, null);
     }
 
     @DisplayName("로그인 상태에서 내 피드 조회가 가능하다.")
@@ -230,7 +236,10 @@ class PostAcceptanceTest {
             .as(new TypeRef<List<PostResponseDto>>() {
             });
 
-        assertThat(response).hasSize(3);
+        assertThat(response)
+            .hasSize(3)
+            .extracting("liked")
+            .containsExactly(false, false, false);
     }
 
     @DisplayName("비로그인 상태에서는 내 피드 조회가 불가능하다.")
@@ -258,8 +267,6 @@ class PostAcceptanceTest {
         requestToWritePostApi(targetUserToken, HttpStatus.CREATED);
         requestToWritePostApi(targetUserToken, HttpStatus.CREATED);
         requestToWritePostApi(targetUserToken, HttpStatus.CREATED);
-        requestToWritePostApi(loginUserToken, HttpStatus.CREATED);
-        requestToWritePostApi(loginUserToken, HttpStatus.CREATED);
 
         List<PostResponseDto> response = given().log().all()
             .auth().oauth2(loginUserToken)
@@ -271,11 +278,13 @@ class PostAcceptanceTest {
             .as(new TypeRef<List<PostResponseDto>>() {
             });
 
-        assertThat(response).hasSize(3);
-        assertThat(response.get(0).getLiked()).isFalse();
+        assertThat(response)
+            .hasSize(3)
+            .extracting("liked")
+            .containsExactly(false, false, false);
     }
 
-    @DisplayName("로그인 상태에서 다른 유저 피드 조회가 가능하다.")
+    @DisplayName("비 로그인 상태에서 다른 유저 피드 조회가 가능하다.")
     @Test
     void readUserFeed_GuestUser_Success() {
         String targetUserToken = 로그인_되어있음(ANOTHER_USERNAME).getToken();
@@ -293,8 +302,10 @@ class PostAcceptanceTest {
             .as(new TypeRef<List<PostResponseDto>>() {
             });
 
-        assertThat(response).hasSize(3);
-        assertThat(response.get(0).getLiked()).isNull();
+        assertThat(response)
+            .hasSize(3)
+            .extracting("liked")
+            .containsExactly(null, null, null);
     }
 
     @DisplayName("게스트는 게시글을 등록할 수 없다. - 유효하지 않은 토큰이 있는 경우 (Authorization header O)")
