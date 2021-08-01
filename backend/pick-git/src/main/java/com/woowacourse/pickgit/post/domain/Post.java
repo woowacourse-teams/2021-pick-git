@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import com.woowacourse.pickgit.exception.post.CannotAddTagException;
+import com.woowacourse.pickgit.exception.post.PostNotBelongToUserException;
 import com.woowacourse.pickgit.post.domain.comment.Comment;
 import com.woowacourse.pickgit.post.domain.comment.Comments;
 import com.woowacourse.pickgit.post.domain.content.Images;
@@ -128,6 +129,13 @@ public class Post {
 
     public boolean isLikedBy(String userName) {
         return likes.contains(userName);
+    }
+
+    public void belongsToUser(User user) {
+        if (getUser().isSameAs(user)) {
+            return;
+        }
+        throw new PostNotBelongToUserException();
     }
 
     public void updateContent(String content) {
