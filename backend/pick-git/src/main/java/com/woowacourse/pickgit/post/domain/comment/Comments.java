@@ -10,7 +10,11 @@ import javax.persistence.OneToMany;
 @Embeddable
 public class Comments {
 
-    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @OneToMany(
+        mappedBy = "post",
+        fetch = FetchType.LAZY,
+        cascade = {CascadeType.PERSIST, CascadeType.REMOVE}
+    )
     private List<Comment> comments = new ArrayList<>();
 
     public Comments() {

@@ -695,34 +695,67 @@ class PostServiceIntegrationTest {
             .hasMessage("해당하는 사용자의 게시물이 아닙니다.");
     }
 
-    @DisplayName("사용자는 게시물을 삭제한다.")
+    @DisplayName("사용자는 댓글이 없는 게시물을 삭제한다.")
     @Test
-    void delete_LoginUser_Success() {
+    void delete_PostWithNoCommentInCaseOfLoginUser_Success() {
         // given
         User user = UserFactory.user(USERNAME);
-        userRepository.save(user);
-        LoginUser loginUser = new LoginUser(USERNAME, ACCESS_TOKEN);
+        User savedUser = userRepository.save(user);
+        LoginUser loginUser = new LoginUser(savedUser.getName(), ACCESS_TOKEN);
 
-        PostRequestDto requestDto = PostRequestDto.builder()
-            .token(ACCESS_TOKEN)
-            .username(USERNAME)
-            .images(List.of(
-                FileFactory.getTestImage1(),
-                FileFactory.getTestImage2()))
-            .githubRepoUrl("https://github.com/da-nyee/woowacourse-projects")
-            .tags(List.of("java", "spring"))
+        Post post = new PostBuilder()
             .content("testContent")
+            .githubRepoUrl("https://github.com/da-nyee")
+            .user(savedUser)
             .build();
 
-        postService.write(requestDto);
+        Post savedPost = postRepository.save(post);
 
-        PostDeleteRequestDto deleteRequestDto = new PostDeleteRequestDto(loginUser, 1L);
+        PostDeleteRequestDto deleteRequestDto = new PostDeleteRequestDto(loginUser,
+            savedPost.getId());
 
         // when
         postService.delete(deleteRequestDto);
 
         // then
-        assertThat(postRepository.findById(1L)).isEmpty();
+        assertThat(postRepository.findById(savedPost.getId())).isEmpty();
+    }
+
+    @DisplayName("사용자는 댓글이 있는 게시물을 삭제한다.")
+    @Test
+    void delete_PostWithCommentInCaseOfLoginUser_Success() {
+        // given
+        User user = UserFactory.user(USERNAME);
+        User savedUser = userRepository.save(user);
+        LoginUser loginUser = new LoginUser(savedUser.getName(), ACCESS_TOKEN);
+
+        User kevin = UserFactory.user("kevin");
+        User savedKevin = userRepository.save(kevin);
+
+        Post post = new PostBuilder()
+            .content("testContent")
+            .githubRepoUrl("https://github.com/da-nyee")
+            .user(savedUser)
+            .build();
+
+        Post savedPost = postRepository.save(post);
+
+        CommentRequest request = CommentRequest.builder()
+            .userName(savedKevin.getName())
+            .content("testComment")
+            .postId(savedPost.getId())
+            .build();
+
+        postService.addComment(request);
+
+        PostDeleteRequestDto deleteRequestDto = new PostDeleteRequestDto(loginUser,
+            savedPost.getId());
+
+        // when
+        postService.delete(deleteRequestDto);
+
+        // then
+        assertThat(postRepository.findById(savedPost.getId())).isEmpty();
     }
 
     @DisplayName("해당하는 사용자의 게시물이 아닌 경우 삭제할 수 없다. - 401 예외")
@@ -730,25 +763,21 @@ class PostServiceIntegrationTest {
     void delete_PostNotBelongToUser_401Exception() {
         // given
         User user = UserFactory.user(USERNAME);
-        User anotherUser = UserFactory.user("anotherUser");
+        User kevin = UserFactory.user("kevin");
         userRepository.save(user);
-        userRepository.save(anotherUser);
+        User savedKevin = userRepository.save(kevin);
         LoginUser loginUser = new LoginUser(USERNAME, ACCESS_TOKEN);
 
-        PostRequestDto requestDto = PostRequestDto.builder()
-            .token(ACCESS_TOKEN)
-            .username("anotherUser")
-            .images(List.of(
-                FileFactory.getTestImage1(),
-                FileFactory.getTestImage2()))
-            .githubRepoUrl("https://github.com/da-nyee/woowacourse-projects")
-            .tags(List.of("java", "spring"))
+        Post post = new PostBuilder()
             .content("testContent")
+            .githubRepoUrl("https://github.com/da-nyee")
+            .user(savedKevin)
             .build();
 
-        postService.write(requestDto);
+        Post savedPost = postRepository.save(post);
 
-        PostDeleteRequestDto deleteRequestDto = new PostDeleteRequestDto(loginUser, 1L);
+        PostDeleteRequestDto deleteRequestDto = new PostDeleteRequestDto(loginUser,
+            savedPost.getId());
 
         // when
         assertThatThrownBy(() -> {

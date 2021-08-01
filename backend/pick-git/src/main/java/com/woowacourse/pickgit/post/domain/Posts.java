@@ -21,4 +21,8 @@ public class Posts {
     public int count() {
         return posts.size();
     }
+
+    public List<Post> getPosts() {
+        return posts;
+    }
 }
