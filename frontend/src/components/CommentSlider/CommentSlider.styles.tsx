@@ -125,7 +125,7 @@ export const CommentTextAreaWrapper = styled.div`
 
 export const CommentTextArea = styled.textarea`
   width: 100%;
-  padding: 1rem 1rem 0rem 1rem;
+  padding: 1.25rem 1rem 0rem 1rem;
   min-height: ${LAYOUT.COMMENT_INPUT_HEIGHT};
   font-size: 0.875rem;
   border: none;
