@@ -41,7 +41,6 @@ public class Likes {
         if (likes.contains(like)) {
             throw new DuplicatedLikeException();
         }
-
         likes.add(like);
     }
 

@@ -64,10 +64,7 @@ public class PostDtoAssembler {
     }
 
     private static List<String> createTagsFrom(Post post) {
-        return post.getTags()
-            .stream()
-            .map(Tag::getName)
-            .collect(toList());
+        return post.getTagNames();
     }
 
     private static Boolean isLikedBy(User requestUser, Post post, boolean isGuest) {

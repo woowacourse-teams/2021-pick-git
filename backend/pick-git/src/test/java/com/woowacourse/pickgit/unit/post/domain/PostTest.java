@@ -33,7 +33,7 @@ class PostTest {
 
         post.addTags(tags);
 
-        assertThat(post.getTags()).hasSize(3);
+        assertThat(post.getTagNames()).hasSize(3);
     }
 
     @DisplayName("중복되는 이름의 Tag가 존재하면 Post에 추가할 수 없다.")

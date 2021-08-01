@@ -113,7 +113,7 @@ class PostRepositoryTest {
             .orElse(null);
 
         assertThat(findPost).isNotNull();
-        assertThat(findPost.getTags()).hasSize(2);
+        assertThat(findPost.getTagNames()).hasSize(2);
     }
 
     @DisplayName("Post를 저장할 때 Tag는 함께 영속화되지 않는다. (태그가 존재하지 않을 경우 예외가 발생한다)")

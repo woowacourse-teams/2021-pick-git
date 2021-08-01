@@ -173,10 +173,6 @@ public class Post {
         return comments.getComments();
     }
 
-    public List<Tag> getTags() {
-        return postTags.getTags();
-    }
-
     public List<String> getTagNames() {
         return postTags.getTagNames();
     }
