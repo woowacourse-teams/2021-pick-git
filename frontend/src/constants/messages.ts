@@ -1,4 +1,3 @@
-import { ErrorResponse } from "../@types";
 import { getMBFromBite } from "../utils/postUpload";
 import { LIMIT } from "./limits";
 

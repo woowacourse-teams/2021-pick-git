@@ -3,6 +3,7 @@ import { useContext } from "react";
 import { InfiniteData, QueryObserverResult, RefetchOptions } from "react-query";
 
 import { ErrorResponse, SearchResultUser } from "../../@types";
+import { PAGE_URL } from "../../constants/urls";
 import UserContext from "../../contexts/UserContext";
 import useFollow from "../../services/hooks/useFollow";
 import Avatar from "../@shared/Avatar/Avatar";
@@ -62,7 +63,7 @@ const SearchListUser = ({ isFetchingNextPage, onIntersect, users, follow, refetc
       <ul>
         {users.map((user) => (
           <UserList key={user.username}>
-            <NameTag>
+            <NameTag to={PAGE_URL.USER_PROFILE(user.username)}>
               <Avatar diameter="1.875rem" imageUrl={user.imageUrl} />
               <span>{user.username}</span>
             </NameTag>

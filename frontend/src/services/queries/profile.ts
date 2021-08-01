@@ -68,44 +68,8 @@ export const useUnfollowingMutation = () =>
     requestDeleteFollow(username, getAccessToken())
   );
 
-export const useProfileMutation = (username: string) => {
-  const queryClient = useQueryClient();
-  const currentProfileQueryKey = [QUERY.GET_PROFILE, { isMyProfile: false, username }];
-  const currentProfileQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
-  const { logout } = useContext(UserContext);
-  const { pushSnackbarMessage } = useContext(SnackBarContext);
-
+export const useProfileMutation = () => {
   return useMutation<SetProfileResponse, AxiosError<ErrorResponse> | Error, SetProfileVariable>(
-    ({ image, description }) => requestSetProfile(image, description, getAccessToken()),
-    {
-      onSuccess: ({ imageUrl, description }) => {
-        if (!currentProfileQueryData) return;
-
-        queryClient.setQueryData<ProfileData>(currentProfileQueryKey, {
-          ...currentProfileQueryData,
-          imageUrl,
-          description,
-        });
-
-        pushSnackbarMessage(SUCCESS_MESSAGE.SET_PROFILE);
-      },
-      onError: (error) => {
-        if (axios.isAxiosError(error)) {
-          const { status, data } = error.response ?? {};
-
-          if (status && isHttpErrorStatus(status)) {
-            handleHTTPError(status, {
-              unauthorized: () => logout(),
-              notFound: () => pushSnackbarMessage("아직 준비되지 않은 서비스입니다."),
-              methodNotAllowed: () => pushSnackbarMessage("아직 준비되지 않은 서비스입니다."),
-            });
-          }
-
-          data?.errorCode && pushSnackbarMessage(data.errorCode);
-        } else {
-          pushSnackbarMessage(UNKNOWN_ERROR_MESSAGE);
-        }
-      },
-    }
+    ({ image, description }) => requestSetProfile(image, description, getAccessToken())
   );
 };
