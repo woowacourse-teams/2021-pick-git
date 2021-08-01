@@ -19,7 +19,7 @@ public class PostResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<CommentResponseDto> comments;
-    private Boolean isLiked;
+    private Boolean liked;
 
     private PostResponse() {
     }
@@ -36,7 +36,7 @@ public class PostResponse {
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
         List<CommentResponseDto> comments,
-        Boolean isLiked
+        Boolean liked
     ) {
         this.id = id;
         this.imageUrls = imageUrls;
@@ -49,7 +49,7 @@ public class PostResponse {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.comments = comments;
-        this.isLiked = isLiked;
+        this.liked = liked;
     }
 
     public Long getId() {
@@ -96,7 +96,7 @@ public class PostResponse {
         return comments;
     }
 
-    public Boolean getIsLiked() {
-        return isLiked;
+    public Boolean getLiked() {
+        return liked;
     }
 }

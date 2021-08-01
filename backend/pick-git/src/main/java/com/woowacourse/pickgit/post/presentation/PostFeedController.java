@@ -88,7 +88,7 @@ public class PostFeedController {
             .createdAt(postResponseDto.getCreatedAt())
             .updatedAt(postResponseDto.getUpdatedAt())
             .comments(postResponseDto.getComments())
-            .isLiked(postResponseDto.getIsLiked())
+            .liked(postResponseDto.getLiked())
             .build();
     }
 }

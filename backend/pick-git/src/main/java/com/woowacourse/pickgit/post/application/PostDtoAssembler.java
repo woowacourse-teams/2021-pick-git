@@ -42,7 +42,7 @@ public class PostDtoAssembler {
             .createdAt(post.getCreatedAt())
             .updatedAt(post.getUpdatedAt())
             .comments(comments)
-            .isLiked(isLikedBy(requestUser, post, isGuest))
+            .liked(isLikedBy(requestUser, post, isGuest))
             .build();
     }
 
@@ -59,7 +59,7 @@ public class PostDtoAssembler {
             .profileImageUrl(comment.getProfileImageUrl())
             .authorName(comment.getAuthorName())
             .content(comment.getContent())
-            .isLiked(false)
+            .liked(false)
             .build();
     }
 

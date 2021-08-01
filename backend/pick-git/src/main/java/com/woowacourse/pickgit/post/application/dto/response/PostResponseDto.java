@@ -18,7 +18,7 @@ public class PostResponseDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<CommentResponseDto> comments;
-    private Boolean isLiked;
+    private Boolean liked;
 
     private PostResponseDto() {
     }
@@ -35,7 +35,7 @@ public class PostResponseDto {
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
         List<CommentResponseDto> comments,
-        Boolean isLiked
+        Boolean liked
     ) {
         this.id = id;
         this.imageUrls = imageUrls;

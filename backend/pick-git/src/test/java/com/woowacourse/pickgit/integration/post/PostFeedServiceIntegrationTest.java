@@ -8,10 +8,10 @@ import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.post.application.PostFeedService;
 import com.woowacourse.pickgit.post.application.PostService;
-import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
-import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.dto.request.CommentRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.HomeFeedRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import java.util.List;
@@ -178,7 +178,7 @@ public class PostFeedServiceIntegrationTest {
 
     private List<Boolean> extractLikes(List<PostResponseDto> postResponseDtos) {
         return postResponseDtos.stream()
-            .map(PostResponseDto::getIsLiked)
+            .map(PostResponseDto::getLiked)
             .collect(toList());
     }
 

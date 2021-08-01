@@ -3,6 +3,8 @@ package com.woowacourse.pickgit.post.application;
 import static java.util.stream.Collectors.toList;
 
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
+import com.woowacourse.pickgit.exception.post.PostNotBelongToUserException;
+import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
 import com.woowacourse.pickgit.post.application.dto.request.CommentRequestDto;

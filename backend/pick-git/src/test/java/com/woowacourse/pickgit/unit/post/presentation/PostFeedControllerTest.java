@@ -22,8 +22,8 @@ import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.PostFactory;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.post.application.PostFeedService;
-import com.woowacourse.pickgit.post.presentation.PostFeedController;
 import com.woowacourse.pickgit.post.application.dto.request.HomeFeedRequestDto;
+import com.woowacourse.pickgit.post.presentation.PostFeedController;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,8 +95,8 @@ public class PostFeedControllerTest {
                     .description("댓글 작성자 프로필 사진"),
                 fieldWithPath("[].comments[].authorName").type(STRING).description("댓글 작성자 이름"),
                 fieldWithPath("[].comments[].content").type(STRING).description("댓글 내용"),
-                fieldWithPath("[].comments[].isLiked").type(BOOLEAN).description("댓글 좋아요 여부"),
-                fieldWithPath("[].isLiked").type(BOOLEAN).description("좋아요 여부")
+                fieldWithPath("[].comments[].liked").type(BOOLEAN).description("댓글 좋아요 여부"),
+                fieldWithPath("[].liked").type(BOOLEAN).description("좋아요 여부")
             )
             )
         );
@@ -150,8 +150,8 @@ public class PostFeedControllerTest {
                     .description("댓글 작성자 프로필 사진"),
                 fieldWithPath("[].comments[].authorName").type(STRING).description("댓글 작성자 이름"),
                 fieldWithPath("[].comments[].content").type(STRING).description("댓글 내용"),
-                fieldWithPath("[].comments[].isLiked").type(BOOLEAN).description("댓글 좋아요 여부"),
-                fieldWithPath("[].isLiked").type(BOOLEAN).description("좋아요 여부")
+                fieldWithPath("[].comments[].liked").type(BOOLEAN).description("댓글 좋아요 여부"),
+                fieldWithPath("[].liked").type(BOOLEAN).description("좋아요 여부")
             )
             )
         );

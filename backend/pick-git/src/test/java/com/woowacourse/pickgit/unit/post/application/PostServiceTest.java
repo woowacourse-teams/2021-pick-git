@@ -13,31 +13,41 @@ import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.woowacourse.pickgit.authentication.domain.user.AppUser;
+import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
+import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.PostFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
+import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
+import com.woowacourse.pickgit.exception.post.CannotUnlikeException;
 import com.woowacourse.pickgit.exception.post.CommentFormatException;
+import com.woowacourse.pickgit.exception.post.DuplicatedLikeException;
 import com.woowacourse.pickgit.exception.post.PostFormatException;
+import com.woowacourse.pickgit.exception.post.PostNotBelongToUserException;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.post.RepositoryParseException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
 import com.woowacourse.pickgit.post.application.PostService;
-import com.woowacourse.pickgit.post.application.dto.response.CommentResponseDto;
+import com.woowacourse.pickgit.post.application.dto.request.CommentRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.PostDeleteRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
+import com.woowacourse.pickgit.post.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDtos;
-import com.woowacourse.pickgit.post.domain.repository.PickGitStorage;
-import com.woowacourse.pickgit.post.domain.util.PlatformRepositoryExtractor;
 import com.woowacourse.pickgit.post.domain.Post;
-import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.post.domain.content.Image;
 import com.woowacourse.pickgit.post.domain.content.Images;
+import com.woowacourse.pickgit.post.domain.repository.PickGitStorage;
+import com.woowacourse.pickgit.post.domain.repository.PostRepository;
+import com.woowacourse.pickgit.post.domain.util.PlatformRepositoryExtractor;
 import com.woowacourse.pickgit.post.domain.util.dto.RepositoryUrlAndName;
-import com.woowacourse.pickgit.post.application.dto.request.CommentRequestDto;
+import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
 import com.woowacourse.pickgit.tag.application.TagService;
 import com.woowacourse.pickgit.tag.application.TagsDto;
 import com.woowacourse.pickgit.tag.domain.Tag;
@@ -334,262 +344,6 @@ class PostServiceTest {
             .extract(requestDto.getToken(), requestDto.getUsername());
     }
 
-    @DisplayName("UserName이 잘못되었다면, Repository 목록을 가져올 수 없다.")
-    @Test
-    void showRepositories_InvalidUserName_Fail() {
-        // given
-        String accessToken = "bearer test token";
-        String userName = "invalidName";
-
-        RepositoryRequestDto requestDto = new RepositoryRequestDto(accessToken, userName);
-
-        given(platformRepositoryExtractor.extract(requestDto.getToken(), requestDto.getUsername()))
-            .willThrow(new RepositoryParseException(
-                "V0001",
-                HttpStatus.BAD_REQUEST,
-                "레포지토리 목록을 불러올 수 없습니다."
-            ));
-
-        // when then
-        assertThatCode(() -> postService.showRepositories(requestDto))
-            .isInstanceOf(RepositoryParseException.class);
-
-        verify(platformRepositoryExtractor, times(1))
-            .extract(requestDto.getToken(), requestDto.getUsername());
-    }
-
-    @DisplayName("메인 홈 피드를 가져온다.")
-    @Test
-    void readHomeFeed_getMainHomeFeed_success() {
-        //given
-        List<Post> posts = List.of(
-            createPostOfId(1L),
-            createPostOfId(2L),
-            createPostOfId(3L)
-        );
-
-        HomeFeedRequest homeFeedRequest = HomeFeedRequest.builder()
-            .appUser(new GuestUser())
-            .page(1L)
-            .limit(3L)
-            .build();
-
-        given(postRepository.findAllPosts(any(Pageable.class)))
-            .willReturn(posts);
-
-        //when
-        List<PostResponseDto> postResponseDtos = postService.readHomeFeed(homeFeedRequest);
-
-        //then
-        List<Long> expected = posts.stream()
-            .map(Post::getId)
-            .collect(toList());
-
-        List<Long> actual = postResponseDtos.stream()
-            .map(PostResponseDto::getId)
-            .collect(toList());
-
-        assertThat(actual).containsAll(expected);
-    }
-
-    private Post createPostOfId(long id) {
-        return new PostBuilder()
-            .id(id)
-            .user(UserFactory.user())
-            .content("test")
-            .build();
-    }
-
-    @DisplayName("나의 홈 피드를 가져온다.")
-    @Test
-    void readMyFeed_getMyHomeFeed_success() {
-        //given
-        List<Post> posts = List.of(
-            createPostOfId(1L),
-            createPostOfId(2L),
-            createPostOfId(3L)
-        );
-
-        HomeFeedRequest homeFeedRequest = HomeFeedRequest.builder()
-            .appUser(new LoginUser("testUser", "at"))
-            .page(1L)
-            .limit(3L)
-            .build();
-
-        given(userRepository.findByBasicProfile_Name(anyString()))
-            .willReturn(Optional.of(UserFactory.user("testUser")));
-        given(postRepository.findAllPostsByUser(any(User.class), any(Pageable.class)))
-            .willReturn(posts);
-
-        //when
-        List<PostResponseDto> postResponseDtos = postService.readMyFeed(homeFeedRequest);
-
-        //then
-        List<Long> expected = posts.stream()
-            .map(Post::getId)
-            .collect(toList());
-
-        List<Long> actual = postResponseDtos.stream()
-            .map(PostResponseDto::getId)
-            .collect(toList());
-
-        assertThat(actual).containsAll(expected);
-    }
-
-    @DisplayName("잘못된 유저는 나의 홈 피드를 가져오지 못한다.")
-    @Test
-    void readMyFeed_invalidUser_ExceptionOccur() {
-        //given
-        HomeFeedRequest homeFeedRequest = HomeFeedRequest.builder()
-            .appUser(new LoginUser("testUser", "at"))
-            .page(1L)
-            .limit(3L)
-            .build();
-
-        //when
-        assertThatCode(() -> postService.readMyFeed(homeFeedRequest))
-            .isInstanceOf(UserNotFoundException.class)
-            .extracting("errorCode")
-            .isEqualTo("U0001");
-
-        verify(userRepository, times(1))
-            .findByBasicProfile_Name(anyString());
-    }
-
-    @DisplayName("게스트 유저는 나의 홈 피드를 가져오지 못한다.")
-    @Test
-    void readMyFeed_guestUser_ExceptionOccur() {
-        //given
-        HomeFeedRequest homeFeedRequest = HomeFeedRequest.builder()
-            .appUser(new GuestUser())
-            .page(1L)
-            .limit(3L)
-            .build();
-
-        //when
-        assertThatCode(() -> postService.readMyFeed(homeFeedRequest))
-            .isInstanceOf(UnauthorizedException.class)
-            .extracting("errorCode")
-            .isEqualTo("A0002");
-    }
-
-    @DisplayName("다른 유저의 홈 피드를 가져온다")
-    @Test
-    void readUserFeed_validUser_ExceptionOccur() {
-        //given
-        List<Post> posts = List.of(
-            createPostOfId(1L),
-            createPostOfId(2L),
-            createPostOfId(3L)
-        );
-
-        HomeFeedRequest homeFeedRequest = HomeFeedRequest.builder()
-            .appUser(new LoginUser("loginUser", "at"))
-            .page(1L)
-            .limit(3L)
-            .build();
-
-        given(userRepository.findByBasicProfile_Name(anyString()))
-            .willReturn(Optional.of(UserFactory.user("testUser")));
-        given(postRepository.findAllPostsByUser(any(User.class), any(Pageable.class)))
-            .willReturn(posts);
-
-        //when
-        List<PostResponseDto> postResponseDtos =
-            postService.readUserFeed(homeFeedRequest, "testUser");
-
-        //then
-        List<Long> expected = posts.stream()
-            .map(Post::getId)
-            .collect(toList());
-
-        List<Long> actual = postResponseDtos.stream()
-            .map(PostResponseDto::getId)
-            .collect(toList());
-
-        assertThat(actual).containsAll(expected);
-
-        verify(userRepository, times(1)).findByBasicProfile_Name(anyString());
-    }
-
-    @DisplayName("게스트 유저는 다른 유저의 홈 피드를 가져온다")
-    @Test
-    void readUserFeed_guestUser_ExceptionOccur() {
-        //given
-        List<Post> posts = List.of(
-            createPostOfId(1L),
-            createPostOfId(2L),
-            createPostOfId(3L)
-        );
-
-        HomeFeedRequest homeFeedRequest = HomeFeedRequest.builder()
-            .appUser(new GuestUser())
-            .page(1L)
-            .limit(3L)
-            .build();
-
-        given(userRepository.findByBasicProfile_Name(anyString()))
-            .willReturn(Optional.of(UserFactory.user("testUser")));
-        given(postRepository.findAllPostsByUser(any(User.class), any(Pageable.class)))
-            .willReturn(posts);
-
-        //when
-        List<PostResponseDto> postResponseDtos =
-            postService.readUserFeed(homeFeedRequest, "testUser");
-
-        //then
-        List<Long> expected = posts.stream()
-            .map(Post::getId)
-            .collect(toList());
-
-        List<Long> actual = postResponseDtos.stream()
-            .map(PostResponseDto::getId)
-            .collect(toList());
-
-        assertThat(actual).containsAll(expected);
-
-        verify(userRepository, times(1)).findByBasicProfile_Name(anyString());
-    }
-
-    @DisplayName("잘못된 유저는 다른 유저의 홈 피드를 가져온다")
-    @Test
-    void readUserFeed_invalidUser_ExceptionOccur() {
-        //given
-        List<Post> posts = List.of(
-            createPostOfId(1L),
-            createPostOfId(2L),
-            createPostOfId(3L)
-        );
-
-        HomeFeedRequest homeFeedRequest = HomeFeedRequest.builder()
-            .appUser(new LoginUser("invalidUser", "at"))
-            .page(1L)
-            .limit(3L)
-            .build();
-
-        given(userRepository.findByBasicProfile_Name("testUser"))
-            .willReturn(Optional.of(UserFactory.user("testUser")));
-        given(postRepository.findAllPostsByUser(any(User.class), any(Pageable.class)))
-            .willReturn(posts);
-
-        //when
-        List<PostResponseDto> postResponseDtos =
-            postService.readUserFeed(homeFeedRequest, "testUser");
-
-        //then
-        List<Long> expected = posts.stream()
-            .map(Post::getId)
-            .collect(toList());
-
-        List<Long> actual = postResponseDtos.stream()
-            .map(PostResponseDto::getId)
-            .collect(toList());
-
-        assertThat(actual).containsAll(expected);
-
-        verify(userRepository, times(1)).findByBasicProfile_Name(anyString());
-    }
-
     @DisplayName("사용자는 특정 게시물을 좋아요 할 수 있다.")
     @Test
     void like_ValidUser_Success() {
@@ -601,7 +355,7 @@ class PostServiceTest {
             .willReturn(Optional.of(UserFactory.user(1L, appUser.getUsername())));
         given(postRepository.findById(anyLong()))
             .willReturn(Optional.of(
-                new PostBuilder()
+                Post.builder()
                     .id(postId)
                     .content("abc")
                     .build())
@@ -627,7 +381,7 @@ class PostServiceTest {
         AppUser appUser = new LoginUser("test user", "token");
         Long postId = 1L;
         User user = UserFactory.user(1L, appUser.getUsername());
-        Post post = new PostBuilder()
+        Post post = Post.builder()
             .id(postId)
             .content("abc")
             .build();
@@ -659,7 +413,7 @@ class PostServiceTest {
         AppUser appUser = new LoginUser("test user", "token");
         Long postId = 1L;
         User user = UserFactory.user(1L, appUser.getUsername());
-        Post post = new PostBuilder()
+        Post post = Post.builder()
             .id(postId)
             .content("abc")
             .build();
@@ -691,7 +445,7 @@ class PostServiceTest {
         AppUser appUser = new LoginUser("test user", "token");
         Long postId = 1L;
         User user = UserFactory.user(1L, appUser.getUsername());
-        Post post = new PostBuilder()
+        Post post = Post.builder()
             .id(postId)
             .content("abc")
             .build();
@@ -720,10 +474,10 @@ class PostServiceTest {
         // given
         LoginUser loginUser = new LoginUser("testUser", "Bearer testToken");
         User user = UserFactory.user(1L, loginUser.getUsername());
-        Post post = new PostBuilder()
+        Post post = Post.builder()
             .id(1L)
             .content("testContent")
-            .user(user)
+            .author(user)
             .build();
 
         PostUpdateRequest updateRequest = PostUpdateRequest.builder()
@@ -767,10 +521,10 @@ class PostServiceTest {
         // given
         LoginUser loginUser = new LoginUser("testUser", "Bearer testToken");
         User user = UserFactory.user(1L, loginUser.getUsername());
-        Post post = new PostBuilder()
+        Post post = Post.builder()
             .id(1L)
             .content("testContent")
-            .user(user)
+            .author(user)
             .build();
 
         PostUpdateRequest updateRequest = PostUpdateRequest.builder()
@@ -814,10 +568,10 @@ class PostServiceTest {
         // given
         LoginUser loginUser = new LoginUser("testUser", "Bearer testToken");
         User user = UserFactory.user(1L, loginUser.getUsername());
-        Post post = new PostBuilder()
+        Post post = Post.builder()
             .id(1L)
             .content("testContent")
-            .user(user)
+            .author(user)
             .build();
 
         PostUpdateRequest updateRequest = PostUpdateRequest.builder()
@@ -916,10 +670,10 @@ class PostServiceTest {
         // given
         LoginUser loginUser = new LoginUser("testUser", "Bearer testToken");
         User user = UserFactory.user(1L, loginUser.getUsername());
-        Post post = new PostBuilder()
+        Post post = Post.builder()
             .id(1L)
             .content("testContent")
-            .user(user)
+            .author(user)
             .build();
 
         given(userRepository.findByBasicProfile_Name(anyString()))

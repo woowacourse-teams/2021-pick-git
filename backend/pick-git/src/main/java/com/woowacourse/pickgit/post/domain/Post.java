@@ -179,6 +179,10 @@ public class Post {
         return postTags.getTags();
     }
 
+    public List<String> getTagNames() {
+        return postTags.getTagNames();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

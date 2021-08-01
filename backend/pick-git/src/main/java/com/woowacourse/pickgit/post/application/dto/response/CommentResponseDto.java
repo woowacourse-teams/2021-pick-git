@@ -28,16 +28,6 @@ public class CommentResponseDto {
         this.liked = liked;
     }
 
-    public static CommentResponse from(Comment comment) {
-        return CommentResponse.builder()
-            .id(comment.getId())
-            .profileImageUrl(comment.getProfileImageUrl())
-            .authorName(comment.getAuthorName())
-            .content(comment.getContent())
-            .liked(false)
-            .build();
-    }
-
     public Long getId() {
         return id;
     }

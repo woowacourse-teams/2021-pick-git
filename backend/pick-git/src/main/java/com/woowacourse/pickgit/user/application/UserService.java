@@ -5,7 +5,7 @@ import static java.util.stream.Collectors.toList;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
-import com.woowacourse.pickgit.post.domain.PickGitStorage;
+import com.woowacourse.pickgit.post.domain.repository.PickGitStorage;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.UserSearchRequestDto;

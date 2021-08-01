@@ -15,7 +15,12 @@ import javax.persistence.OneToMany;
 @Embeddable
 public class PostTags {
 
-    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @OneToMany(
+        mappedBy = "post",
+        fetch = FetchType.LAZY,
+        cascade = CascadeType.PERSIST,
+        orphanRemoval = true
+    )
     private List<PostTag> postTags;
 
     public PostTags() {
@@ -59,9 +64,19 @@ public class PostTags {
         }
     }
 
+    public void clear() {
+        postTags.clear();
+    }
+
     public List<Tag> getTags() {
         return postTags.stream()
             .map(PostTag::getTag)
+            .collect(toList());
+    }
+
+    public List<String> getTagNames() {
+        return getTags().stream()
+            .map(Tag::getName)
             .collect(toList());
     }
 }

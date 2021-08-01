@@ -67,10 +67,6 @@ public class Comment {
         return content.getContent();
     }
 
-    public String getProfileImageUrl() {
-        return user.getImage();
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {

@@ -7,11 +7,7 @@ import com.woowacourse.pickgit.exception.post.RepositoryParseException;
 import com.woowacourse.pickgit.post.domain.util.PlatformRepositoryApiRequester;
 import com.woowacourse.pickgit.post.domain.util.PlatformRepositoryExtractor;
 import com.woowacourse.pickgit.post.domain.util.dto.RepositoryUrlAndName;
-import com.woowacourse.pickgit.exception.post.RepositoryParseException;
-import com.woowacourse.pickgit.post.domain.PlatformRepositoryExtractor;
-import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
 import java.util.List;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component

@@ -4,16 +4,24 @@ import static java.util.stream.Collectors.toList;
 
 import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
+import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.request.CommentRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.PostDeleteRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.CommentResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.presentation.dto.request.ContentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.PostRequest;
+import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
 import com.woowacourse.pickgit.post.presentation.dto.response.CommentResponse;
+import com.woowacourse.pickgit.post.presentation.dto.response.LikeResponse;
+import com.woowacourse.pickgit.post.presentation.dto.response.PostUpdateResponse;
 import com.woowacourse.pickgit.post.presentation.dto.response.RepositoryResponse;
 import java.net.URI;
 import java.util.List;
@@ -34,6 +42,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 @RestController
 public class PostController {
+
+    private static final String REDIRECT_URL = "/api/posts/%s/%d";
 
     private final PostService postService;
 
@@ -100,7 +110,7 @@ public class PostController {
             .profileImageUrl(commentResponseDto.getProfileImageUrl())
             .content(commentResponseDto.getContent())
             .authorName(commentResponseDto.getAuthorName())
-            .isLiked(commentResponseDto.getIsLiked())
+            .liked(commentResponseDto.getLiked())
             .build();
     }
 

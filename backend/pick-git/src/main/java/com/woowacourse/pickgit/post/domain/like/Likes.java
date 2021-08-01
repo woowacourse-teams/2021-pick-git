@@ -1,6 +1,7 @@
 package com.woowacourse.pickgit.post.domain.like;
 
-import com.woowacourse.pickgit.user.domain.User;
+import com.woowacourse.pickgit.exception.post.CannotUnlikeException;
+import com.woowacourse.pickgit.exception.post.DuplicatedLikeException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;

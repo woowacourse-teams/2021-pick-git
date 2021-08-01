@@ -8,7 +8,6 @@ import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.FileFactory;
-import com.woowacourse.pickgit.common.factory.PostBuilder;
 import com.woowacourse.pickgit.common.factory.PostFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
@@ -22,29 +21,21 @@ import com.woowacourse.pickgit.exception.post.PostNotBelongToUserException;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
 import com.woowacourse.pickgit.post.application.PostService;
-import com.woowacourse.pickgit.post.application.dto.response.CommentResponseDto;
-import com.woowacourse.pickgit.post.application.dto.CommentResponse;
+import com.woowacourse.pickgit.post.application.dto.request.CommentRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostDeleteRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
+import com.woowacourse.pickgit.post.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
-import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDtos;
-import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
-import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDtos;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
-import com.woowacourse.pickgit.post.application.dto.request.CommentRequestDto;
-import com.woowacourse.pickgit.post.domain.PostRepository;
-import com.woowacourse.pickgit.post.presentation.dto.request.CommentRequest;
-import com.woowacourse.pickgit.post.presentation.dto.request.HomeFeedRequest;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.IntStream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -63,7 +54,6 @@ import org.springframework.test.context.ActiveProfiles;
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @ActiveProfiles("test")
-@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 class PostServiceIntegrationTest {
     private static final String USERNAME = "jipark3";
     private static final String ACCESS_TOKEN = "oauth.access.token";
@@ -277,7 +267,6 @@ class PostServiceIntegrationTest {
             .extracting("errorCode")
             .isEqualTo("V0001");
     }
-}
 
     @DisplayName("사용자는 특정 게시물을 좋아요 할 수 있다. - 성공")
     @Test
@@ -582,10 +571,10 @@ class PostServiceIntegrationTest {
         User savedUser = userRepository.save(user);
         LoginUser loginUser = new LoginUser(savedUser.getName(), ACCESS_TOKEN);
 
-        Post post = new PostBuilder()
+        Post post = Post.builder()
             .content("testContent")
             .githubRepoUrl("https://github.com/da-nyee")
-            .user(savedUser)
+            .author(savedUser)
             .build();
 
         Post savedPost = postRepository.save(post);
@@ -611,15 +600,15 @@ class PostServiceIntegrationTest {
         User kevin = UserFactory.user("kevin");
         User savedKevin = userRepository.save(kevin);
 
-        Post post = new PostBuilder()
+        Post post = Post.builder()
             .content("testContent")
             .githubRepoUrl("https://github.com/da-nyee")
-            .user(savedUser)
+            .author(savedUser)
             .build();
 
         Post savedPost = postRepository.save(post);
 
-        CommentRequest request = CommentRequest.builder()
+        CommentRequestDto request = CommentRequestDto.builder()
             .userName(savedKevin.getName())
             .content("testComment")
             .postId(savedPost.getId())
@@ -647,10 +636,10 @@ class PostServiceIntegrationTest {
         User savedKevin = userRepository.save(kevin);
         LoginUser loginUser = new LoginUser(USERNAME, ACCESS_TOKEN);
 
-        Post post = new PostBuilder()
+        Post post = Post.builder()
             .content("testContent")
             .githubRepoUrl("https://github.com/da-nyee")
-            .user(savedKevin)
+            .author(savedKevin)
             .build();
 
         Post savedPost = postRepository.save(post);
