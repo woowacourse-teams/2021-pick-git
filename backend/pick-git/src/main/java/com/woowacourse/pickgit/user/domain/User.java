@@ -9,6 +9,7 @@ import com.woowacourse.pickgit.user.domain.follow.Followings;
 import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
 import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -107,6 +108,11 @@ public class User {
 
     public boolean isSameAs(User user) {
         return this.id.equals(user.getId());
+    }
+
+    public void delete(Post post) {
+        List<Post> posts = this.posts.getPosts();
+        posts.remove(post);
     }
 
     public Long getId() {
