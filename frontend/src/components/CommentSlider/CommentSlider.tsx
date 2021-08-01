@@ -102,14 +102,14 @@ const CommentSlider = ({ post, isSliderShown, onSliderClose, onCommentSave }: Pr
   ));
 
   const horizontalSliderComponents = [
-    <ImageSlider slideButtonKind="in-box" imageUrls={sliderPost.imageUrls} />,
-    <PostContent>
+    <ImageSlider key="images" slideButtonKind="in-box" imageUrls={sliderPost.imageUrls} />,
+    <PostContent key="contents">
       <PostContentAuthorLink to={PAGE_URL.USER_PROFILE(sliderPost.authorName)}>
         {sliderPost.authorName}
       </PostContentAuthorLink>
       {sliderPost.content}
     </PostContent>,
-    <TagListWrapper>{tagListItems}</TagListWrapper>,
+    <TagListWrapper key="tags">{tagListItems}</TagListWrapper>,
   ];
 
   const horizontalSliderItems = horizontalSliderComponents.map((component, index) => (
