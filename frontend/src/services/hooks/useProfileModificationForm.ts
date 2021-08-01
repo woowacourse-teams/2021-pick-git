@@ -26,7 +26,7 @@ const useProfileModificationForm = (
   const { pushSnackbarMessage } = useContext(SnackBarContext);
 
   const queryClient = useQueryClient();
-  const currentProfileQueryKey = [QUERY.GET_PROFILE, { isMyProfile: false, username }];
+  const currentProfileQueryKey = [QUERY.GET_PROFILE, { isMyProfile: true, username }];
   const currentProfileQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
   const { mutate, data, error, isLoading, isSuccess } = useProfileMutation();
 
@@ -73,7 +73,7 @@ const useProfileModificationForm = (
     mutate({ image, description });
   };
 
-  const handleMutationResult = () => {
+  const handleMutationResultFetch = () => {
     if (!data || !currentProfileQueryData) {
       return;
     }
@@ -127,7 +127,7 @@ const useProfileModificationForm = (
   }, [isSuccess]);
 
   useEffect(() => {
-    handleMutationResult();
+    handleMutationResultFetch();
   }, [data]);
 
   useEffect(() => {
