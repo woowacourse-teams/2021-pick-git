@@ -7,28 +7,30 @@ import { Container, PostItemWrapper } from "./Feed.style";
 import useBottomSlider from "../../services/hooks/@common/useBottomSlider";
 import CommentSlider from "../CommentSlider/CommentSlider";
 import useFeedMutation from "../../services/hooks/useFeedMutation";
-import { FAILURE_MESSAGE } from "../../constants/messages";
+import { FAILURE_MESSAGE, SUCCESS_MESSAGE } from "../../constants/messages";
 import { getAPIErrorMessage } from "../../utils/error";
 import { useHistory } from "react-router-dom";
 import { PAGE_URL } from "../../constants/urls";
 import usePostEdit from "../../services/hooks/usePostEdit";
-import { QueryKey } from "react-query";
+import { InfiniteData, QueryKey } from "react-query";
+import { getPostsFromPages } from "../../utils/feed";
 
 interface Props {
-  posts: Post[];
+  infinitePostsData: InfiniteData<Post[]>;
   queryKey: QueryKey;
 }
 
-const Feed = ({ posts, queryKey }: Props) => {
+const Feed = ({ infinitePostsData, queryKey }: Props) => {
   const [selectedPostId, setSelectedPostId] = useState<Post["id"]>();
   const { pushSnackbarMessage } = useContext(SnackBarContext);
-  const { setPosts, mutateAddPostLike, mutateDeletePostLike, mutateAddComment, mutateDeletePost } =
-    useFeedMutation(queryKey);
+  const { addPostComment, addPostLike, deletePost, deletePostLike } = useFeedMutation(queryKey);
   const { setPostEditData } = usePostEdit();
   const { isBottomSliderShown, showBottomSlider, hideBottomSlider, removeSlideEventHandler, setSlideEventHandler } =
     useBottomSlider();
   const { isLoggedIn, currentUsername } = useContext(UserContext);
   const history = useHistory();
+
+  const posts = getPostsFromPages(infinitePostsData.pages);
 
   const selectedPost = posts.find((post) => post.id === selectedPostId);
 
@@ -38,13 +40,14 @@ const Feed = ({ posts, queryKey }: Props) => {
   }, []);
 
   const handlePostEdit = async (post: Post) => {
-    setPostEditData({ content: post.content, postId: post.id, tags: JSON.parse(post.tags.join(",")) });
+    setPostEditData({ content: post.content, postId: post.id, tags: post.tags });
     history.push(PAGE_URL.EDIT_POST_FIRST_STEP);
   };
 
   const handlePostDelete = async (postId: Post["id"]) => {
     try {
-      await mutateDeletePost(postId);
+      await deletePost(postId);
+      pushSnackbarMessage(SUCCESS_MESSAGE.POST_DELETED);
     } catch (error) {
       pushSnackbarMessage(getAPIErrorMessage(error.response?.data.errorCode));
     }
@@ -58,20 +61,10 @@ const Feed = ({ posts, queryKey }: Props) => {
       return;
     }
 
-    // TODO : setQueryData 로 바꾸기
     if (targetPost.liked) {
-      const { liked, likesCount } = await mutateDeletePostLike(targetPost.id);
-      targetPost.liked = liked;
-      targetPost.likesCount = likesCount;
-      setPosts(newPosts);
-      return;
-    }
-
-    if (!targetPost.liked) {
-      const { liked, likesCount } = await mutateAddPostLike(targetPost.id);
-      targetPost.liked = liked;
-      targetPost.likesCount = likesCount;
-      setPosts(newPosts);
+      await deletePostLike(targetPost.id);
+    } else {
+      await addPostLike(targetPost.id);
     }
   };
 
@@ -94,11 +87,7 @@ const Feed = ({ posts, queryKey }: Props) => {
     }
 
     try {
-      const newComment = await mutateAddComment({ postId: selectedPostId, commentContent: value });
-      const newPosts = [...posts];
-      newPosts.find((post) => post.id === selectedPostId)?.comments.push(newComment);
-
-      setPosts(newPosts);
+      await addPostComment(selectedPostId, value);
     } catch (error) {
       pushSnackbarMessage(FAILURE_MESSAGE.COMMENT_SAVE_FAILED);
     }

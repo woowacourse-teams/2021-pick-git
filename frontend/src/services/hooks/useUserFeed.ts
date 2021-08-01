@@ -8,18 +8,21 @@ import { QUERY } from "../../constants/queries";
 import { PAGE_URL } from "../../constants/urls";
 import SnackBarContext from "../../contexts/SnackbarContext";
 import UserContext from "../../contexts/UserContext";
-import { removeDuplicatedData } from "../../utils/data";
 import { handleHTTPError } from "../../utils/error";
 import { isHttpErrorStatus } from "../../utils/typeGuard";
 import { useUserPostsQuery } from "../queries";
 
 const useUserFeed = (isMyFeed: boolean, username: string | null, prevData?: InfiniteData<Post[]>) => {
-  const [allPosts, setAllPosts] = useState<Post[]>([]);
   const [isAllPostsFetched, setIsAllPostsFetched] = useState(false);
-  const { data, isLoading, error, isError, refetch, fetchNextPage, isFetchingNextPage } = useUserPostsQuery(
-    isMyFeed,
-    username
-  );
+  const {
+    data: infinitePostsData,
+    isLoading,
+    error,
+    isError,
+    refetch,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useUserPostsQuery(isMyFeed, username);
 
   const queryClient = useQueryClient();
   const { pushSnackbarMessage } = useContext(SnackBarContext);
@@ -33,9 +36,9 @@ const useUserFeed = (isMyFeed: boolean, username: string | null, prevData?: Infi
   };
 
   const handleDataFetch = () => {
-    if (!data) return;
+    if (!infinitePostsData) return;
 
-    const pages = data.pages;
+    const pages = infinitePostsData.pages;
 
     if (!pages) return;
 
@@ -44,11 +47,6 @@ const useUserFeed = (isMyFeed: boolean, username: string | null, prevData?: Infi
     if (!lastPage || !lastPage.length) {
       setIsAllPostsFetched(true);
     }
-
-    const fetchedPosts = pages?.reduce((acc, postPage) => acc.concat(postPage), []) ?? [];
-    const filteredPosts = removeDuplicatedData<Post>(fetchedPosts, (post) => post.id);
-
-    setAllPosts(filteredPosts);
   };
 
   const handleError = () => {
@@ -83,13 +81,13 @@ const useUserFeed = (isMyFeed: boolean, username: string | null, prevData?: Infi
 
   useEffect(() => {
     handleDataFetch();
-  }, [data]);
+  }, [infinitePostsData]);
 
   useEffect(() => {
     handleError();
   }, [error]);
 
-  return { allPosts, handleIntersect, isLoading, isError, isFetchingNextPage, data };
+  return { infinitePostsData, handleIntersect, isLoading, isError, isFetchingNextPage, refetch };
 };
 
 export default useUserFeed;

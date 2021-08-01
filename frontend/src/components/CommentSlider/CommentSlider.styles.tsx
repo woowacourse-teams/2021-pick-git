@@ -96,15 +96,29 @@ export const CommentText = styled.span`
   font-size: 0.75rem;
 `;
 
+export const SendIconWrapper = styled.div`
+  cursor: pointer;
+  transition: opacity 0.5s;
+
+  :hover {
+    opacity: 0.5;
+  }
+`;
+
 export const CommentTextAreaWrapper = styled.div`
   position: fixed;
   bottom: 0;
   width: 100%;
   display: flex;
   align-items: center;
+  transition: background-color 0.5s;
+
   ${({ theme }) => `
     border-top: 1px solid ${theme.color.borderColor};
     background-color: ${theme.color.white};
+    :focus-within {
+      background-color: ${theme.color.secondaryColor};
+    }
   `};
   padding-right: 1rem;
 `;
@@ -115,10 +129,9 @@ export const CommentTextArea = styled.textarea`
   min-height: ${LAYOUT.COMMENT_INPUT_HEIGHT};
   font-size: 0.875rem;
   border: none;
-  transition: background-color 0.5s;
+  background-color: transparent;
 
   :focus {
     outline: none;
-    background-color: ${({ theme }) => theme.color.secondaryColor};
   }
 `;

@@ -12,7 +12,7 @@ export const SearchInputWrapper = styled.div`
 `;
 
 export const RepositoryList = styled.ul`
-  height: 400px;
+  height: auto;
   overflow-y: auto;
 `;
 

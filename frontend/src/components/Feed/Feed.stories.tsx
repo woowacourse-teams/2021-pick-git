@@ -11,15 +11,13 @@ export default {
 };
 
 const Template: Story = (args) => {
-  const { data, isLoading } = useHomeFeedPostsQuery();
+  const { data: infinitePostsData, isLoading } = useHomeFeedPostsQuery();
 
-  const allPosts = data?.pages?.reduce((acc, postPage) => acc.concat(postPage), []);
-
-  if (isLoading || !allPosts) {
+  if (isLoading || !infinitePostsData) {
     return <PageLoading />;
   }
 
-  return <Feed {...args} posts={allPosts} queryKey={QUERY.GET_HOME_FEED_POSTS} />;
+  return <Feed {...args} infinitePostsData={infinitePostsData} queryKey={QUERY.GET_HOME_FEED_POSTS} />;
 };
 
 export const Default = Template.bind({});

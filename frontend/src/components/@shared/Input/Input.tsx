@@ -27,6 +27,7 @@ const Input = ({
         type="text"
         ref={inputRef}
         textAlign={textAlign}
+        autoComplete="off"
         value={value}
         {...props}
         style={icon ? { marginLeft: "0.9375rem" } : {}}

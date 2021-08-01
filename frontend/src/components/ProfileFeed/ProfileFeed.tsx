@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { PAGE_URL } from "../../constants/urls";
 import useUserFeed from "../../services/hooks/useUserFeed";
+import { getPostsFromPages } from "../../utils/feed";
 
 import PageLoading from "../@layout/PageLoading/PageLoading";
 import InfiniteScrollContainer from "../@shared/InfiniteScrollContainer/InfiniteScrollContainer";
@@ -10,7 +11,14 @@ export interface Props extends ReturnType<typeof useUserFeed> {
   username: string;
 }
 
-const ProfileFeed = ({ username, allPosts, isLoading, isError, isFetchingNextPage, handleIntersect, data }: Props) => {
+const ProfileFeed = ({
+  username,
+  infinitePostsData,
+  isLoading,
+  isError,
+  isFetchingNextPage,
+  handleIntersect,
+}: Props) => {
   if (isLoading) {
     return (
       <Empty>
@@ -19,12 +27,14 @@ const ProfileFeed = ({ username, allPosts, isLoading, isError, isFetchingNextPag
     );
   }
 
-  if (isError) {
+  if (isError || !infinitePostsData) {
     return <div>피드를 가져올 수 없습니다.</div>;
   }
 
+  const posts = getPostsFromPages(infinitePostsData.pages);
+
   const Feed = () => {
-    if (allPosts?.length) {
+    if (posts.length > 0) {
       return (
         <Container>
           <InfiniteScrollContainer
@@ -32,12 +42,12 @@ const ProfileFeed = ({ username, allPosts, isLoading, isError, isFetchingNextPag
             onIntersect={handleIntersect ?? (() => {})}
           >
             <Grid>
-              {allPosts?.map(({ id, imageUrls, authorName, content }) => (
+              {posts?.map(({ id, imageUrls, authorName, content }) => (
                 <Link
                   to={{
                     pathname: PAGE_URL.USER_FEED,
                     search: `?username=${username}`,
-                    state: { prevData: data, postId: id },
+                    state: { prevData: infinitePostsData, postId: id },
                   }}
                   key={id}
                 >

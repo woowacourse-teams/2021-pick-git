@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
-import { useQueryClient } from "react-query";
+import { InfiniteData, useQueryClient } from "react-query";
 
 import { Post } from "../../@types";
 import { QUERY } from "../../constants/queries";
@@ -9,11 +9,20 @@ import { removeDuplicatedData } from "../../utils/data";
 import { handleHTTPError } from "../../utils/error";
 import { isHttpErrorStatus } from "../../utils/typeGuard";
 import { useHomeFeedPostsQuery } from "../queries";
+import useFeedMutation from "./useFeedMutation";
 
 const useHomeFeed = () => {
   const { logout } = useContext(UserContext);
-  const [posts, setPosts] = useState<Post[]>([]);
-  const { data, isLoading, error, isError, isFetching, fetchNextPage } = useHomeFeedPostsQuery();
+  const {
+    data: infinitePostsData,
+    isLoading,
+    error,
+    isError,
+    isFetching,
+    fetchNextPage,
+    refetch,
+  } = useHomeFeedPostsQuery();
+  const { setPostsPages } = useFeedMutation([QUERY]);
   const queryClient = useQueryClient();
 
   const handlePostsEndIntersect = () => {
@@ -38,21 +47,24 @@ const useHomeFeed = () => {
   };
 
   const handleDataFetch = () => {
-    const fetchedPosts = data?.pages?.reduce((acc, postPage) => acc.concat(postPage), []) ?? [];
-    const filteredPosts = removeDuplicatedData<Post>(fetchedPosts, (post) => post.id);
+    if (!infinitePostsData) {
+      return;
+    }
 
-    setPosts(filteredPosts);
+    const filteredPages = infinitePostsData.pages.map((page) => removeDuplicatedData<Post>(page, (page) => page.id));
+
+    setPostsPages(filteredPages);
   };
 
   useEffect(() => {
     handleDataFetch();
-  }, [data]);
+  }, [infinitePostsData]);
 
   useEffect(() => {
     handleError();
   }, [error]);
 
-  return { posts, handlePostsEndIntersect, isLoading, isFetching, isError };
+  return { infinitePostsData, isLoading, isFetching, isError, refetch, handlePostsEndIntersect };
 };
 
 export default useHomeFeed;
