@@ -34,7 +34,7 @@ export interface CommentData {
   profileImageUrl: string;
   authorName: string;
   content: string;
-  isLiked: boolean;
+  liked: boolean;
 }
 
 export interface CommentAddData {
@@ -54,7 +54,7 @@ export interface Post {
   createdAt: string;
   updatedAt: string;
   comments: CommentData[];
-  isLiked: boolean;
+  liked: boolean;
 }
 
 export interface PostUploadData {

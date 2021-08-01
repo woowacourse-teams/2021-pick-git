@@ -30,7 +30,7 @@ Default.args = {
         "https://images.unsplash.com/photo-1543610892-0b1f7e6d8ac1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=634&q=80",
       authorName: "swon3210",
       content: "이게 댓글이지",
-      isLiked: true,
+      liked: true,
     },
     {
       id: 2,
@@ -38,10 +38,10 @@ Default.args = {
         "https://images.unsplash.com/photo-1543610892-0b1f7e6d8ac1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=634&q=80",
       authorName: "swon3210",
       content: "이게 댓글이지",
-      isLiked: true,
+      liked: true,
     },
   ],
   createdAt: "3일 전",
-  isLiked: true,
+  liked: true,
   likeCount: 32,
 };

@@ -1,4 +1,5 @@
 import { Dispatch, SetStateAction, useState } from "react";
+import { LIMIT } from "../../constants/limits";
 import { FAILURE_MESSAGE } from "../../constants/messages";
 import useMessageModal from "../../services/hooks/@common/useMessageModal";
 import { isValidFilesSize, isValidFilesSizeCount } from "../../utils/postUpload";
@@ -63,6 +64,7 @@ const PostContentUploader = ({ isImageUploaderShown, content, setFiles, setConte
           value={content}
           placeholder="내용을 작성해주세요..."
           autoGrow
+          maxLength={LIMIT.POST_CONTENT_MAX_LENGTH}
         />
       </TextEditorWrapper>
       {isModalShown && (

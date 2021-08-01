@@ -1,4 +1,4 @@
-import { useQueryClient } from "react-query";
+import { QueryKey, useQueryClient } from "react-query";
 import { CommentData, Post } from "../../@types";
 
 import {
@@ -9,7 +9,7 @@ import {
   useDeletePostMutation,
 } from "../queries";
 
-const useFeedMutation = (queryKey: string) => {
+const useFeedMutation = (queryKey: QueryKey) => {
   const { mutateAsync: mutateDeletePostLike } = useDeletePostLikeMutation();
   const { mutateAsync: mutateAddPostLike } = useAddPostLikeMutation();
   const { mutateAsync: mutateDeletePost } = useDeletePostMutation();
@@ -19,22 +19,6 @@ const useFeedMutation = (queryKey: string) => {
 
   const setPosts = (posts: Post[]) => {
     queryClient.setQueryData<Post[]>(queryKey, posts);
-  };
-
-  const deletePostLike = async (post: Post) => {
-    try {
-      await mutateDeletePostLike(post.id);
-    } catch (error) {
-      alert(error.message);
-    }
-  };
-
-  const addPostLike = async (post: Post) => {
-    try {
-      await mutateAddPostLike(post.id);
-    } catch (error) {
-      alert(error.message);
-    }
   };
 
   const deleteComment = async (postId: Post["id"], commendId: CommentData["id"]) => {
@@ -47,8 +31,8 @@ const useFeedMutation = (queryKey: string) => {
 
   return {
     setPosts,
-    deletePostLike,
-    addPostLike,
+    mutateAddPostLike,
+    mutateDeletePostLike,
     mutateAddComment,
     mutateDeletePost,
     deleteComment,
