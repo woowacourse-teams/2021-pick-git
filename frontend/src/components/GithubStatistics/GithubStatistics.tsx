@@ -27,7 +27,7 @@ const stats: Stats = {
   commits: { name: "Commits", icon: <ClockIcon />, countVariable: "commitsCount" },
   prs: { name: "PRs", icon: <PrIcon />, countVariable: "prsCount" },
   issues: { name: "Issues", icon: <IssueIcon />, countVariable: "issuesCount" },
-  repos: { name: "Contributes", icon: <BookIcon />, countVariable: "reposCount" },
+  contributes: { name: "Contributes", icon: <BookIcon />, countVariable: "contributesCount" },
 };
 
 const GithubStatistics = ({ username, githubStatisticQueryResult }: Props) => {
