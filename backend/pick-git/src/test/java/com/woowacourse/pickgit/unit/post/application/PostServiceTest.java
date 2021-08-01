@@ -737,7 +737,7 @@ class PostServiceTest {
 
         verify(userRepository, times(1))
             .findByBasicProfile_Name("testUser");
-        verify(postRepository, times(2))
+        verify(postRepository, times(1))
             .findByIdAndUser(1L, user);
         verify(tagService, times(1))
             .findOrCreateTags(any(TagsDto.class));
@@ -784,7 +784,7 @@ class PostServiceTest {
 
         verify(userRepository, times(1))
             .findByBasicProfile_Name("testUser");
-        verify(postRepository, times(2))
+        verify(postRepository, times(1))
             .findByIdAndUser(1L, user);
         verify(tagService, times(1))
             .findOrCreateTags(any(TagsDto.class));
@@ -831,7 +831,7 @@ class PostServiceTest {
 
         verify(userRepository, times(1))
             .findByBasicProfile_Name("testUser");
-        verify(postRepository, times(2))
+        verify(postRepository, times(1))
             .findByIdAndUser(1L, user);
         verify(tagService, times(1))
             .findOrCreateTags(any(TagsDto.class));

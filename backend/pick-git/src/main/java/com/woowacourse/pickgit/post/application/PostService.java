@@ -202,11 +202,9 @@ public class PostService {
         post.updateContent(updateRequestDto.getContent());
         post.updateTags(tags);
 
-        Post updatedPost = findPostByIdAndUser(updateRequestDto.getPostId(), user);
-
         return PostUpdateResponseDto.builder()
-            .content(updatedPost.getContent())
-            .tags(updatedPost.getTagNames())
+            .content(post.getContent())
+            .tags(post.getTagNames())
             .build();
     }
 
