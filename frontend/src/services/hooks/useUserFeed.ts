@@ -36,6 +36,9 @@ const useUserFeed = (isMyFeed: boolean, username: string | null, prevData?: Infi
     if (!data) return;
 
     const pages = data.pages;
+
+    if (!pages) return;
+
     const lastPage = pages[pages.length - 1];
 
     if (!lastPage || !lastPage.length) {

@@ -35,10 +35,10 @@ class PostRepositoryTest {
     private PostRepository postRepository;
 
     @Autowired
-    private TestEntityManager testEntityManager;
+    private TagRepository tagRepository;
 
     @Autowired
-    private TagRepository tagRepository;
+    private TestEntityManager testEntityManager;
 
     @DisplayName("게시글을 저장한다.")
     @Test

@@ -41,6 +41,7 @@ const CommentSlider = ({ post, isSliderShown, onSliderClose, onCommentSave }: Pr
   const [sliderPost, setSliderPost] = useState<Post>();
   const [stepIndex, setStepIndex] = useState(0);
   const commentTextAreaRef = useRef<HTMLTextAreaElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!post) {
@@ -82,10 +83,7 @@ const CommentSlider = ({ post, isSliderShown, onSliderClose, onCommentSave }: Pr
   const commentListItems = sliderPost.comments.map((comment) => (
     <CommentListItem key={comment.id}>
       <CommentContent>
-        <Avatar
-          diameter="2.5rem"
-          imageUrl="https://images.unsplash.com/photo-1599566150163-29194dcaad36?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80"
-        />
+        <Avatar diameter="2.5rem" imageUrl={comment.profileImageUrl} />
         <CommentText>
           <PostContentAuthorLink to={PAGE_URL.USER_PROFILE(sliderPost.authorName)}>
             {sliderPost.authorName}
@@ -93,7 +91,7 @@ const CommentSlider = ({ post, isSliderShown, onSliderClose, onCommentSave }: Pr
           {comment.content}
         </CommentText>
       </CommentContent>
-      {comment.isLiked ? <HeartIcon /> : <HeartLineIcon />}
+      {comment.liked ? <HeartIcon /> : <HeartLineIcon />}
     </CommentListItem>
   ));
 
@@ -121,12 +119,22 @@ const CommentSlider = ({ post, isSliderShown, onSliderClose, onCommentSave }: Pr
   ));
 
   const handleCommentSave = () => {
-    commentTextAreaRef.current && onCommentSave(commentTextAreaRef.current?.value);
+    if (!commentTextAreaRef.current || !containerRef.current) {
+      return;
+    }
+
+    onCommentSave(commentTextAreaRef.current.value);
+    commentTextAreaRef.current.value = "";
+
+    containerRef.current.scroll({
+      top: containerRef.current.offsetHeight,
+      behavior: "smooth",
+    });
   };
 
   return (
     <BottomSliderPortal isSliderShown={isSliderShown}>
-      <Container>
+      <Container ref={containerRef}>
         <SliderHeader>
           <CloseButton>
             <GoDownIcon onClick={onSliderClose} />

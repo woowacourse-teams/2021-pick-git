@@ -98,10 +98,26 @@ export const CommentWrapper = styled.div`
   margin-bottom: 0.5rem;
 `;
 
-export const MyComment = styled.div`
+export const CommentSliderToggleLink = styled.a`
   display: flex;
+  justify-content: flex-end;
   align-items: center;
-  padding: 0 0.75rem;
+  padding: 0 1rem;
+  font-size: 10px;
+  transition: opacity 0.5s;
+
+  :hover {
+    opacity: 0.5;
+  }
+`;
+
+export const CommentSliderToggleLinkText = styled.span`
+  margin-right: 0.5rem;
+`;
+
+export const MoreCommentExistIndicator = styled.div`
+  text-align: center;
+  cursor: pointer;
 `;
 
 export const CommentInputWrapper = styled.div`

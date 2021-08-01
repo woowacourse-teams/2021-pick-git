@@ -2,13 +2,13 @@ import axios from "axios";
 
 switch (process.env.DEPLOY) {
   case "main":
-    axios.defaults.baseURL = "http://api.pick-git.com/api";
+    axios.defaults.baseURL = "https://api.pick-git.com/api";
     break;
   case "develop":
-    axios.defaults.baseURL = "http://api.pick-git.com/api";
+    axios.defaults.baseURL = "https://api.pick-git.com/api";
     break;
   default:
-    axios.defaults.baseURL = "http://localhost:3000/api";
+    axios.defaults.baseURL = "http://localhost:3001/api/";
 }
 
 export * from "./profile";
