@@ -49,7 +49,7 @@ const config = {
     hot: true,
     proxy: {
       "/api": {
-        target: "http://devapi.pickgit.p-e.kr:8080",
+        target: "http://api.pick-git.com",
         changeOrigin: true,
         secure: false,
       },

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { Spinner } from "../@shared/Loader/Loader.style";
 
@@ -23,7 +24,7 @@ export const Button = styled.button<{ follow: boolean }>`
   font-weight: bold;
 `;
 
-export const NameTag = styled.div`
+export const NameTag = styled(Link)`
   display: flex;
   align-items: center;
 
