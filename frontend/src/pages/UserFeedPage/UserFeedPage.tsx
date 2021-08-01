@@ -28,7 +28,7 @@ const UserFeedPage = () => {
     state: { prevData, postId },
   } = useLocation<LocationState>();
 
-  const { allPosts, handleIntersect, isLoading, isError, isFetchingNextPage } = useUserFeed(
+  const { infinitePostsData, isLoading, isError, isFetchingNextPage, handleIntersect } = useUserFeed(
     isMyFeed,
     username,
     prevData
@@ -50,14 +50,17 @@ const UserFeedPage = () => {
     return <PageLoading />;
   }
 
-  if (isError) {
+  if (isError || !infinitePostsData) {
     return <div>피드를 가져올 수 없습니다.</div>;
   }
 
   return (
     <Container>
       <InfiniteScrollContainer isLoaderShown={isFetchingNextPage} onIntersect={handleIntersect}>
-        <Feed posts={allPosts} queryKey={[QUERY.GET_USER_FEED_POSTS, { username: currentUsername, isMyFeed }]} />
+        <Feed
+          infinitePostsData={infinitePostsData}
+          queryKey={[QUERY.GET_USER_FEED_POSTS, { username: currentUsername, isMyFeed }]}
+        />
       </InfiniteScrollContainer>
     </Container>
   );

@@ -121,7 +121,7 @@ const PostItem = ({
     </CommentWrapper>
   ));
 
-  const tagList = JSON.parse(tags.join(",")).map((tag: string, index: number) => (
+  const tagList = tags.map((tag: string, index: number) => (
     // TODO: key prop 수정 => tag가 unique임이 보장된 후에!
     <TagItemLinkButton key={index} to={PAGE_URL.POSTS_WITH_TAG(tag)}>
       <Chip>{tag}</Chip>
@@ -170,11 +170,11 @@ const PostItem = ({
             : commentList}
         </CommentsWrapper>
       </PostBody>
+      <PostCreatedDateText>{currentTimeDiffText}</PostCreatedDateText>
       <CommentSliderToggleLink onClick={onCommentInputClick}>
-        <CommentSliderToggleLinkText>댓글 작성</CommentSliderToggleLinkText>
+        <CommentSliderToggleLinkText>{isLoggedIn ? "댓글 작성" : "댓글 보기"}</CommentSliderToggleLinkText>
         <ArrowRightIcon />
       </CommentSliderToggleLink>
-      <PostCreatedDateText>{currentTimeDiffText}</PostCreatedDateText>
     </Container>
   );
 };

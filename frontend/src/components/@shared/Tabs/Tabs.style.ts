@@ -30,7 +30,6 @@ export const TabButton = styled.button<{
 
     :hover {
       background-color: ${tabIndicatorKind === "line" && "#eee"};
-      opacity: ${tabIndicatorKind === "pill" && "0.5"};
     }
   `};
 `;

@@ -39,7 +39,7 @@ const userPostsQueryFunction: QueryFunction<Post[]> = async ({ queryKey, pagePar
 
 export const useHomeFeedPostsQuery = () => {
   return useInfiniteQuery<Post[], AxiosError<ErrorResponse>>(
-    QUERY.GET_HOME_FEED_POSTS,
+    [QUERY.GET_HOME_FEED_POSTS],
     async ({ pageParam = 0 }) => {
       return await requestGetHomeFeedPosts(pageParam, getAccessToken());
     },
@@ -47,6 +47,7 @@ export const useHomeFeedPostsQuery = () => {
       getNextPageParam: (_, pages) => {
         return pages.length;
       },
+      cacheTime: 0,
     }
   );
 };

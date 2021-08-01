@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { Container, StepSlider, StepContainer, NextStepButtonWrapper } from "./AddPostPage.style";
 import { POST_ADD_STEPS } from "../../constants/steps";
 import RepositorySelector from "../../components/RepositorySelector/RepositorySelector";
@@ -9,7 +9,7 @@ import { PAGE_URL } from "../../constants/urls";
 import usePostUpload from "../../services/hooks/usePostUpload";
 import useMessageModal from "../../services/hooks/@common/useMessageModal";
 import MessageModalPortal from "../../components/@layout/MessageModalPortal/MessageModalPortal";
-import { FAILURE_MESSAGE, WARNING_MESSAGE } from "../../constants/messages";
+import { FAILURE_MESSAGE, SUCCESS_MESSAGE, WARNING_MESSAGE } from "../../constants/messages";
 import {
   getPostAddValidationMessage,
   isContentEmpty,
@@ -21,6 +21,7 @@ import {
 import { getAPIErrorMessage } from "../../utils/error";
 import usePostAddStep from "../../services/hooks/usePostAddStep";
 import { useGithubTagsQuery } from "../../services/queries";
+import SnackBarContext from "../../contexts/SnackbarContext";
 
 const AddPostPage = () => {
   const { stepIndex, goNextStep, setStepMoveEventHandler, removeStepMoveEventHandler, completeStep } = usePostAddStep(
@@ -39,6 +40,7 @@ const AddPostPage = () => {
     uploadPost,
     resetPostUploadData,
   } = usePostUpload();
+  const { pushSnackbarMessage } = useContext(SnackBarContext);
   const { modalMessage, isModalShown, isCancelButtonShown, showAlertModal, showConfirmModal, hideMessageModal } =
     useMessageModal();
   const tagsQueryResult = useGithubTagsQuery(githubRepositoryName);
@@ -79,6 +81,7 @@ const AddPostPage = () => {
     try {
       await uploadPost();
       resetPostUploadData();
+      pushSnackbarMessage(SUCCESS_MESSAGE.POST_ADDED);
       completeStep();
     } catch (error) {
       showAlertModal(getAPIErrorMessage(error.response?.data.errorCode));
