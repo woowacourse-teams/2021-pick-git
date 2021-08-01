@@ -40,7 +40,6 @@ import java.util.List;
 import java.util.function.Function;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -195,7 +194,9 @@ public class PostService {
 
     public PostUpdateResponseDto update(PostUpdateRequestDto updateRequestDto) {
         User user = findUserByName(updateRequestDto.getUsername());
-        Post post = findPostByIdAndUser(updateRequestDto.getPostId(), user);
+        Post post = findPostById(updateRequestDto.getPostId());
+
+        post.belongsToUser(user);
 
         List<Tag> tags = tagService.findOrCreateTags(new TagsDto(updateRequestDto.getTags()));
 
@@ -210,7 +211,9 @@ public class PostService {
 
     public void delete(PostDeleteRequestDto deleteRequestDto) {
         User user = findUserByName(deleteRequestDto.getUsername());
-        Post post = findPostByIdAndUser(deleteRequestDto.getPostId(), user);
+        Post post = findPostById(deleteRequestDto.getPostId());
+
+        post.belongsToUser(user);
 
         postRepository.delete(post);
     }
@@ -219,11 +222,5 @@ public class PostService {
         return userRepository
             .findByBasicProfile_Name(username)
             .orElseThrow(UserNotFoundException::new);
-    }
-
-    @Transactional(readOnly = true)
-    public Post findPostByIdAndUser(Long postId, User user) {
-        return postRepository.findByIdAndUser(postId, user)
-            .orElseThrow(PostNotFoundException::new);
     }
 }

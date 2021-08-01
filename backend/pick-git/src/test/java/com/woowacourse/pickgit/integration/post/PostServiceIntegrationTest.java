@@ -19,6 +19,7 @@ import com.woowacourse.pickgit.exception.post.CannotAddTagException;
 import com.woowacourse.pickgit.exception.post.CannotUnlikeException;
 import com.woowacourse.pickgit.exception.post.CommentFormatException;
 import com.woowacourse.pickgit.exception.post.DuplicatedLikeException;
+import com.woowacourse.pickgit.exception.post.PostNotBelongToUserException;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
 import com.woowacourse.pickgit.post.application.PostService;
@@ -660,9 +661,9 @@ class PostServiceIntegrationTest {
             .isEqualTo(responseDto);
     }
 
-    @DisplayName("해당하는 사용자의 게시물이 아닌 경우 수정할 수 없다. - 500 예외")
+    @DisplayName("해당하는 사용자의 게시물이 아닌 경우 수정할 수 없다. - 401 예외")
     @Test
-    void update_PostNotBelongToUser_500Exception() {
+    void update_PostNotBelongToUser_401Exception() {
         // given
         User user = UserFactory.user(USERNAME);
         User anotherUser = UserFactory.user("anotherUser");
@@ -689,10 +690,10 @@ class PostServiceIntegrationTest {
         // when
         assertThatThrownBy(() -> {
             postService.update(updateRequestDto);
-        }).isInstanceOf(PostNotFoundException.class)
-            .hasFieldOrPropertyWithValue("errorCode", "P0002")
-            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
-            .hasMessage("해당하는 게시물을 찾을 수 없습니다.");
+        }).isInstanceOf(PostNotBelongToUserException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "P0005")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)
+            .hasMessage("해당하는 사용자의 게시물이 아닙니다.");
     }
 
     @DisplayName("사용자는 게시물을 삭제한다.")
@@ -722,18 +723,12 @@ class PostServiceIntegrationTest {
         postService.delete(deleteRequestDto);
 
         // then
-        assertThatThrownBy(() -> {
-            postRepository.findById(1L)
-                .orElseThrow(PostNotFoundException::new);
-        }).isInstanceOf(PostNotFoundException.class)
-            .hasFieldOrPropertyWithValue("errorCode", "P0002")
-            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
-            .hasMessage("해당하는 게시물을 찾을 수 없습니다.");
+        assertThat(postRepository.findById(1L)).isEmpty();
     }
 
-    @DisplayName("해당하는 사용자의 게시물이 아닌 경우 삭제할 수 없다. - 500 예외")
+    @DisplayName("해당하는 사용자의 게시물이 아닌 경우 삭제할 수 없다. - 401 예외")
     @Test
-    void delete_PostNotBelongToUser_500Exception() {
+    void delete_PostNotBelongToUser_401Exception() {
         // given
         User user = UserFactory.user(USERNAME);
         User anotherUser = UserFactory.user("anotherUser");
@@ -759,9 +754,9 @@ class PostServiceIntegrationTest {
         // when
         assertThatThrownBy(() -> {
             postService.delete(deleteRequestDto);
-        }).isInstanceOf(PostNotFoundException.class)
-            .hasFieldOrPropertyWithValue("errorCode", "P0002")
-            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
-            .hasMessage("해당하는 게시물을 찾을 수 없습니다.");
+        }).isInstanceOf(PostNotBelongToUserException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "P0005")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)
+            .hasMessage("해당하는 사용자의 게시물이 아닙니다.");
     }
 }
