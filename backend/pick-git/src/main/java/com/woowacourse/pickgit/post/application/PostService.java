@@ -4,7 +4,6 @@ import static java.util.stream.Collectors.toList;
 
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.exception.post.PostNotBelongToUserException;
-import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
 import com.woowacourse.pickgit.post.application.dto.request.CommentRequestDto;
@@ -161,21 +160,18 @@ public class PostService {
         return new LikeResponseDto(target.getLikeCounts(), false);
     }
 
-    private Post findPostById(Long id) {
-        return postRepository.findById(id)
-            .orElseThrow(PostNotFoundException::new);
-    }
-
     public PostUpdateResponseDto update(PostUpdateRequestDto updateRequestDto) {
         User user = findUserByName(updateRequestDto.getUsername());
         Post post = findPostById(updateRequestDto.getPostId());
 
-        if (post.belongsToUser(user)) {
-            List<Tag> tags = tagService.findOrCreateTags(new TagsDto(updateRequestDto.getTags()));
-
-            post.updateContent(updateRequestDto.getContent());
-            post.updateTags(tags);
+        if (!post.isWrittenBy(user)) {
+            throw new PostNotBelongToUserException();
         }
+
+        List<Tag> tags = tagService.findOrCreateTags(new TagsDto(updateRequestDto.getTags()));
+
+        post.updateContent(updateRequestDto.getContent());
+        post.updateTags(tags);
 
         return PostUpdateResponseDto.builder()
             .content(post.getContent())
@@ -187,10 +183,17 @@ public class PostService {
         User user = findUserByName(deleteRequestDto.getUsername());
         Post post = findPostById(deleteRequestDto.getPostId());
 
-        if (post.belongsToUser(user)) {
-            user.delete(post);
-            postRepository.delete(post);
+        if (!post.isWrittenBy(user)) {
+            throw new PostNotBelongToUserException();
         }
+
+        user.delete(post);
+        postRepository.delete(post);
+    }
+
+    private Post findPostById(Long id) {
+        return postRepository.findById(id)
+            .orElseThrow(PostNotFoundException::new);
     }
 
     private User findUserByName(String username) {

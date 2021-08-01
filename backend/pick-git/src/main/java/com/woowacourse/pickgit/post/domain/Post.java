@@ -116,14 +116,12 @@ public class Post {
     }
 
     public boolean isLikedBy(User user) {
-        return likes.contains(new Like(this, user));
+        Like like = new Like(this, user);
+        return likes.contains(like);
     }
 
-    public boolean belongsToUser(User user) {
-        if (this.user.equals(user)) {
-            return true;
-        }
-        throw new PostNotBelongToUserException();
+    public boolean isWrittenBy(User user) {
+        return this.user.equals(user);
     }
 
     public void updateContent(String content) {
