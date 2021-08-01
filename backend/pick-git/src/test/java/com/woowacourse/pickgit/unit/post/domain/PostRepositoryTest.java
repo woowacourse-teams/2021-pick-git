@@ -6,8 +6,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.woowacourse.pickgit.common.factory.PostBuilder;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.config.JpaTestConfiguration;
-import com.woowacourse.pickgit.exception.post.PostNotFoundException;
-import com.woowacourse.pickgit.exception.user.UserNotFoundException;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.PostRepository;
 import com.woowacourse.pickgit.post.domain.comment.Comment;
@@ -160,64 +158,6 @@ class PostRepositoryTest {
 
         List<Comment> comments = findPost.getComments();
         assertThat(comments).hasSize(1);
-    }
-
-    @DisplayName("저장되어 있는 게시물 중 2번째 게시물을 조회한다.")
-    @Test
-    void findByIdAndUser_SecondPost_Success() {
-        // given
-        User user = UserFactory.user("testUser");
-        userRepository.save(user);
-
-        Post post1 = postBuilder("testContent1", "https://github.com/da-nyee/1", user);
-        Post post2 = postBuilder("testContent2", "https://github.com/da-nyee/2", user);
-
-        postRepository.save(post1);
-        postRepository.save(post2);
-        flushAndClear();
-
-        // when
-        User findUser = userRepository.findByBasicProfile_Name(user.getName())
-            .orElseThrow(UserNotFoundException::new);
-        Post findPost = postRepository.findByIdAndUser(post2.getId(), findUser)
-            .orElseThrow(PostNotFoundException::new);
-
-        // then
-        assertThat(findPost)
-            .usingRecursiveComparison()
-            .ignoringFields("user")
-            .isNotEqualTo(post1);
-        assertThat(findPost)
-            .usingRecursiveComparison()
-            .ignoringFields("user")
-            .isEqualTo(post2);
-    }
-
-    @DisplayName("저장되어 있지 않은 게시물은 조회할 수 없다. - 500 예외")
-    @Test
-    void findPostByIdAndUser_unsavedPost_500Exception() {
-        // given
-        User user = UserFactory.user("testUser");
-        userRepository.save(user);
-
-        Post post = postBuilder("testContent1", "https://github.com/da-nyee/1", user);
-
-        postRepository.save(post);
-        flushAndClear();
-
-        User findUser = userRepository.findByBasicProfile_Name(user.getName())
-            .orElseThrow(UserNotFoundException::new);
-
-        // when
-        assertThat(postRepository.findByIdAndUser(2L, findUser)).isEmpty();
-    }
-
-    private Post postBuilder(String content, String repoUrl, User savedUser) {
-        return new PostBuilder()
-            .content(content)
-            .githubRepoUrl(repoUrl)
-            .user(savedUser)
-            .build();
     }
 
     private void flushAndClear() {
