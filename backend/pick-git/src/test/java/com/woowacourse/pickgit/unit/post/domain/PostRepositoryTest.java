@@ -25,7 +25,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.http.HttpStatus;
 
 @Import(JpaTestConfiguration.class)
 @DataJpaTest
@@ -193,27 +192,24 @@ class PostRepositoryTest {
             .ignoringFields("user")
             .isEqualTo(post2);
     }
-    
+
     @DisplayName("저장되어 있지 않은 게시물은 조회할 수 없다. - 500 예외")
     @Test
     void findPostByIdAndUser_unsavedPost_500Exception() {
         // given
         User user = UserFactory.user("testUser");
-        User savedUser = userRepository.save(user);
+        userRepository.save(user);
 
-        Post post = postBuilder("testContent1", "https://github.com/da-nyee/1", savedUser);
+        Post post = postBuilder("testContent1", "https://github.com/da-nyee/1", user);
 
         postRepository.save(post);
         flushAndClear();
 
+        User findUser = userRepository.findByBasicProfile_Name(user.getName())
+            .orElseThrow(UserNotFoundException::new);
+
         // when
-        assertThatThrownBy(() -> {
-            postRepository.findByIdAndUser(2L, savedUser)
-                .orElseThrow(PostNotFoundException::new);
-        }).isInstanceOf(PostNotFoundException.class)
-            .hasFieldOrPropertyWithValue("errorCode", "P0002")
-            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
-            .hasMessage("해당하는 게시물을 찾을 수 없습니다.");
+        assertThat(postRepository.findByIdAndUser(2L, findUser)).isEmpty();
     }
 
     private Post postBuilder(String content, String repoUrl, User savedUser) {
