@@ -63,7 +63,8 @@ public class Post {
     @OneToMany(
         mappedBy = "post",
         fetch = FetchType.LAZY,
-        cascade = {CascadeType.PERSIST, CascadeType.REMOVE}
+        cascade = CascadeType.PERSIST,
+        orphanRemoval = true
     )
     private List<PostTag> postTags = new ArrayList<>();
 
