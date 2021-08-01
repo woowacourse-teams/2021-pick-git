@@ -120,7 +120,7 @@ public class Post {
     }
 
     public boolean belongsToUser(User user) {
-        if (user.equals(user)) {
+        if (this.user.equals(user)) {
             return true;
         }
         throw new PostNotBelongToUserException();

@@ -522,9 +522,9 @@ class PostServiceIntegrationTest {
             List.of("java", "spring"), "hello");
 
         // when
-        assertThatThrownBy(() -> {
-            postService.update(updateRequestDto);
-        }).isInstanceOf(PostNotBelongToUserException.class)
+        assertThatThrownBy(() ->
+            postService.update(updateRequestDto)
+        ).isInstanceOf(PostNotBelongToUserException.class)
             .hasFieldOrPropertyWithValue("errorCode", "P0005")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)
             .hasMessage("해당하는 사용자의 게시물이 아닙니다.");
@@ -648,9 +648,9 @@ class PostServiceIntegrationTest {
             savedPost.getId());
 
         // when
-        assertThatThrownBy(() -> {
-            postService.delete(deleteRequestDto);
-        }).isInstanceOf(PostNotBelongToUserException.class)
+        assertThatThrownBy(() ->
+            postService.delete(deleteRequestDto)
+        ).isInstanceOf(PostNotBelongToUserException.class)
             .hasFieldOrPropertyWithValue("errorCode", "P0005")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)
             .hasMessage("해당하는 사용자의 게시물이 아닙니다.");
