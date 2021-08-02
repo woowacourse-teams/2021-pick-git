@@ -42,17 +42,17 @@ const SearchListUser = ({ isFetchingNextPage, onIntersect, users, follow, refetc
       );
     }
 
+    if (isFollowLoading || isUnfollowLoading) {
+      return (
+        <ButtonLoader type="button" follow={isFollowLoading}>
+          {isFollowLoading ? "팔로우" : "팔로우 취소"}
+          <ButtonSpinner size="1rem" />
+        </ButtonLoader>
+      );
+    }
+
     return <></>;
   };
-
-  if (isFollowLoading || isUnfollowLoading) {
-    return (
-      <ButtonLoader type="button" follow={isFollowLoading}>
-        {isFollowLoading ? "팔로우" : "팔로우 취소"}
-        <ButtonSpinner size="1rem" />
-      </ButtonLoader>
-    );
-  }
 
   if (!users.length) {
     return <Empty>검색결과가 없습니다.</Empty>;

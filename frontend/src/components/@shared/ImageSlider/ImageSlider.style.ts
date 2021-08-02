@@ -69,11 +69,13 @@ export const Indicator = styled.div`
   bottom: 0.8125rem;
   transform: translateX(-50%);
 
-  width: fit-content;
-  font-size: 0.75rem;
+  display: flex;
+  justify-content: center;
+  width: 2.5rem;
+  font-size: 0.6rem;
   line-height: 0.9;
   color: ${({ theme }) => theme.color.white};
-  background-color: rgba(0, 0, 0, 0.5);
-  padding: 0.3rem 0.8rem;
+  background-color: rgba(0, 0, 0, 0.4);
+  padding: 0.3rem;
   border-radius: 10px;
 `;

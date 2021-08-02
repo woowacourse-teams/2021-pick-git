@@ -7,13 +7,15 @@ import { Container, PostItemWrapper } from "./Feed.style";
 import useBottomSlider from "../../services/hooks/@common/useBottomSlider";
 import CommentSlider from "../CommentSlider/CommentSlider";
 import useFeedMutation from "../../services/hooks/useFeedMutation";
-import { FAILURE_MESSAGE, SUCCESS_MESSAGE } from "../../constants/messages";
+import { FAILURE_MESSAGE, SUCCESS_MESSAGE, WARNING_MESSAGE } from "../../constants/messages";
 import { getAPIErrorMessage } from "../../utils/error";
 import { useHistory } from "react-router-dom";
 import { PAGE_URL } from "../../constants/urls";
 import usePostEdit from "../../services/hooks/usePostEdit";
 import { InfiniteData, QueryKey } from "react-query";
 import { getPostsFromPages } from "../../utils/feed";
+import useMessageModal from "../../services/hooks/@common/useMessageModal";
+import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
 
 interface Props {
   infinitePostsData: InfiniteData<Post[]>;
@@ -25,6 +27,8 @@ const Feed = ({ infinitePostsData, queryKey }: Props) => {
   const { pushSnackbarMessage } = useContext(SnackBarContext);
   const { addPostComment, addPostLike, deletePost, deletePostLike } = useFeedMutation(queryKey);
   const { setPostEditData } = usePostEdit();
+  const { modalMessage, isModalShown, isCancelButtonShown, showAlertModal, showConfirmModal, hideMessageModal } =
+    useMessageModal();
   const { isBottomSliderShown, showBottomSlider, hideBottomSlider, removeSlideEventHandler, setSlideEventHandler } =
     useBottomSlider();
   const { isLoggedIn, currentUsername } = useContext(UserContext);
@@ -44,9 +48,20 @@ const Feed = ({ infinitePostsData, queryKey }: Props) => {
     history.push(PAGE_URL.EDIT_POST_FIRST_STEP);
   };
 
-  const handlePostDelete = async (postId: Post["id"]) => {
+  const handlePostDeleteButtonClick = (postId: Post["id"]) => {
+    setSelectedPostId(postId);
+    showConfirmModal(WARNING_MESSAGE.POST_DELETE);
+  };
+
+  const handlePostDelete = async () => {
+    if (!selectedPostId) {
+      return;
+    }
+
+    hideMessageModal();
+
     try {
-      await deletePost(postId);
+      await deletePost(selectedPostId);
       pushSnackbarMessage(SUCCESS_MESSAGE.POST_DELETED);
     } catch (error) {
       pushSnackbarMessage(getAPIErrorMessage(error.response?.data.errorCode));
@@ -114,7 +129,7 @@ const Feed = ({ infinitePostsData, queryKey }: Props) => {
             liked={post.liked}
             likeCount={post.likesCount}
             tags={post.tags}
-            onPostDelete={() => handlePostDelete(post.id)}
+            onPostDelete={() => handlePostDeleteButtonClick(post.id)}
             onPostEdit={() => handlePostEdit(post)}
             onPostLike={() => handlePostLike(post.id)}
             onMoreCommentClick={() => handleCommentsClick(post.id)}
@@ -129,6 +144,14 @@ const Feed = ({ infinitePostsData, queryKey }: Props) => {
         isSliderShown={isBottomSliderShown}
         onSliderClose={handleCommentSliderClose}
       />
+      {isModalShown && isCancelButtonShown && (
+        <MessageModalPortal
+          heading={modalMessage}
+          onConfirm={handlePostDelete}
+          onClose={hideMessageModal}
+          onCancel={hideMessageModal}
+        />
+      )}
     </Container>
   );
 };
