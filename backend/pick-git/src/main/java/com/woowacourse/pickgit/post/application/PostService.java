@@ -196,12 +196,12 @@ public class PostService {
         User user = findUserByName(updateRequestDto.getUsername());
         Post post = findPostById(updateRequestDto.getPostId());
 
-        post.belongsToUser(user);
+        if (post.belongsToUser(user)) {
+            List<Tag> tags = tagService.findOrCreateTags(new TagsDto(updateRequestDto.getTags()));
 
-        List<Tag> tags = tagService.findOrCreateTags(new TagsDto(updateRequestDto.getTags()));
-
-        post.updateContent(updateRequestDto.getContent());
-        post.updateTags(tags);
+            post.updateContent(updateRequestDto.getContent());
+            post.updateTags(tags);
+        }
 
         return PostUpdateResponseDto.builder()
             .content(post.getContent())
@@ -213,9 +213,10 @@ public class PostService {
         User user = findUserByName(deleteRequestDto.getUsername());
         Post post = findPostById(deleteRequestDto.getPostId());
 
-        post.belongsToUser(user);
-
-        postRepository.delete(post);
+        if (post.belongsToUser(user)) {
+            user.delete(post);
+            postRepository.delete(post);
+        }
     }
 
     private User findUserByName(String username) {

@@ -69,10 +69,9 @@ export const GlobalStyle = createGlobalStyle`
     font-size: 2rem;
     display: block;
     margin: 20px;
-  }
-  a {
     all: unset;
   }
+  
   a:link {
     text-decoration: none;
     color: #3f464d;
@@ -88,6 +87,10 @@ export const GlobalStyle = createGlobalStyle`
   a:hover {
     text-decoration: none;
     cursor: pointer;
+  }
+
+  a, button {
+    -webkit-tap-highlight-color: transparent;
   }
 
   * {

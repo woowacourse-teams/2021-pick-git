@@ -112,6 +112,8 @@ export const CommentSliderToggleLink = styled.a`
 `;
 
 export const CommentSliderToggleLinkText = styled.span`
+  font-size: 12px;
+  font-weight: bold;
   margin-right: 0.5rem;
 `;
 
@@ -127,6 +129,6 @@ export const CommentInputWrapper = styled.div`
 
 export const PostCreatedDateText = styled.span`
   padding: 0.75rem;
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: bold;
 `;

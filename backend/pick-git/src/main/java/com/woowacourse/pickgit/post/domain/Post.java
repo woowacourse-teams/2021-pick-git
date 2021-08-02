@@ -37,8 +37,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 public class Post {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Embedded
@@ -64,7 +63,8 @@ public class Post {
     @OneToMany(
         mappedBy = "post",
         fetch = FetchType.LAZY,
-        cascade = {CascadeType.PERSIST, CascadeType.REMOVE}
+        cascade = CascadeType.PERSIST,
+        orphanRemoval = true
     )
     private List<PostTag> postTags = new ArrayList<>();
 
@@ -131,9 +131,9 @@ public class Post {
         return likes.contains(userName);
     }
 
-    public void belongsToUser(User user) {
+    public boolean belongsToUser(User user) {
         if (getUser().isSameAs(user)) {
-            return;
+            return true;
         }
         throw new PostNotBelongToUserException();
     }

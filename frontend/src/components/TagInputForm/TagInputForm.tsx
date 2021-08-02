@@ -1,8 +1,9 @@
 import { AxiosError } from "axios";
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { UseQueryResult } from "react-query";
 import { useHistory } from "react-router-dom";
 import { ErrorResponse, Tags } from "../../@types";
+import { LIMIT } from "../../constants/limits";
 import { FAILURE_MESSAGE } from "../../constants/messages";
 import { PAGE_URL } from "../../constants/urls";
 import useMessageModal from "../../services/hooks/@common/useMessageModal";
@@ -12,7 +13,7 @@ import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal
 import PageLoading from "../@layout/PageLoading/PageLoading";
 import Chip from "../@shared/Chip/Chip";
 import Input from "../@shared/Input/Input";
-import { Container, Form, TagList, TagListItem } from "./TagInputForm.style";
+import { Container, Form, TagList, TagListItem, TextLengthIndicator } from "./TagInputForm.style";
 
 interface Props {
   githubRepositoryName: string;
@@ -22,6 +23,7 @@ interface Props {
 }
 
 const TagInputForm = ({ githubRepositoryName, tags, tagsQueryResult, setTags }: Props) => {
+  const [tagInputLength, setTagInputLength] = useState(0);
   const { modalMessage, isModalShown, hideMessageModal, showAlertModal } = useMessageModal();
   const history = useHistory();
 
@@ -82,6 +84,14 @@ const TagInputForm = ({ githubRepositoryName, tags, tagsQueryResult, setTags }: 
     history.push(PAGE_URL.HOME);
   };
 
+  const handleTagInputChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
+    if (event.currentTarget.value.length > LIMIT.POST_TAG_LENGTH) {
+      event.currentTarget.value = event.currentTarget.value.substr(0, LIMIT.POST_TAG_LENGTH);
+    }
+
+    setTagInputLength(event.currentTarget.value.length);
+  };
+
   if (tagsQueryResult && tagsQueryResult.error) {
     tagsQueryResult.error.response &&
       showAlertModal(getAPIErrorMessage(tagsQueryResult.error.response?.data.errorCode));
@@ -97,7 +107,14 @@ const TagInputForm = ({ githubRepositoryName, tags, tagsQueryResult, setTags }: 
   return (
     <Container>
       <Form onSubmit={handleTagSubmit}>
-        <Input kind="borderBottom" textAlign="center" placeholder="태그 입력..." name="tag-input" />
+        <Input
+          kind="borderBottom"
+          textAlign="center"
+          placeholder="태그 입력..."
+          name="tag-input"
+          onChange={handleTagInputChange}
+        />
+        <TextLengthIndicator>{`${tagInputLength} / ${LIMIT.POST_TAG_LENGTH}`}</TextLengthIndicator>
       </Form>
       <TagList>{tagListItems}</TagList>
       {isModalShown && (

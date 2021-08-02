@@ -38,3 +38,4 @@ public class Images {
         images.forEach(image -> image.toPost(post));
     }
 }
+
