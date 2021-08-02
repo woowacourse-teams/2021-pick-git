@@ -145,7 +145,7 @@ class PostRepositoryTest {
             .build();
 
         // when
-        Comment comment = new Comment("test comment");
+        Comment comment = new Comment("test comment", testUser);
         post.addComment(comment);
 
         postRepository.save(post);

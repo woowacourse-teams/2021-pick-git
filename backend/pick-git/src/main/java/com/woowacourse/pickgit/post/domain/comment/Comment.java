@@ -32,13 +32,14 @@ public class Comment {
     protected Comment() {
     }
 
-    public Comment(String content) {
-        this(null, content);
+    public Comment(String content, User user) {
+        this(null, content, user);
     }
 
-    public Comment(Long id, String content) {
+    public Comment(Long id, String content, User user) {
         this.id = id;
         this.content = new CommentContent(content);
+        this.user = user;
     }
 
     public void belongTo(Post post) {

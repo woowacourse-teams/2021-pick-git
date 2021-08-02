@@ -220,6 +220,11 @@ class PostServiceTest {
 
         User user = UserFactory.user("testuser");
 
+        given(userRepository.findByBasicProfile_Name(user.getName()))
+            .willReturn(Optional.of(user));
+        given(postRepository.findById(post.getId()))
+            .willReturn(Optional.of(post));
+
         CommentRequestDto commentRequestDto =
             new CommentRequestDto(user.getName(), "", post.getId());
 

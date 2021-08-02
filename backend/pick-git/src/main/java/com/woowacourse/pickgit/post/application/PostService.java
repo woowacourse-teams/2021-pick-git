@@ -97,10 +97,10 @@ public class PostService {
         var postId = commentRequestDto.getPostId();
         var content = commentRequestDto.getContent();
 
-        Comment comment = new Comment(content);
-
         User user = findUserByName(userName);
         Post post = findPostById(postId);
+
+        Comment comment = new Comment(content, user);
         post.addComment(comment);
 
         return createCommentResponseDto(comment);
