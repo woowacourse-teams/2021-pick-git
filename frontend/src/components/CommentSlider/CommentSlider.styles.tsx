@@ -10,7 +10,7 @@ export const Container = styled.div`
   width: 100%;
   height: 100%;
   padding-bottom: ${LAYOUT.HEADER_HEIGHT};
-  overflow-x: scroll;
+  overflow-x: hidden;
   overflow-y: scroll;
 `;
 

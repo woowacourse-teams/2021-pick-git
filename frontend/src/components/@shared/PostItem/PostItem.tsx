@@ -40,6 +40,7 @@ import { LIMIT } from "../../../constants/limits";
 import { getTimeDiffFromCurrent } from "../../../utils/date";
 import EmptyPostImage from "../../../assets/images/empty-post-image.png";
 import ButtonDrawer from "../ButtonDrawer/ButtonDrawer";
+import { getTextElementsWithWithBr } from "../../../utils/text";
 
 export interface Props {
   currentUserName: string;
@@ -162,7 +163,11 @@ const PostItem = ({
         <LikeCountText>좋아요 {likeCount}개</LikeCountText>
         <PostContent>
           <PostContentAuthorLink to={PAGE_URL.USER_PROFILE(authorName)}>{authorName}</PostContentAuthorLink>
-          {shouldHideContent ? content.slice(0, LIMIT.POST_CONTENT_HIDE_LENGTH).concat("...") : content}
+          {shouldHideContent
+            ? getTextElementsWithWithBr(content)
+                .slice(0, LIMIT.POST_CONTENT_HIDE_LENGTH)
+                .concat(<span>...</span>)
+            : getTextElementsWithWithBr(content)}
           {shouldHideContent ? (
             <MoreContentLinkButton onClick={handleMoreContentShow}>더보기</MoreContentLinkButton>
           ) : (

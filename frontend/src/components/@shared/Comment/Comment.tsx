@@ -3,7 +3,7 @@ import { HeartIcon, HeartLineIcon } from "../../../assets/icons";
 
 export interface Props {
   authorName: string;
-  content: string;
+  content: React.ReactNode;
   liked: boolean;
   link?: string;
   onCommentLike: () => void;
