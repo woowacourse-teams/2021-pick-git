@@ -60,7 +60,7 @@ const EditPostPage = () => {
     try {
       await editPost();
       resetPostEditData();
-      pushSnackbarMessage(SUCCESS_MESSAGE.POST_ADDED);
+      pushSnackbarMessage(SUCCESS_MESSAGE.POST_MODIFIED);
       completeStep();
     } catch (error) {
       showAlertModal(getAPIErrorMessage(error.response?.data.errorCode));
