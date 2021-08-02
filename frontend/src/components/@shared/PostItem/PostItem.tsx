@@ -93,7 +93,7 @@ const PostItem = ({
   onPostDelete,
   onPostLike,
 }: Props) => {
-  const [shouldHideContent, setShouldHideContent] = useState(content.length > LIMIT.POST_CONTENT_HIDE_LENGTH);
+  const [shouldHideContent, setShouldHideContent] = useState(true);
   const { color } = useContext(ThemeContext);
 
   const { min, hour, day } = getTimeDiffFromCurrent(createdAt);
