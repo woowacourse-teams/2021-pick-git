@@ -14,7 +14,9 @@ export const FAILURE_MESSAGE = {
   NO_CONTENT_MODIFIED: "변경사항이 없습니다.",
   PROFILE_DESCRIPTION_MAX_LENGTH_EXCEEDED: `한 줄 소개는 ${LIMIT.PROFILE_DESCRIPTION_LENGTH}자 이하로만 입력할 수 있습니다.`,
   POST_CONTENT_LENGTH_LIMIT_EXCEEDED: `게시글은 ${LIMIT.POST_CONTENT_MAX_LENGTH}자 이하로만 입력할 수 있습니다.`,
-  POST_FILE_SIZE_EXCEEDED: `용량이 ${getMBFromBite(LIMIT.POST_FILE_MAX_SIZE)}MB 이상인 파일은 업로드 할 수 없습니다.`,
+  POST_FILE_SIZE_EXCEEDED: `총 용량이 ${getMBFromBite(
+    LIMIT.POST_FILE_MAX_SIZE
+  )}MB 이상인 파일들은 업로드 할 수 없습니다.`,
   POST_FILE_COUNT_EXCEEDED: `${LIMIT.POST_FILE_MAX_COUNT}개 이상의 파일은 업로드 할 수 없습니다.`,
   POST_TAG_LENGTH_LIMIT_EXCEEDED: `태그는 ${LIMIT.POST_TAG_LENGTH}자 이하로만 입력할 수 있습니다.`,
   POST_DUPLICATED_TAG_EXIST: "해당 태그와 중복된 태그가 이미 입력되어 있습니다.",
