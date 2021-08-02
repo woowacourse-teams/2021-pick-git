@@ -3,7 +3,7 @@ import { LIMIT } from "../constants/limits";
 import { FAILURE_MESSAGE } from "../constants/messages";
 
 export const getMBFromBite = (bite: number) => {
-  return Math.floor((bite / 1000) * 1000);
+  return Math.floor(bite / (1000 * 1000));
 };
 
 export const isContentEmpty = (content: PostUploadData["content"]) => {
@@ -19,7 +19,7 @@ export const isFilesEmpty = (files: PostUploadData["files"]) => {
 };
 
 export const isValidFilesSize = (files: PostUploadData["files"]) => {
-  return files.every((file) => file.size <= LIMIT.POST_FILE_MAX_SIZE);
+  return files.reduce((acc, file) => acc + file.size, 0) < LIMIT.POST_FILE_MAX_SIZE;
 };
 
 export const isValidFilesSizeCount = (files: PostUploadData["files"]) => {
