@@ -7,9 +7,9 @@ import { requestGetRepositories, requestGetTags } from "../requests/github";
 
 type GithubTagsQueryKey = readonly [typeof QUERY.GET_GITHUB_TAGS, string];
 
-export const useGithubRepositoriesQuery = () => {
+export const useGithubRepositoriesQuery = (username: string) => {
   return useQuery<GithubRepository[], AxiosError<ErrorResponse>>(QUERY.GET_GITHUB_REPOSITORIES, () =>
-    requestGetRepositories(getAccessToken())
+    requestGetRepositories(username, getAccessToken())
   );
 };
 

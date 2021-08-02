@@ -8,7 +8,7 @@ export default {
 };
 
 const Template: Story = (args) => (
-  <RepositorySelector goNextStep={() => {}} setGithubRepositoryName={() => {}} {...args} />
+  <RepositorySelector currentUsername="swon3210" goNextStep={() => {}} setGithubRepositoryName={() => {}} {...args} />
 );
 
 export const Default = Template.bind({});
