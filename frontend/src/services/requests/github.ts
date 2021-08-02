@@ -3,12 +3,12 @@ import { GithubRepository, Tags } from "../../@types";
 import { API_URL } from "../../constants/urls";
 import { customError } from "../../utils/error";
 
-export const requestGetRepositories = async (accessToken: string | null) => {
+export const requestGetRepositories = async (username: string, accessToken: string | null) => {
   if (!accessToken) {
     throw customError.noAccessToken;
   }
 
-  const response = await axios.get<GithubRepository[]>(API_URL.GITHUB_REPOSITORIES, {
+  const response = await axios.get<GithubRepository[]>(API_URL.GITHUB_REPOSITORIES(username), {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },

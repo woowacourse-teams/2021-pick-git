@@ -114,7 +114,7 @@ const PostItem = ({
       <Comment
         content={comment.content}
         liked={comment.liked}
-        authorName={authorName}
+        authorName={comment.authorName}
         link={currentUserName === comment.authorName ? PAGE_URL.MY_PROFILE : PAGE_URL.USER_PROFILE(comment.authorName)}
         onCommentLike={() => onCommentLike(comment.id)}
       />

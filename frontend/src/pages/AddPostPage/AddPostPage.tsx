@@ -22,6 +22,7 @@ import { getAPIErrorMessage } from "../../utils/error";
 import usePostAddStep from "../../services/hooks/usePostAddStep";
 import { useGithubTagsQuery } from "../../services/queries";
 import SnackBarContext from "../../contexts/SnackbarContext";
+import UserContext from "../../contexts/UserContext";
 
 const AddPostPage = () => {
   const { stepIndex, goNextStep, setStepMoveEventHandler, removeStepMoveEventHandler, completeStep } = usePostAddStep(
@@ -44,12 +45,14 @@ const AddPostPage = () => {
   const { modalMessage, isModalShown, isCancelButtonShown, showAlertModal, showConfirmModal, hideMessageModal } =
     useMessageModal();
   const tagsQueryResult = useGithubTagsQuery(githubRepositoryName);
+  const { currentUsername } = useContext(UserContext);
 
   const stepComponents = [
     <RepositorySelector
       key="repository-selector"
       setGithubRepositoryName={setGithubRepositoryName}
       goNextStep={goNextStep}
+      currentUsername={currentUsername}
     />,
     <PostContentUploader
       key="post-content-uploader"
