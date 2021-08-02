@@ -65,7 +65,7 @@ const TagInputForm = ({ githubRepositoryName, tags, tagsQueryResult, setTags }: 
     }
 
     setTags([...tags, newTag]);
-
+    setTagInputLength(0);
     event.currentTarget["tag-input"].value = "";
   };
 
