@@ -57,10 +57,7 @@ const UserFeedPage = () => {
   return (
     <Container>
       <InfiniteScrollContainer isLoaderShown={isFetchingNextPage} onIntersect={handleIntersect}>
-        <Feed
-          infinitePostsData={infinitePostsData}
-          queryKey={[QUERY.GET_USER_FEED_POSTS, { username: currentUsername, isMyFeed }]}
-        />
+        <Feed infinitePostsData={infinitePostsData} queryKey={[QUERY.GET_USER_FEED_POSTS, { username, isMyFeed }]} />
       </InfiniteScrollContainer>
     </Container>
   );
