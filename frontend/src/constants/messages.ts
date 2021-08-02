@@ -23,6 +23,7 @@ export const FAILURE_MESSAGE = {
   POST_TAG_SPECIAL_SYMBOL_EXIST: "태그에는 -, _ 를 제외한 특수문자가 포함될 수 없습니다.",
   POST_REPOSITORY_NOT_SELECTED: "리포지터리를 선택해주세요",
   POST_FILE_AND_CONTENT_EMPTY: "이미지와 글 모두 작성되지 않았습니다.",
+  POST_FILE: "이미지를 추가해주세요.",
   COMMENT_CONTENT_MAX_LENGTH_EXCEEDED: `댓글은 ${LIMIT.COMMENT_LENGTH}자 이하로만 입력할 수 있습니다.`,
   COMMENT_SAVE_FAILED: "댓글을 저장하지 못했습니다",
 };

@@ -108,7 +108,7 @@ const AddPostPage = () => {
     }
 
     if (stepIndex === 1 && isFilesEmpty(files)) {
-      showConfirmModal(WARNING_MESSAGE.POST_FILE_NOT_UPLOADED);
+      showAlertModal(FAILURE_MESSAGE.POST_FILE);
       return;
     }
 
