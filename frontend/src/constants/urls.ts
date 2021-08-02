@@ -30,6 +30,7 @@ export const API_URL = {
   },
   SELF_PROFILE: "/profiles/me",
   ADD_POSTS: "/posts",
+  GITHUB_REPOSITORIES: (username: string) => `/github/${username}/repositories`,
   USER_PROFILE: (username: string) => `/profiles/${username}`,
   USER_PROFILE_FOLLOW: (username: string) => `/profiles/${username}/followings`,
   MY_POSTS: (page: number, limit: number) => `/posts/me?page=${page}&limit=${limit}`,
@@ -42,7 +43,6 @@ export const API_URL = {
   POSTS_LIKES: (postId: number) => `/posts/${postId}/likes`,
   POSTS_COMMENTS: (postId: number) => `/posts/${postId}/comments`,
   GITHUB_STATS: (username: string) => `/profiles/${username}/contributions`,
-  GITHUB_REPOSITORIES: "/github/swon3210/repositories",
   GITHUB_TAGS: (repositoryName: string) => `/github/repositories/${repositoryName}/tags/languages`,
 };
 

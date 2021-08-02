@@ -86,8 +86,8 @@ const CommentSlider = ({ post, isSliderShown, onSliderClose, onCommentSave }: Pr
       <CommentContent>
         <Avatar diameter="2.5rem" imageUrl={comment.profileImageUrl} />
         <CommentText>
-          <PostContentAuthorLink to={PAGE_URL.USER_PROFILE(sliderPost.authorName)}>
-            {sliderPost.authorName}
+          <PostContentAuthorLink to={PAGE_URL.USER_PROFILE(comment.authorName)}>
+            {comment.authorName}
           </PostContentAuthorLink>
           {comment.content}
         </CommentText>

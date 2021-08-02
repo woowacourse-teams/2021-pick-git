@@ -114,7 +114,7 @@ const PostItem = ({
       <Comment
         content={comment.content}
         liked={comment.liked}
-        authorName={authorName}
+        authorName={comment.authorName}
         link={currentUserName === comment.authorName ? PAGE_URL.MY_PROFILE : PAGE_URL.USER_PROFILE(comment.authorName)}
         onCommentLike={() => onCommentLike(comment.id)}
       />
@@ -128,8 +128,12 @@ const PostItem = ({
     </TagItemLinkButton>
   ));
 
-  const onMoreContentShow = () => {
+  const handleMoreContentShow = () => {
     setShouldHideContent(false);
+  };
+
+  const handleMoreContentHide = () => {
+    setShouldHideContent(true);
   };
 
   return (
@@ -159,7 +163,11 @@ const PostItem = ({
         <PostContent>
           <PostContentAuthorLink to={PAGE_URL.USER_PROFILE(authorName)}>{authorName}</PostContentAuthorLink>
           {shouldHideContent ? content.slice(0, LIMIT.POST_CONTENT_HIDE_LENGTH).concat("...") : content}
-          {shouldHideContent && <MoreContentLinkButton onClick={onMoreContentShow}>더보기</MoreContentLinkButton>}
+          {shouldHideContent ? (
+            <MoreContentLinkButton onClick={handleMoreContentShow}>더보기</MoreContentLinkButton>
+          ) : (
+            <MoreContentLinkButton onClick={handleMoreContentHide}>간략히</MoreContentLinkButton>
+          )}
         </PostContent>
         <TagListWrapper>{shouldHideContent || tagList}</TagListWrapper>
         <CommentsWrapper>

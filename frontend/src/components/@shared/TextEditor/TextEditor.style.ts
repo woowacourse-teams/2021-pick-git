@@ -29,5 +29,9 @@ export const TextLengthIndicator = styled.div<React.CSSProperties>`
   color: ${({ theme }) => theme.color.lighterTextColor};
   font-size: 0.8rem;
   float: right;
+
+  display: flex;
+  justify-content: flex-end;
+  width: 3.5rem;
   height: 1rem;
 `;

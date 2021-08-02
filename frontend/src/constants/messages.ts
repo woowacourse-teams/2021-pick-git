@@ -28,6 +28,7 @@ export const FAILURE_MESSAGE = {
 export const WARNING_MESSAGE = {
   POST_FILE_NOT_UPLOADED: "아무런 파일도 업로드 되지 않았습니다. 이대로 진행할까요?",
   POST_CONTENT_EMPTY: "글 내용이 비었습니다. 이대로 진행할까요?",
+  POST_DELETE: "정말로 게시물을 삭제하시겠습니까?",
 };
 
 export const REDIRECT_MESSAGE = {
