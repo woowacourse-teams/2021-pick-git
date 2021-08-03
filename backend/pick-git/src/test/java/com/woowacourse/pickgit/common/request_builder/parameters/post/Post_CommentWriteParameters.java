@@ -17,6 +17,11 @@ public class Post_CommentWriteParameters extends Parameters {
         super(spec, httpMethod, url, params);
     }
 
+    public Post_CommentWriteParameters initAllParams() {
+        content("test comment");
+        return this;
+    }
+
     public Post_CommentWriteParameters content(String content) {
         setParam(CONTENT, content);
         return this;

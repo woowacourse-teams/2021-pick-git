@@ -8,9 +8,9 @@ import io.restassured.specification.RequestSpecification;
 import java.util.List;
 import org.springframework.http.HttpMethod;
 
-public class Put_PostModificationParameters extends Parameters {
+public class Put_PostUpdateParameters extends Parameters {
 
-    public Put_PostModificationParameters(
+    public Put_PostUpdateParameters(
         RequestSpecification spec,
         HttpMethod httpMethod,
         String url,
@@ -19,16 +19,22 @@ public class Put_PostModificationParameters extends Parameters {
         super(spec, httpMethod, url, params);
     }
 
-    public Put_PostModificationParameters tags(String... tags) {
+    public Put_PostUpdateParameters initAllParams() {
+        tags("updateTag1", "updateTag2");
+        content("update content");
+        return this;
+    }
+
+    public Put_PostUpdateParameters tags(String... tags) {
         return tags(List.of(tags));
     }
 
-    public Put_PostModificationParameters tags(List<String> tags) {
+    public Put_PostUpdateParameters tags(List<String> tags) {
         setParam(TAGS, tags);
         return this;
     }
 
-    public Put_PostModificationParameters content(String content) {
+    public Put_PostUpdateParameters content(String content) {
         setParam(CONTENT, content);
         return this;
     }
