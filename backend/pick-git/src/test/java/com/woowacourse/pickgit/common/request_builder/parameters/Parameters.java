@@ -38,17 +38,29 @@ public abstract class Parameters {
         this.multiparts = new ArrayList<>();
     }
 
-    protected void formParam(String key, Object value) {
+    protected void setBody(File data) {
+        spec.body(data);
+    }
+
+    protected void setBody(String data) {
+        spec.body(data);
+    }
+
+    protected void setBody(byte[] data) {
+        spec.body(data);
+    }
+
+    protected void setParam(String key, Object value) {
         formParams.put(key, value);
     }
 
-    protected void multiparts(List<File> files) {
+    protected void setMultiparts(List<File> files) {
         this.multiparts.clear();
         this.multiparts.addAll(files);
     }
 
-    protected void multiparts(File... files) {
-        multiparts(List.of(files));
+    protected void setMultiparts(File... files) {
+        setMultiparts(List.of(files));
     }
 
     public ExtractableResponse<Response> extract() {

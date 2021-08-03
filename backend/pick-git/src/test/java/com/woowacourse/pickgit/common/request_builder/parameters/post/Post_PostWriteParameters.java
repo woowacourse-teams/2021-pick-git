@@ -11,9 +11,9 @@ import java.io.File;
 import java.util.List;
 import org.springframework.http.HttpMethod;
 
-public class PostWriteParameters extends Parameters {
+public class Post_PostWriteParameters extends Parameters {
 
-    public PostWriteParameters(
+    public Post_PostWriteParameters(
         RequestSpecification spec,
         HttpMethod httpMethod,
         String url,
@@ -22,7 +22,7 @@ public class PostWriteParameters extends Parameters {
         super(spec, httpMethod, url, params);
     }
 
-    public PostWriteParameters initAllParams() {
+    public Post_PostWriteParameters initAllParams() {
         githubRepoUrl("https://github.com/sample");
         content("testContent");
         tags("java", "c++");
@@ -31,34 +31,29 @@ public class PostWriteParameters extends Parameters {
         return this;
     }
 
-    public PostWriteParameters githubRepoUrl(String githubRepoUrl) {
-        formParam(GITHUB_REPO_URL, githubRepoUrl);
+    public Post_PostWriteParameters githubRepoUrl(String githubRepoUrl) {
+        setParam(GITHUB_REPO_URL, githubRepoUrl);
         return this;
     }
 
-    public PostWriteParameters content(String content) {
-        formParam(CONTENT, content);
+    public Post_PostWriteParameters content(String content) {
+        setParam(CONTENT, content);
         return this;
     }
 
-    public PostWriteParameters tags(String... tags) {
+    public Post_PostWriteParameters tags(String... tags) {
         tags(List.of(tags));
         return this;
     }
 
-    public PostWriteParameters tags(List<String> tags) {
-        formParam(TAGS, String.join(",", tags));
+    public Post_PostWriteParameters tags(List<String> tags) {
+        setParam(TAGS, String.join(",", tags));
 
         return this;
     }
 
-    public PostWriteParameters images(File... file) {
-        multiparts(List.of(file));
-        return this;
-    }
-
-    public PostWriteParameters param(String key, Object value) {
-        formParam(key, value);
+    public Post_PostWriteParameters images(File... file) {
+        setMultiparts(List.of(file));
         return this;
     }
 }
