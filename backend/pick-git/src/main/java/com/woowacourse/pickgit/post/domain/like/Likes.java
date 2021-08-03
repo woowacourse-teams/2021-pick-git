@@ -34,7 +34,7 @@ public class Likes {
 
     public boolean contains(Like like) {
         return likes.stream()
-            .anyMatch(l -> l.equals(like));
+            .anyMatch(like::equals);
     }
 
     public void add(Like like) {
