@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.function.Function;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Transactional
@@ -68,11 +69,11 @@ public class PostService {
     }
 
     private Post createPost(PostRequestDto postRequestDto) {
-        var content = postRequestDto.getContent();
-        var files = postRequestDto.getImages();
-        var userName = postRequestDto.getUsername();
-        var githubRepoUrl = postRequestDto.getGithubRepoUrl();
-        var tags = tagService.findOrCreateTags(new TagsDto(postRequestDto.getTags()));
+        String content = postRequestDto.getContent();
+        List<MultipartFile> files = postRequestDto.getImages();
+        String userName = postRequestDto.getUsername();
+        String githubRepoUrl = postRequestDto.getGithubRepoUrl();
+        List<Tag> tags = tagService.findOrCreateTags(new TagsDto(postRequestDto.getTags()));
 
         User user = findUserByName(userName);
         List<String> imageUrls = pickgitStorage.storeMultipartFile(files, userName);
@@ -93,9 +94,9 @@ public class PostService {
     }
 
     public CommentResponseDto addComment(CommentRequestDto commentRequestDto) {
-        var userName = commentRequestDto.getUserName();
-        var postId = commentRequestDto.getPostId();
-        var content = commentRequestDto.getContent();
+        String userName = commentRequestDto.getUserName();
+        Long postId = commentRequestDto.getPostId();
+        String content = commentRequestDto.getContent();
 
         User user = findUserByName(userName);
         Post post = findPostById(postId);
@@ -121,9 +122,9 @@ public class PostService {
         String token = repositoryRequestDto.getToken();
         String username = repositoryRequestDto.getUsername();
 
-        var repositoryUrlAndNames =
+        List<RepositoryUrlAndName> repositoryUrlAndNames =
             platformRepositoryExtractor.extract(token, username);
-        var repositoryResponseDtos =
+        List<RepositoryResponseDto> repositoryResponseDtos =
             createRepositoryResponseDtos(repositoryUrlAndNames);
 
         return new RepositoryResponseDtos(repositoryResponseDtos);

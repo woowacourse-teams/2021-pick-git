@@ -35,9 +35,9 @@ public class PostFeedController {
         @RequestParam Long page,
         @RequestParam Long limit
     ) {
-        var homeFeedRequestDto = new HomeFeedRequestDto(appUser, page, limit);
-        var postResponseDtos = postFeedService.homeFeed(homeFeedRequestDto);
-        var postResponses = createPostResponses(postResponseDtos);
+        HomeFeedRequestDto homeFeedRequestDto = new HomeFeedRequestDto(appUser, page, limit);
+        List<PostResponseDto> postResponseDtos = postFeedService.homeFeed(homeFeedRequestDto);
+        List<PostResponse> postResponses = createPostResponses(postResponseDtos);
 
         return ResponseEntity.ok(postResponses);
     }
@@ -48,9 +48,9 @@ public class PostFeedController {
         @RequestParam Long page,
         @RequestParam Long limit
     ) {
-        var homeFeedRequestDto = new HomeFeedRequestDto(appUser, page, limit);
-        var postResponseDtos = postFeedService.myFeed(homeFeedRequestDto);
-        var postResponses = createPostResponses(postResponseDtos);
+        HomeFeedRequestDto homeFeedRequestDto = new HomeFeedRequestDto(appUser, page, limit);
+        List<PostResponseDto> postResponseDtos = postFeedService.myFeed(homeFeedRequestDto);
+        List<PostResponse> postResponses = createPostResponses(postResponseDtos);
 
         return ResponseEntity.ok(postResponses);
     }
@@ -62,9 +62,10 @@ public class PostFeedController {
         @RequestParam Long page,
         @RequestParam Long limit
     ) {
-        var homeFeedRequestDto = new HomeFeedRequestDto(appUser, page, limit);
-        var postResponseDtos = postFeedService.userFeed(homeFeedRequestDto, username);
-        var postResponses = createPostResponses(postResponseDtos);
+        HomeFeedRequestDto homeFeedRequestDto = new HomeFeedRequestDto(appUser, page, limit);
+        List<PostResponseDto> postResponseDtos =
+            postFeedService.userFeed(homeFeedRequestDto, username);
+        List<PostResponse> postResponses = createPostResponses(postResponseDtos);
 
         return ResponseEntity.ok(postResponses);
     }

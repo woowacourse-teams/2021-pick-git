@@ -50,10 +50,10 @@ public class PostFeedService {
         HomeFeedRequestDto homeFeedRequestDto,
         Optional<String> userName
     ) {
-        var page = homeFeedRequestDto.getPage().intValue();
-        var limit = homeFeedRequestDto.getLimit().intValue();
-        var requestUserName = homeFeedRequestDto.getRequestUserName();
-        var isGuest = homeFeedRequestDto.isGuest();
+        int page = homeFeedRequestDto.getPage().intValue();
+        int limit = homeFeedRequestDto.getLimit().intValue();
+        String requestUserName = homeFeedRequestDto.getRequestUserName();
+        boolean isGuest = homeFeedRequestDto.isGuest();
 
         Pageable pageable = PageRequest.of(page, limit);
         List<Post> result = getPostsBy(userName, pageable);

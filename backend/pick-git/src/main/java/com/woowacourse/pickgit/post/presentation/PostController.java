@@ -16,6 +16,7 @@ import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDtos;
 import com.woowacourse.pickgit.post.presentation.dto.request.ContentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.PostRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
@@ -56,7 +57,8 @@ public class PostController {
         @Authenticated AppUser user,
         PostRequest request
     ) {
-        var postImageUrlResponseDto = postService.write(createPostRequestDto(user, request));
+        PostImageUrlResponseDto postImageUrlResponseDto =
+            postService.write(createPostRequestDto(user, request));
 
         return ResponseEntity
             .created(redirectUrl(user, postImageUrlResponseDto))
@@ -85,9 +87,9 @@ public class PostController {
         @PathVariable Long postId,
         @Valid @RequestBody ContentRequest request
     ) {
-        var commentRequestDto = createCommentRequest(user, postId, request);
-        var commentResponseDto = postService.addComment(commentRequestDto);
-        var commentResponse = createCommentResponse(commentResponseDto);
+        CommentRequestDto commentRequestDto = createCommentRequest(user, postId, request);
+        CommentResponseDto commentResponseDto = postService.addComment(commentRequestDto);
+        CommentResponse commentResponse = createCommentResponse(commentResponseDto);
 
         return ResponseEntity.ok(commentResponse);
     }
@@ -121,10 +123,11 @@ public class PostController {
     ) {
         String token = user.getAccessToken();
 
-        var repositoryRequestDto = new RepositoryRequestDto(token, username);
-        var repositoryResponseDtos = postService.userRepositories(repositoryRequestDto);
-        var repositoryResponses =
-            toRepositoryResponses(repositoryResponseDtos.getRepositoryResponseDtos());
+        RepositoryRequestDto repositoryRequestDto = new RepositoryRequestDto(token, username);
+        RepositoryResponseDtos repositoryResponseDtos =
+            postService.userRepositories(repositoryRequestDto);
+        List<RepositoryResponse> repositoryResponses = toRepositoryResponses(
+            repositoryResponseDtos.getRepositoryResponseDtos());
 
         return ResponseEntity.ok(repositoryResponses);
     }
