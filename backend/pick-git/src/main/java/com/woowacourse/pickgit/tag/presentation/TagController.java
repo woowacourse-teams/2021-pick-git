@@ -25,8 +25,10 @@ public class TagController {
     }
 
     @GetMapping("/github/repositories/{repositoryName}/tags/languages")
-    public ResponseEntity<List<String>> extractLanguageTags(@Authenticated AppUser appUser,
-        @PathVariable String repositoryName) {
+    public ResponseEntity<List<String>> extractLanguageTags(
+        @Authenticated AppUser appUser,
+        @PathVariable String repositoryName
+    ) {
         String accessToken = appUser.getAccessToken();
         ExtractionRequestDto extractionRequestDto = ExtractionRequestDto.builder()
             .accessToken(accessToken)

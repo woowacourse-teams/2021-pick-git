@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 
 public abstract class FormatException extends ApplicationException {
 
-    public FormatException(String errorCode, HttpStatus httpStatus, String message) {
+    protected FormatException(String errorCode, HttpStatus httpStatus, String message) {
         super(errorCode, httpStatus, message);
     }
 }

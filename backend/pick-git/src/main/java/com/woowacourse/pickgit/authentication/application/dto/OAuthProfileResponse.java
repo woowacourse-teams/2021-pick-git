@@ -33,8 +33,16 @@ public class OAuthProfileResponse {
     public OAuthProfileResponse() {
     }
 
-    public OAuthProfileResponse(String name, String image, String description,
-        String githubUrl, String company, String location, String website, String twitter) {
+    public OAuthProfileResponse(
+        String name,
+        String image,
+        String description,
+        String githubUrl,
+        String company,
+        String location,
+        String website,
+        String twitter
+    ) {
         this.name = name;
         this.image = image;
         this.description = description;

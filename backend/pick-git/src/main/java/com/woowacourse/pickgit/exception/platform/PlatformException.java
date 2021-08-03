@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 
 public abstract class PlatformException extends ApplicationException {
 
-    public PlatformException(String errorCode, HttpStatus httpStatus, String message) {
+    protected PlatformException(String errorCode, HttpStatus httpStatus, String message) {
         super(errorCode, httpStatus, message);
     }
 }

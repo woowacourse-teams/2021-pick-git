@@ -4,15 +4,14 @@ import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileRespon
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.infrastructure.dto.OAuthAccessTokenRequest;
 import com.woowacourse.pickgit.authentication.infrastructure.dto.OAuthAccessTokenResponse;
-import com.woowacourse.pickgit.exception.platform.PlatformException;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
+import java.util.Objects;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 @Component
@@ -39,22 +38,23 @@ public class GithubOAuthClient implements OAuthClient {
 
     @Override
     public String getAccessToken(String code) {
-        OAuthAccessTokenRequest githubAccessTokenRequest = new OAuthAccessTokenRequest(clientId, clientSecret, code);
+        OAuthAccessTokenRequest githubAccessTokenRequest =
+            new OAuthAccessTokenRequest(clientId, clientSecret, code);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Accept", MediaType.APPLICATION_JSON_VALUE);
 
-        HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity(githubAccessTokenRequest, headers);
+        HttpEntity<OAuthAccessTokenRequest> httpEntity =
+            new HttpEntity<>(githubAccessTokenRequest, headers);
 
         RestTemplate restTemplate = new RestTemplate();
-        String accessToken = restTemplate
+        OAuthAccessTokenResponse response = restTemplate
             .exchange(accessTokenUrl, HttpMethod.POST, httpEntity, OAuthAccessTokenResponse.class)
-            .getBody()
-            .getAccessToken();
+            .getBody();
 
-        if (accessToken == null) {
+        if (Objects.isNull(response)) {
             throw new PlatformHttpErrorException();
         }
-        return accessToken;
+        return response.getAccessToken();
     }
 
     @Override
@@ -63,11 +63,14 @@ public class GithubOAuthClient implements OAuthClient {
         headers.add("Accept", MediaType.APPLICATION_JSON_VALUE);
         headers.add("Authorization", "Bearer " + githubAccessToken);
 
-        HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity(headers);
+        HttpEntity<Void> httpEntity = new HttpEntity<>(headers);
 
         RestTemplate restTemplate = new RestTemplate();
         return restTemplate
-            .exchange("https://api.github.com/user", HttpMethod.GET, httpEntity, OAuthProfileResponse.class)
-            .getBody();
+            .exchange(
+                "https://api.github.com/user",
+                HttpMethod.GET, httpEntity,
+                OAuthProfileResponse.class
+            ).getBody();
     }
 }

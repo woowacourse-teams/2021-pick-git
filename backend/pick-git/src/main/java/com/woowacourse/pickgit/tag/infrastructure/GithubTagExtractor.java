@@ -20,8 +20,10 @@ public class GithubTagExtractor implements PlatformTagExtractor {
     private final PlatformTagApiRequester platformTagApiRequester;
     private final ObjectMapper objectMapper;
 
-    public GithubTagExtractor(PlatformTagApiRequester platformTagApiRequester,
-        ObjectMapper objectMapper) {
+    public GithubTagExtractor(
+        PlatformTagApiRequester platformTagApiRequester,
+        ObjectMapper objectMapper
+    ) {
         this.platformTagApiRequester = platformTagApiRequester;
         this.objectMapper = objectMapper;
     }

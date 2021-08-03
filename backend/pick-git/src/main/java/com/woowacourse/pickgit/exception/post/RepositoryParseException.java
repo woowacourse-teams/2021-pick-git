@@ -5,7 +5,9 @@ import org.springframework.http.HttpStatus;
 public class RepositoryParseException extends PostException {
 
     public RepositoryParseException(
-        String errorCode, HttpStatus httpStatus, String message
+        String errorCode,
+        HttpStatus httpStatus,
+        String message
     ) {
         super(errorCode, httpStatus, message);
     }

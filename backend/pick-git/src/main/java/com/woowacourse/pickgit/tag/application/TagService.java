@@ -19,8 +19,10 @@ public class TagService {
     private final PlatformTagExtractor platformTagExtractor;
     private final TagRepository tagRepository;
 
-    public TagService(PlatformTagExtractor platformTagExtractor,
-        TagRepository tagRepository) {
+    public TagService(
+        PlatformTagExtractor platformTagExtractor,
+        TagRepository tagRepository
+    ) {
         this.platformTagExtractor = platformTagExtractor;
         this.tagRepository = tagRepository;
     }

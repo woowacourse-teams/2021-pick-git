@@ -16,6 +16,7 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
 
     @Value("${security.jwt.secret-key}")
     private String secretKey;
+
     @Value("${security.jwt.expiration-time}")
     private long expirationTimeInMilliSeconds;
 
@@ -54,7 +55,11 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
     @Override
     public String getPayloadByKey(String token, String key) {
         try {
-            return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get(key, String.class);
+            return Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getBody()
+                .get(key, String.class);
         } catch (JwtException | IllegalArgumentException e) {
             throw new InvalidTokenException();
         }

@@ -4,10 +4,10 @@ import org.springframework.http.HttpStatus;
 
 public abstract class ApplicationException extends RuntimeException {
 
-    private String errorCode;
-    private HttpStatus httpStatus;
+    private final String errorCode;
+    private final HttpStatus httpStatus;
 
-    public ApplicationException(String errorCode, HttpStatus httpStatus, String message) {
+    protected ApplicationException(String errorCode, HttpStatus httpStatus, String message) {
         super(message);
         this.errorCode = errorCode;
         this.httpStatus = httpStatus;
