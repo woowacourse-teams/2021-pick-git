@@ -2,47 +2,55 @@ package com.woowacourse.pickgit.common.request_builder;
 
 import static io.restassured.RestAssured.given;
 
-import com.woowacourse.pickgit.common.request_builder.post.Parameters;
-import io.restassured.RestAssured;
+import com.woowacourse.pickgit.common.request_builder.parameters.Parameters;
 import io.restassured.specification.RequestSpecification;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import lombok.extern.java.Log;
+import org.springframework.http.HttpMethod;
 
-public class LoginBuilder<T extends ServiceBuilder> {
+public class LoginBuilder<T extends Parameters> {
 
     private RequestSpecification spec;
-    private final Class<T> builderType;
+    private final Class<T> parameterType;
+    private final HttpMethod httpMethod;
+    private final String url;
+    private final Object[] params;
 
-    public LoginBuilder(Class<T> builderType) {
+    public LoginBuilder(
+        Class<T> parameterType,
+        HttpMethod httpMethod,
+        String url,
+        Object... params
+    ) {
         spec = given().log().all();
-        this.builderType = builderType;
+        this.parameterType = parameterType;
+        this.httpMethod = httpMethod;
+        this.url = url;
+        this.params = params;
     }
 
-    public LoginBuilder<T> withUser(String token) {
+    public T withUser(String token) {
         spec = given().log().all().auth().oauth2(token);
-        return this;
+
+        return getParameterBuilder();
     }
 
-    public LoginBuilder<T> guest() {
+    public T withGuest() {
         spec = given().log().all();
-        return this;
+        return getParameterBuilder();
     }
 
-    public Parameters.Builder withInitParams() {
-        return Parameters.builderWithInitParams(getServiceBuilder());
-    }
-
-    public Parameters.Builder withEmptyParams() {
-        return Parameters.builder(getServiceBuilder());
-    }
-
-    private T getServiceBuilder() {
+    private T getParameterBuilder() {
         try {
-            Constructor<T> declaredConstructor = builderType
-                .getDeclaredConstructor(RequestSpecification.class);
+            Constructor<T> declaredConstructor = parameterType
+                .getDeclaredConstructor(
+                    RequestSpecification.class,
+                    HttpMethod.class,
+                    String.class,
+                    Object[].class
+                );
 
-            return declaredConstructor.newInstance(spec);
+            return declaredConstructor.newInstance(spec, httpMethod, url, params);
         } catch (NoSuchMethodException |
             InstantiationException |
             IllegalAccessException |
