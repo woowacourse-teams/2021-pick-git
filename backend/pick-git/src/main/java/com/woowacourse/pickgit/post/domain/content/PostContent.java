@@ -17,11 +17,11 @@ public class PostContent {
     }
 
     public PostContent(String content) {
-        validateLengthIsOverThenMaximumContentLength(content);
+        validateLengthIsOverThanMaximumContentLength(content);
         this.content = content;
     }
 
-    private void validateLengthIsOverThenMaximumContentLength(String content) {
+    private void validateLengthIsOverThanMaximumContentLength(String content) {
         if (content.length() > MAXIMUM_CONTENT_LENGTH) {
             throw new PostFormatException();
         }

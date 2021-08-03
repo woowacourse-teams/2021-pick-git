@@ -12,8 +12,11 @@ public class PostNotFoundException extends PostException {
         this(ERROR_CODE, HTTP_STATUS, MESSAGE);
     }
 
-    public PostNotFoundException(String errorCode, HttpStatus httpStatus,
-        String message) {
+    public PostNotFoundException(
+        String errorCode,
+        HttpStatus httpStatus,
+        String message
+    ) {
         super(errorCode, httpStatus, message);
     }
 }
