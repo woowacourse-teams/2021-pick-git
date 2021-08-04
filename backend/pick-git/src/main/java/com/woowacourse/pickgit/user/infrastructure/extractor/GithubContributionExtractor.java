@@ -50,11 +50,7 @@ public class GithubContributionExtractor implements PlatformContributionExtracto
         try {
             return objectMapper.readValue(response, new TypeReference<>() {});
         } catch (JsonProcessingException e) {
-            throw new ContributionParseException(
-                "V0001",
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "활동 통계를 조회할 수 없습니다."
-            );
+            throw new ContributionParseException();
         }
     }
 
@@ -74,11 +70,7 @@ public class GithubContributionExtractor implements PlatformContributionExtracto
         try {
             return objectMapper.readValue(response, new TypeReference<>() {});
         } catch (JsonProcessingException e) {
-            throw new ContributionParseException(
-                "V0001",
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "활동 통계를 조회할 수 없습니다."
-            );
+            throw new ContributionParseException();
         }
     }
 }
