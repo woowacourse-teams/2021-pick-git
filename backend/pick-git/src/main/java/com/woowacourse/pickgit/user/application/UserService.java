@@ -43,10 +43,12 @@ public class UserService {
     private final OAuthAccessTokenDao oAuthAccessTokenDao;
     private final PlatformContributionCalculator platformContributionCalculator;
 
-    public UserService(UserRepository userRepository,
+    public UserService(
+        UserRepository userRepository,
         PickGitStorage pickGitStorage,
         OAuthAccessTokenDao oAuthAccessTokenDao,
-        PlatformContributionCalculator platformContributionCalculator) {
+        PlatformContributionCalculator platformContributionCalculator
+    ) {
         this.userRepository = userRepository;
         this.pickGitStorage = pickGitStorage;
         this.oAuthAccessTokenDao = oAuthAccessTokenDao;
