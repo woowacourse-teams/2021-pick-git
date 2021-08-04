@@ -3,6 +3,8 @@ package com.woowacourse.pickgit.unit.user.presentation;
 import static com.woowacourse.pickgit.docs.ApiDocumentUtils.getDocumentRequest;
 import static com.woowacourse.pickgit.docs.ApiDocumentUtils.getDocumentResponse;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -22,6 +24,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.requestP
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -35,14 +38,17 @@ import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.FollowSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.ProfileEditResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
+import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import com.woowacourse.pickgit.user.presentation.UserController;
 import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
 import java.util.Optional;
+import java.util.List;
 import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -643,5 +649,221 @@ class UserControllerTest {
                 )
             ));
         }
+    }
+
+    @DisplayName("로그인 - 특정 유저의 팔로잉 목록을 조회한다.")
+    @Test
+    void searchFollowings_LoginUser_Success() throws Exception {
+        // given
+        List<UserSearchResponseDto> userSearchResponseDtos = List.of(
+            new UserSearchResponseDto("image1", "kevin", true),
+            new UserSearchResponseDto("image2", "koda", false),
+            new UserSearchResponseDto("image3", "source", null)
+        );
+        given(oAuthService.validateToken("token"))
+            .willReturn(true);
+        given(oAuthService.findRequestUserByToken("token"))
+            .willReturn(new LoginUser("source", "token"));
+        given(userService.searchFollowings(
+            any(AuthUserRequestDto.class),
+            any(FollowSearchRequestDto.class)
+        )).willReturn(userSearchResponseDtos);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+            get("/api/profiles/{username}/followings", "mark")
+                .param("page", "0")
+                .param("limit", "3")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer token")
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+            .andExpect(jsonPath("$[*].imageUrl", contains("image1", "image2", "image3")))
+            .andExpect(jsonPath("$[*].username", contains("kevin", "koda", "source")))
+            .andExpect(jsonPath("$[*].following", contains(true, false, null)));
+
+        verify(oAuthService, times(1)).validateToken("token");
+        verify(oAuthService, times(1)).findRequestUserByToken("token");
+        verify(userService, times(1))
+            .searchFollowings(any(AuthUserRequestDto.class), any(FollowSearchRequestDto.class));
+
+        // restdocs
+        resultActions.andDo(document("search-followings-LoggedIn",
+            getDocumentRequest(),
+            getDocumentResponse(),
+            pathParameters(
+                parameterWithName("username").description("팔로잉 목록 조회 대상 유저 이름")
+            ),
+            requestParameters(
+                parameterWithName("page").description("page"),
+                parameterWithName("limit").description("limit")
+            ),
+            responseFields(
+                fieldWithPath("[].imageUrl").type(STRING).description("팔로잉 유저 이미지 url"),
+                fieldWithPath("[].username").type(STRING).description("팔로잉 유저 이름"),
+                fieldWithPath("[].following").type(BOOLEAN).optional().description("로그인시 검색된 유저 팔로잉 여부")
+            )
+        ));
+    }
+
+    @DisplayName("비로그인 - 특정 유저의 팔로잉 목록을 조회한다.")
+    @Test
+    void searchFollowings_GuestUser_Success() throws Exception {
+        // given
+        List<UserSearchResponseDto> userSearchResponseDtos = List.of(
+            new UserSearchResponseDto("image1", "kevin", null),
+            new UserSearchResponseDto("image2", "koda", null),
+            new UserSearchResponseDto("image3", "source", null)
+        );
+        given(oAuthService.findRequestUserByToken(null))
+            .willReturn(new GuestUser());
+        given(userService.searchFollowings(
+            any(AuthUserRequestDto.class),
+            any(FollowSearchRequestDto.class)
+        )).willReturn(userSearchResponseDtos);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+            get("/api/profiles/{username}/followings", "mark")
+                .param("page", "0")
+                .param("limit", "3")
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+            .andExpect(jsonPath("$[*].imageUrl", contains("image1", "image2", "image3")))
+            .andExpect(jsonPath("$[*].username", contains("kevin", "koda", "source")))
+            .andExpect(jsonPath("$[*].following", contains(nullValue(), nullValue(), nullValue())));
+
+        verify(oAuthService, times(1)).findRequestUserByToken(null);
+        verify(userService, times(1))
+            .searchFollowings(any(AuthUserRequestDto.class), any(FollowSearchRequestDto.class));
+
+        // restdocs
+        resultActions.andDo(document("search-followings-unLoggedIn",
+            getDocumentRequest(),
+            getDocumentResponse(),
+            pathParameters(
+                parameterWithName("username").description("팔로잉 목록 조회 대상 유저 이름")
+            ),
+            requestParameters(
+                parameterWithName("page").description("page"),
+                parameterWithName("limit").description("limit")
+            ),
+            responseFields(
+                fieldWithPath("[].imageUrl").type(STRING).description("팔로잉 유저 이미지 url"),
+                fieldWithPath("[].username").type(STRING).description("팔로잉 유저 이름"),
+                fieldWithPath("[].following").type(NULL).description("비로그인시 검색된 유저 팔로잉 여부")
+            )
+        ));
+    }
+
+    @DisplayName("로그인 - 특정 유저의 팔로워 목록을 조회한다.")
+    @Test
+    void searchFollowers_LoginUser_Success() throws Exception {
+        // given
+        List<UserSearchResponseDto> userSearchResponseDtos = List.of(
+            new UserSearchResponseDto("image1", "kevin", true),
+            new UserSearchResponseDto("image2", "koda", false),
+            new UserSearchResponseDto("image3", "source", null)
+        );
+        given(oAuthService.validateToken("token"))
+            .willReturn(true);
+        given(oAuthService.findRequestUserByToken("token"))
+            .willReturn(new LoginUser("source", "token"));
+        given(userService.searchFollowers(
+            any(AuthUserRequestDto.class),
+            any(FollowSearchRequestDto.class)
+        )).willReturn(userSearchResponseDtos);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+            get("/api/profiles/{username}/followers", "mark")
+                .param("page", "0")
+                .param("limit", "3")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer token")
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+            .andExpect(jsonPath("$[*].imageUrl", contains("image1", "image2", "image3")))
+            .andExpect(jsonPath("$[*].username", contains("kevin", "koda", "source")))
+            .andExpect(jsonPath("$[*].following", contains(true, false, null)));
+
+        verify(oAuthService, times(1)).validateToken("token");
+        verify(oAuthService, times(1)).findRequestUserByToken("token");
+        verify(userService, times(1))
+            .searchFollowers(any(AuthUserRequestDto.class), any(FollowSearchRequestDto.class));
+
+        // restdocs
+        resultActions.andDo(document("search-followers-LoggedIn",
+            getDocumentRequest(),
+            getDocumentResponse(),
+            pathParameters(
+                parameterWithName("username").description("팔로워 목록 조회 대상 유저 이름")
+            ),
+            requestParameters(
+                parameterWithName("page").description("page"),
+                parameterWithName("limit").description("limit")
+            ),
+            responseFields(
+                fieldWithPath("[].imageUrl").type(STRING).description("팔로워 유저 이미지 url"),
+                fieldWithPath("[].username").type(STRING).description("팔로워 유저 이름"),
+                fieldWithPath("[].following").type(BOOLEAN).optional().description("로그인시 검색된 유저 팔로잉 여부")
+            )
+        ));
+    }
+
+    @DisplayName("비로그인 - 특정 유저의 팔로워 목록을 조회한다.")
+    @Test
+    void searchFollowers_GuestUser_Success() throws Exception {
+        // given
+        List<UserSearchResponseDto> userSearchResponseDtos = List.of(
+            new UserSearchResponseDto("image1", "kevin", null),
+            new UserSearchResponseDto("image2", "koda", null),
+            new UserSearchResponseDto("image3", "source", null)
+        );
+        given(oAuthService.findRequestUserByToken(null))
+            .willReturn(new GuestUser());
+        given(userService.searchFollowers(
+            any(AuthUserRequestDto.class),
+            any(FollowSearchRequestDto.class)
+        )).willReturn(userSearchResponseDtos);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+            get("/api/profiles/{username}/followers", "mark")
+                .param("page", "0")
+                .param("limit", "3")
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+            .andExpect(jsonPath("$[*].imageUrl", contains("image1", "image2", "image3")))
+            .andExpect(jsonPath("$[*].username", contains("kevin", "koda", "source")))
+            .andExpect(jsonPath("$[*].following", contains(nullValue(), nullValue(), nullValue())));
+
+        verify(oAuthService, times(1)).findRequestUserByToken(null);
+        verify(userService, times(1))
+            .searchFollowers(any(AuthUserRequestDto.class), any(FollowSearchRequestDto.class));
+
+        // restdocs
+        resultActions.andDo(document("search-followers-unLoggedIn",
+            getDocumentRequest(),
+            getDocumentResponse(),
+            pathParameters(
+                parameterWithName("username").description("팔로워 목록 조회 대상 유저 이름")
+            ),
+            requestParameters(
+                parameterWithName("page").description("page"),
+                parameterWithName("limit").description("limit")
+            ),
+            responseFields(
+                fieldWithPath("[].imageUrl").type(STRING).description("팔로워 유저 이미지 url"),
+                fieldWithPath("[].username").type(STRING).description("팔로워 유저 이름"),
+                fieldWithPath("[].following").type(NULL).description("비로그인시 검색된 유저 팔로잉 여부")
+            )
+        ));
     }
 }
