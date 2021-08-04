@@ -10,7 +10,6 @@ export const PAGE_URL = {
   HOME_FEED: "/posts",
   TAG_FEED_BASE: "/posts/tag",
   USER_FEED: "/posts/user",
-  TAG_FEED: (tag: string) => `/posts/tag?tag=${tag}`,
   LOGIN: "/login",
   AUTH_PROCESSING: "/auth",
   ADD_POST: "/add-post",
@@ -20,6 +19,7 @@ export const PAGE_URL = {
   SEARCH: "/search",
   PROFILE: "/profile",
   MY_PROFILE: "/profile/me",
+  TAG_FEED: (tag: string) => `/posts/tag?tag=${tag}`,
   USER_PROFILE: (username: string) => `/profile?username=${username}`,
   POSTS_WITH_TAG: (tag: string) => `/posts/${tag}`,
 };

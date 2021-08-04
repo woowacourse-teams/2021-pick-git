@@ -7,6 +7,7 @@ export interface Props {
   height?: string;
   fontSize?: string;
   autoGrow?: boolean;
+  lineHeight?: string;
   placeholder?: string;
   maxLength?: number;
   value: string;
@@ -18,6 +19,7 @@ const TEXT_EDITOR_LINE_HEIGHT = 1.2;
 const TextEditor = ({
   width,
   height,
+  lineHeight,
   fontSize = "1rem",
   autoGrow = false,
   placeholder,
@@ -53,6 +55,7 @@ const TextEditor = ({
         width={width}
         minHeight={height}
         height={currentHeight}
+        lineHeight={lineHeight}
         placeholder={placeholder}
         value={value}
         onChange={handleChange}
