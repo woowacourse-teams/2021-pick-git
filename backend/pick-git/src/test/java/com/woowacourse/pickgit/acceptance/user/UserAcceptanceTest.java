@@ -538,13 +538,28 @@ class UserAcceptanceTest {
             .isEqualTo(contributions);
     }
 
+    @DisplayName("게스트는 활동 통계를 조회할 수 없다. - 401 예외")
+    @Test
+    void getContributions_invalidToken_401Exception() {
+        // when
+        ApiErrorResponse response = authenticatedRequest(
+            "invalid" + loginUserAccessToken,
+            String.format("/api/profiles/%s/contributions", "testUser"),
+            Method.GET,
+            HttpStatus.UNAUTHORIZED
+        ).as(ApiErrorResponse.class);
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("A0001");
+    }
+
     @DisplayName("유효하지 않은 유저 이름으로 활동 통계를 조회할 수 없다. - 400 예외")
     @Test
     void getContributions_invalidUsername_400Exception() {
         // when
         ApiErrorResponse response = authenticatedRequest(
             loginUserAccessToken,
-            String.format("/api/profiles/%s/contributions", "invalidName"),
+            String.format("/api/profiles/%s/contributions", "invalidUser"),
             Method.GET,
             HttpStatus.BAD_REQUEST
         ).as(ApiErrorResponse.class);
