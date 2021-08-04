@@ -1,6 +1,7 @@
-package com.woowacourse.pickgit.post.application.search.type;
+package com.woowacourse.pickgit.post.application.search;
 
 import com.woowacourse.pickgit.exception.post.IllegalSearchTypeException;
+import com.woowacourse.pickgit.post.application.search.type.SearchType;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +19,5 @@ public class SearchTypes {
             .filter(searchType -> searchType.isSatisfiedBy(typeName))
             .findAny()
             .orElseThrow(IllegalSearchTypeException::new);
-
     }
 }

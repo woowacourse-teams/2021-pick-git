@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.post.application.search;
+package com.woowacourse.pickgit.post.application.search.type;
 
 import com.woowacourse.pickgit.post.application.search.type.SearchType;
 import com.woowacourse.pickgit.post.domain.Post;
