@@ -3,7 +3,9 @@ package com.woowacourse.pickgit.post.application;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
 import com.woowacourse.pickgit.post.application.dto.request.HomeFeedRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.SearchPostsRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
+import com.woowacourse.pickgit.post.application.search.type.SearchTypes;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.user.domain.User;
@@ -22,10 +24,16 @@ public class PostFeedService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final SearchTypes searchTypes;
 
-    public PostFeedService(PostRepository postRepository, UserRepository userRepository) {
+    public PostFeedService(
+        PostRepository postRepository,
+        UserRepository userRepository,
+        SearchTypes searchTypes
+    ) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
+        this.searchTypes = searchTypes;
     }
 
     public List<PostResponseDto> homeFeed(HomeFeedRequestDto homeFeedRequestDto) {
@@ -78,5 +86,22 @@ public class PostFeedService {
         return userRepository
             .findByBasicProfile_Name(userName)
             .orElseThrow(UserNotFoundException::new);
+    }
+
+    public List<PostResponseDto> search(SearchPostsRequestDto searchPostsRequestDto) {
+        String keyword = searchPostsRequestDto.getKeyword();
+        String type = searchPostsRequestDto.getType();
+        int page = searchPostsRequestDto.getPage();
+        int limit = searchPostsRequestDto.getLimit();
+        String userName = searchPostsRequestDto.getUserName();
+        boolean isGuest = searchPostsRequestDto.isGuest();
+
+        PageRequest pageable = PageRequest.of(page, limit);
+        String[] keywords = keyword.split(" ");
+
+        List<Post> search = searchTypes.findByTypeName(type).search(keywords, pageable);
+        User user = findUserByName(userName);
+
+        return PostDtoAssembler.assembleFrom(user, isGuest, search);
     }
 }

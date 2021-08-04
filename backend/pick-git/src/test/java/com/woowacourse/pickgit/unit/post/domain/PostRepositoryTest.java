@@ -172,7 +172,7 @@ class PostRepositoryTest {
     @DisplayName("Tag를 기반으로 Post를 불러온다.")
     @ParameterizedTest
     @MethodSource("getPostsAndTagsForSearchPostByTagName")
-    void findAllPostsByTagNames_findAllPostsByTagNames_Success(
+    void findAllPostsByTagNamesfindAllPostsByTagNames_findAllPostsByTagNames_Success(
         List<Post> posts,
         User user,
         List<Tag> tags,
