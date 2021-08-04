@@ -1,6 +1,5 @@
 package com.woowacourse.pickgit.post.application.search.type;
 
-import com.woowacourse.pickgit.post.application.search.type.SearchType;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import java.util.List;
