@@ -29,16 +29,16 @@ class TagTypeTest {
     @Mock
     private PostRepository postRepository;
 
-    @DisplayName("테그 타입이 유효한지 확인한다.")
+    @DisplayName("검색 타입이 유효한지 확인한다.")
     @ParameterizedTest
     @CsvSource(value = {"tags, true", "name, false", "test, false"})
-    void isSatisfiedBy(String type, boolean expected) {
+    void isSatisfiedBy_checkSearchType_Success(String type, boolean expected) {
         assertThat(tagType.isSatisfiedBy(type)).isEqualTo(expected);
     }
 
     @DisplayName("keyword를 기준으로 검색한다.")
     @Test
-    void search() {
+    void search_findByKeyword_Success() {
         Post post = Post.builder()
             .id(1L)
             .build();

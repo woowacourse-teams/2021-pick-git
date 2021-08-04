@@ -88,7 +88,7 @@ public class PostAcceptanceTest_searchPost {
     @DisplayName("유저는 Tag로 게시물을 검색할 수 있다.")
     @ParameterizedTest
     @MethodSource("getPostSearchArguments")
-    void name(String keyword, int page, int limit) {
+    void userCanFindPostViaTags(String keyword, int page, int limit) {
         ExtractableResponse<Response> extract = PickGitRequest
             .get("/api/search/posts?type=tags&keyword={keyword}&page={page}&limit={limit}",
                 keyword, page, limit
@@ -110,7 +110,7 @@ public class PostAcceptanceTest_searchPost {
     @DisplayName("게스트는 Tag로 게시물을 검색할 수 있다.")
     @ParameterizedTest
     @MethodSource("getPostSearchArguments")
-    void name2(String keyword, int page, int limit) {
+    void guestCanFindPostViaTags(String keyword, int page, int limit) {
         ExtractableResponse<Response> extract = PickGitRequest
             .get("/api/search/posts?type=tags&keyword={keyword}&page={page}&limit={limit}",
                 keyword, page, limit)
@@ -157,7 +157,7 @@ public class PostAcceptanceTest_searchPost {
 
     @DisplayName("존재하지 않는 type을 요청하면 예외가 발생한다.")
     @Test
-    void name() {
+    void userCanFindPostViaTags() {
         ApiErrorResponse errorResponse = PickGitRequest
             .get("/api/search/posts?type=invalidType&keyword={keyword}&page={page}&limit={limit}",
                 "keyword", 0, 1)

@@ -29,7 +29,7 @@ class SearchTypesTest {
     @DisplayName("맞는 타입이 있으면 SearchType을 반환한다.")
     @ParameterizedTest
     @CsvSource(value = {"A", "B"})
-    void findByTypeName(String type) {
+    void findByTypeName_ValidType_ReturnSearchType(String type) {
         SearchTypes searchTypes = new SearchTypes(
             List.of(
                 createSearchType("A"),
@@ -42,7 +42,7 @@ class SearchTypesTest {
 
     @DisplayName("맞는 타입이 없으면 예외를 발생한다.")
     @Test
-    void name() {
+    void findByTypeName_InvalidType_ExceptionOccur() {
         SearchTypes searchTypes = new SearchTypes(
             List.of(
                 createSearchType("A"),
