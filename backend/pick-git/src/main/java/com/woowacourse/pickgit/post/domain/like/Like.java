@@ -30,8 +30,22 @@ public class Like {
     protected Like() {
     }
 
-    public boolean contains(String userName) {
-        return user.getName().equals(userName);
+    public Like(Post post, User user) {
+        this(null, post, user);
+    }
+
+    public Like(Long id, Post post, User user) {
+        this.id = id;
+        this.post = post;
+        this.user = user;
+    }
+
+    private Post getPost() {
+        return post;
+    }
+
+    private User getUser() {
+        return user;
     }
 
     @Override
@@ -43,11 +57,12 @@ public class Like {
             return false;
         }
         Like like = (Like) o;
-        return Objects.equals(id, like.id);
+        return Objects.equals(post, like.getPost()) &&
+            Objects.equals(user, like.getUser());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(post, user);
     }
 }

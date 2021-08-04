@@ -1,6 +1,6 @@
 package com.woowacourse.pickgit.common.network;
 
-import com.woowacourse.pickgit.post.infrastructure.RestClient;
+import com.woowacourse.pickgit.post.domain.util.RestClient;
 import java.net.URI;
 import java.util.Map;
 import java.util.Set;
@@ -30,7 +30,9 @@ public class RestTemplateClient implements RestClient {
     public final RestTemplate restTemplate = createRestTemplate();
 
     private static RestTemplate createRestTemplate() {
-        var factory = new HttpComponentsClientHttpRequestFactory();
+        HttpComponentsClientHttpRequestFactory factory =
+            new HttpComponentsClientHttpRequestFactory();
+        
         factory.setReadTimeout(READ_TIMEOUT);
         factory.setConnectionRequestTimeout(CONNECTION_REQUEST_TIMEOUT);
 

@@ -1,13 +1,13 @@
-import { STEPS } from "../../constants/steps";
-import useStep from "../../services/hooks/@common/useStep";
+import { POST_ADD_STEPS } from "../../constants/steps";
+import usePostAddStep from "../../services/hooks/usePostAddStep";
 import StepHeader from "../@layout/StepHeader/StepHeader";
 
 const PostAddStepHeader = () => {
-  const { stepIndex, goBack, goNextStep } = useStep(STEPS);
+  const { stepIndex, goBack, goNextStep } = usePostAddStep(POST_ADD_STEPS);
 
   return (
-    <StepHeader isNextStepExist={stepIndex < STEPS.length - 1} onGoBack={goBack} onNextStepClick={goNextStep}>
-      {STEPS[stepIndex]}
+    <StepHeader isNextStepExist={stepIndex < POST_ADD_STEPS.length - 1} onGoBack={goBack} onNextStepClick={goNextStep}>
+      {POST_ADD_STEPS[stepIndex].title}
     </StepHeader>
   );
 };

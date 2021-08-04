@@ -1,39 +1,18 @@
 import { Container } from "./HomeFeedPage.style";
 import Feed from "../../components/Feed/Feed";
-import { useHomeFeedPostsQuery } from "../../services/queries";
 import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
-import axios from "axios";
-import { useQueryClient } from "react-query";
-import { useContext } from "react";
-import UserContext from "../../contexts/UserContext";
+import useHomeFeed from "../../services/hooks/useHomeFeed";
 import { QUERY } from "../../constants/queries";
 
 const HomeFeedPage = () => {
-  const { data, isLoading, error, isFetching, fetchNextPage } = useHomeFeedPostsQuery();
-  const queryClient = useQueryClient();
-  const { logout } = useContext(UserContext);
+  const { infinitePostsData, isLoading, isFetching, isError, handlePostsEndIntersect } = useHomeFeed();
 
-  const allPosts = data?.pages?.reduce((acc, postPage) => acc.concat(postPage), []);
-
-  const handlePostsEndIntersect = () => {
-    fetchNextPage();
-  };
-
-  if (error) {
-    if (axios.isAxiosError(error)) {
-      const { status } = error.response ?? {};
-
-      if (status === 401) {
-        logout();
-        queryClient.refetchQueries(QUERY.GET_HOME_FEED_POSTS, { active: true });
-      }
-    }
-
+  if (isError || !infinitePostsData) {
     return <div>에러!!</div>;
   }
 
-  if (isLoading || !allPosts) {
+  if (isLoading) {
     return (
       <Container>
         <PageLoading />
@@ -44,7 +23,7 @@ const HomeFeedPage = () => {
   return (
     <Container>
       <InfiniteScrollContainer isLoaderShown={isFetching} onIntersect={handlePostsEndIntersect}>
-        <Feed posts={allPosts} />
+        <Feed infinitePostsData={infinitePostsData} queryKey={[QUERY.GET_HOME_FEED_POSTS]} />
       </InfiniteScrollContainer>
     </Container>
   );

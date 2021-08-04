@@ -10,11 +10,9 @@ import UserContext from "../../contexts/UserContext";
 import { QUERY } from "../../constants/queries";
 
 const TagFeedPage = () => {
-  const { data, isLoading, error, isFetching, fetchNextPage } = useHomeFeedPostsQuery();
+  const { data: infinitePostsData, isLoading, error, isFetching, fetchNextPage } = useHomeFeedPostsQuery();
   const queryClient = useQueryClient();
   const { logout } = useContext(UserContext);
-
-  const allPosts = data?.pages?.reduce((acc, postPage) => acc.concat(postPage), []);
 
   const handlePostsEndIntersect = () => {
     fetchNextPage();
@@ -33,14 +31,14 @@ const TagFeedPage = () => {
     return <div>에러!!</div>;
   }
 
-  if (isLoading || !allPosts) {
+  if (isLoading || !infinitePostsData) {
     return <PageLoading />;
   }
 
   return (
     <Container>
       <InfiniteScrollContainer isLoaderShown={isFetching} onIntersect={handlePostsEndIntersect}>
-        <Feed posts={allPosts} />
+        <Feed infinitePostsData={infinitePostsData} queryKey="" />
       </InfiniteScrollContainer>
     </Container>
   );

@@ -92,14 +92,34 @@ export const TagItemLinkButton = styled(Link)`
   margin-bottom: 0.5625rem;
 `;
 
+export const CommentsWrapper = styled.div``;
+
 export const CommentWrapper = styled.div`
   margin-bottom: 0.5rem;
 `;
 
-export const MyComment = styled.div`
+export const CommentSliderToggleLink = styled.a`
   display: flex;
+  justify-content: flex-end;
   align-items: center;
-  padding: 0 0.75rem;
+  padding: 0 1rem;
+  font-size: 10px;
+  transition: opacity 0.5s;
+
+  :hover {
+    opacity: 0.5;
+  }
+`;
+
+export const CommentSliderToggleLinkText = styled.span`
+  font-size: 12px;
+  font-weight: bold;
+  margin-right: 0.5rem;
+`;
+
+export const MoreCommentExistIndicator = styled.div`
+  text-align: center;
+  cursor: pointer;
 `;
 
 export const CommentInputWrapper = styled.div`
@@ -109,6 +129,6 @@ export const CommentInputWrapper = styled.div`
 
 export const PostCreatedDateText = styled.span`
   padding: 0.75rem;
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   font-weight: bold;
 `;

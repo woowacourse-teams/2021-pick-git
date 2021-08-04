@@ -1,15 +1,15 @@
 import { createContext, Dispatch, SetStateAction, useState } from "react";
-import { GithubRepository } from "../@types";
+import { PostUploadData } from "../@types";
 
 interface Value {
-  files: File[];
-  githubRepositoryName: string;
-  content: string;
-  tags: string[];
-  setFiles: Dispatch<SetStateAction<File[]>>;
-  setGithubRepositoryName: Dispatch<SetStateAction<string>>;
-  setContent: Dispatch<SetStateAction<string>>;
-  setTags: Dispatch<SetStateAction<string[]>>;
+  files: PostUploadData["files"];
+  githubRepositoryName: PostUploadData["githubRepositoryName"];
+  content: PostUploadData["content"];
+  tags: PostUploadData["tags"];
+  setFiles: Dispatch<SetStateAction<PostUploadData["files"]>>;
+  setGithubRepositoryName: Dispatch<SetStateAction<PostUploadData["githubRepositoryName"]>>;
+  setContent: Dispatch<SetStateAction<PostUploadData["content"]>>;
+  setTags: Dispatch<SetStateAction<PostUploadData["tags"]>>;
 }
 
 const defaultValue = {
@@ -26,10 +26,10 @@ const defaultValue = {
 const PostAddDataContext = createContext<Value>(defaultValue);
 
 export const PostAddDataContextProvider = ({ children }: { children: React.ReactNode }) => {
-  const [files, setFiles] = useState<File[]>([]);
-  const [githubRepositoryName, setGithubRepositoryName] = useState<string>("");
-  const [content, setContent] = useState<string>("");
-  const [tags, setTags] = useState<string[]>([]);
+  const [files, setFiles] = useState<PostUploadData["files"]>([]);
+  const [githubRepositoryName, setGithubRepositoryName] = useState<PostUploadData["githubRepositoryName"]>("");
+  const [content, setContent] = useState<PostUploadData["content"]>("");
+  const [tags, setTags] = useState<PostUploadData["tags"]>([]);
 
   return (
     <PostAddDataContext.Provider

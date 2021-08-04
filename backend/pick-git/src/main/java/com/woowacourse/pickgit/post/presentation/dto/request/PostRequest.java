@@ -1,11 +1,10 @@
 package com.woowacourse.pickgit.post.presentation.dto.request;
 
 import java.util.List;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
+import lombok.Builder;
 import org.springframework.web.multipart.MultipartFile;
 
+@Builder
 public class PostRequest {
 
     private List<MultipartFile> images;

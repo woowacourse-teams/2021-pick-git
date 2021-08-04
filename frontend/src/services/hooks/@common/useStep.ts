@@ -1,15 +1,20 @@
-import { useContext, useEffect } from "react";
+import { Dispatch, SetStateAction } from "react";
 import { useHistory } from "react-router-dom";
-import PostAddStepContext from "../../../contexts/PostAddStepContext";
+import { Step } from "../../../@types";
 import { getLastPath } from "../../../utils/history";
 
-const useStep = (steps: string[], stepCompleteLink?: string) => {
-  const { stepIndex, setStepIndex } = useContext(PostAddStepContext);
+interface Parameters {
+  steps: Step[];
+  stepIndex: number;
+  setStepIndex: Dispatch<SetStateAction<number>>;
+}
+
+const useStep = ({ steps, stepIndex, setStepIndex }: Parameters) => {
   const history = useHistory();
 
   const setStepMoveEventHandler = () => {
     window.onpopstate = () => {
-      if (getLastPath(history.location.pathname) === steps[stepIndex + 1]) {
+      if (getLastPath(history.location.pathname) === steps[stepIndex + 1]?.path) {
         setStepIndex(stepIndex + 1);
         return;
       }
@@ -32,12 +37,7 @@ const useStep = (steps: string[], stepCompleteLink?: string) => {
 
   const goNextStep = () => {
     setStepIndex(stepIndex + 1);
-    history.push(steps[stepIndex + 1]);
-  };
-
-  const completeStep = () => {
-    setStepIndex(0);
-    stepCompleteLink && history.push(stepCompleteLink);
+    history.push(steps[stepIndex + 1].path);
   };
 
   return {
@@ -46,7 +46,6 @@ const useStep = (steps: string[], stepCompleteLink?: string) => {
     removeStepMoveEventHandler,
     goBack,
     goNextStep,
-    completeStep,
   };
 };
 

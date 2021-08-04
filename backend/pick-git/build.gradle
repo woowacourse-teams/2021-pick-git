@@ -19,6 +19,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.apache.httpcomponents:httpclient:4.5'
+	implementation 'net.rakugakibox.spring.boot:logback-access-spring-boot-starter:2.7.1'
 
 	compileOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.4'
 
@@ -27,9 +28,15 @@ dependencies {
 
 	asciidoctor 'org.springframework.restdocs:spring-restdocs-asciidoctor:1.2.6.RELEASE'
 
-	testImplementation('org.springframework.restdocs:spring-restdocs-mockmvc')
+	compileOnly 'org.projectlombok:lombok:1.18.20'
+	annotationProcessor 'org.projectlombok:lombok:1.18.20'
+
+	testCompileOnly 'org.projectlombok:lombok:1.18.20'
+	testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
+
+	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '4.4.0'
+	testImplementation 'io.rest-assured:rest-assured:4.4.0'
 }
 
 processResources.dependsOn('copySecurity')

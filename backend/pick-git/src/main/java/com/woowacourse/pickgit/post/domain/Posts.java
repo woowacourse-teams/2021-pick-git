@@ -9,13 +9,22 @@ import javax.persistence.OneToMany;
 @Embeddable
 public class Posts {
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Post> posts = new ArrayList<>();
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Post> posts;
 
     public Posts() {
+        this(new ArrayList<>());
     }
 
-    public int getCounts() {
+    public Posts(List<Post> posts) {
+        this.posts = posts;
+    }
+
+    public int count() {
         return posts.size();
+    }
+
+    public List<Post> getPosts() {
+        return posts;
     }
 }

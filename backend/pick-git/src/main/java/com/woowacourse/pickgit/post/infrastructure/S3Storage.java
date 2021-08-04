@@ -1,25 +1,24 @@
 package com.woowacourse.pickgit.post.infrastructure;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.xml.bind.v2.model.core.TypeRef;
+import static java.util.stream.Collectors.toList;
+
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
-import com.woowacourse.pickgit.post.presentation.PickGitStorage;
+import com.woowacourse.pickgit.post.domain.repository.PickGitStorage;
+import com.woowacourse.pickgit.post.domain.util.RestClient;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoProperties.Storage;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 @Repository
 @Profile("!test")
@@ -28,12 +27,14 @@ public class S3Storage implements PickGitStorage {
     private static final String MULTIPART_KEY = "files";
 
     private final RestClient restClient;
+    private final String s3ProxyUrl;
 
-    @Value("${storage.pickgit.s3proxy}")
-    private String s3ProxyUrl;
-
-    public S3Storage(RestClient restClient) {
+    public S3Storage(
+        RestClient restClient,
+        @Value("${storage.pickgit.s3proxy}") String s3ProxyUrl
+    ) {
         this.restClient = restClient;
+        this.s3ProxyUrl = s3ProxyUrl;
     }
 
     @Override
@@ -43,6 +44,16 @@ public class S3Storage implements PickGitStorage {
             .getBody();
 
         return response.getUrls();
+    }
+
+    @Override
+    public Optional<String> store(File file, String userName) {
+        List<String> imageUrls = restClient
+            .postForEntity(s3ProxyUrl, createBody(List.of(file), userName), StorageDto.class)
+            .getBody()
+            .getUrls();
+
+        return Optional.ofNullable(imageUrls.get(0));
     }
 
     private MultiValueMap<String, Object> createBody(
@@ -60,6 +71,38 @@ public class S3Storage implements PickGitStorage {
         files.forEach(file -> body.add(MULTIPART_KEY, new FileSystemResource(file)));
 
         return body;
+    }
+
+    @Override
+    public List<String> storeMultipartFile(List<MultipartFile> multipartFiles, String userName) {
+        return store(toFiles(multipartFiles), userName);
+    }
+
+    private List<File> toFiles(List<MultipartFile> files) {
+        return files.stream()
+            .map(toFile())
+            .collect(toList());
+    }
+
+    private Function<MultipartFile, File> toFile() {
+        return multipartFile -> {
+            try {
+                return multipartFile.getResource().getFile();
+            } catch (IOException e) {
+                return tryCreateTempFile(multipartFile);
+            }
+        };
+    }
+
+    private File tryCreateTempFile(MultipartFile multipartFile) {
+        try {
+            Path tempFile = Files.createTempFile(null, null);
+            Files.write(tempFile, multipartFile.getBytes());
+
+            return tempFile.toFile();
+        } catch (IOException ioException) {
+            throw new PlatformHttpErrorException();
+        }
     }
 
     public static class StorageDto {

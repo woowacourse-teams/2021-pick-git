@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
 import { createContext, ReactNode, useEffect, useState } from "react";
 
-import SnackBar from "../components/@shared/Snackbar/Snackbar";
+import SnackBar from "../components/@layout/Snackbar/Snackbar";
 import { MAX_STACK_NUM, SNACKBAR_DURATION } from "../constants/snackbar";
 
 interface Props {
@@ -9,11 +8,11 @@ interface Props {
 }
 
 interface Value {
-  pushMessage: (message: string) => void;
+  pushSnackbarMessage: (message: string) => void;
 }
 
 const SnackBarContext = createContext<Value>({
-  pushMessage: () => {},
+  pushSnackbarMessage: () => {},
 });
 
 const keyGenerator = (() => {
@@ -26,7 +25,7 @@ export const SnackBarContextProvider = ({ children }: Props) => {
   const [messages, setMessages] = useState<{ id: number; text: string }[]>([]);
   const messageIds = messages.join();
 
-  const pushMessage = (message: string): void =>
+  const pushSnackbarMessage = (message: string): void =>
     setMessages((messages) => {
       const newMessages = [...messages, { id: keyGenerator(), text: message }];
 
@@ -48,7 +47,7 @@ export const SnackBarContextProvider = ({ children }: Props) => {
   }, [messageIds]);
 
   return (
-    <SnackBarContext.Provider value={{ pushMessage }}>
+    <SnackBarContext.Provider value={{ pushSnackbarMessage }}>
       {children}
       {messages.map((message, index, arr) => (
         <SnackBar key={message.id} order={arr.length - index}>

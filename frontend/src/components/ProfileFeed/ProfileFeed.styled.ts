@@ -1,6 +1,11 @@
 import styled from "styled-components";
 
-export const GridContainer = styled.div`
+export const Container = styled.div`
+  height: 100%;
+  overflow-y: auto;
+`;
+
+export const Grid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   row-gap: 2px;

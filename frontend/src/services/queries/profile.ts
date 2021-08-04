@@ -1,13 +1,22 @@
 import { QueryFunction, useMutation, useQuery, useQueryClient } from "react-query";
 import axios, { AxiosError } from "axios";
 
-import { ProfileData } from "../../@types";
+import { ErrorResponse, MutateResponseFollow, ProfileData } from "../../@types";
 import { QUERY } from "../../constants/queries";
-import { requestAddFollow, requestDeleteFollow, requestGetSelfProfile, requestGetUserProfile } from "../requests";
+import {
+  requestAddFollow,
+  requestDeleteFollow,
+  requestGetSelfProfile,
+  requestGetUserProfile,
+  requestSetProfile,
+} from "../requests";
 import UserContext from "../../contexts/UserContext";
 import { useContext } from "react";
 import { getAccessToken } from "../../storage/storage";
 import SnackBarContext from "../../contexts/SnackbarContext";
+import { SUCCESS_MESSAGE, UNKNOWN_ERROR_MESSAGE } from "../../constants/messages";
+import { customError, handleHTTPError } from "../../utils/error";
+import { isHttpErrorStatus } from "../../utils/typeGuard";
 
 type ProfileQueryKey = readonly [
   typeof QUERY.GET_PROFILE,
@@ -17,13 +26,23 @@ type ProfileQueryKey = readonly [
   }
 ];
 
+interface SetProfileVariable {
+  image: File | null;
+  description: string;
+}
+
+interface SetProfileResponse {
+  imageUrl: string;
+  description: string;
+}
+
 export const useProfileQuery = (isMyProfile: boolean, username: string | null) => {
   const profileQueryFunction: QueryFunction<ProfileData> = async ({ queryKey }) => {
     const [, { isMyProfile, username }] = queryKey as ProfileQueryKey;
     const accessToken = getAccessToken();
 
     if (isMyProfile) {
-      if (!accessToken) throw Error("no accessToken");
+      if (!accessToken) throw customError.noAccessToken;
 
       return await requestGetSelfProfile(accessToken);
     } else {
@@ -33,50 +52,24 @@ export const useProfileQuery = (isMyProfile: boolean, username: string | null) =
     }
   };
 
-  return useQuery<ProfileData, AxiosError<ProfileData>>(
+  return useQuery<ProfileData, AxiosError<ErrorResponse>>(
     [QUERY.GET_PROFILE, { isMyProfile, username }],
     profileQueryFunction
   );
 };
 
-const useFollowMutation = (
-  username: string | undefined,
-  callback: (userName: string | undefined, accessToken: string | null) => Promise<any>
-) => {
-  const queryClient = useQueryClient();
-  const currentProfileQueryKey = [QUERY.GET_PROFILE, { isMyProfile: false, username }];
-  const currentProfileQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
-  const { logout } = useContext(UserContext);
-  const { pushMessage } = useContext(SnackBarContext);
+export const useFollowingMutation = () =>
+  useMutation<MutateResponseFollow, AxiosError<ErrorResponse>, string>((username) =>
+    requestAddFollow(username, getAccessToken())
+  );
 
-  return useMutation(() => callback(username, getAccessToken()), {
-    onSuccess: ({ followerCount, following }) => {
-      if (!currentProfileQueryData) return;
+export const useUnfollowingMutation = () =>
+  useMutation<MutateResponseFollow, AxiosError<ErrorResponse>, string>((username) =>
+    requestDeleteFollow(username, getAccessToken())
+  );
 
-      queryClient.setQueryData<ProfileData>(currentProfileQueryKey, {
-        ...currentProfileQueryData,
-        followerCount,
-        following,
-      });
-    },
-
-    onError: (error) => {
-      if (axios.isAxiosError(error)) {
-        const { status } = error.response ?? {};
-
-        if (status === 401) {
-          pushMessage("로그인한 사용자만 이용할 수 있는 기능입니다.");
-          logout();
-        }
-
-        return;
-      }
-      pushMessage("요청하신 작업을 수행할 수 없습니다.");
-    },
-  });
+export const useProfileMutation = () => {
+  return useMutation<SetProfileResponse, AxiosError<ErrorResponse> | Error, SetProfileVariable>(
+    ({ image, description }) => requestSetProfile(image, description, getAccessToken())
+  );
 };
-
-export const useFollowingMutation = (userName: string | undefined) => useFollowMutation(userName, requestAddFollow);
-
-export const useUnfollowingMutation = (userName: string | undefined) =>
-  useFollowMutation(userName, requestDeleteFollow);

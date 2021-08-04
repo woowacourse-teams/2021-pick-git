@@ -1,34 +1,37 @@
 pipeline {
     agent any
 
-    environment {
-       INSTANCE_PEM_PATH = credentials('instances-pem-path')
-       HOST = credentials('HOST_DEV')
-    }
-
     stages {
-        stage('Test and Build') {
-            steps {
-                echo 'Test and build backend...'
-
-                dir('./backend/pick-git') {
-                    sh '''
-                        ./gradlew clean build
-                    '''
+        stage('Checkout SCM') {
+                steps {
+                  checkout([$class: 'GitSCM', branches: [[name: '*/develop']], extensions: [], userRemoteConfigs: [[credentialsId: 'bperhaps_github_token_AT', url: 'https://github.com/bperhaps/jenkins-test-2021-pick-git']]])
                 }
+            }
+
+
+        stage('Build') {
+            steps {
+              dir('./backend/pick-git') {
+                sh '''
+                  ./gradlew -x test clean build
+                '''
+              }
+            }
+        }
+
+        stage('Test') {
+            steps {
+              dir('./backend/pick-git') {
+                sh '''
+                  ./gradlew test
+                '''
+              }
             }
         }
 
         stage('Deploy') {
             steps {
-                echo 'deploying backend...'
-
-                dir('./backend/pick-git/script') {
-                  sh '''
-                    chmod 755 ./deploy_script.sh
-                    ./deploy_script.sh -c ~/.ssh/EC2-DEV-PICK-GIT.pem -h $HOST -d prod
-                  '''
-                }
+               sshPublisher(publishers: [sshPublisherDesc(configName: 'MINSUNG', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: 'nohup java -jar pick-git-0.0.1-SNAPSHOT.jar &', execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '/home/ubuntu', remoteDirectorySDF: false, removePrefix: 'backend/pick-git/build/libs/', sourceFiles: 'backend/pick-git/build/libs/*.jar')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
             }
         }
     }

@@ -1,8 +1,9 @@
 import axios from "axios";
 
-import { Post, PostAddFormData } from "../../@types";
+import { Post, PostEditData, PostUploadData } from "../../@types";
 import { LIMIT } from "../../constants/limits";
 import { API_URL } from "../../constants/urls";
+import { customError } from "../../utils/error";
 
 export const requestGetHomeFeedPosts = async (pageParam: number, accessToken: string | null) => {
   const config = accessToken
@@ -12,6 +13,7 @@ export const requestGetHomeFeedPosts = async (pageParam: number, accessToken: st
         },
       }
     : {};
+
   const response = await axios.get<Post[]>(API_URL.POSTS(pageParam, LIMIT.FEED_COUNT_PER_FETCH), config);
 
   return response.data;
@@ -40,12 +42,12 @@ export const requestGetUserFeedPosts = async (username: string, pageParam: numbe
   return response.data;
 };
 
-export const requestAddPostLike = async (postId: string, accessToken: string | null) => {
+export const requestAddPostLike = async (postId: Post["id"], accessToken: string | null) => {
   if (!accessToken) {
-    throw Error("no accessToken");
+    throw customError.noAccessToken;
   }
 
-  const response = await axios.post<{ likesCount: number; isLiked: boolean }>(API_URL.POSTS_LIKES(postId), {
+  const response = await axios.put<{ likesCount: number; liked: boolean }>(API_URL.POSTS_LIKES(postId), null, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -54,12 +56,24 @@ export const requestAddPostLike = async (postId: string, accessToken: string | n
   return response.data;
 };
 
-export const requestDeletePostLike = async (postId: string, accessToken: string | null) => {
+export const requestDeletePost = async (postId: Post["id"], accessToken: string | null) => {
   if (!accessToken) {
-    throw Error("no accessToken");
+    throw customError.noAccessToken;
   }
 
-  const response = await axios.delete<{ likesCount: number; isLiked: boolean }>(API_URL.POSTS_LIKES(postId), {
+  await axios.delete(API_URL.POST(postId), {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+};
+
+export const requestDeletePostLike = async (postId: Post["id"], accessToken: string | null) => {
+  if (!accessToken) {
+    throw customError.noAccessToken;
+  }
+
+  const response = await axios.delete<{ likesCount: number; liked: boolean }>(API_URL.POSTS_LIKES(postId), {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -70,22 +84,38 @@ export const requestDeletePostLike = async (postId: string, accessToken: string 
 
 export const requestAddPost = async (
   username: string,
-  { files, githubRepositoryName, tags, content }: PostAddFormData,
+  { files, githubRepositoryName, tags, content }: PostUploadData,
   accessToken: string | null
 ) => {
   if (!accessToken) {
-    throw Error("no accessToken");
+    throw customError.noAccessToken;
   }
 
   const formData = new FormData();
   files.forEach((file) => formData.append("images", file));
   formData.append("githubRepoUrl", `https://github.com/${username}/${githubRepositoryName}`);
-  formData.append("tags", JSON.stringify(tags));
   formData.append("content", content);
+  formData.append("tags", tags.join(","));
 
   await axios.post(API_URL.ADD_POSTS, formData, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
   });
+};
+
+export const requestEditPost = async ({ postId, tags, content }: PostEditData, accessToken: string | null) => {
+  if (!accessToken) {
+    throw Error("no accessToken");
+  }
+
+  await axios.put(
+    API_URL.POST(postId),
+    { tags, content },
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
 };

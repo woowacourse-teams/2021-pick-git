@@ -1,5 +1,8 @@
 package com.woowacourse.pickgit.tag.application;
 
+import lombok.Builder;
+
+@Builder
 public class ExtractionRequestDto {
 
     private String accessToken;

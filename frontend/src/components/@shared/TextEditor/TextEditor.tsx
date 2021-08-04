@@ -1,6 +1,6 @@
-import { ChangeEventHandler, KeyboardEventHandler, useState } from "react";
+import { useState } from "react";
 
-import TextArea from "./TextEditor.style";
+import { Container, TextArea, TextLengthIndicator } from "./TextEditor.style";
 
 export interface Props {
   width?: string;
@@ -8,16 +8,26 @@ export interface Props {
   fontSize?: string;
   autoGrow?: boolean;
   placeholder?: string;
+  maxLength?: number;
   value: string;
-  onChange: ChangeEventHandler<HTMLTextAreaElement>;
+  onChange: React.ChangeEventHandler<HTMLTextAreaElement>;
 }
 
 const TEXT_EDITOR_LINE_HEIGHT = 1.2;
 
-const TextEditor = ({ width, height, fontSize = "1rem", autoGrow = false, placeholder, value, onChange }: Props) => {
+const TextEditor = ({
+  width,
+  height,
+  fontSize = "1rem",
+  autoGrow = false,
+  placeholder,
+  maxLength,
+  value,
+  onChange,
+}: Props) => {
   const [currentHeight, setCurrentHeight] = useState("");
 
-  const onKeyUp: KeyboardEventHandler<HTMLTextAreaElement> = ({ key }) => {
+  const handleKeyUp: React.KeyboardEventHandler<HTMLTextAreaElement> = ({ key }) => {
     if (!autoGrow) return;
 
     if (key === "Enter" || key === "Backspace" || key === "Delete") {
@@ -29,17 +39,28 @@ const TextEditor = ({ width, height, fontSize = "1rem", autoGrow = false, placeh
     }
   };
 
+  const handleChange: React.ChangeEventHandler<HTMLTextAreaElement> = (event) => {
+    if (maxLength && event.target.value.length > maxLength) {
+      return;
+    }
+
+    onChange(event);
+  };
+
   return (
-    <TextArea
-      width={width}
-      minHeight={height}
-      height={currentHeight}
-      placeholder={placeholder}
-      value={value}
-      onChange={onChange}
-      onKeyUp={onKeyUp}
-      fontSize={fontSize}
-    />
+    <Container height={currentHeight} minHeight={height}>
+      <TextArea
+        width={width}
+        minHeight={height}
+        height={currentHeight}
+        placeholder={placeholder}
+        value={value}
+        onChange={handleChange}
+        onKeyUp={handleKeyUp}
+        fontSize={fontSize}
+      />
+      {maxLength && <TextLengthIndicator>{`${value.length} / ${maxLength}`}</TextLengthIndicator>}
+    </Container>
   );
 };
 

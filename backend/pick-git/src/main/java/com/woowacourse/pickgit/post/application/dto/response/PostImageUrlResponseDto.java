@@ -1,7 +1,9 @@
 package com.woowacourse.pickgit.post.application.dto.response;
 
 import java.util.List;
+import lombok.Builder;
 
+@Builder
 public class PostImageUrlResponseDto {
 
     private Long id;
@@ -11,7 +13,7 @@ public class PostImageUrlResponseDto {
     }
 
     public PostImageUrlResponseDto(Long id) {
-        this(id, null);
+        this(id, List.of());
     }
 
     public PostImageUrlResponseDto(Long id, List<String> imageUrls) {

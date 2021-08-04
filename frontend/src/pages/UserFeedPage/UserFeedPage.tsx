@@ -1,46 +1,63 @@
-import { Container } from "./UserFeedPage.style";
+import { useContext, useEffect, useState } from "react";
+
 import Feed from "../../components/Feed/Feed";
-import { useHomeFeedPostsQuery } from "../../services/queries";
 import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
-import axios from "axios";
-import { useQueryClient } from "react-query";
-import { useContext } from "react";
+import useUserFeed from "../../services/hooks/useUserFeed";
+import { Container } from "./UserFeedPage.style";
+import { InfiniteData } from "react-query";
+import { Post } from "../../@types";
+import { useLocation } from "react-router-dom";
+
 import UserContext from "../../contexts/UserContext";
+import { LayoutInPx } from "../../constants/layout";
 import { QUERY } from "../../constants/queries";
 
+interface LocationState {
+  prevData?: InfiniteData<Post[]>;
+  postId?: string;
+}
+
 const UserFeedPage = () => {
-  const { data, isLoading, error, isFetching, fetchNextPage } = useHomeFeedPostsQuery();
-  const queryClient = useQueryClient();
-  const { logout } = useContext(UserContext);
+  const [isMountedOnce, setIsMountedOnce] = useState(false);
+  const { currentUsername } = useContext(UserContext);
+  const username = new URLSearchParams(location.search).get("username");
+  const isMyFeed = currentUsername === username;
 
-  const allPosts = data?.pages?.reduce((acc, postPage) => acc.concat(postPage), []);
+  const {
+    state: { prevData, postId },
+  } = useLocation<LocationState>();
 
-  const handlePostsEndIntersect = () => {
-    fetchNextPage();
-  };
+  const { infinitePostsData, isLoading, isError, isFetchingNextPage, handleIntersect } = useUserFeed(
+    isMyFeed,
+    username,
+    prevData
+  );
 
-  if (error) {
-    if (axios.isAxiosError(error)) {
-      const { status } = error.response ?? {};
-
-      if (status === 401) {
-        logout();
-        queryClient.refetchQueries(QUERY.GET_HOME_FEED_POSTS, { active: true });
-      }
+  useEffect(() => {
+    if (!isMountedOnce) {
+      setIsMountedOnce(true);
     }
 
-    return <div>에러!!</div>;
+    const $targetPost = document.querySelector(`#post${postId}`);
+
+    if ($targetPost && $targetPost instanceof HTMLElement) {
+      window.scrollTo(0, $targetPost.offsetTop - LayoutInPx.HEADER_HEIGHT);
+    }
+  }, [postId, isMountedOnce]);
+
+  if (isLoading) {
+    return <PageLoading />;
   }
 
-  if (isLoading || !allPosts) {
-    return <PageLoading />;
+  if (isError || !infinitePostsData) {
+    return <div>피드를 가져올 수 없습니다.</div>;
   }
 
   return (
     <Container>
-      <InfiniteScrollContainer isLoaderShown={isFetching} onIntersect={handlePostsEndIntersect}>
-        <Feed posts={allPosts} />
+      <InfiniteScrollContainer isLoaderShown={isFetchingNextPage} onIntersect={handleIntersect}>
+        <Feed infinitePostsData={infinitePostsData} queryKey={[QUERY.GET_USER_FEED_POSTS, { username, isMyFeed }]} />
       </InfiniteScrollContainer>
     </Container>
   );

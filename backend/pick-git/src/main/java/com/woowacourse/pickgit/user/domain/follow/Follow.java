@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.user.domain.follow;
 
+import com.woowacourse.pickgit.exception.user.SameSourceTargetUserException;
 import com.woowacourse.pickgit.user.domain.User;
 import java.util.Objects;
 import javax.persistence.Entity;
@@ -35,8 +36,19 @@ public class Follow {
     }
 
     public Follow(User source, User target) {
+        validateDifferentSourceTarget(source, target);
         this.source = source;
         this.target = target;
+    }
+
+    private void validateDifferentSourceTarget(User source, User target) {
+        if (source.equals(target)) {
+            throw new SameSourceTargetUserException();
+        }
+    }
+
+    public boolean isFollowing(User targetUser) {
+        return this.target.equals(targetUser);
     }
 
     public Long getId() {
@@ -60,12 +72,12 @@ public class Follow {
             return false;
         }
         Follow follow = (Follow) o;
-        return Objects.equals(source, follow.source) && Objects
-            .equals(target, follow.target);
+        return Objects.equals(getSource(), follow.getSource())
+            && Objects.equals(getTarget(), follow.getTarget());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(source, target);
+        return Objects.hash(getSource(), getTarget());
     }
 }

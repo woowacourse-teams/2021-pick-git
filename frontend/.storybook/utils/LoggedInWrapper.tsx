@@ -1,7 +1,7 @@
 import { useContext, useEffect } from "react";
 import UserContext, { UserContextProvider } from "../../src/contexts/UserContext";
 
-const LoggedInWrapper = ({ children }: { children: React.ReactElement }) => {
+const LoggedInWrapper = ({ children }: { children: React.ReactNode }) => {
   const Inner = () => {
     const { login } = useContext(UserContext);
 

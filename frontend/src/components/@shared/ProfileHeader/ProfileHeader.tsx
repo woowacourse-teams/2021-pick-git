@@ -1,35 +1,32 @@
 import { useContext } from "react";
 import { ThemeContext } from "styled-components";
-
 import { ProfileData } from "../../../@types";
-import SnackBarContext from "../../../contexts/SnackbarContext";
+
 import UserContext from "../../../contexts/UserContext";
-import { useFollowingMutation, useUnfollowingMutation } from "../../../services/queries";
+import useModal from "../../../services/hooks/@common/useModal";
+import useFollow from "../../../services/hooks/useFollow";
+import ModalPortal from "../../@layout/Modal/ModalPortal";
+import ProfileModificationForm from "../../ProfileModificationForm/ProfileModificationForm";
 import Avatar from "../Avatar/Avatar";
 import Button from "../Button/Button";
 import CountIndicator from "../CountIndicator/CountIndicator";
-import { Container, Indicators } from "./ProfileHeader.style";
+import { ButtonLoader, ButtonSpinner, Container, Indicators } from "./ProfileHeader.style";
 
 export interface Props {
-  profile?: ProfileData;
   isMyProfile: boolean;
+  profile: ProfileData | null;
+  username: string;
 }
 
-const ProfileHeader = ({ profile, isMyProfile }: Props) => {
+const ProfileHeader = ({ isMyProfile, profile, username }: Props) => {
   const theme = useContext(ThemeContext);
   const { isLoggedIn } = useContext(UserContext);
-  const { pushMessage } = useContext(SnackBarContext);
+  const { isModalShown, showModal, hideModal } = useModal(false);
+  const { toggleFollow, isFollowLoading, isUnfollowLoading } = useFollow();
 
-  const { mutate: follow, isLoading: isFollowLoading } = useFollowingMutation(profile?.name);
-  const { mutate: unFollow, isLoading: isUnfollowLoading } = useUnfollowingMutation(profile?.name);
-
-  const onFollowButtonClick = () => {
-    if (profile?.following === null) return;
-
-    if (profile?.following) {
-      unFollow();
-    } else {
-      follow();
+  const handleFollowButtonClick = () => {
+    if (profile && profile.following !== null) {
+      toggleFollow(username, profile.following);
     }
   };
 
@@ -39,12 +36,17 @@ const ProfileHeader = ({ profile, isMyProfile }: Props) => {
     }
 
     if (isFollowLoading || isUnfollowLoading) {
-      return <div>loading</div>;
+      return (
+        <ButtonLoader type="button" kind="squaredBlock" backgroundColor={theme.color.tertiaryColor}>
+          {isFollowLoading ? "팔로우" : "팔로우 취소"}
+          <ButtonSpinner size="1rem" />
+        </ButtonLoader>
+      );
     }
 
     if (isMyProfile) {
       return (
-        <Button type="button" kind="squaredBlock" onClick={() => pushMessage("아직 지원하지 않는 기능입니다")}>
+        <Button type="button" kind="squaredBlock" onClick={showModal}>
           프로필 수정
         </Button>
       );
@@ -56,14 +58,14 @@ const ProfileHeader = ({ profile, isMyProfile }: Props) => {
           type="button"
           kind="squaredBlock"
           backgroundColor={theme.color.tertiaryColor}
-          onClick={onFollowButtonClick}
+          onClick={handleFollowButtonClick}
         >
           팔로우 취소
         </Button>
       );
     } else {
       return (
-        <Button type="button" kind="squaredBlock" onClick={onFollowButtonClick}>
+        <Button type="button" kind="squaredBlock" onClick={handleFollowButtonClick}>
           팔로우
         </Button>
       );
@@ -72,7 +74,7 @@ const ProfileHeader = ({ profile, isMyProfile }: Props) => {
 
   return (
     <Container>
-      <Avatar diameter="3.75rem" fontSize="0.875rem" imageUrl={profile?.image} name={profile?.name} />
+      <Avatar diameter="3.75rem" fontSize="0.875rem" imageUrl={profile?.imageUrl} name={profile?.name} />
       <div>
         <Indicators>
           <CountIndicator name="게시물" count={profile?.postCount ?? 0} />
@@ -81,6 +83,16 @@ const ProfileHeader = ({ profile, isMyProfile }: Props) => {
         </Indicators>
         <ProfileButton />
       </div>
+      {isModalShown && isLoggedIn && (
+        <ModalPortal onClose={hideModal} isCloseButtonShown={true}>
+          <ProfileModificationForm
+            username={username}
+            profileImageUrl={profile?.imageUrl}
+            prevDescription={profile?.description}
+            onTerminate={hideModal}
+          />
+        </ModalPortal>
+      )}
     </Container>
   );
 };

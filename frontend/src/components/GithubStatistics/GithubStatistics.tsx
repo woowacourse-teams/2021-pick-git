@@ -1,50 +1,68 @@
+import { AxiosError } from "axios";
 import { useContext } from "react";
+import { UseQueryResult } from "react-query";
 import { ThemeContext } from "styled-components";
 
-import { GithubStats } from "../../@types";
+import { ErrorResponse, GithubStats } from "../../@types";
 import { BookIcon, ClockIcon, IssueIcon, PrIcon, StarIcon } from "../../assets/icons";
-import { useGithubStatsQuery } from "../../services/queries/githubStats";
+import PageLoading from "../@layout/PageLoading/PageLoading";
 import CircleIcon from "../@shared/CircleIcon/CircleIcon";
 import { Container, ContributionGraphWrapper, GithubStatsWrapper, Stat } from "./GithubStatistics.style";
 
-export interface Props {
-  username: string;
+interface Stats {
+  [K: string]: {
+    name: string;
+    icon: React.ReactElement;
+    countVariable: keyof GithubStats;
+  };
 }
 
-// TODO: typing
-const stats = {
-  stars: { name: "Stars", icon: <StarIcon /> },
-  commits: { name: "Commits", icon: <ClockIcon /> },
-  prs: { name: "PRs", icon: <PrIcon /> },
-  issues: { name: "Issues", icon: <IssueIcon /> },
-  contributes: { name: "Contributes", icon: <BookIcon /> },
+export interface Props {
+  username: string | null;
+  githubStatisticQueryResult: UseQueryResult<GithubStats, AxiosError<ErrorResponse>>;
+}
+
+const stats: Stats = {
+  stars: { name: "Stars", icon: <StarIcon />, countVariable: "starsCount" },
+  commits: { name: "Commits", icon: <ClockIcon />, countVariable: "commitsCount" },
+  prs: { name: "PRs", icon: <PrIcon />, countVariable: "prsCount" },
+  issues: { name: "Issues", icon: <IssueIcon />, countVariable: "issuesCount" },
+  contributes: { name: "Contributes", icon: <BookIcon />, countVariable: "contributesCount" },
 };
 
-const GithubStatistics = ({ username }: Props) => {
+const GithubStatistics = ({ username, githubStatisticQueryResult }: Props) => {
   const { color } = useContext(ThemeContext);
-  const { data, isLoading, error } = useGithubStatsQuery(username);
+  const { data, isLoading, error } = githubStatisticQueryResult;
 
   if (isLoading) {
-    return <div>loading</div>;
+    return <PageLoading />;
   }
 
   const GithubStats = () => {
-    if (error) {
-      return <div>Github Stats을 표시할 수 없습니다.</div>;
-    }
+    const Content = () => {
+      if (error) {
+        return <div>Github Stats을 표시할 수 없습니다.</div>;
+      }
 
-    return (
-      <>
-        <h2>Github Stats</h2>
-        <GithubStatsWrapper>
+      return (
+        <>
           {Object.entries(stats).map(([key, content]) => (
             <Stat key={key}>
               <CircleIcon diameter="2.375rem" fontSize="0.625rem" name={content.name}>
                 {content.icon}
               </CircleIcon>
-              <span>{data?.[key as keyof GithubStats] ?? 0}</span>
+              <span>{data?.[content.countVariable] ?? 0}</span>
             </Stat>
           ))}
+        </>
+      );
+    };
+
+    return (
+      <>
+        <h2>Github Stats</h2>
+        <GithubStatsWrapper>
+          <Content />
         </GithubStatsWrapper>
       </>
     );

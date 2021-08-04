@@ -1,9 +1,10 @@
 package com.woowacourse.pickgit.post.application.dto.response;
 
-import com.woowacourse.pickgit.post.application.dto.CommentResponse;
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.Builder;
 
+@Builder
 public class PostResponseDto {
 
     private Long id;
@@ -16,16 +17,26 @@ public class PostResponseDto {
     private List<String> tags;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private List<CommentResponse> comments;
-    private Boolean isLiked;
+    private List<CommentResponseDto> comments;
+    private Boolean liked;
 
     private PostResponseDto() {
     }
 
-    public PostResponseDto(Long id, List<String> imageUrls, String githubRepoUrl, String content,
-        String authorName, String profileImageUrl, Integer likesCount,
-        List<String> tags, LocalDateTime createdAt, LocalDateTime updatedAt,
-        List<CommentResponse> comments, Boolean isLiked) {
+    public PostResponseDto(
+        Long id,
+        List<String> imageUrls,
+        String githubRepoUrl,
+        String content,
+        String authorName,
+        String profileImageUrl,
+        Integer likesCount,
+        List<String> tags,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt,
+        List<CommentResponseDto> comments,
+        Boolean liked
+    ) {
         this.id = id;
         this.imageUrls = imageUrls;
         this.githubRepoUrl = githubRepoUrl;
@@ -37,7 +48,7 @@ public class PostResponseDto {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.comments = comments;
-        this.isLiked = isLiked;
+        this.liked = liked;
     }
 
     public Long getId() {
@@ -80,11 +91,11 @@ public class PostResponseDto {
         return updatedAt;
     }
 
-    public List<CommentResponse> getComments() {
+    public List<CommentResponseDto> getComments() {
         return comments;
     }
 
-    public Boolean getIsLiked() {
-        return isLiked;
+    public Boolean getLiked() {
+        return liked;
     }
 }

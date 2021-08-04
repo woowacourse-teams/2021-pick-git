@@ -1,6 +1,9 @@
+import { clientErrorCodeName, httpErrorStatus, httpErrorStatusName } from "../constants/error";
+import { API_ERROR_MESSAGE, CLIENT_ERROR_MESSAGE } from "../constants/messages";
+
 export interface ProfileData {
   name: string;
-  image: string;
+  imageUrl: string;
   description: string;
   followerCount: number;
   followingCount: number;
@@ -10,23 +13,37 @@ export interface ProfileData {
   location: string;
   website: string;
   twitter: string;
-  following?: boolean;
+  following: boolean | null;
 }
 
+export interface MutateResponseFollow {
+  followerCount: number;
+  following: boolean;
+}
+
+export interface SearchResultUser {
+  imageUrl: string;
+  username: string;
+  following: boolean | null;
+}
+
+export interface SearchResultTag {}
+
 export interface CommentData {
-  commentId: string;
+  id: number;
+  profileImageUrl: string;
   authorName: string;
   content: string;
-  isLiked: boolean;
+  liked: boolean;
 }
 
 export interface CommentAddData {
-  postId: Post["postId"];
+  postId: Post["id"];
   commentContent: CommentData["content"];
 }
 
 export interface Post {
-  postId: string;
+  id: number;
   imageUrls: string[];
   githubRepoUrl: string;
   content: string;
@@ -37,22 +54,28 @@ export interface Post {
   createdAt: string;
   updatedAt: string;
   comments: CommentData[];
-  isLiked: boolean;
+  liked: boolean;
 }
 
-export interface PostAddFormData {
+export interface PostUploadData {
   files: File[];
   githubRepositoryName: string;
   tags: string[];
   content: string;
 }
 
+export interface PostEditData {
+  postId: Post["id"];
+  tags: string[];
+  content: string;
+}
+
 export interface GithubStats {
-  stars: string;
-  commits: string;
-  prs: string;
-  issues: string;
-  contributes: string;
+  starsCount: number;
+  commitsCount: number;
+  prsCount: number;
+  issuesCount: number;
+  contributesCount: number;
 }
 
 export interface GithubRepository {
@@ -60,4 +83,38 @@ export interface GithubRepository {
   name: string;
 }
 
+export interface TabItem {
+  name: string;
+  onTabChange: () => void;
+}
+
 export type Tags = string[];
+
+export type Step = {
+  title: string;
+  path: string;
+};
+
+export type TabIndicatorKind = "line" | "pill";
+
+export type APIErrorCode = keyof typeof API_ERROR_MESSAGE;
+
+export type ErrorResponse = {
+  errorCode: APIErrorCode;
+};
+
+export type HTTPErrorStatus = keyof typeof httpErrorStatus;
+
+export type HTTPErrorStatusName = typeof httpErrorStatusName[number];
+
+export type HTTPErrorHandler = {
+  [V in HTTPErrorStatusName]?: () => void;
+};
+
+export type ClientErrorCode = keyof typeof CLIENT_ERROR_MESSAGE;
+
+export type ClientErrorCodeName = typeof clientErrorCodeName[number];
+
+export type ClientErrorHandler = {
+  [V in ClientErrorCodeName]?: () => void;
+};

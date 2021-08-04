@@ -1,9 +1,8 @@
 import {
   Container,
-  MyComment,
-  CommentInputWrapper,
+  CommentSliderToggleLink,
+  CommentsWrapper,
   CommentWrapper,
-  IconLinkButton,
   IconLink,
   IconLinkButtonsWrapper,
   LikeCountText,
@@ -17,6 +16,8 @@ import {
   TagItemLinkButton,
   PostCreatedDateText,
   MoreContentLinkButton,
+  CommentSliderToggleLinkText,
+  MoreCommentExistIndicator,
 } from "./PostItem.style";
 import Avatar from "../Avatar/Avatar";
 import CircleIcon from "../CircleIcon/CircleIcon";
@@ -24,32 +25,44 @@ import Comment from "../Comment/Comment";
 import ImageSlider from "../ImageSlider/ImageSlider";
 import Chip from "../Chip/Chip";
 import { CommentData } from "../../../@types";
-import { EditIcon, PostHeartIcon, PostHeartLineIcon, GithubIcon, SendIcon } from "../../../assets/icons";
+import {
+  EditIcon,
+  PostHeartIcon,
+  PostHeartLineIcon,
+  GithubIcon,
+  TrashIcon,
+  ArrowRightIcon,
+} from "../../../assets/icons";
 import { useContext, useState } from "react";
 import { ThemeContext } from "styled-components";
 import { PAGE_URL } from "../../../constants/urls";
 import { LIMIT } from "../../../constants/limits";
-import TextEditor from "../TextEditor/TextEditor";
 import { getTimeDiffFromCurrent } from "../../../utils/date";
+import EmptyPostImage from "../../../assets/images/empty-post-image.png";
+import ButtonDrawer from "../ButtonDrawer/ButtonDrawer";
+import { getTextElementsWithWithBr } from "../../../utils/text";
 
 export interface Props {
+  currentUserName: string;
   authorName: string;
   authorImageUrl: string;
   authorGithubUrl: string;
   isEditable: boolean;
   imageUrls: string[];
   likeCount: number;
-  isLiked: boolean;
+  liked: boolean;
   content: string;
   comments: CommentData[];
   commenterImageUrl: string;
   tags: string[];
   createdAt: string;
-  commentValue: string;
-  onCommentValueChange: React.ChangeEventHandler<HTMLTextAreaElement>;
-  onCommentValueSave: () => void;
+  isLoggedIn: boolean;
+  onMoreCommentClick: () => void;
+  onCommentInputClick: () => void;
+  onPostEdit: () => void;
+  onPostDelete: () => void;
   onPostLike: () => void;
-  onCommentLike: (commentId: string) => void;
+  onCommentLike: (commentId: CommentData["id"]) => void;
 }
 
 const timeDiffTextTable = {
@@ -60,25 +73,27 @@ const timeDiffTextTable = {
 };
 
 const PostItem = ({
+  currentUserName,
   authorName,
   authorImageUrl,
   authorGithubUrl,
   isEditable,
   imageUrls,
   likeCount,
-  isLiked,
+  liked,
   content,
   comments,
-  commenterImageUrl,
   tags,
   createdAt,
-  commentValue,
-  onCommentValueChange,
-  onCommentValueSave,
+  isLoggedIn,
+  onMoreCommentClick,
+  onCommentInputClick,
   onCommentLike,
+  onPostEdit,
+  onPostDelete,
   onPostLike,
 }: Props) => {
-  const [shouldHideContent, setShouldHideContent] = useState(content.length > LIMIT.POST_CONTENT_HIDE_LENGTH);
+  const [shouldHideContent, setShouldHideContent] = useState(true);
   const { color } = useContext(ThemeContext);
 
   const { min, hour, day } = getTimeDiffFromCurrent(createdAt);
@@ -90,26 +105,36 @@ const PostItem = ({
     ? timeDiffTextTable.min(min)
     : timeDiffTextTable.sec();
 
+  const circleButtons = [
+    { node: <EditIcon />, onClick: onPostEdit },
+    { node: <TrashIcon />, onClick: onPostDelete },
+  ];
+
   const commentList = comments.map((comment) => (
-    <CommentWrapper key={comment.commentId}>
+    <CommentWrapper key={comment.id}>
       <Comment
         content={comment.content}
-        isLiked={comment.isLiked}
+        liked={comment.liked}
         authorName={comment.authorName}
-        link={`/profile/${comment.authorName}`}
-        onCommentLike={() => onCommentLike(comment.commentId)}
+        link={currentUserName === comment.authorName ? PAGE_URL.MY_PROFILE : PAGE_URL.USER_PROFILE(comment.authorName)}
+        onCommentLike={() => onCommentLike(comment.id)}
       />
     </CommentWrapper>
   ));
 
-  const tagList = JSON.parse(tags.join(",")).map((tag: string) => (
-    <TagItemLinkButton key={tag} to={PAGE_URL.POSTS_WITH_TAG(tag)}>
+  const tagList = tags.map((tag: string, index: number) => (
+    // TODO: key prop 수정 => tag가 unique임이 보장된 후에!
+    <TagItemLinkButton key={index} to={PAGE_URL.POSTS_WITH_TAG(tag)}>
       <Chip>{tag}</Chip>
     </TagItemLinkButton>
   ));
 
-  const onMoreContentShow = () => {
+  const handleMoreContentShow = () => {
     setShouldHideContent(false);
+  };
+
+  const handleMoreContentHide = () => {
+    setShouldHideContent(true);
   };
 
   return (
@@ -119,16 +144,16 @@ const PostItem = ({
           <Avatar diameter="1.9375rem" imageUrl={authorImageUrl} />
           <PostAuthorName>{authorName}</PostAuthorName>
         </PostAuthorInfoLink>
-        {isEditable && (
-          <IconLinkButton to={PAGE_URL.EDIT_POST}>
-            <EditIcon />
-          </IconLinkButton>
-        )}
+        {isEditable && <ButtonDrawer circleButtons={circleButtons} />}
       </PostHeader>
-      <ImageSlider imageUrls={imageUrls} slideButtonKind="in-box" />
+      <ImageSlider imageUrls={imageUrls.length !== 0 ? imageUrls : [EmptyPostImage]} slideButtonKind="in-box" />
       <PostBody>
         <IconLinkButtonsWrapper>
-          <IconLink onClick={onPostLike}>{isLiked ? <PostHeartIcon /> : <PostHeartLineIcon />}</IconLink>
+          {isLoggedIn ? (
+            <IconLink onClick={onPostLike}>{liked ? <PostHeartIcon /> : <PostHeartLineIcon />}</IconLink>
+          ) : (
+            <div></div>
+          )}
           <IconLink href={authorGithubUrl} target="_blank">
             <CircleIcon diameter="1.625rem" backgroundColor={color.tertiaryColor}>
               <GithubIcon />
@@ -138,29 +163,31 @@ const PostItem = ({
         <LikeCountText>좋아요 {likeCount}개</LikeCountText>
         <PostContent>
           <PostContentAuthorLink to={PAGE_URL.USER_PROFILE(authorName)}>{authorName}</PostContentAuthorLink>
-          {shouldHideContent ? content.slice(0, LIMIT.POST_CONTENT_HIDE_LENGTH).concat("...") : content}
-          {shouldHideContent && <MoreContentLinkButton onClick={onMoreContentShow}>더보기</MoreContentLinkButton>}
+          {shouldHideContent
+            ? getTextElementsWithWithBr(content)
+                .slice(0, LIMIT.POST_CONTENT_HIDE_LENGTH)
+                .concat(<span>...</span>)
+            : getTextElementsWithWithBr(content)}
+          {shouldHideContent ? (
+            <MoreContentLinkButton onClick={handleMoreContentShow}>더보기</MoreContentLinkButton>
+          ) : (
+            <MoreContentLinkButton onClick={handleMoreContentHide}>간략히</MoreContentLinkButton>
+          )}
         </PostContent>
         <TagListWrapper>{shouldHideContent || tagList}</TagListWrapper>
-        {commentList}
+        <CommentsWrapper>
+          {commentList.length > 10
+            ? commentList
+                .slice(0, 10)
+                .concat(<MoreCommentExistIndicator onClick={onMoreCommentClick}>...</MoreCommentExistIndicator>)
+            : commentList}
+        </CommentsWrapper>
       </PostBody>
-      <MyComment>
-        <Avatar diameter="1.9375rem" imageUrl={commenterImageUrl} />
-        <CommentInputWrapper>
-          <TextEditor
-            placeholder="댓글 달기..."
-            onChange={onCommentValueChange}
-            value={commentValue}
-            width="100%"
-            height="0.8rem;"
-            fontSize="0.625rem"
-          />
-        </CommentInputWrapper>
-        <IconLink onClick={onCommentValueSave}>
-          <SendIcon />
-        </IconLink>
-      </MyComment>
       <PostCreatedDateText>{currentTimeDiffText}</PostCreatedDateText>
+      <CommentSliderToggleLink onClick={onCommentInputClick}>
+        <CommentSliderToggleLinkText>{isLoggedIn ? "댓글 작성" : "댓글 보기"}</CommentSliderToggleLinkText>
+        <ArrowRightIcon />
+      </CommentSliderToggleLink>
     </Container>
   );
 };

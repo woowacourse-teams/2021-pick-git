@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+  <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+  <springProfile name="prod, local">
+    <include resource="logback/error-logger.xml"/>
+    <logger name="com.woowacourse.s3_proxy" level="INFO">
+      <appender-ref ref="error-logger"/>
+    </logger>
+    <logger name="org.springframework" level="INFO" additivity="false">
+      <appender-ref ref="error-logger"/>
+    </logger>
+  </springProfile>
+
+  <springProfile name="test">
+    <include resource="logback/test/test-basic-logger.xml"/>
+    <logger name="com.woowacourse.s3_proxy" level="TRACE">
+      <appender-ref ref="test-basic-logger"/>
+    </logger>
+  </springProfile>
+</configuration>

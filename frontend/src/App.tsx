@@ -1,4 +1,5 @@
-import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
+import { useContext, useEffect } from "react";
+import { BrowserRouter, Route, Redirect, Switch } from "react-router-dom";
 
 import { PAGE_URL } from "./constants/urls";
 import LoginPage from "./pages/LoginPage/LoginPage";
@@ -11,27 +12,63 @@ import AddPostPage from "./pages/AddPostPage/AddPostPage";
 import { PostAddDataContextProvider } from "./contexts/PostAddDataContext";
 import UserFeedPage from "./pages/UserFeedPage/UserFeedPage";
 import TagFeedPage from "./pages/TagFeedPage/TagFeedPage";
+import SearchPage from "./pages/SearchPage/SearchPage";
+import SearchHeader from "./components/@layout/SearchHeader/SearchHeader";
+import UserContext from "./contexts/UserContext";
+import { getAccessToken } from "./storage/storage";
+import { requestGetSelfProfile } from "./services/requests";
+import SnackBarContext from "./contexts/SnackbarContext";
+import { SUCCESS_MESSAGE } from "./constants/messages";
+import EditPostPage from "./pages/EditPostPage/EditPostPage";
+import { PostEditStepContextProvider } from "./contexts/PostEditStepContext";
 
 const App = () => {
+  const { currentUsername, login, logout } = useContext(UserContext);
+  const { pushSnackbarMessage } = useContext(SnackBarContext);
+
+  useEffect(() => {
+    const accessToken = getAccessToken();
+
+    if (!accessToken || !currentUsername) return;
+
+    (async () => {
+      try {
+        const { name } = await requestGetSelfProfile(accessToken);
+
+        login(accessToken, name);
+        pushSnackbarMessage(SUCCESS_MESSAGE.LOGIN);
+      } catch (error) {
+        logout();
+        pushSnackbarMessage(SUCCESS_MESSAGE.LOGOUT);
+      }
+    })();
+  }, []);
+
   return (
     <BrowserRouter>
       <Switch>
-        <Route exact path={[PAGE_URL.HOME, PAGE_URL.PROFILE, PAGE_URL.MY_PROFILE]}>
+        <Route exact path={[PAGE_URL.HOME, PAGE_URL.PROFILE, PAGE_URL.MY_PROFILE, PAGE_URL.USER_FEED]}>
           <NavigationHeader />
         </Route>
         <Route path={PAGE_URL.ADD_POST}>
           <PostAddStepHeader />
+        </Route>
+        <Route path={PAGE_URL.SEARCH}>
+          <SearchHeader />
         </Route>
       </Switch>
       <Switch>
         <Route exact path={[PAGE_URL.HOME, PAGE_URL.HOME_FEED]}>
           <HomeFeedPage />
         </Route>
-        <Route exact path={PAGE_URL.USER_FEED("swon3210")}>
+        <Route exact path={PAGE_URL.USER_FEED}>
           <UserFeedPage />
         </Route>
-        <Route exact path={PAGE_URL.TAG_FEED("Javascript")}>
+        <Route exact path={PAGE_URL.TAG_FEED_BASE}>
           <TagFeedPage />
+        </Route>
+        <Route exact path={PAGE_URL.SEARCH}>
+          <SearchPage />
         </Route>
         <Route exact path={PAGE_URL.LOGIN}>
           <LoginPage />
@@ -49,6 +86,11 @@ const App = () => {
           <PostAddDataContextProvider>
             <AddPostPage />
           </PostAddDataContextProvider>
+        </Route>
+        <Route path={PAGE_URL.EDIT_POST}>
+          <PostEditStepContextProvider>
+            <EditPostPage />
+          </PostEditStepContextProvider>
         </Route>
         <Redirect to="/" />
       </Switch>

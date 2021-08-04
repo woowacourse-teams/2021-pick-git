@@ -27,11 +27,28 @@ public class CommentContent {
 
     private boolean isNotValidContent(String content) {
         return Objects.isNull(content)
-            || content.isEmpty()
-            || content.length() > MAX_COMMENT_CONTENT_LENGTH;
+            || content.isBlank()
+            || content.length() >= MAX_COMMENT_CONTENT_LENGTH;
     }
 
     public String getContent() {
         return content;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        CommentContent that = (CommentContent) o;
+        return Objects.equals(content, that.getContent());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(content);
     }
 }

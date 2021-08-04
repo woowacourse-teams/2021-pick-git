@@ -22,7 +22,7 @@ const InfiniteScrollContainer = ({ isLoaderShown, onIntersect, children }: Props
 
   useEffect(() => {
     loaderRef.current && observer.observe(loaderRef.current);
-  }, [loaderRef]);
+  }, [loaderRef.current]);
 
   return (
     <Container>
