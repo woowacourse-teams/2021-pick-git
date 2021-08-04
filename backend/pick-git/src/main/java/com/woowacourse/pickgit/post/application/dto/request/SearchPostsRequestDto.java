@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.post.application.dto.request;
 
+import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import lombok.Builder;
 
 @Builder
@@ -13,6 +14,21 @@ public class SearchPostsRequestDto {
     private boolean isGuest;
 
     private SearchPostsRequestDto() {
+    }
+
+    public SearchPostsRequestDto(
+        String type,
+        String keyword,
+        int page,
+        int limit,
+        AppUser appUser
+    ) {
+        this.type = type;
+        this.keyword = keyword;
+        this.page = page;
+        this.limit = limit;
+        this.userName = appUser.isGuest() ? null : appUser.getUsername();
+        this.isGuest = appUser.isGuest();
     }
 
     public SearchPostsRequestDto(
