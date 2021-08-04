@@ -77,7 +77,7 @@ public class PostFeedController {
         @Authenticated AppUser appUser,
         SearchPostsRequest searchPostsByTagRequest
     ) {
-        String type = searchPostsByTagRequest.getKeyword();
+        String type = searchPostsByTagRequest.getType();
         String keyword = searchPostsByTagRequest.getKeyword();
         int page = searchPostsByTagRequest.getPage();
         int limit = searchPostsByTagRequest.getLimit();
