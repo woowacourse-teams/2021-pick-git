@@ -518,14 +518,15 @@ class UserAcceptanceTest {
             );
     }
 
-    @DisplayName("누구든지 활동 통계를 조회할 수 있다.")
+    @DisplayName("사용자는 활동 통계를 조회할 수 있다.")
     @Test
-    void getContributions_Anyone_Success() {
+    void getContributions_LoginUser_Success() {
         // given
         ContributionResponseDto contributions = UserFactory.mockContributionResponseDto();
 
         // when
-        ContributionResponse response = unauthenticatedRequest(
+        ContributionResponse response = authenticatedRequest(
+            loginUserAccessToken,
             String.format("/api/profiles/%s/contributions", "testUser"),
             Method.GET,
             HttpStatus.OK
@@ -541,7 +542,8 @@ class UserAcceptanceTest {
     @Test
     void getContributions_invalidUsername_400Exception() {
         // when
-        ApiErrorResponse response = unauthenticatedRequest(
+        ApiErrorResponse response = authenticatedRequest(
+            loginUserAccessToken,
             String.format("/api/profiles/%s/contributions", "invalidName"),
             Method.GET,
             HttpStatus.BAD_REQUEST

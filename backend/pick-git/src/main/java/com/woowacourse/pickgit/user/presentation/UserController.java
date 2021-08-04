@@ -9,6 +9,7 @@ import com.woowacourse.pickgit.user.application.dto.response.ContributionRespons
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.ProfileEditResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
+import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
 import com.woowacourse.pickgit.user.presentation.dto.request.ProfileEditRequest;
 import com.woowacourse.pickgit.user.presentation.dto.response.ContributionResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.FollowResponse;
@@ -130,10 +131,21 @@ public class UserController {
     }
 
     @GetMapping("/{username}/contributions")
-    public ResponseEntity<ContributionResponse> getContributions(@PathVariable String username) {
-        ContributionResponseDto responseDto = userService.calculateContributions(username);
+    public ResponseEntity<ContributionResponse> getContributions(
+        @Authenticated AppUser user,
+        @PathVariable String username
+    ) {
+        ContributionResponseDto responseDto = userService
+            .calculateContributions(createContributionRequestDto(user, username));
 
         return ResponseEntity.ok(createContributionResponse(responseDto));
+    }
+
+    private ContributionRequestDto createContributionRequestDto(AppUser user, String username) {
+        return ContributionRequestDto.builder()
+            .accessToken(user.getAccessToken())
+            .username(username)
+            .build();
     }
 
     private ContributionResponse createContributionResponse(ContributionResponseDto responseDto) {

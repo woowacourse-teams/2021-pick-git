@@ -35,9 +35,9 @@ public class GithubContributionExtractor implements PlatformContributionExtracto
     }
 
     @Override
-    public ItemDto extractStars(String username) {
+    public ItemDto extractStars(String accessToken, String username) {
         String apiUrl = generateUrl(username);
-        String response = platformContributionApiRequester.request(apiUrl);
+        String response = platformContributionApiRequester.request(apiUrl, accessToken);
 
         return parseToStars(response);
     }
@@ -59,9 +59,9 @@ public class GithubContributionExtractor implements PlatformContributionExtracto
     }
 
     @Override
-    public CountDto extractCount(String restUrl, String username) {
+    public CountDto extractCount(String restUrl, String accessToken, String username) {
         String apiUrl = generateUrl(restUrl, username);
-        String response = platformContributionApiRequester.request(apiUrl);
+        String response = platformContributionApiRequester.request(apiUrl, accessToken);
 
         return parseToCount(response);
     }

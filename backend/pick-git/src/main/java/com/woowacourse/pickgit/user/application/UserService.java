@@ -2,6 +2,8 @@ package com.woowacourse.pickgit.user.application;
 
 import static java.util.stream.Collectors.toList;
 
+import com.woowacourse.pickgit.authentication.domain.OAuthAccessTokenDao;
+import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
@@ -18,6 +20,7 @@ import com.woowacourse.pickgit.user.domain.Contribution;
 import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -37,15 +40,16 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PickGitStorage pickGitStorage;
+    private final OAuthAccessTokenDao oAuthAccessTokenDao;
     private final PlatformContributionCalculator platformContributionCalculator;
 
-    public UserService(
-        UserRepository userRepository,
+    public UserService(UserRepository userRepository,
         PickGitStorage pickGitStorage,
-        PlatformContributionCalculator platformContributionCalculator
-    ) {
+        OAuthAccessTokenDao oAuthAccessTokenDao,
+        PlatformContributionCalculator platformContributionCalculator) {
         this.userRepository = userRepository;
         this.pickGitStorage = pickGitStorage;
+        this.oAuthAccessTokenDao = oAuthAccessTokenDao;
         this.platformContributionCalculator = platformContributionCalculator;
     }
 
@@ -162,10 +166,12 @@ public class UserService {
             .build();
     }
 
-    public ContributionResponseDto calculateContributions(String username) {
-        User user = findUserByName(username);
+    public ContributionResponseDto calculateContributions(ContributionRequestDto requestDto) {
+        String accessToken = oAuthAccessTokenDao.findByKeyToken(requestDto.getAccessToken())
+            .orElseThrow(InvalidTokenException::new);
+        User user = findUserByName(requestDto.getUsername());
 
-        Contribution contribution = platformContributionCalculator.calculate(user.getName());
+        Contribution contribution = platformContributionCalculator.calculate(accessToken, user.getName());
 
         return ContributionResponseDto.builder()
             .starsCount(contribution.getStarsCount())

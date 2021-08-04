@@ -3,6 +3,7 @@ package com.woowacourse.pickgit.common.factory;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
+import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
 import java.util.List;
 
 public class UserFactory {
@@ -94,6 +95,13 @@ public class UserFactory {
             .website("www.pick-git.com")
             .twitter("pick-git twitter")
             .following(null)
+            .build();
+    }
+
+    public static ContributionRequestDto mockContributionRequestDto() {
+        return ContributionRequestDto.builder()
+            .accessToken("testAccessToken")
+            .username("testUser")
             .build();
     }
 

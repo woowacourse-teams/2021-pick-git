@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.authentication.dao;
+package com.woowacourse.pickgit.authentication.domain;
 
 import java.util.Optional;
 

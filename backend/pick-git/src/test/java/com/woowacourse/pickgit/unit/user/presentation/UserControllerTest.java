@@ -40,6 +40,7 @@ import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.ProfileEditResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.presentation.UserController;
+import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
 import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -538,18 +539,25 @@ class UserControllerTest {
         }
     }
 
-    @DisplayName("누구든지 활동 통계를 조회할 수 있다.")
+    @DisplayName("사용자는 활동 통계를 조회할 수 있다.")
     @Test
-    void getContributions_Anyone_Success() throws Exception {
+    void getContributions_LoginUser_Success() throws Exception {
         // given
+        LoginUser loginUser = new LoginUser("testUser", "testAccessToken");
+
         ContributionResponseDto responseDto = UserFactory.mockContributionResponseDto();
 
-        given(userService.calculateContributions("testUser"))
+        given(oAuthService.validateToken("testAccessToken"))
+            .willReturn(true);
+        given(oAuthService.findRequestUserByToken("testAccessToken"))
+            .willReturn(loginUser);
+        given(userService.calculateContributions(any(ContributionRequestDto.class)))
             .willReturn(responseDto);
 
         // when
         ResultActions perform = mockMvc
             .perform(get("/api/profiles/{username}/contributions", "testUser")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer testAccessToken")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(MediaType.ALL));
 
@@ -561,11 +569,20 @@ class UserControllerTest {
             .getContentAsString();
 
         assertThat(body).isEqualTo(objectMapper.writeValueAsString(responseDto));
-        verify(userService, times(1)).calculateContributions("testUser");
+
+        verify(oAuthService, times(1))
+            .validateToken("testAccessToken");
+        verify(oAuthService, times(1))
+            .findRequestUserByToken("testAccessToken");
+        verify(userService, times(1))
+            .calculateContributions(any(ContributionRequestDto.class));
 
         perform.andDo(document("contributions-LoggedIn",
             getDocumentRequest(),
             getDocumentResponse(),
+            requestHeaders(
+                headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer testAccessToken")
+            ),
             pathParameters(
                 parameterWithName("username").description("사용자 이름")
             ),

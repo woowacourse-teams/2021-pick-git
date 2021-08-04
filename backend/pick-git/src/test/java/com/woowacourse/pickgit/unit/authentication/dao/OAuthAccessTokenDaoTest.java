@@ -2,8 +2,8 @@ package com.woowacourse.pickgit.unit.authentication.dao;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.woowacourse.pickgit.authentication.dao.CollectionOAuthAccessTokenDao;
-import com.woowacourse.pickgit.authentication.dao.OAuthAccessTokenDao;
+import com.woowacourse.pickgit.authentication.infrastructure.dao.CollectionOAuthAccessTokenDao;
+import com.woowacourse.pickgit.authentication.domain.OAuthAccessTokenDao;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

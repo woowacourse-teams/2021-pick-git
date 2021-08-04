@@ -1,8 +1,10 @@
 package com.woowacourse.pickgit.config;
 
+import com.woowacourse.pickgit.authentication.domain.OAuthAccessTokenDao;
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.common.mockapi.MockContributionApiRequester;
 import com.woowacourse.pickgit.common.mockapi.MockGithubOAuthClient;
+import com.woowacourse.pickgit.common.mockapi.MockOAuthAccessTokenDao;
 import com.woowacourse.pickgit.common.mockapi.MockPickGitStorage;
 import com.woowacourse.pickgit.common.mockapi.MockRepositoryApiRequester;
 import com.woowacourse.pickgit.common.mockapi.MockTagApiRequester;
@@ -39,5 +41,10 @@ public class InfrastructureTestConfiguration {
     @Bean
     public OAuthClient githubOAuthClient() {
         return new MockGithubOAuthClient();
+    }
+
+    @Bean
+    public OAuthAccessTokenDao githubOAuthAccessTokenDao() {
+        return new MockOAuthAccessTokenDao();
     }
 }
