@@ -1,6 +1,5 @@
 package com.woowacourse.pickgit.integration.post;
 
-import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -9,7 +8,6 @@ import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.FileFactory;
-import com.woowacourse.pickgit.common.factory.PostBuilder;
 import com.woowacourse.pickgit.common.factory.PostFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
@@ -23,25 +21,21 @@ import com.woowacourse.pickgit.exception.post.PostNotBelongToUserException;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
 import com.woowacourse.pickgit.post.application.PostService;
-import com.woowacourse.pickgit.post.application.dto.CommentResponse;
+import com.woowacourse.pickgit.post.application.dto.request.CommentRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostDeleteRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
+import com.woowacourse.pickgit.post.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
-import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
-import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDtos;
 import com.woowacourse.pickgit.post.domain.Post;
-import com.woowacourse.pickgit.post.domain.PostRepository;
-import com.woowacourse.pickgit.post.presentation.dto.request.CommentRequest;
-import com.woowacourse.pickgit.post.presentation.dto.request.HomeFeedRequest;
+import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.IntStream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -57,11 +51,10 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
 @Import(InfrastructureTestConfiguration.class)
-@SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
+@SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @ActiveProfiles("test")
 class PostServiceIntegrationTest {
-
     private static final String USERNAME = "jipark3";
     private static final String ACCESS_TOKEN = "oauth.access.token";
 
@@ -73,7 +66,7 @@ class PostServiceIntegrationTest {
 
     @Autowired
     private UserRepository userRepository;
-
+    
     @DisplayName("게시물에 댓글을 정상 등록한다.")
     @Test
     void addComment_ValidContent_Success() {
@@ -83,21 +76,21 @@ class PostServiceIntegrationTest {
         User kevin = UserFactory.user("kevin");
         User savedKevin = userRepository.save(kevin);
 
-        Post post = new PostBuilder()
+        Post post = Post.builder()
             .content("testContent")
             .githubRepoUrl("https://github.com/bperhaps")
-            .user(savedTestUser)
+            .author(savedTestUser)
             .build();
         Post savedPost = postRepository.save(post);
 
         // when
-        CommentRequest commentRequest = CommentRequest.builder()
+        CommentRequestDto commentRequestDto = CommentRequestDto.builder()
             .userName("kevin")
             .content("test comment")
             .postId(savedPost.getId())
             .build();
 
-        CommentResponse commentResponseDto = postService.addComment(commentRequest);
+        CommentResponseDto commentResponseDto = postService.addComment(commentRequestDto);
 
         // then
         assertThat(commentResponseDto.getAuthorName()).isEqualTo(savedKevin.getName());
@@ -115,21 +108,21 @@ class PostServiceIntegrationTest {
         User kevin = UserFactory.user("kevin");
         User savedKevin = userRepository.save(kevin);
 
-        Post post = new PostBuilder()
+        Post post = Post.builder()
             .content("testContent")
             .githubRepoUrl("https://github.com/bperhaps")
-            .user(savedTestUser)
+            .author(savedTestUser)
             .build();
         Post savedPost = postRepository.save(post);
 
-        CommentRequest commentRequest = CommentRequest.builder()
+        CommentRequestDto commentRequestDto = CommentRequestDto.builder()
             .userName("kevin")
             .content(content)
             .postId(savedPost.getId())
             .build();
 
         // then
-        assertThatCode(() -> postService.addComment(commentRequest))
+        assertThatCode(() -> postService.addComment(commentRequestDto))
             .isInstanceOf(CommentFormatException.class)
             .extracting("errorCode")
             .isEqualTo("F0002");
@@ -141,14 +134,14 @@ class PostServiceIntegrationTest {
         userRepository.save(UserFactory.user("kevin"));
 
         // when
-        CommentRequest commentRequest = CommentRequest.builder()
+        CommentRequestDto commentRequestDto = CommentRequestDto.builder()
             .userName("kevin")
             .content("content")
             .postId(-1L)
             .build();
 
         // then
-        assertThatCode(() -> postService.addComment(commentRequest))
+        assertThatCode(() -> postService.addComment(commentRequestDto))
             .isInstanceOf(PostNotFoundException.class)
             .extracting("errorCode")
             .isEqualTo("P0002");
@@ -158,19 +151,19 @@ class PostServiceIntegrationTest {
     @Test
     void addComment_UserNotFound_ExceptionThrown() {
         // given
-        Post post = new PostBuilder()
+        Post post = Post.builder()
             .build();
         Post savedPost = postRepository.save(post);
 
         // when
-        CommentRequest commentRequest = CommentRequest.builder()
+        CommentRequestDto commentRequestDto = CommentRequestDto.builder()
             .userName("anonymous")
             .content("content")
             .postId(savedPost.getId())
             .build();
 
         // then
-        assertThatCode(() -> postService.addComment(commentRequest))
+        assertThatCode(() -> postService.addComment(commentRequestDto))
             .isInstanceOf(UserNotFoundException.class)
             .extracting("errorCode")
             .isEqualTo("U0001");
@@ -235,10 +228,10 @@ class PostServiceIntegrationTest {
         RepositoryRequestDto requestDto = new RepositoryRequestDto(ACCESS_TOKEN, USERNAME);
 
         // when
-        RepositoriesResponseDto responseDto = postService.showRepositories(requestDto);
+        RepositoryResponseDtos responseDto = postService.userRepositories(requestDto);
 
         // then
-        assertThat(responseDto.getRepositories()).hasSize(2);
+        assertThat(responseDto.getRepositoryResponseDtos()).hasSize(2);
     }
 
     @DisplayName("토큰이 유효하지 않은 경우 예외가 발생한다. - 500 예외")
@@ -252,7 +245,7 @@ class PostServiceIntegrationTest {
 
         // then
         assertThatThrownBy(() -> {
-            postService.showRepositories(requestDto);
+            postService.userRepositories(requestDto);
         }).isInstanceOf(PlatformHttpErrorException.class)
             .extracting("errorCode")
             .isEqualTo("V0001");
@@ -269,168 +262,10 @@ class PostServiceIntegrationTest {
 
         // then
         assertThatThrownBy(() ->
-            postService.showRepositories(requestDto)
+            postService.userRepositories(requestDto)
         ).isInstanceOf(PlatformHttpErrorException.class)
             .extracting("errorCode")
             .isEqualTo("V0001");
-    }
-
-    @DisplayName("저장된 게시물 중 3, 4번째 글을 최신날짜순으로 가져온다.")
-    @Test
-    void readHomeFeed_Success() {
-        //given
-        createMockPosts();
-
-        LoginUser loginUser = new LoginUser("kevin", "a");
-
-        HomeFeedRequest homeFeedRequest = HomeFeedRequest.builder()
-            .appUser(loginUser)
-            .page(1L)
-            .limit(2L)
-            .build();
-
-        // when
-        List<PostResponseDto> postResponseDtos = postService.readHomeFeed(homeFeedRequest);
-
-        //then
-        List<String> postNames = postResponseDtos.stream()
-            .map(PostResponseDto::getAuthorName)
-            .collect(toList());
-
-        List<String> repoNames = extractGithubRepoUrls(postResponseDtos);
-
-        assertThat(postResponseDtos).hasSize(2);
-        assertThat(postNames).containsExactly("dani", "ginger");
-        assertThat(repoNames).containsExactly("java-racingcar", "jwp-chess");
-    }
-
-    private void createMockPosts() {
-        List<PostRequestDto> postRequestDtos = PostFactory.mockPostRequestDtos();
-        List<User> users = postRequestDtos.stream()
-            .map(PostRequestDto::getUsername)
-            .map(UserFactory::user)
-            .collect(toList());
-
-        IntStream.range(0, users.size())
-            .forEach(index -> {
-                User user = users.get(index);
-                PostRequestDto newPost = postRequestDtos.get(index);
-
-                userRepository.save(user);
-                Long postId = postService.write(newPost).getId();
-
-                CommentRequest commentRequest =
-                    new CommentRequest(user.getName(), "test comment" + index, postId);
-                postService.addComment(commentRequest);
-            });
-    }
-
-    @DisplayName("내 피드 게시물들만 조회한다.")
-    @Test
-    void readMyFeed_Success() {
-        //given
-        User savedUser = userRepository.save(UserFactory.user("kevin"));
-        List<PostRequestDto> postRequestDtos = PostFactory.mockPostRequestForAssertingMyFeed();
-        postRequestDtos.forEach(postService::write);
-
-        LoginUser loginUser = new LoginUser(savedUser.getName(), "a");
-
-        //when
-        HomeFeedRequest homeFeedRequest = HomeFeedRequest.builder()
-            .appUser(loginUser)
-            .page(0L)
-            .limit((long) postRequestDtos.size())
-            .build();
-
-        List<PostResponseDto> postResponseDtos = postService.readMyFeed(homeFeedRequest);
-        List<String> repoNames = postResponseDtos.stream()
-            .map(PostResponseDto::getGithubRepoUrl)
-            .collect(toList());
-
-        //then
-        assertThat(postResponseDtos).hasSize(postRequestDtos.size());
-        assertThat(repoNames).containsAll(extractGithubRepoUrls(postRequestDtos));
-    }
-
-    @DisplayName("로그인 사용자가 다른 사용자의 피드 게시물을 조회한다.")
-    @Test
-    void readUserFeed_LoginUser_Success() {
-        //given
-        User neozal = userRepository.save(UserFactory.user("neozal"));
-        User kevin = userRepository.save(UserFactory.user("kevin"));
-
-        List<PostRequestDto> postRequestDtos =
-            PostFactory.mockPostRequestForAssertingMyFeed();
-        postRequestDtos.forEach(postService::write);
-
-        LoginUser loginUser = new LoginUser(neozal.getName(), "a");
-        HomeFeedRequest homeFeedRequest = HomeFeedRequest.builder()
-            .appUser(loginUser)
-            .page(0L)
-            .limit((long) postRequestDtos.size())
-            .build();
-
-        //when
-        List<PostResponseDto> postResponseDtos =
-            postService.readUserFeed(homeFeedRequest, kevin.getName());
-
-        List<String> repoNames = extractGithubRepoUrls(postResponseDtos);
-        List<Boolean> likes = extractLikes(postResponseDtos);
-
-        //then
-        assertThat(postResponseDtos).hasSize(postRequestDtos.size());
-        assertThat(repoNames).containsAll(extractGithubRepoUrls(postRequestDtos));
-        assertThat(likes).containsAll(extractLikes(postResponseDtos));
-    }
-
-    @DisplayName("비로그인 사용자가 다른 사용자의 피드 게시물을 조회한다.")
-    @Test
-    void readUserFeed_GuestUser_Success() {
-        User savedUser = userRepository.save(UserFactory.user("kevin"));
-
-        //given
-        List<PostRequestDto> postRequestDtos = PostFactory.mockPostRequestForAssertingMyFeed();
-        postRequestDtos.forEach(postService::write);
-
-        HomeFeedRequest homeFeedRequest = HomeFeedRequest.builder()
-            .appUser(new GuestUser())
-            .page(0L)
-            .limit((long) postRequestDtos.size())
-            .build();
-
-        //when
-        List<PostResponseDto> postResponseDtos =
-            postService.readUserFeed(homeFeedRequest, savedUser.getName());
-        List<String> repoNames = extractGithubRepoUrls(postResponseDtos);
-        List<Boolean> likes = extractLikes(postResponseDtos);
-
-        //then
-        assertThat(postResponseDtos).hasSize(postRequestDtos.size());
-        assertThat(repoNames).containsAll(extractGithubRepoUrls(postRequestDtos));
-        assertThat(likes).allMatch(Objects::isNull);
-    }
-
-    private List<Boolean> extractLikes(List<PostResponseDto> postResponseDtos) {
-        return postResponseDtos.stream()
-            .map(PostResponseDto::getLiked)
-            .collect(toList());
-    }
-
-    private List<String> extractGithubRepoUrls(List<?> dtos) {
-        Objects.requireNonNull(dtos);
-
-        return dtos.stream()
-            .map(dto -> {
-                if (dto instanceof PostResponseDto) {
-                    return ((PostResponseDto) dto).getGithubRepoUrl();
-                }
-
-                if (dto instanceof PostRequestDto) {
-                    return ((PostRequestDto) dto).getGithubRepoUrl();
-                }
-
-                throw new IllegalArgumentException();
-            }).collect(toList());
     }
 
     @DisplayName("사용자는 특정 게시물을 좋아요 할 수 있다. - 성공")
@@ -687,9 +522,9 @@ class PostServiceIntegrationTest {
             List.of("java", "spring"), "hello");
 
         // when
-        assertThatThrownBy(() -> {
-            postService.update(updateRequestDto);
-        }).isInstanceOf(PostNotBelongToUserException.class)
+        assertThatThrownBy(() ->
+            postService.update(updateRequestDto)
+        ).isInstanceOf(PostNotBelongToUserException.class)
             .hasFieldOrPropertyWithValue("errorCode", "P0005")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)
             .hasMessage("해당하는 사용자의 게시물이 아닙니다.");
@@ -736,10 +571,10 @@ class PostServiceIntegrationTest {
         User savedUser = userRepository.save(user);
         LoginUser loginUser = new LoginUser(savedUser.getName(), ACCESS_TOKEN);
 
-        Post post = new PostBuilder()
+        Post post = Post.builder()
             .content("testContent")
             .githubRepoUrl("https://github.com/da-nyee")
-            .user(savedUser)
+            .author(savedUser)
             .build();
 
         Post savedPost = postRepository.save(post);
@@ -765,15 +600,15 @@ class PostServiceIntegrationTest {
         User kevin = UserFactory.user("kevin");
         User savedKevin = userRepository.save(kevin);
 
-        Post post = new PostBuilder()
+        Post post = Post.builder()
             .content("testContent")
             .githubRepoUrl("https://github.com/da-nyee")
-            .user(savedUser)
+            .author(savedUser)
             .build();
 
         Post savedPost = postRepository.save(post);
 
-        CommentRequest request = CommentRequest.builder()
+        CommentRequestDto request = CommentRequestDto.builder()
             .userName(savedKevin.getName())
             .content("testComment")
             .postId(savedPost.getId())
@@ -801,10 +636,10 @@ class PostServiceIntegrationTest {
         User savedKevin = userRepository.save(kevin);
         LoginUser loginUser = new LoginUser(USERNAME, ACCESS_TOKEN);
 
-        Post post = new PostBuilder()
+        Post post = Post.builder()
             .content("testContent")
             .githubRepoUrl("https://github.com/da-nyee")
-            .user(savedKevin)
+            .author(savedKevin)
             .build();
 
         Post savedPost = postRepository.save(post);
@@ -813,9 +648,9 @@ class PostServiceIntegrationTest {
             savedPost.getId());
 
         // when
-        assertThatThrownBy(() -> {
-            postService.delete(deleteRequestDto);
-        }).isInstanceOf(PostNotBelongToUserException.class)
+        assertThatThrownBy(() ->
+            postService.delete(deleteRequestDto)
+        ).isInstanceOf(PostNotBelongToUserException.class)
             .hasFieldOrPropertyWithValue("errorCode", "P0005")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)
             .hasMessage("해당하는 사용자의 게시물이 아닙니다.");

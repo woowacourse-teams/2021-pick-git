@@ -3,43 +3,33 @@ package com.woowacourse.pickgit.post.application;
 import static java.util.stream.Collectors.toList;
 
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
-import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
+import com.woowacourse.pickgit.exception.post.PostNotBelongToUserException;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
-import com.woowacourse.pickgit.post.application.dto.CommentResponse;
+import com.woowacourse.pickgit.post.application.dto.request.CommentRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostDeleteRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
+import com.woowacourse.pickgit.post.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
-import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
-import com.woowacourse.pickgit.post.application.dto.response.RepositoriesResponseDto;
-import com.woowacourse.pickgit.post.domain.PickGitStorage;
-import com.woowacourse.pickgit.post.domain.PlatformRepositoryExtractor;
+import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDtos;
 import com.woowacourse.pickgit.post.domain.Post;
-import com.woowacourse.pickgit.post.domain.PostRepository;
 import com.woowacourse.pickgit.post.domain.comment.Comment;
-import com.woowacourse.pickgit.post.domain.content.Image;
-import com.woowacourse.pickgit.post.domain.content.Images;
-import com.woowacourse.pickgit.post.domain.content.PostContent;
-import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
-import com.woowacourse.pickgit.post.presentation.dto.request.CommentRequest;
-import com.woowacourse.pickgit.post.presentation.dto.request.HomeFeedRequest;
+import com.woowacourse.pickgit.post.domain.repository.PickGitStorage;
+import com.woowacourse.pickgit.post.domain.repository.PostRepository;
+import com.woowacourse.pickgit.post.domain.util.PlatformRepositoryExtractor;
+import com.woowacourse.pickgit.post.domain.util.dto.RepositoryUrlAndName;
 import com.woowacourse.pickgit.tag.application.TagService;
 import com.woowacourse.pickgit.tag.application.TagsDto;
 import com.woowacourse.pickgit.tag.domain.Tag;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Function;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -55,120 +45,104 @@ public class PostService {
     private final PlatformRepositoryExtractor platformRepositoryExtractor;
 
     public PostService(
+        TagService tagService,
         UserRepository userRepository,
         PostRepository postRepository,
         PickGitStorage pickgitStorage,
-        PlatformRepositoryExtractor platformRepositoryExtractor,
-        TagService tagService
+        PlatformRepositoryExtractor platformRepositoryExtractor
     ) {
+        this.tagService = tagService;
         this.userRepository = userRepository;
         this.postRepository = postRepository;
         this.pickgitStorage = pickgitStorage;
         this.platformRepositoryExtractor = platformRepositoryExtractor;
-        this.tagService = tagService;
     }
 
     public PostImageUrlResponseDto write(PostRequestDto postRequestDto) {
-        PostContent postContent = new PostContent(postRequestDto.getContent());
+        Post post = createPost(postRequestDto);
+        Post savedPost = postRepository.save(post);
 
-        User user = findUserByName(postRequestDto.getUsername());
+        return PostImageUrlResponseDto.builder()
+            .id(savedPost.getId())
+            .imageUrls(savedPost.getImageUrls())
+            .build();
+    }
 
-        Post post = new Post(
-            getImagesFrom(postRequestDto),
-            postContent,
-            postRequestDto.getGithubRepoUrl(),
-            user
-        );
-
+    private Post createPost(PostRequestDto postRequestDto) {
+        String content = postRequestDto.getContent();
+        List<MultipartFile> files = postRequestDto.getImages();
+        String userName = postRequestDto.getUsername();
+        String githubRepoUrl = postRequestDto.getGithubRepoUrl();
         List<Tag> tags = tagService.findOrCreateTags(new TagsDto(postRequestDto.getTags()));
+
+        User user = findUserByName(userName);
+        List<String> imageUrls = pickgitStorage.storeMultipartFile(files, userName);
+
+        Post post = createPost(content, githubRepoUrl, user, imageUrls);
         post.addTags(tags);
 
-        Post findPost = postRepository.save(post);
-        return new PostImageUrlResponseDto(findPost.getId(), findPost.getImageUrls());
+        return post;
     }
 
-    private Images getImagesFrom(PostRequestDto postRequestDto) {
-        List<File> files = filesOf(postRequestDto);
-
-        return new Images(getImagesFrom(postRequestDto, files));
+    private Post createPost(String content, String githubRepoUrl, User user, List<String> imageUrls) {
+        return Post.builder()
+            .content(content)
+            .images(imageUrls)
+            .githubRepoUrl(githubRepoUrl)
+            .author(user)
+            .build();
     }
 
-    private List<Image> getImagesFrom(PostRequestDto postRequestDto, List<File> files) {
-        return pickgitStorage
-            .store(files, postRequestDto.getUsername())
-            .stream()
-            .map(Image::new)
+    public CommentResponseDto addComment(CommentRequestDto commentRequestDto) {
+        String userName = commentRequestDto.getUserName();
+        Long postId = commentRequestDto.getPostId();
+        String content = commentRequestDto.getContent();
+
+        User user = findUserByName(userName);
+        Post post = findPostById(postId);
+
+        Comment comment = new Comment(content, user);
+        post.addComment(comment);
+
+        return createCommentResponseDto(comment);
+    }
+
+    private CommentResponseDto createCommentResponseDto(Comment comment) {
+        return CommentResponseDto.builder()
+            .id(comment.getId())
+            .profileImageUrl(comment.getProfileImageUrl())
+            .authorName(comment.getAuthorName())
+            .content(comment.getContent())
+            .liked(false)
+            .build();
+    }
+
+    @Transactional(readOnly = true)
+    public RepositoryResponseDtos userRepositories(RepositoryRequestDto repositoryRequestDto) {
+        String token = repositoryRequestDto.getToken();
+        String username = repositoryRequestDto.getUsername();
+
+        List<RepositoryUrlAndName> repositoryUrlAndNames =
+            platformRepositoryExtractor.extract(token, username);
+        List<RepositoryResponseDto> repositoryResponseDtos =
+            createRepositoryResponseDtos(repositoryUrlAndNames);
+
+        return new RepositoryResponseDtos(repositoryResponseDtos);
+    }
+
+    private List<RepositoryResponseDto> createRepositoryResponseDtos(
+        List<RepositoryUrlAndName> repositoryUrlAndNames
+    ) {
+        return repositoryUrlAndNames.stream()
+            .map(toRepositoryResponseDto())
             .collect(toList());
     }
 
-    private List<File> filesOf(PostRequestDto postRequestDto) {
-        return postRequestDto.getImages().stream()
-            .map(toFile())
-            .collect(toList());
-    }
-
-    private Function<MultipartFile, File> toFile() {
-        return multipartFile -> {
-            try {
-                return multipartFile.getResource().getFile();
-            } catch (IOException e) {
-                return tryCreateTempFile(multipartFile);
-            }
-        };
-    }
-
-    private File tryCreateTempFile(MultipartFile multipartFile) {
-        try {
-            Path tempFile = Files.createTempFile(null, null);
-            Files.write(tempFile, multipartFile.getBytes());
-
-            return tempFile.toFile();
-        } catch (IOException ioException) {
-            throw new PlatformHttpErrorException();
-        }
-    }
-
-    public CommentResponse addComment(CommentRequest commentRequest) {
-        User user = userRepository.findByBasicProfile_Name(commentRequest.getUserName())
-            .orElseThrow(UserNotFoundException::new);
-        Post post = postRepository.findById(commentRequest.getPostId())
-            .orElseThrow(PostNotFoundException::new);
-        Comment comment = new Comment(commentRequest.getContent());
-        user.addComment(post, comment);
-        return CommentResponse.from(comment);
-    }
-
-    @Transactional(readOnly = true)
-    public RepositoriesResponseDto showRepositories(RepositoryRequestDto repositoryRequestDto) {
-        List<RepositoryResponseDto> repositories = platformRepositoryExtractor
-            .extract(repositoryRequestDto.getToken(), repositoryRequestDto.getUsername());
-
-        return new RepositoriesResponseDto(repositories);
-    }
-
-    @Transactional(readOnly = true)
-    public List<PostResponseDto> readHomeFeed(HomeFeedRequest homeFeedRequest) {
-        Pageable pageable = PageRequest.of(homeFeedRequest.getPage(), homeFeedRequest.getLimit());
-        List<Post> result = postRepository.findAllPosts(pageable);
-        return PostDtoAssembler.assembleFrom(homeFeedRequest.getAppUser(), result);
-    }
-
-    @Transactional(readOnly = true)
-    public List<PostResponseDto> readMyFeed(HomeFeedRequest homeFeedRequest) {
-        return readFeed(homeFeedRequest, homeFeedRequest.getAppUser().getUsername());
-    }
-
-    @Transactional(readOnly = true)
-    public List<PostResponseDto> readUserFeed(HomeFeedRequest homeFeedRequest, String username) {
-        return readFeed(homeFeedRequest, username);
-    }
-
-    private List<PostResponseDto> readFeed(HomeFeedRequest homeFeedRequest, String username) {
-        AppUser appUser = homeFeedRequest.getAppUser();
-        User target = findUserByName(username);
-        Pageable pageable = PageRequest.of(homeFeedRequest.getPage(), homeFeedRequest.getLimit());
-        List<Post> result = postRepository.findAllPostsByUser(target, pageable);
-        return PostDtoAssembler.assembleFrom(appUser, result);
+    private Function<RepositoryUrlAndName, RepositoryResponseDto> toRepositoryResponseDto() {
+        return repositoryUrlAndName -> RepositoryResponseDto.builder()
+            .name(repositoryUrlAndName.getName())
+            .url(repositoryUrlAndName.getUrl())
+            .build();
     }
 
     public LikeResponseDto like(AppUser user, Long postId) {
@@ -187,21 +161,18 @@ public class PostService {
         return new LikeResponseDto(target.getLikeCounts(), false);
     }
 
-    private Post findPostById(Long id) {
-        return postRepository.findById(id)
-            .orElseThrow(PostNotFoundException::new);
-    }
-
     public PostUpdateResponseDto update(PostUpdateRequestDto updateRequestDto) {
         User user = findUserByName(updateRequestDto.getUsername());
         Post post = findPostById(updateRequestDto.getPostId());
 
-        if (post.belongsToUser(user)) {
-            List<Tag> tags = tagService.findOrCreateTags(new TagsDto(updateRequestDto.getTags()));
-
-            post.updateContent(updateRequestDto.getContent());
-            post.updateTags(tags);
+        if (!post.isWrittenBy(user)) {
+            throw new PostNotBelongToUserException();
         }
+
+        List<Tag> tags = tagService.findOrCreateTags(new TagsDto(updateRequestDto.getTags()));
+
+        post.updateContent(updateRequestDto.getContent());
+        post.updateTags(tags);
 
         return PostUpdateResponseDto.builder()
             .content(post.getContent())
@@ -213,10 +184,17 @@ public class PostService {
         User user = findUserByName(deleteRequestDto.getUsername());
         Post post = findPostById(deleteRequestDto.getPostId());
 
-        if (post.belongsToUser(user)) {
-            user.delete(post);
-            postRepository.delete(post);
+        if (!post.isWrittenBy(user)) {
+            throw new PostNotBelongToUserException();
         }
+
+        user.delete(post);
+        postRepository.delete(post);
+    }
+
+    private Post findPostById(Long id) {
+        return postRepository.findById(id)
+            .orElseThrow(PostNotFoundException::new);
     }
 
     private User findUserByName(String username) {

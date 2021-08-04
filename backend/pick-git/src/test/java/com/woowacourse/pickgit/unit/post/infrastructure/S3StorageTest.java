@@ -39,7 +39,7 @@ class S3StorageTest {
                     ArrayList<FileSystemResource> fileSystemResources =
                         (ArrayList<FileSystemResource>) datas.get("files");
 
-                    if (Objects.isNull(fileSystemResources)) {
+                    if(Objects.isNull(fileSystemResources)) {
                         fileSystemResources = new ArrayList<>();
                     }
 

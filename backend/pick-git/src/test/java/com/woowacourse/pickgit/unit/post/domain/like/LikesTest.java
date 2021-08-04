@@ -2,7 +2,6 @@ package com.woowacourse.pickgit.unit.post.domain.like;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.woowacourse.pickgit.common.factory.PostBuilder;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.like.Like;
@@ -18,14 +17,15 @@ import org.junit.jupiter.params.provider.CsvSource;
 class LikesTest {
 
     private Likes likes;
+    private Post post;
 
     @BeforeEach
     void setUp() {
-        Post post = new PostBuilder().id(1L).build();
+        post = Post.builder().id(1L).build();
 
-        User testUser1 = UserFactory.user("testUser1");
-        User testUser2 = UserFactory.user("testUser2");
-        User testUser3 = UserFactory.user("testUser3");
+        User testUser1 = UserFactory.user(1L, "testUser1");
+        User testUser2 = UserFactory.user(2L, "testUser2");
+        User testUser3 = UserFactory.user(3L, "testUser3");
 
         likes = new Likes(List.of(
             new Like(post, testUser1),
@@ -42,10 +42,9 @@ class LikesTest {
 
     @DisplayName("특정 사용자의 like가 포함되어 있는지 확인한다.")
     @ParameterizedTest
-    @CsvSource(value = {"testUser1,true", "testUser2,true", "noTestUser1,false"})
-    void contains(String userName, boolean expected) {
-        assertThat(likes.contains(userName)).isEqualTo(expected);
+    @CsvSource(value = {"1, testUser1, true", "2,testUser2, true", "4, noTestUser1, false"})
+    void contains(Long id, String userName, boolean expected) {
+        User user = UserFactory.user(id, userName);
+        assertThat(likes.contains(new Like(post, user))).isEqualTo(expected);
     }
-
-
 }

@@ -32,16 +32,15 @@ public class Likes {
         return likes.size();
     }
 
-    public boolean contains(String userName) {
+    public boolean contains(Like like) {
         return likes.stream()
-            .anyMatch(like -> like.isOwnedBy(userName));
+            .anyMatch(like::equals);
     }
 
     public void add(Like like) {
         if (likes.contains(like)) {
             throw new DuplicatedLikeException();
         }
-
         likes.add(like);
     }
 

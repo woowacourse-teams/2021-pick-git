@@ -34,4 +34,21 @@ public class CommentContent {
     public String getContent() {
         return content;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        CommentContent that = (CommentContent) o;
+        return Objects.equals(content, that.getContent());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(content);
+    }
 }

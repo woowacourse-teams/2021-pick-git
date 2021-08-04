@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.post.infrastructure;
+package com.woowacourse.pickgit.post.domain.util;
 
 public interface PlatformRepositoryApiRequester {
 

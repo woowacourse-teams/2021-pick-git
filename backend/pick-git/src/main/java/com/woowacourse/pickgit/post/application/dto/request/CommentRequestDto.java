@@ -1,18 +1,18 @@
-package com.woowacourse.pickgit.post.presentation.dto.request;
+package com.woowacourse.pickgit.post.application.dto.request;
 
 import lombok.Builder;
 
 @Builder
-public class CommentRequest {
+public class CommentRequestDto {
 
     private String userName;
     private String content;
     private Long postId;
 
-    private CommentRequest() {
+    private CommentRequestDto() {
     }
 
-    public CommentRequest(String userName, String content, Long postId) {
+    public CommentRequestDto(String userName, String content, Long postId) {
         this.userName = userName;
         this.content = content;
         this.postId = postId;

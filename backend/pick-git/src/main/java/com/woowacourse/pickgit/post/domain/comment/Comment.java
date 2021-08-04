@@ -32,27 +32,34 @@ public class Comment {
     protected Comment() {
     }
 
-    public Comment(String content) {
-        this(null, content);
+    public Comment(String content, User user) {
+        this(null, content, user);
     }
 
-    public Comment(Long id, String content) {
+    public Comment(Long id, String content, User user) {
         this.id = id;
         this.content = new CommentContent(content);
-    }
-
-    public Comment writeBy(User user) {
         this.user = user;
-        return this;
     }
 
-    public Comment toPost(Post post) {
+    public void belongTo(Post post) {
         this.post = post;
-        return this;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getProfileImageUrl() {
         return user.getImage();
+    }
+
+    public String getAuthorName() {
+        return user.getName();
+    }
+
+    public String getContent() {
+        return content.getContent();
     }
 
     @Override
@@ -64,27 +71,11 @@ public class Comment {
             return false;
         }
         Comment comment = (Comment) o;
-        return Objects.equals(id, comment.id);
+        return Objects.equals(id, comment.getId());
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id);
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getAuthorName() {
-        return user.getName();
-    }
-
-    public String getContent() {
-        return content.getContent();
-    }
-
-    public User getUser() {
-        return user;
     }
 }
