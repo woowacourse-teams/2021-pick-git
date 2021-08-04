@@ -15,6 +15,7 @@ import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
+import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.user.DuplicateFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidFollowException;
@@ -737,61 +738,99 @@ class UserServiceTest {
         return AuthUserRequestDto.from(new GuestUser());
     }
 
-    @DisplayName("사용자는 활동 통계를 조회할 수 있다.")
-    @Test
-    void calculateContributions_LoginUser_Success() {
-        // given
-        User user = UserFactory.user();
-        ContributionRequestDto requestDto = UserFactory.mockContributionRequestDto();
+    @DisplayName("calculateContributions 메소드는")
+    @Nested
+    class Describe_calculateContributions {
 
-        Contribution contribution = new Contribution(11, 48, 48, 48, 48);
+        @DisplayName("로그인 되어 있을 때")
+        @Nested
+        class Context_Login {
 
-        given(userRepository.findByBasicProfile_Name("testUser"))
-            .willReturn(Optional.of(user));
-        given(oAuthAccessTokenDao.findByKeyToken("testAccessToken"))
-            .willReturn(Optional.of("oauth.access.token"));
-        given(platformContributionCalculator.calculate("oauth.access.token", "testUser"))
-            .willReturn(contribution);
+            @DisplayName("사용자는 활동 통계를 조회할 수 있다.")
+            @Test
+            void calculateContributions_LoginUser_Success() {
+                // given
+                User user = UserFactory.user();
+                ContributionRequestDto requestDto = UserFactory.mockContributionRequestDto();
 
-        ContributionResponseDto responseDto = UserFactory.mockContributionResponseDto();
+                Contribution contribution = new Contribution(11, 48, 48, 48, 48);
 
-        // when
-        ContributionResponseDto contributions = userService.calculateContributions(requestDto);
+                given(userRepository.findByBasicProfile_Name("testUser"))
+                    .willReturn(Optional.of(user));
+                given(oAuthAccessTokenDao.findByKeyToken("testAccessToken"))
+                    .willReturn(Optional.of("oauth.access.token"));
+                given(platformContributionCalculator.calculate("oauth.access.token", "testUser"))
+                    .willReturn(contribution);
 
-        // then
-        assertThat(contributions)
-            .usingRecursiveComparison()
-            .isEqualTo(responseDto);
+                ContributionResponseDto responseDto = UserFactory.mockContributionResponseDto();
 
-        verify(userRepository, times(1))
-            .findByBasicProfile_Name("testUser");
-        verify(oAuthAccessTokenDao, times(1))
-            .findByKeyToken("testAccessToken");
-        verify(platformContributionCalculator, times(1))
-            .calculate("oauth.access.token", "testUser");
-    }
+                // when
+                ContributionResponseDto contributions = userService
+                    .calculateContributions(requestDto);
 
-    @DisplayName("존재하지 않는 유저 이름으로 활동 통계를 조회할 수 없다. - 400 예외")
-    @Test
-    void calculateContributions_InvalidUsername_400Exception() {
-        // given
-        ContributionRequestDto requestDto = UserFactory.mockContributionRequestDto();
+                // then
+                assertThat(contributions)
+                    .usingRecursiveComparison()
+                    .isEqualTo(responseDto);
 
-        given(oAuthAccessTokenDao.findByKeyToken("testAccessToken"))
-            .willReturn(Optional.of("oauth.access.token"));
+                verify(userRepository, times(1))
+                    .findByBasicProfile_Name("testUser");
+                verify(oAuthAccessTokenDao, times(1))
+                    .findByKeyToken("testAccessToken");
+                verify(platformContributionCalculator, times(1))
+                    .calculate("oauth.access.token", "testUser");
+            }
 
-        // when
-        assertThatThrownBy(() -> {
-            userService.calculateContributions(requestDto);
-        }).isInstanceOf(InvalidUserException.class)
-            .hasFieldOrPropertyWithValue("errorCode", "U0001")
-            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
-            .hasMessage("유효하지 않은 유저입니다.");
+            @DisplayName("존재하지 않는 유저 이름으로 활동 통계를 조회할 수 없다. - 400 예외")
+            @Test
+            void calculateContributions_InvalidUsername_400Exception() {
+                // given
+                ContributionRequestDto requestDto = UserFactory.mockContributionRequestDto();
 
-        // then
-        verify(oAuthAccessTokenDao, times(1))
-            .findByKeyToken("testAccessToken");
-        verify(userRepository, times(1))
-            .findByBasicProfile_Name("testUser");
+                given(oAuthAccessTokenDao.findByKeyToken("testAccessToken"))
+                    .willReturn(Optional.of("oauth.access.token"));
+
+                // when
+                assertThatThrownBy(() -> {
+                    userService.calculateContributions(requestDto);
+                }).isInstanceOf(InvalidUserException.class)
+                    .hasFieldOrPropertyWithValue("errorCode", "U0001")
+                    .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
+                    .hasMessage("유효하지 않은 유저입니다.");
+
+                // then
+                verify(oAuthAccessTokenDao, times(1))
+                    .findByKeyToken("testAccessToken");
+                verify(userRepository, times(1))
+                    .findByBasicProfile_Name("testUser");
+            }
+        }
+
+        @DisplayName("비로그인 되어 있으면")
+        @Nested
+        class Context_Guest {
+
+            @DisplayName("게스트는 활동 통계를 조회할 수 없다. - 401 예외")
+            @Test
+            void calculateContributions_InvalidToken_401Exception() {
+                // given
+                ContributionRequestDto requestDto = UserFactory.mockContributionRequestDto();
+
+                given(oAuthAccessTokenDao.findByKeyToken(any()))
+                    .willThrow(new InvalidTokenException());
+
+                // when
+                assertThatThrownBy(() -> {
+                    userService.calculateContributions(requestDto);
+                }).isInstanceOf(InvalidTokenException.class)
+                    .hasFieldOrPropertyWithValue("errorCode", "A0001")
+                    .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)
+                    .hasMessage("토큰 인증 에러");
+
+                // then
+                verify(oAuthAccessTokenDao, times(1))
+                    .findByKeyToken(any());
+            }
+        }
     }
 }
