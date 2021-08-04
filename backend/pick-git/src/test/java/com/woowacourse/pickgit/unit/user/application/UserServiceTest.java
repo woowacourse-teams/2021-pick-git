@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -22,6 +23,7 @@ import com.woowacourse.pickgit.exception.user.SameSourceTargetUserException;
 import com.woowacourse.pickgit.post.domain.repository.PickGitStorage;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.FollowSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.UserSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
@@ -687,11 +689,6 @@ class UserServiceTest {
         verify(userRepository, times(1)).findByBasicProfile_Name(loginUser.getName());
     }
 
-    private AuthUserRequestDto createLoginAuthUserRequestDto(String username) {
-        AppUser appUser = new LoginUser(username, "Bearer testToken");
-        return AuthUserRequestDto.from(appUser);
-    }
-
     @DisplayName("비 로그인 - 저장된 유저중 유사한 이름을 가진 유저를 검색한다. (팔로잉 필드 null)")
     @Test
     void searchUser_GuestUser_Success() {
@@ -727,10 +724,6 @@ class UserServiceTest {
         verify(userRepository, times(1))
             .searchByUsernameLike(searchKeyword, PageRequest.of(page, limit));
         verify(userRepository, times(0)).findByBasicProfile_Name(anyString());
-    }
-
-    private AuthUserRequestDto createGuestAuthUserRequestDto() {
-        return AuthUserRequestDto.from(new GuestUser());
     }
 
     @DisplayName("calculateContributions 메소드는")
@@ -791,5 +784,163 @@ class UserServiceTest {
                     .findByBasicProfile_Name("testUser");
             }
         }
+    }
+
+    @DisplayName("searchFollowings 메서드는")
+    @Nested
+    class Describe_searchFollowings {
+
+        @DisplayName("게스트일 때")
+        @Nested
+        class Context_Guest {
+
+            @DisplayName("특정 유저가 팔로잉 중인 유저 목록을 조회할 수 있다. - 팔로우 여부 null")
+            @Test
+            void searchFollowings_Guest_FollowingNull() {
+                // given
+                AuthUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
+                FollowSearchRequestDto followSearchRequestDto =
+                    FollowSearchRequestDto.builder()
+                        .username("target")
+                        .page(0L)
+                        .limit(3L)
+                        .build();
+                User target = UserFactory.user(1L, "target");
+                List<User> followings = List.of(
+                    UserFactory.user(2L, "ala"),
+                    UserFactory.user(3L, "hello")
+                );
+
+                given(userRepository.findByBasicProfile_Name("target"))
+                    .willReturn(Optional.of(target));
+                given(userRepository.searchFollowingsOf(eq(target), eq(PageRequest.of(0, 3))))
+                    .willReturn(followings);
+
+                // when
+                List<UserSearchResponseDto> response =
+                    userService.searchFollowings(authUserRequestDto, followSearchRequestDto);
+
+                // then
+                assertThat(response)
+                    .extracting("username")
+                    .containsExactly("ala", "hello");
+
+                assertThat(response)
+                    .extracting("following")
+                    .containsOnlyNulls();
+
+                verify(userRepository, times(1)).findByBasicProfile_Name("target");
+                verify(userRepository, times(1))
+                    .searchFollowingsOf(eq(target), eq(PageRequest.of(0, 3)));
+            }
+
+            @DisplayName("존재하지 않는 유저의 팔로잉 목록을 조회할 수 없다.")
+            @Test
+            void searchFollowings_TargetNotExists_ExceptionThrown() {
+                // given
+                AuthUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
+                FollowSearchRequestDto followSearchRequestDto =
+                    FollowSearchRequestDto.builder()
+                        .username("target")
+                        .page(0L)
+                        .limit(3L)
+                        .build();
+
+                given(userRepository.findByBasicProfile_Name("target"))
+                    .willReturn(Optional.empty());
+
+                // when, then
+                assertThatCode(() ->
+                    userService.searchFollowings(authUserRequestDto, followSearchRequestDto)
+                ).isInstanceOf(InvalidUserException.class);
+
+                // then
+                verify(userRepository, times(1)).findByBasicProfile_Name("target");
+            }
+        }
+
+        @DisplayName("로그인 유저일 때")
+        @Nested
+        class Context_LoginUser {
+
+            @DisplayName("특정 유저가 팔로잉 중인 유저 목록을 조회할 수 있다. - 팔로우 여부 true/false, 본인은 null")
+            @Test
+            void searchFollowings_LoginUser_FollowingNull() {
+                // given
+                AuthUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("source");
+                FollowSearchRequestDto followSearchRequestDto =
+                    FollowSearchRequestDto.builder()
+                        .username("target")
+                        .page(0L)
+                        .limit(3L)
+                        .build();
+                User loginUser = UserFactory.user(4L, "source");
+                User target = UserFactory.user(1L, "target");
+                List<User> followings = List.of(
+                    UserFactory.user(2L, "ala"),
+                    UserFactory.user(3L, "hello"),
+                    loginUser
+                );
+                loginUser.follow(followings.get(0));
+
+                given(userRepository.findByBasicProfile_Name("target"))
+                    .willReturn(Optional.of(target));
+                given(userRepository.searchFollowingsOf(eq(target), eq(PageRequest.of(0, 3))))
+                    .willReturn(followings);
+                given(userRepository.findByBasicProfile_Name("source"))
+                    .willReturn(Optional.of(loginUser));
+
+                // when
+                List<UserSearchResponseDto> response =
+                    userService.searchFollowings(authUserRequestDto, followSearchRequestDto);
+
+                // then
+                assertThat(response)
+                    .extracting("username")
+                    .containsExactly("ala", "hello", "source");
+
+                assertThat(response)
+                    .extracting("following")
+                    .containsExactly(true, false, null);
+
+                verify(userRepository, times(1)).findByBasicProfile_Name("target");
+                verify(userRepository, times(1))
+                    .searchFollowingsOf(eq(target), eq(PageRequest.of(0, 3)));
+                verify(userRepository, times(1)).findByBasicProfile_Name("source");
+            }
+
+            @DisplayName("존재하지 않는 유저의 팔로잉 목록을 조회할 수 없다.")
+            @Test
+            void searchFollowings_TargetNotExists_ExceptionThrown() {
+                // given
+                AuthUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("source");
+                FollowSearchRequestDto followSearchRequestDto =
+                    FollowSearchRequestDto.builder()
+                        .username("target")
+                        .page(0L)
+                        .limit(3L)
+                        .build();
+
+                given(userRepository.findByBasicProfile_Name("target"))
+                    .willReturn(Optional.empty());
+
+                // when, then
+                assertThatCode(() ->
+                    userService.searchFollowings(authUserRequestDto, followSearchRequestDto)
+                ).isInstanceOf(InvalidUserException.class);
+
+                // then
+                verify(userRepository, times(1)).findByBasicProfile_Name("target");
+            }
+        }
+    }
+
+    private AuthUserRequestDto createLoginAuthUserRequestDto(String username) {
+        AppUser appUser = new LoginUser(username, "Bearer testToken");
+        return AuthUserRequestDto.from(appUser);
+    }
+
+    private AuthUserRequestDto createGuestAuthUserRequestDto() {
+        return AuthUserRequestDto.from(new GuestUser());
     }
 }

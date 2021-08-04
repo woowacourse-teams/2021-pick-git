@@ -18,6 +18,7 @@ import com.woowacourse.pickgit.exception.user.InvalidUserException;
 import com.woowacourse.pickgit.exception.user.SameSourceTargetUserException;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.FollowSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.UserSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
@@ -485,6 +486,81 @@ class UserServiceIntegrationTest {
                 tuple(userInDb.get(1).getName(), userInDb.get(1).getImage(), null),
                 tuple(userInDb.get(2).getName(), userInDb.get(2).getImage(), null)
             );
+    }
+
+    @DisplayName("로그인 - 특정 유저의 팔로잉 목록을 조회한다. (팔로잉 필드는 true/false, 본인은 null)")
+    @Test
+    void searchFollowings_LoginUser_Success() {
+        // given
+        AuthUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("bingbing");
+        FollowSearchRequestDto followSearchRequestDto =
+            FollowSearchRequestDto.builder()
+                .username("target")
+                .page(0L)
+                .limit(10L)
+                .build();
+        List<User> usersInDb = UserFactory.mockSearchUsers();
+        User targetUser = UserFactory.user("target");
+
+        userRepository.saveAll(usersInDb);
+        userRepository.save(targetUser);
+
+        usersInDb.forEach(mockUser -> {
+            AuthUserRequestDto targetAuthDto = createLoginAuthUserRequestDto("target");
+            userService.followUser(targetAuthDto, mockUser.getName());
+        });
+        for (int i = 0; i < 3; i++) {
+            userService.followUser(authUserRequestDto, usersInDb.get(i).getName());
+        }
+
+        // when
+        List<UserSearchResponseDto> response =
+            userService.searchFollowings(authUserRequestDto, followSearchRequestDto);
+
+        // then
+        assertThat(response)
+            .extracting("username")
+            .containsExactly(usersInDb.stream().map(User::getName).toArray());
+
+        assertThat(response)
+            .extracting("following")
+            .containsExactly(true, true, true, false, null);
+    }
+
+    @DisplayName("비로그인 - 특정 유저의 팔로잉 목록을 조회한다. (팔로잉 필드는 모두 null)")
+    @Test
+    void searchFollowings_GuestUser_Success() {
+        // given
+        AuthUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
+        FollowSearchRequestDto followSearchRequestDto =
+            FollowSearchRequestDto.builder()
+                .username("target")
+                .page(0L)
+                .limit(10L)
+                .build();
+        List<User> usersInDb = UserFactory.mockSearchUsers();
+        User targetUser = UserFactory.user("target");
+
+        userRepository.saveAll(usersInDb);
+        userRepository.save(targetUser);
+
+        usersInDb.forEach(mockUser -> {
+            AuthUserRequestDto targetAuthDto = createLoginAuthUserRequestDto("target");
+            userService.followUser(targetAuthDto, mockUser.getName());
+        });
+
+        // when
+        List<UserSearchResponseDto> response =
+            userService.searchFollowings(authUserRequestDto, followSearchRequestDto);
+
+        // then
+        assertThat(response)
+            .extracting("username")
+            .containsExactly(usersInDb.stream().map(User::getName).toArray());
+
+        assertThat(response)
+            .extracting("following")
+            .containsOnlyNulls();
     }
 
     private AuthUserRequestDto createLoginAuthUserRequestDto(String username) {

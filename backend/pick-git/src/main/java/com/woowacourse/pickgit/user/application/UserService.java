@@ -7,6 +7,7 @@ import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
 import com.woowacourse.pickgit.post.domain.repository.PickGitStorage;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.FollowSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.UserSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
@@ -26,6 +27,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -207,14 +209,51 @@ public class UserService {
         return convertToUserSearchResponseDtoWithFollowing(loginUser, users);
     }
 
+    @Transactional(readOnly = true)
+    public List<UserSearchResponseDto> searchFollowings(
+        AuthUserRequestDto authUserRequestDto,
+        FollowSearchRequestDto followSearchRequestDto
+    ) {
+        User target = findUserByName(followSearchRequestDto.getUsername());
+        Pageable pageable = PageRequest.of(
+            Math.toIntExact(followSearchRequestDto.getPage()),
+            Math.toIntExact(followSearchRequestDto.getLimit())
+        );
+        List<User> followings = userRepository.searchFollowingsOf(target, pageable);
+
+        if (authUserRequestDto.isGuest()) {
+            return convertToUserSearchResponseDtoWithoutFollowing(followings);
+        }
+
+        User loginUser = findUserByName(authUserRequestDto.getUsername());
+        return convertToUserSearchResponseDtoWithFollowingAndIncludingMe(loginUser, followings);
+    }
+
+    private List<UserSearchResponseDto> convertToUserSearchResponseDtoWithFollowingAndIncludingMe(
+        User loginUser,
+        List<User> followings
+    ) {
+        return followings.stream()
+            .map(followUser -> convert(loginUser, followUser))
+            .collect(Collectors.toList());
+    }
+
+    private UserSearchResponseDto convert(User loginUser, User followUser) {
+        if (loginUser.equals(followUser)) {
+            return new UserSearchResponseDto(loginUser.getImage(), loginUser.getName(), null);
+        }
+        return new UserSearchResponseDto(
+            followUser.getImage(),
+            followUser.getName(),
+            loginUser.isFollowing(followUser)
+        );
+    }
+
     private List<UserSearchResponseDto> convertToUserSearchResponseDtoWithoutFollowing(
         List<User> users
     ) {
         return users.stream()
-            .map(user -> new UserSearchResponseDto(
-                user.getImage(),
-                user.getName(),
-                null))
+            .map(user -> new UserSearchResponseDto(user.getImage(), user.getName(), null))
             .collect(toList());
     }
 
