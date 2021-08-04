@@ -114,7 +114,6 @@ const PostItem = ({
     <CommentWrapper key={comment.id}>
       <Comment
         content={comment.content}
-        liked={comment.liked}
         authorName={comment.authorName}
         link={currentUserName === comment.authorName ? PAGE_URL.MY_PROFILE : PAGE_URL.USER_PROFILE(comment.authorName)}
         onCommentLike={() => onCommentLike(comment.id)}

@@ -47,10 +47,10 @@ export const PostContentAuthorLink = styled(Link)`
   font-weight: bold;
 `;
 
-export const PostContent = styled.span`
+export const PostContent = styled.p`
   font-size: 0.625rem;
   line-height: 1.5rem;
-  padding: 0 1.375rem;
+  padding: 0 1.125rem;
 `;
 
 export const TagListWrapper = styled.div`
@@ -81,14 +81,8 @@ export const CommentList = styled.ul`
 export const CommentListItem = styled.li`
   padding: 0 1.125rem;
   display: flex;
-  justify-content: space-between;
   align-items: center;
   margin-bottom: 1.4375rem;
-`;
-
-export const CommentContent = styled.div`
-  display: flex;
-  align-items: center;
 `;
 
 export const CommentText = styled.span`

@@ -27,8 +27,7 @@ const Feed = ({ infinitePostsData, queryKey }: Props) => {
   const { pushSnackbarMessage } = useContext(SnackBarContext);
   const { addPostComment, addPostLike, deletePost, deletePostLike } = useFeedMutation(queryKey);
   const { setPostEditData } = usePostEdit();
-  const { modalMessage, isModalShown, isCancelButtonShown, showAlertModal, showConfirmModal, hideMessageModal } =
-    useMessageModal();
+  const { modalMessage, isModalShown, isCancelButtonShown, showConfirmModal, hideMessageModal } = useMessageModal();
   const { isBottomSliderShown, showBottomSlider, hideBottomSlider, removeSlideEventHandler, setSlideEventHandler } =
     useBottomSlider();
   const { isLoggedIn, currentUsername } = useContext(UserContext);
