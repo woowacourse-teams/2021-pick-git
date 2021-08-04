@@ -28,3 +28,13 @@ export const ContributionGraphWrapper = styled.div`
   width: 100%;
   overflow-x: auto;
 `;
+
+export const Empty = styled.div`
+  width: 100%;
+  height: 23.5625rem;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
