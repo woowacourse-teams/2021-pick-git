@@ -7,6 +7,8 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSenderOptions;
 import io.restassured.specification.RequestSpecification;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +41,12 @@ public abstract class Parameters {
     }
 
     protected void setBody(File data) {
-        spec.body(data);
+        try {
+            byte[] bytes = Files.readAllBytes(data.toPath());
+            spec.body(bytes);
+        } catch (IOException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     protected void setBody(String data) {
