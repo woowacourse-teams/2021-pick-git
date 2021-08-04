@@ -1,11 +1,10 @@
 package com.woowacourse.pickgit.post.domain.content;
 
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toUnmodifiableList;
 
 import com.woowacourse.pickgit.post.domain.Post;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.FetchType;
@@ -28,14 +27,20 @@ public class Images {
         this.images = images;
     }
 
+    public void belongTo(Post post) {
+        images.forEach(image -> image.belongTo(post));
+    }
+
     public List<String> getUrls() {
         return images.stream()
             .map(Image::getUrl)
-            .collect(toList());
+            .collect(toUnmodifiableList());
     }
 
-    public void setMapping(Post post) {
-        images.forEach(image -> image.toPost(post));
+    public List<String> getImageUrls() {
+        return images.stream()
+            .map(Image::getUrl)
+            .collect(toUnmodifiableList());
     }
 }
 

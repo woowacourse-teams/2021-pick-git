@@ -31,13 +31,12 @@ public class Image {
         this.url = url;
     }
 
-    public String getUrl() {
-        return url;
+    public void belongTo(Post post) {
+        this.post = post;
     }
 
-    public Image toPost(Post post) {
-        this.post = post;
-        return this;
+    public String getUrl() {
+        return url;
     }
 
     @Override
@@ -49,11 +48,11 @@ public class Image {
             return false;
         }
         Image image = (Image) o;
-        return Objects.equals(id, image.id);
+        return Objects.equals(url, image.getUrl());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(url);
     }
 }

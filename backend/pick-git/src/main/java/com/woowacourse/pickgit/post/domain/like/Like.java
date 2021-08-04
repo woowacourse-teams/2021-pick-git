@@ -40,8 +40,12 @@ public class Like {
         this.user = user;
     }
 
-    public boolean isOwnedBy(String userName) {
-        return user.getName().equals(userName);
+    private Post getPost() {
+        return post;
+    }
+
+    private User getUser() {
+        return user;
     }
 
     @Override
@@ -53,7 +57,8 @@ public class Like {
             return false;
         }
         Like like = (Like) o;
-        return Objects.equals(post, like.post) && Objects.equals(user, like.user);
+        return Objects.equals(post, like.getPost()) &&
+            Objects.equals(user, like.getUser());
     }
 
     @Override

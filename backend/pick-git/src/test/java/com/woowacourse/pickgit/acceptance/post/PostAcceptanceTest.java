@@ -13,9 +13,9 @@ import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
 import com.woowacourse.pickgit.exception.post.CannotUnlikeException;
 import com.woowacourse.pickgit.exception.post.DuplicatedLikeException;
-import com.woowacourse.pickgit.post.application.dto.CommentResponse;
+import com.woowacourse.pickgit.post.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
-import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.presentation.dto.request.ContentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
 import com.woowacourse.pickgit.post.presentation.dto.response.LikeResponse;
@@ -361,8 +361,8 @@ class PostAcceptanceTest {
         ContentRequest request = new ContentRequest("this is content");
 
         // when
-        CommentResponse response = requestAddComment(token, postId, request, HttpStatus.OK)
-            .as(CommentResponse.class);
+        CommentResponseDto response = requestAddComment(token, postId, request, HttpStatus.OK)
+            .as(CommentResponseDto.class);
 
         // then
         assertThat(response.getAuthorName()).isEqualTo(ANOTHER_USERNAME);
@@ -482,7 +482,7 @@ class PostAcceptanceTest {
         // when
         List<RepositoryResponseDto> response =
             request(token, USERNAME, HttpStatus.OK.value())
-                .as(new TypeRef<List<RepositoryResponseDto>>() {
+                .as(new TypeRef<>() {
                 });
 
         // then

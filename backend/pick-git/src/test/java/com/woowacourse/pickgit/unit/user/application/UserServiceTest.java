@@ -19,7 +19,7 @@ import com.woowacourse.pickgit.exception.user.DuplicateFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
 import com.woowacourse.pickgit.exception.user.SameSourceTargetUserException;
-import com.woowacourse.pickgit.post.domain.PickGitStorage;
+import com.woowacourse.pickgit.post.domain.repository.PickGitStorage;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;

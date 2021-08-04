@@ -6,9 +6,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woowacourse.pickgit.common.mockapi.MockRepositoryApiRequester;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
-import com.woowacourse.pickgit.post.domain.PlatformRepositoryExtractor;
-import com.woowacourse.pickgit.post.domain.dto.RepositoryResponseDto;
-import com.woowacourse.pickgit.post.infrastructure.GithubRepositoryExtractor;
+import com.woowacourse.pickgit.post.domain.util.PlatformRepositoryExtractor;
+import com.woowacourse.pickgit.post.domain.util.dto.RepositoryUrlAndName;
+import com.woowacourse.pickgit.post.infrastructure.extractor.GithubRepositoryExtractor;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,7 +32,7 @@ class GithubRepositoryExtractorTest {
     @DisplayName("깃허브 레포지토리를 요청하면, 레포지토리를 반환한다.")
     @Test
     void extract_requestGithubRepository_returnRepositories() {
-        List<RepositoryResponseDto> repositories = platformRepositoryExtractor
+        List<RepositoryUrlAndName> repositories = platformRepositoryExtractor
             .extract(ACCESS_TOKEN, "jipark3");
 
         assertThat(repositories)
@@ -65,7 +65,7 @@ class GithubRepositoryExtractorTest {
             .isEqualTo("V0001");
     }
 
-    private RepositoryResponseDto createRRepositoryResponseDto(String name, String url) {
-        return new RepositoryResponseDto(name, url);
+    private RepositoryUrlAndName createRRepositoryResponseDto(String name, String url) {
+        return new RepositoryUrlAndName(name, url);
     }
 }

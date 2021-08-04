@@ -5,12 +5,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
 import com.woowacourse.pickgit.post.domain.Post;
-import com.woowacourse.pickgit.post.domain.PostRepository;
-import com.woowacourse.pickgit.post.domain.content.Images;
-import com.woowacourse.pickgit.post.domain.content.PostContent;
+import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
-import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -290,12 +287,9 @@ class UserRepositoryTest {
                 // given
                 User user = userRepository.findByBasicProfile_Name("testUser")
                     .orElseThrow(IllegalArgumentException::new);
-                Post post =
-                    new Post(new Images(new ArrayList<>()), new PostContent("hi"), "url", user);
-                Post post1 =
-                    new Post(new Images(new ArrayList<>()), new PostContent("hi"), "url", user);
-                Post post2 =
-                    new Post(new Images(new ArrayList<>()), new PostContent("hi"), "url", user);
+                Post post = Post.builder().author(user).build();
+                Post post1 = Post.builder().author(user).build();
+                Post post2 = Post.builder().author(user).build();
                 postRepository.save(post);
                 postRepository.save(post1);
                 postRepository.save(post2);

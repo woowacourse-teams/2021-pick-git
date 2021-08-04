@@ -1,5 +1,7 @@
-package com.woowacourse.pickgit.post.infrastructure;
+package com.woowacourse.pickgit.post.infrastructure.requester;
 
+import com.woowacourse.pickgit.post.domain.util.PlatformRepositoryApiRequester;
+import com.woowacourse.pickgit.post.domain.util.RestClient;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.RequestEntity;

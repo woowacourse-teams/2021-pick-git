@@ -3,12 +3,11 @@ package com.woowacourse.pickgit.unit.post.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.woowacourse.pickgit.common.factory.PostBuilder;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.config.JpaTestConfiguration;
 import com.woowacourse.pickgit.post.domain.Post;
-import com.woowacourse.pickgit.post.domain.PostRepository;
 import com.woowacourse.pickgit.post.domain.comment.Comment;
+import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.tag.domain.Tag;
 import com.woowacourse.pickgit.tag.domain.TagRepository;
 import com.woowacourse.pickgit.user.domain.User;
@@ -27,7 +26,7 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 @Import(JpaTestConfiguration.class)
 @DataJpaTest
 class PostRepositoryTest {
-
+    
     @Autowired
     private UserRepository userRepository;
 
@@ -48,9 +47,9 @@ class PostRepositoryTest {
             UserFactory.user("testUser")
         );
 
-        Post post = new PostBuilder()
+        Post post = Post.builder()
             .content("test")
-            .user(savedTestUser)
+            .author(savedTestUser)
             .build();
 
         // when
@@ -72,9 +71,9 @@ class PostRepositoryTest {
             UserFactory.user("testUser")
         );
 
-        Post post = new PostBuilder()
+        Post post = Post.builder()
             .content("test")
-            .user(savedTestUser)
+            .author(savedTestUser)
             .build();
 
         // when
@@ -92,10 +91,10 @@ class PostRepositoryTest {
         User testUser = UserFactory.user("testUser");
         User savedTestUser = userRepository.save(testUser);
 
-        Post post = new PostBuilder()
+        Post post = Post.builder()
             .content("testContent")
             .githubRepoUrl("https://github.com/bperhaps")
-            .user(savedTestUser)
+            .author(savedTestUser)
             .build();
         Post savedPost = postRepository.save(post);
 
@@ -114,14 +113,14 @@ class PostRepositoryTest {
             .orElse(null);
 
         assertThat(findPost).isNotNull();
-        assertThat(findPost.getTags()).hasSize(2);
+        assertThat(findPost.getTagNames()).hasSize(2);
     }
 
     @DisplayName("Post를 저장할 때 Tag는 함께 영속화되지 않는다. (태그가 존재하지 않을 경우 예외가 발생한다)")
     @Test
     void save_WhenSavingPost_TagNotSavedTogether() {
         // given
-        Post post = new PostBuilder()
+        Post post = Post.builder()
             .content("abc")
             .build();
         List<Tag> tags = Arrays.asList(new Tag("tag1"), new Tag("tag2"));
@@ -139,14 +138,14 @@ class PostRepositoryTest {
         User testUser = UserFactory.user("testUser");
         User savedTestUser = userRepository.save(testUser);
 
-        Post post = new PostBuilder()
+        Post post = Post.builder()
             .content("testContent")
             .githubRepoUrl("https://github.com/bperhaps")
-            .user(savedTestUser)
+            .author(savedTestUser)
             .build();
 
         // when
-        Comment comment = new Comment("test comment");
+        Comment comment = new Comment("test comment", testUser);
         post.addComment(comment);
 
         postRepository.save(post);
