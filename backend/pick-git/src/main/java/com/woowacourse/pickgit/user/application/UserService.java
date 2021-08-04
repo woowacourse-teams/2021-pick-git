@@ -229,6 +229,26 @@ public class UserService {
         return convertToUserSearchResponseDtoWithFollowingAndIncludingMe(loginUser, followings);
     }
 
+    @Transactional(readOnly = true)
+    public List<UserSearchResponseDto> searchFollowers(
+        AuthUserRequestDto authUserRequestDto,
+        FollowSearchRequestDto followSearchRequestDto
+    ) {
+        User target = findUserByName(followSearchRequestDto.getUsername());
+        Pageable pageable = PageRequest.of(
+            Math.toIntExact(followSearchRequestDto.getPage()),
+            Math.toIntExact(followSearchRequestDto.getLimit())
+        );
+        List<User> followers = userRepository.searchFollowersOf(target, pageable);
+
+        if (authUserRequestDto.isGuest()) {
+            return convertToUserSearchResponseDtoWithoutFollowing(followers);
+        }
+
+        User loginUser = findUserByName(authUserRequestDto.getUsername());
+        return convertToUserSearchResponseDtoWithFollowingAndIncludingMe(loginUser, followers);
+    }
+
     private List<UserSearchResponseDto> convertToUserSearchResponseDtoWithFollowingAndIncludingMe(
         User loginUser,
         List<User> followings
