@@ -1,7 +1,8 @@
+import { PAGE_URL } from "../../constants/urls";
 import useGithubStatistics from "../../services/hooks/useGithubStatistics";
 import useUserFeed from "../../services/hooks/useUserFeed";
 import GithubStatistics from "../GithubStatistics/GithubStatistics";
-import ProfileFeed from "../ProfileFeed/ProfileFeed";
+import GridFeed from "../@shared/GridFeed/GridFeed";
 
 export interface Props {
   isMyProfile: boolean;
@@ -14,7 +15,7 @@ const ProfileTabContents = ({ isMyProfile, username, tabIndex }: Props) => {
   const githubStatisticQueryResult = useGithubStatistics(username);
 
   const tabContents = [
-    <ProfileFeed key="profile-feed" username={username} {...userFeedProps} />,
+    <GridFeed key="profile-feed" feedPagePath={PAGE_URL.USER_FEED(username)} {...userFeedProps} />,
     <GithubStatistics key="github-stats" username={username} githubStatisticQueryResult={githubStatisticQueryResult} />,
   ];
 
