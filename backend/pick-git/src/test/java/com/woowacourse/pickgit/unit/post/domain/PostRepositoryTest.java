@@ -3,6 +3,7 @@ package com.woowacourse.pickgit.unit.post.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.woowacourse.pickgit.common.factory.PostFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.config.JpaTestConfiguration;
 import com.woowacourse.pickgit.post.domain.Post;
@@ -21,6 +22,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.data.domain.PageRequest;
 
 @Import(JpaTestConfiguration.class)
 @DataJpaTest
@@ -128,6 +130,78 @@ class PostRepositoryTest {
         post.addTags(tags);
         assertThatThrownBy(() -> postRepository.save(post))
             .isInstanceOf(InvalidDataAccessApiUsageException.class);
+    }
+
+    @DisplayName("Post에 Comment를 추가하면 Comment가 자동 영속화된다.")
+    @Test
+    void addComment_WhenSavingPost_CommentSavedTogether() {
+        // given
+        User testUser = UserFactory.user("testUser");
+        User savedTestUser = userRepository.save(testUser);
+
+        Post post = Post.builder()
+            .content("testContent")
+            .githubRepoUrl("https://github.com/bperhaps")
+            .author(savedTestUser)
+            .build();
+
+        // when
+        Comment comment = new Comment("test comment", testUser);
+        post.addComment(comment);
+
+        postRepository.save(post);
+        flushAndClear();
+
+        // then
+        Post findPost = postRepository.findById(post.getId())
+            .orElseThrow(IllegalArgumentException::new);
+
+        List<Comment> comments = findPost.getComments();
+        assertThat(comments).hasSize(1);
+    }
+
+    @DisplayName("나를 포함하여 내가 팔로잉하는 유저들의 게시글을 최신순으로 가져온다.")
+    @Test
+    void findAllAssociatedPostsByUser_FollowingsLatestIncludingMe_Success() {
+        // given - mockUsers
+        User tester = UserFactory.user("tester");
+        List<User> mockUsers = List.of(
+            UserFactory.user("a1"),
+            UserFactory.user("a2"),
+            UserFactory.user("a3"),
+            UserFactory.user("a4"),
+            UserFactory.user("a5"),
+            UserFactory.user("a6"),
+            UserFactory.user("a7"),
+            UserFactory.user("a8")
+        );
+        userRepository.save(tester);
+        userRepository.saveAll(mockUsers);
+
+        // given - follow
+        int mockUserCounts = mockUsers.size();
+        for (int i = 0; i < mockUserCounts; i += 2) {
+            tester.follow(mockUsers.get(i));
+        }
+
+        // given - mockPosts
+        List<Post> mockPosts = PostFactory.mockPostsBy(mockUsers);
+        Post testerPost = PostFactory.mockPostBy(tester);
+        postRepository.saveAll(mockPosts);
+        postRepository.save(testerPost);
+
+        flushAndClear();
+
+        // when
+        List<Post> feeds =
+            postRepository.findAllAssociatedPostsByUser(tester, PageRequest.of(0, 10));
+
+        // then
+        assertThat(feeds)
+            .extracting("user")
+            .extracting("basicProfile")
+            .extracting("name")
+            .containsExactly("tester", "a7", "a5", "a3", "a1");
     }
 
     private void flushAndClear() {

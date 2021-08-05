@@ -7,6 +7,7 @@ import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.like.Likes;
 import com.woowacourse.pickgit.user.domain.User;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import org.mockito.Mock;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,6 +19,33 @@ public class PostFactory {
 
     public static class Builder {
 
+    }
+
+    public static Post mockPostBy(User user) {
+        return Post.builder()
+            .content("mock post content")
+            .author(user)
+            .githubRepoUrl("mock-url")
+            .images(new ArrayList<>())
+            .tags(new ArrayList<>())
+            .build();
+    }
+
+    public static List<Post> mockPostsBy(List<User> users) {
+        List<Post> posts = new ArrayList<>();
+        int userCounts = users.size();
+        for (int i = 0; i < userCounts; i++) {
+            posts.add(
+                Post.builder()
+                    .content("abc" + i)
+                    .author(users.get(i))
+                    .githubRepoUrl("url" + i)
+                    .images(new ArrayList<>())
+                    .tags(new ArrayList<>())
+                    .build()
+            );
+        }
+        return posts;
     }
 
     public static List<PostRequestDto> mockPostRequestDtos() {
