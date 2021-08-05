@@ -173,7 +173,8 @@ public class UserService {
             .orElseThrow(InvalidTokenException::new);
         User user = findUserByName(requestDto.getUsername());
 
-        Contribution contribution = platformContributionCalculator.calculate(accessToken, user.getName());
+        Contribution contribution = platformContributionCalculator
+            .calculate(accessToken, user.getName());
 
         return ContributionResponseDto.builder()
             .starsCount(contribution.getStarsCount())
