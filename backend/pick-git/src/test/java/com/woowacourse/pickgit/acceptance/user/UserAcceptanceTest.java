@@ -3,7 +3,7 @@ package com.woowacourse.pickgit.acceptance.user;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.given;
 
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
@@ -482,8 +482,8 @@ class UserAcceptanceTest {
                 url,
                 Method.GET,
                 HttpStatus.OK
-            ).as(new TypeRef<List<UserSearchResponseDto>>() {
-                });
+            ).as(new TypeRef<>() {
+            });
 
         // then
         assertThat(response)
@@ -505,8 +505,8 @@ class UserAcceptanceTest {
                 url,
                 Method.GET,
                 HttpStatus.OK
-            ).as(new TypeRef<List<UserSearchResponseDto>>() {
-                });
+            ).as(new TypeRef<>() {
+            });
 
         // then
         assertThat(response)
@@ -538,7 +538,7 @@ class UserAcceptanceTest {
             .isEqualTo(contributions);
     }
 
-    @DisplayName("게스트는 활동 통계를 조회할 수 없다. - 401 예외")
+    @DisplayName("유효하지 않은 토큰으로 활동 통계를 조회할 수 없다. - 401 예외")
     @Test
     void getContributions_invalidToken_401Exception() {
         // when
@@ -595,8 +595,12 @@ class UserAcceptanceTest {
     }
 
     private OAuthTokenResponse 로그인_되어있음(User user) {
+        // when
         OAuthTokenResponse response = 로그인_요청(user).as(OAuthTokenResponse.class);
+
+        // then
         assertThat(response.getToken()).isNotBlank();
+
         return response;
     }
 
@@ -610,11 +614,12 @@ class UserAcceptanceTest {
             user.getCompany(), user.getLocation(), user.getWebsite(), user.getTwitter()
         );
 
-        // mock
-        when(oAuthClient.getAccessToken(oauthCode)).thenReturn(accessToken);
-        when(oAuthClient.getGithubProfile(accessToken)).thenReturn(oAuthProfileResponse);
+        given(oAuthClient.getAccessToken(oauthCode))
+            .willReturn(accessToken);
+        given(oAuthClient.getGithubProfile(accessToken))
+            .willReturn(oAuthProfileResponse);
 
-        // when
+        // then
         return RestAssured
             .given().log().all()
             .accept(MediaType.APPLICATION_JSON_VALUE)

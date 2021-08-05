@@ -46,9 +46,11 @@ public class OAuthService {
 
         updateUserOrCreateUser(githubProfileResponse);
 
-        return new TokenDto(createTokenAndSave(
-            githubAccessToken,
-            githubProfileResponse.getName()),
+        return new TokenDto(
+            createTokenAndSave(
+                githubAccessToken,
+                githubProfileResponse.getName()
+            ),
             githubProfileResponse.getName()
         );
     }
