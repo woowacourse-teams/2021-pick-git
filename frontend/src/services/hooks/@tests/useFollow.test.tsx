@@ -93,7 +93,7 @@ beforeAll(() => {
 test("should add Follow", async () => {
   const { result, waitFor } = renderHook(() => useFollow(), { wrapper });
 
-  await act(() => result.current.toggleFollow(username, false));
+  await act(() => result.current.toggleFollow(username, false, false));
   await waitFor(() => !result.current.isFollowLoading);
 
   const currentQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
@@ -105,7 +105,7 @@ test("should add Follow", async () => {
 test("should add Unfollow", async () => {
   const { result, waitFor } = renderHook(() => useFollow(), { wrapper });
 
-  await act(() => result.current.toggleFollow(username, true));
+  await act(() => result.current.toggleFollow(username, true, false));
   await waitFor(() => !result.current.isFollowLoading);
 
   const currentQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
@@ -119,7 +119,7 @@ test("should handle empty accessToken error", async () => {
 
   const { result, waitFor } = renderHook(() => useFollow(), { wrapper });
 
-  await act(() => result.current.toggleFollow(username, false));
+  await act(() => result.current.toggleFollow(username, false, false));
   await waitFor(() => !result.current.isFollowLoading);
 
   const currentQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
