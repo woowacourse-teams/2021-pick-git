@@ -3,6 +3,7 @@ package com.woowacourse.pickgit.unit.user.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -822,12 +823,11 @@ class UserServiceTest {
 
                 // then
                 assertThat(response)
-                    .extracting("username")
-                    .containsExactly("ala", "hello");
-
-                assertThat(response)
-                    .extracting("following")
-                    .containsOnlyNulls();
+                    .extracting("username", "following")
+                    .containsExactly(
+                        tuple("ala", null),
+                        tuple("hello", null)
+                    );
 
                 verify(userRepository, times(1)).findByBasicProfile_Name("target");
                 verify(userRepository, times(1))
@@ -896,12 +896,12 @@ class UserServiceTest {
 
                 // then
                 assertThat(response)
-                    .extracting("username")
-                    .containsExactly("ala", "hello", "source");
-
-                assertThat(response)
-                    .extracting("following")
-                    .containsExactly(true, false, null);
+                    .extracting("username", "following")
+                    .containsExactly(
+                        tuple("ala", true),
+                        tuple("hello", false),
+                        tuple("source", null)
+                    );
 
                 verify(userRepository, times(1)).findByBasicProfile_Name("target");
                 verify(userRepository, times(1))
@@ -971,12 +971,11 @@ class UserServiceTest {
 
                 // then
                 assertThat(response)
-                    .extracting("username")
-                    .containsExactly("ala", "hello");
-
-                assertThat(response)
-                    .extracting("following")
-                    .containsOnlyNulls();
+                    .extracting("username", "following")
+                    .containsExactly(
+                        tuple("ala", null),
+                        tuple("hello", null)
+                    );
 
                 verify(userRepository, times(1)).findByBasicProfile_Name("target");
                 verify(userRepository, times(1))
@@ -1045,12 +1044,12 @@ class UserServiceTest {
 
                 // then
                 assertThat(response)
-                    .extracting("username")
-                    .containsExactly("ala", "hello", "source");
-
-                assertThat(response)
-                    .extracting("following")
-                    .containsExactly(true, false, null);
+                    .extracting("username", "following")
+                    .containsExactly(
+                        tuple("ala", true),
+                        tuple("hello", false),
+                        tuple("source", null)
+                    );
 
                 verify(userRepository, times(1)).findByBasicProfile_Name("target");
                 verify(userRepository, times(1))

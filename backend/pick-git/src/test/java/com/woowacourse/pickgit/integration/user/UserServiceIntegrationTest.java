@@ -519,12 +519,14 @@ class UserServiceIntegrationTest {
 
         // then
         assertThat(response)
-            .extracting("username")
-            .containsExactly(usersInDb.stream().map(User::getName).toArray());
-
-        assertThat(response)
-            .extracting("following")
-            .containsExactly(true, true, true, false, null);
+            .extracting("username", "following")
+            .containsExactly(
+                tuple(usersInDb.get(0).getName(), true),
+                tuple(usersInDb.get(1).getName(), true),
+                tuple(usersInDb.get(2).getName(), true),
+                tuple(usersInDb.get(3).getName(), false),
+                tuple(usersInDb.get(4).getName(), null)
+            );
     }
 
     @DisplayName("비로그인 - 특정 유저의 팔로잉 목록을 조회한다. (팔로잉 필드는 모두 null)")
@@ -555,12 +557,14 @@ class UserServiceIntegrationTest {
 
         // then
         assertThat(response)
-            .extracting("username")
-            .containsExactly(usersInDb.stream().map(User::getName).toArray());
-
-        assertThat(response)
-            .extracting("following")
-            .containsOnlyNulls();
+            .extracting("username", "following")
+            .containsExactly(
+                tuple(usersInDb.get(0).getName(), null),
+                tuple(usersInDb.get(1).getName(), null),
+                tuple(usersInDb.get(2).getName(), null),
+                tuple(usersInDb.get(3).getName(), null),
+                tuple(usersInDb.get(4).getName(), null)
+            );
     }
 
     @DisplayName("로그인 - 특정 유저의 팔로워 목록을 조회한다. (팔로잉 필드는 true/false, 본인은 null)")
@@ -594,12 +598,14 @@ class UserServiceIntegrationTest {
 
         // then
         assertThat(response)
-            .extracting("username")
-            .containsExactly(usersInDb.stream().map(User::getName).toArray());
-
-        assertThat(response)
-            .extracting("following")
-            .containsExactly(true, true, true, false, null);
+            .extracting("username", "following")
+            .containsExactly(
+                tuple(usersInDb.get(0).getName(), true),
+                tuple(usersInDb.get(1).getName(), true),
+                tuple(usersInDb.get(2).getName(), true),
+                tuple(usersInDb.get(3).getName(), false),
+                tuple(usersInDb.get(4).getName(), null)
+            );
     }
 
     @DisplayName("비로그인 - 특정 유저의 팔로워 목록을 조회한다. (팔로잉 필드는 모두 null)")
@@ -630,12 +636,14 @@ class UserServiceIntegrationTest {
 
         // then
         assertThat(response)
-            .extracting("username")
-            .containsExactly(usersInDb.stream().map(User::getName).toArray());
-
-        assertThat(response)
-            .extracting("following")
-            .containsOnlyNulls();
+            .extracting("username", "following")
+            .containsExactly(
+                tuple(usersInDb.get(0).getName(), null),
+                tuple(usersInDb.get(1).getName(), null),
+                tuple(usersInDb.get(2).getName(), null),
+                tuple(usersInDb.get(3).getName(), null),
+                tuple(usersInDb.get(4).getName(), null)
+            );
     }
 
     private AuthUserRequestDto createLoginAuthUserRequestDto(String username) {
