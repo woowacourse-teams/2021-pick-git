@@ -1,29 +1,27 @@
 package com.woowacourse.pickgit.post.application.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 
 @Builder
 public class RepositoryResponseDto {
 
-    @JsonProperty("html_url")
-    private String url;
-
     private String name;
+
+    private String url;
 
     private RepositoryResponseDto() {
     }
 
-    public RepositoryResponseDto(String url, String name) {
-        this.url = url;
+    public RepositoryResponseDto(String name, String url) {
         this.name = name;
-    }
-
-    public String getUrl() {
-        return url;
+        this.url = url;
     }
 
     public String getName() {
         return name;
+    }
+
+    public String getUrl() {
+        return url;
     }
 }

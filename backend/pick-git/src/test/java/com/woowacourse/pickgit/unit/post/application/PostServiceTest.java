@@ -53,6 +53,7 @@ import com.woowacourse.pickgit.tag.application.TagsDto;
 import com.woowacourse.pickgit.tag.domain.Tag;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -276,14 +277,14 @@ class PostServiceTest {
         verify(postRepository, times(1)).findById(anyLong());
     }
 
-    @DisplayName("사용자는 Repository 목록을 가져올 수 있다.")
+    @DisplayName("사용자는 해당하는 페이지에 퍼블릭 레포지토리가 있는 경우 퍼블릭 레포지토리 목록을 가져온다.")
     @Test
-    void showRepositories_LoginUser_Success() {
+    void userRepositories_ValidRepositoriesInCaseOfLoginUser_Success() {
         // given
         String token = "Bearer testToken";
         String username = "testUser";
 
-        RepositoryRequestDto requestDto = createRepositoryRequestDto(token, username);
+        RepositoryRequestDto requestDto = createRepositoryRequestDto(token, username, 0L, 50L);
 
         List<RepositoryNameAndUrl> repositories = List.of(
             new RepositoryNameAndUrl("pick", "https://github.com/jipark3/pick"),
@@ -306,6 +307,7 @@ class PostServiceTest {
             repositoryResponsesDto.getRepositoryResponsesDto();
 
         // then
+        assertThat(responsesDto).hasSize(2);
         assertThat(responsesDto)
             .usingRecursiveComparison()
             .isEqualTo(repositories);
@@ -319,14 +321,55 @@ class PostServiceTest {
             );
     }
 
-    @DisplayName("유효하지 않은 토큰인 경우 Repository 목록을 가져올 수 없다.")
+    @DisplayName("사용자는 해당하는 페이지에 퍼블릭 레포지토리가 없는 경우 빈 배열을 가져온다.")
     @Test
-    void showRepositories_InvalidAccessToken_Fail() {
+    void userRepositories_EmptyRepositoriesInCaseOfLoginUser_Success() {
+        // given
+        String token = "Bearer testToken";
+        String username = "testUser";
+
+        RepositoryRequestDto requestDto = createRepositoryRequestDto(token, username, 59L, 50L);
+
+        List<RepositoryNameAndUrl> repositories = new ArrayList<>();
+
+        given(platformRepositoryExtractor
+            .extract(
+                requestDto.getToken(),
+                requestDto.getUsername(),
+                requestDto.getPage(),
+                requestDto.getLimit()
+            ))
+            .willReturn(repositories);
+
+        // when
+        RepositoryResponsesDto repositoryResponsesDto = postService.userRepositories(requestDto);
+
+        List<RepositoryResponseDto> responsesDto = repositoryResponsesDto
+            .getRepositoryResponsesDto();
+
+        // then
+        assertThat(responsesDto).hasSize(0);
+        assertThat(responsesDto)
+            .usingRecursiveComparison()
+            .isEqualTo(repositories);
+
+        verify(platformRepositoryExtractor, times(1))
+            .extract(
+                requestDto.getToken(),
+                requestDto.getUsername(),
+                requestDto.getPage(),
+                requestDto.getLimit()
+            );
+    }
+
+    @DisplayName("유효하지 않은 토큰인 경우 퍼블릭 레포지토리 목록을 가져올 수 없다. - 500 예외")
+    @Test
+    void userRepositories_InvalidToken_500Exception() {
         // given
         String token = "Bearer invalidToken";
         String username = "testUser";
 
-        RepositoryRequestDto requestDto = createRepositoryRequestDto(token, username);
+        RepositoryRequestDto requestDto = createRepositoryRequestDto(token, username, 0L, 50L);
 
         given(platformRepositoryExtractor
             .extract(
@@ -354,14 +397,14 @@ class PostServiceTest {
             );
     }
 
-    @DisplayName("유효하지 않은 유저 이름인 경우 Repository 목록을 가져올 수 없다.")
+    @DisplayName("유효하지 않은 유저 이름인 경우 퍼블릭 레포지토리 목록을 가져올 수 없다 - 500 예외")
     @Test
-    void showRepositories_InvalidUsername_Fail() {
+    void userRepositories_InvalidUsername_500Exception() {
         // given
         String token = "Bearer testToken";
         String username = "invalidUser";
 
-        RepositoryRequestDto requestDto = createRepositoryRequestDto(token, username);
+        RepositoryRequestDto requestDto = createRepositoryRequestDto(token, username, 0L, 50L);
 
         given(platformRepositoryExtractor
             .extract(
@@ -389,12 +432,17 @@ class PostServiceTest {
             );
     }
 
-    private RepositoryRequestDto createRepositoryRequestDto(String token, String username) {
+    private RepositoryRequestDto createRepositoryRequestDto(
+        String token,
+        String username,
+        Long page,
+        Long limit
+    ) {
         return RepositoryRequestDto.builder()
             .token(token)
             .username(username)
-            .page(0L)
-            .limit(50L)
+            .page(page)
+            .limit(limit)
             .build();
     }
 

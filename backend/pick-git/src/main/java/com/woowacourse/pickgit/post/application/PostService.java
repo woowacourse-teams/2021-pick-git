@@ -128,12 +128,12 @@ public class PostService {
                 repositoryRequestDto.getLimit()
             );
         List<RepositoryResponseDto> repositoryResponsesDto =
-            createRepositoryResponseDtos(repositoryNameAndUrls);
+            createRepositoryResponsesDto(repositoryNameAndUrls);
 
         return new RepositoryResponsesDto(repositoryResponsesDto);
     }
 
-    private List<RepositoryResponseDto> createRepositoryResponseDtos(
+    private List<RepositoryResponseDto> createRepositoryResponsesDto(
         List<RepositoryNameAndUrl> repositoryNameAndUrls
     ) {
         return repositoryNameAndUrls.stream()
@@ -142,9 +142,9 @@ public class PostService {
     }
 
     private Function<RepositoryNameAndUrl, RepositoryResponseDto> toRepositoryResponseDto() {
-        return repositoryUrlAndName -> RepositoryResponseDto.builder()
-            .name(repositoryUrlAndName.getName())
-            .url(repositoryUrlAndName.getUrl())
+        return repositoryNameAndUrl -> RepositoryResponseDto.builder()
+            .name(repositoryNameAndUrl.getName())
+            .url(repositoryNameAndUrl.getUrl())
             .build();
     }
 
