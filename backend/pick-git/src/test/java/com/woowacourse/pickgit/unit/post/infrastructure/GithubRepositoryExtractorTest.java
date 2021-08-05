@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woowacourse.pickgit.common.mockapi.MockRepositoryApiRequester;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
+import com.woowacourse.pickgit.post.domain.util.PlatformRepositoryApiRequester;
 import com.woowacourse.pickgit.post.domain.util.PlatformRepositoryExtractor;
 import com.woowacourse.pickgit.post.domain.util.dto.RepositoryNameAndUrl;
 import com.woowacourse.pickgit.post.infrastructure.extractor.GithubRepositoryExtractor;
@@ -13,6 +14,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 
 class GithubRepositoryExtractorTest {
 
@@ -29,11 +31,11 @@ class GithubRepositoryExtractorTest {
             new GithubRepositoryExtractor(objectMapper, new MockRepositoryApiRequester());
     }
 
-    @DisplayName("깃허브 레포지토리를 요청하면, 레포지토리를 반환한다.")
+    @DisplayName("요청 페이지에 퍼블릭 레포지토리가 있는 경우 퍼블릭 레포지토리 목록을 반환한다.")
     @Test
     void extract_requestGithubRepository_returnRepositories() {
         List<RepositoryNameAndUrl> repositories = platformRepositoryExtractor
-            .extract(ACCESS_TOKEN, "jipark3", 0L, 50L);
+            .extract(ACCESS_TOKEN, USERNAME, 0L, 50L);
 
         assertThat(repositories)
             .usingRecursiveComparison()
@@ -43,29 +45,75 @@ class GithubRepositoryExtractorTest {
             ));
     }
 
+    @DisplayName("요청 페이지에 퍼블릭 레포지토리가 없는 경우 빈 배열을 반환한다.")
+    @Test
+    void extract_requestGithubRepository_returnEmptyRepositories() {
+        // given
+        platformRepositoryExtractor =
+            new GithubRepositoryExtractor(objectMapper, new MockEmptyRepositoryApiRequester());
+
+        // when
+        List<RepositoryNameAndUrl> repositories = platformRepositoryExtractor
+            .extract(ACCESS_TOKEN, USERNAME, 59L, 50L);
+
+        // then
+        assertThat(repositories).isEqualTo(List.of());
+    }
+
     @DisplayName("토큰이 유효하지 않은 경우 예외가 발생한다. - 500 예외")
     @Test
-    void extract_InvalidAccessToken_401Exception() {
+    void extract_InvalidToken_500Exception() {
         // then
         assertThatThrownBy(() -> {
             platformRepositoryExtractor.extract(ACCESS_TOKEN + "hi", USERNAME, 0L, 50L);
         }).isInstanceOf(PlatformHttpErrorException.class)
-            .extracting("errorCode")
-            .isEqualTo("V0001");
+            .hasFieldOrPropertyWithValue("errorCode", "V0001")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
+            .hasMessage("외부 플랫폼 연동에 실패");
     }
 
     @DisplayName("사용자가 유효하지 않은 경우 예외가 발생한다. - 500 예외")
     @Test
-    void extract_InvalidUserName_404Exception() {
+    void extract_InvalidUsername_500Exception() {
         // then
         assertThatThrownBy(() -> {
             platformRepositoryExtractor.extract(ACCESS_TOKEN, USERNAME + "hi", 0L, 50L);
         }).isInstanceOf(PlatformHttpErrorException.class)
-            .extracting("errorCode")
-            .isEqualTo("V0001");
+            .hasFieldOrPropertyWithValue("errorCode", "V0001")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
+            .hasMessage("외부 플랫폼 연동에 실패");
     }
 
     private RepositoryNameAndUrl createRepositoryResponseDto(String name, String url) {
         return new RepositoryNameAndUrl(name, url);
+    }
+
+    private static class MockEmptyRepositoryApiRequester implements PlatformRepositoryApiRequester {
+
+        private static final String API_URL_FORMAT = "https://api.github.com/users/%s/repos?page=60&per_page=50";
+        private static final String USERNAME = "jipark3";
+        private static final String ACCESS_TOKEN = "oauth.access.token";
+
+        @Override
+        public String request(String token, String url) {
+            String apiUrl = String.format(API_URL_FORMAT, USERNAME);
+
+            if (isNotValidToken(token)) {
+                throw new PlatformHttpErrorException("외부 플랫폼 토큰 인증 실패");
+            }
+            if (isNotValidUrl(url, apiUrl)) {
+                throw new PlatformHttpErrorException("외부 플랫폼 URL 찾기 실패");
+            }
+
+            return "[]";
+        }
+
+        private boolean isNotValidToken(String token) {
+            return !ACCESS_TOKEN.equals(token);
+        }
+
+        private boolean isNotValidUrl(String url, String apiUrl) {
+            return !url.equals(apiUrl);
+        }
     }
 }
