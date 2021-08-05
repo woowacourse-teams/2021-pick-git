@@ -9,13 +9,11 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.woowacourse.pickgit.authentication.domain.OAuthAccessTokenDao;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
-import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.user.DuplicateFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidFollowException;
@@ -61,9 +59,6 @@ class UserServiceTest {
 
     @Mock
     private PickGitStorage pickGitStorage;
-
-    @Mock
-    private OAuthAccessTokenDao oAuthAccessTokenDao;
 
     @Mock
     private PlatformContributionCalculator platformContributionCalculator;
@@ -757,8 +752,6 @@ class UserServiceTest {
 
                 given(userRepository.findByBasicProfile_Name("testUser"))
                     .willReturn(Optional.of(user));
-                given(oAuthAccessTokenDao.findByKeyToken("testAccessToken"))
-                    .willReturn(Optional.of("oauth.access.token"));
                 given(platformContributionCalculator.calculate("oauth.access.token", "testUser"))
                     .willReturn(contribution);
 
@@ -775,8 +768,6 @@ class UserServiceTest {
 
                 verify(userRepository, times(1))
                     .findByBasicProfile_Name("testUser");
-                verify(oAuthAccessTokenDao, times(1))
-                    .findByKeyToken("testAccessToken");
                 verify(platformContributionCalculator, times(1))
                     .calculate("oauth.access.token", "testUser");
             }
@@ -787,9 +778,6 @@ class UserServiceTest {
                 // given
                 ContributionRequestDto requestDto = UserFactory.mockContributionRequestDto();
 
-                given(oAuthAccessTokenDao.findByKeyToken("testAccessToken"))
-                    .willReturn(Optional.of("oauth.access.token"));
-
                 // when
                 assertThatThrownBy(() -> {
                     userService.calculateContributions(requestDto);
@@ -799,37 +787,8 @@ class UserServiceTest {
                     .hasMessage("유효하지 않은 유저입니다.");
 
                 // then
-                verify(oAuthAccessTokenDao, times(1))
-                    .findByKeyToken("testAccessToken");
                 verify(userRepository, times(1))
                     .findByBasicProfile_Name("testUser");
-            }
-        }
-
-        @DisplayName("비로그인 되어 있으면")
-        @Nested
-        class Context_Guest {
-
-            @DisplayName("게스트는 활동 통계를 조회할 수 없다. - 401 예외")
-            @Test
-            void calculateContributions_InvalidToken_401Exception() {
-                // given
-                ContributionRequestDto requestDto = UserFactory.mockContributionRequestDto();
-
-                given(oAuthAccessTokenDao.findByKeyToken(any()))
-                    .willThrow(new InvalidTokenException());
-
-                // when
-                assertThatThrownBy(() -> {
-                    userService.calculateContributions(requestDto);
-                }).isInstanceOf(InvalidTokenException.class)
-                    .hasFieldOrPropertyWithValue("errorCode", "A0001")
-                    .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)
-                    .hasMessage("토큰 인증 에러");
-
-                // then
-                verify(oAuthAccessTokenDao, times(1))
-                    .findByKeyToken(any());
             }
         }
     }

@@ -100,7 +100,7 @@ public class UserFactory {
 
     public static ContributionRequestDto mockContributionRequestDto() {
         return ContributionRequestDto.builder()
-            .accessToken("testAccessToken")
+            .accessToken("oauth.access.token")
             .username("testUser")
             .build();
     }
