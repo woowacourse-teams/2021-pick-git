@@ -29,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
+import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
@@ -361,13 +362,13 @@ class UserControllerTest {
         @Test
         void getContributions_LoginUser_Success() throws Exception {
             // given
-            LoginUser loginUser = new LoginUser("testUser", "testAccessToken");
+            LoginUser loginUser = new LoginUser("testUser", "oauth.access.token");
 
             ContributionResponseDto responseDto = UserFactory.mockContributionResponseDto();
 
-            given(oAuthService.validateToken("testAccessToken"))
+            given(oAuthService.validateToken("test.access.token"))
                 .willReturn(true);
-            given(oAuthService.findRequestUserByToken("testAccessToken"))
+            given(oAuthService.findRequestUserByToken("test.access.token"))
                 .willReturn(loginUser);
             given(userService.calculateContributions(any(ContributionRequestDto.class)))
                 .willReturn(responseDto);
@@ -375,7 +376,7 @@ class UserControllerTest {
             // when
             ResultActions perform = mockMvc
                 .perform(get("/api/profiles/{username}/contributions", "testUser")
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer testAccessToken")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer test.access.token")
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .accept(MediaType.ALL));
 
@@ -389,9 +390,9 @@ class UserControllerTest {
             assertThat(body).isEqualTo(objectMapper.writeValueAsString(responseDto));
 
             verify(oAuthService, times(1))
-                .validateToken("testAccessToken");
+                .validateToken("test.access.token");
             verify(oAuthService, times(1))
-                .findRequestUserByToken("testAccessToken");
+                .findRequestUserByToken("test.access.token");
             verify(userService, times(1))
                 .calculateContributions(any(ContributionRequestDto.class));
 
@@ -399,7 +400,7 @@ class UserControllerTest {
                 getDocumentRequest(),
                 getDocumentResponse(),
                 requestHeaders(
-                    headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer testAccessToken")
+                    headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer accessToken")
                 ),
                 pathParameters(
                     parameterWithName("username").description("사용자 이름")
@@ -600,8 +601,12 @@ class UserControllerTest {
         @Test
         void getContributions_GuestUser_401Exception() throws Exception {
             // given
-            given(oAuthService.validateToken(any()))
-                .willReturn(false);
+            GuestUser guestUser = new GuestUser();
+
+            given(oAuthService.validateToken(null))
+                .willReturn(true);
+            given(oAuthService.findRequestUserByToken(null))
+                .willReturn(guestUser);
 
             // when
             ResultActions perform = mockMvc
@@ -613,10 +618,12 @@ class UserControllerTest {
             // then
             perform
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("errorCode").value("A0001"));
+                .andExpect(jsonPath("errorCode").value("A0002"));
 
             verify(oAuthService, times(1))
-                .validateToken(any());
+                .validateToken(null);
+            verify(oAuthService, times(1))
+                .findRequestUserByToken(null);
 
             perform.andDo(document("contribution-unLoggedIn",
                 getDocumentRequest(),
