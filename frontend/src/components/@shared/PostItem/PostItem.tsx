@@ -123,7 +123,7 @@ const PostItem = ({
 
   const tagList = tags.map((tag: string, index: number) => (
     // TODO: key prop 수정 => tag가 unique임이 보장된 후에!
-    <TagItemLinkButton key={index} to={PAGE_URL.POSTS_WITH_TAG(tag)}>
+    <TagItemLinkButton type="button" key={index} to={PAGE_URL.POSTS_WITH_TAG(tag)}>
       <Chip>{tag}</Chip>
     </TagItemLinkButton>
   ));
