@@ -9,7 +9,7 @@ import { Container, Empty, Grid, GridItem } from "./GridFeed.styled";
 
 export interface Props {
   feedPagePath?: string;
-  infinitePostsData?: InfiniteData<Post[]>;
+  infinitePostsData?: InfiniteData<Post[] | null>;
   isLoading: boolean;
   isError: boolean;
   isFetchingNextPage: boolean;

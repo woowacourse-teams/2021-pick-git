@@ -55,8 +55,6 @@ const useSearchUserData = () => {
           logout();
           refetch();
         },
-        notFound: () => pushSnackbarMessage("아직 준비되지 않은 서비스입니다."),
-        methodNotAllowed: () => pushSnackbarMessage("아직 준비되지 않은 서비스입니다."),
       };
 
       if (status && isHttpErrorStatus(status)) {

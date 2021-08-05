@@ -21,6 +21,7 @@ import SnackBarContext from "./contexts/SnackbarContext";
 import { SUCCESS_MESSAGE } from "./constants/messages";
 import EditPostPage from "./pages/EditPostPage/EditPostPage";
 import { PostEditStepContextProvider } from "./contexts/PostEditStepContext";
+import SearchPostResultPage from "./pages/SearchPostResultPage/SearchPostResultPage";
 
 const App = () => {
   const { currentUsername, login, logout } = useContext(UserContext);
@@ -69,6 +70,9 @@ const App = () => {
         </Route>
         <Route exact path={PAGE_URL.SEARCH}>
           <SearchPage />
+        </Route>
+        <Route exact path={PAGE_URL.SEARCH_RESULT_POST_BASE}>
+          <SearchPostResultPage />
         </Route>
         <Route exact path={PAGE_URL.LOGIN}>
           <LoginPage />
