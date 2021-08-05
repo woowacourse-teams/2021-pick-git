@@ -1,25 +1,36 @@
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
-
-import { HTTPErrorHandler, SearchResultUser } from "../../@types";
+import { InfiniteData, useQueryClient } from "react-query";
+import { HTTPErrorHandler, Post } from "../../@types";
 import { UNKNOWN_ERROR_MESSAGE } from "../../constants/messages";
+import { QUERY } from "../../constants/queries";
 import SearchContext from "../../contexts/SearchContext";
 import SnackBarContext from "../../contexts/SnackbarContext";
 import UserContext from "../../contexts/UserContext";
-import { removeDuplicatedData } from "../../utils/data";
 import { getAPIErrorMessage, handleHTTPError } from "../../utils/error";
 import { isHttpErrorStatus } from "../../utils/typeGuard";
-import { useSearchUserResultQuery } from "../queries/search";
+import { useSearchPostResultQuery } from "../queries/search";
 
-const useSearchUserData = () => {
+const useSearchPostData = (type: string | null, prevData?: InfiniteData<Post[]>) => {
   const { keyword } = useContext(SearchContext);
   const { pushSnackbarMessage } = useContext(SnackBarContext);
   const { logout } = useContext(UserContext);
+  const queryClient = useQueryClient();
+  const formattedKeyword = keyword.trim().replace(",", " ").replace(/\s+/g, " ");
+  const queryKey = [QUERY.GET_SEARCH_POST_RESULT, { type, formattedKeyword }];
 
-  const [results, setResults] = useState<SearchResultUser[]>([]);
   const [isAllResultFetched, setIsAllResultFetched] = useState(false);
-  const { data, error, isError, isLoading, fetchNextPage, isFetchingNextPage, refetch } =
-    useSearchUserResultQuery(keyword);
+  const {
+    data: infinitePostsData,
+    error,
+    isError,
+    isLoading,
+    fetchNextPage,
+    isFetchingNextPage,
+    refetch,
+  } = useSearchPostResultQuery(type, keyword, queryKey);
+
+  console.log(isAllResultFetched);
 
   const handleIntersect = async () => {
     if (isAllResultFetched) return;
@@ -28,21 +39,16 @@ const useSearchUserData = () => {
   };
 
   const handleDataFetch = () => {
-    if (!data) {
+    if (!infinitePostsData) {
       return;
     }
 
-    const { pages } = data ?? {};
+    const { pages } = infinitePostsData ?? {};
     const lastPage = pages?.[pages.length - 1];
 
     if (!lastPage || !lastPage.length) {
       setIsAllResultFetched(true);
     }
-
-    const fetchedData = pages.map((page) => page ?? []).reduce((acc, page) => [...acc, ...page], []);
-    const filteredData = removeDuplicatedData<SearchResultUser>(fetchedData, (data) => data);
-
-    setResults(filteredData);
   };
 
   const handleError = () => {
@@ -68,14 +74,29 @@ const useSearchUserData = () => {
   };
 
   useEffect(() => {
+    if (prevData) {
+      queryClient.setQueryData([QUERY.GET_SEARCH_POST_RESULT, { type, keyword }], prevData);
+    }
+  }, []);
+
+  useEffect(() => {
     handleError();
   }, [error]);
 
   useEffect(() => {
     handleDataFetch();
-  }, [data]);
+  }, [infinitePostsData]);
 
-  return { results, isError, isLoading, isFetchingNextPage, handleIntersect, refetch };
+  return {
+    infinitePostsData,
+    isError,
+    isLoading,
+    isFetchingNextPage,
+    handleIntersect,
+    refetch,
+    queryKey,
+    formattedKeyword,
+  };
 };
 
-export default useSearchUserData;
+export default useSearchPostData;

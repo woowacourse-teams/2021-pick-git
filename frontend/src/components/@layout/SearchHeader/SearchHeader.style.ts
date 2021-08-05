@@ -5,7 +5,7 @@ export const Container = styled(Header)<React.CSSProperties>`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.625rem 1.4375rem;
+  padding: 0.4rem 1.4375rem;
 `;
 
 export const GoBackLink = styled.a`
@@ -19,4 +19,9 @@ export const GoBackLink = styled.a`
 
 export const SearchInputWrapper = styled.div`
   flex-grow: 1;
+  height: 100%;
+
+  input {
+    height: 100%;
+  }
 `;

@@ -1,18 +1,23 @@
+import { InfiniteData } from "react-query";
 import { Link } from "react-router-dom";
-import { PAGE_URL } from "../../constants/urls";
-import useUserFeed from "../../services/hooks/useUserFeed";
-import { getPostsFromPages } from "../../utils/feed";
+import { Post } from "../../../@types";
+import { getPostsFromPages } from "../../../utils/feed";
 
-import PageLoading from "../@layout/PageLoading/PageLoading";
-import InfiniteScrollContainer from "../@shared/InfiniteScrollContainer/InfiniteScrollContainer";
-import { Container, Empty, Grid, GridItem } from "./ProfileFeed.styled";
+import PageLoading from "../../@layout/PageLoading/PageLoading";
+import InfiniteScrollContainer from "../InfiniteScrollContainer/InfiniteScrollContainer";
+import { Container, Empty, Grid, GridItem } from "./GridFeed.styled";
 
-export interface Props extends ReturnType<typeof useUserFeed> {
-  username: string;
+export interface Props {
+  feedPagePath?: string;
+  infinitePostsData?: InfiniteData<Post[] | null>;
+  isLoading: boolean;
+  isError: boolean;
+  isFetchingNextPage: boolean;
+  handleIntersect: () => void;
 }
 
-const ProfileFeed = ({
-  username,
+const GridFeed = ({
+  feedPagePath,
   infinitePostsData,
   isLoading,
   isError,
@@ -45,8 +50,8 @@ const ProfileFeed = ({
               {posts?.map(({ id, imageUrls, authorName, content }) => (
                 <Link
                   to={{
-                    pathname: PAGE_URL.USER_FEED,
-                    search: `?username=${username}`,
+                    pathname: feedPagePath?.split("?")[0] ?? "",
+                    search: `?${feedPagePath?.split("?")[1]}`,
                     state: { prevData: infinitePostsData, postId: id },
                   }}
                   key={id}
@@ -66,4 +71,4 @@ const ProfileFeed = ({
   return <Feed />;
 };
 
-export default ProfileFeed;
+export default GridFeed;

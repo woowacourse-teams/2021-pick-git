@@ -9,7 +9,8 @@ export const PAGE_URL = {
   HOME: "/",
   HOME_FEED: "/posts",
   TAG_FEED_BASE: "/posts/tag",
-  USER_FEED: "/posts/user",
+  USER_FEED_BASE: "/posts/user",
+  USER_FEED: (username: string) => `/posts/user?username=${username}`,
   LOGIN: "/login",
   AUTH_PROCESSING: "/auth",
   ADD_POST: "/add-post",
@@ -17,6 +18,8 @@ export const PAGE_URL = {
   EDIT_POST: "/edit-post",
   EDIT_POST_FIRST_STEP: `/edit-post/${POST_EDIT_STEPS[0].path}`,
   SEARCH: "/search",
+  SEARCH_RESULT_POST_BASE: "/search/posts",
+  SEARCH_RESULT_POST: (type: string) => `/search/posts?type=${type}`,
   PROFILE: "/profile",
   MY_PROFILE: "/profile/me",
   TAG_FEED: (tag: string) => `/posts/tag?tag=${tag}`,
@@ -37,6 +40,8 @@ export const API_URL = {
   USER_POSTS: (username: string, page: number, limit: number) => `/posts/${username}?page=${page}&limit=${limit}`,
   SEARCH_USER: (keyword: string, page: number, limit: number) =>
     `/search/users?keyword=${keyword}&page=${page}&limit=${limit}`,
+  SEARCH_POST: (type: string, keyword: string, page: number, limit: number) =>
+    `/search/posts?type=${type}&keyword=${keyword}&page=${page}&limit=${limit}`,
   AFTER_LOGIN: (code: string) => `afterlogin?code=${code}`,
   POST: (postId: number) => `/posts/${postId}`,
   POSTS: (page: number, limit: number) => `/posts?page=${page}&limit=${limit}`,

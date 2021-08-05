@@ -14,3 +14,11 @@ export const Empty = styled.div`
   align-items: center;
   height: 100%;
 `;
+
+export const KeywordsWrapper = styled.div`
+  margin: 1rem 0 1rem;
+
+  span {
+    margin: 0.3rem;
+  }
+`;

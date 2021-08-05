@@ -1,36 +1,29 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { InfiniteData } from "react-query";
 import { useLocation } from "react-router-dom";
 
-import Feed from "../../components/Feed/Feed";
-import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
-import PageLoading from "../../components/@layout/PageLoading/PageLoading";
-import useUserFeed from "../../services/hooks/useUserFeed";
-import { Container } from "./UserFeedPage.style";
 import { Post } from "../../@types";
-
-import UserContext from "../../contexts/UserContext";
+import useSearchPostData from "../../services/hooks/useSearchPostData";
 import { LayoutInPx } from "../../constants/layout";
-import { QUERY } from "../../constants/queries";
+import PageLoading from "../../components/@layout/PageLoading/PageLoading";
+import { Container } from "./SearchPostResultPage.style";
+import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
+import Feed from "../../components/Feed/Feed";
 
 interface LocationState {
   prevData?: InfiniteData<Post[]>;
   postId?: string;
 }
 
-const UserFeedPage = () => {
+const SearchPostResultPage = () => {
   const [isMountedOnce, setIsMountedOnce] = useState(false);
-  const { currentUsername } = useContext(UserContext);
-  const username = new URLSearchParams(location.search).get("username");
-  const isMyFeed = currentUsername === username;
-
+  const type = new URLSearchParams(location.search).get("type");
   const {
     state: { prevData, postId },
   } = useLocation<LocationState>();
 
-  const { infinitePostsData, isLoading, isError, isFetchingNextPage, handleIntersect } = useUserFeed(
-    isMyFeed,
-    username,
+  const { infinitePostsData, isError, isLoading, isFetchingNextPage, handleIntersect, queryKey } = useSearchPostData(
+    type,
     prevData
   );
 
@@ -57,10 +50,10 @@ const UserFeedPage = () => {
   return (
     <Container>
       <InfiniteScrollContainer isLoaderShown={isFetchingNextPage} onIntersect={handleIntersect}>
-        <Feed infinitePostsData={infinitePostsData} queryKey={[QUERY.GET_USER_FEED_POSTS, { username, isMyFeed }]} />
+        <Feed infinitePostsData={infinitePostsData} queryKey={queryKey} />
       </InfiniteScrollContainer>
     </Container>
   );
 };
 
-export default UserFeedPage;
+export default SearchPostResultPage;

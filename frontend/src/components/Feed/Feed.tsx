@@ -18,7 +18,7 @@ import useMessageModal from "../../services/hooks/@common/useMessageModal";
 import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
 
 interface Props {
-  infinitePostsData: InfiniteData<Post[]>;
+  infinitePostsData: InfiniteData<Post[] | null>;
   queryKey: QueryKey;
 }
 

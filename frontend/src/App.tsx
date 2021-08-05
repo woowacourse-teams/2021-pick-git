@@ -21,6 +21,7 @@ import SnackBarContext from "./contexts/SnackbarContext";
 import { SUCCESS_MESSAGE } from "./constants/messages";
 import EditPostPage from "./pages/EditPostPage/EditPostPage";
 import { PostEditStepContextProvider } from "./contexts/PostEditStepContext";
+import SearchPostResultPage from "./pages/SearchPostResultPage/SearchPostResultPage";
 
 const App = () => {
   const { currentUsername, login, logout } = useContext(UserContext);
@@ -47,7 +48,7 @@ const App = () => {
   return (
     <BrowserRouter>
       <Switch>
-        <Route exact path={[PAGE_URL.HOME, PAGE_URL.PROFILE, PAGE_URL.MY_PROFILE, PAGE_URL.USER_FEED]}>
+        <Route exact path={[PAGE_URL.HOME, PAGE_URL.PROFILE, PAGE_URL.MY_PROFILE, PAGE_URL.USER_FEED_BASE]}>
           <NavigationHeader />
         </Route>
         <Route path={PAGE_URL.ADD_POST}>
@@ -61,7 +62,7 @@ const App = () => {
         <Route exact path={[PAGE_URL.HOME, PAGE_URL.HOME_FEED]}>
           <HomeFeedPage />
         </Route>
-        <Route exact path={PAGE_URL.USER_FEED}>
+        <Route exact path={PAGE_URL.USER_FEED_BASE}>
           <UserFeedPage />
         </Route>
         <Route exact path={PAGE_URL.TAG_FEED_BASE}>
@@ -69,6 +70,9 @@ const App = () => {
         </Route>
         <Route exact path={PAGE_URL.SEARCH}>
           <SearchPage />
+        </Route>
+        <Route exact path={PAGE_URL.SEARCH_RESULT_POST_BASE}>
+          <SearchPostResultPage />
         </Route>
         <Route exact path={PAGE_URL.LOGIN}>
           <LoginPage />
