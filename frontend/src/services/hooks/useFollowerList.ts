@@ -1,25 +1,21 @@
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
-
 import { HTTPErrorHandler, UserItem } from "../../@types";
 import { UNKNOWN_ERROR_MESSAGE } from "../../constants/messages";
-import SearchContext from "../../contexts/SearchContext";
 import SnackBarContext from "../../contexts/SnackbarContext";
 import UserContext from "../../contexts/UserContext";
 import { removeDuplicatedData } from "../../utils/data";
 import { getAPIErrorMessage, handleHTTPError } from "../../utils/error";
 import { isHttpErrorStatus } from "../../utils/typeGuard";
-import { useSearchUserResultQuery } from "../queries/search";
+import { useFollowersQuery } from "../queries";
 
-const useSearchUserData = () => {
-  const { keyword } = useContext(SearchContext);
-  const { pushSnackbarMessage } = useContext(SnackBarContext);
-  const { logout } = useContext(UserContext);
-
+const useFollowerList = (username: string | null) => {
   const [results, setResults] = useState<UserItem[]>([]);
   const [isAllResultFetched, setIsAllResultFetched] = useState(false);
-  const { data, error, isError, isLoading, fetchNextPage, isFetchingNextPage, refetch } =
-    useSearchUserResultQuery(keyword);
+  const { data, error, isLoading, isError, isFetchingNextPage, refetch, fetchNextPage } = useFollowersQuery(username);
+
+  const { pushSnackbarMessage } = useContext(SnackBarContext);
+  const { logout } = useContext(UserContext);
 
   const handleIntersect = async () => {
     if (isAllResultFetched) return;
@@ -68,14 +64,14 @@ const useSearchUserData = () => {
   };
 
   useEffect(() => {
-    handleError();
-  }, [error]);
-
-  useEffect(() => {
     handleDataFetch();
   }, [data]);
+
+  useEffect(() => {
+    handleError();
+  }, [error]);
 
   return { results, isError, isLoading, isFetchingNextPage, handleIntersect, refetch };
 };
 
-export default useSearchUserData;
+export default useFollowerList;

@@ -1,6 +1,7 @@
 import axios from "axios";
 
-import { MutateResponseFollow, ProfileData } from "../../@types";
+import { MutateResponseFollow, ProfileData, UserItem } from "../../@types";
+import { LIMIT } from "../../constants/limits";
 import { API_URL } from "../../constants/urls";
 import { customError } from "../../utils/error";
 
@@ -27,6 +28,29 @@ export const requestGetUserProfile = async (username: string, accessToken: strin
       }
     : {};
   const response = await axios.get<ProfileData>(API_URL.USER_PROFILE(username), config);
+
+  return response.data;
+};
+
+export const requestSetProfile = async (profileImage: File | null, description: string, accessToken: string | null) => {
+  if (!accessToken) {
+    throw customError.noAccessToken;
+  }
+
+  if (!profileImage && !description) {
+    throw Error("no data to set");
+  }
+
+  const formData = new FormData();
+
+  formData.append("image", profileImage ?? new File([], ""));
+  formData.append("description", description);
+
+  const response = await axios.post(API_URL.SELF_PROFILE, formData, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
 
   return response.data;
 };
@@ -59,25 +83,42 @@ export const requestDeleteFollow = async (username: string, applyGithub: boolean
   return response.data;
 };
 
-export const requestSetProfile = async (profileImage: File | null, description: string, accessToken: string | null) => {
-  if (!accessToken) {
-    throw customError.noAccessToken;
+export const requestGetFollowings = async (username: string | null, pageParam: number, accessToken: string | null) => {
+  if (!username) {
+    return null;
   }
 
-  if (!profileImage && !description) {
-    throw Error("no data to set");
+  const config = accessToken
+    ? {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    : {};
+  const response = await axios.get<UserItem[]>(
+    API_URL.USER_PROFILE_FOLLOWINGS(username, pageParam, LIMIT.SEARCH_RESULT_COUNT_PER_FETCH),
+    config
+  );
+
+  return response.data;
+};
+
+export const requestGetFollowers = async (username: string | null, pageParam: number, accessToken: string | null) => {
+  if (!username) {
+    return null;
   }
 
-  const formData = new FormData();
-
-  formData.append("image", profileImage ?? new File([], ""));
-  formData.append("description", description);
-
-  const response = await axios.post(API_URL.SELF_PROFILE, formData, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
+  const config = accessToken
+    ? {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    : {};
+  const response = await axios.get<UserItem[]>(
+    API_URL.USER_PROFILE_FOLLOWERS(username, pageParam, LIMIT.SEARCH_RESULT_COUNT_PER_FETCH),
+    config
+  );
 
   return response.data;
 };

@@ -22,6 +22,9 @@ import { SUCCESS_MESSAGE } from "./constants/messages";
 import EditPostPage from "./pages/EditPostPage/EditPostPage";
 import { PostEditStepContextProvider } from "./contexts/PostEditStepContext";
 import SearchPostResultPage from "./pages/SearchPostResultPage/SearchPostResultPage";
+import FollowingList from "./pages/FollowingUserListPage/FollowingList";
+import FollowerList from "./pages/FollowerList/FollowerList";
+import OneDepthStepHeader from "./components/OneDepthStepHeader/OneDepthStepHeader";
 
 const App = () => {
   const { currentUsername, login, logout } = useContext(UserContext);
@@ -50,6 +53,12 @@ const App = () => {
       <Switch>
         <Route exact path={[PAGE_URL.HOME, PAGE_URL.PROFILE, PAGE_URL.MY_PROFILE, PAGE_URL.USER_FEED_BASE]}>
           <NavigationHeader />
+        </Route>
+        <Route exact path={PAGE_URL.FOLLOWINGS_BASE}>
+          <OneDepthStepHeader title="팔로잉 목록" />
+        </Route>
+        <Route exact path={PAGE_URL.FOLLOWERS_BASE}>
+          <OneDepthStepHeader title="팔로우 목록" />
         </Route>
         <Route path={PAGE_URL.ADD_POST}>
           <PostAddStepHeader />
@@ -85,6 +94,12 @@ const App = () => {
         </Route>
         <Route path={PAGE_URL.PROFILE}>
           <ProfilePage isMyProfile={false} />
+        </Route>
+        <Route path={PAGE_URL.FOLLOWINGS_BASE}>
+          <FollowingList />
+        </Route>
+        <Route path={PAGE_URL.FOLLOWERS_BASE}>
+          <FollowerList />
         </Route>
         <Route path={PAGE_URL.ADD_POST}>
           <PostAddDataContextProvider>

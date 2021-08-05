@@ -4,7 +4,7 @@ import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import Chip from "../../components/@shared/Chip/Chip";
 import GridFeed from "../../components/@shared/GridFeed/GridFeed";
 import Tabs from "../../components/@shared/Tabs/Tabs";
-import SearchListUser from "../../components/SearchListUser/SearchListUser";
+import UserList from "../../components/UserList/UserList";
 import { PAGE_URL } from "../../constants/urls";
 import useFollow from "../../services/hooks/useFollow";
 import useSearchPostData from "../../services/hooks/useSearchPostData";
@@ -43,7 +43,7 @@ const SearchPage = () => {
 
   const tabItems = tabNames.map((name, index) => ({ name, onTabChange: () => setTabIndex(index) }));
   const tabContents = [
-    <SearchListUser
+    <UserList
       key="user"
       users={userSearchResults}
       isFetchingNextPage={isUserSearchFetchingNextPage}

@@ -1,16 +1,16 @@
 import { Story } from "@storybook/react";
 import LoggedInWrapper from "../../../.storybook/utils/LoggedInWrapper";
 
-import SearchListUser, { Props } from "./SearchListUser";
+import UserList, { Props } from "./UserList";
 
 export default {
-  title: "Components/SearchListUser",
-  component: SearchListUser,
+  title: "Components/UserList",
+  component: UserList,
 };
 
 const Template: Story<Props> = (args) => (
   <LoggedInWrapper>
-    <SearchListUser {...args} />
+    <UserList {...args} />
   </LoggedInWrapper>
 );
 

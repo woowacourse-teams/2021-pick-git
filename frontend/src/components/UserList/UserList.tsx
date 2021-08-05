@@ -2,7 +2,7 @@ import { AxiosError } from "axios";
 import { useContext, useState } from "react";
 import { InfiniteData, QueryObserverResult, RefetchOptions } from "react-query";
 
-import { ErrorResponse, SearchResultUser } from "../../@types";
+import { ErrorResponse, UserItem } from "../../@types";
 import { WARNING_MESSAGE } from "../../constants/messages";
 import { PAGE_URL } from "../../constants/urls";
 import UserContext from "../../contexts/UserContext";
@@ -11,19 +11,19 @@ import useFollow from "../../services/hooks/useFollow";
 import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
 import Avatar from "../@shared/Avatar/Avatar";
 import InfiniteScrollContainer from "../@shared/InfiniteScrollContainer/InfiniteScrollContainer";
-import { Button, Empty, NameTag, UserList, ButtonLoader, ButtonSpinner } from "./SearchListUser.style";
+import { Button, Empty, NameTag, List, ButtonLoader, ButtonSpinner } from "./UserList.style";
 
 export interface Props {
   isFetchingNextPage: boolean;
   onIntersect: () => void;
-  users: SearchResultUser[];
+  users: UserItem[];
   follow: ReturnType<typeof useFollow>;
   refetch: (
     options?: RefetchOptions | undefined
-  ) => Promise<QueryObserverResult<InfiniteData<SearchResultUser[] | null>, AxiosError<ErrorResponse>>>;
+  ) => Promise<QueryObserverResult<InfiniteData<UserItem[] | null>, AxiosError<ErrorResponse>>>;
 }
 
-const SearchListUser = ({ isFetchingNextPage, onIntersect, users, follow, refetch }: Props) => {
+const UserList = ({ isFetchingNextPage, onIntersect, users, follow, refetch }: Props) => {
   const [currentUsername, setCurrentUsername] = useState("");
   const [currentUserFollowing, setCurrentUserFollowing] = useState(false);
   const { isLoggedIn } = useContext(UserContext);
@@ -75,13 +75,13 @@ const SearchListUser = ({ isFetchingNextPage, onIntersect, users, follow, refetc
       <InfiniteScrollContainer isLoaderShown={isFetchingNextPage} onIntersect={onIntersect}>
         <ul>
           {users.map((user) => (
-            <UserList key={user.username}>
+            <List key={user.username}>
               <NameTag to={PAGE_URL.USER_PROFILE(user.username)}>
                 <Avatar diameter="1.875rem" imageUrl={user.imageUrl} />
                 <span>{user.username}</span>
               </NameTag>
               <FollowButton username={user.username} following={user.following} />
-            </UserList>
+            </List>
           ))}
         </ul>
       </InfiniteScrollContainer>
@@ -97,4 +97,4 @@ const SearchListUser = ({ isFetchingNextPage, onIntersect, users, follow, refetc
   );
 };
 
-export default SearchListUser;
+export default UserList;

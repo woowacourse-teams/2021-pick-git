@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import { Post, SearchResultUser } from "../../@types";
+import { Post, UserItem } from "../../@types";
 import { LIMIT } from "../../constants/limits";
 import { API_URL } from "../../constants/urls";
 
@@ -16,7 +16,7 @@ export const requestGetSearchUserResult = async (keyword: string, pageParam: num
         },
       }
     : {};
-  const response = await axios.get<SearchResultUser[]>(
+  const response = await axios.get<UserItem[]>(
     API_URL.SEARCH_USER(keyword, pageParam, LIMIT.SEARCH_RESULT_COUNT_PER_FETCH),
     config
   );

@@ -25,6 +25,10 @@ export const PAGE_URL = {
   MY_PROFILE: "/profile/me",
   TAG_FEED: (tag: string) => `/posts/tag?tag=${tag}`,
   USER_PROFILE: (username: string) => `/profile?username=${username}`,
+  FOLLOWINGS_BASE: "/followings",
+  FOLLOWERS_BASE: "/followers",
+  FOLLOWINGS: (username: string) => `/followings?username=${username}`,
+  FOLLOWERS: (username: string) => `/followers?username=${username}`,
 };
 
 export const API_URL = {
@@ -39,6 +43,10 @@ export const API_URL = {
     `/profiles/${username}/followings?githubFollowing=${githubFollowing}`,
   USER_PROFILE_UNFOLLOW: (username: string, githubUnfollowing: boolean) =>
     `/profiles/${username}/followings?githubUnfollowing=${githubUnfollowing}`,
+  USER_PROFILE_FOLLOWINGS: (username: string, pageParam: number, limit: number) =>
+    `/profiles/${username}/followings?page=${pageParam}&limit=${limit}`,
+  USER_PROFILE_FOLLOWERS: (username: string, pageParam: number, limit: number) =>
+    `/profiles/${username}/followers?page=${pageParam}&limit=${limit}`,
   MY_POSTS: (page: number, limit: number) => `/posts/me?page=${page}&limit=${limit}`,
   USER_POSTS: (username: string, page: number, limit: number) => `/posts/${username}?page=${page}&limit=${limit}`,
   SEARCH_USER: (keyword: string, page: number, limit: number) =>
