@@ -296,7 +296,8 @@ class PostControllerTest {
         // when
         ResultActions perform = mockMvc.perform(get("/api/github/repositories")
             .header(HttpHeaders.AUTHORIZATION, "Bearer " + ACCESS_TOKEN)
-            .accept(MediaType.ALL));
+            .queryParam("page", "0")
+            .queryParam("limit", "50"));
 
         // then
         perform

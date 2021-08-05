@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin(value = "*")
@@ -114,8 +115,12 @@ public class PostController {
     }
 
     @GetMapping("/github/repositories")
-    public ResponseEntity<List<RepositoryResponse>> userRepositories(@Authenticated AppUser user) {
-        RepositoryRequestDto repositoryRequestDto = toRepositoryRequestDto(user);
+    public ResponseEntity<List<RepositoryResponse>> userRepositories(
+        @Authenticated AppUser user,
+        @RequestParam Long page,
+        @RequestParam Long limit
+    ) {
+        RepositoryRequestDto repositoryRequestDto = toRepositoryRequestDto(user, page, limit);
 
         RepositoryResponsesDto repositoryResponsesDto = postService
             .userRepositories(repositoryRequestDto);
@@ -127,10 +132,12 @@ public class PostController {
         return ResponseEntity.ok(repositoryResponses);
     }
 
-    private RepositoryRequestDto toRepositoryRequestDto(AppUser user) {
+    private RepositoryRequestDto toRepositoryRequestDto(AppUser user, Long page, Long limit) {
         return RepositoryRequestDto.builder()
             .token(user.getAccessToken())
             .username(user.getUsername())
+            .page(page)
+            .limit(limit)
             .build();
     }
 

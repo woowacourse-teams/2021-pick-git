@@ -5,7 +5,7 @@ import com.woowacourse.pickgit.post.domain.util.PlatformRepositoryApiRequester;
 
 public class MockRepositoryApiRequester implements PlatformRepositoryApiRequester {
 
-    private static final String API_URL_FORMAT = "https://api.github.com/users/%s/repos";
+    private static final String API_URL_FORMAT = "https://api.github.com/users/%s/repos?page=1&per_page=50";
     private static final String USERNAME = "jipark3";
     private static final String ACCESS_TOKEN = "oauth.access.token";
 
@@ -20,7 +20,8 @@ public class MockRepositoryApiRequester implements PlatformRepositoryApiRequeste
             throw new PlatformHttpErrorException("외부 플랫폼 URL 찾기 실패");
         }
 
-        return "[{\"name\": \"binghe-hi\"}, {\"name\": \"doms-react\"}]";
+        return "[{\"name\": \"binghe-hi\", \"html_url\": \"https://github.com/jipark3/binghe-hi\"},"
+            + "{\"name\": \"doms-react\", \"html_url\": \"https://github.com/jipark3/doms-react\"}]";
     }
 
     private boolean isNotValidToken(String token) {

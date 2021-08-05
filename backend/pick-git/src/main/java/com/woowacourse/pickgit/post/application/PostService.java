@@ -22,7 +22,7 @@ import com.woowacourse.pickgit.post.domain.comment.Comment;
 import com.woowacourse.pickgit.post.domain.repository.PickGitStorage;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.post.domain.util.PlatformRepositoryExtractor;
-import com.woowacourse.pickgit.post.domain.util.dto.RepositoryUrlAndName;
+import com.woowacourse.pickgit.post.domain.util.dto.RepositoryNameAndUrl;
 import com.woowacourse.pickgit.tag.application.TagService;
 import com.woowacourse.pickgit.tag.application.TagsDto;
 import com.woowacourse.pickgit.tag.domain.Tag;
@@ -84,7 +84,8 @@ public class PostService {
         return post;
     }
 
-    private Post createPost(String content, String githubRepoUrl, User user, List<String> imageUrls) {
+    private Post createPost(String content, String githubRepoUrl, User user,
+        List<String> imageUrls) {
         return Post.builder()
             .content(content)
             .images(imageUrls)
@@ -119,26 +120,28 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public RepositoryResponsesDto userRepositories(RepositoryRequestDto repositoryRequestDto) {
-        String token = repositoryRequestDto.getToken();
-        String username = repositoryRequestDto.getUsername();
+        List<RepositoryNameAndUrl> repositoryNameAndUrls = platformRepositoryExtractor
+            .extract(
+                repositoryRequestDto.getToken(),
+                repositoryRequestDto.getUsername(),
+                repositoryRequestDto.getPage(),
+                repositoryRequestDto.getLimit()
+            );
+        List<RepositoryResponseDto> repositoryResponsesDto =
+            createRepositoryResponseDtos(repositoryNameAndUrls);
 
-        List<RepositoryUrlAndName> repositoryUrlAndNames =
-            platformRepositoryExtractor.extract(token, username);
-        List<RepositoryResponseDto> repositoryResponseDtos =
-            createRepositoryResponseDtos(repositoryUrlAndNames);
-
-        return new RepositoryResponsesDto(repositoryResponseDtos);
+        return new RepositoryResponsesDto(repositoryResponsesDto);
     }
 
     private List<RepositoryResponseDto> createRepositoryResponseDtos(
-        List<RepositoryUrlAndName> repositoryUrlAndNames
+        List<RepositoryNameAndUrl> repositoryNameAndUrls
     ) {
-        return repositoryUrlAndNames.stream()
+        return repositoryNameAndUrls.stream()
             .map(toRepositoryResponseDto())
             .collect(toList());
     }
 
-    private Function<RepositoryUrlAndName, RepositoryResponseDto> toRepositoryResponseDto() {
+    private Function<RepositoryNameAndUrl, RepositoryResponseDto> toRepositoryResponseDto() {
         return repositoryUrlAndName -> RepositoryResponseDto.builder()
             .name(repositoryUrlAndName.getName())
             .url(repositoryUrlAndName.getUrl())

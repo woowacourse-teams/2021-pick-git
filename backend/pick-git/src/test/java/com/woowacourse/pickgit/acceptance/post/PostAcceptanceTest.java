@@ -501,7 +501,7 @@ class PostAcceptanceTest {
         return given().log().all()
             .auth().oauth2(token)
             .when()
-            .get("/api/github/repositories")
+            .get("/api/github/repositories?page=" + 0L + "&limit=" + 50L)
             .then().log().all()
             .statusCode(statusCode)
             .extract();
@@ -868,4 +868,3 @@ class PostAcceptanceTest {
             .extract();
     }
 }
-

@@ -55,6 +55,7 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @ActiveProfiles("test")
 class PostServiceIntegrationTest {
+
     private static final String USERNAME = "jipark3";
     private static final String ACCESS_TOKEN = "oauth.access.token";
 
@@ -66,7 +67,7 @@ class PostServiceIntegrationTest {
 
     @Autowired
     private UserRepository userRepository;
-    
+
     @DisplayName("게시물에 댓글을 정상 등록한다.")
     @Test
     void addComment_ValidContent_Success() {
@@ -225,7 +226,7 @@ class PostServiceIntegrationTest {
     @Test
     void showRepositories_LoginUser_Success() {
         // given
-        RepositoryRequestDto requestDto = new RepositoryRequestDto(ACCESS_TOKEN, USERNAME);
+        RepositoryRequestDto requestDto = createRepositoryRequestDto(ACCESS_TOKEN, USERNAME);
 
         // when
         RepositoryResponsesDto responseDto = postService.userRepositories(requestDto);
@@ -238,10 +239,7 @@ class PostServiceIntegrationTest {
     @Test
     void showRepositories_InvalidAccessToken_401Exception() {
         // given
-        String invalidToken = "invalidToken";
-
-        RepositoryRequestDto requestDto =
-            new RepositoryRequestDto(invalidToken, USERNAME);
+        RepositoryRequestDto requestDto = createRepositoryRequestDto("invalidToken", USERNAME);
 
         // then
         assertThatThrownBy(() -> {
@@ -255,10 +253,7 @@ class PostServiceIntegrationTest {
     @Test
     void showRepositories_InvalidUsername_404Exception() {
         // given
-        String invalidUserName = "invalidUser";
-
-        RepositoryRequestDto requestDto =
-            new RepositoryRequestDto(ACCESS_TOKEN, invalidUserName);
+        RepositoryRequestDto requestDto = createRepositoryRequestDto(ACCESS_TOKEN, "invalidUser");
 
         // then
         assertThatThrownBy(() ->
@@ -266,6 +261,15 @@ class PostServiceIntegrationTest {
         ).isInstanceOf(PlatformHttpErrorException.class)
             .extracting("errorCode")
             .isEqualTo("V0001");
+    }
+
+    private RepositoryRequestDto createRepositoryRequestDto(String token, String username) {
+        return RepositoryRequestDto.builder()
+            .token(token)
+            .username(username)
+            .page(0L)
+            .limit(50L)
+            .build();
     }
 
     @DisplayName("사용자는 특정 게시물을 좋아요 할 수 있다. - 성공")

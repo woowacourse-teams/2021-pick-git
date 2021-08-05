@@ -2,17 +2,17 @@ package com.woowacourse.pickgit.post.domain.util.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class RepositoryUrlAndName {
+public class RepositoryNameAndUrl {
+
+    private String name;
 
     @JsonProperty("html_url")
     private String url;
 
-    private String name;
-
-    private RepositoryUrlAndName() {
+    private RepositoryNameAndUrl() {
     }
 
-    public RepositoryUrlAndName(String name, String url) {
+    public RepositoryNameAndUrl(String name, String url) {
         this.name = name;
         this.url = url;
     }

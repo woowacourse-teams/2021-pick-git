@@ -15,11 +15,14 @@ import org.springframework.web.client.RestClientException;
 
 class GithubRepositoryApiRequesterTest {
 
-    private static final String BEARER_TOKEN = "rightToken";
-    private static final String RIGHT_RESPONSE = "[{\"name\": \"binghe-hi\" }, {\"name\": \"doms-react\" }]";
-    private static final String BAD_CREDENTIAL = "{\n"
-        + "    \"message\": \"Bad credentials\",\n"
-        + "    \"documentation_url\": \"https://docs.github.com/rest\"\n"
+    private static final String ACCESS_TOKEN = "oauth.access.token";
+    private static final String VALID_RESPONSE = "["
+        + "{\"name\": \"binghe-hi\", \"html_url\": \"https://github.com/jipark3/binghe-hi\"},"
+        + "{\"name\": \"doms-react\", \"html_url\": \"https://github.com/jipark3/doms-react\"}"
+        + "]";
+    private static final String INVALID_RESPONSE = "{"
+        + "\"message\": \"Bad credentials\","
+        + "\"documentation_url\": \"https://docs.github.com/rest\""
         + "}";
 
     private GithubRepositoryApiRequester githubRepositoryApiRequester;
@@ -33,17 +36,17 @@ class GithubRepositoryApiRequesterTest {
                     headers.get(HttpHeaders.AUTHORIZATION)
                 ).orElse(List.of());
 
-                boolean hasRightToken = authorizations.stream()
-                    .anyMatch(authorization -> authorization.contains(BEARER_TOKEN));
+                boolean hasAccessToken = authorizations.stream()
+                    .anyMatch(authorization -> authorization.contains(ACCESS_TOKEN));
 
-                if (!hasRightToken) {
+                if (!hasAccessToken) {
                     return ResponseEntity.ok(
-                        responseType.cast(BAD_CREDENTIAL)
+                        responseType.cast(INVALID_RESPONSE)
                     );
                 }
 
                 return ResponseEntity.ok(
-                    responseType.cast(RIGHT_RESPONSE)
+                    responseType.cast(VALID_RESPONSE)
                 );
             }
         );
@@ -53,33 +56,30 @@ class GithubRepositoryApiRequesterTest {
     @Test
     void request_requestGithubRepositoryOfUser_thenGetRightResponse() {
         //when
-        String request = githubRepositoryApiRequester
-            .request(BEARER_TOKEN, "githubUrl");
+        String request = githubRepositoryApiRequester.request(ACCESS_TOKEN, "githubUrl");
 
         //then
-        assertThat(request).isEqualTo(RIGHT_RESPONSE);
+        assertThat(request).isEqualTo(VALID_RESPONSE);
     }
 
-    @DisplayName("잘못된 토큰으로 깃허브 레포지토리 요청을 하면, badCredential 예외가 발생한다.")
+    @DisplayName("잘못된 토큰으로 깃허브 레포지토리 요청을 하면, Bad Credential 예외가 발생한다.")
     @Test
     void request_requestGithubRepositoryOfUserWithBadBearerToken_thenGetBadCredential() {
         //when
-        String request = githubRepositoryApiRequester
-            .request("Bearer invalidToken", "githubUrl");
+        String request = githubRepositoryApiRequester.request("Bearer invalidToken", "githubUrl");
 
         //then
-        assertThat(request).isEqualTo(BAD_CREDENTIAL);
+        assertThat(request).isEqualTo(INVALID_RESPONSE);
     }
 
-    @DisplayName("토큰 없이 깃허브 레포지토리 요청을 하면, badCredential 예외가 발생한다.")
+    @DisplayName("토큰 없이 깃허브 레포지토리 요청을 하면, Bad Credential 예외가 발생한다.")
     @Test
     void request_requestGithubRepositoryWithoutBearerToken_thenGetBadCredential() {
         //when
-        String request = githubRepositoryApiRequester
-            .request(null, "githubUrl");
+        String request = githubRepositoryApiRequester.request(null, "githubUrl");
 
         //then
-        assertThat(request).isEqualTo(BAD_CREDENTIAL);
+        assertThat(request).isEqualTo(INVALID_RESPONSE);
     }
 
     private void setUpGithubRepositoryApiRequester(
