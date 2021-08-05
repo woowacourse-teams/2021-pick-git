@@ -1,22 +1,19 @@
-import { QueryFunction, useMutation, useQuery, useQueryClient } from "react-query";
-import axios, { AxiosError } from "axios";
+import { QueryFunction, useInfiniteQuery, useMutation, useQuery } from "react-query";
+import { AxiosError } from "axios";
 
-import { ErrorResponse, MutateResponseFollow, ProfileData } from "../../@types";
+import { ErrorResponse, MutateResponseFollow, ProfileData, UserItem } from "../../@types";
 import { QUERY } from "../../constants/queries";
 import {
   requestAddFollow,
   requestDeleteFollow,
+  requestGetFollowers,
+  requestGetFollowings,
   requestGetSelfProfile,
   requestGetUserProfile,
   requestSetProfile,
 } from "../requests";
-import UserContext from "../../contexts/UserContext";
-import { useContext } from "react";
 import { getAccessToken } from "../../storage/storage";
-import SnackBarContext from "../../contexts/SnackbarContext";
-import { SUCCESS_MESSAGE, UNKNOWN_ERROR_MESSAGE } from "../../constants/messages";
-import { customError, handleHTTPError } from "../../utils/error";
-import { isHttpErrorStatus } from "../../utils/typeGuard";
+import { customError } from "../../utils/error";
 
 type ProfileQueryKey = readonly [
   typeof QUERY.GET_PROFILE,
@@ -76,5 +73,21 @@ export const useUnfollowingMutation = () =>
 export const useProfileMutation = () => {
   return useMutation<SetProfileResponse, AxiosError<ErrorResponse> | Error, SetProfileVariable>(
     ({ image, description }) => requestSetProfile(image, description, getAccessToken())
+  );
+};
+
+export const useFollowingsQuery = (username: string | null) => {
+  return useInfiniteQuery<UserItem[] | null, AxiosError<ErrorResponse>>(
+    [QUERY.GET_PROFILE_FOLLOWING, { username }],
+    async ({ pageParam = 0 }) => await requestGetFollowings(username, pageParam, getAccessToken()),
+    { getNextPageParam: (_, pages) => pages.length }
+  );
+};
+
+export const useFollowersQuery = (username: string | null) => {
+  return useInfiniteQuery<UserItem[] | null, AxiosError<ErrorResponse>>(
+    [QUERY.GET_PROFILE_FOLLOWER, { username }],
+    async ({ pageParam = 0 }) => await requestGetFollowers(username, pageParam, getAccessToken()),
+    { getNextPageParam: (_, pages) => pages.length }
   );
 };
