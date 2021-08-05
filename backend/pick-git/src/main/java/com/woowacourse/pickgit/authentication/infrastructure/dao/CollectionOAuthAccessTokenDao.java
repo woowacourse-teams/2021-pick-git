@@ -10,7 +10,15 @@ import org.springframework.stereotype.Component;
 @Profile("!test")
 public class CollectionOAuthAccessTokenDao implements OAuthAccessTokenDao {
 
-    private final ConcurrentHashMap<String, String> tokenDB = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, String> tokenDB;
+
+    public CollectionOAuthAccessTokenDao() {
+        this(new ConcurrentHashMap<>());
+    }
+
+    private CollectionOAuthAccessTokenDao(ConcurrentHashMap<String, String> tokenDB) {
+        this.tokenDB = tokenDB;
+    }
 
     public void insert(String token, String oauthAccessToken) {
         tokenDB.put(token, oauthAccessToken);
