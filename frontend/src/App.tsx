@@ -22,6 +22,8 @@ import { SUCCESS_MESSAGE } from "./constants/messages";
 import EditPostPage from "./pages/EditPostPage/EditPostPage";
 import { PostEditStepContextProvider } from "./contexts/PostEditStepContext";
 import SearchPostResultPage from "./pages/SearchPostResultPage/SearchPostResultPage";
+import FollowingList from "./pages/FollowingUserListPage/FollowingList";
+import FollowerList from "./pages/FollowerList/FollowerList";
 
 const App = () => {
   const { currentUsername, login, logout } = useContext(UserContext);
@@ -48,7 +50,17 @@ const App = () => {
   return (
     <BrowserRouter>
       <Switch>
-        <Route exact path={[PAGE_URL.HOME, PAGE_URL.PROFILE, PAGE_URL.MY_PROFILE, PAGE_URL.USER_FEED_BASE]}>
+        <Route
+          exact
+          path={[
+            PAGE_URL.HOME,
+            PAGE_URL.PROFILE,
+            PAGE_URL.MY_PROFILE,
+            PAGE_URL.USER_FEED_BASE,
+            PAGE_URL.FOLLOWINGS_BASE,
+            PAGE_URL.FOLLOWERS_BASE,
+          ]}
+        >
           <NavigationHeader />
         </Route>
         <Route path={PAGE_URL.ADD_POST}>
@@ -85,6 +97,12 @@ const App = () => {
         </Route>
         <Route path={PAGE_URL.PROFILE}>
           <ProfilePage isMyProfile={false} />
+        </Route>
+        <Route path={PAGE_URL.FOLLOWINGS_BASE}>
+          <FollowingList />
+        </Route>
+        <Route path={PAGE_URL.FOLLOWERS_BASE}>
+          <FollowerList />
         </Route>
         <Route path={PAGE_URL.ADD_POST}>
           <PostAddDataContextProvider>

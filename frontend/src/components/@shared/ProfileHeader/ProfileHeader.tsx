@@ -1,7 +1,9 @@
 import { useContext } from "react";
+import { Link } from "react-router-dom";
 import { ThemeContext } from "styled-components";
 import { ProfileData } from "../../../@types";
 import { WARNING_MESSAGE } from "../../../constants/messages";
+import { PAGE_URL } from "../../../constants/urls";
 
 import UserContext from "../../../contexts/UserContext";
 import useMessageModal from "../../../services/hooks/@common/useMessageModal";
@@ -90,8 +92,12 @@ const ProfileHeader = ({ isMyProfile, profile, username }: Props) => {
       <div>
         <Indicators>
           <CountIndicator name="게시물" count={profile?.postCount ?? 0} />
-          <CountIndicator name="팔로워" count={profile?.followerCount ?? 0} />
-          <CountIndicator name="팔로잉" count={profile?.followingCount ?? 0} />
+          <Link to={PAGE_URL.FOLLOWERS(username)}>
+            <CountIndicator name="팔로워" count={profile?.followerCount ?? 0} />
+          </Link>
+          <Link to={PAGE_URL.FOLLOWINGS(username)}>
+            <CountIndicator name="팔로잉" count={profile?.followingCount ?? 0} />
+          </Link>
         </Indicators>
         <ProfileButton />
       </div>
