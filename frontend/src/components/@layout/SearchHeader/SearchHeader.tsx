@@ -16,11 +16,11 @@ const SearchHeader = () => {
     history.goBack();
   };
 
-  const applyKeywordToContext = useDebounce(() => onKeywordChange(localKeyword), 300);
+  const applyKeywordToContext = useDebounce<string>((value) => onKeywordChange(value ?? ""), 300);
 
   const handleKeywordChange: React.ChangeEventHandler<HTMLInputElement> = ({ target: { value } }) => {
     setLocalKeyword(value);
-    applyKeywordToContext();
+    applyKeywordToContext(value);
   };
 
   useEffect(() => {
