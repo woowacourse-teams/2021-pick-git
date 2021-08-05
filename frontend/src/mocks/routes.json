@@ -4,5 +4,7 @@
   "/profiles/:username": "/user-profiles",
   "/authorization/github": "/github-login",
   "/posts?page=:page&limit=:limit": "/posts?_page=:page&_limit=:limit",
-  "/posts/:username": "/posts"
+  "/posts/:username": "/posts",
+  "/search/posts?type=tags&keyword=asd&page=0&limit=5": "/posts",
+  "/search/posts?type=tags&keyword=asd&page=1&limit=5": "/empty"
 }
