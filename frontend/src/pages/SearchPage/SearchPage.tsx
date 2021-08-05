@@ -12,9 +12,17 @@ import useSearchUserData from "../../services/hooks/useSearchUserData";
 import { Container, Empty, KeywordsWrapper } from "./SearchPage.style";
 
 const tabNames = ["계정", "태그"];
+const searchTypeIndex = {
+  tags: 1,
+};
+
+const isSearchTypeValid = (type: string | null): type is keyof typeof searchTypeIndex =>
+  type !== null && type in searchTypeIndex;
 
 const SearchPage = () => {
-  const [tabIndex, setTabIndex] = useState(0);
+  const type = new URLSearchParams(location.search).get("type");
+  const defaultTabIndex = isSearchTypeValid(type) ? searchTypeIndex[type] : 0;
+  const [tabIndex, setTabIndex] = useState(defaultTabIndex);
   const {
     results: userSearchResults,
     isError: isUserSearchError,
@@ -73,7 +81,7 @@ const SearchPage = () => {
 
   return (
     <Container>
-      <Tabs tabItems={tabItems} tabIndicatorKind="line" />
+      <Tabs tabItems={tabItems} defaultTabIndex={defaultTabIndex} tabIndicatorKind="line" />
       <Content tabIndex={tabIndex} />
     </Container>
   );

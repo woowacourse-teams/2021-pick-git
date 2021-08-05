@@ -90,6 +90,20 @@ export const TagListWrapper = styled.div`
 export const TagItemLinkButton = styled(Link)`
   margin-right: 0.625rem;
   margin-bottom: 0.5625rem;
+
+  :hover {
+    span {
+      transition: opacity 0.5s;
+      opacity: 0.7;
+    }
+  }
+
+  :active {
+    span {
+      opacity: 0.7;
+      filter: brightness(1.1);
+    }
+  }
 `;
 
 export const CommentsWrapper = styled.div``;
