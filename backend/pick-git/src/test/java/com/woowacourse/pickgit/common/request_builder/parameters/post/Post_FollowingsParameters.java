@@ -3,7 +3,6 @@ package com.woowacourse.pickgit.common.request_builder.parameters.post;
 import static com.woowacourse.pickgit.common.PickgitHeaders.GITHUB_FOLLOWING;
 
 import com.woowacourse.pickgit.common.request_builder.parameters.Parameters;
-import com.woowacourse.pickgit.common.request_builder.parameters.put.Put_PostUpdateParameters;
 import io.restassured.specification.RequestSpecification;
 import org.springframework.http.HttpMethod;
 

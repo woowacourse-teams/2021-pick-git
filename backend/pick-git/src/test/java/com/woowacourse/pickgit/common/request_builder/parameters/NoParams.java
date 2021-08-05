@@ -1,6 +1,5 @@
 package com.woowacourse.pickgit.common.request_builder.parameters;
 
-import com.woowacourse.pickgit.common.request_builder.parameters.Parameters;
 import io.restassured.specification.RequestSpecification;
 import org.springframework.http.HttpMethod;
 

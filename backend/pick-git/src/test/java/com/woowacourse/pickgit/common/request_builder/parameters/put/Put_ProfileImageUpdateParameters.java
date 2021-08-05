@@ -2,10 +2,8 @@ package com.woowacourse.pickgit.common.request_builder.parameters.put;
 
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.request_builder.parameters.Parameters;
-import com.woowacourse.pickgit.common.request_builder.parameters.post.Post_PostWriteParameters;
 import io.restassured.specification.RequestSpecification;
 import java.io.File;
-import java.nio.file.Files;
 import org.apache.http.entity.ContentType;
 import org.springframework.http.HttpMethod;
 
