@@ -13,22 +13,22 @@ public class MockRepositoryApiRequester implements PlatformRepositoryApiRequeste
     public String request(String token, String url) {
         String apiUrl = String.format(API_URL_FORMAT, USERNAME);
 
-        if (isNotValidToken(token)) {
-            throw new PlatformHttpErrorException("외부 플랫폼 토큰 인증 실패");
+        if (isInvalidToken(token)) {
+            throw new PlatformHttpErrorException("유효하지 않은 외부 플랫폼 토큰");
         }
-        if (isNotValidUrl(url, apiUrl)) {
-            throw new PlatformHttpErrorException("외부 플랫폼 URL 찾기 실패");
+        if (isInvalidUrl(url, apiUrl)) {
+            throw new PlatformHttpErrorException("유효하지 않은 외부 플랫폼 URL");
         }
 
         return "[{\"name\": \"binghe-hi\", \"html_url\": \"https://github.com/jipark3/binghe-hi\"},"
             + "{\"name\": \"doms-react\", \"html_url\": \"https://github.com/jipark3/doms-react\"}]";
     }
 
-    private boolean isNotValidToken(String token) {
+    private boolean isInvalidToken(String token) {
         return !ACCESS_TOKEN.equals(token);
     }
 
-    private boolean isNotValidUrl(String url, String apiUrl) {
+    private boolean isInvalidUrl(String url, String apiUrl) {
         return !url.equals(apiUrl);
     }
 }

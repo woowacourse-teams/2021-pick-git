@@ -69,7 +69,7 @@ class GithubRepositoryExtractorTest {
         }).isInstanceOf(PlatformHttpErrorException.class)
             .hasFieldOrPropertyWithValue("errorCode", "V0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
-            .hasMessage("외부 플랫폼 연동에 실패");
+            .hasMessage("유효하지 않은 외부 플랫폼 토큰");
     }
 
     @DisplayName("사용자가 유효하지 않은 경우 예외가 발생한다. - 500 예외")
@@ -81,7 +81,7 @@ class GithubRepositoryExtractorTest {
         }).isInstanceOf(PlatformHttpErrorException.class)
             .hasFieldOrPropertyWithValue("errorCode", "V0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
-            .hasMessage("외부 플랫폼 연동에 실패");
+            .hasMessage("유효하지 않은 외부 플랫폼 URL");
     }
 
     private RepositoryNameAndUrl createRepositoryResponseDto(String name, String url) {
@@ -98,21 +98,21 @@ class GithubRepositoryExtractorTest {
         public String request(String token, String url) {
             String apiUrl = String.format(API_URL_FORMAT, USERNAME);
 
-            if (isNotValidToken(token)) {
-                throw new PlatformHttpErrorException("외부 플랫폼 토큰 인증 실패");
+            if (isInvalidToken(token)) {
+                throw new PlatformHttpErrorException("유효하지 않은 외부 플랫폼 토큰");
             }
-            if (isNotValidUrl(url, apiUrl)) {
-                throw new PlatformHttpErrorException("외부 플랫폼 URL 찾기 실패");
+            if (isInvalidUrl(url, apiUrl)) {
+                throw new PlatformHttpErrorException("유효하지 않은 외부 플랫폼 URL");
             }
 
             return "[]";
         }
 
-        private boolean isNotValidToken(String token) {
+        private boolean isInvalidToken(String token) {
             return !ACCESS_TOKEN.equals(token);
         }
 
-        private boolean isNotValidUrl(String url, String apiUrl) {
+        private boolean isInvalidUrl(String url, String apiUrl) {
             return !url.equals(apiUrl);
         }
     }
