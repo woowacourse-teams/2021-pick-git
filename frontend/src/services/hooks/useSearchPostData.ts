@@ -30,8 +30,6 @@ const useSearchPostData = (type: string | null, prevData?: InfiniteData<Post[]>)
     refetch,
   } = useSearchPostResultQuery(type, keyword, queryKey);
 
-  console.log(isAllResultFetched);
-
   const handleIntersect = async () => {
     if (isAllResultFetched) return;
 
