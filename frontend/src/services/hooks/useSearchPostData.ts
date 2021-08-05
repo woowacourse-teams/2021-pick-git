@@ -16,7 +16,8 @@ const useSearchPostData = (type: string | null, prevData?: InfiniteData<Post[]>)
   const { pushSnackbarMessage } = useContext(SnackBarContext);
   const { logout } = useContext(UserContext);
   const queryClient = useQueryClient();
-  const queryKey = [QUERY.GET_SEARCH_POST_RESULT, { type, keyword }];
+  const formattedKeyword = keyword.trim().replace(",", " ").replace(/\s+/g, " ");
+  const queryKey = [QUERY.GET_SEARCH_POST_RESULT, { type, formattedKeyword }];
 
   const [isAllResultFetched, setIsAllResultFetched] = useState(false);
   const {
@@ -86,7 +87,16 @@ const useSearchPostData = (type: string | null, prevData?: InfiniteData<Post[]>)
     handleDataFetch();
   }, [infinitePostsData]);
 
-  return { infinitePostsData, isError, isLoading, isFetchingNextPage, handleIntersect, refetch, queryKey };
+  return {
+    infinitePostsData,
+    isError,
+    isLoading,
+    isFetchingNextPage,
+    handleIntersect,
+    refetch,
+    queryKey,
+    formattedKeyword,
+  };
 };
 
 export default useSearchPostData;
