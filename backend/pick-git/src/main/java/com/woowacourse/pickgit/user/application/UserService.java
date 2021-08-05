@@ -2,8 +2,6 @@ package com.woowacourse.pickgit.user.application;
 
 import static java.util.stream.Collectors.toList;
 
-import com.woowacourse.pickgit.authentication.domain.OAuthAccessTokenDao;
-import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
@@ -40,18 +38,15 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PickGitStorage pickGitStorage;
-    private final OAuthAccessTokenDao oAuthAccessTokenDao;
     private final PlatformContributionCalculator platformContributionCalculator;
 
     public UserService(
         UserRepository userRepository,
         PickGitStorage pickGitStorage,
-        OAuthAccessTokenDao oAuthAccessTokenDao,
         PlatformContributionCalculator platformContributionCalculator
     ) {
         this.userRepository = userRepository;
         this.pickGitStorage = pickGitStorage;
-        this.oAuthAccessTokenDao = oAuthAccessTokenDao;
         this.platformContributionCalculator = platformContributionCalculator;
     }
 
@@ -161,6 +156,12 @@ public class UserService {
         return generateFollowResponse(target, false);
     }
 
+    private void validateIsGuest(AuthUserRequestDto requestDto) {
+        if (requestDto.isGuest()) {
+            throw new UnauthorizedException();
+        }
+    }
+
     private FollowResponseDto generateFollowResponse(User target, boolean isFollowing) {
         return FollowResponseDto.builder()
             .followerCount(target.getFollowerCount())
@@ -169,12 +170,10 @@ public class UserService {
     }
 
     public ContributionResponseDto calculateContributions(ContributionRequestDto requestDto) {
-        String accessToken = oAuthAccessTokenDao.findByKeyToken(requestDto.getAccessToken())
-            .orElseThrow(InvalidTokenException::new);
         User user = findUserByName(requestDto.getUsername());
 
         Contribution contribution = platformContributionCalculator
-            .calculate(accessToken, user.getName());
+            .calculate(requestDto.getAccessToken(), user.getName());
 
         return ContributionResponseDto.builder()
             .starsCount(contribution.getStarsCount())
@@ -219,6 +218,11 @@ public class UserService {
             .collect(toList());
     }
 
+    private User findUserByName(String githubName) {
+        return userRepository.findByBasicProfile_Name(githubName)
+            .orElseThrow(InvalidUserException::new);
+    }
+
     private List<UserSearchResponseDto> convertToUserSearchResponseDtoWithFollowing(
         User loginUser,
         List<User> users
@@ -235,16 +239,5 @@ public class UserService {
 
     private Predicate<User> isLoginUser(User loginUser) {
         return user -> !user.equals(loginUser);
-    }
-
-    private void validateIsGuest(AuthUserRequestDto requestDto) {
-        if (requestDto.isGuest()) {
-            throw new UnauthorizedException();
-        }
-    }
-
-    private User findUserByName(String githubName) {
-        return userRepository.findByBasicProfile_Name(githubName)
-            .orElseThrow(InvalidUserException::new);
     }
 }
