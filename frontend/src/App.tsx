@@ -24,6 +24,7 @@ import { PostEditStepContextProvider } from "./contexts/PostEditStepContext";
 import SearchPostResultPage from "./pages/SearchPostResultPage/SearchPostResultPage";
 import FollowingList from "./pages/FollowingUserListPage/FollowingList";
 import FollowerList from "./pages/FollowerList/FollowerList";
+import OneDepthStepHeader from "./components/OneDepthStepHeader/OneDepthStepHeader";
 
 const App = () => {
   const { currentUsername, login, logout } = useContext(UserContext);
@@ -50,18 +51,14 @@ const App = () => {
   return (
     <BrowserRouter>
       <Switch>
-        <Route
-          exact
-          path={[
-            PAGE_URL.HOME,
-            PAGE_URL.PROFILE,
-            PAGE_URL.MY_PROFILE,
-            PAGE_URL.USER_FEED_BASE,
-            PAGE_URL.FOLLOWINGS_BASE,
-            PAGE_URL.FOLLOWERS_BASE,
-          ]}
-        >
+        <Route exact path={[PAGE_URL.HOME, PAGE_URL.PROFILE, PAGE_URL.MY_PROFILE, PAGE_URL.USER_FEED_BASE]}>
           <NavigationHeader />
+        </Route>
+        <Route exact path={PAGE_URL.FOLLOWINGS_BASE}>
+          <OneDepthStepHeader title="팔로잉 목록" />
+        </Route>
+        <Route exact path={PAGE_URL.FOLLOWERS_BASE}>
+          <OneDepthStepHeader title="팔로우 목록" />
         </Route>
         <Route path={PAGE_URL.ADD_POST}>
           <PostAddStepHeader />
