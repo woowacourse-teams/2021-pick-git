@@ -8,7 +8,8 @@ import SearchContext from "../../../contexts/SearchContext";
 import useDebounce from "../../../services/hooks/@common/useDebounce";
 
 const SearchHeader = () => {
-  const [localKeyword, setLocalKeyword] = useState("");
+  const defaultKeyword = new URLSearchParams(location.search).get("keyword");
+  const [localKeyword, setLocalKeyword] = useState(defaultKeyword ?? "");
   const history = useHistory();
   const { onKeywordChange } = useContext(SearchContext);
 
@@ -20,12 +21,15 @@ const SearchHeader = () => {
 
   const handleKeywordChange: React.ChangeEventHandler<HTMLInputElement> = ({ target: { value } }) => {
     setLocalKeyword(value);
-    applyKeywordToContext(value);
   };
 
   useEffect(() => {
     onKeywordChange("");
   }, []);
+
+  useEffect(() => {
+    applyKeywordToContext(localKeyword);
+  }, [localKeyword]);
 
   return (
     <Container>
