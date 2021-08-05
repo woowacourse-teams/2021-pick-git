@@ -1,9 +1,7 @@
-package com.woowacourse.pickgit.user.domain;
+package com.woowacourse.pickgit.user.infrastructure.extractor;
 
 import com.woowacourse.pickgit.user.infrastructure.dto.CountDto;
 import com.woowacourse.pickgit.user.infrastructure.dto.ItemDto;
-import com.woowacourse.pickgit.user.infrastructure.dto.StarsDto;
-import java.util.List;
 
 public interface PlatformContributionExtractor {
 

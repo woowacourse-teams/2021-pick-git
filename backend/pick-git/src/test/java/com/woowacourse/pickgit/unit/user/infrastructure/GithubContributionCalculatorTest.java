@@ -9,7 +9,7 @@ import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.user.ContributionParseException;
 import com.woowacourse.pickgit.user.domain.Contribution;
 import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
-import com.woowacourse.pickgit.user.domain.PlatformContributionExtractor;
+import com.woowacourse.pickgit.user.infrastructure.extractor.PlatformContributionExtractor;
 import com.woowacourse.pickgit.user.infrastructure.calculator.GithubContributionCalculator;
 import com.woowacourse.pickgit.user.infrastructure.extractor.GithubContributionExtractor;
 import com.woowacourse.pickgit.user.infrastructure.requester.PlatformContributionApiRequester;

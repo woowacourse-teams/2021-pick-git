@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woowacourse.pickgit.common.mockapi.MockContributionApiRequester;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.user.ContributionParseException;
-import com.woowacourse.pickgit.user.domain.PlatformContributionExtractor;
+import com.woowacourse.pickgit.user.infrastructure.extractor.PlatformContributionExtractor;
 import com.woowacourse.pickgit.user.infrastructure.dto.CountDto;
 import com.woowacourse.pickgit.user.infrastructure.dto.ItemDto;
 import com.woowacourse.pickgit.user.infrastructure.dto.StarsDto;
