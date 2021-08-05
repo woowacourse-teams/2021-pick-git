@@ -59,11 +59,11 @@ const useFollow = () => {
     }
   };
 
-  const toggleFollow = async (username: string, isFollowing: boolean) => {
+  const toggleFollow = async (username: string, isFollowing: boolean, applyGithub: boolean) => {
     try {
       const { followerCount, following } = isFollowing
-        ? await mutateToUnFollow(username)
-        : await mutateToFollow(username);
+        ? await mutateToUnFollow({ username, applyGithub })
+        : await mutateToFollow({ username, applyGithub });
 
       setProfileQueryData(username, followerCount, following);
     } catch (error) {

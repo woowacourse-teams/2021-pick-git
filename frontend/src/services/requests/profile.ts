@@ -31,12 +31,12 @@ export const requestGetUserProfile = async (username: string, accessToken: strin
   return response.data;
 };
 
-export const requestAddFollow = async (username: string, accessToken: string | null) => {
+export const requestAddFollow = async (username: string, applyGithub: boolean, accessToken: string | null) => {
   if (!accessToken) {
     throw customError.noAccessToken;
   }
 
-  const response = await axios.post<MutateResponseFollow>(API_URL.USER_PROFILE_FOLLOW(username), null, {
+  const response = await axios.post<MutateResponseFollow>(API_URL.USER_PROFILE_FOLLOW(username, applyGithub), null, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -45,12 +45,12 @@ export const requestAddFollow = async (username: string, accessToken: string | n
   return response.data;
 };
 
-export const requestDeleteFollow = async (username: string, accessToken: string | null) => {
+export const requestDeleteFollow = async (username: string, applyGithub: boolean, accessToken: string | null) => {
   if (!accessToken) {
     throw customError.noAccessToken;
   }
 
-  const response = await axios.delete<MutateResponseFollow>(API_URL.USER_PROFILE_FOLLOW(username), {
+  const response = await axios.delete<MutateResponseFollow>(API_URL.USER_PROFILE_UNFOLLOW(username, applyGithub), {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },

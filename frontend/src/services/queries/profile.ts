@@ -36,6 +36,11 @@ interface SetProfileResponse {
   description: string;
 }
 
+interface MutateFollowVariable {
+  username: string;
+  applyGithub: boolean;
+}
+
 export const useProfileQuery = (isMyProfile: boolean, username: string | null) => {
   const profileQueryFunction: QueryFunction<ProfileData> = async ({ queryKey }) => {
     const [, { isMyProfile, username }] = queryKey as ProfileQueryKey;
@@ -59,13 +64,13 @@ export const useProfileQuery = (isMyProfile: boolean, username: string | null) =
 };
 
 export const useFollowingMutation = () =>
-  useMutation<MutateResponseFollow, AxiosError<ErrorResponse>, string>((username) =>
-    requestAddFollow(username, getAccessToken())
+  useMutation<MutateResponseFollow, AxiosError<ErrorResponse>, MutateFollowVariable>(({ username, applyGithub }) =>
+    requestAddFollow(username, applyGithub, getAccessToken())
   );
 
 export const useUnfollowingMutation = () =>
-  useMutation<MutateResponseFollow, AxiosError<ErrorResponse>, string>((username) =>
-    requestDeleteFollow(username, getAccessToken())
+  useMutation<MutateResponseFollow, AxiosError<ErrorResponse>, MutateFollowVariable>(({ username, applyGithub }) =>
+    requestDeleteFollow(username, applyGithub, getAccessToken())
   );
 
 export const useProfileMutation = () => {

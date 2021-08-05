@@ -35,7 +35,10 @@ export const API_URL = {
   ADD_POSTS: "/posts",
   GITHUB_REPOSITORIES: (username: string) => `/github/${username}/repositories`,
   USER_PROFILE: (username: string) => `/profiles/${username}`,
-  USER_PROFILE_FOLLOW: (username: string) => `/profiles/${username}/followings`,
+  USER_PROFILE_FOLLOW: (username: string, githubFollowing: boolean) =>
+    `/profiles/${username}/followings?githubFollowing=${githubFollowing}`,
+  USER_PROFILE_UNFOLLOW: (username: string, githubUnfollowing: boolean) =>
+    `/profiles/${username}/followings?githubUnfollowing=${githubUnfollowing}`,
   MY_POSTS: (page: number, limit: number) => `/posts/me?page=${page}&limit=${limit}`,
   USER_POSTS: (username: string, page: number, limit: number) => `/posts/${username}?page=${page}&limit=${limit}`,
   SEARCH_USER: (keyword: string, page: number, limit: number) =>

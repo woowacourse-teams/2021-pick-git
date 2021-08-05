@@ -1,10 +1,13 @@
 import { useContext } from "react";
 import { ThemeContext } from "styled-components";
 import { ProfileData } from "../../../@types";
+import { WARNING_MESSAGE } from "../../../constants/messages";
 
 import UserContext from "../../../contexts/UserContext";
+import useMessageModal from "../../../services/hooks/@common/useMessageModal";
 import useModal from "../../../services/hooks/@common/useModal";
 import useFollow from "../../../services/hooks/useFollow";
+import MessageModalPortal from "../../@layout/MessageModalPortal/MessageModalPortal";
 import ModalPortal from "../../@layout/Modal/ModalPortal";
 import ProfileModificationForm from "../../ProfileModificationForm/ProfileModificationForm";
 import Avatar from "../Avatar/Avatar";
@@ -22,11 +25,20 @@ const ProfileHeader = ({ isMyProfile, profile, username }: Props) => {
   const theme = useContext(ThemeContext);
   const { isLoggedIn } = useContext(UserContext);
   const { isModalShown, showModal, hideModal } = useModal(false);
+  const { modalMessage, isModalShown: isMessageModalShown, hideMessageModal, showConfirmModal } = useMessageModal();
   const { toggleFollow, isFollowLoading, isUnfollowLoading } = useFollow();
+
+  const toggleFollowWithGithubFollowing = (applyGithub: boolean) => () => {
+    if (profile && profile.following !== null) {
+      toggleFollow(username, profile.following, applyGithub);
+    }
+
+    hideMessageModal();
+  };
 
   const handleFollowButtonClick = () => {
     if (profile && profile.following !== null) {
-      toggleFollow(username, profile.following);
+      showConfirmModal(profile.following ? WARNING_MESSAGE.GITHUB_UNFOLLOWING : WARNING_MESSAGE.GITHUB_FOLLOWING);
     }
   };
 
@@ -92,6 +104,14 @@ const ProfileHeader = ({ isMyProfile, profile, username }: Props) => {
             onTerminate={hideModal}
           />
         </ModalPortal>
+      )}
+      {isMessageModalShown && (
+        <MessageModalPortal
+          heading={modalMessage}
+          onConfirm={toggleFollowWithGithubFollowing(true)}
+          onCancel={toggleFollowWithGithubFollowing(false)}
+          onClose={hideMessageModal}
+        />
       )}
     </Container>
   );
