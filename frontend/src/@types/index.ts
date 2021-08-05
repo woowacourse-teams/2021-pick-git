@@ -21,7 +21,7 @@ export interface MutateResponseFollow {
   following: boolean;
 }
 
-export interface SearchResultUser {
+export interface UserItem {
   imageUrl: string;
   username: string;
   following: boolean | null;

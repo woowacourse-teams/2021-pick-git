@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { Spinner } from "../@shared/Loader/Loader.style";
 
-export const UserList = styled.li`
+export const List = styled.li`
   display: flex;
   justify-content: space-between;
   align-items: center;

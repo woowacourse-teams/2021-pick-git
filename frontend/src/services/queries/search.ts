@@ -1,13 +1,13 @@
 import { AxiosError } from "axios";
 
 import { QueryKey, useInfiniteQuery } from "react-query";
-import { ErrorResponse, Post, SearchResultUser } from "../../@types";
+import { ErrorResponse, Post, UserItem } from "../../@types";
 import { QUERY } from "../../constants/queries";
 import { getAccessToken } from "../../storage/storage";
 import { requestGetSearchUserResult, requestGetSearchPostResult } from "../requests";
 
 export const useSearchUserResultQuery = (keyword: string) =>
-  useInfiniteQuery<SearchResultUser[] | null, AxiosError<ErrorResponse>>(
+  useInfiniteQuery<UserItem[] | null, AxiosError<ErrorResponse>>(
     [QUERY.GET_SEARCH_USER_RESULT, { keyword }],
     async ({ pageParam = 0 }) => await requestGetSearchUserResult(keyword, pageParam, getAccessToken()),
     {

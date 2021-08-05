@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 
-import { HTTPErrorHandler, SearchResultUser } from "../../@types";
+import { HTTPErrorHandler, UserItem } from "../../@types";
 import { UNKNOWN_ERROR_MESSAGE } from "../../constants/messages";
 import SearchContext from "../../contexts/SearchContext";
 import SnackBarContext from "../../contexts/SnackbarContext";
@@ -16,7 +16,7 @@ const useSearchUserData = () => {
   const { pushSnackbarMessage } = useContext(SnackBarContext);
   const { logout } = useContext(UserContext);
 
-  const [results, setResults] = useState<SearchResultUser[]>([]);
+  const [results, setResults] = useState<UserItem[]>([]);
   const [isAllResultFetched, setIsAllResultFetched] = useState(false);
   const { data, error, isError, isLoading, fetchNextPage, isFetchingNextPage, refetch } =
     useSearchUserResultQuery(keyword);
@@ -40,7 +40,7 @@ const useSearchUserData = () => {
     }
 
     const fetchedData = pages.map((page) => page ?? []).reduce((acc, page) => [...acc, ...page], []);
-    const filteredData = removeDuplicatedData<SearchResultUser>(fetchedData, (data) => data);
+    const filteredData = removeDuplicatedData<UserItem>(fetchedData, (data) => data);
 
     setResults(filteredData);
   };
