@@ -180,8 +180,7 @@ public class UserController {
             .build();
         List<UserSearchResponseDto> userSearchResponseDtos =
             userService.searchFollowings(authUserRequestDto, followSearchRequestDto);
-        List<UserSearchResponse> userSearchResponses = convert(userSearchResponseDtos);
-        return ResponseEntity.ok(userSearchResponses);
+        return ResponseEntity.ok(createUserSearchResponses(userSearchResponseDtos));
     }
 
     @GetMapping("/{username}/followers")
@@ -199,17 +198,20 @@ public class UserController {
             .build();
         List<UserSearchResponseDto> userSearchResponseDtos =
             userService.searchFollowers(authUserRequestDto, followSearchRequestDto);
-        List<UserSearchResponse> userSearchResponses = convert(userSearchResponseDtos);
-        return ResponseEntity.ok(userSearchResponses);
+        return ResponseEntity.ok(createUserSearchResponses(userSearchResponseDtos));
     }
 
-    private List<UserSearchResponse> convert(List<UserSearchResponseDto> userSearchResponseDtos) {
+    private List<UserSearchResponse> createUserSearchResponses(
+        List<UserSearchResponseDto> userSearchResponseDtos
+    ) {
         return userSearchResponseDtos.stream()
-            .map(this::convert)
+            .map(this::createUserSearchResponse)
             .collect(toList());
     }
 
-    private UserSearchResponse convert(UserSearchResponseDto userSearchResponseDto) {
+    private UserSearchResponse createUserSearchResponse(
+        UserSearchResponseDto userSearchResponseDto
+    ) {
         return UserSearchResponse.builder()
             .imageUrl(userSearchResponseDto.getImageUrl())
             .username(userSearchResponseDto.getUsername())

@@ -27,7 +27,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -255,7 +254,7 @@ public class UserService {
     ) {
         return followings.stream()
             .map(followUser -> convert(loginUser, followUser))
-            .collect(Collectors.toList());
+            .collect(toList());
     }
 
     private UserSearchResponseDto convert(User loginUser, User followUser) {

@@ -32,7 +32,7 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @ActiveProfiles("test")
-class Acceptance_GetFollowingsAndFollowers {
+class UserAcceptance_GetFollowingsAndFollowers {
 
     @LocalServerPort
     private int port;
