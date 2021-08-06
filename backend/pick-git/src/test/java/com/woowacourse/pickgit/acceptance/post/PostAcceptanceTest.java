@@ -45,8 +45,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Import(InfrastructureTestConfiguration.class)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @ActiveProfiles("test")
 class PostAcceptanceTest {
@@ -54,24 +54,22 @@ class PostAcceptanceTest {
     private static final String ANOTHER_USERNAME = "pick-git-login";
     private static final String USERNAME = "jipark3";
 
-    @LocalServerPort
-    int port;
+    private String githubRepoUrl;
+    private String content;
+    private Map<String, Object> request;
 
     @MockBean
     private OAuthClient oAuthClient;
 
-    private String githubRepoUrl;
-    private List<String> tags;
-    private String content;
-
-    private Map<String, Object> request;
+    @LocalServerPort
+    int port;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
 
         githubRepoUrl = "https://github.com/woowacourse-teams/2021-pick-git";
-        tags = List.of("java", "spring");
+        List<String> tags = List.of("java", "spring");
         content = "this is content";
 
         Map<String, Object> body = new HashMap<>();
@@ -184,7 +182,7 @@ class PostAcceptanceTest {
             .then().log().all()
             .statusCode(HttpStatus.OK.value())
             .extract()
-            .as(new TypeRef<List<PostResponseDto>>() {
+            .as(new TypeRef<>() {
             });
 
         assertThat(response)
@@ -208,7 +206,7 @@ class PostAcceptanceTest {
             .then().log().all()
             .statusCode(HttpStatus.OK.value())
             .extract()
-            .as(new TypeRef<List<PostResponseDto>>() {
+            .as(new TypeRef<>() {
             });
 
         assertThat(response)
@@ -233,7 +231,7 @@ class PostAcceptanceTest {
             .then().log().all()
             .statusCode(HttpStatus.OK.value())
             .extract()
-            .as(new TypeRef<List<PostResponseDto>>() {
+            .as(new TypeRef<>() {
             });
 
         assertThat(response)
@@ -275,7 +273,7 @@ class PostAcceptanceTest {
             .then().log().all()
             .statusCode(HttpStatus.OK.value())
             .extract()
-            .as(new TypeRef<List<PostResponseDto>>() {
+            .as(new TypeRef<>() {
             });
 
         assertThat(response)
@@ -299,7 +297,7 @@ class PostAcceptanceTest {
             .then().log().all()
             .statusCode(HttpStatus.OK.value())
             .extract()
-            .as(new TypeRef<List<PostResponseDto>>() {
+            .as(new TypeRef<>() {
             });
 
         assertThat(response)
@@ -461,7 +459,8 @@ class PostAcceptanceTest {
         String token,
         Long postId,
         ContentRequest request,
-        HttpStatus httpStatus) {
+        HttpStatus httpStatus
+    ) {
         return given().log().all()
             .auth().oauth2(token)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -475,14 +474,14 @@ class PostAcceptanceTest {
 
     @DisplayName("사용자는 Repository 목록을 가져올 수 있다.")
     @Test
-    void showRepositories_LoginUser_Success() {
+    void userRepositories_LoginUser_Success() {
         // given
-        String token = 로그인_되어있음(ANOTHER_USERNAME).getToken();
+        String token = 로그인_되어있음(USERNAME).getToken();
 
         // when
-        List<RepositoryResponseDto> response =
-            request(token, USERNAME, HttpStatus.OK.value())
-                .as(new TypeRef<>() {});
+        List<RepositoryResponseDto> response = requestUserRepositories(token, HttpStatus.OK.value())
+            .as(new TypeRef<>() {
+            });
 
         // then
         assertThat(response).hasSize(2);
@@ -490,27 +489,22 @@ class PostAcceptanceTest {
 
     @DisplayName("토큰이 유효하지 않은 경우 예외가 발생한다. - 500 예외")
     @Test
-    void showRepositories_InvalidAccessToken_500Exception() {
+    void userRepositories_InvalidAccessToken_500Exception() {
         // given
-        String token = 로그인_되어있음(ANOTHER_USERNAME).getToken();
+        String token = 로그인_되어있음(USERNAME).getToken();
 
         // when
-        request(token + "hi", USERNAME, HttpStatus.UNAUTHORIZED.value());
+        requestUserRepositories(token + "hi", HttpStatus.UNAUTHORIZED.value());
     }
 
-    @DisplayName("사용자가 유효하지 않은 경우 예외가 발생한다. - 500 예외")
-    @Test
-    void showRepositories_InvalidUsername_400Exception() {
-        // given
-        String token = 로그인_되어있음(ANOTHER_USERNAME).getToken();
-
-        // when
-        ApiErrorResponse response =
-            request(token, USERNAME + "pika", HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .as(ApiErrorResponse.class);
-
-        // then
-        assertThat(response.getErrorCode()).isEqualTo("V0001");
+    private ExtractableResponse<Response> requestUserRepositories(String token, int statusCode) {
+        return given().log().all()
+            .auth().oauth2(token)
+            .when()
+            .get("/api/github/repositories?page=" + 0L + "&limit=" + 50L)
+            .then().log().all()
+            .statusCode(statusCode)
+            .extract();
     }
 
     @DisplayName("로그인 사용자는 게시물을 좋아요 할 수 있다. - 성공")
@@ -685,16 +679,6 @@ class PostAcceptanceTest {
 
         // then
         assertThat(unlikeResponse.getErrorCode()).isEqualTo("P0004");
-    }
-
-    private ExtractableResponse<Response> request(String token, String username, int statusCode) {
-        return given().log().all()
-            .auth().oauth2(token)
-            .when()
-            .get("/api/github/{username}/repositories", username)
-            .then().log().all()
-            .statusCode(statusCode)
-            .extract();
     }
 
     @DisplayName("사용자는 게시물을 수정한다.")

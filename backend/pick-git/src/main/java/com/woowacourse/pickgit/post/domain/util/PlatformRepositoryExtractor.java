@@ -1,9 +1,10 @@
 package com.woowacourse.pickgit.post.domain.util;
 
-import com.woowacourse.pickgit.post.domain.util.dto.RepositoryUrlAndName;
+import com.woowacourse.pickgit.post.domain.util.dto.RepositoryNameAndUrl;
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 
 public interface PlatformRepositoryExtractor {
 
-    List<RepositoryUrlAndName> extract(String token, String username);
+    List<RepositoryNameAndUrl> extract(String token, String username, Pageable pageable);
 }

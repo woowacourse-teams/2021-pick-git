@@ -2,7 +2,6 @@ package com.woowacourse.pickgit.user.domain;
 
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.Posts;
-import com.woowacourse.pickgit.post.domain.comment.Comment;
 import com.woowacourse.pickgit.user.domain.follow.Follow;
 import com.woowacourse.pickgit.user.domain.follow.Followers;
 import com.woowacourse.pickgit.user.domain.follow.Followings;

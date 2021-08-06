@@ -8,7 +8,7 @@ public class PlatformHttpErrorException extends PlatformException {
     private static final String MESSAGE = "외부 플랫폼 연동에 실패";
 
     public PlatformHttpErrorException() {
-        super(CODE, HttpStatus.INTERNAL_SERVER_ERROR, MESSAGE);
+        this(MESSAGE);
     }
 
     public PlatformHttpErrorException(String message) {

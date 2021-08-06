@@ -30,7 +30,7 @@ import com.woowacourse.pickgit.post.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
-import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDtos;
+import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponsesDto;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.user.domain.User;
@@ -55,6 +55,7 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @ActiveProfiles("test")
 class PostServiceIntegrationTest {
+
     private static final String USERNAME = "jipark3";
     private static final String ACCESS_TOKEN = "oauth.access.token";
 
@@ -66,7 +67,7 @@ class PostServiceIntegrationTest {
 
     @Autowired
     private UserRepository userRepository;
-    
+
     @DisplayName("게시물에 댓글을 정상 등록한다.")
     @Test
     void addComment_ValidContent_Success() {
@@ -225,23 +226,20 @@ class PostServiceIntegrationTest {
     @Test
     void showRepositories_LoginUser_Success() {
         // given
-        RepositoryRequestDto requestDto = new RepositoryRequestDto(ACCESS_TOKEN, USERNAME);
+        RepositoryRequestDto requestDto = createRepositoryRequestDto(ACCESS_TOKEN, USERNAME);
 
         // when
-        RepositoryResponseDtos responseDto = postService.userRepositories(requestDto);
+        RepositoryResponsesDto responseDto = postService.userRepositories(requestDto);
 
         // then
-        assertThat(responseDto.getRepositoryResponseDtos()).hasSize(2);
+        assertThat(responseDto.getRepositoryResponsesDto()).hasSize(2);
     }
 
     @DisplayName("토큰이 유효하지 않은 경우 예외가 발생한다. - 500 예외")
     @Test
     void showRepositories_InvalidAccessToken_401Exception() {
         // given
-        String invalidToken = "invalidToken";
-
-        RepositoryRequestDto requestDto =
-            new RepositoryRequestDto(invalidToken, USERNAME);
+        RepositoryRequestDto requestDto = createRepositoryRequestDto("invalidToken", USERNAME);
 
         // then
         assertThatThrownBy(() -> {
@@ -255,10 +253,7 @@ class PostServiceIntegrationTest {
     @Test
     void showRepositories_InvalidUsername_404Exception() {
         // given
-        String invalidUserName = "invalidUser";
-
-        RepositoryRequestDto requestDto =
-            new RepositoryRequestDto(ACCESS_TOKEN, invalidUserName);
+        RepositoryRequestDto requestDto = createRepositoryRequestDto(ACCESS_TOKEN, "invalidUser");
 
         // then
         assertThatThrownBy(() ->
@@ -266,6 +261,15 @@ class PostServiceIntegrationTest {
         ).isInstanceOf(PlatformHttpErrorException.class)
             .extracting("errorCode")
             .isEqualTo("V0001");
+    }
+
+    private RepositoryRequestDto createRepositoryRequestDto(String token, String username) {
+        return RepositoryRequestDto.builder()
+            .token(token)
+            .username(username)
+            .page(0L)
+            .limit(50L)
+            .build();
     }
 
     @DisplayName("사용자는 특정 게시물을 좋아요 할 수 있다. - 성공")
