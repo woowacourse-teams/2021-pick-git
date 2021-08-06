@@ -16,7 +16,7 @@ import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
-import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDtos;
+import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponsesDto;
 import com.woowacourse.pickgit.post.presentation.dto.request.ContentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.PostRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
@@ -53,10 +53,7 @@ public class PostController {
     }
 
     @PostMapping("/posts")
-    public ResponseEntity<Void> write(
-        @Authenticated AppUser user,
-        PostRequest request
-    ) {
+    public ResponseEntity<Void> write(@Authenticated AppUser user, PostRequest request) {
         PostImageUrlResponseDto postImageUrlResponseDto =
             postService.write(createPostRequestDto(user, request));
 
@@ -116,20 +113,25 @@ public class PostController {
             .build();
     }
 
-    @GetMapping("/github/{username}/repositories")
-    public ResponseEntity<List<RepositoryResponse>> userRepositories(
-        @Authenticated AppUser user,
-        @PathVariable String username
-    ) {
-        String token = user.getAccessToken();
+    @GetMapping("/github/repositories")
+    public ResponseEntity<List<RepositoryResponse>> userRepositories(@Authenticated AppUser user) {
+        RepositoryRequestDto repositoryRequestDto = toRepositoryRequestDto(user);
 
-        RepositoryRequestDto repositoryRequestDto = new RepositoryRequestDto(token, username);
-        RepositoryResponseDtos repositoryResponseDtos =
-            postService.userRepositories(repositoryRequestDto);
+        RepositoryResponsesDto repositoryResponsesDto = postService
+            .userRepositories(repositoryRequestDto);
+
         List<RepositoryResponse> repositoryResponses = toRepositoryResponses(
-            repositoryResponseDtos.getRepositoryResponseDtos());
+            repositoryResponsesDto.getRepositoryResponsesDto()
+        );
 
         return ResponseEntity.ok(repositoryResponses);
+    }
+
+    private RepositoryRequestDto toRepositoryRequestDto(AppUser user) {
+        return RepositoryRequestDto.builder()
+            .token(user.getAccessToken())
+            .username(user.getUsername())
+            .build();
     }
 
     private List<RepositoryResponse> toRepositoryResponses(
@@ -142,8 +144,8 @@ public class PostController {
 
     private Function<RepositoryResponseDto, RepositoryResponse> toRepositoryResponse() {
         return repositoryResponseDto -> RepositoryResponse.builder()
-            .name(repositoryResponseDto.getName())
             .url(repositoryResponseDto.getUrl())
+            .name(repositoryResponseDto.getName())
             .build();
     }
 

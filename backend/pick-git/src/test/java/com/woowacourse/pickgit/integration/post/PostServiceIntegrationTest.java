@@ -30,7 +30,7 @@ import com.woowacourse.pickgit.post.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
-import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDtos;
+import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponsesDto;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.user.domain.User;
@@ -228,10 +228,10 @@ class PostServiceIntegrationTest {
         RepositoryRequestDto requestDto = new RepositoryRequestDto(ACCESS_TOKEN, USERNAME);
 
         // when
-        RepositoryResponseDtos responseDto = postService.userRepositories(requestDto);
+        RepositoryResponsesDto responseDto = postService.userRepositories(requestDto);
 
         // then
-        assertThat(responseDto.getRepositoryResponseDtos()).hasSize(2);
+        assertThat(responseDto.getRepositoryResponsesDto()).hasSize(2);
     }
 
     @DisplayName("토큰이 유효하지 않은 경우 예외가 발생한다. - 500 예외")

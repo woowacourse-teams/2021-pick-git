@@ -16,7 +16,7 @@ import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
-import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDtos;
+import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponsesDto;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.comment.Comment;
 import com.woowacourse.pickgit.post.domain.repository.PickGitStorage;
@@ -118,7 +118,7 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public RepositoryResponseDtos userRepositories(RepositoryRequestDto repositoryRequestDto) {
+    public RepositoryResponsesDto userRepositories(RepositoryRequestDto repositoryRequestDto) {
         String token = repositoryRequestDto.getToken();
         String username = repositoryRequestDto.getUsername();
 
@@ -127,7 +127,7 @@ public class PostService {
         List<RepositoryResponseDto> repositoryResponseDtos =
             createRepositoryResponseDtos(repositoryUrlAndNames);
 
-        return new RepositoryResponseDtos(repositoryResponseDtos);
+        return new RepositoryResponsesDto(repositoryResponseDtos);
     }
 
     private List<RepositoryResponseDto> createRepositoryResponseDtos(

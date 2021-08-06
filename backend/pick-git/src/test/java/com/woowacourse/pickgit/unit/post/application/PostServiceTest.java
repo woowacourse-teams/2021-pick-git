@@ -39,7 +39,7 @@ import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
-import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDtos;
+import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponsesDto;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.content.Image;
 import com.woowacourse.pickgit.post.domain.content.Images;
@@ -294,8 +294,8 @@ class PostServiceTest {
             .willReturn(repositories);
 
         // when
-        RepositoryResponseDtos repositoryResponseDtos = postService.userRepositories(requestDto);
-        List<RepositoryResponseDto> responseDtos = repositoryResponseDtos.getRepositoryResponseDtos();
+        RepositoryResponsesDto repositoryResponsesDto = postService.userRepositories(requestDto);
+        List<RepositoryResponseDto> responseDtos = repositoryResponsesDto.getRepositoryResponsesDto();
 
         // then
         assertThat(responseDtos)

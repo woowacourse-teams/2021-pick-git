@@ -1,5 +1,8 @@
 package com.woowacourse.pickgit.post.application.dto.request;
 
+import lombok.Builder;
+
+@Builder
 public class RepositoryRequestDto {
 
     private String token;

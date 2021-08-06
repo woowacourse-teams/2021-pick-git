@@ -53,7 +53,7 @@ import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
-import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDtos;
+import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponsesDto;
 import com.woowacourse.pickgit.post.presentation.PostController;
 import com.woowacourse.pickgit.post.presentation.dto.request.ContentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
@@ -79,9 +79,7 @@ import org.springframework.test.web.servlet.ResultActions;
 @ActiveProfiles("test")
 class PostControllerTest {
 
-    private static final String USERNAME = "jipark3";
     private static final String ACCESS_TOKEN = "testToken";
-    private static final String API_ACCESS_TOKEN = "oauth.access.token";
 
     @Autowired
     private MockMvc mockMvc;
@@ -278,44 +276,46 @@ class PostControllerTest {
 
     @DisplayName("사용자는 Repository 목록을 가져올 수 있다.")
     @Test
-    void showRepositories_LoginUser_Success() throws Exception {
+    void userRepositories_LoginUser_Success() throws Exception {
         // given
-        LoginUser loginUser = new LoginUser("testUser", "at");
+        RepositoryResponsesDto responseDto = new RepositoryResponsesDto(List.of(
+            new RepositoryResponseDto("https://github.com/jipark3/pick", "pick"),
+            new RepositoryResponseDto("https://github.com/jipark3/git", "git")
+        ));
 
         given(oAuthService.validateToken(any()))
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(any()))
-            .willReturn(loginUser);
-
-        RepositoryResponseDtos responseDto = new RepositoryResponseDtos(List.of(
-            new RepositoryResponseDto("pick", "https://github.com/jipark3/pick"),
-            new RepositoryResponseDto("git", "https://github.com/jipark3/git")
-        ));
-        String repositories = objectMapper.writeValueAsString(responseDto.getRepositoryResponseDtos());
-
+            .willReturn(new LoginUser("testUser", ACCESS_TOKEN));
         given(postService.userRepositories(any(RepositoryRequestDto.class)))
             .willReturn(responseDto);
 
+        String repositories = objectMapper
+            .writeValueAsString(responseDto.getRepositoryResponsesDto());
+
+        // when
+        ResultActions perform = mockMvc.perform(get("/api/github/repositories")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer " + ACCESS_TOKEN)
+            .accept(MediaType.ALL));
+
         // then
-        ResultActions perform = mockMvc
-            .perform(get("/api/github/${userName}/repositories", USERNAME)
-                .header(HttpHeaders.AUTHORIZATION, API_ACCESS_TOKEN))
+        perform
             .andExpect(status().isOk())
             .andExpect(content().string(repositories));
+
+        verify(postService, times(1))
+            .userRepositories(any(RepositoryRequestDto.class));
 
         //documentation
         perform.andDo(document("post-repositories-loggedIn",
             getDocumentRequest(),
             getDocumentResponse(),
             requestHeaders(
-                headerWithName(HttpHeaders.AUTHORIZATION).description("bearer token")
-            ),
-            pathParameters(
-                parameterWithName("userName").description("유저 이름")
+                headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer token")
             ),
             responseFields(
-                fieldWithPath("[].name").type(STRING).description("레포지토리 이름"),
-                fieldWithPath("[].html_url").type(STRING).description("레포지토리 주소")
+                fieldWithPath("[].html_url").type(STRING).description("레포지토리 주소"),
+                fieldWithPath("[].name").type(STRING).description("레포지토리 이름")
             )
         ));
     }

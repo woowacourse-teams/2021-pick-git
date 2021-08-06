@@ -17,14 +17,14 @@ public class MockRepositoryApiRequester implements PlatformRepositoryApiRequeste
             throw new PlatformHttpErrorException("외부 플랫폼 토큰 인증 실패");
         }
         if (isNotValidUrl(url, apiUrl)) {
-            throw new PlatformHttpErrorException("외부 플랫폼 URL NotFound");
+            throw new PlatformHttpErrorException("외부 플랫폼 URL 찾기 실패");
         }
 
-        return "[{\"name\": \"binghe-hi\" }, {\"name\": \"doms-react\" }]";
+        return "[{\"name\": \"binghe-hi\"}, {\"name\": \"doms-react\"}]";
     }
 
     private boolean isNotValidToken(String token) {
-        return !token.equals(ACCESS_TOKEN);
+        return !ACCESS_TOKEN.equals(token);
     }
 
     private boolean isNotValidUrl(String url, String apiUrl) {
