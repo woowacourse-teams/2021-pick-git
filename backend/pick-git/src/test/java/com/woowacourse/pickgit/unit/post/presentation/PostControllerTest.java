@@ -38,7 +38,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
-import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.exception.post.CannotUnlikeException;
 import com.woowacourse.pickgit.exception.post.CommentFormatException;
@@ -112,8 +111,8 @@ class PostControllerTest {
 
         // when
         ResultActions perform = mockMvc.perform(multipart("/api/posts")
-            .file(FileFactory.getTestImage1())
-            .file(FileFactory.getTestImage2())
+            .file("images", "testImage1".getBytes())
+            .file("images", "testImage2".getBytes())
             .param(PickGit.GITHUB_REPO_URL, "https://github.com/bperhaps")
             .param(PickGit.CONTENT, "content")
             .param(PickGit.TAGS, new String[]{"tag1", "tag2"})
@@ -145,8 +144,8 @@ class PostControllerTest {
 
         // when
         ResultActions perform = mockMvc.perform(multipart("/api/posts")
-            .file(FileFactory.getTestImage1())
-            .file(FileFactory.getTestImage2())
+            .file("images", "testImage1".getBytes())
+            .file("images", "testImage2".getBytes())
             .param(PickGit.GITHUB_REPO_URL, "https://github.com/bperhaps")
             .param(PickGit.CONTENT, "content")
             .param(PickGit.TAGS, new String[]{"tag1", "tag2"}));
@@ -305,7 +304,7 @@ class PostControllerTest {
             .andExpect(content().string(repositories));
 
         //documentation
-        perform.andDo(document("repositories-loggedIn",
+        perform.andDo(document("post-repositories-loggedIn",
             getDocumentRequest(),
             getDocumentResponse(),
             requestHeaders(

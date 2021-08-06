@@ -1,0 +1,21 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+
+== Search
+=== 유저 검색 - 로그인
+==== Request
+include::{snippets}/search-user-LoggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/search-user-LoggedIn/http-response.adoc[]
+
+=== 유저 검색 - 비 로그인
+==== Request
+include::{snippets}/search-user-unLoggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/search-user-unLoggedIn/http-response.adoc[]
