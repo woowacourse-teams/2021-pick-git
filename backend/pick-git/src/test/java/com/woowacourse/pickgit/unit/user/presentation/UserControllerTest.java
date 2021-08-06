@@ -114,7 +114,7 @@ class UserControllerTest {
             verify(userService, times(1))
                 .getMyUserProfile(any(AuthUserRequestDto.class));
 
-            perform.andDo(document("profilesMe",
+            perform.andDo(document("profiles-me",
                 getDocumentRequest(),
                 getDocumentResponse(),
                 requestHeaders(
@@ -327,7 +327,7 @@ class UserControllerTest {
 
             // when
             ResultActions perform = mockMvc.perform(multipart("/api/profiles/me")
-                .file(image)
+                .file("images", "testImage1".getBytes())
                 .param("description", description)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer token")
             );
@@ -344,7 +344,7 @@ class UserControllerTest {
                 .editProfile(any(AuthUserRequestDto.class), any(ProfileEditRequestDto.class));
 
             // restdocs
-            perform.andDo(document("edit-profile",
+            perform.andDo(document("profiles-edit",
                 getDocumentRequest(),
                 getDocumentResponse(),
                 requestHeaders(
@@ -396,7 +396,7 @@ class UserControllerTest {
             verify(userService, times(1))
                 .calculateContributions(any(ContributionRequestDto.class));
 
-            perform.andDo(document("contributions-LoggedIn",
+            perform.andDo(document("profiles-contributions-LoggedIn",
                 getDocumentRequest(),
                 getDocumentResponse(),
                 requestHeaders(
@@ -441,7 +441,7 @@ class UserControllerTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("errorCode").value("A0001"));
 
-            perform.andDo(document("profilesMe",
+            perform.andDo(document("profiles-me-unLoggedIn",
                 getDocumentRequest(),
                 getDocumentResponse(),
                 requestHeaders(
@@ -577,15 +577,13 @@ class UserControllerTest {
         @Test
         void editUserProfile_GuestUser_Fail() throws Exception {
             // given
-            MockMultipartFile image = FileFactory.getTestImage1();
-
             // mock
             given(oAuthService.validateToken(any()))
                 .willReturn(false);
 
             // when
             ResultActions perform = mockMvc.perform(multipart("/api/profiles/me")
-                .file(image)
+                .file("images", "testImage1".getBytes())
                 .param("description", "updated description")
             );
 
@@ -595,6 +593,15 @@ class UserControllerTest {
                 .andExpect(jsonPath("errorCode").value("A0001"));
 
             verify(oAuthService, times(1)).validateToken(any());
+
+            perform.andDo(document("profiles-edit-unLoggedIn",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                requestPartBody("images"),
+                responseFields(
+                    fieldWithPath("errorCode").type(STRING).description("에러 코드")
+                )
+            ));
         }
 
         @DisplayName("게스트는 활동 통계를 조회할 수 없다. - 401 예외")
@@ -625,7 +632,7 @@ class UserControllerTest {
             verify(oAuthService, times(1))
                 .findRequestUserByToken(null);
 
-            perform.andDo(document("contribution-unLoggedIn",
+            perform.andDo(document("profiles-contributions-unLoggedIn",
                 getDocumentRequest(),
                 getDocumentResponse(),
                 requestHeaders(

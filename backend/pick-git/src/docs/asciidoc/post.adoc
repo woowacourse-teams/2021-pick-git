@@ -20,20 +20,80 @@ include::{snippets}/posts-post-guest/http-request.adoc[]
 ==== Response
 include::{snippets}/posts-post-guest/http-response.adoc[]
 
-=== 홈 피드 요청 - 로그인
+=== 레포지토리 조회 - 로그인
+==== Request
+include::{snippets}/post-repositories-loggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/post-repositories-loggedIn/http-response.adoc[]
+
+=== 홈 피드 조회 요청 - 로그인
 ==== Request
 include::{snippets}/post-homefeed-LoggedIn/http-request.adoc[]
 ==== Response
 include::{snippets}/post-homefeed-LoggedIn/http-response.adoc[]
 
-=== 홈 피드 요청 - 비 로그인
+=== 홈 피드 조회 요청 - 비 로그인
 ==== Request
 include::{snippets}/post-homefeed-unLoggedIn/http-request.adoc[]
 ==== Response
 include::{snippets}/post-homefeed-unLoggedIn/http-response.adoc[]
 
-=== 레포지토리 요청 - 로그인
+=== 게시물 좋아요 - 로그인
 ==== Request
-include::{snippets}/repositories-loggedIn/http-request.adoc[]
+include::{snippets}/post-likePost-LoggedIn/http-request.adoc[]
 ==== Response
-include::{snippets}/repositories-loggedIn/http-response.adoc[]
+include::{snippets}/post-likePost-LoggedIn/http-response.adoc[]
+
+=== 게시물 좋아요 - 비 로그인
+==== Request
+include::{snippets}/post-likePost-unLoggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/post-likePost-unLoggedIn/http-response.adoc[]
+
+=== 게시물 좋아요 취소 - 로그인
+==== Request
+include::{snippets}/post-unlikePost-LoggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/post-unlikePost-LoggedIn/http-response.adoc[]
+
+=== 게시물 좋아요 취소 - 비 로그인
+==== Request
+include::{snippets}/post-unlikePost-unLoggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/post-unlikePost-unLoggedIn/http-response.adoc[]
+
+=== 게시물 중복 좋아요
+==== Request
+include::{snippets}/post-likePost-duplicatedLike/http-request.adoc[]
+==== Response
+include::{snippets}/post-likePost-duplicatedLike/http-response.adoc[]
+
+=== 게시물 좋아하지 않은 게시물 좋아요 취소
+==== Request
+include::{snippets}/post-unlikePost-unlikedPost/http-request.adoc[]
+==== Response
+include::{snippets}/post-unlikePost-unlikedPost/http-response.adoc[]
+
+=== 게시물 수정
+==== Request
+include::{snippets}/post-update/http-request.adoc[]
+==== Response
+include::{snippets}/post-update/http-response.adoc[]
+
+=== 게시물 수정 - null 컨텐츠
+==== Request
+include::{snippets}/post-update-nullContent/http-request.adoc[]
+==== Response
+include::{snippets}/post-update-nullContent/http-response.adoc[]
+
+=== 게시물 수정 - 500자 이상 컨텐츠
+==== Request
+include::{snippets}/post-update-Over500Content/http-request.adoc[]
+==== Response
+include::{snippets}/post-update-Over500Content/http-response.adoc[]
+
+=== 게시물 삭제
+==== Request
+include::{snippets}/post-delete/http-request.adoc[]
+==== Response
+include::{snippets}/post-delete/http-response.adoc[]

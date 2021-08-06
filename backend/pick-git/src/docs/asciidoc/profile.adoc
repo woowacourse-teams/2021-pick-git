@@ -8,11 +8,17 @@ endif::[]
 :toclevels: 4
 
 == Profile
-=== 내 프로필 조회
+=== 내 프로필 조회 - 로그인
 ==== Request
-include::{snippets}/profilesMe/http-request.adoc[]
+include::{snippets}/profiles-me/http-request.adoc[]
 ==== Response
-include::{snippets}/profilesMe/http-response.adoc[]
+include::{snippets}/profiles-me/http-response.adoc[]
+
+=== 내 프로필 조회 - 비로그인
+==== Request
+include::{snippets}/profiles-me-unLoggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/profiles-me-unLoggedIn/http-response.adoc[]
 
 === 다른 사용자 프로필 조회 - 로그인
 ==== Request
@@ -25,3 +31,27 @@ include::{snippets}/profiles-LoggedIn/http-response.adoc[]
 include::{snippets}/profiles-unLoggedIn/http-request.adoc[]
 ==== Response
 include::{snippets}/profiles-unLoggedIn/http-response.adoc[]
+
+=== 내 프로필 수정 - 로그인
+==== Request
+include::{snippets}/profiles-edit/http-request.adoc[]
+==== Response
+include::{snippets}/profiles-edit/http-response.adoc[]
+
+=== 내 프로필 수정 - 비 로그인
+==== Request
+include::{snippets}/profiles-edit-unLoggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/profiles-edit-unLoggedIn/http-response.adoc[]
+
+=== Github 통계 조회 - 로그인
+==== Request
+include::{snippets}/profiles-contributions-LoggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/profiles-contributions-LoggedIn/http-response.adoc[]
+
+=== Github 통계 조회 - 비 로그인
+==== Request
+include::{snippets}/profiles-contributions-unLoggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/profiles-contributions-unLoggedIn/http-response.adoc[]

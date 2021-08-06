@@ -19,9 +19,3 @@ include::{snippets}/comment-post/http-response.adoc[]
 include::{snippets}/comment-post-emptyContent/http-request.adoc[]
 ==== Response
 include::{snippets}/comment-post-emptyContent/http-response.adoc[]
-
-=== 댓글 등록 - 내용이 없는 경우
-==== Request
-include::{snippets}/comment-post-emptyContent/http-request.adoc[]
-==== Response
-include::{snippets}/comment-post-emptyContent/http-response.adoc[]
