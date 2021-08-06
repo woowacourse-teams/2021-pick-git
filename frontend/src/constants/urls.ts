@@ -36,6 +36,8 @@ export const API_URL = {
     GITHUB: "/authorization/github",
   },
   SELF_PROFILE: "/profiles/me",
+  SELF_PROFILE_IMAGE: (fileName: string) => `/profiles/me/image/${fileName}`,
+  SELF_PROFILE_DESCRIPTION: "/profiles/me/description",
   ADD_POSTS: "/posts",
   GITHUB_REPOSITORIES: (username: string) => `/github/${username}/repositories`,
   USER_PROFILE: (username: string) => `/profiles/${username}`,
