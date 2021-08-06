@@ -11,6 +11,7 @@ import com.woowacourse.pickgit.post.application.dto.request.PostDeleteRequestDto
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.SearchRepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
@@ -22,6 +23,7 @@ import com.woowacourse.pickgit.post.domain.comment.Comment;
 import com.woowacourse.pickgit.post.domain.repository.PickGitStorage;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.post.domain.util.PlatformRepositoryExtractor;
+import com.woowacourse.pickgit.post.domain.util.PlatformRepositorySearchExtractor;
 import com.woowacourse.pickgit.post.domain.util.dto.RepositoryNameAndUrl;
 import com.woowacourse.pickgit.tag.application.TagService;
 import com.woowacourse.pickgit.tag.application.TagsDto;
@@ -45,19 +47,22 @@ public class PostService {
     private final PostRepository postRepository;
     private final PickGitStorage pickgitStorage;
     private final PlatformRepositoryExtractor platformRepositoryExtractor;
+    private final PlatformRepositorySearchExtractor platformRepositorySearchExtractor;
 
     public PostService(
         TagService tagService,
         UserRepository userRepository,
         PostRepository postRepository,
         PickGitStorage pickgitStorage,
-        PlatformRepositoryExtractor platformRepositoryExtractor
+        PlatformRepositoryExtractor platformRepositoryExtractor,
+        PlatformRepositorySearchExtractor platformRepositorySearchExtractor
     ) {
         this.tagService = tagService;
         this.userRepository = userRepository;
         this.postRepository = postRepository;
         this.pickgitStorage = pickgitStorage;
         this.platformRepositoryExtractor = platformRepositoryExtractor;
+        this.platformRepositorySearchExtractor = platformRepositorySearchExtractor;
     }
 
     public PostImageUrlResponseDto write(PostRequestDto postRequestDto) {
@@ -137,6 +142,24 @@ public class PostService {
             createRepositoryResponsesDto(repositoryNameAndUrls);
 
         return new RepositoryResponsesDto(repositoryResponsesDto);
+    }
+
+    @Transactional(readOnly = true)
+    public RepositoryResponsesDto searchUserRepositories(
+        SearchRepositoryRequestDto searchRepositoryRequestDto
+    ) {
+        String token = searchRepositoryRequestDto.getToken();
+        String username = searchRepositoryRequestDto.getUsername();
+        String keyword = searchRepositoryRequestDto.getKeyword();
+        int page = searchRepositoryRequestDto.getPage();
+        int limit = searchRepositoryRequestDto.getLimit();
+
+        List<RepositoryNameAndUrl> repositoryNameAndUrls =
+            platformRepositorySearchExtractor.extract(token, username, keyword, page, limit);
+        List<RepositoryResponseDto> repositoryResponseDtos =
+            createRepositoryResponsesDto(repositoryNameAndUrls);
+
+        return new RepositoryResponsesDto(repositoryResponseDtos);
     }
 
     private List<RepositoryResponseDto> createRepositoryResponsesDto(

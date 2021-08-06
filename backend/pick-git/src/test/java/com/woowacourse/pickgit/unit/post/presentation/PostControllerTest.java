@@ -29,6 +29,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.requestP
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -48,6 +49,7 @@ import com.woowacourse.pickgit.post.application.dto.request.PostDeleteRequestDto
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.SearchRepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
@@ -317,6 +319,56 @@ class PostControllerTest {
             responseFields(
                 fieldWithPath("[].html_url").type(STRING).description("레포지토리 주소"),
                 fieldWithPath("[].name").type(STRING).description("레포지토리 이름")
+            )
+        ));
+    }
+
+    @DisplayName("사용자는 Repository 목록을 검색할 수 있다.")
+    @Test
+    void userSearchedRepositories_LoginUser_Success() throws Exception {
+        // given
+        LoginUser loginUser = new LoginUser("testUser", "at");
+
+        given(oAuthService.validateToken(any()))
+            .willReturn(true);
+        given(oAuthService.findRequestUserByToken(any()))
+            .willReturn(loginUser);
+
+        RepositoryResponsesDto responseDto = new RepositoryResponsesDto(List.of(
+            new RepositoryResponseDto("pick", "https://github.com/jipark3/pick"),
+            new RepositoryResponseDto("pick-git", "https://github.com/jipark3/pick-git")
+        ));
+        String repositories = objectMapper.writeValueAsString(responseDto.getRepositoryResponsesDto());
+
+        given(postService.searchUserRepositories(any(SearchRepositoryRequestDto.class)))
+            .willReturn(responseDto);
+
+        // then
+        ResultActions perform = mockMvc
+            .perform(get("/api/github/search/repositories")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + ACCESS_TOKEN)
+                .param("keyword", "pick")
+                .param("page", "1")
+                .param("limit", "2")
+            )
+            .andExpect(status().isOk())
+            .andExpect(content().string(repositories));
+
+        //documentation
+        perform.andDo(document("post-searchRepositories-loggedIn",
+            getDocumentRequest(),
+            getDocumentResponse(),
+            requestHeaders(
+                headerWithName(HttpHeaders.AUTHORIZATION).description("bearer token")
+            ),
+            requestParameters(
+                parameterWithName("keyword").description("검색 키워드"),
+                parameterWithName("page").description("page"),
+                parameterWithName("limit").description("limit")
+            ),
+            responseFields(
+                fieldWithPath("[].name").type(STRING).description("레포지토리 이름"),
+                fieldWithPath("[].html_url").type(STRING).description("레포지토리 주소")
             )
         ));
     }

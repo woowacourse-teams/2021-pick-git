@@ -34,6 +34,7 @@ import com.woowacourse.pickgit.post.application.dto.request.PostDeleteRequestDto
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.SearchRepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
@@ -47,6 +48,7 @@ import com.woowacourse.pickgit.post.domain.repository.PickGitStorage;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.post.domain.util.PlatformRepositoryExtractor;
 import com.woowacourse.pickgit.post.domain.util.dto.RepositoryNameAndUrl;
+import com.woowacourse.pickgit.post.domain.util.PlatformRepositorySearchExtractor;
 import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
 import com.woowacourse.pickgit.tag.application.TagService;
 import com.woowacourse.pickgit.tag.application.TagsDto;
@@ -84,6 +86,9 @@ class PostServiceTest {
 
     @Mock
     private PlatformRepositoryExtractor platformRepositoryExtractor;
+
+    @Mock
+    private PlatformRepositorySearchExtractor platformRepositorySearchExtractor;
 
     @Mock
     private TagService tagService;
@@ -406,6 +411,132 @@ class PostServiceTest {
             .page(page)
             .limit(limit)
             .build();
+    }
+
+    @DisplayName("사용자는 Repository 목록을 검색해서 가져올 수 있다.")
+    @Test
+    void searchUserRepositories_LoginUser_Success() {
+        // given
+        String accessToken = "bearer token";
+        String userName = "testUserName";
+        String keyword = "pick";
+        int page = 1;
+        int limit = 2;
+
+        SearchRepositoryRequestDto searchRepositoryRequestDto = new SearchRepositoryRequestDto(
+            accessToken, userName, keyword, page, limit
+        );
+
+        List<RepositoryNameAndUrl> repositories = List.of(
+            new RepositoryNameAndUrl("pick", "https://github.com/jipark3/pick"),
+            new RepositoryNameAndUrl("pick-git", "https://github.com/jipark3/pick-git")
+        );
+
+        given(platformRepositorySearchExtractor
+            .extract(
+                searchRepositoryRequestDto.getToken(),
+                searchRepositoryRequestDto.getUsername(),
+                searchRepositoryRequestDto.getKeyword(),
+                searchRepositoryRequestDto.getPage(),
+                searchRepositoryRequestDto.getLimit()
+            )
+        ).willReturn(repositories);
+
+        // when
+
+        RepositoryResponsesDto repositoryResponsesDto =
+            postService.searchUserRepositories(searchRepositoryRequestDto);
+        List<RepositoryResponseDto> responseDtos =
+            repositoryResponsesDto.getRepositoryResponsesDto();
+
+        // then
+        assertThat(responseDtos)
+            .usingRecursiveComparison()
+            .isEqualTo(repositories);
+        verify(platformRepositorySearchExtractor, times(1))
+            .extract(
+                searchRepositoryRequestDto.getToken(),
+                searchRepositoryRequestDto.getUsername(),
+                searchRepositoryRequestDto.getKeyword(),
+                searchRepositoryRequestDto.getPage(),
+                searchRepositoryRequestDto.getLimit()
+            );
+    }
+
+    @DisplayName("AccessToken이 잘못되었다면, Repository 목록을 검색할 수 없다.")
+    @Test
+    void searchUserRepositories_InvalidAccessToken_Fail() {
+        // given
+        String accessToken = "bearer invalid token";
+        String userName = "testUserName";
+        String keyword = "pick";
+        int page = 1;
+        int limit = 2;
+
+        SearchRepositoryRequestDto searchRepositoryRequestDto = new SearchRepositoryRequestDto(
+            accessToken, userName, keyword, page, limit
+        );
+
+        given(platformRepositorySearchExtractor
+            .extract(
+                searchRepositoryRequestDto.getToken(),
+                searchRepositoryRequestDto.getUsername(),
+                searchRepositoryRequestDto.getKeyword(),
+                searchRepositoryRequestDto.getPage(),
+                searchRepositoryRequestDto.getLimit()
+            )
+        ).willThrow(new RepositoryParseException());
+
+        // when then
+        assertThatCode(() -> postService.searchUserRepositories(searchRepositoryRequestDto))
+            .isInstanceOf(RepositoryParseException.class);
+
+        verify(platformRepositorySearchExtractor, times(1))
+            .extract(
+                searchRepositoryRequestDto.getToken(),
+                searchRepositoryRequestDto.getUsername(),
+                searchRepositoryRequestDto.getKeyword(),
+                searchRepositoryRequestDto.getPage(),
+                searchRepositoryRequestDto.getLimit()
+            );
+    }
+
+    @DisplayName("UserName이 잘못되었다면, Repository 목록을 검색할 수 없다.")
+    @Test
+    void searchUserRepositories_InvalidUserName_Fail() {
+        // given
+        String accessToken = "bearer test token";
+        String userName = "invalidName";
+        String keyword = "pick";
+        int page = 1;
+        int limit = 2;
+
+        SearchRepositoryRequestDto searchRepositoryRequestDto = new SearchRepositoryRequestDto(
+            accessToken, userName, keyword, page, limit
+        );
+
+        given(platformRepositorySearchExtractor
+            .extract(
+                searchRepositoryRequestDto.getToken(),
+                searchRepositoryRequestDto.getUsername(),
+                searchRepositoryRequestDto.getKeyword(),
+                searchRepositoryRequestDto.getPage(),
+                searchRepositoryRequestDto.getLimit()
+            )
+        ).willThrow(new RepositoryParseException());
+
+        // when then
+        assertThatCode(() -> postService.searchUserRepositories(searchRepositoryRequestDto))
+            .isInstanceOf(RepositoryParseException.class);
+
+        verify(platformRepositorySearchExtractor, times(1))
+            .extract(
+                searchRepositoryRequestDto.getToken(),
+                searchRepositoryRequestDto.getUsername(),
+                searchRepositoryRequestDto.getKeyword(),
+                searchRepositoryRequestDto.getPage(),
+                searchRepositoryRequestDto.getLimit()
+            );
     }
 
     @DisplayName("사용자는 특정 게시물을 좋아요 할 수 있다.")
