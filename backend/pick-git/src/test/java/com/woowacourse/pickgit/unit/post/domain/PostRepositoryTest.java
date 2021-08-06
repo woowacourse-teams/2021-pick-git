@@ -204,49 +204,6 @@ class PostRepositoryTest {
             .containsExactly("tester", "a7", "a5", "a3", "a1");
     }
 
-    @DisplayName("전체 게시물을 최신순으로 가져온다.")
-    @Test
-    void findAllPostsByUser_FollowingsNotConcerned_Success() {
-        // given - mockUsers
-        User tester = UserFactory.user("tester");
-        List<User> mockUsers = List.of(
-            UserFactory.user("a1"),
-            UserFactory.user("a2"),
-            UserFactory.user("a3"),
-            UserFactory.user("a4"),
-            UserFactory.user("a5"),
-            UserFactory.user("a6"),
-            UserFactory.user("a7"),
-            UserFactory.user("a8")
-        );
-        userRepository.save(tester);
-        userRepository.saveAll(mockUsers);
-
-        // given - follow
-        int mockUserCounts = mockUsers.size();
-        for (int i = 0; i < mockUserCounts; i += 2) {
-            tester.follow(mockUsers.get(i));
-        }
-
-        // given - mockPosts
-        List<Post> mockPosts = PostFactory.mockPostsBy(mockUsers);
-        Post testerPost = PostFactory.mockPostBy(tester);
-        postRepository.saveAll(mockPosts);
-        postRepository.save(testerPost);
-
-        flushAndClear();
-
-        // when
-        List<Post> feeds = postRepository.findAllPosts(PageRequest.of(0, 10));
-
-        // then
-        assertThat(feeds)
-            .extracting("user")
-            .extracting("basicProfile")
-            .extracting("name")
-            .containsExactly("tester", "a8", "a7", "a6", "a5", "a4", "a3", "a2", "a1");
-    }
-
     private void flushAndClear() {
         testEntityManager.flush();
         testEntityManager.clear();

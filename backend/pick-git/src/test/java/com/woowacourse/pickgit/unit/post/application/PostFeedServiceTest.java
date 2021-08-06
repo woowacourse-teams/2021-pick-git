@@ -3,8 +3,10 @@ package com.woowacourse.pickgit.unit.post.application;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -30,7 +32,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
-public class PostFeedServiceTest {
+class PostFeedServiceTest {
+
     @InjectMocks
     private PostFeedService postFeedService;
 
@@ -40,9 +43,9 @@ public class PostFeedServiceTest {
     @Mock
     private PostRepository postRepository;
 
-    @DisplayName("메인 홈 피드를 가져온다.")
+    @DisplayName("게스트 유저 - 최신순의 메인 홈 피드를 가져온다. (좋아요 여부 null)")
     @Test
-    void readHomeFeed_getMainHomeFeed_success() {
+    void readHomeFeed_LatestAllWhenGuest_success() {
         //given
         List<Post> posts = List.of(
             createPostOfId(1L),
@@ -63,15 +66,56 @@ public class PostFeedServiceTest {
         List<PostResponseDto> postResponseDtos = postFeedService.homeFeed(homeFeedRequestDto);
 
         //then
-        List<Long> expected = posts.stream()
-            .map(Post::getId)
-            .collect(toList());
+        assertThat(postResponseDtos)
+            .extracting("id", "liked")
+            .containsExactly(
+                tuple(1L, null),
+                tuple(2L, null),
+                tuple(3L, null)
+            );
 
-        List<Long> actual = postResponseDtos.stream()
-            .map(PostResponseDto::getId)
-            .collect(toList());
+        verify(postRepository, times(1)).findAllPosts(any(Pageable.class));
+    }
 
-        assertThat(actual).containsAll(expected);
+    @DisplayName("로그인 유저 - 팔로잉한 사람들의 최신 게시글 피드를 가져온다. (좋아요 여부 true/false)")
+    @Test
+    void readHomeFeed_FollowingsWhenLogin_success() {
+        //given
+        List<Post> posts = List.of(
+            createPostOfId(1L),
+            createPostOfId(2L),
+            createPostOfId(3L)
+        );
+
+        HomeFeedRequestDto homeFeedRequestDto = HomeFeedRequestDto.builder()
+            .isGuest(false)
+            .requestUserName("tester")
+            .page(1L)
+            .limit(3L)
+            .build();
+
+        User tester = UserFactory.user(1L, "tester");
+        posts.get(0).like(tester);
+
+        given(userRepository.findByBasicProfile_Name(homeFeedRequestDto.getRequestUserName()))
+            .willReturn(Optional.of(tester));
+        given(postRepository.findAllAssociatedPostsByUser(eq(tester), any(Pageable.class)))
+            .willReturn(posts);
+
+        //when
+        List<PostResponseDto> postResponseDtos = postFeedService.homeFeed(homeFeedRequestDto);
+
+        //then
+        assertThat(postResponseDtos)
+            .extracting("id", "liked")
+            .containsExactly(
+                tuple(1L, true),
+                tuple(2L, false),
+                tuple(3L, false)
+            );
+
+        verify(postRepository, times(1))
+            .findAllAssociatedPostsByUser(eq(tester), any(Pageable.class));
     }
 
     private Post createPostOfId(long id) {
