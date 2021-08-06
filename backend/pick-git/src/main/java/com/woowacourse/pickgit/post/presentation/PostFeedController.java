@@ -6,7 +6,9 @@ import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.post.application.PostFeedService;
 import com.woowacourse.pickgit.post.application.dto.request.HomeFeedRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.SearchPostsRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
+import com.woowacourse.pickgit.post.presentation.dto.request.SearchPostsRequest;
 import com.woowacourse.pickgit.post.presentation.dto.response.PostResponse;
 import java.util.List;
 import java.util.function.Function;
@@ -65,6 +67,25 @@ public class PostFeedController {
         HomeFeedRequestDto homeFeedRequestDto = new HomeFeedRequestDto(appUser, page, limit);
         List<PostResponseDto> postResponseDtos =
             postFeedService.userFeed(homeFeedRequestDto, username);
+        List<PostResponse> postResponses = createPostResponses(postResponseDtos);
+
+        return ResponseEntity.ok(postResponses);
+    }
+
+    @GetMapping("/search/posts")
+    public ResponseEntity<List<PostResponse>> searchPosts(
+        @Authenticated AppUser appUser,
+        SearchPostsRequest searchPostsByTagRequest
+    ) {
+        String type = searchPostsByTagRequest.getType();
+        String keyword = searchPostsByTagRequest.getKeyword();
+        int page = searchPostsByTagRequest.getPage();
+        int limit = searchPostsByTagRequest.getLimit();
+
+        SearchPostsRequestDto searchPostsRequestDto =
+            new SearchPostsRequestDto(type, keyword, page, limit, appUser);
+
+        List<PostResponseDto> postResponseDtos = postFeedService.search(searchPostsRequestDto);
         List<PostResponse> postResponses = createPostResponses(postResponseDtos);
 
         return ResponseEntity.ok(postResponses);
