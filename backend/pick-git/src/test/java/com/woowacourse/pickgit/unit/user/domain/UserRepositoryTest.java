@@ -318,4 +318,138 @@ class UserRepositoryTest {
             }
         }
     }
+
+    @DisplayName("searchFollowingsOf 메서드는")
+    @Nested
+    class Describe_searchFollowingsOf {
+
+        @DisplayName("특정 유저가 팔로잉하는 유저가 없다면")
+        @Nested
+        class Context_NoFollowingsAvailable {
+
+            @DisplayName("빈 리스트를 반환한다.")
+            @Test
+            void searchFollowingsOf_NoFollowings_EmptyList() {
+                // given
+                User user1 = UserFactory.user("user1");
+                Pageable pageable = PageRequest.of(0, 2);
+
+                userRepository.save(user1);
+
+                testEntityManager.flush();
+                testEntityManager.clear();
+
+                // when
+                List<User> followings = userRepository.searchFollowingsOf(user1, pageable);
+
+                // then
+                assertThat(followings).isEmpty();
+            }
+        }
+
+        @DisplayName("특정 유저가 팔로잉하는 유저가 있다면")
+        @Nested
+        class Context_FollowingsAvailable {
+
+            @DisplayName("페이징 조건에 맞춰 팔로잉중인 유저 리스트를 반환한다.")
+            @Test
+            void searchFollowingsOf_FollowingsAvailable_Pageable() {
+                // given
+                User user1 = UserFactory.user("user1");
+                User user2 = UserFactory.user("user2");
+                User user3 = UserFactory.user("user3");
+                User user4 = UserFactory.user("user4");
+                Pageable pageable = PageRequest.of(0, 2);
+
+                userRepository.save(user1);
+                userRepository.save(user2);
+                userRepository.save(user3);
+                userRepository.save(user4);
+
+                user1.follow(user2);
+                user1.follow(user3);
+                user1.follow(user4);
+
+                testEntityManager.flush();
+                testEntityManager.clear();
+
+                // when
+                List<User> followings = userRepository.searchFollowingsOf(user1, pageable);
+
+                // then
+                assertThat(followings)
+                    .extracting("basicProfile")
+                    .extracting("name")
+                    .containsExactly("user2", "user3")
+                    .hasSize(2);
+            }
+        }
+    }
+
+    @DisplayName("searchFollowersOf 메서드는")
+    @Nested
+    class Describe_searchFollowersOf {
+
+        @DisplayName("특정 유저를 팔로우하는 팔로워 유저가 없다면")
+        @Nested
+        class Context_NoFollowersAvailable {
+
+            @DisplayName("빈 리스트를 반환한다.")
+            @Test
+            void searchFollowersOf_NoFollowers_EmptyList() {
+                // given
+                User user1 = UserFactory.user("user1");
+                Pageable pageable = PageRequest.of(0, 2);
+
+                userRepository.save(user1);
+
+                testEntityManager.flush();
+                testEntityManager.clear();
+
+                // when
+                List<User> followers = userRepository.searchFollowersOf(user1, pageable);
+
+                // then
+                assertThat(followers).isEmpty();
+            }
+        }
+
+        @DisplayName("특정 유저를 팔로우하는 팔로워 유저가 있다면")
+        @Nested
+        class Context_FollowersAvailable {
+
+            @DisplayName("페이징 조건에 맞춰 팔로워 유저 리스트를 반환한다.")
+            @Test
+            void searchFollowersOf_FollowersAvailable_Pageable() {
+                // given
+                User user1 = UserFactory.user("user1");
+                User user2 = UserFactory.user("user2");
+                User user3 = UserFactory.user("user3");
+                User user4 = UserFactory.user("user4");
+                Pageable pageable = PageRequest.of(0, 2);
+
+                userRepository.save(user1);
+                userRepository.save(user2);
+                userRepository.save(user3);
+                userRepository.save(user4);
+
+                user1.follow(user4);
+                user2.follow(user4);
+                user3.follow(user4);
+
+                testEntityManager.flush();
+                testEntityManager.clear();
+
+                // when
+                List<User> followers = userRepository.searchFollowersOf(user4, pageable);
+
+                // then
+                assertThat(followers)
+                    .extracting("basicProfile")
+                    .extracting("name")
+                    .containsExactly("user1", "user2")
+                    .hasSize(2);
+            }
+        }
+    }
 }
