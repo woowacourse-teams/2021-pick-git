@@ -30,6 +30,8 @@ import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import java.util.List;
 import java.util.function.Function;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -120,13 +122,17 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public RepositoryResponsesDto userRepositories(RepositoryRequestDto repositoryRequestDto) {
+        String token = repositoryRequestDto.getToken();
+        String username = repositoryRequestDto.getUsername();
+
+        Pageable pageable = PageRequest.of(
+            Math.toIntExact(repositoryRequestDto.getPage()),
+            Math.toIntExact(repositoryRequestDto.getLimit())
+        );
+
         List<RepositoryNameAndUrl> repositoryNameAndUrls = platformRepositoryExtractor
-            .extract(
-                repositoryRequestDto.getToken(),
-                repositoryRequestDto.getUsername(),
-                repositoryRequestDto.getPage(),
-                repositoryRequestDto.getLimit()
-            );
+            .extract(token, username, pageable);
+
         List<RepositoryResponseDto> repositoryResponsesDto =
             createRepositoryResponsesDto(repositoryNameAndUrls);
 

@@ -8,6 +8,7 @@ import com.woowacourse.pickgit.post.domain.util.PlatformRepositoryApiRequester;
 import com.woowacourse.pickgit.post.domain.util.PlatformRepositoryExtractor;
 import com.woowacourse.pickgit.post.domain.util.dto.RepositoryNameAndUrl;
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -27,20 +28,16 @@ public class GithubRepositoryExtractor implements PlatformRepositoryExtractor {
     }
 
     @Override
-    public List<RepositoryNameAndUrl> extract(
-        String token,
-        String username,
-        Long page,
-        Long limit
-    ) {
-        String apiUrl = generateApiUrl(username, page, limit);
+    public List<RepositoryNameAndUrl> extract(String token, String username, Pageable pageable) {
+        String apiUrl = generateApiUrl(username, pageable);
         String response = platformRepositoryApiRequester.request(token, apiUrl);
 
         return parseToRepositories(response);
     }
 
-    private String generateApiUrl(String username, Long page, Long limit) {
-        return String.format(API_URL_FORMAT, username, page.intValue() + 1, limit.intValue());
+    private String generateApiUrl(String username, Pageable pageable) {
+        return String
+            .format(API_URL_FORMAT, username, pageable.getPageNumber() + 1, pageable.getPageSize());
     }
 
     private List<RepositoryNameAndUrl> parseToRepositories(String response) {

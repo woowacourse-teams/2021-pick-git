@@ -62,6 +62,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -285,6 +287,7 @@ class PostServiceTest {
         String username = "testUser";
 
         RepositoryRequestDto requestDto = createRepositoryRequestDto(token, username, 0L, 50L);
+        Pageable pageable = PageRequest.of(0, 50);
 
         List<RepositoryNameAndUrl> repositories = List.of(
             new RepositoryNameAndUrl("pick", "https://github.com/jipark3/pick"),
@@ -292,12 +295,7 @@ class PostServiceTest {
         );
 
         given(platformRepositoryExtractor
-            .extract(
-                requestDto.getToken(),
-                requestDto.getUsername(),
-                requestDto.getPage(),
-                requestDto.getLimit()
-            ))
+            .extract(requestDto.getToken(), requestDto.getUsername(), pageable))
             .willReturn(repositories);
 
         // when
@@ -313,12 +311,7 @@ class PostServiceTest {
             .isEqualTo(repositories);
 
         verify(platformRepositoryExtractor, times(1))
-            .extract(
-                requestDto.getToken(),
-                requestDto.getUsername(),
-                requestDto.getPage(),
-                requestDto.getLimit()
-            );
+            .extract(requestDto.getToken(), requestDto.getUsername(), pageable);
     }
 
     @DisplayName("사용자는 해당하는 페이지에 퍼블릭 레포지토리가 없는 경우 빈 배열을 가져온다.")
@@ -329,16 +322,12 @@ class PostServiceTest {
         String username = "testUser";
 
         RepositoryRequestDto requestDto = createRepositoryRequestDto(token, username, 59L, 50L);
+        Pageable pageable = PageRequest.of(59, 50);
 
         List<RepositoryNameAndUrl> repositories = new ArrayList<>();
 
         given(platformRepositoryExtractor
-            .extract(
-                requestDto.getToken(),
-                requestDto.getUsername(),
-                requestDto.getPage(),
-                requestDto.getLimit()
-            ))
+            .extract(requestDto.getToken(), requestDto.getUsername(), pageable))
             .willReturn(repositories);
 
         // when
@@ -354,12 +343,7 @@ class PostServiceTest {
             .isEqualTo(repositories);
 
         verify(platformRepositoryExtractor, times(1))
-            .extract(
-                requestDto.getToken(),
-                requestDto.getUsername(),
-                requestDto.getPage(),
-                requestDto.getLimit()
-            );
+            .extract(requestDto.getToken(), requestDto.getUsername(), pageable);
     }
 
     @DisplayName("유효하지 않은 토큰인 경우 퍼블릭 레포지토리 목록을 가져올 수 없다. - 500 예외")
@@ -370,14 +354,10 @@ class PostServiceTest {
         String username = "testUser";
 
         RepositoryRequestDto requestDto = createRepositoryRequestDto(token, username, 0L, 50L);
+        Pageable pageable = PageRequest.of(0, 50);
 
         given(platformRepositoryExtractor
-            .extract(
-                requestDto.getToken(),
-                requestDto.getUsername(),
-                requestDto.getPage(),
-                requestDto.getLimit()
-            ))
+            .extract(requestDto.getToken(), requestDto.getUsername(), pageable))
             .willThrow(new RepositoryParseException());
 
         // when
@@ -389,12 +369,7 @@ class PostServiceTest {
 
         // then
         verify(platformRepositoryExtractor, times(1))
-            .extract(
-                requestDto.getToken(),
-                requestDto.getUsername(),
-                requestDto.getPage(),
-                requestDto.getLimit()
-            );
+            .extract(requestDto.getToken(), requestDto.getUsername(), pageable);
     }
 
     @DisplayName("유효하지 않은 유저 이름인 경우 퍼블릭 레포지토리 목록을 가져올 수 없다 - 500 예외")
@@ -405,14 +380,10 @@ class PostServiceTest {
         String username = "invalidUser";
 
         RepositoryRequestDto requestDto = createRepositoryRequestDto(token, username, 0L, 50L);
+        Pageable pageable = PageRequest.of(0, 50);
 
         given(platformRepositoryExtractor
-            .extract(
-                requestDto.getToken(),
-                requestDto.getUsername(),
-                requestDto.getPage(),
-                requestDto.getLimit()
-            ))
+            .extract(requestDto.getToken(), requestDto.getUsername(), pageable))
             .willThrow(new RepositoryParseException());
 
         // when
@@ -424,20 +395,11 @@ class PostServiceTest {
 
         // then
         verify(platformRepositoryExtractor, times(1))
-            .extract(
-                requestDto.getToken(),
-                requestDto.getUsername(),
-                requestDto.getPage(),
-                requestDto.getLimit()
-            );
+            .extract(requestDto.getToken(), requestDto.getUsername(), pageable);
     }
 
-    private RepositoryRequestDto createRepositoryRequestDto(
-        String token,
-        String username,
-        Long page,
-        Long limit
-    ) {
+    private RepositoryRequestDto createRepositoryRequestDto(String token, String username,
+        Long page, Long limit) {
         return RepositoryRequestDto.builder()
             .token(token)
             .username(username)
