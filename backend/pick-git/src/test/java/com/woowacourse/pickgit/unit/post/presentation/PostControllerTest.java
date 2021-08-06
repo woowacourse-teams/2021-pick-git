@@ -323,7 +323,7 @@ class PostControllerTest {
         ));
     }
 
-    @DisplayName("사용자는 Repository 목록을 검색할 수 있다.")
+    @DisplayName("사용자는 Repository 목록을 검색할 수 있다. - 성공")
     @Test
     void userSearchedRepositories_LoginUser_Success() throws Exception {
         // given

@@ -276,9 +276,10 @@ class PostServiceIntegrationTest {
     @Test
     void searchUserRepositories_LoginUser_Success() {
         // given
-        SearchRepositoryRequestDto requestDto = new SearchRepositoryRequestDto(
-            ACCESS_TOKEN, USERNAME, "woowa", 0, 2
-        );
+        SearchRepositoryRequestDto requestDto =
+            new SearchRepositoryRequestDto(
+                ACCESS_TOKEN, USERNAME, "woowa", 0, 2
+            );
 
         // when
         RepositoryResponsesDto repositoryResponsesDto = postService
@@ -296,7 +297,7 @@ class PostServiceIntegrationTest {
         String invalidToken = "invalidToken";
 
         SearchRepositoryRequestDto requestDto = new SearchRepositoryRequestDto(
-            invalidToken, USERNAME, "hello-repo", 1, 2
+            invalidToken, USERNAME, "woowa", 1, 2
         );
 
         // then
