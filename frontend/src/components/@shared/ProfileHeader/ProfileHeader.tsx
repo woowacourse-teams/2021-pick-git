@@ -117,6 +117,8 @@ const ProfileHeader = ({ isMyProfile, profile, username }: Props) => {
           onConfirm={toggleFollowWithGithubFollowing(true)}
           onCancel={toggleFollowWithGithubFollowing(false)}
           onClose={hideMessageModal}
+          confirmText="예"
+          cancelText="아니오"
         />
       )}
     </Container>

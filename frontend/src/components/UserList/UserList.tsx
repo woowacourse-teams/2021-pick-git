@@ -33,6 +33,7 @@ const UserList = ({ isFetchingNextPage, onIntersect, users, follow, refetch }: P
   const toggleFollowWithGithubFollowing = (applyGithub: boolean) => async () => {
     await toggleFollow(currentUsername, currentUserFollowing, applyGithub);
     refetch();
+    hideMessageModal();
   };
 
   const handleFollowButtonClick = (username: string, following: boolean) => {
@@ -91,6 +92,8 @@ const UserList = ({ isFetchingNextPage, onIntersect, users, follow, refetch }: P
           onConfirm={toggleFollowWithGithubFollowing(true)}
           onCancel={toggleFollowWithGithubFollowing(false)}
           onClose={hideMessageModal}
+          confirmText="예"
+          cancelText="아니오"
         />
       )}
     </>

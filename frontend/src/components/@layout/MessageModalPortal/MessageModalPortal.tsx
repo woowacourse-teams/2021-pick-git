@@ -15,9 +15,18 @@ export interface Props {
   onClose: () => void;
   onCancel?: () => void;
   onConfirm?: () => void;
+  confirmText?: string;
+  cancelText?: string;
 }
 
-export const MessageModal = ({ heading, onClose, onCancel, onConfirm }: Props) => {
+export const MessageModal = ({
+  heading,
+  onClose,
+  onCancel,
+  onConfirm,
+  confirmText = "확인",
+  cancelText = "취소",
+}: Props) => {
   return (
     <Container>
       <BackDrop onMouseDown={onClose} />
@@ -25,8 +34,8 @@ export const MessageModal = ({ heading, onClose, onCancel, onConfirm }: Props) =
         <ModalBody>
           <Text>{heading}</Text>
           <ButtonsWrapper>
-            {onCancel && <CancelButton onClick={onCancel}>취소</CancelButton>}
-            {onConfirm && <ConfirmButton onClick={onConfirm}>확인</ConfirmButton>}
+            {onCancel && <CancelButton onClick={onCancel}>{cancelText}</CancelButton>}
+            {onConfirm && <ConfirmButton onClick={onConfirm}>{confirmText}</ConfirmButton>}
           </ButtonsWrapper>
         </ModalBody>
       </ModalContent>
