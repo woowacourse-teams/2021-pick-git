@@ -13,9 +13,10 @@ import org.springframework.web.client.RestTemplate;
 public class GithubContributionApiRequester implements PlatformContributionApiRequester {
 
     @Override
-    public String request(String url) {
+    public String request(String url, String accessToken) {
         try {
             HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.setBearerAuth(accessToken);
             httpHeaders.set("Accept", "application/vnd.github.cloak-preview");
 
             RequestEntity<Void> requestEntity = RequestEntity

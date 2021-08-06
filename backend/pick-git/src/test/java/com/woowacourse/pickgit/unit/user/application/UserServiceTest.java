@@ -33,6 +33,7 @@ import com.woowacourse.pickgit.user.domain.Contribution;
 import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
@@ -686,6 +687,11 @@ class UserServiceTest {
         verify(userRepository, times(1)).findByBasicProfile_Name(loginUser.getName());
     }
 
+    private AuthUserRequestDto createLoginAuthUserRequestDto(String username) {
+        AppUser appUser = new LoginUser(username, "Bearer testToken");
+        return AuthUserRequestDto.from(appUser);
+    }
+
     @DisplayName("비 로그인 - 저장된 유저중 유사한 이름을 가진 유저를 검색한다. (팔로잉 필드 null)")
     @Test
     void searchUser_GuestUser_Success() {
@@ -723,57 +729,67 @@ class UserServiceTest {
         verify(userRepository, times(0)).findByBasicProfile_Name(anyString());
     }
 
-    @DisplayName("누구든지 활동 통계를 조회할 수 있다.")
-    @Test
-    void calculateContributions_Anyone_Success() {
-        // given
-        User user = UserFactory.user();
-
-        Contribution contribution = new Contribution(11, 48, 48, 48, 48);
-
-        given(userRepository.findByBasicProfile_Name("testUser"))
-            .willReturn(Optional.of(user));
-        given(platformContributionCalculator.calculate("testUser"))
-            .willReturn(contribution);
-
-        ContributionResponseDto responseDto = UserFactory.mockContributionResponseDto();
-
-        // when
-        ContributionResponseDto contributions = userService.calculateContributions("testUser");
-
-        // then
-        assertThat(contributions)
-            .usingRecursiveComparison()
-            .isEqualTo(responseDto);
-
-        verify(userRepository, times(1))
-            .findByBasicProfile_Name("testUser");
-        verify(platformContributionCalculator, times(1))
-            .calculate("testUser");
-    }
-
-    @DisplayName("존재하지 않는 유저 이름으로 활동 통계를 조회할 수 없다. - 400 예외")
-    @Test
-    void calculateContributions_InvalidUsername_400Exception() {
-        // when
-        assertThatThrownBy(() -> {
-            userService.calculateContributions("invalidName");
-        }).isInstanceOf(InvalidUserException.class)
-            .hasFieldOrPropertyWithValue("errorCode", "U0001")
-            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
-            .hasMessage("유효하지 않은 유저입니다.");
-
-        // then
-        verify(userRepository, times(1))
-            .findByBasicProfile_Name("invalidName");
-    }
-
-    private AuthUserRequestDto createLoginAuthUserRequestDto(String username) {
-        AppUser appUser = new LoginUser(username, "Bearer testToken");
-        return AuthUserRequestDto.from(appUser);
-    }
-
     private AuthUserRequestDto createGuestAuthUserRequestDto() {
         return AuthUserRequestDto.from(new GuestUser());
+    }
+
+    @DisplayName("calculateContributions 메소드는")
+    @Nested
+    class Describe_calculateContributions {
+
+        @DisplayName("로그인 되어 있을 때")
+        @Nested
+        class Context_Login {
+
+            @DisplayName("사용자는 활동 통계를 조회할 수 있다.")
+            @Test
+            void calculateContributions_LoginUser_Success() {
+                // given
+                User user = UserFactory.user();
+                ContributionRequestDto requestDto = UserFactory.mockContributionRequestDto();
+
+                Contribution contribution = new Contribution(11, 48, 48, 48, 48);
+
+                given(userRepository.findByBasicProfile_Name("testUser"))
+                    .willReturn(Optional.of(user));
+                given(platformContributionCalculator.calculate("oauth.access.token", "testUser"))
+                    .willReturn(contribution);
+
+                ContributionResponseDto responseDto = UserFactory.mockContributionResponseDto();
+
+                // when
+                ContributionResponseDto contributions = userService
+                    .calculateContributions(requestDto);
+
+                // then
+                assertThat(contributions)
+                    .usingRecursiveComparison()
+                    .isEqualTo(responseDto);
+
+                verify(userRepository, times(1))
+                    .findByBasicProfile_Name("testUser");
+                verify(platformContributionCalculator, times(1))
+                    .calculate("oauth.access.token", "testUser");
+            }
+
+            @DisplayName("존재하지 않는 유저 이름으로 활동 통계를 조회할 수 없다. - 400 예외")
+            @Test
+            void calculateContributions_InvalidUsername_400Exception() {
+                // given
+                ContributionRequestDto requestDto = UserFactory.mockContributionRequestDto();
+
+                // when
+                assertThatThrownBy(() -> {
+                    userService.calculateContributions(requestDto);
+                }).isInstanceOf(InvalidUserException.class)
+                    .hasFieldOrPropertyWithValue("errorCode", "U0001")
+                    .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
+                    .hasMessage("유효하지 않은 유저입니다.");
+
+                // then
+                verify(userRepository, times(1))
+                    .findByBasicProfile_Name("testUser");
+            }
+        }
     }
 }

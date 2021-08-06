@@ -55,7 +55,8 @@ public class OAuthConfiguration implements WebMvcConfigurer {
             .addPathPatterns("/api/posts/*/comments", HttpMethod.POST)
             .addPathPatterns("/api/profiles/me", HttpMethod.GET, HttpMethod.POST)
             .addPathPatterns("/api/profiles/*/followings", HttpMethod.POST, HttpMethod.DELETE)
-            .addPathPatterns("/api/posts/*", HttpMethod.PUT, HttpMethod.DELETE);
+            .addPathPatterns("/api/posts/*", HttpMethod.PUT, HttpMethod.DELETE)
+            .addPathPatterns("/api/profiles/*/contributions", HttpMethod.GET);
 
         HandlerInterceptor ignoreAuthenticationInterceptor = new PathMatchInterceptor(
             ignoreAuthenticationInterceptor())

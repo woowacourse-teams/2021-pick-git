@@ -29,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
+import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
@@ -40,6 +41,8 @@ import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.ProfileEditResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.presentation.UserController;
+import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
+import java.util.Optional;
 import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -354,6 +357,63 @@ class UserControllerTest {
                 ))
             );
         }
+
+        @DisplayName("사용자는 활동 통계를 조회할 수 있다.")
+        @Test
+        void getContributions_LoginUser_Success() throws Exception {
+            // given
+            LoginUser loginUser = new LoginUser("testUser", "oauth.access.token");
+
+            ContributionResponseDto responseDto = UserFactory.mockContributionResponseDto();
+
+            given(oAuthService.validateToken("test.access.token"))
+                .willReturn(true);
+            given(oAuthService.findRequestUserByToken("test.access.token"))
+                .willReturn(loginUser);
+            given(userService.calculateContributions(any(ContributionRequestDto.class)))
+                .willReturn(responseDto);
+
+            // when
+            ResultActions perform = mockMvc
+                .perform(get("/api/profiles/{username}/contributions", "testUser")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer test.access.token")
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .accept(MediaType.ALL));
+
+            // then
+            String body = perform
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+            assertThat(body).isEqualTo(objectMapper.writeValueAsString(responseDto));
+
+            verify(oAuthService, times(1))
+                .validateToken("test.access.token");
+            verify(oAuthService, times(1))
+                .findRequestUserByToken("test.access.token");
+            verify(userService, times(1))
+                .calculateContributions(any(ContributionRequestDto.class));
+
+            perform.andDo(document("contributions-LoggedIn",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                requestHeaders(
+                    headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer accessToken")
+                ),
+                pathParameters(
+                    parameterWithName("username").description("사용자 이름")
+                ),
+                responseFields(
+                    fieldWithPath("starsCount").description("스타 개수"),
+                    fieldWithPath("commitsCount").description("커밋 개수"),
+                    fieldWithPath("prsCount").description("PR 개수"),
+                    fieldWithPath("issuesCount").description("이슈 개수"),
+                    fieldWithPath("reposCount").description("퍼블릭 레포지토리 개수")
+                )
+            ));
+        }
     }
 
     @DisplayName("비로그인 상태일 때")
@@ -536,46 +596,45 @@ class UserControllerTest {
 
             verify(oAuthService, times(1)).validateToken(any());
         }
-    }
 
-    @DisplayName("누구든지 활동 통계를 조회할 수 있다.")
-    @Test
-    void getContributions_Anyone_Success() throws Exception {
-        // given
-        ContributionResponseDto responseDto = UserFactory.mockContributionResponseDto();
+        @DisplayName("게스트는 활동 통계를 조회할 수 없다. - 401 예외")
+        @Test
+        void getContributions_GuestUser_401Exception() throws Exception {
+            // given
+            GuestUser guestUser = new GuestUser();
 
-        given(userService.calculateContributions("testUser"))
-            .willReturn(responseDto);
+            given(oAuthService.validateToken(null))
+                .willReturn(true);
+            given(oAuthService.findRequestUserByToken(null))
+                .willReturn(guestUser);
 
-        // when
-        ResultActions perform = mockMvc
-            .perform(get("/api/profiles/{username}/contributions", "testUser")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .accept(MediaType.ALL));
+            // when
+            ResultActions perform = mockMvc
+                .perform(get("/api/profiles/{username}/contributions", "testUser")
+                    .header(HttpHeaders.AUTHORIZATION, Optional.empty())
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .accept(MediaType.ALL));
 
-        // then
-        String body = perform
-            .andExpect(status().isOk())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
+            // then
+            perform
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("errorCode").value("A0002"));
 
-        assertThat(body).isEqualTo(objectMapper.writeValueAsString(responseDto));
-        verify(userService, times(1)).calculateContributions("testUser");
+            verify(oAuthService, times(1))
+                .validateToken(null);
+            verify(oAuthService, times(1))
+                .findRequestUserByToken(null);
 
-        perform.andDo(document("contributions-LoggedIn",
-            getDocumentRequest(),
-            getDocumentResponse(),
-            pathParameters(
-                parameterWithName("username").description("사용자 이름")
-            ),
-            responseFields(
-                fieldWithPath("starsCount").description("스타 개수"),
-                fieldWithPath("commitsCount").description("커밋 개수"),
-                fieldWithPath("prsCount").description("PR 개수"),
-                fieldWithPath("issuesCount").description("이슈 개수"),
-                fieldWithPath("reposCount").description("퍼블릭 레포지토리 개수")
-            )
-        ));
+            perform.andDo(document("contribution-unLoggedIn",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                requestHeaders(
+                    headerWithName(HttpHeaders.AUTHORIZATION).description(Optional.empty())
+                ),
+                responseFields(
+                    fieldWithPath("errorCode").type(STRING).description("에러 코드")
+                )
+            ));
+        }
     }
 }

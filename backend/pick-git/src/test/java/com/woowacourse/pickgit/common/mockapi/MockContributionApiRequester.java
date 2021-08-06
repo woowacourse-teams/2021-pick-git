@@ -6,10 +6,13 @@ import com.woowacourse.pickgit.user.infrastructure.requester.PlatformContributio
 public class MockContributionApiRequester implements PlatformContributionApiRequester {
 
     @Override
-    public String request(String url) {
+    public String request(String url, String accessToken) {
         String validPrefix = "https://api.github.com/search/";
 
         if (!url.startsWith(validPrefix)) {
+            throw new PlatformHttpErrorException();
+        }
+        if (!"oauth.access.token".equals(accessToken)) {
             throw new PlatformHttpErrorException();
         }
 

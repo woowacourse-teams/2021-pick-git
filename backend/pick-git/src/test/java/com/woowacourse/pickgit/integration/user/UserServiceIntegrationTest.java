@@ -27,6 +27,7 @@ import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponse
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -176,6 +177,7 @@ class UserServiceIntegrationTest {
     }
 
     @DisplayName("비로그인 유저는 팔로우할 수 없다.")
+    @Test
     void follow_Guest_Failure() {
         // given
         AuthUserRequestDto requestDto = createGuestAuthUserRequestDto();
@@ -338,16 +340,17 @@ class UserServiceIntegrationTest {
         assertThat(responseDto.isFollowing()).isFalse();
     }
 
-    @DisplayName("누구든지 활동 통계를 조회할 수 있다.")
+    @DisplayName("사용자는 활동 통계를 조회할 수 있다.")
     @Test
-    void getContributions_Anyone_Success() {
+    void calculateContributions_LoginUser_Success() {
         // given
         userRepository.save(UserFactory.user());
 
+        ContributionRequestDto requestDto = UserFactory.mockContributionRequestDto();
         ContributionResponseDto contributions = UserFactory.mockContributionResponseDto();
 
         // when
-        ContributionResponseDto responseDto = userService.calculateContributions("testUser");
+        ContributionResponseDto responseDto = userService.calculateContributions(requestDto);
 
         // then
         assertThat(responseDto)
@@ -357,11 +360,14 @@ class UserServiceIntegrationTest {
 
     @DisplayName("존재하지 않은 유저 이름으로 활동 통계를 조회할 수 없다. - 400 예외")
     @Test
-    void getContributions_InvalidUsername_400Exception() {
+    void calculateContributions_InvalidUsername_400Exception() {
+        // given
+        ContributionRequestDto requestDto = UserFactory.mockContributionRequestDto();
+
         // when
-        assertThatThrownBy(() ->
-            userService.calculateContributions("invalidName"))
-            .isInstanceOf(InvalidUserException.class)
+        assertThatThrownBy(() -> {
+            userService.calculateContributions(requestDto);
+        }).isInstanceOf(InvalidUserException.class)
             .hasFieldOrPropertyWithValue("errorCode", "U0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
             .hasMessage("유효하지 않은 유저입니다.");

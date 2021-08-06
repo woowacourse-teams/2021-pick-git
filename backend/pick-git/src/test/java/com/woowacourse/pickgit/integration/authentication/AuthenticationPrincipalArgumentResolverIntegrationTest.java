@@ -6,8 +6,8 @@ import static org.mockito.BDDMockito.given;
 
 import com.woowacourse.pickgit.authentication.application.JwtTokenProvider;
 import com.woowacourse.pickgit.authentication.application.OAuthService;
-import com.woowacourse.pickgit.authentication.dao.CollectionOAuthAccessTokenDao;
-import com.woowacourse.pickgit.authentication.dao.OAuthAccessTokenDao;
+import com.woowacourse.pickgit.authentication.infrastructure.dao.CollectionOAuthAccessTokenDao;
+import com.woowacourse.pickgit.authentication.domain.OAuthAccessTokenDao;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.infrastructure.JwtTokenProviderImpl;
 import com.woowacourse.pickgit.authentication.presentation.AuthenticationPrincipalArgumentResolver;

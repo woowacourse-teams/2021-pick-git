@@ -18,6 +18,7 @@ import com.woowacourse.pickgit.user.domain.Contribution;
 import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -155,6 +156,12 @@ public class UserService {
         return generateFollowResponse(target, false);
     }
 
+    private void validateIsGuest(AuthUserRequestDto requestDto) {
+        if (requestDto.isGuest()) {
+            throw new UnauthorizedException();
+        }
+    }
+
     private FollowResponseDto generateFollowResponse(User target, boolean isFollowing) {
         return FollowResponseDto.builder()
             .followerCount(target.getFollowerCount())
@@ -162,10 +169,11 @@ public class UserService {
             .build();
     }
 
-    public ContributionResponseDto calculateContributions(String username) {
-        User user = findUserByName(username);
+    public ContributionResponseDto calculateContributions(ContributionRequestDto requestDto) {
+        User user = findUserByName(requestDto.getUsername());
 
-        Contribution contribution = platformContributionCalculator.calculate(user.getName());
+        Contribution contribution = platformContributionCalculator
+            .calculate(requestDto.getAccessToken(), user.getName());
 
         return ContributionResponseDto.builder()
             .starsCount(contribution.getStarsCount())
@@ -210,6 +218,11 @@ public class UserService {
             .collect(toList());
     }
 
+    private User findUserByName(String githubName) {
+        return userRepository.findByBasicProfile_Name(githubName)
+            .orElseThrow(InvalidUserException::new);
+    }
+
     private List<UserSearchResponseDto> convertToUserSearchResponseDtoWithFollowing(
         User loginUser,
         List<User> users
@@ -226,16 +239,5 @@ public class UserService {
 
     private Predicate<User> isLoginUser(User loginUser) {
         return user -> !user.equals(loginUser);
-    }
-
-    private void validateIsGuest(AuthUserRequestDto requestDto) {
-        if (requestDto.isGuest()) {
-            throw new UnauthorizedException();
-        }
-    }
-
-    private User findUserByName(String githubName) {
-        return userRepository.findByBasicProfile_Name(githubName)
-            .orElseThrow(InvalidUserException::new);
     }
 }

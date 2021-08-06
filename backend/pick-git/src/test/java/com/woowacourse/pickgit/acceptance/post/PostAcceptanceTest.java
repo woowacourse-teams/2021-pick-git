@@ -482,8 +482,7 @@ class PostAcceptanceTest {
         // when
         List<RepositoryResponseDto> response =
             request(token, USERNAME, HttpStatus.OK.value())
-                .as(new TypeRef<>() {
-                });
+                .as(new TypeRef<>() {});
 
         // then
         assertThat(response).hasSize(2);
