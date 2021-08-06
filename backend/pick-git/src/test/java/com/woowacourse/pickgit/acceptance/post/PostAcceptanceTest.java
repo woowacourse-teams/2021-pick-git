@@ -163,9 +163,9 @@ class PostAcceptanceTest {
         assertThat(response.getErrorCode()).isEqualTo("P0001");
     }
 
-    @DisplayName("로그인일때 게시물을 조회한다. - 댓글 및 게시글의 좋아요 여부를 확인할 수 있다.")
+    @DisplayName("로그인일때 홈 피드를 조회한다. - 게시글 좋아요 여부 true/false")
     @Test
-    void read_LoginUser_Success() {
+    void readHomeFeed_LoginUser_Success() {
         String token = 로그인_되어있음(ANOTHER_USERNAME).getToken();
 
         requestToWritePostApi(token, HttpStatus.CREATED);
@@ -188,7 +188,7 @@ class PostAcceptanceTest {
             .containsExactly(false, false, false);
     }
 
-    @DisplayName("비 로그인이어도 게시글 조회가 가능하다. - Comment 및 게시물 좋아요 여부는 항상 false")
+    @DisplayName("비 로그인이어도 홈 피드 조회가 가능하다. - 게시물 좋아요 여부는 항상 null")
     @Test
     void read_GuestUser_Success() {
         String token = 로그인_되어있음(ANOTHER_USERNAME).getToken();

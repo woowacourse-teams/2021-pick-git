@@ -152,7 +152,42 @@ public class PostFactory {
         return List.of(fixture1, fixture2, fixture3, fixture4, fixture5);
     }
 
-    public static List<PostResponseDto> mockPostResponseDtos() {
+    public static List<PostResponseDto> mockPostResponseDtosForGuest() {
+        CommentResponseDto commentFixture1 = CommentResponseDto.builder()
+            .id(1L)
+            .profileImageUrl("commentAuthorProfileImageUrl")
+            .authorName("commentAuthorName1")
+            .content("commentContent1")
+            .liked(null)
+            .build();
+
+        CommentResponseDto commentFixture2 = CommentResponseDto.builder()
+            .id(2L)
+            .profileImageUrl("commentAuthorProfileImageUrl")
+            .authorName("commentAuthorName2")
+            .content("commentContent2")
+            .liked(null)
+            .build();
+
+        PostResponseDto fixture1 = PostResponseDto.builder()
+            .id(1L)
+            .imageUrls(List.of("image1Url", "image2Url"))
+            .githubRepoUrl("githubRepoUrl")
+            .content("content")
+            .authorName("authorName")
+            .profileImageUrl("profileImageUrl")
+            .likesCount(1)
+            .tags(List.of("tag1", "tag2"))
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
+            .comments(List.of(commentFixture1, commentFixture2))
+            .liked(null)
+            .build();
+
+        return List.of(fixture1);
+    }
+
+    public static List<PostResponseDto> mockPostResponseDtosForLogin() {
         CommentResponseDto commentFixture1 = CommentResponseDto.builder()
             .id(1L)
             .profileImageUrl("commentAuthorProfileImageUrl")
