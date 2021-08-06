@@ -34,6 +34,11 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 class UserAcceptance_GetFollowingsAndFollowers {
 
+    private static final String FOLLOWINGS_API_URL =
+        "/api/profiles/{username}/followings?page={page}&limit={limit}";
+    private static final String FOLLOWERS_API_URL =
+        "/api/profiles/{username}/followers?page={page}&limit={limit}";
+
     @LocalServerPort
     private int port;
 
@@ -70,11 +75,11 @@ class UserAcceptance_GetFollowingsAndFollowers {
         }
 
         // when
-        List<UserSearchResponse> response = PickGitRequest.get(
-            String.format("/api/profiles/%s/followings?page=%s&limit=%s", "target", "0", "10")
-        ).withUser()
+        List<UserSearchResponse> response = PickGitRequest
+            .get(FOLLOWINGS_API_URL, "target", "0", "10")
+            .withUser()
             .extract()
-            .as(new TypeRef<List<UserSearchResponse>>() {
+            .as(new TypeRef<>() {
             });
 
         // then
@@ -106,11 +111,12 @@ class UserAcceptance_GetFollowingsAndFollowers {
         }
 
         // when
-        List<UserSearchResponse> response = PickGitRequest.get(
-            String.format("/api/profiles/%s/followings?page=%s&limit=%s", "target", "0", "10")
-        ).withGuest()
+        List<UserSearchResponse> response = PickGitRequest
+            .get(FOLLOWINGS_API_URL, "target", "0",
+                "10")
+            .withGuest()
             .extract()
-            .as(new TypeRef<List<UserSearchResponse>>() {
+            .as(new TypeRef<>() {
             });
 
         // then
@@ -147,11 +153,11 @@ class UserAcceptance_GetFollowingsAndFollowers {
         }
 
         // when
-        List<UserSearchResponse> response = PickGitRequest.get(
-            String.format("/api/profiles/%s/followers?page=%s&limit=%s", "target", "0", "10")
-        ).withUser()
+        List<UserSearchResponse> response = PickGitRequest
+            .get(FOLLOWERS_API_URL, "target", "0", "10")
+            .withUser()
             .extract()
-            .as(new TypeRef<List<UserSearchResponse>>() {
+            .as(new TypeRef<>() {
             });
 
         // then
@@ -183,11 +189,11 @@ class UserAcceptance_GetFollowingsAndFollowers {
         }
 
         // when
-        List<UserSearchResponse> response = PickGitRequest.get(
-            String.format("/api/profiles/%s/followers?page=%s&limit=%s", "target", "0", "10")
-        ).withGuest()
+        List<UserSearchResponse> response = PickGitRequest
+            .get(FOLLOWERS_API_URL, "target", "0", "10")
+            .withGuest()
             .extract()
-            .as(new TypeRef<List<UserSearchResponse>>() {
+            .as(new TypeRef<>() {
             });
 
         // then
