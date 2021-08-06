@@ -7,7 +7,6 @@ import com.woowacourse.pickgit.exception.post.IllegalSearchTypeException;
 import com.woowacourse.pickgit.post.application.search.type.SearchType;
 import com.woowacourse.pickgit.post.domain.Post;
 import java.util.List;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -56,7 +55,6 @@ class SearchTypesTest {
             .isEqualTo("P0006");
     }
 
-    @NotNull
     private SearchType createSearchType(String TYPE) {
         return new SearchType() {
             @Override
