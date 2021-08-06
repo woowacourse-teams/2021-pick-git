@@ -107,7 +107,7 @@ public class PostFeedControllerTest_searchPosts {
                 .param("limit", "3"));
 
         perform.andExpect(status().isOk());
-        perform.andDo(document("/api/search/posts_get_guest",
+        perform.andDo(document("api_search_posts_get_guest",
             getDocumentRequest(),
             getDocumentResponse(),
             requestParameters(
@@ -156,7 +156,7 @@ public class PostFeedControllerTest_searchPosts {
                 .header(HttpHeaders.AUTHORIZATION, API_ACCESS_TOKEN));
 
         perform.andExpect(status().isOk());
-        perform.andDo(document("/api/search/posts_get_login",
+        perform.andDo(document("api_search_posts_get_login",
             getDocumentRequest(),
             getDocumentResponse(),
             requestHeaders(
