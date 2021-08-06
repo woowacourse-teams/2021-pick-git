@@ -62,15 +62,15 @@ asciidoctor {
 	dependsOn test
 }
 
-task copyDocuments(type: Copy) {
+bootJar {
 	dependsOn asciidoctor
 
-	from file("build/asciidoc/html5/index.html")
-	into file("src/main/resources/static/docs")
-}
+	copy {
+		from 'build/asciidoc/html5'
+		into 'src/main/resources/static/docs'
+		include '*.html'
+	}
 
-bootJar {
-	dependsOn copyDocuments
 }
 
 test {
