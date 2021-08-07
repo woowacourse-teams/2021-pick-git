@@ -75,7 +75,7 @@ export interface GithubStats {
   commitsCount: number;
   prsCount: number;
   issuesCount: number;
-  contributesCount: number;
+  reposCount: number;
 }
 
 export interface GithubRepository {

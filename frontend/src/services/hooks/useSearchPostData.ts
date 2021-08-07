@@ -12,6 +12,7 @@ import { isHttpErrorStatus } from "../../utils/typeGuard";
 import { useSearchPostResultQuery } from "../queries/search";
 
 const useSearchPostData = (type: string | null, prevData?: InfiniteData<Post[]>) => {
+  const [prevKeyword, setPrevKeyword] = useState<string | null>(null);
   const { keyword } = useContext(SearchContext);
   const { pushSnackbarMessage } = useContext(SnackBarContext);
   const { logout } = useContext(UserContext);
@@ -31,6 +32,7 @@ const useSearchPostData = (type: string | null, prevData?: InfiniteData<Post[]>)
   } = useSearchPostResultQuery(type, keyword, queryKey);
 
   const handleIntersect = async () => {
+    console.log(isAllResultFetched);
     if (isAllResultFetched) return;
 
     await fetchNextPage();
@@ -41,8 +43,13 @@ const useSearchPostData = (type: string | null, prevData?: InfiniteData<Post[]>)
       return;
     }
 
-    const { pages } = infinitePostsData ?? {};
-    const lastPage = pages?.[pages.length - 1];
+    const { pages } = infinitePostsData;
+
+    if (!pages) {
+      return;
+    }
+
+    const lastPage = pages[pages.length - 1];
 
     if (!lastPage || !lastPage.length) {
       setIsAllResultFetched(true);
@@ -76,6 +83,13 @@ const useSearchPostData = (type: string | null, prevData?: InfiniteData<Post[]>)
       queryClient.setQueryData([QUERY.GET_SEARCH_POST_RESULT, { type, keyword }], prevData);
     }
   }, []);
+
+  useEffect(() => {
+    if (prevKeyword !== keyword) {
+      setPrevKeyword(keyword);
+      setIsAllResultFetched(false);
+    }
+  }, [keyword]);
 
   useEffect(() => {
     handleError();

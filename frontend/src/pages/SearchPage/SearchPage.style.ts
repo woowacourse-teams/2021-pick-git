@@ -6,6 +6,7 @@ export const Container = styled(Page)<React.CSSProperties>`
   padding-left: 1.4375rem;
   padding-right: 1.4375rem;
   height: 100vh;
+  overflow-y: hidden;
 `;
 
 export const Empty = styled.div`

@@ -14,7 +14,7 @@ const stats: Stats = {
   commits: { name: "Commits", icon: <ClockIcon />, countVariable: "commitsCount" },
   prs: { name: "PRs", icon: <PrIcon />, countVariable: "prsCount" },
   issues: { name: "Issues", icon: <IssueIcon />, countVariable: "issuesCount" },
-  contributes: { name: "Contributes", icon: <BookIcon />, countVariable: "contributesCount" },
+  repos: { name: "Repositories", icon: <BookIcon />, countVariable: "reposCount" },
 };
 
 interface Stats {
