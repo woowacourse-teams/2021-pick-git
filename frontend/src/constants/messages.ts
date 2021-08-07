@@ -58,6 +58,7 @@ export const API_ERROR_MESSAGE = {
 
 export const CLIENT_ERROR_MESSAGE = {
   C0001: "로그인이 만료되었습니다",
+  C0002: "파일을 읽을 수 없습니다. 다시 시도해주세요.",
 };
 
 export const UNKNOWN_ERROR_MESSAGE = "알 수 없는 에러가 발생하였습니다.";

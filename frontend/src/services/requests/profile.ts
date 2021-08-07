@@ -32,25 +32,66 @@ export const requestGetUserProfile = async (username: string, accessToken: strin
   return response.data;
 };
 
-export const requestSetProfile = async (profileImage: File | null, description: string, accessToken: string | null) => {
+export const requestSetProfileImage = async (profileImage: File, accessToken: string | null) => {
   if (!accessToken) {
     throw customError.noAccessToken;
   }
 
-  if (!profileImage && !description) {
-    throw Error("no data to set");
+  const fileReader = new FileReader();
+  const waitFileReaderLoad = new Promise<string>((resolve, reject) => {
+    fileReader.onload = () => {
+      if (fileReader.error) {
+        reject(fileReader.error);
+      }
+
+      resolve("done");
+    };
+  });
+
+  fileReader.readAsArrayBuffer(profileImage);
+  try {
+    await waitFileReaderLoad;
+  } catch (error) {
+    console.error(error);
+
+    throw customError.fileReader;
   }
 
-  const formData = new FormData();
+  if (fileReader.result && fileReader.result instanceof ArrayBuffer) {
+    const imageByteArray = Array.from(new Int8Array(fileReader.result));
 
-  formData.append("image", profileImage ?? new File([], ""));
-  formData.append("description", description);
+    const response = await axios.put<{ imageUrl: string }>(
+      API_URL.SELF_PROFILE_IMAGE(profileImage.name),
+      JSON.stringify(imageByteArray),
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "text/plain",
+        },
+      }
+    );
 
-  const response = await axios.post(API_URL.SELF_PROFILE, formData, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
+    return response.data;
+  }
+
+  return null;
+};
+
+export const requestSetProfileDescription = async (description: string, accessToken: string | null) => {
+  if (!accessToken) {
+    throw customError.noAccessToken;
+  }
+
+  const response = await axios.put<{ description: string }>(
+    API_URL.SELF_PROFILE_DESCRIPTION,
+    { description },
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
 
   return response.data;
 };

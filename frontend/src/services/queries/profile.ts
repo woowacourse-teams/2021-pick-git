@@ -10,7 +10,8 @@ import {
   requestGetFollowings,
   requestGetSelfProfile,
   requestGetUserProfile,
-  requestSetProfile,
+  requestSetProfileDescription,
+  requestSetProfileImage,
 } from "../requests";
 import { getAccessToken } from "../../storage/storage";
 import { customError } from "../../utils/error";
@@ -22,16 +23,6 @@ type ProfileQueryKey = readonly [
     username: string | null;
   }
 ];
-
-interface SetProfileVariable {
-  image: File | null;
-  description: string;
-}
-
-interface SetProfileResponse {
-  imageUrl: string;
-  description: string;
-}
 
 interface MutateFollowVariable {
   username: string;
@@ -70,9 +61,15 @@ export const useUnfollowingMutation = () =>
     requestDeleteFollow(username, applyGithub, getAccessToken())
   );
 
-export const useProfileMutation = () => {
-  return useMutation<SetProfileResponse, AxiosError<ErrorResponse> | Error, SetProfileVariable>(
-    ({ image, description }) => requestSetProfile(image, description, getAccessToken())
+export const useProfileImageMutation = () => {
+  return useMutation<{ imageUrl: string } | null, AxiosError<ErrorResponse> | Error, { image: File }>(({ image }) =>
+    requestSetProfileImage(image, getAccessToken())
+  );
+};
+
+export const useProfileDescriptionMutation = () => {
+  return useMutation<{ description: string }, AxiosError<ErrorResponse> | Error, { description: string }>(
+    ({ description }) => requestSetProfileDescription(description, getAccessToken())
   );
 };
 
