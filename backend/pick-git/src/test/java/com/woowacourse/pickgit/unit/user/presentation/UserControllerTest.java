@@ -259,6 +259,9 @@ class UserControllerTest {
                 requestHeaders(
                     headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer token")
                 ),
+                requestParameters(
+                    parameterWithName("githubFollowing").description("깃헙 자동 팔로우 여부")
+                ),
                 pathParameters(
                     parameterWithName("userName").description("다른 사용자 이름")
                 ),
@@ -311,6 +314,9 @@ class UserControllerTest {
                 getDocumentResponse(),
                 requestHeaders(
                     headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer token")
+                ),
+                requestParameters(
+                    parameterWithName("githubUnfollowing").description("깃헙 자동 언팔로우 여부")
                 ),
                 pathParameters(
                     parameterWithName("userName").description("다른 사용자 이름")

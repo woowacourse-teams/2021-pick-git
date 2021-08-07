@@ -71,6 +71,9 @@ class UserServiceTest {
     @Mock
     private PlatformContributionCalculator platformContributionCalculator;
 
+    @Mock
+    private PlatformFollowingRequester platformFollowingRequester;
+
     @DisplayName("getMyUserProfile 메서드는")
     @Nested
     class Describe_getMyUserProfile {
@@ -385,6 +388,87 @@ class UserServiceTest {
                 verify(userRepository, times(2))
                     .findByBasicProfile_Name(loginUsername);
             }
+
+            @DisplayName("플랫폼 자동 팔로우 사용여부가")
+            @Nested
+            class Context_githubFollowing {
+
+                @DisplayName("true라면 자동 팔로우 한다.")
+                @Test
+                void follow_githubFollowingTrue_AutoFollow() {
+                    //given
+                    User loginUser = UserFactory.user(1L, "testUser");
+                    String loginUsername = loginUser.getName();
+                    AuthUserRequestDto authUserRequestDto =
+                        createLoginAuthUserRequestDto(loginUsername);
+                    User targetUser = UserFactory.user(2L, "testUser2");
+                    String targetUsername = targetUser.getName();
+
+                    given(userRepository.findByBasicProfile_Name(loginUsername))
+                        .willReturn(Optional.of(loginUser));
+                    given(userRepository.findByBasicProfile_Name(targetUsername))
+                        .willReturn(Optional.of(targetUser));
+
+                    FollowRequestDto requestDto = FollowRequestDto.builder()
+                        .authUserRequestDto(authUserRequestDto)
+                        .targetName(targetUsername)
+                        .githubFollowing(true)
+                        .build();
+
+                    //when
+                    FollowResponseDto responseDto =
+                        userService.followUser(requestDto);
+
+                    //then
+                    assertThat(responseDto.getFollowerCount()).isEqualTo(1);
+                    assertThat(responseDto.isFollowing()).isTrue();
+
+                    verify(userRepository, times(1))
+                        .findByBasicProfile_Name(loginUsername);
+                    verify(userRepository, times(1))
+                        .findByBasicProfile_Name(targetUsername);
+                    verify(platformFollowingRequester, times(1))
+                        .follow(targetUsername, authUserRequestDto.getAccessToken());
+                }
+
+                @DisplayName("false라면 자동 팔로우 하지 않는다")
+                @Test
+                void follow_githubFollowingFalse_NonAutoFollow() {
+                    //given
+                    User loginUser = UserFactory.user(1L, "testUser");
+                    String loginUsername = loginUser.getName();
+                    AuthUserRequestDto authUserRequestDto =
+                        createLoginAuthUserRequestDto(loginUsername);
+                    User targetUser = UserFactory.user(2L, "testUser2");
+                    String targetUsername = targetUser.getName();
+
+                    given(userRepository.findByBasicProfile_Name(loginUsername))
+                        .willReturn(Optional.of(loginUser));
+                    given(userRepository.findByBasicProfile_Name(targetUsername))
+                        .willReturn(Optional.of(targetUser));
+
+                    FollowRequestDto requestDto = FollowRequestDto.builder()
+                        .authUserRequestDto(authUserRequestDto)
+                        .targetName(targetUsername)
+                        .githubFollowing(false)
+                        .build();
+
+                    //when
+                    FollowResponseDto responseDto =
+                        userService.followUser(requestDto);
+
+                    //then
+                    assertThat(responseDto.getFollowerCount()).isEqualTo(1);
+                    assertThat(responseDto.isFollowing()).isTrue();
+
+                    verify(userRepository, times(1))
+                        .findByBasicProfile_Name(loginUsername);
+                    verify(userRepository, times(1))
+                        .findByBasicProfile_Name(targetUsername);
+                    verify(platformFollowingRequester, times(0))
+                        .follow(targetUsername, authUserRequestDto.getAccessToken());
+                }
+            }
         }
 
         @DisplayName("Source 유저가 특정 Target 유저를 팔로우 중이지 않을 때")
@@ -654,6 +738,94 @@ class UserServiceTest {
                     .findByBasicProfile_Name(loginUsername);
                 verify(userRepository, times(2))
                     .findByBasicProfile_Name(targetUsername);
+            }
+        }
+
+        @DisplayName("플랫폼 자동 언팔로우 사용여부가")
+        class Context_githubFollowing {
+
+            @DisplayName("true라면 자동 팔로우 한다.")
+            @Test
+            void unfollow_githubUnFollowingTrue_AutoUnFollow() {
+                //given
+                User loginUser = UserFactory.user(1L, "testUser");
+                String loginUsername = loginUser.getName();
+                AuthUserRequestDto authUserRequestDto =
+                    createLoginAuthUserRequestDto(loginUsername);
+                User targetUser = UserFactory.user(2L, "testUser2");
+                String targetUsername = targetUser.getName();
+
+                given(userRepository.findByBasicProfile_Name(loginUsername))
+                    .willReturn(Optional.of(loginUser));
+                given(userRepository.findByBasicProfile_Name(targetUsername))
+                    .willReturn(Optional.of(targetUser));
+
+                FollowRequestDto requestDto = FollowRequestDto.builder()
+                    .authUserRequestDto(authUserRequestDto)
+                    .targetName(targetUsername)
+                    .githubFollowing(true)
+                    .build();
+
+                userService.followUser(requestDto);
+
+                //when
+                FollowResponseDto responseDto =
+                    userService.unfollowUser(requestDto);
+
+                //then
+                assertThat(responseDto.getFollowerCount()).isZero();
+                assertThat(responseDto.isFollowing()).isFalse();
+
+                verify(userRepository, times(2))
+                    .findByBasicProfile_Name(loginUsername);
+                verify(userRepository, times(2))
+                    .findByBasicProfile_Name(targetUsername);
+                verify(platformFollowingRequester, times(1))
+                    .follow(targetUsername, authUserRequestDto.getAccessToken());
+                verify(platformFollowingRequester, times(1))
+                    .unfollow(targetUsername, authUserRequestDto.getAccessToken());
+            }
+
+            @DisplayName("false라면 자동 팔로우 하지 않는다.")
+            @Test
+            void unfollow_githubUnFollowingFalse_NonAutoUnFollow() {
+                //given
+                User loginUser = UserFactory.user(1L, "testUser");
+                String loginUsername = loginUser.getName();
+                AuthUserRequestDto authUserRequestDto =
+                    createLoginAuthUserRequestDto(loginUsername);
+                User targetUser = UserFactory.user(2L, "testUser2");
+                String targetUsername = targetUser.getName();
+
+                given(userRepository.findByBasicProfile_Name(loginUsername))
+                    .willReturn(Optional.of(loginUser));
+                given(userRepository.findByBasicProfile_Name(targetUsername))
+                    .willReturn(Optional.of(targetUser));
+
+                FollowRequestDto requestDto = FollowRequestDto.builder()
+                    .authUserRequestDto(authUserRequestDto)
+                    .targetName(targetUsername)
+                    .githubFollowing(false)
+                    .build();
+
+                userService.followUser(requestDto);
+
+                //when
+                FollowResponseDto responseDto =
+                    userService.unfollowUser(requestDto);
+
+                //then
+                assertThat(responseDto.getFollowerCount()).isZero();
+                assertThat(responseDto.isFollowing()).isFalse();
+
+                verify(userRepository, times(2))
+                    .findByBasicProfile_Name(loginUsername);
+                verify(userRepository, times(2))
+                    .findByBasicProfile_Name(targetUsername);
+                verify(platformFollowingRequester, times(0))
+                    .follow(targetUsername, authUserRequestDto.getAccessToken());
+                verify(platformFollowingRequester, times(0))
+                    .unfollow(targetUsername, authUserRequestDto.getAccessToken());
             }
         }
     }
