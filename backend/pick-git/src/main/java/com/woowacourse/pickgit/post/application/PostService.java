@@ -156,6 +156,7 @@ public class PostService {
 
         List<RepositoryNameAndUrl> repositoryNameAndUrls =
             platformRepositorySearchExtractor.extract(token, username, keyword, page, limit);
+
         List<RepositoryResponseDto> repositoryResponseDtos =
             createRepositoryResponsesDto(repositoryNameAndUrls);
 

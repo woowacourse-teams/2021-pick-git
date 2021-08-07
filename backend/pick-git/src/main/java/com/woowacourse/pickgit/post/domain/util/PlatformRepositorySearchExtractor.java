@@ -6,5 +6,11 @@ import java.util.List;
 
 public interface PlatformRepositorySearchExtractor {
 
-    List<RepositoryNameAndUrl> extract(String token, String username, String keyword, int page, int limit);
+    List<RepositoryNameAndUrl> extract(
+        String token,
+        String username,
+        String keyword,
+        int page,
+        int limit
+    );
 }

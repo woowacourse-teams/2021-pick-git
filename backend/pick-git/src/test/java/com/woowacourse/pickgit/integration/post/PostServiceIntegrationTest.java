@@ -297,7 +297,7 @@ class PostServiceIntegrationTest {
         String invalidToken = "invalidToken";
 
         SearchRepositoryRequestDto requestDto = new SearchRepositoryRequestDto(
-            invalidToken, USERNAME, "woowa", 1, 2
+            invalidToken, USERNAME, "woowa", 0, 2
         );
 
         // then

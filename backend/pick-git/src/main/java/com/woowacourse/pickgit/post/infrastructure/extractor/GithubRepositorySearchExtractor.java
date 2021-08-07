@@ -36,8 +36,10 @@ public class GithubRepositorySearchExtractor implements PlatformRepositorySearch
         int page,
         int limit
     ) {
-        String response = platformRepositoryApiRequester.request(
-            token, generateApiUrl(username, keyword, page + 1, limit)
+        String response =
+            platformRepositoryApiRequester.request(
+                token,
+                generateApiUrl(username, keyword, page + 1, limit)
         );
 
         return parseToRepositories(response);
@@ -49,7 +51,14 @@ public class GithubRepositorySearchExtractor implements PlatformRepositorySearch
         int page,
         int limit
     ) {
-        return String.format(API_URL_FORMAT, username, keyword, page, limit);
+
+        return String.format(
+            API_URL_FORMAT,
+            username,
+            keyword,
+            page,
+            limit
+        );
     }
 
     private List<RepositoryNameAndUrl> parseToRepositories(String response) {

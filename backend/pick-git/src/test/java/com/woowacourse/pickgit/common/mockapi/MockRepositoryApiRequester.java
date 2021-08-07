@@ -30,6 +30,7 @@ public class MockRepositoryApiRequester implements PlatformRepositoryApiRequeste
         if (isInvalidToken(token)) {
             throw new PlatformHttpErrorException("유효하지 않은 외부 플랫폼 토큰");
         }
+
         if (isInvalidUrl(url, userRepoApiUrl, userRepoSearchApiUrl)) {
             throw new PlatformHttpErrorException("유효하지 않은 외부 플랫폼 URL");
         }

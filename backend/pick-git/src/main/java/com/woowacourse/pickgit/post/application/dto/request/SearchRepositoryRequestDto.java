@@ -12,8 +12,13 @@ public class SearchRepositoryRequestDto {
     private SearchRepositoryRequestDto() {
     }
 
-    public SearchRepositoryRequestDto(String token, String username, String keyword, int page,
-        int limit) {
+    public SearchRepositoryRequestDto(
+        String token,
+        String username,
+        String keyword,
+        int page,
+        int limit
+    ) {
         this.token = token;
         this.username = username;
         this.keyword = keyword;

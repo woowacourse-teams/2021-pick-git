@@ -473,9 +473,10 @@ class PostServiceTest {
         int page = 1;
         int limit = 2;
 
-        SearchRepositoryRequestDto searchRepositoryRequestDto = new SearchRepositoryRequestDto(
-            accessToken, userName, keyword, page, limit
-        );
+        SearchRepositoryRequestDto searchRepositoryRequestDto =
+            new SearchRepositoryRequestDto(
+                accessToken, userName, keyword, page, limit
+            );
 
         given(platformRepositorySearchExtractor
             .extract(
@@ -488,8 +489,9 @@ class PostServiceTest {
         ).willThrow(new RepositoryParseException());
 
         // when then
-        assertThatCode(() -> postService.searchUserRepositories(searchRepositoryRequestDto))
-            .isInstanceOf(RepositoryParseException.class);
+        assertThatCode(() ->
+            postService.searchUserRepositories(searchRepositoryRequestDto)
+        ).isInstanceOf(RepositoryParseException.class);
 
         verify(platformRepositorySearchExtractor, times(1))
             .extract(
@@ -526,8 +528,9 @@ class PostServiceTest {
         ).willThrow(new RepositoryParseException());
 
         // when then
-        assertThatCode(() -> postService.searchUserRepositories(searchRepositoryRequestDto))
-            .isInstanceOf(RepositoryParseException.class);
+        assertThatCode(() ->
+            postService.searchUserRepositories(searchRepositoryRequestDto)
+        ).isInstanceOf(RepositoryParseException.class);
 
         verify(platformRepositorySearchExtractor, times(1))
             .extract(

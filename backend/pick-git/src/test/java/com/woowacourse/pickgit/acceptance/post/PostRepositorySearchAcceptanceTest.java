@@ -69,14 +69,13 @@ public class PostRepositorySearchAcceptanceTest {
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract()
-                .as(new TypeRef<>() {
-                });
+                .as(new TypeRef<>() {});
 
         // then
         assertThat(response).hasSize(2);
     }
 
-    @DisplayName("토큰이 없는 경우 예외가 발생한다. - 401 예외")
+    @DisplayName("레포지토리 검색 시 토큰이 없는 경우 예외가 발생한다. - 401 예외")
     @Test
     void searchUserRepositories_InvalidAccessToken_401Exception() {
         // given
@@ -95,8 +94,7 @@ public class PostRepositorySearchAcceptanceTest {
                 .then().log().all()
                 .statusCode(HttpStatus.UNAUTHORIZED.value())
                 .extract()
-                .as(new TypeRef<>() {
-                });
+                .as(new TypeRef<>() {});
 
         assertThat(exception.getErrorCode()).isEqualTo("A0001");
     }
