@@ -4,11 +4,17 @@
 
   <springProfile name="prod, local">
     <include resource="logback/error-logger.xml"/>
+    <include resource="logback/warn-logger.xml"/>
+    <include resource="logback/info-logger.xml"/>
     <logger name="com.woowacourse.s3_proxy" level="INFO">
       <appender-ref ref="error-logger"/>
+      <appender-ref ref="warn-logger"/>
+      <appender-ref ref="info-logger"/>
     </logger>
     <logger name="org.springframework" level="INFO" additivity="false">
       <appender-ref ref="error-logger"/>
+      <appender-ref ref="warn-logger"/>
+      <appender-ref ref="info-logger"/>
     </logger>
   </springProfile>
 

@@ -3,13 +3,19 @@
   <include resource="org/springframework/boot/logging/logback/base.xml"/>
 
   <springProfile name="prod, local">
-    <include resource="logback/db-logger.xml"/>
     <include resource="logback/error-logger.xml"/>
+    <include resource="logback/warn-logger.xml"/>
+    <include resource="logback/info-logger.xml"/>
+    <include resource="logback/db-logger.xml"/>
     <logger name="com.woowacourse.pickgit" level="INFO">
       <appender-ref ref="error-logger"/>
+      <appender-ref ref="warn-logger"/>
+      <appender-ref ref="info-logger"/>
     </logger>
     <logger name="org.springframework" level="INFO" additivity="false">
       <appender-ref ref="error-logger"/>
+      <appender-ref ref="warn-logger"/>
+      <appender-ref ref="info-logger"/>
     </logger>
     <logger name="org.hibernate.tool.hbm2ddl" level="DEBUG" additivity="false">
       <appender-ref ref="db-logger"/>
