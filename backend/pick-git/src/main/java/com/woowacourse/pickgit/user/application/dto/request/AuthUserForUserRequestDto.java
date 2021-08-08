@@ -29,6 +29,10 @@ public class AuthUserForUserRequestDto {
         if (appUser.isGuest()) {
             return new AuthUserForUserRequestDto(null, true);
         }
-        return new AuthUserForUserRequestDto(appUser.getUsername(), appUser.getAccessToken(), false);
+        return new AuthUserForUserRequestDto(
+            appUser.getUsername(),
+            appUser.getAccessToken(),
+            false
+        );
     }
 }

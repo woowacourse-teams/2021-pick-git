@@ -92,6 +92,10 @@ public class User {
     }
 
     public Boolean isFollowing(User targetUser) {
+        if (this.equals(targetUser)) {
+            return null;
+        }
+
         return this.followings.isFollowing(targetUser);
     }
 

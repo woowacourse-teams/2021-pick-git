@@ -1,9 +1,14 @@
 package com.woowacourse.pickgit.post.application;
 
+import static java.util.stream.Collectors.toList;
+
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
+import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
+import com.woowacourse.pickgit.post.application.dto.request.AuthUserForPostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.HomeFeedRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.SearchPostsRequestDto;
+import com.woowacourse.pickgit.post.application.dto.response.LikeUsersResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.search.SearchTypes;
 import com.woowacourse.pickgit.post.domain.Post;
@@ -78,16 +83,6 @@ public class PostFeedService {
             .orElse(postRepository.findAllPosts(pageable));
     }
 
-    private User findUserByName(String userName) {
-        if(Objects.isNull(userName)) {
-            return null;
-        }
-
-        return userRepository
-            .findByBasicProfile_Name(userName)
-            .orElseThrow(UserNotFoundException::new);
-    }
-
     public List<PostResponseDto> search(SearchPostsRequestDto searchPostsRequestDto) {
         String keyword = searchPostsRequestDto.getKeyword();
         String type = searchPostsRequestDto.getType();
@@ -103,5 +98,62 @@ public class PostFeedService {
         User user = findUserByName(userName);
 
         return PostDtoAssembler.assembleFrom(user, isGuest, search);
+    }
+
+    @Transactional(readOnly = true)
+    public List<LikeUsersResponseDto> likeUsers(AuthUserForPostRequestDto authUserRequestDto, Long postId) {
+        Post post = findPostWithLikeUsers(postId);
+        List<User> likeUsers = post.getLikeUsers();
+
+        if (authUserRequestDto.isGuest()) {
+            return createLikeUsersResponseDtoOfGuest(likeUsers);
+        }
+
+        User loginUser = findUserByName(authUserRequestDto.getUsername());
+        List<LikeUsersResponseDto> likeUsersResponseDtoOfLoginUser = createLikeUsersResponseDtoOfLoginUser(
+            loginUser, likeUsers);
+        return likeUsersResponseDtoOfLoginUser;
+    }
+
+    private Post findPostWithLikeUsers(Long postId) {
+        return postRepository.findPostWithLikeUsers(postId)
+            .orElseThrow(PostNotFoundException::new);
+    }
+
+    private List<LikeUsersResponseDto> createLikeUsersResponseDtoOfGuest(
+        List<User> likeUsers
+    ) {
+        return likeUsers.stream()
+            .map(user ->
+                new LikeUsersResponseDto(
+                    user.getImage(),
+                    user.getName(),
+                    null
+                )
+            ).collect(toList());
+    }
+
+    private List<LikeUsersResponseDto> createLikeUsersResponseDtoOfLoginUser(
+        User loginUser,
+        List<User> likeUsers
+    ) {
+        return likeUsers.stream()
+            .map(user ->
+                new LikeUsersResponseDto(
+                    user.getImage(),
+                    user.getName(),
+                    loginUser.isFollowing(user)
+                )
+            ).collect(toList());
+    }
+
+    private User findUserByName(String userName) {
+        if(Objects.isNull(userName)) {
+            return null;
+        }
+
+        return userRepository
+            .findByBasicProfile_Name(userName)
+            .orElseThrow(UserNotFoundException::new);
     }
 }

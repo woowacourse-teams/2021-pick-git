@@ -68,6 +68,7 @@ public class OAuthConfiguration implements WebMvcConfigurer {
             .addPathPatterns("/api/search/**", HttpMethod.GET)
             .addPathPatterns("/api/profiles/*/followings", HttpMethod.GET)
             .addPathPatterns("/api/profiles/*/followers", HttpMethod.GET)
+            .addPathPatterns("/api/posts/*/likes", HttpMethod.GET)
             .excludePatterns("/api/profiles/*/followings", HttpMethod.POST, HttpMethod.DELETE)
             .excludePatterns("/api/profiles/me", HttpMethod.GET)
             .excludePatterns("/api/posts/me", HttpMethod.GET)

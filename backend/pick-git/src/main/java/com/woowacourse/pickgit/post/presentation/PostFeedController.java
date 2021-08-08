@@ -5,10 +5,13 @@ import static java.util.stream.Collectors.toList;
 import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.post.application.PostFeedService;
+import com.woowacourse.pickgit.post.application.dto.request.AuthUserForPostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.HomeFeedRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.SearchPostsRequestDto;
+import com.woowacourse.pickgit.post.application.dto.response.LikeUsersResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.presentation.dto.request.SearchPostsRequest;
+import com.woowacourse.pickgit.post.presentation.dto.response.LikeUsersResponse;
 import com.woowacourse.pickgit.post.presentation.dto.response.PostResponse;
 import java.util.List;
 import java.util.function.Function;
@@ -112,5 +115,29 @@ public class PostFeedController {
             .comments(postResponseDto.getComments())
             .liked(postResponseDto.getLiked())
             .build();
+    }
+
+    @GetMapping("/posts/{postId}/likes")
+    public ResponseEntity<List<LikeUsersResponse>> searchLikeUsers(
+        @Authenticated AppUser appUser,
+        @PathVariable Long postId
+    ) {
+        AuthUserForPostRequestDto authUserRequestDto = AuthUserForPostRequestDto.from(appUser);
+
+        List<LikeUsersResponseDto> likeUsersResponseDtos = postFeedService
+            .likeUsers(authUserRequestDto, postId);
+
+        return ResponseEntity.ok(createLikeUsersResponse(likeUsersResponseDtos));
+    }
+
+    private List<LikeUsersResponse> createLikeUsersResponse(
+        List<LikeUsersResponseDto> likeUsersResponseDtos) {
+        return likeUsersResponseDtos.stream()
+            .map(dto -> LikeUsersResponse.builder()
+                .username(dto.getUsername())
+                .imageUrl(dto.getImageUrl())
+                .following(dto.getFollowing())
+                .build()
+            ).collect(toList());
     }
 }

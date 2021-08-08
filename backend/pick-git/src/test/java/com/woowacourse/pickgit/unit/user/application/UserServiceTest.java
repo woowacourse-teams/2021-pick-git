@@ -234,11 +234,11 @@ class UserServiceTest {
             @Test
             void getUserProfile_FindByNameInCaseOfLoginUseIsNotFollowing_Success() {
                 //given
-                User loginUser = UserFactory.user("testUser");
+                User loginUser = UserFactory.user(1L, "testUser");
                 String loginUsername = loginUser.getName();
                 AuthUserForUserRequestDto authUserRequestDto =
                     createLoginAuthUserRequestDto(loginUsername);
-                User targetUser = UserFactory.user("testUser2");
+                User targetUser = UserFactory.user(2L, "testUser2");
                 String targetUsername = targetUser.getName();
 
                 given(userRepository.findByBasicProfile_Name(targetUsername))

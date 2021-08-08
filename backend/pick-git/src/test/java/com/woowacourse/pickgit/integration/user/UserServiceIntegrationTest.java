@@ -635,6 +635,7 @@ class UserServiceIntegrationTest {
                 .build();
             userService.followUser(requestDto);
         });
+
         for (int i = 0; i < 3; i++) {
             FollowRequestDto requestDto = FollowRequestDto.builder()
                 .authUserRequestDto(authUserRequestDto)
@@ -679,6 +680,7 @@ class UserServiceIntegrationTest {
 
         usersInDb.forEach(mockUser -> {
             AuthUserForUserRequestDto targetAuthDto = createLoginAuthUserRequestDto("target");
+
             FollowRequestDto requestDto = FollowRequestDto.builder()
                 .authUserRequestDto(targetAuthDto)
                 .targetName(mockUser.getName())
@@ -721,7 +723,9 @@ class UserServiceIntegrationTest {
         userRepository.save(targetUser);
 
         usersInDb.forEach(mockUser -> {
-            AuthUserForUserRequestDto mockUserAuthDto = createLoginAuthUserRequestDto(mockUser.getName());
+            AuthUserForUserRequestDto mockUserAuthDto =
+                createLoginAuthUserRequestDto(mockUser.getName());
+
             FollowRequestDto requestDto = FollowRequestDto.builder()
                 .authUserRequestDto(mockUserAuthDto)
                 .targetName("target")
@@ -729,6 +733,7 @@ class UserServiceIntegrationTest {
                 .build();
             userService.followUser(requestDto);
         });
+
         for (int i = 0; i < 3; i++) {
             FollowRequestDto requestDto = FollowRequestDto.builder()
                 .authUserRequestDto(authUserRequestDto)
@@ -773,6 +778,7 @@ class UserServiceIntegrationTest {
 
         usersInDb.forEach(mockUser -> {
             AuthUserForUserRequestDto mockUserAuthDto = createLoginAuthUserRequestDto(mockUser.getName());
+
             FollowRequestDto requestDto = FollowRequestDto.builder()
                 .authUserRequestDto(mockUserAuthDto)
                 .targetName("target")
