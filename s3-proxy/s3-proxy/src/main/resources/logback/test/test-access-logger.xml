@@ -4,7 +4,7 @@
     <encoder>
       <charset>utf8</charset>
       <pattern>
-        %n%boldGreen(###### HTTP Request ######) %n%fullRequest%boldCyan(###### HTTP Response ######) %n%fullResponse
+        %n###### HTTP Request ###### %n%fullRequest###### HTTP Response ###### %n%fullResponse
       </pattern>
     </encoder>
   </appender>

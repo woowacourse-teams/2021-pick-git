@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <included>
-  <property name="home" value="logs/access/"/>
-  <appender name="access-logger" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>${home}access.log</file>
+  <property name="home" value="logs/info/"/>
+  <appender name="info-logger" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${home}info.log</file>
+    <filter class="ch.qos.logback.classic.filter.LevelFilter">
+      <level>INFO</level>
+      <onMatch>ACCEPT</onMatch>
+      <onMismatch>DENY</onMismatch>
+    </filter>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>${home}access-%d{yyyyMMdd}-%i.log</fileNamePattern>
+      <fileNamePattern>${home}info-%d{yyyyMMdd}-%i.log</fileNamePattern>
       <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
         <maxFileSize>15MB</maxFileSize>
       </timeBasedFileNamingAndTriggeringPolicy>
@@ -13,7 +18,7 @@
     <encoder>
       <charset>utf8</charset>
       <Pattern>
-        %n###### HTTP Request ###### %n%fullRequest###### HTTP Response ###### %n%fullResponse
+        %d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %t %class{36}.%M L:%L %n      > %m%n
       </Pattern>
     </encoder>
   </appender>
