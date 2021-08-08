@@ -126,6 +126,7 @@ public class UserController {
             .image(request.getImage())
             .decription(request.getDescription())
             .build();
+
         ProfileEditResponseDto responseDto =
             userService.editProfile(authUserRequestDto, profileEditRequestDto);
 
@@ -178,9 +179,9 @@ public class UserController {
             .page(page)
             .limit(limit)
             .build();
-        List<UserSearchResponseDto> userSearchResponseDtos =
+        List<UserSearchResponseDto> userSearchResponsesDto =
             userService.searchFollowings(authUserRequestDto, followSearchRequestDto);
-        return ResponseEntity.ok(createUserSearchResponses(userSearchResponseDtos));
+        return ResponseEntity.ok(createUserSearchResponses(userSearchResponsesDto));
     }
 
     @GetMapping("/{username}/followers")
@@ -196,9 +197,9 @@ public class UserController {
             .page(page)
             .limit(limit)
             .build();
-        List<UserSearchResponseDto> userSearchResponseDtos =
+        List<UserSearchResponseDto> userSearchResponsesDto =
             userService.searchFollowers(authUserRequestDto, followSearchRequestDto);
-        return ResponseEntity.ok(createUserSearchResponses(userSearchResponseDtos));
+        return ResponseEntity.ok(createUserSearchResponses(userSearchResponsesDto));
     }
 
     private List<UserSearchResponse> createUserSearchResponses(

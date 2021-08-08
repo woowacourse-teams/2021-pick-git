@@ -5,7 +5,7 @@
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 1.5.8">
-<title>Authorization</title>
+<title>Post</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /* Asciidoctor default stylesheet | MIT License | http://asciidoctor.org */
@@ -436,146 +436,36 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_authorization">Authorization</a>
+<li><a href="#_post">Post</a>
 <ul class="sectlevel2">
-<li><a href="#_깃허브_로그인_url_받기">깃허브 로그인 url 받기</a>
+<li><a href="#_게시물_작성_로그인">게시물 작성 - 로그인</a>
 <ul class="sectlevel3">
 <li><a href="#_request">Request</a></li>
 <li><a href="#_response">Response</a></li>
 </ul>
 </li>
-<li><a href="#_깃허브_로그인_후">깃허브 로그인 후</a>
+<li><a href="#_게시물_작성_비_로그인">게시물 작성 - 비 로그인</a>
 <ul class="sectlevel3">
 <li><a href="#_request_2">Request</a></li>
 <li><a href="#_response_2">Response</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li><a href="#_comment">Comment</a>
-<ul class="sectlevel2">
-<li><a href="#_댓글_등록">댓글 등록</a>
+<li><a href="#_홈_피드_요청_로그인">홈 피드 요청 - 로그인</a>
 <ul class="sectlevel3">
 <li><a href="#_request_3">Request</a></li>
 <li><a href="#_response_3">Response</a></li>
 </ul>
 </li>
-<li><a href="#_댓글_등록_내용이_없는_경우">댓글 등록 - 내용이 없는 경우</a>
+<li><a href="#_홈_피드_요청_비_로그인">홈 피드 요청 - 비 로그인</a>
 <ul class="sectlevel3">
 <li><a href="#_request_4">Request</a></li>
 <li><a href="#_response_4">Response</a></li>
 </ul>
 </li>
-<li><a href="#_댓글_등록_내용이_없는_경우_2">댓글 등록 - 내용이 없는 경우</a>
+<li><a href="#_레포지토리_요청_로그인">레포지토리 요청 - 로그인</a>
 <ul class="sectlevel3">
 <li><a href="#_request_5">Request</a></li>
 <li><a href="#_response_5">Response</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#_authorization_2">Authorization</a>
-<ul class="sectlevel2">
-<li><a href="#_팔로잉_요청_로그인">팔로잉 요청 - 로그인</a>
-<ul class="sectlevel3">
-<li><a href="#_request_6">Request</a></li>
-<li><a href="#_response_6">Response</a></li>
-</ul>
-</li>
-<li><a href="#_언팔로우_요청_로그인">언팔로우 요청 - 로그인</a>
-<ul class="sectlevel3">
-<li><a href="#_request_7">Request</a></li>
-<li><a href="#_response_7">Response</a></li>
-</ul>
-</li>
-<li><a href="#_팔로잉_요청_비_로그인">팔로잉 요청 - 비 로그인</a>
-<ul class="sectlevel3">
-<li><a href="#_request_8">Request</a></li>
-<li><a href="#_response_8">Response</a></li>
-</ul>
-</li>
-<li><a href="#_언팔로우_요청_비_로그인">언팔로우 요청 - 비 로그인</a>
-<ul class="sectlevel3">
-<li><a href="#_request_9">Request</a></li>
-<li><a href="#_response_9">Response</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#_post">Post</a>
-<ul class="sectlevel2">
-<li><a href="#_게시물_작성_로그인">게시물 작성 - 로그인</a>
-<ul class="sectlevel3">
-<li><a href="#_request_10">Request</a></li>
-<li><a href="#_response_10">Response</a></li>
-</ul>
-</li>
-<li><a href="#_게시물_작성_비_로그인">게시물 작성 - 비 로그인</a>
-<ul class="sectlevel3">
-<li><a href="#_request_11">Request</a></li>
-<li><a href="#_response_11">Response</a></li>
-</ul>
-</li>
-<li><a href="#_홈_피드_요청_로그인">홈 피드 요청 - 로그인</a>
-<ul class="sectlevel3">
-<li><a href="#_request_12">Request</a></li>
-<li><a href="#_response_12">Response</a></li>
-</ul>
-</li>
-<li><a href="#_홈_피드_요청_비_로그인">홈 피드 요청 - 비 로그인</a>
-<ul class="sectlevel3">
-<li><a href="#_request_13">Request</a></li>
-<li><a href="#_response_13">Response</a></li>
-</ul>
-</li>
-<li><a href="#_레포지토리_요청_로그인">레포지토리 요청 - 로그인</a>
-<ul class="sectlevel3">
-<li><a href="#_request_14">Request</a></li>
-<li><a href="#_response_14">Response</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#_profile">Profile</a>
-<ul class="sectlevel2">
-<li><a href="#_내_프로필_조회">내 프로필 조회</a>
-<ul class="sectlevel3">
-<li><a href="#_request_15">Request</a></li>
-<li><a href="#_response_15">Response</a></li>
-</ul>
-</li>
-<li><a href="#_다른_사용자_프로필_조회_로그인">다른 사용자 프로필 조회 - 로그인</a>
-<ul class="sectlevel3">
-<li><a href="#_request_16">Request</a></li>
-<li><a href="#_response_16">Response</a></li>
-</ul>
-</li>
-<li><a href="#_다른_사용자_프로필_조회_비_로그인">다른 사용자 프로필 조회 - 비 로그인</a>
-<ul class="sectlevel3">
-<li><a href="#_request_17">Request</a></li>
-<li><a href="#_response_17">Response</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#_tag">Tag</a>
-<ul class="sectlevel2">
-<li><a href="#_특정_유저의_태그_목록_요청">특정 유저의 태그 목록 요청</a>
-<ul class="sectlevel3">
-<li><a href="#_request_18">Request</a></li>
-<li><a href="#_response_18">Response</a></li>
-</ul>
-</li>
-<li><a href="#_유효하지_않은_accesstoken으로_태그_추출_요청">유효하지 않은 AccessToken으로 태그 추출 요청</a>
-<ul class="sectlevel3">
-<li><a href="#_request_19">Request</a></li>
-<li><a href="#_response_19">Response</a></li>
-</ul>
-</li>
-<li><a href="#_유효하지_않은_레포지토리_태그_추출_요청">유효하지 않은 레포지토리 태그 추출 요청</a>
-<ul class="sectlevel3">
-<li><a href="#_request_20">Request</a></li>
-<li><a href="#_response_20">Response</a></li>
 </ul>
 </li>
 </ul>
@@ -585,326 +475,12 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_authorization">Authorization</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_깃허브_로그인_url_받기">깃허브 로그인 url 받기</h3>
-<div class="sect3">
-<h4 id="_request">Request</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /api/authorization/github HTTP/1.1
-Host: localhost:8080</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_response">Response</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json
-Content-Length: 47
-
-{
-  "url" : "http://github.authorization.url"
-}</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_깃허브_로그인_후">깃허브 로그인 후</h3>
-<div class="sect3">
-<h4 id="_request_2">Request</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /api/afterlogin?code=random HTTP/1.1
-Host: localhost:8080</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_response_2">Response</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json
-Content-Length: 52
-
-{
-  "token" : "jwt token",
-  "username" : "binghe"
-}</code></pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_comment">Comment</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_댓글_등록">댓글 등록</h3>
-<div class="sect3">
-<h4 id="_request_3">Request</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /api/posts/1/comments HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer test
-Content-Length: 32
-Host: localhost:8080
-
-{
-  "content" : "test Comment"
-}</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_response_3">Response</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json
-Content-Length: 140
-
-{
-  "id" : 1,
-  "profileImageUrl" : "kevin profile image url",
-  "authorName" : "kevin",
-  "content" : "test Comment",
-  "isLiked" : false
-}</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_댓글_등록_내용이_없는_경우">댓글 등록 - 내용이 없는 경우</h3>
-<div class="sect3">
-<h4 id="_request_4">Request</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /api/posts/1/comments HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer test
-Content-Length: 20
-Host: localhost:8080
-
-{
-  "content" : ""
-}</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_response_4">Response</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json
-Content-Length: 27
-
-{
-  "errorCode" : "F0001"
-}</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_댓글_등록_내용이_없는_경우_2">댓글 등록 - 내용이 없는 경우</h3>
-<div class="sect3">
-<h4 id="_request_5">Request</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /api/posts/1/comments HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer test
-Content-Length: 20
-Host: localhost:8080
-
-{
-  "content" : ""
-}</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_response_5">Response</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 400 Bad Request
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json
-Content-Length: 27
-
-{
-  "errorCode" : "F0001"
-}</code></pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_authorization_2">Authorization</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_팔로잉_요청_로그인">팔로잉 요청 - 로그인</h3>
-<div class="sect3">
-<h4 id="_request_6">Request</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /api/profiles/testUser/followings HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer testToken
-Accept: */*
-Host: localhost:8080</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_response_6">Response</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json
-Content-Length: 47
-
-{
-  "followerCount" : 1,
-  "following" : true
-}</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_언팔로우_요청_로그인">언팔로우 요청 - 로그인</h3>
-<div class="sect3">
-<h4 id="_request_7">Request</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /api/profiles/testUser/followings HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer testToken
-Accept: */*
-Host: localhost:8080</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_response_7">Response</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json
-Content-Length: 48
-
-{
-  "followerCount" : 1,
-  "following" : false
-}</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_팔로잉_요청_비_로그인">팔로잉 요청 - 비 로그인</h3>
-<div class="sect3">
-<h4 id="_request_8">Request</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /api/profiles/testUser/followings HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Accept: */*
-Host: localhost:8080</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_response_8">Response</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json
-Content-Length: 27
-
-{
-  "errorCode" : "A0002"
-}</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_언팔로우_요청_비_로그인">언팔로우 요청 - 비 로그인</h3>
-<div class="sect3">
-<h4 id="_request_9">Request</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /api/profiles/testUser/followings HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Accept: */*
-Host: localhost:8080</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_response_9">Response</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json
-Content-Length: 27
-
-{
-  "errorCode" : "A0002"
-}</code></pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
 <h2 id="_post">Post</h2>
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_게시물_작성_로그인">게시물 작성 - 로그인</h3>
 <div class="sect3">
-<h4 id="_request_10">Request</h4>
+<h4 id="_request">Request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /api/posts HTTP/1.1
@@ -1171,7 +747,7 @@ I�/���u�����a����Z[&amp;��3j��h��}��
 </div>
 </div>
 <div class="sect3">
-<h4 id="_response_10">Response</h4>
+<h4 id="_response">Response</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 201 Created
@@ -1186,7 +762,7 @@ Location: /api/posts/testUser/1</code></pre>
 <div class="sect2">
 <h3 id="_게시물_작성_비_로그인">게시물 작성 - 비 로그인</h3>
 <div class="sect3">
-<h4 id="_request_11">Request</h4>
+<h4 id="_request_2">Request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /api/posts HTTP/1.1
@@ -1452,7 +1028,7 @@ I�/���u�����a����Z[&amp;��3j��h��}��
 </div>
 </div>
 <div class="sect3">
-<h4 id="_response_11">Response</h4>
+<h4 id="_response_2">Response</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 401 Unauthorized
@@ -1472,7 +1048,7 @@ Content-Length: 27
 <div class="sect2">
 <h3 id="_홈_피드_요청_로그인">홈 피드 요청 - 로그인</h3>
 <div class="sect3">
-<h4 id="_request_12">Request</h4>
+<h4 id="_request_3">Request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /api/posts?page=0&amp;limit=3 HTTP/1.1
@@ -1482,7 +1058,7 @@ Host: localhost:8080</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_response_12">Response</h4>
+<h4 id="_response_3">Response</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
@@ -1525,7 +1101,7 @@ Content-Length: 731
 <div class="sect2">
 <h3 id="_홈_피드_요청_비_로그인">홈 피드 요청 - 비 로그인</h3>
 <div class="sect3">
-<h4 id="_request_13">Request</h4>
+<h4 id="_request_4">Request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /api/posts?page=0&amp;limit=3 HTTP/1.1
@@ -1534,7 +1110,7 @@ Host: localhost:8080</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_response_13">Response</h4>
+<h4 id="_response_4">Response</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
@@ -1577,7 +1153,7 @@ Content-Length: 731
 <div class="sect2">
 <h3 id="_레포지토리_요청_로그인">레포지토리 요청 - 로그인</h3>
 <div class="sect3">
-<h4 id="_request_14">Request</h4>
+<h4 id="_request_5">Request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /api/github/$jipark3/repositories HTTP/1.1
@@ -1587,7 +1163,7 @@ Host: localhost:8080</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_response_14">Response</h4>
+<h4 id="_response_5">Response</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
@@ -1605,224 +1181,6 @@ Content-Length: 146
   "html_url" : "https://github.com/jipark3/git"
 } ]</code></pre>
 </div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_profile">Profile</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_내_프로필_조회">내 프로필 조회</h3>
-<div class="sect3">
-<h4 id="_request_15">Request</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /api/profiles/me HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bad testToken
-Accept: */*
-Host: localhost:8080</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_response_15">Response</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json
-Content-Length: 27
-
-{
-  "errorCode" : "A0002"
-}</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_다른_사용자_프로필_조회_로그인">다른 사용자 프로필 조회 - 로그인</h3>
-<div class="sect3">
-<h4 id="_request_16">Request</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /api/profiles/testUser%7D HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Authorization: Bearer testToken
-Accept: */*
-Host: localhost:8080</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_response_16">Response</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json
-Content-Length: 342
-
-{
-  "name" : "testUser",
-  "imageUrl" : "http://img.com",
-  "description" : "The Best",
-  "followerCount" : 0,
-  "followingCount" : 0,
-  "postCount" : 0,
-  "githubUrl" : "https://github.com/yjksw",
-  "company" : "woowacourse",
-  "location" : "Seoul",
-  "website" : "www.pick-git.com",
-  "twitter" : "pick-git twitter",
-  "following" : false
-}</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_다른_사용자_프로필_조회_비_로그인">다른 사용자 프로필 조회 - 비 로그인</h3>
-<div class="sect3">
-<h4 id="_request_17">Request</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /api/profiles/testUser%7D HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Accept: */*
-Host: localhost:8080</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_response_17">Response</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json
-Content-Length: 341
-
-{
-  "name" : "testUser",
-  "imageUrl" : "http://img.com",
-  "description" : "The Best",
-  "followerCount" : 0,
-  "followingCount" : 0,
-  "postCount" : 0,
-  "githubUrl" : "https://github.com/yjksw",
-  "company" : "woowacourse",
-  "location" : "Seoul",
-  "website" : "www.pick-git.com",
-  "twitter" : "pick-git twitter",
-  "following" : null
-}</code></pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_tag">Tag</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_특정_유저의_태그_목록_요청">특정 유저의 태그 목록 요청</h3>
-<div class="sect3">
-<h4 id="_request_18">Request</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /api/github/repositories/repo%7D/tags/languages HTTP/1.1
-Authorization: Bearer validtoken
-Host: localhost:8080</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_response_18">Response</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json
-Content-Length: 28
-
-[ "Java", "Python", "HTML" ]</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_유효하지_않은_accesstoken으로_태그_추출_요청">유효하지 않은 AccessToken으로 태그 추출 요청</h3>
-<div class="sect3">
-<h4 id="_request_19">Request</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /api/github/repositories/abc%7D/tags/languages HTTP/1.1
-Authorization: Bearer invalid
-Host: localhost:8080</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_response_19">Response</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 401 Unauthorized
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json
-Content-Length: 27
-
-{
-  "errorCode" : "A0001"
-}</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_유효하지_않은_레포지토리_태그_추출_요청">유효하지 않은 레포지토리 태그 추출 요청</h3>
-<div class="sect3">
-<h4 id="_request_20">Request</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /api/github/repositories/abc%7D/tags/languages HTTP/1.1
-Authorization: Bearer validtoken
-Host: localhost:8080</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_response_20">Response</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 500 Internal Server Error
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
-Content-Type: application/json
-Content-Length: 27
-
-{
-  "errorCode" : "V0001"
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>PickGit API</p>
 </div>
 </div>
 </div>
