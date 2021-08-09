@@ -2,14 +2,17 @@ import { Dispatch, SetStateAction, useContext, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { ThemeContext } from "styled-components";
 import { RepositoryIcon, SearchIcon } from "../../assets/icons";
-import { REDIRECT_MESSAGE } from "../../constants/messages";
+import { FAILURE_MESSAGE, REDIRECT_MESSAGE } from "../../constants/messages";
 import { PAGE_URL } from "../../constants/urls";
 import useMessageModal from "../../services/hooks/@common/useMessageModal";
+import useThrottle from "../../services/hooks/@common/useThrottle";
 import { useGithubRepositoriesQuery } from "../../services/queries";
 import { getAPIErrorMessage } from "../../utils/error";
+import { getRepositoriesFromPages } from "../../utils/infiniteData";
 import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
 import PageLoading from "../@layout/PageLoading/PageLoading";
 import CircleIcon from "../@shared/CircleIcon/CircleIcon";
+import InfiniteScrollContainer from "../@shared/InfiniteScrollContainer/InfiniteScrollContainer";
 import Input from "../@shared/Input/Input";
 import {
   Container,
@@ -21,15 +24,21 @@ import {
 } from "./RepositorySelector.style";
 
 interface Props {
-  currentUsername: string;
   setGithubRepositoryName: Dispatch<SetStateAction<string>>;
   goNextStep: () => void;
 }
 
-const RepositorySelector = ({ currentUsername, setGithubRepositoryName, goNextStep }: Props) => {
-  const [searchText, setSearchText] = useState("");
-  const { data: repositories, isLoading, error } = useGithubRepositoriesQuery(currentUsername);
+const RepositorySelector = ({ setGithubRepositoryName, goNextStep }: Props) => {
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const {
+    data: infiniteRepositoriesData,
+    isLoading,
+    error,
+    isFetching,
+    fetchNextPage,
+  } = useGithubRepositoriesQuery(searchKeyword);
   const { modalMessage, isModalShown, showAlertModal, hideMessageModal } = useMessageModal();
+
   const { color } = useContext(ThemeContext);
   const history = useHistory();
 
@@ -42,29 +51,14 @@ const RepositorySelector = ({ currentUsername, setGithubRepositoryName, goNextSt
     history.goBack();
   };
 
-  const searchedRepositoryListItems = repositories
-    ?.filter((repository) => repository.name.includes(searchText))
-    .map((repository) => (
-      <RepositoryListItem key={repository.name} onClick={() => handleRepositorySelect(repository.name)}>
-        <RepositoryCircle>
-          <CircleIcon diameter="1.875rem" backgroundColor={color.tertiaryColor}>
-            <RepositoryIcon />
-          </CircleIcon>
-        </RepositoryCircle>
-        <RepositoryName>{repository.name}</RepositoryName>
-      </RepositoryListItem>
-    ));
-
-  if (repositories?.length === 0) {
-    showAlertModal(REDIRECT_MESSAGE.NO_REPOSITORY_EXIST);
-  }
-
   const handleErrorConfirm = () => {
     history.push(PAGE_URL.HOME);
   };
 
-  const handleSearchInputChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
-    setSearchText(event.currentTarget.value);
+  const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.currentTarget;
+
+    setSearchKeyword(value);
   };
 
   if (error) {
@@ -74,7 +68,41 @@ const RepositorySelector = ({ currentUsername, setGithubRepositoryName, goNextSt
   }
 
   if (isLoading) {
-    return <PageLoading />;
+    return (
+      <Container>
+        <SearchInputWrapper>
+          <Input kind="borderBottom" icon={<SearchIcon />} onChange={handleSearchInputChange} />
+        </SearchInputWrapper>
+        <PageLoading />
+      </Container>
+    );
+  }
+
+  if (!infiniteRepositoriesData) {
+    showAlertModal(FAILURE_MESSAGE.POST_REPOSITORY_NOT_LOADABLE);
+
+    return <MessageModalPortal heading={modalMessage} onConfirm={handleErrorConfirm} onClose={hideMessageModal} />;
+  }
+
+  const repositories = getRepositoriesFromPages(infiniteRepositoriesData.pages);
+
+  const searchedRepositoryListItems = isLoading ? (
+    <PageLoading />
+  ) : (
+    repositories.map((repository) => (
+      <RepositoryListItem key={repository.name} onClick={() => handleRepositorySelect(repository.name)}>
+        <RepositoryCircle>
+          <CircleIcon diameter="1.875rem" backgroundColor={color.tertiaryColor}>
+            <RepositoryIcon />
+          </CircleIcon>
+        </RepositoryCircle>
+        <RepositoryName>{repository.name}</RepositoryName>
+      </RepositoryListItem>
+    ))
+  );
+
+  if (repositories?.length === 0) {
+    showAlertModal(REDIRECT_MESSAGE.NO_REPOSITORY_EXIST);
   }
 
   return (
@@ -82,7 +110,11 @@ const RepositorySelector = ({ currentUsername, setGithubRepositoryName, goNextSt
       <SearchInputWrapper>
         <Input kind="borderBottom" icon={<SearchIcon />} onChange={handleSearchInputChange} />
       </SearchInputWrapper>
-      <RepositoryList>{searchedRepositoryListItems}</RepositoryList>
+      <RepositoryList>
+        <InfiniteScrollContainer isLoaderShown={isFetching} onIntersect={fetchNextPage}>
+          {searchedRepositoryListItems}
+        </InfiniteScrollContainer>
+      </RepositoryList>
       {isModalShown && <MessageModalPortal heading={modalMessage} onConfirm={goBackToHome} onClose={goBackToHome} />}
     </Container>
   );
