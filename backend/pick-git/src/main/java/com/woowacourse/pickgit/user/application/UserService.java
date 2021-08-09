@@ -9,10 +9,12 @@ import com.woowacourse.pickgit.post.domain.repository.PickGitStorage;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.ProfileImageEditRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.UserSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.ProfileEditResponseDto;
+import com.woowacourse.pickgit.user.application.dto.response.ProfileImageEditResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import com.woowacourse.pickgit.user.domain.Contribution;
@@ -139,6 +141,50 @@ public class UserService {
         return pickGitStorage
             .store(file, username)
             .orElseThrow(PlatformHttpErrorException::new);
+    }
+
+    public ProfileImageEditResponseDto editProfileImage(
+        AuthUserRequestDto authUserRequestDto,
+        ProfileImageEditRequestDto profileImageEditRequestDto
+    ) {
+        User user = findUserByName(authUserRequestDto.getUsername());
+
+        String userImageUrl = saveImageAndGetUrl(
+            profileImageEditRequestDto.getImage(),
+            user.getName()
+        );
+        user.updateProfileImage(userImageUrl);
+        return new ProfileImageEditResponseDto(userImageUrl);
+    }
+
+    private String saveImageAndGetUrl(byte[] imageSource, String username) {
+        File imgFile = fileFrom(imageSource);
+        return pickGitStorage
+            .store(imgFile, username)
+            .orElseThrow(PlatformHttpErrorException::new);
+    }
+
+    private File fileFrom(byte[] image) {
+        try {
+            Path path = Files.write(
+                Files.createTempFile(null, null),
+                image
+            );
+
+            return path.toFile();
+        } catch (IOException e) {
+            throw new PlatformHttpErrorException();
+        }
+    }
+
+    public String editProfileDescription(
+        AuthUserRequestDto authUserRequestDto,
+        String description
+    ) {
+        User user = findUserByName(authUserRequestDto.getUsername());
+
+        user.updateDescription(description);
+        return description;
     }
 
     public FollowResponseDto followUser(AuthUserRequestDto requestDto, String targetName) {
