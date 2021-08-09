@@ -23,11 +23,6 @@ public class MockPickGitStorage implements PickGitStorage {
     }
 
     @Override
-    public Optional<String> store(File file, String userName) {
-        return Optional.ofNullable(file.getName());
-    }
-
-    @Override
     public List<String> storeMultipartFile(List<MultipartFile> multipartFiles, String userName) {
         return store(toFiles(multipartFiles), userName);
     }
@@ -55,20 +50,6 @@ public class MockPickGitStorage implements PickGitStorage {
 
             return tempFile.toFile();
         } catch (IOException ioException) {
-            throw new PlatformHttpErrorException();
-        }
-    }
-
-    @Override
-    public File fileFrom(byte[] image) {
-        try {
-            Path path = Files.write(
-                Files.createTempFile(null, null),
-                image
-            );
-
-            return path.toFile();
-        } catch (IOException e) {
             throw new PlatformHttpErrorException();
         }
     }

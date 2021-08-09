@@ -5,7 +5,6 @@ import static java.util.stream.Collectors.toList;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
-import com.woowacourse.pickgit.post.domain.repository.PickGitStorage;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
@@ -21,6 +20,7 @@ import com.woowacourse.pickgit.user.domain.Contribution;
 import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.domain.profile.PickGitProfileStorage;
 import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
 import java.io.File;
 import java.io.IOException;
@@ -40,16 +40,16 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final PickGitStorage pickGitStorage;
+    private final PickGitProfileStorage pickGitProfileStorage;
     private final PlatformContributionCalculator platformContributionCalculator;
 
     public UserService(
         UserRepository userRepository,
-        PickGitStorage pickGitStorage,
+        PickGitProfileStorage pickGitProfileStorage,
         PlatformContributionCalculator platformContributionCalculator
     ) {
         this.userRepository = userRepository;
-        this.pickGitStorage = pickGitStorage;
+        this.pickGitProfileStorage = pickGitProfileStorage;
         this.platformContributionCalculator = platformContributionCalculator;
     }
 
@@ -138,7 +138,7 @@ public class UserService {
     }
 
     private String saveImageAndGetUrl(File file, String username) {
-        return pickGitStorage
+        return pickGitProfileStorage
             .store(file, username)
             .orElseThrow(PlatformHttpErrorException::new);
     }
@@ -149,19 +149,12 @@ public class UserService {
     ) {
         User user = findUserByName(authUserRequestDto.getUsername());
 
-        String userImageUrl = saveImageAndGetUrl(
+        String userImageUrl = pickGitProfileStorage.storeByteFile(
             profileImageEditRequestDto.getImage(),
             user.getName()
         );
         user.updateProfileImage(userImageUrl);
         return new ProfileImageEditResponseDto(userImageUrl);
-    }
-
-    private String saveImageAndGetUrl(byte[] imageSource, String username) {
-        File imgFile = pickGitStorage.fileFrom(imageSource);
-        return pickGitStorage
-            .store(imgFile, username)
-            .orElseThrow(PlatformHttpErrorException::new);
     }
 
     public String editProfileDescription(

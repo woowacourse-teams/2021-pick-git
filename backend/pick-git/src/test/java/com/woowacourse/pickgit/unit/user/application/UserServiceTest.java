@@ -21,7 +21,6 @@ import com.woowacourse.pickgit.exception.user.DuplicateFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
 import com.woowacourse.pickgit.exception.user.SameSourceTargetUserException;
-import com.woowacourse.pickgit.post.domain.repository.PickGitStorage;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowSearchRequestDto;
@@ -38,6 +37,7 @@ import com.woowacourse.pickgit.user.domain.Contribution;
 import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.domain.profile.PickGitProfileStorage;
 import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
 import java.io.File;
 import java.io.FileInputStream;
@@ -65,7 +65,7 @@ class UserServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private PickGitStorage pickGitStorage;
+    private PickGitProfileStorage pickGitProfileStorage;
 
     @Mock
     private PlatformContributionCalculator platformContributionCalculator;
@@ -607,10 +607,8 @@ class UserServiceTest {
             // mock
             given(userRepository.findByBasicProfile_Name("testUser"))
                 .willReturn(Optional.of(UserFactory.user(1L, "testUser")));
-            given(pickGitStorage.fileFrom(imageSource))
-                .willReturn(imageFile);
-            given(pickGitStorage.store(any(File.class), anyString()))
-                .willReturn(Optional.ofNullable(imageFile.getName()));
+            given(pickGitProfileStorage.storeByteFile(imageSource, "testUser"))
+                .willReturn(imageFile.getName());
 
             // when
             ProfileImageEditRequestDto requestDto = ProfileImageEditRequestDto
@@ -625,8 +623,8 @@ class UserServiceTest {
 
             verify(userRepository, times(1))
                 .findByBasicProfile_Name("testUser");
-            verify(pickGitStorage, times(1))
-                .store(any(File.class), anyString());
+            verify(pickGitProfileStorage, times(1))
+                .storeByteFile(imageSource, "testUser");
         }
     }
 
@@ -668,7 +666,7 @@ class UserServiceTest {
         // mock
         given(userRepository.findByBasicProfile_Name("testUser"))
             .willReturn(Optional.of(UserFactory.user(1L, "testUser")));
-        given(pickGitStorage.store(any(File.class), anyString()))
+        given(pickGitProfileStorage.store(any(File.class), anyString()))
             .willReturn(Optional.ofNullable(image.getName()));
 
         // when
@@ -685,7 +683,7 @@ class UserServiceTest {
         assertThat(responseDto.getDescription()).isEqualTo(updatedDescription);
         verify(userRepository, times(1))
             .findByBasicProfile_Name("testUser");
-        verify(pickGitStorage, times(1))
+        verify(pickGitProfileStorage, times(1))
             .store(any(File.class), anyString());
     }
 
