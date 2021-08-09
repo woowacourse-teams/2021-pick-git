@@ -158,23 +158,10 @@ public class UserService {
     }
 
     private String saveImageAndGetUrl(byte[] imageSource, String username) {
-        File imgFile = fileFrom(imageSource);
+        File imgFile = pickGitStorage.fileFrom(imageSource);
         return pickGitStorage
             .store(imgFile, username)
             .orElseThrow(PlatformHttpErrorException::new);
-    }
-
-    private File fileFrom(byte[] image) {
-        try {
-            Path path = Files.write(
-                Files.createTempFile(null, null),
-                image
-            );
-
-            return path.toFile();
-        } catch (IOException e) {
-            throw new PlatformHttpErrorException();
-        }
     }
 
     public String editProfileDescription(

@@ -58,4 +58,18 @@ public class MockPickGitStorage implements PickGitStorage {
             throw new PlatformHttpErrorException();
         }
     }
+
+    @Override
+    public File fileFrom(byte[] image) {
+        try {
+            Path path = Files.write(
+                Files.createTempFile(null, null),
+                image
+            );
+
+            return path.toFile();
+        } catch (IOException e) {
+            throw new PlatformHttpErrorException();
+        }
+    }
 }

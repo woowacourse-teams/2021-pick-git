@@ -607,6 +607,8 @@ class UserServiceTest {
             // mock
             given(userRepository.findByBasicProfile_Name("testUser"))
                 .willReturn(Optional.of(UserFactory.user(1L, "testUser")));
+            given(pickGitStorage.fileFrom(imageSource))
+                .willReturn(imageFile);
             given(pickGitStorage.store(any(File.class), anyString()))
                 .willReturn(Optional.ofNullable(imageFile.getName()));
 
@@ -620,6 +622,7 @@ class UserServiceTest {
 
             // then
             assertThat(responseDto.getImageUrl()).isEqualTo(imageFile.getName());
+
             verify(userRepository, times(1))
                 .findByBasicProfile_Name("testUser");
             verify(pickGitStorage, times(1))

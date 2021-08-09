@@ -9,5 +9,6 @@ public interface PickGitStorage {
 
     List<String> store(List<File> files, String userName);
     Optional<String> store(File file, String userName);
+    File fileFrom(byte[] image);
     List<String> storeMultipartFile(List<MultipartFile> multipartFiles, String userName);
 }
