@@ -9,6 +9,7 @@ import useFollow from "../useFollow";
 import UserContext from "../../../contexts/UserContext";
 import SnackBarContext from "../../../contexts/SnackbarContext";
 import { API_ERROR_MESSAGE, CLIENT_ERROR_MESSAGE, UNKNOWN_ERROR_MESSAGE } from "../../../constants/messages";
+import { API_URL } from "../../../constants/urls";
 
 const username = "aaaa";
 const currentProfileQueryKey = [QUERY.GET_PROFILE, { isMyProfile: false, username }];
@@ -96,15 +97,15 @@ afterAll(() => {
 
 describe("Success Case", () => {
   beforeAll(() => {
-    expectations.addFollowExpectation = nock("http://localhost:3000")
-      .post(`/api/profiles/${username}/followings`)
+    expectations.addFollowExpectation = nock("http://localhost:3000/api")
+      .post(API_URL.USER_PROFILE_FOLLOW(username, false))
       .reply(200, {
         followerCount: addedFollowerCount,
         following: true,
       });
 
-    expectations.deleteFollowExpectation = nock("http://localhost:3000")
-      .delete(`/api/profiles/${username}/followings`)
+    expectations.deleteFollowExpectation = nock("http://localhost:3000/api")
+      .delete(API_URL.USER_PROFILE_UNFOLLOW(username, false))
       .reply(200, {
         followerCount: deletedFollowerCount,
         following: false,
@@ -162,8 +163,8 @@ describe("FAILURE CASE", () => {
   test("failure2: should handle http error: 401", async () => {
     const { result, waitFor } = renderHook(() => useFollow(), { wrapper });
 
-    expectations.addFollowExpectation = nock("http://localhost:3000")
-      .post(`/api/profiles/${username}/followings`)
+    expectations.addFollowExpectation = nock("http://localhost:3000/api")
+      .post(API_URL.USER_PROFILE_FOLLOW(username, false))
       .reply(401, {
         errorCode: unAuthorizedTokenError,
       });
@@ -181,8 +182,8 @@ describe("FAILURE CASE", () => {
   test("failure3: should show http error message", async () => {
     const { result, waitFor } = renderHook(() => useFollow(), { wrapper });
 
-    expectations.addFollowExpectation = nock("http://localhost:3000")
-      .post(`/api/profiles/${username}/followings`)
+    expectations.addFollowExpectation = nock("http://localhost:3000/api")
+      .post(API_URL.USER_PROFILE_FOLLOW(username, false))
       .reply(401, {
         errorCode: unAuthorizedTokenError,
       });
@@ -196,8 +197,8 @@ describe("FAILURE CASE", () => {
   test("failure4: should show unknown error message for invalid error code", async () => {
     const { result, waitFor } = renderHook(() => useFollow(), { wrapper });
 
-    expectations.addFollowExpectation = nock("http://localhost:3000")
-      .post(`/api/profiles/${username}/followings`)
+    expectations.addFollowExpectation = nock("http://localhost:3000/api")
+      .post(API_URL.USER_PROFILE_FOLLOW(username, false))
       .reply(401, {
         errorCode: invalidErrorCode,
       });
