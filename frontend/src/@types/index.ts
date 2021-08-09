@@ -42,6 +42,11 @@ export interface CommentAddData {
   commentContent: CommentData["content"];
 }
 
+export interface CommentDeleteData {
+  postId: Post["id"];
+  commentId: CommentData["id"];
+}
+
 export interface Post {
   id: number;
   imageUrls: string[];

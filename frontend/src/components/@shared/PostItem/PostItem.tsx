@@ -57,12 +57,12 @@ export interface Props {
   tags: string[];
   createdAt: string;
   isLoggedIn: boolean;
+  handlePostLikeCountClick: () => void;
   onMoreCommentClick: () => void;
   onCommentInputClick: () => void;
   onPostEdit: () => void;
   onPostDelete: () => void;
   onPostLike: () => void;
-  onCommentLike: (commentId: CommentData["id"]) => void;
 }
 
 const timeDiffTextTable = {
@@ -86,9 +86,9 @@ const PostItem = ({
   tags,
   createdAt,
   isLoggedIn,
+  handlePostLikeCountClick,
   onMoreCommentClick,
   onCommentInputClick,
-  onCommentLike,
   onPostEdit,
   onPostDelete,
   onPostLike,
@@ -116,7 +116,6 @@ const PostItem = ({
         content={comment.content}
         authorName={comment.authorName}
         link={currentUserName === comment.authorName ? PAGE_URL.MY_PROFILE : PAGE_URL.USER_PROFILE(comment.authorName)}
-        onCommentLike={() => onCommentLike(comment.id)}
       />
     </CommentWrapper>
   ));
@@ -158,7 +157,7 @@ const PostItem = ({
             </CircleIcon>
           </IconLink>
         </IconLinkButtonsWrapper>
-        <LikeCountText>좋아요 {likeCount}개</LikeCountText>
+        <LikeCountText onClick={handlePostLikeCountClick}>좋아요 {likeCount}개</LikeCountText>
         <PostContent>
           <PostContentAuthorLink to={PAGE_URL.USER_PROFILE(authorName)}>{authorName}</PostContentAuthorLink>
           {shouldHideContent

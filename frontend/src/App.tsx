@@ -25,6 +25,7 @@ import SearchPostResultPage from "./pages/SearchPostResultPage/SearchPostResultP
 import FollowingList from "./pages/FollowingUserListPage/FollowingList";
 import FollowerList from "./pages/FollowerList/FollowerList";
 import OneDepthStepHeader from "./components/OneDepthStepHeader/OneDepthStepHeader";
+import CommentsPage from "./pages/CommentsPage/CommentsPage";
 
 const App = () => {
   const { currentUsername, login, logout } = useContext(UserContext);
@@ -63,7 +64,7 @@ const App = () => {
         <Route path={PAGE_URL.ADD_POST}>
           <PostAddStepHeader />
         </Route>
-        <Route path={PAGE_URL.SEARCH}>
+        <Route path={[PAGE_URL.SEARCH, PAGE_URL.POST_LIKE_PEOPLE]}>
           <SearchHeader />
         </Route>
       </Switch>
@@ -110,6 +111,9 @@ const App = () => {
           <PostEditStepContextProvider>
             <EditPostPage />
           </PostEditStepContextProvider>
+        </Route>
+        <Route path={PAGE_URL.POST_COMMENTS}>
+          <CommentsPage />
         </Route>
         <Redirect to="/" />
       </Switch>

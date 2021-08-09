@@ -55,10 +55,15 @@ export const IconLinkButtonsWrapper = styled.div`
   margin-bottom: 0.4375rem;
 `;
 
-export const LikeCountText = styled.span`
+export const LikeCountText = styled.a`
   font-weight: bold;
   margin-bottom: 0.5rem;
   font-size: 0.75rem;
+  transition: opacity 0.5s;
+
+  :hover {
+    opacity: 0.5;
+  }
 `;
 
 export const MoreContentLinkButton = styled.a`

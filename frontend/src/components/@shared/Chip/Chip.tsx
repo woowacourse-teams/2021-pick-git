@@ -1,4 +1,4 @@
-import { CancelIcon } from "../../../assets/icons";
+import { DeleteIcon } from "../../../assets/icons";
 import { Container, DeleteButton, Text } from "./Chip.style";
 
 export interface Props extends React.HTMLAttributes<HTMLSpanElement> {
@@ -13,7 +13,7 @@ const Chip = ({ backgroundColor, children, onDelete }: Props) => {
       <Text>{children}</Text>
       {onDelete && (
         <DeleteButton onClick={onDelete}>
-          <CancelIcon />
+          <DeleteIcon />
         </DeleteButton>
       )}
     </Container>

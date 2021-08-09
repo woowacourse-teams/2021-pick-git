@@ -23,6 +23,8 @@ export const PAGE_URL = {
   SEARCH_RESULT_POST: (type: string) => `/search/posts?type=${type}`,
   PROFILE: "/profile",
   MY_PROFILE: "/profile/me",
+  POST_COMMENTS: `/comments`,
+  POST_LIKE_PEOPLE: `/post-like-people`,
   TAG_FEED: (tag: string) => `/posts/tag?tag=${tag}`,
   USER_PROFILE: (username: string) => `/profile?username=${username}`,
   FOLLOWINGS_BASE: "/followings",
@@ -39,7 +41,8 @@ export const API_URL = {
   SELF_PROFILE_IMAGE: (fileName: string) => `/profiles/me/image/${fileName}`,
   SELF_PROFILE_DESCRIPTION: "/profiles/me/description",
   ADD_POSTS: "/posts",
-  GITHUB_REPOSITORIES: (username: string) => `/github/${username}/repositories`,
+  GITHUB_REPOSITORIES: (keyword: string, page: number, limit: number) =>
+    `/github/repositories?keyword=${keyword}&page=${page}&limit=${limit}`,
   USER_PROFILE: (username: string) => `/profiles/${username}`,
   USER_PROFILE_FOLLOW: (username: string, githubFollowing: boolean) =>
     `/profiles/${username}/followings?githubFollowing=${githubFollowing}`,
@@ -58,8 +61,12 @@ export const API_URL = {
   AFTER_LOGIN: (code: string) => `afterlogin?code=${code}`,
   POST: (postId: number) => `/posts/${postId}`,
   POSTS: (page: number, limit: number) => `/posts?page=${page}&limit=${limit}`,
-  POSTS_LIKES: (postId: number) => `/posts/${postId}/likes`,
-  POSTS_COMMENTS: (postId: number) => `/posts/${postId}/comments`,
+  POST_LIKE_PEOPLE: (postId: number, page: number, limit: number) =>
+    `/posts/${postId}/likes?page=${page}&limit=${limit}`,
+  POST_LIKES: (postId: number) => `/posts/${postId}/likes`,
+  POST_COMMENT: (postId: number, commentId?: number) => `/posts/${postId}/comments/${commentId ?? ""}`,
+  POST_COMMENTS: (postId: number, page: number, limit: number) =>
+    `/posts/${postId}/comments?page=${page}&limit=${limit}`,
   GITHUB_STATS: (username: string) => `/profiles/${username}/contributions`,
   GITHUB_TAGS: (repositoryName: string) => `/github/repositories/${repositoryName}/tags/languages`,
 };

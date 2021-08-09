@@ -13,15 +13,9 @@ import useFeedMutation from "./useFeedMutation";
 
 const useHomeFeed = () => {
   const { logout } = useContext(UserContext);
-  const {
-    data: infinitePostsData,
-    isLoading,
-    error,
-    isError,
-    isFetching,
-    fetchNextPage,
-    refetch,
-  } = useHomeFeedPostsQuery();
+  const { data: infinitePostsData, isLoading, error, isError, isFetching, fetchNextPage } = useHomeFeedPostsQuery();
+
+  // TODO : 그냥 QUERY 만 보내도 되는지 알아보기
   const { setPostsPages } = useFeedMutation([QUERY]);
   const queryClient = useQueryClient();
 
@@ -64,7 +58,7 @@ const useHomeFeed = () => {
     handleError();
   }, [error]);
 
-  return { infinitePostsData, isLoading, isFetching, isError, refetch, handlePostsEndIntersect };
+  return { infinitePostsData, isLoading, isFetching, isError, handlePostsEndIntersect };
 };
 
 export default useHomeFeed;
