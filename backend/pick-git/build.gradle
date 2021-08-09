@@ -70,7 +70,6 @@ bootJar {
 		into 'src/main/resources/static/docs'
 		include '*.html'
 	}
-
 }
 
 test {
