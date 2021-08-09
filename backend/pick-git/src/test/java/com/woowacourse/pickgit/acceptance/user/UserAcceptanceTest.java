@@ -16,16 +16,23 @@ import com.woowacourse.pickgit.user.application.dto.response.ContributionRespons
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
+import com.woowacourse.pickgit.user.presentation.dto.request.ProfileDescriptionRequest;
 import com.woowacourse.pickgit.user.presentation.dto.response.ContributionResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.FollowResponse;
+import com.woowacourse.pickgit.user.presentation.dto.response.ProfileDescriptionResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.ProfileEditResponse;
+import com.woowacourse.pickgit.user.presentation.dto.response.ProfileImageEditResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.UserProfileResponse;
 import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
+import io.restassured.http.ContentType;
 import io.restassured.http.Method;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -414,7 +421,7 @@ class UserAcceptanceTest {
         assertThat(response.getErrorCode()).isEqualTo("U0003");
     }
 
-    @DisplayName("로그인 사용자는 자신의 프로필(이미지, 한 줄 소개 포함)을 수정할 수 있다.")
+    @DisplayName("로그인 사용자는 자신의 프로필(이미지, 한 줄 소개 포함)을 수정할 수 있다. - 삭제 예정")
     @Test
     void editUserProfile_LoginUserWithImageAndDescription_Success() {
         // given
@@ -436,6 +443,89 @@ class UserAcceptanceTest {
         // then
         assertThat(response.getImageUrl()).isNotBlank();
         assertThat(response.getDescription()).isEqualTo(description);
+    }
+
+    @DisplayName("로그인 사용자는 자신의 프로필 이미지를 수정할 수 있다.")
+    @Test
+    void editProfileImage_LoginUser_Success() throws IOException {
+        // given
+        File imageFile = FileFactory.getTestImage1File();
+
+        // when
+        ProfileImageEditResponse response = given().log().all()
+            .auth().oauth2(loginUserAccessToken)
+            .contentType(MediaType.TEXT_PLAIN_VALUE)
+            .body(new FileInputStream(imageFile).readAllBytes())
+            .when()
+            .put("/api/profiles/me/image")
+            .then().log().all()
+            .statusCode(HttpStatus.OK.value())
+            .extract()
+            .as(ProfileImageEditResponse.class);
+
+        // then
+        assertThat(response.getImageUrl()).isNotBlank();
+    }
+
+    @DisplayName("게스트는 프로필 이미지를 수정할 수 없다.")
+    @Test
+    void editProfileImage_GuestUser_Fail() throws IOException {
+        // given
+        File imageFile = FileFactory.getTestImage1File();
+
+        // when
+        ApiErrorResponse response = given().log().all()
+            .body(new FileInputStream(imageFile).readAllBytes())
+            .when()
+            .put("/api/profiles/me/image")
+            .then().log().all()
+            .statusCode(HttpStatus.UNAUTHORIZED.value())
+            .extract()
+            .as(ApiErrorResponse.class);
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("A0001");
+    }
+
+    @DisplayName("로그인 사용자는 자신의 한 줄 소개를 수정할 수 있다.")
+    @Test
+    void editProfileDescription_LoginUser_Success() {
+        // given
+        String description = "updated description";
+
+        // when
+        ProfileDescriptionResponse response = given().log().all()
+            .auth().oauth2(loginUserAccessToken)
+            .contentType(ContentType.JSON)
+            .body(new ProfileDescriptionRequest(description))
+            .when()
+            .put("/api/profiles/me/description")
+            .then().log().all()
+            .extract()
+            .as(ProfileDescriptionResponse.class);
+
+        // then
+        assertThat(response.getDescription()).isEqualTo(description);
+    }
+
+    @DisplayName("게스트는 자신의 한 줄 소개를 수정할 수 없다.")
+    @Test
+    void editProfileDescription_GuestUser_Fail() {
+        // given
+        String description = "updated description";
+
+        // when
+        ApiErrorResponse response = given().log().all()
+            .contentType(ContentType.JSON)
+            .body(new ProfileDescriptionRequest(description))
+            .when()
+            .put("/api/profiles/me/description")
+            .then().log().all()
+            .extract()
+            .as(ApiErrorResponse.class);
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("A0001");
     }
 
     @DisplayName("게스트는 프로필을 수정할 수 없다.")

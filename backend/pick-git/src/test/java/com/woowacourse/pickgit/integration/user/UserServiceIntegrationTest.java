@@ -20,15 +20,20 @@ import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.ProfileImageEditRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.UserSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.ProfileEditResponseDto;
+import com.woowacourse.pickgit.user.application.dto.response.ProfileImageEditResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -420,6 +425,48 @@ class UserServiceIntegrationTest {
         // then
         assertThat(responseDto.getImageUrl()).isEqualTo(user.getImage());
         assertThat(responseDto.getDescription()).isEqualTo(updatedDescription);
+    }
+
+    @DisplayName("자신의 프로필 이미지를 수정할 수 있다.")
+    @Test
+    void editProfileImage_LoginUser_Success() throws IOException {
+        // given
+        User user = UserFactory.user("testUser");
+        AuthUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
+        File file = FileFactory.getTestImage1File();
+
+        userRepository.save(user);
+
+        // when
+        ProfileImageEditRequestDto requestDto = ProfileImageEditRequestDto
+            .builder()
+            .image(new FileInputStream(file).readAllBytes())
+            .build();
+        ProfileImageEditResponseDto responseDto =
+            userService.editProfileImage(authUserRequestDto, requestDto);
+
+        // then
+        assertThat(responseDto.getImageUrl()).isNotBlank();
+    }
+
+    @DisplayName("자신의 프로필 한 줄 소개를 수정할 수 있다.")
+    @Test
+    void editProfileDescription_LoginUser_Success() {
+        // given
+        User user = UserFactory.user("testUser");
+        AuthUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
+        String description = "updated description";
+
+        userRepository.save(user);
+
+        // when
+        String updatedDescription = userService.editProfileDescription(
+            authUserRequestDto,
+            description
+        );
+
+        // then
+        assertThat(updatedDescription).isEqualTo(description);
     }
 
     @DisplayName("로그인 - 저장된 유저중 유사한 이름을 가진 유저를 검색한다. 단, 자기 자신은 검색되지 않는다. (팔로잉한 여부 boolean)")

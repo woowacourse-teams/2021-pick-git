@@ -23,11 +23,6 @@ public class MockPickGitStorage implements PickGitStorage {
     }
 
     @Override
-    public Optional<String> store(File file, String userName) {
-        return Optional.ofNullable(file.getName());
-    }
-
-    @Override
     public List<String> storeMultipartFile(List<MultipartFile> multipartFiles, String userName) {
         return store(toFiles(multipartFiles), userName);
     }

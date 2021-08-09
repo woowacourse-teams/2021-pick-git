@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -20,12 +21,14 @@ import static org.springframework.restdocs.payload.JsonFieldType.NULL;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestPartBody;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -40,15 +43,20 @@ import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.ProfileImageEditRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.ProfileEditResponseDto;
+import com.woowacourse.pickgit.user.application.dto.response.ProfileImageEditResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import com.woowacourse.pickgit.user.presentation.UserController;
 import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
-import java.util.Optional;
+import com.woowacourse.pickgit.user.presentation.dto.request.ProfileDescriptionRequest;
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.List;
+import java.util.Optional;
 import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -310,60 +318,6 @@ class UserControllerTest {
             ));
         }
 
-        @DisplayName("사용자는 자신의 프로필을 수정할 수 있다.")
-        @Test
-        void editUserProfile_LoginUserWithImageAndDescription_Success() throws Exception {
-            // given
-            AppUser loginUser = new LoginUser("testUser", "token");
-            String description = "updated description";
-            MockMultipartFile image = FileFactory.getTestImage1();
-            ProfileEditResponseDto responseDto = ProfileEditResponseDto.builder()
-                .imageUrl(image.getOriginalFilename())
-                .description(description)
-                .build();
-
-            // mock
-            given(oAuthService.validateToken("token"))
-                .willReturn(true);
-            given(oAuthService.findRequestUserByToken("token"))
-                .willReturn(loginUser);
-            given(userService
-                .editProfile(any(AuthUserRequestDto.class), any(ProfileEditRequestDto.class)))
-                .willReturn(responseDto);
-
-            // when
-            ResultActions perform = mockMvc.perform(multipart("/api/profiles/me")
-                .file("images", "testImage1".getBytes())
-                .param("description", description)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer token")
-            );
-
-            // then
-            perform
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("imageUrl").value(image.getOriginalFilename()))
-                .andExpect(jsonPath("description").value(description));
-
-            verify(oAuthService, times(1)).validateToken("token");
-            verify(oAuthService, times(1)).findRequestUserByToken("token");
-            verify(userService, times(1))
-                .editProfile(any(AuthUserRequestDto.class), any(ProfileEditRequestDto.class));
-
-            // restdocs
-            perform.andDo(document("profiles-edit",
-                getDocumentRequest(),
-                getDocumentResponse(),
-                requestHeaders(
-                    headerWithName(HttpHeaders.AUTHORIZATION).description("bearer token")
-                ),
-                requestPartBody("images"),
-                responseFields(
-                    fieldWithPath("imageUrl").type(STRING).description("변경된 프로필 이미지 url"),
-                    fieldWithPath("description").type(STRING).description("변경된 한 줄 소개")
-                ))
-            );
-        }
-
         @DisplayName("사용자는 활동 통계를 조회할 수 있다.")
         @Test
         void getContributions_LoginUser_Success() throws Exception {
@@ -419,6 +373,144 @@ class UserControllerTest {
                     fieldWithPath("reposCount").description("퍼블릭 레포지토리 개수")
                 )
             ));
+        }
+
+        @DisplayName("사용자는 자신의 프로필을 수정할 수 있다.")
+        @Test
+        void editUserProfile_LoginUserWithImageAndDescription_Success() throws Exception {
+            // given
+            AppUser loginUser = new LoginUser("testUser", "token");
+            String description = "updated description";
+            MockMultipartFile image = FileFactory.getTestImage1();
+            ProfileEditResponseDto responseDto = ProfileEditResponseDto.builder()
+                .imageUrl(image.getOriginalFilename())
+                .description(description)
+                .build();
+
+            // mock
+            given(oAuthService.validateToken("token"))
+                .willReturn(true);
+            given(oAuthService.findRequestUserByToken("token"))
+                .willReturn(loginUser);
+            given(userService
+                .editProfile(any(AuthUserRequestDto.class), any(ProfileEditRequestDto.class)))
+                .willReturn(responseDto);
+
+            // when
+            ResultActions perform = mockMvc.perform(multipart("/api/profiles/me")
+                .file("images", "testImage1".getBytes())
+                .param("description", description)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer token")
+            );
+
+            // then
+            perform
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("imageUrl").value(image.getOriginalFilename()))
+                .andExpect(jsonPath("description").value(description));
+
+            verify(oAuthService, times(1)).validateToken("token");
+            verify(oAuthService, times(1)).findRequestUserByToken("token");
+            verify(userService, times(1))
+                .editProfile(any(AuthUserRequestDto.class), any(ProfileEditRequestDto.class));
+
+            // restdocs
+            perform.andDo(document("profiles-edit",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                requestHeaders(
+                    headerWithName(HttpHeaders.AUTHORIZATION).description("bearer token")
+                ),
+                requestPartBody("images"),
+                responseFields(
+                    fieldWithPath("imageUrl").type(STRING).description("변경된 프로필 이미지 url"),
+                    fieldWithPath("description").type(STRING).description("변경된 한 줄 소개")
+                ))
+            );
+        }
+
+        @DisplayName("자신의 프로필 이미지를 수정할 수 있다.")
+        @Test
+        void editUserProfileImage_LoginUserWithImage_Success() throws Exception {
+            // given
+            AppUser loginUser = new LoginUser("testUser", "token");
+            File file = FileFactory.getTestImage1File();
+
+            // mock
+            given(oAuthService.validateToken("token"))
+                .willReturn(true);
+            given(oAuthService.findRequestUserByToken("token"))
+                .willReturn(loginUser);
+            given(userService
+                .editProfileImage(any(AuthUserRequestDto.class), any(ProfileImageEditRequestDto.class)))
+                .willReturn(new ProfileImageEditResponseDto(file.getName()));
+
+            // when
+            ResultActions perform = mockMvc.perform(
+                put("/api/profiles/me/image")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer token")
+                    .content(new FileInputStream(file).readAllBytes())
+            );
+
+            // then
+            perform
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("imageUrl").value(file.getName()));
+
+            verify(oAuthService, times(1)).validateToken("token");
+            verify(oAuthService, times(1)).findRequestUserByToken("token");
+            verify(userService, times(1))
+                .editProfileImage(any(AuthUserRequestDto.class), any(ProfileImageEditRequestDto.class));
+        }
+
+        @DisplayName("자신의 프로필 한 줄 소개를 수정할 수 있다.")
+        @Test
+        void editUserProfileDescrption_LoginUserWithDescrption_Success()
+            throws Exception {
+            // given
+            AppUser loginUser = new LoginUser("testUser", "token");
+            String description = "updated description";
+
+            // mock
+            given(oAuthService.validateToken("token"))
+                .willReturn(true);
+            given(oAuthService.findRequestUserByToken("token"))
+                .willReturn(loginUser);
+            given(userService.editProfileDescription(any(AuthUserRequestDto.class), anyString()))
+                .willReturn(description);
+
+            // when
+            ResultActions perform = mockMvc.perform(
+                put("/api/profiles/me/description")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer token")
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .content(objectMapper.writeValueAsString(new ProfileDescriptionRequest(description)))
+            );
+
+            // then
+            perform
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("description").value(description));
+
+            verify(oAuthService, times(1)).validateToken("token");
+            verify(oAuthService, times(1)).findRequestUserByToken("token");
+            verify(userService, times(1))
+                .editProfileDescription(any(AuthUserRequestDto.class), anyString());
+
+            // restdocs
+            perform.andDo(document("edit-profile-description",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                requestHeaders(
+                    headerWithName(HttpHeaders.AUTHORIZATION).description("bearer token")
+                ),
+                requestFields(
+                    fieldWithPath("description").type(STRING).description("프로필 한 줄 소개")
+                ),
+                responseFields(
+                    fieldWithPath("description").type(STRING).description("변경된 한 줄 소개")
+                ))
+            );
         }
     }
 

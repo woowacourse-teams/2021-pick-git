@@ -21,23 +21,27 @@ import com.woowacourse.pickgit.exception.user.DuplicateFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
 import com.woowacourse.pickgit.exception.user.SameSourceTargetUserException;
-import com.woowacourse.pickgit.post.domain.repository.PickGitStorage;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.ProfileImageEditRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.UserSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.ProfileEditResponseDto;
+import com.woowacourse.pickgit.user.application.dto.response.ProfileImageEditResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import com.woowacourse.pickgit.user.domain.Contribution;
 import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.domain.profile.PickGitProfileStorage;
 import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -61,7 +65,7 @@ class UserServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private PickGitStorage pickGitStorage;
+    private PickGitProfileStorage pickGitProfileStorage;
 
     @Mock
     private PlatformContributionCalculator platformContributionCalculator;
@@ -588,6 +592,69 @@ class UserServiceTest {
         }
     }
 
+    @DisplayName("editProfileImage 메서드는")
+    @Nested
+    class Describe_editProfileImage {
+
+        @DisplayName("새로운 프로필 이미지를 저장소에 업데이트하고 URL을 반환한다.")
+        @Test
+        void editProfileImage_WithImage_Success() throws IOException {
+            // given
+            AuthUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
+            File imageFile = FileFactory.getTestImage1File();
+            byte[] imageSource = new FileInputStream(imageFile).readAllBytes();
+
+            // mock
+            given(userRepository.findByBasicProfile_Name("testUser"))
+                .willReturn(Optional.of(UserFactory.user(1L, "testUser")));
+            given(pickGitProfileStorage.storeByteFile(imageSource, "testUser"))
+                .willReturn(imageFile.getName());
+
+            // when
+            ProfileImageEditRequestDto requestDto = ProfileImageEditRequestDto
+                .builder()
+                .image(imageSource)
+                .build();
+            ProfileImageEditResponseDto responseDto =
+                userService.editProfileImage(authUserRequestDto, requestDto);
+
+            // then
+            assertThat(responseDto.getImageUrl()).isEqualTo(imageFile.getName());
+
+            verify(userRepository, times(1))
+                .findByBasicProfile_Name("testUser");
+            verify(pickGitProfileStorage, times(1))
+                .storeByteFile(imageSource, "testUser");
+        }
+    }
+
+    @DisplayName("editProfileDescription 메서드는")
+    @Nested
+    class Describe_editProfileDescription {
+
+        @DisplayName("새로운 프로필 한 줄 소개를 저장소에 업데이트한다.")
+        @Test
+        void editProfileDescription_WithDescription_SuccesS() {
+            // given
+            AuthUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
+            String description = "updated description";
+
+            // mock
+            given(userRepository.findByBasicProfile_Name("testUser"))
+                .willReturn(Optional.of(UserFactory.user(1L, "testUser")));
+
+            // when
+            String updatedDescription = userService
+                .editProfileDescription(authUserRequestDto, description);
+
+            // then
+            assertThat(updatedDescription).isEqualTo(description);
+            verify(userRepository, times(1))
+                .findByBasicProfile_Name("testUser");
+        }
+    }
+
+
     @DisplayName("자신의 프로필(이미지, 한 줄 소개 포함)을 수정할 수 있다.")
     @Test
     void editUserProfile_WithImageAndDescription_Success() {
@@ -599,7 +666,7 @@ class UserServiceTest {
         // mock
         given(userRepository.findByBasicProfile_Name("testUser"))
             .willReturn(Optional.of(UserFactory.user(1L, "testUser")));
-        given(pickGitStorage.store(any(File.class), anyString()))
+        given(pickGitProfileStorage.store(any(File.class), anyString()))
             .willReturn(Optional.ofNullable(image.getName()));
 
         // when
@@ -616,7 +683,7 @@ class UserServiceTest {
         assertThat(responseDto.getDescription()).isEqualTo(updatedDescription);
         verify(userRepository, times(1))
             .findByBasicProfile_Name("testUser");
-        verify(pickGitStorage, times(1))
+        verify(pickGitProfileStorage, times(1))
             .store(any(File.class), anyString());
     }
 

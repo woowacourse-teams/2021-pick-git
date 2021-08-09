@@ -46,16 +46,6 @@ public class S3Storage implements PickGitStorage {
         return response.getUrls();
     }
 
-    @Override
-    public Optional<String> store(File file, String userName) {
-        List<String> imageUrls = restClient
-            .postForEntity(s3ProxyUrl, createBody(List.of(file), userName), StorageDto.class)
-            .getBody()
-            .getUrls();
-
-        return Optional.ofNullable(imageUrls.get(0));
-    }
-
     private MultiValueMap<String, Object> createBody(
         List<File> files,
         String userName
