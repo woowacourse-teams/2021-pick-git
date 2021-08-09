@@ -242,4 +242,5 @@ public class PostController {
     private PostDeleteRequestDto createPostDeleteRequestDto(AppUser user, Long postId) {
         return new PostDeleteRequestDto(user, postId);
     }
+
 }
