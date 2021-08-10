@@ -139,7 +139,8 @@ class UserAcceptanceTest {
 
         authenticatedRequest(
             loginUserAccessToken,
-            String.format("/api/profiles/%s/followings", targetUser.getName()),
+            String.format("/api/profiles/%s/followings?githubFollowing=false",
+                targetUser.getName()),
             Method.POST,
             HttpStatus.OK
         );
@@ -234,7 +235,7 @@ class UserAcceptanceTest {
     @Test
     void followUser_NotLogin_Failure() {
         ApiErrorResponse response = unauthenticatedRequest(
-            String.format("/api/profiles/%s/followings", targetUser.getName()),
+            String.format("/api/profiles/%s/followings?githubFollowing=false", targetUser.getName()),
             Method.POST,
             HttpStatus.UNAUTHORIZED
         ).as(ApiErrorResponse.class);
@@ -252,7 +253,8 @@ class UserAcceptanceTest {
         FollowResponse response =
             authenticatedRequest(
                 loginUserAccessToken,
-                String.format("/api/profiles/%s/followings", targetUser.getName()),
+                String.format("/api/profiles/%s/followings?githubFollowing=false",
+                    targetUser.getName()),
                 Method.POST,
                 HttpStatus.OK
             ).as(FollowResponse.class);
@@ -270,7 +272,8 @@ class UserAcceptanceTest {
         ApiErrorResponse response =
             authenticatedRequest(
                 loginUserAccessToken,
-                String.format("/api/profiles/%s/followings", loginUser.getName()),
+                String.format("/api/profiles/%s/followings?githubFollowing=false",
+                    loginUser.getName()),
                 Method.POST,
                 HttpStatus.BAD_REQUEST
             ).as(ApiErrorResponse.class);
@@ -286,7 +289,8 @@ class UserAcceptanceTest {
         ApiErrorResponse response =
             authenticatedRequest(
                 loginUserAccessToken,
-                String.format("/api/profiles/%s/followings", "invalidName"),
+                String.format("/api/profiles/%s/followings?githubFollowing=false",
+                    "invalidName"),
                 Method.POST,
                 HttpStatus.BAD_REQUEST
             ).as(ApiErrorResponse.class);
@@ -302,7 +306,8 @@ class UserAcceptanceTest {
         FollowResponse followResponse =
             authenticatedRequest(
                 loginUserAccessToken,
-                String.format("/api/profiles/%s/followings", targetUser.getName()),
+                String.format("/api/profiles/%s/followings?githubFollowing=false",
+                    targetUser.getName()),
                 Method.POST,
                 HttpStatus.OK
             ).as(FollowResponse.class);
@@ -317,7 +322,7 @@ class UserAcceptanceTest {
         ApiErrorResponse errorResponse =
             authenticatedRequest(
                 loginUserAccessToken,
-                String.format("/api/profiles/%s/followings", targetUser.getName()),
+                String.format("/api/profiles/%s/followings?githubFollowing=false", targetUser.getName()),
                 Method.POST,
                 HttpStatus.BAD_REQUEST
             ).as(ApiErrorResponse.class);
@@ -330,7 +335,8 @@ class UserAcceptanceTest {
     @Test
     void unfollowUser_NotLogin_Failure() {
         ApiErrorResponse response = unauthenticatedRequest(
-            String.format("/api/profiles/%s/followings", targetUser.getName()),
+            String.format("/api/profiles/%s/followings?githubUnfollowing=false",
+                targetUser.getName()),
             Method.DELETE,
             HttpStatus.UNAUTHORIZED
         ).as(ApiErrorResponse.class);
@@ -345,7 +351,7 @@ class UserAcceptanceTest {
         FollowResponse followResponse =
             authenticatedRequest(
                 loginUserAccessToken,
-                String.format("/api/profiles/%s/followings", targetUser.getName()),
+                String.format("/api/profiles/%s/followings?githubFollowing=false", targetUser.getName()),
                 Method.POST,
                 HttpStatus.OK
             ).as(FollowResponse.class);
@@ -362,7 +368,7 @@ class UserAcceptanceTest {
         FollowResponse unfollowResponse =
             authenticatedRequest(
                 loginUserAccessToken,
-                String.format("/api/profiles/%s/followings", targetUser.getName()),
+                String.format("/api/profiles/%s/followings?githubUnfollowing=false", targetUser.getName()),
                 Method.DELETE,
                 HttpStatus.OK
             ).as(FollowResponse.class);
@@ -380,7 +386,8 @@ class UserAcceptanceTest {
         ApiErrorResponse response =
             authenticatedRequest(
                 loginUserAccessToken,
-                String.format("/api/profiles/%s/followings", loginUser.getName()),
+                String.format("/api/profiles/%s/followings?githubUnfollowing=false",
+                    loginUser.getName()),
                 Method.DELETE,
                 HttpStatus.BAD_REQUEST
             ).as(ApiErrorResponse.class);
@@ -396,7 +403,8 @@ class UserAcceptanceTest {
         ApiErrorResponse response =
             authenticatedRequest(
                 loginUserAccessToken,
-                String.format("/api/profiles/%s/followings", "invalidName"),
+                String.format("/api/profiles/%s/followings?githubUnfollowing=false",
+                    "invalidName"),
                 Method.DELETE,
                 HttpStatus.BAD_REQUEST
             ).as(ApiErrorResponse.class);
@@ -412,7 +420,8 @@ class UserAcceptanceTest {
         ApiErrorResponse response =
             authenticatedRequest(
                 loginUserAccessToken,
-                String.format("/api/profiles/%s/followings", targetUser.getName()),
+                String.format("/api/profiles/%s/followings?githubUnfollowing=false",
+                    targetUser.getName()),
                 Method.DELETE,
                 HttpStatus.BAD_REQUEST
             ).as(ApiErrorResponse.class);
@@ -557,7 +566,7 @@ class UserAcceptanceTest {
         // given
         authenticatedRequest(
             loginUserAccessToken,
-            String.format("/api/profiles/%s/followings", targetUser.getName()),
+            String.format("/api/profiles/%s/followings?githubFollowing=false", targetUser.getName()),
             Method.POST,
             HttpStatus.OK
         );

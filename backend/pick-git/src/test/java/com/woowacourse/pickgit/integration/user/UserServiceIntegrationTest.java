@@ -17,7 +17,8 @@ import com.woowacourse.pickgit.exception.user.InvalidFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
 import com.woowacourse.pickgit.exception.user.SameSourceTargetUserException;
 import com.woowacourse.pickgit.user.application.UserService;
-import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.FollowRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileImageEditRequestDto;
@@ -62,7 +63,7 @@ class UserServiceIntegrationTest {
     @Test
     void getMyUserProfile_Guest_Failure() {
         // given
-        AuthUserRequestDto requestDto = createGuestAuthUserRequestDto();
+        AuthUserForUserRequestDto requestDto = createGuestAuthUserRequestDto();
 
         // when, then
         assertThatCode(() -> userService.getMyUserProfile(requestDto))
@@ -74,7 +75,7 @@ class UserServiceIntegrationTest {
     void getMyUserProfile_WithMyName_Success() {
         //given
         User loginUser = userRepository.save(UserFactory.user());
-        AuthUserRequestDto requestDto = createLoginAuthUserRequestDto(loginUser.getName());
+        AuthUserForUserRequestDto requestDto = createLoginAuthUserRequestDto(loginUser.getName());
         UserProfileResponseDto responseDto = UserFactory.mockLoginUserProfileResponseDto();
 
         //when
@@ -90,7 +91,7 @@ class UserServiceIntegrationTest {
     @Test
     void getUserProfile_FindByNameInCaseOfGuestUser_Success() {
         //given
-        AuthUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
+        AuthUserForUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
         UserProfileResponseDto responseDto = UserFactory.mockGuestUserProfileResponseDto();
         User targetUser = userRepository.save(UserFactory.user());
 
@@ -108,7 +109,7 @@ class UserServiceIntegrationTest {
     @Test
     void getUserProfile_FindByInvalidNameInCaseOfGuestUser_400Exception() {
         // given
-        AuthUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
+        AuthUserForUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
 
         // when
         assertThatThrownBy(() ->
@@ -125,10 +126,16 @@ class UserServiceIntegrationTest {
         // given
         User loginUser = userRepository.save(UserFactory.user("testUser"));
         User target = userRepository.save(UserFactory.user("testUser2"));
-        AuthUserRequestDto authUserRequestDto =
+        AuthUserForUserRequestDto authUserRequestDto =
             createLoginAuthUserRequestDto(loginUser.getName());
 
-        userService.followUser(authUserRequestDto, target.getName());
+        FollowRequestDto requestDto = FollowRequestDto.builder()
+            .authUserRequestDto(authUserRequestDto)
+            .targetName(target.getName())
+            .githubFollowing(false)
+            .build();
+
+        userService.followUser(requestDto);
 
         UserProfileResponseDto responseDto =
             UserFactory.mockLoginUserProfileIsFollowingResponseDto();
@@ -149,7 +156,7 @@ class UserServiceIntegrationTest {
         // given
         User loginUser = userRepository.save(UserFactory.user("testUser"));
         User target = userRepository.save(UserFactory.user("testUser2"));
-        AuthUserRequestDto authUserRequestDto =
+        AuthUserForUserRequestDto authUserRequestDto =
             createLoginAuthUserRequestDto(loginUser.getName());
 
         UserProfileResponseDto responseDto =
@@ -170,7 +177,7 @@ class UserServiceIntegrationTest {
     void getUserProfile_FindByInvalidNameInCaseOfLoginUser_400Exception() {
         // given
         User loginUser = userRepository.save(UserFactory.user("testUser"));
-        AuthUserRequestDto authUserRequestDto =
+        AuthUserForUserRequestDto authUserRequestDto =
             createLoginAuthUserRequestDto(loginUser.getName());
 
         // when
@@ -186,10 +193,16 @@ class UserServiceIntegrationTest {
     @Test
     void follow_Guest_Failure() {
         // given
-        AuthUserRequestDto requestDto = createGuestAuthUserRequestDto();
+        AuthUserForUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
+
+        FollowRequestDto requestDto = FollowRequestDto.builder()
+            .authUserRequestDto(authUserRequestDto)
+            .targetName("testUser")
+            .githubFollowing(false)
+            .build();
 
         // when, then
-        assertThatCode(() -> userService.followUser(requestDto, "testUser"))
+        assertThatCode(() -> userService.followUser(requestDto))
             .isInstanceOf(UnauthorizedException.class);
     }
 
@@ -198,11 +211,17 @@ class UserServiceIntegrationTest {
     void follow_FindByInvalidName_400Exception() {
         // given
         User loginUser = userRepository.save(UserFactory.user("testUser"));
-        AuthUserRequestDto authUserRequestDto =
+        AuthUserForUserRequestDto authUserRequestDto =
             createLoginAuthUserRequestDto(loginUser.getName());
 
+        FollowRequestDto requestDto = FollowRequestDto.builder()
+            .authUserRequestDto(authUserRequestDto)
+            .targetName("kevin")
+            .githubFollowing(false)
+            .build();
+
         // when, then
-        assertThatCode(() -> userService.followUser(authUserRequestDto, "kevin"))
+        assertThatCode(() -> userService.followUser(requestDto))
             .isInstanceOf(InvalidUserException.class)
             .hasFieldOrPropertyWithValue("errorCode", "U0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
@@ -214,12 +233,18 @@ class UserServiceIntegrationTest {
     void follow_SameUser_400Exception() {
         //given
         User loginUser = userRepository.save(UserFactory.user("testUser"));
-        AuthUserRequestDto authUserRequestDto =
+        AuthUserForUserRequestDto authUserRequestDto =
             createLoginAuthUserRequestDto(loginUser.getName());
+
+        FollowRequestDto requestDto = FollowRequestDto.builder()
+            .authUserRequestDto(authUserRequestDto)
+            .targetName(loginUser.getName())
+            .githubFollowing(false)
+            .build();
 
         // when, then
         assertThatCode(
-            () -> userService.followUser(authUserRequestDto, loginUser.getName()))
+            () -> userService.followUser(requestDto))
             .isInstanceOf(SameSourceTargetUserException.class)
             .hasFieldOrPropertyWithValue("errorCode", "U0004")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
@@ -232,12 +257,18 @@ class UserServiceIntegrationTest {
         // given
         User loginUser = userRepository.save(UserFactory.user("testUser"));
         User target = userRepository.save(UserFactory.user("testUser2"));
-        AuthUserRequestDto authUserRequestDto =
+        AuthUserForUserRequestDto authUserRequestDto =
             createLoginAuthUserRequestDto(loginUser.getName());
+
+        FollowRequestDto requestDto = FollowRequestDto.builder()
+            .authUserRequestDto(authUserRequestDto)
+            .targetName(target.getName())
+            .githubFollowing(false)
+            .build();
 
         // when
         FollowResponseDto responseDto = userService
-            .followUser(authUserRequestDto, target.getName());
+            .followUser(requestDto);
 
         // then
         assertThat(responseDto.getFollowerCount()).isOne();
@@ -250,14 +281,20 @@ class UserServiceIntegrationTest {
         // given
         User loginUser = userRepository.save(UserFactory.user("testUser"));
         User target = userRepository.save(UserFactory.user("testUser2"));
-        AuthUserRequestDto authUserRequestDto =
+        AuthUserForUserRequestDto authUserRequestDto =
             createLoginAuthUserRequestDto(loginUser.getName());
 
-        userService.followUser(authUserRequestDto, target.getName());
+        FollowRequestDto requestDto = FollowRequestDto.builder()
+            .authUserRequestDto(authUserRequestDto)
+            .targetName(target.getName())
+            .githubFollowing(false)
+            .build();
+
+        userService.followUser(requestDto);
 
         // when
         assertThatThrownBy(() ->
-            userService.followUser(authUserRequestDto, target.getName()))
+            userService.followUser(requestDto))
             .isInstanceOf(DuplicateFollowException.class)
             .hasFieldOrPropertyWithValue("errorCode", "U0002")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
@@ -268,10 +305,16 @@ class UserServiceIntegrationTest {
     @Test
     void unfollow_Guest_Failure() {
         // given
-        AuthUserRequestDto requestDto = createGuestAuthUserRequestDto();
+        AuthUserForUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
+
+        FollowRequestDto requestDto = FollowRequestDto.builder()
+            .authUserRequestDto(authUserRequestDto)
+            .targetName("testUser")
+            .githubFollowing(false)
+            .build();
 
         // when, then
-        assertThatCode(() -> userService.unfollowUser(requestDto, "testUser"))
+        assertThatCode(() -> userService.unfollowUser(requestDto))
             .isInstanceOf(UnauthorizedException.class);
     }
 
@@ -280,11 +323,17 @@ class UserServiceIntegrationTest {
     void unfollow_FindByInvalidName_400Exception() {
         //given
         User loginUser = userRepository.save(UserFactory.user("testUser"));
-        AuthUserRequestDto authUserRequestDto =
+        AuthUserForUserRequestDto authUserRequestDto =
             createLoginAuthUserRequestDto(loginUser.getName());
 
+        FollowRequestDto requestDto = FollowRequestDto.builder()
+            .authUserRequestDto(authUserRequestDto)
+            .targetName("kevin")
+            .githubFollowing(false)
+            .build();
+
         // when, then
-        assertThatCode(() -> userService.followUser(authUserRequestDto, "kevin"))
+        assertThatCode(() -> userService.followUser(requestDto))
             .isInstanceOf(InvalidUserException.class)
             .hasFieldOrPropertyWithValue("errorCode", "U0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
@@ -296,12 +345,18 @@ class UserServiceIntegrationTest {
     void unfollow_SameUser_400Exception() {
         //given
         User loginUser = userRepository.save(UserFactory.user("testUser"));
-        AuthUserRequestDto authUserRequestDto =
+        AuthUserForUserRequestDto authUserRequestDto =
             createLoginAuthUserRequestDto(loginUser.getName());
+
+        FollowRequestDto requestDto = FollowRequestDto.builder()
+            .authUserRequestDto(authUserRequestDto)
+            .targetName(loginUser.getName())
+            .githubFollowing(false)
+            .build();
 
         // when, then
         assertThatCode(
-            () -> userService.unfollowUser(authUserRequestDto, loginUser.getName()))
+            () -> userService.unfollowUser(requestDto))
             .isInstanceOf(SameSourceTargetUserException.class)
             .hasFieldOrPropertyWithValue("errorCode", "U0004")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
@@ -314,12 +369,18 @@ class UserServiceIntegrationTest {
         // given
         User loginUser = userRepository.save(UserFactory.user("testUser"));
         User target = userRepository.save(UserFactory.user("testUser2"));
-        AuthUserRequestDto authUserRequestDto =
+        AuthUserForUserRequestDto authUserRequestDto =
             createLoginAuthUserRequestDto(loginUser.getName());
+
+        FollowRequestDto requestDto = FollowRequestDto.builder()
+            .authUserRequestDto(authUserRequestDto)
+            .targetName(target.getName())
+            .githubFollowing(false)
+            .build();
 
         // when, then
         assertThatThrownBy(
-            () -> userService.unfollowUser(authUserRequestDto, target.getName()))
+            () -> userService.unfollowUser(requestDto))
             .isInstanceOf(InvalidFollowException.class)
             .hasFieldOrPropertyWithValue("errorCode", "U0003")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
@@ -332,14 +393,20 @@ class UserServiceIntegrationTest {
         // given
         User loginUser = userRepository.save(UserFactory.user("testUser"));
         User target = userRepository.save(UserFactory.user("testUser2"));
-        AuthUserRequestDto authUserRequestDto =
+        AuthUserForUserRequestDto authUserRequestDto =
             createLoginAuthUserRequestDto(loginUser.getName());
 
-        userService.followUser(authUserRequestDto, target.getName());
+        FollowRequestDto requestDto = FollowRequestDto.builder()
+            .authUserRequestDto(authUserRequestDto)
+            .targetName(target.getName())
+            .githubFollowing(false)
+            .build();
+
+        userService.followUser(requestDto);
 
         // when
         FollowResponseDto responseDto = userService
-            .unfollowUser(authUserRequestDto, target.getName());
+            .unfollowUser(requestDto);
 
         // then
         assertThat(responseDto.getFollowerCount()).isZero();
@@ -385,7 +452,7 @@ class UserServiceIntegrationTest {
         // given
         String updatedDescription = "updated description";
         User user = UserFactory.user("testUser");
-        AuthUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
+        AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
 
         userRepository.save(user);
 
@@ -409,7 +476,7 @@ class UserServiceIntegrationTest {
         // given
         String updatedDescription = "updated description";
         User user = UserFactory.user("testUser");
-        AuthUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
+        AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
 
         userRepository.save(user);
 
@@ -432,7 +499,7 @@ class UserServiceIntegrationTest {
     void editProfileImage_LoginUser_Success() throws IOException {
         // given
         User user = UserFactory.user("testUser");
-        AuthUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
+        AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
         File file = FileFactory.getTestImage1File();
 
         userRepository.save(user);
@@ -454,7 +521,7 @@ class UserServiceIntegrationTest {
     void editProfileDescription_LoginUser_Success() {
         // given
         User user = UserFactory.user("testUser");
-        AuthUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
+        AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
         String description = "updated description";
 
         userRepository.save(user);
@@ -483,13 +550,19 @@ class UserServiceIntegrationTest {
         List<User> usersInDb = UserFactory.mockSearchUsers();
         User loginUser = usersInDb.get(0);
         List<User> searchedUsers = usersInDb.subList(1, usersInDb.size());
-        AuthUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto(loginUser.getName());
+        AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto(loginUser.getName());
 
         userRepository.save(loginUser);
         searchedUsers.forEach(user -> userRepository.save(user));
 
+        FollowRequestDto requestDto = FollowRequestDto.builder()
+            .authUserRequestDto(authUserRequestDto)
+            .targetName(searchedUsers.get(0).getName())
+            .githubFollowing(false)
+            .build();
+
         // when
-        userService.followUser(authUserRequestDto, searchedUsers.get(0).getName());
+        userService.followUser(requestDto);
 
         List<UserSearchResponseDto> searchResult =
             userService.searchUser(authUserRequestDto, userSearchRequestDto);
@@ -517,7 +590,7 @@ class UserServiceIntegrationTest {
             .page(0L)
             .limit(3L)
             .build();
-        AuthUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
+        AuthUserForUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
         List<User> userInDb = UserFactory.mockSearchUsers();
         userRepository.saveAll(userInDb);
 
@@ -539,7 +612,7 @@ class UserServiceIntegrationTest {
     @Test
     void searchFollowings_LoginUser_Success() {
         // given
-        AuthUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("bingbing");
+        AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("bingbing");
         FollowSearchRequestDto followSearchRequestDto =
             FollowSearchRequestDto.builder()
                 .username("target")
@@ -553,11 +626,21 @@ class UserServiceIntegrationTest {
         userRepository.save(targetUser);
 
         usersInDb.forEach(mockUser -> {
-            AuthUserRequestDto targetAuthDto = createLoginAuthUserRequestDto("target");
-            userService.followUser(targetAuthDto, mockUser.getName());
+            AuthUserForUserRequestDto targetAuthDto = createLoginAuthUserRequestDto("target");
+            FollowRequestDto requestDto = FollowRequestDto.builder()
+                .authUserRequestDto(targetAuthDto)
+                .targetName(mockUser.getName())
+                .githubFollowing(false)
+                .build();
+            userService.followUser(requestDto);
         });
         for (int i = 0; i < 3; i++) {
-            userService.followUser(authUserRequestDto, usersInDb.get(i).getName());
+            FollowRequestDto requestDto = FollowRequestDto.builder()
+                .authUserRequestDto(authUserRequestDto)
+                .targetName(usersInDb.get(i).getName())
+                .githubFollowing(false)
+                .build();
+            userService.followUser(requestDto);
         }
 
         // when
@@ -580,7 +663,7 @@ class UserServiceIntegrationTest {
     @Test
     void searchFollowings_GuestUser_Success() {
         // given
-        AuthUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
+        AuthUserForUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
         FollowSearchRequestDto followSearchRequestDto =
             FollowSearchRequestDto.builder()
                 .username("target")
@@ -594,8 +677,13 @@ class UserServiceIntegrationTest {
         userRepository.save(targetUser);
 
         usersInDb.forEach(mockUser -> {
-            AuthUserRequestDto targetAuthDto = createLoginAuthUserRequestDto("target");
-            userService.followUser(targetAuthDto, mockUser.getName());
+            AuthUserForUserRequestDto targetAuthDto = createLoginAuthUserRequestDto("target");
+            FollowRequestDto requestDto = FollowRequestDto.builder()
+                .authUserRequestDto(targetAuthDto)
+                .targetName(mockUser.getName())
+                .githubFollowing(false)
+                .build();
+            userService.followUser(requestDto);
         });
 
         // when
@@ -618,7 +706,7 @@ class UserServiceIntegrationTest {
     @Test
     void searchFollowers_LoginUser_Success() {
         // given
-        AuthUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("bingbing");
+        AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("bingbing");
         FollowSearchRequestDto followSearchRequestDto =
             FollowSearchRequestDto.builder()
                 .username("target")
@@ -632,11 +720,21 @@ class UserServiceIntegrationTest {
         userRepository.save(targetUser);
 
         usersInDb.forEach(mockUser -> {
-            AuthUserRequestDto mockUserAuthDto = createLoginAuthUserRequestDto(mockUser.getName());
-            userService.followUser(mockUserAuthDto, "target");
+            AuthUserForUserRequestDto mockUserAuthDto = createLoginAuthUserRequestDto(mockUser.getName());
+            FollowRequestDto requestDto = FollowRequestDto.builder()
+                .authUserRequestDto(mockUserAuthDto)
+                .targetName("target")
+                .githubFollowing(false)
+                .build();
+            userService.followUser(requestDto);
         });
         for (int i = 0; i < 3; i++) {
-            userService.followUser(authUserRequestDto, usersInDb.get(i).getName());
+            FollowRequestDto requestDto = FollowRequestDto.builder()
+                .authUserRequestDto(authUserRequestDto)
+                .targetName(usersInDb.get(i).getName())
+                .githubFollowing(false)
+                .build();
+            userService.followUser(requestDto);
         }
 
         // when
@@ -659,7 +757,7 @@ class UserServiceIntegrationTest {
     @Test
     void searchFollowers_GuestUser_Success() {
         // given
-        AuthUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
+        AuthUserForUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
         FollowSearchRequestDto followSearchRequestDto =
             FollowSearchRequestDto.builder()
                 .username("target")
@@ -673,8 +771,13 @@ class UserServiceIntegrationTest {
         userRepository.save(targetUser);
 
         usersInDb.forEach(mockUser -> {
-            AuthUserRequestDto mockUserAuthDto = createLoginAuthUserRequestDto(mockUser.getName());
-            userService.followUser(mockUserAuthDto, "target");
+            AuthUserForUserRequestDto mockUserAuthDto = createLoginAuthUserRequestDto(mockUser.getName());
+            FollowRequestDto requestDto = FollowRequestDto.builder()
+                .authUserRequestDto(mockUserAuthDto)
+                .targetName("target")
+                .githubFollowing(false)
+                .build();
+            userService.followUser(requestDto);
         });
 
         // when
@@ -693,12 +796,12 @@ class UserServiceIntegrationTest {
             );
     }
 
-    private AuthUserRequestDto createLoginAuthUserRequestDto(String username) {
+    private AuthUserForUserRequestDto createLoginAuthUserRequestDto(String username) {
         AppUser appUser = new LoginUser(username, "Bearer testToken");
-        return AuthUserRequestDto.from(appUser);
+        return AuthUserForUserRequestDto.from(appUser);
     }
 
-    private AuthUserRequestDto createGuestAuthUserRequestDto() {
-        return AuthUserRequestDto.from(new GuestUser());
+    private AuthUserForUserRequestDto createGuestAuthUserRequestDto() {
+        return AuthUserForUserRequestDto.from(new GuestUser());
     }
 }

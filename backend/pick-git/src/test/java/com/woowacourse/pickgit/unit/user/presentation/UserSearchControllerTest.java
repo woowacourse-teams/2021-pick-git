@@ -26,7 +26,7 @@ import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.user.application.UserService;
-import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.UserSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import com.woowacourse.pickgit.user.presentation.UserSearchController;
@@ -72,7 +72,7 @@ class UserSearchControllerTest {
         given(oAuthService.validateToken("token")).willReturn(true);
         given(oAuthService.findRequestUserByToken("token"))
             .willReturn(new LoginUser("pick-git", "token"));
-        given(userService.searchUser(any(AuthUserRequestDto.class), any(UserSearchRequestDto.class)))
+        given(userService.searchUser(any(AuthUserForUserRequestDto.class), any(UserSearchRequestDto.class)))
             .willReturn(userSearchRespons);
 
         // when
@@ -101,7 +101,7 @@ class UserSearchControllerTest {
         verify(oAuthService, times(1))
             .findRequestUserByToken("token");
         verify(userService, times(1))
-            .searchUser(any(AuthUserRequestDto.class), any(UserSearchRequestDto.class));
+            .searchUser(any(AuthUserForUserRequestDto.class), any(UserSearchRequestDto.class));
 
         // restdocs
         perform.andDo(document("search-user-LoggedIn",
@@ -134,7 +134,7 @@ class UserSearchControllerTest {
         // mock
         given(oAuthService.findRequestUserByToken(any()))
             .willReturn(new GuestUser());
-        given(userService.searchUser(any(AuthUserRequestDto.class), any(UserSearchRequestDto.class)))
+        given(userService.searchUser(any(AuthUserForUserRequestDto.class), any(UserSearchRequestDto.class)))
             .willReturn(userSearchRespons);
 
         // when
@@ -161,7 +161,7 @@ class UserSearchControllerTest {
         verify(oAuthService, times(1))
             .findRequestUserByToken(any());
         verify(userService, times(1))
-            .searchUser(any(AuthUserRequestDto.class), any(UserSearchRequestDto.class));
+            .searchUser(any(AuthUserForUserRequestDto.class), any(UserSearchRequestDto.class));
 
         // restdocs
         perform.andDo(document("search-user-unLoggedIn",
