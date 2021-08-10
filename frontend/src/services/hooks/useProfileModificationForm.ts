@@ -151,17 +151,12 @@ const useProfileModificationForm = (
         setDescriptionQuery(response.description);
       }
 
+      submitEffect?.();
       pushSnackbarMessage(SUCCESS_MESSAGE.SET_PROFILE);
     } catch (error) {
       handleError(error);
     }
   };
-
-  useEffect(() => {
-    if (isMutateImageSuccess && isMutateDescriptionSuccess) {
-      submitEffect?.();
-    }
-  }, [isMutateImageSuccess, isMutateDescriptionSuccess]);
 
   return {
     values: { image, imageUrl, description },

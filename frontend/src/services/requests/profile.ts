@@ -58,18 +58,14 @@ export const requestSetProfileImage = async (profileImage: File, accessToken: st
   }
 
   if (fileReader.result && fileReader.result instanceof ArrayBuffer) {
-    const imageByteArray = Array.from(new Int8Array(fileReader.result));
+    const imageByteArray = new Int8Array(fileReader.result);
 
-    const response = await axios.put<{ imageUrl: string }>(
-      API_URL.SELF_PROFILE_IMAGE(profileImage.name),
-      JSON.stringify(imageByteArray),
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "text/plain",
-        },
-      }
-    );
+    const response = await axios.put<{ imageUrl: string }>(API_URL.SELF_PROFILE_IMAGE, imageByteArray, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/octet-stream",
+      },
+    });
 
     return response.data;
   }
