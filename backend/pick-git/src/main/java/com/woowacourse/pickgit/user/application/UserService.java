@@ -5,7 +5,7 @@ import static java.util.stream.Collectors.toList;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
-import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
@@ -47,7 +47,7 @@ public class UserService {
 
     public UserService(
         UserRepository userRepository,
-        PickGitStorage pickGitStorage,
+        PickGitProfileStorage pickGitProfileStorage,
         PlatformContributionCalculator platformContributionCalculator,
         PlatformFollowingRequester platformFollowingRequester
     ) {
@@ -58,14 +58,14 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserProfileResponseDto getMyUserProfile(AuthUserRequestDto requestDto) {
+    public UserProfileResponseDto getMyUserProfile(AuthUserForUserRequestDto requestDto) {
         validateIsGuest(requestDto);
         User user = findUserByName(requestDto.getUsername());
         return generateUserProfileResponse(user, null);
     }
 
     @Transactional(readOnly = true)
-    public UserProfileResponseDto getUserProfile(AuthUserRequestDto requestDto, String targetName) {
+    public UserProfileResponseDto getUserProfile(AuthUserForUserRequestDto requestDto, String targetName) {
         User target = findUserByName(targetName);
         if (requestDto.isGuest()) {
             return generateUserProfileResponse(target, null);
@@ -92,7 +92,7 @@ public class UserService {
     }
 
     public ProfileEditResponseDto editProfile(
-        AuthUserRequestDto authUserRequestDto,
+        AuthUserForUserRequestDto authUserRequestDto,
         ProfileEditRequestDto profileEditRequestDto
     ) {
         validateIsGuest(authUserRequestDto);
@@ -149,7 +149,7 @@ public class UserService {
     }
 
     public ProfileImageEditResponseDto editProfileImage(
-        AuthUserRequestDto authUserRequestDto,
+        AuthUserForUserRequestDto authUserRequestDto,
         ProfileImageEditRequestDto profileImageEditRequestDto
     ) {
         User user = findUserByName(authUserRequestDto.getUsername());
@@ -163,7 +163,7 @@ public class UserService {
     }
 
     public String editProfileDescription(
-        AuthUserRequestDto authUserRequestDto,
+        AuthUserForUserRequestDto authUserRequestDto,
         String description
     ) {
         User user = findUserByName(authUserRequestDto.getUsername());
@@ -172,10 +172,11 @@ public class UserService {
         return description;
     }
 
-    public FollowResponseDto followUser(AuthUserRequestDto requestDto, String targetName) {
-        validateIsGuest(requestDto);
-        User source = findUserByName(requestDto.getUsername());
-        User target = findUserByName(targetName);
+    public FollowResponseDto followUser(FollowRequestDto requestDto) {
+        AuthUserForUserRequestDto authUserRequestDto = requestDto.getAuthUserRequestDto();
+        validateIsGuest(authUserRequestDto);
+        User source = findUserByName(authUserRequestDto.getUsername());
+        User target = findUserByName(requestDto.getTargetName());
 
         source.follow(target);
         followInPlatform(requestDto);
@@ -192,7 +193,7 @@ public class UserService {
     }
 
     public FollowResponseDto unfollowUser(FollowRequestDto requestDto) {
-        AuthUserRequestDto authUserRequestDto = requestDto.getAuthUserRequestDto();
+        AuthUserForUserRequestDto authUserRequestDto = requestDto.getAuthUserRequestDto();
         validateIsGuest(authUserRequestDto);
         User source = findUserByName(authUserRequestDto.getUsername());
         User target = findUserByName(requestDto.getTargetName());
@@ -211,7 +212,7 @@ public class UserService {
         }
     }
 
-    private void validateIsGuest(AuthUserRequestDto requestDto) {
+    private void validateIsGuest(AuthUserForUserRequestDto requestDto) {
         if (requestDto.isGuest()) {
             throw new UnauthorizedException();
         }
@@ -241,7 +242,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public List<UserSearchResponseDto> searchUser(
-        AuthUserRequestDto authUserRequestDto,
+        AuthUserForUserRequestDto authUserRequestDto,
         UserSearchRequestDto userSearchRequestDto
     ) {
         Pageable pageable = PageRequest.of(
@@ -264,7 +265,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public List<UserSearchResponseDto> searchFollowings(
-        AuthUserRequestDto authUserRequestDto,
+        AuthUserForUserRequestDto authUserRequestDto,
         FollowSearchRequestDto followSearchRequestDto
     ) {
         User target = findUserByName(followSearchRequestDto.getUsername());
@@ -284,7 +285,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public List<UserSearchResponseDto> searchFollowers(
-        AuthUserRequestDto authUserRequestDto,
+        AuthUserForUserRequestDto authUserRequestDto,
         FollowSearchRequestDto followSearchRequestDto
     ) {
         User target = findUserByName(followSearchRequestDto.getUsername());

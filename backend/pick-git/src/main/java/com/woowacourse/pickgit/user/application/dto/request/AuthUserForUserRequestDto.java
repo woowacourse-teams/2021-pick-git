@@ -6,29 +6,29 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class AuthUserRequestDto {
+public class AuthUserForUserRequestDto {
 
     private String username;
     private String accessToken;
     private boolean isGuest;
 
-    private AuthUserRequestDto() {
+    private AuthUserForUserRequestDto() {
     }
 
-    private AuthUserRequestDto(String username, boolean isGuest) {
+    private AuthUserForUserRequestDto(String username, boolean isGuest) {
         this(username, null, isGuest);
     }
 
-    public AuthUserRequestDto(String username, String accessToken, boolean isGuest) {
+    public AuthUserForUserRequestDto(String username, String accessToken, boolean isGuest) {
         this.username = username;
         this.accessToken = accessToken;
         this.isGuest = isGuest;
     }
 
-    public static AuthUserRequestDto from(AppUser appUser) {
+    public static AuthUserForUserRequestDto from(AppUser appUser) {
         if (appUser.isGuest()) {
-            return new AuthUserRequestDto(null, true);
+            return new AuthUserForUserRequestDto(null, true);
         }
-        return new AuthUserRequestDto(appUser.getUsername(), appUser.getAccessToken(), false);
+        return new AuthUserForUserRequestDto(appUser.getUsername(), appUser.getAccessToken(), false);
     }
 }

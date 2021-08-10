@@ -5,7 +5,7 @@ import static java.util.stream.Collectors.toList;
 import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.user.application.UserService;
-import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
@@ -56,7 +56,7 @@ public class UserController {
     public ResponseEntity<UserProfileResponse> getAuthenticatedUserProfile(
         @Authenticated AppUser appUser
     ) {
-        AuthUserRequestDto authUserRequestDto = AuthUserRequestDto.from(appUser);
+        AuthUserForUserRequestDto authUserRequestDto = AuthUserForUserRequestDto.from(appUser);
         UserProfileResponseDto responseDto = userService.getMyUserProfile(authUserRequestDto);
 
         return ResponseEntity.ok(createUserProfileResponse(responseDto));
@@ -67,7 +67,7 @@ public class UserController {
         @Authenticated AppUser appUser,
         @PathVariable String username
     ) {
-        AuthUserRequestDto authUserRequestDto = AuthUserRequestDto.from(appUser);
+        AuthUserForUserRequestDto authUserRequestDto = AuthUserForUserRequestDto.from(appUser);
         UserProfileResponseDto responseDto = userService
             .getUserProfile(authUserRequestDto, username);
 
@@ -100,7 +100,7 @@ public class UserController {
         @RequestParam Boolean githubFollowing
     ) {
         FollowRequestDto followRequestDto = FollowRequestDto.builder()
-            .authUserRequestDto(AuthUserRequestDto.from(appUser))
+            .authUserRequestDto(AuthUserForUserRequestDto.from(appUser))
             .targetName(username)
             .githubFollowing(githubFollowing)
             .build();
@@ -117,7 +117,7 @@ public class UserController {
         @RequestParam Boolean githubUnfollowing
     ) {
         FollowRequestDto unfollowRequestDto = FollowRequestDto.builder()
-            .authUserRequestDto(AuthUserRequestDto.from(appUser))
+            .authUserRequestDto(AuthUserForUserRequestDto.from(appUser))
             .targetName(username)
             .githubFollowing(githubUnfollowing)
             .build();
@@ -139,7 +139,7 @@ public class UserController {
         @Authenticated AppUser appUser,
         @ModelAttribute ProfileEditRequest request
     ) {
-        AuthUserRequestDto authUserRequestDto = AuthUserRequestDto.from(appUser);
+        AuthUserForUserRequestDto authUserRequestDto = AuthUserForUserRequestDto.from(appUser);
         ProfileEditRequestDto profileEditRequestDto = ProfileEditRequestDto
             .builder()
             .image(request.getImage())
@@ -161,7 +161,7 @@ public class UserController {
         @Authenticated AppUser appUser,
         @RequestBody byte[] image
     ) {
-        AuthUserRequestDto authUserRequestDto = AuthUserRequestDto.from(appUser);
+        AuthUserForUserRequestDto authUserRequestDto = AuthUserForUserRequestDto.from(appUser);
         ProfileImageEditRequestDto profileImageEditRequestDto = ProfileImageEditRequestDto
             .builder()
             .image(image)
@@ -176,7 +176,7 @@ public class UserController {
         @Authenticated AppUser appUser,
         @Valid @RequestBody ProfileDescriptionRequest request
     ) {
-        AuthUserRequestDto authUserRequestDto = AuthUserRequestDto.from(appUser);
+        AuthUserForUserRequestDto authUserRequestDto = AuthUserForUserRequestDto.from(appUser);
         String editResult = userService.editProfileDescription(
             authUserRequestDto,
             request.getDescription()
@@ -219,7 +219,7 @@ public class UserController {
         @RequestParam Long page,
         @RequestParam Long limit
     ) {
-        AuthUserRequestDto authUserRequestDto = AuthUserRequestDto.from(appUser);
+        AuthUserForUserRequestDto authUserRequestDto = AuthUserForUserRequestDto.from(appUser);
         FollowSearchRequestDto followSearchRequestDto = FollowSearchRequestDto.builder()
             .username(username)
             .page(page)
@@ -237,7 +237,7 @@ public class UserController {
         @RequestParam Long page,
         @RequestParam Long limit
     ) {
-        AuthUserRequestDto authUserRequestDto = AuthUserRequestDto.from(appUser);
+        AuthUserForUserRequestDto authUserRequestDto = AuthUserForUserRequestDto.from(appUser);
         FollowSearchRequestDto followSearchRequestDto = FollowSearchRequestDto.builder()
             .username(username)
             .page(page)

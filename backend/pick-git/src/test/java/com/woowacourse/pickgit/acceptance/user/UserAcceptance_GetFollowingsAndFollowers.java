@@ -8,7 +8,7 @@ import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.common.request_builder.PickGitRequest;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.user.application.UserService;
-import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowRequestDto;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
@@ -64,8 +64,8 @@ class UserAcceptance_GetFollowingsAndFollowers {
         userRepository.save(target);
         userRepository.saveAll(usersInDb);
 
-        AuthUserRequestDto targetAuthDto =
-            AuthUserRequestDto.from(new LoginUser(target.getName(), "token"));
+        AuthUserForUserRequestDto targetAuthDto =
+            AuthUserForUserRequestDto.from(new LoginUser(target.getName(), "token"));
         for (User user : usersInDb) {
             FollowRequestDto requestDto = FollowRequestDto.builder()
                 .authUserRequestDto(targetAuthDto)
@@ -74,8 +74,8 @@ class UserAcceptance_GetFollowingsAndFollowers {
                 .build();
             userService.followUser(requestDto);
         }
-        AuthUserRequestDto testerAuthDto =
-            AuthUserRequestDto.from(new LoginUser("testUser", "token"));
+        AuthUserForUserRequestDto testerAuthDto =
+            AuthUserForUserRequestDto.from(new LoginUser("testUser", "token"));
         for (int i = 0; i < 3; i++) {
             FollowRequestDto requestDto = FollowRequestDto.builder()
                 .authUserRequestDto(testerAuthDto)
@@ -115,8 +115,8 @@ class UserAcceptance_GetFollowingsAndFollowers {
         userRepository.save(target);
         userRepository.saveAll(usersInDb);
 
-        AuthUserRequestDto targetAuthDto =
-            AuthUserRequestDto.from(new LoginUser(target.getName(), "token"));
+        AuthUserForUserRequestDto targetAuthDto =
+            AuthUserForUserRequestDto.from(new LoginUser(target.getName(), "token"));
         for (User user : usersInDb) {
             FollowRequestDto requestDto = FollowRequestDto.builder()
                 .authUserRequestDto(targetAuthDto)
@@ -158,8 +158,8 @@ class UserAcceptance_GetFollowingsAndFollowers {
         userRepository.saveAll(usersInDb);
 
         for (User user : usersInDb) {
-            AuthUserRequestDto mockUserAuthDto =
-                AuthUserRequestDto.from(new LoginUser(user.getName(), "token"));
+            AuthUserForUserRequestDto mockUserAuthDto =
+                AuthUserForUserRequestDto.from(new LoginUser(user.getName(), "token"));
             FollowRequestDto requestDto = FollowRequestDto.builder()
                 .authUserRequestDto(mockUserAuthDto)
                 .targetName(target.getName())
@@ -167,8 +167,8 @@ class UserAcceptance_GetFollowingsAndFollowers {
                 .build();
             userService.followUser(requestDto);
         }
-        AuthUserRequestDto testerAuthDto =
-            AuthUserRequestDto.from(new LoginUser("testUser", "token"));
+        AuthUserForUserRequestDto testerAuthDto =
+            AuthUserForUserRequestDto.from(new LoginUser("testUser", "token"));
         for (int i = 0; i < 3; i++) {
             FollowRequestDto requestDto = FollowRequestDto.builder()
                 .authUserRequestDto(testerAuthDto)
@@ -209,8 +209,8 @@ class UserAcceptance_GetFollowingsAndFollowers {
         userRepository.saveAll(usersInDb);
 
         for (User user : usersInDb) {
-            AuthUserRequestDto mockUserAuthDto =
-                AuthUserRequestDto.from(new LoginUser(user.getName(), "token"));
+            AuthUserForUserRequestDto mockUserAuthDto =
+                AuthUserForUserRequestDto.from(new LoginUser(user.getName(), "token"));
             FollowRequestDto requestDto = FollowRequestDto.builder()
                 .authUserRequestDto(mockUserAuthDto)
                 .targetName(target.getName())

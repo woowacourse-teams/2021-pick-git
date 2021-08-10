@@ -40,7 +40,7 @@ import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.user.application.UserService;
-import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
@@ -53,12 +53,9 @@ import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponse
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import com.woowacourse.pickgit.user.presentation.UserController;
 import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
-<<<<<<< HEAD
 import com.woowacourse.pickgit.user.presentation.dto.request.ProfileDescriptionRequest;
 import java.io.File;
 import java.io.FileInputStream;
-=======
->>>>>>> b90308f8... feat: 팔로우/언팔로우시 깃헙 자동 연동 기능 구현
 import java.util.List;
 import java.util.Optional;
 import org.apache.http.HttpHeaders;
@@ -107,7 +104,7 @@ class UserControllerTest {
                 .willReturn(true);
             given(oAuthService.findRequestUserByToken("testToken"))
                 .willReturn(new LoginUser("loginUser", "testToken"));
-            given(userService.getMyUserProfile(any(AuthUserRequestDto.class)))
+            given(userService.getMyUserProfile(any(AuthUserForUserRequestDto.class)))
                 .willReturn(responseDto);
 
             // when
@@ -130,7 +127,7 @@ class UserControllerTest {
             verify(oAuthService, times(1))
                 .findRequestUserByToken("testToken");
             verify(userService, times(1))
-                .getMyUserProfile(any(AuthUserRequestDto.class));
+                .getMyUserProfile(any(AuthUserForUserRequestDto.class));
 
             perform.andDo(document("profiles-me",
                 getDocumentRequest(),
@@ -166,7 +163,7 @@ class UserControllerTest {
                 .willReturn(true);
             given(oAuthService.findRequestUserByToken("testToken"))
                 .willReturn(new LoginUser("loginUser", "Bearer testToken"));
-            given(userService.getUserProfile(any(AuthUserRequestDto.class), eq("testUser2")))
+            given(userService.getUserProfile(any(AuthUserForUserRequestDto.class), eq("testUser2")))
                 .willReturn(responseDto);
 
             // when
@@ -189,7 +186,7 @@ class UserControllerTest {
             verify(oAuthService, times(1))
                 .findRequestUserByToken("testToken");
             verify(userService, times(1))
-                .getUserProfile(any(AuthUserRequestDto.class), eq("testUser2"));
+                .getUserProfile(any(AuthUserForUserRequestDto.class), eq("testUser2"));
 
             perform.andDo(document("profiles-LoggedIn",
                 getDocumentRequest(),
@@ -403,7 +400,7 @@ class UserControllerTest {
             given(oAuthService.findRequestUserByToken("token"))
                 .willReturn(loginUser);
             given(userService
-                .editProfile(any(AuthUserRequestDto.class), any(ProfileEditRequestDto.class)))
+                .editProfile(any(AuthUserForUserRequestDto.class), any(ProfileEditRequestDto.class)))
                 .willReturn(responseDto);
 
             // when
@@ -422,7 +419,7 @@ class UserControllerTest {
             verify(oAuthService, times(1)).validateToken("token");
             verify(oAuthService, times(1)).findRequestUserByToken("token");
             verify(userService, times(1))
-                .editProfile(any(AuthUserRequestDto.class), any(ProfileEditRequestDto.class));
+                .editProfile(any(AuthUserForUserRequestDto.class), any(ProfileEditRequestDto.class));
 
             // restdocs
             perform.andDo(document("profiles-edit",
@@ -452,7 +449,7 @@ class UserControllerTest {
             given(oAuthService.findRequestUserByToken("token"))
                 .willReturn(loginUser);
             given(userService
-                .editProfileImage(any(AuthUserRequestDto.class), any(ProfileImageEditRequestDto.class)))
+                .editProfileImage(any(AuthUserForUserRequestDto.class), any(ProfileImageEditRequestDto.class)))
                 .willReturn(new ProfileImageEditResponseDto(file.getName()));
 
             // when
@@ -470,7 +467,7 @@ class UserControllerTest {
             verify(oAuthService, times(1)).validateToken("token");
             verify(oAuthService, times(1)).findRequestUserByToken("token");
             verify(userService, times(1))
-                .editProfileImage(any(AuthUserRequestDto.class), any(ProfileImageEditRequestDto.class));
+                .editProfileImage(any(AuthUserForUserRequestDto.class), any(ProfileImageEditRequestDto.class));
         }
 
         @DisplayName("자신의 프로필 한 줄 소개를 수정할 수 있다.")
@@ -486,7 +483,7 @@ class UserControllerTest {
                 .willReturn(true);
             given(oAuthService.findRequestUserByToken("token"))
                 .willReturn(loginUser);
-            given(userService.editProfileDescription(any(AuthUserRequestDto.class), anyString()))
+            given(userService.editProfileDescription(any(AuthUserForUserRequestDto.class), anyString()))
                 .willReturn(description);
 
             // when
@@ -505,7 +502,7 @@ class UserControllerTest {
             verify(oAuthService, times(1)).validateToken("token");
             verify(oAuthService, times(1)).findRequestUserByToken("token");
             verify(userService, times(1))
-                .editProfileDescription(any(AuthUserRequestDto.class), anyString());
+                .editProfileDescription(any(AuthUserForUserRequestDto.class), anyString());
 
             // restdocs
             perform.andDo(document("edit-profile-description",
@@ -569,7 +566,7 @@ class UserControllerTest {
 
             given(oAuthService.findRequestUserByToken(any()))
                 .willCallRealMethod();
-            given(userService.getUserProfile(any(AuthUserRequestDto.class), eq("testUser")))
+            given(userService.getUserProfile(any(AuthUserForUserRequestDto.class), eq("testUser")))
                 .willReturn(responseDto);
 
             // when
@@ -589,7 +586,7 @@ class UserControllerTest {
             verify(oAuthService, times(1))
                 .findRequestUserByToken(any());
             verify(userService, times(1))
-                .getUserProfile(any(AuthUserRequestDto.class), eq("testUser"));
+                .getUserProfile(any(AuthUserForUserRequestDto.class), eq("testUser"));
 
             perform.andDo(document("profiles-unLoggedIn",
                 getDocumentRequest(),
@@ -767,7 +764,7 @@ class UserControllerTest {
         given(oAuthService.findRequestUserByToken("token"))
             .willReturn(new LoginUser("source", "token"));
         given(userService.searchFollowings(
-            any(AuthUserRequestDto.class),
+            any(AuthUserForUserRequestDto.class),
             any(FollowSearchRequestDto.class)
         )).willReturn(userSearchResponseDtos);
 
@@ -788,7 +785,7 @@ class UserControllerTest {
         verify(oAuthService, times(1)).validateToken("token");
         verify(oAuthService, times(1)).findRequestUserByToken("token");
         verify(userService, times(1))
-            .searchFollowings(any(AuthUserRequestDto.class), any(FollowSearchRequestDto.class));
+            .searchFollowings(any(AuthUserForUserRequestDto.class), any(FollowSearchRequestDto.class));
 
         // restdocs
         resultActions.andDo(document("search-followings-LoggedIn",
@@ -821,7 +818,7 @@ class UserControllerTest {
         given(oAuthService.findRequestUserByToken(null))
             .willReturn(new GuestUser());
         given(userService.searchFollowings(
-            any(AuthUserRequestDto.class),
+            any(AuthUserForUserRequestDto.class),
             any(FollowSearchRequestDto.class)
         )).willReturn(userSearchResponseDtos);
 
@@ -840,7 +837,7 @@ class UserControllerTest {
 
         verify(oAuthService, times(1)).findRequestUserByToken(null);
         verify(userService, times(1))
-            .searchFollowings(any(AuthUserRequestDto.class), any(FollowSearchRequestDto.class));
+            .searchFollowings(any(AuthUserForUserRequestDto.class), any(FollowSearchRequestDto.class));
 
         // restdocs
         resultActions.andDo(document("search-followings-unLoggedIn",
@@ -875,7 +872,7 @@ class UserControllerTest {
         given(oAuthService.findRequestUserByToken("token"))
             .willReturn(new LoginUser("source", "token"));
         given(userService.searchFollowers(
-            any(AuthUserRequestDto.class),
+            any(AuthUserForUserRequestDto.class),
             any(FollowSearchRequestDto.class)
         )).willReturn(userSearchResponseDtos);
 
@@ -896,7 +893,7 @@ class UserControllerTest {
         verify(oAuthService, times(1)).validateToken("token");
         verify(oAuthService, times(1)).findRequestUserByToken("token");
         verify(userService, times(1))
-            .searchFollowers(any(AuthUserRequestDto.class), any(FollowSearchRequestDto.class));
+            .searchFollowers(any(AuthUserForUserRequestDto.class), any(FollowSearchRequestDto.class));
 
         // restdocs
         resultActions.andDo(document("search-followers-LoggedIn",
@@ -929,7 +926,7 @@ class UserControllerTest {
         given(oAuthService.findRequestUserByToken(null))
             .willReturn(new GuestUser());
         given(userService.searchFollowers(
-            any(AuthUserRequestDto.class),
+            any(AuthUserForUserRequestDto.class),
             any(FollowSearchRequestDto.class)
         )).willReturn(userSearchResponseDtos);
 
@@ -948,7 +945,7 @@ class UserControllerTest {
 
         verify(oAuthService, times(1)).findRequestUserByToken(null);
         verify(userService, times(1))
-            .searchFollowers(any(AuthUserRequestDto.class), any(FollowSearchRequestDto.class));
+            .searchFollowers(any(AuthUserForUserRequestDto.class), any(FollowSearchRequestDto.class));
 
         // restdocs
         resultActions.andDo(document("search-followers-unLoggedIn",

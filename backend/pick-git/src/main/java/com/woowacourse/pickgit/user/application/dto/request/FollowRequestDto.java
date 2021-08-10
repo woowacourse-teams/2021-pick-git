@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public class FollowRequestDto {
 
-    private AuthUserRequestDto authUserRequestDto;
+    private AuthUserForUserRequestDto authUserRequestDto;
     private String targetName;
     private boolean githubFollowing;
 
@@ -15,7 +15,10 @@ public class FollowRequestDto {
     }
 
     public FollowRequestDto(
-        AuthUserRequestDto authUserRequestDto, String targetName, boolean githubFollowing) {
+        AuthUserForUserRequestDto authUserRequestDto,
+        String targetName,
+        boolean githubFollowing
+    ) {
         this.authUserRequestDto = authUserRequestDto;
         this.targetName = targetName;
         this.githubFollowing = githubFollowing;

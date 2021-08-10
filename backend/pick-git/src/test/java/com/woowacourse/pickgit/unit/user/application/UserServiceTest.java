@@ -22,7 +22,7 @@ import com.woowacourse.pickgit.exception.user.InvalidFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
 import com.woowacourse.pickgit.exception.user.SameSourceTargetUserException;
 import com.woowacourse.pickgit.user.application.UserService;
-import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
@@ -38,6 +38,7 @@ import com.woowacourse.pickgit.user.domain.Contribution;
 import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.domain.follow.PlatformFollowingRequester;
 import com.woowacourse.pickgit.user.domain.profile.PickGitProfileStorage;
 import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
 import java.io.File;
@@ -88,7 +89,7 @@ class UserServiceTest {
                 // given
                 User loginUser = UserFactory.user();
                 String username = loginUser.getName();
-                AuthUserRequestDto requestDto = createLoginAuthUserRequestDto(username);
+                AuthUserForUserRequestDto requestDto = createLoginAuthUserRequestDto(username);
 
                 given(userRepository.findByBasicProfile_Name(username))
                     .willReturn(Optional.of(loginUser));
@@ -116,7 +117,7 @@ class UserServiceTest {
             @Test
             void getMyUserProfile_Guest_Failure() {
                 // given
-                AuthUserRequestDto requestDto = createGuestAuthUserRequestDto();
+                AuthUserForUserRequestDto requestDto = createGuestAuthUserRequestDto();
 
                 // when, then
                 assertThatCode(() -> userService.getMyUserProfile(requestDto))
@@ -137,7 +138,7 @@ class UserServiceTest {
             @Test
             void getUserProfile_FindByNameInCaseOfGuestUser_Success() {
                 //given
-                AuthUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
+                AuthUserForUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
                 User targetUser = UserFactory.user("testUser");
                 String targetUsername = targetUser.getName();
 
@@ -163,7 +164,7 @@ class UserServiceTest {
             @Test
             void getUserProfile_FindByInvalidNameInCaseOfGuestUser_400Exception() {
                 //given
-                AuthUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
+                AuthUserForUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
                 String invalidName = "InvalidName";
 
                 given(userRepository.findByBasicProfile_Name(invalidName))
@@ -193,7 +194,7 @@ class UserServiceTest {
                 //given
                 User loginUser = UserFactory.user(1L, "testUser");
                 String loginUsername = loginUser.getName();
-                AuthUserRequestDto authUserRequestDto =
+                AuthUserForUserRequestDto authUserRequestDto =
                     createLoginAuthUserRequestDto(loginUsername);
                 User targetUser = UserFactory.user(2L, "testUser2");
                 String targetUsername = targetUser.getName();
@@ -235,7 +236,7 @@ class UserServiceTest {
                 //given
                 User loginUser = UserFactory.user("testUser");
                 String loginUsername = loginUser.getName();
-                AuthUserRequestDto authUserRequestDto =
+                AuthUserForUserRequestDto authUserRequestDto =
                     createLoginAuthUserRequestDto(loginUsername);
                 User targetUser = UserFactory.user("testUser2");
                 String targetUsername = targetUser.getName();
@@ -269,7 +270,7 @@ class UserServiceTest {
                 //given
                 User loginUser = UserFactory.user("testUser");
                 String loginUsername = loginUser.getName();
-                AuthUserRequestDto authUserRequestDto =
+                AuthUserForUserRequestDto authUserRequestDto =
                     createLoginAuthUserRequestDto(loginUsername);
                 String targetUsername = "invalidname";
 
@@ -304,7 +305,7 @@ class UserServiceTest {
             @Test
             void follow_Guest_Failure() {
                 // given
-                AuthUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
+                AuthUserForUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
 
                 FollowRequestDto requestDto = FollowRequestDto.builder()
                     .authUserRequestDto(authUserRequestDto)
@@ -327,7 +328,7 @@ class UserServiceTest {
                 //given
                 User loginUser = UserFactory.user(1L, "testUser");
                 String loginUsername = loginUser.getName();
-                AuthUserRequestDto authUserRequestDto =
+                AuthUserForUserRequestDto authUserRequestDto =
                     createLoginAuthUserRequestDto(loginUsername);
                 String invalidTargetName = "django";
 
@@ -366,7 +367,7 @@ class UserServiceTest {
                 //given
                 User loginUser = UserFactory.user(1L, "testUser");
                 String loginUsername = loginUser.getName();
-                AuthUserRequestDto authUserRequestDto =
+                AuthUserForUserRequestDto authUserRequestDto =
                     createLoginAuthUserRequestDto(loginUsername);
 
                 given(userRepository.findByBasicProfile_Name(loginUsername))
@@ -399,7 +400,7 @@ class UserServiceTest {
                     //given
                     User loginUser = UserFactory.user(1L, "testUser");
                     String loginUsername = loginUser.getName();
-                    AuthUserRequestDto authUserRequestDto =
+                    AuthUserForUserRequestDto authUserRequestDto =
                         createLoginAuthUserRequestDto(loginUsername);
                     User targetUser = UserFactory.user(2L, "testUser2");
                     String targetUsername = targetUser.getName();
@@ -437,7 +438,7 @@ class UserServiceTest {
                     //given
                     User loginUser = UserFactory.user(1L, "testUser");
                     String loginUsername = loginUser.getName();
-                    AuthUserRequestDto authUserRequestDto =
+                    AuthUserForUserRequestDto authUserRequestDto =
                         createLoginAuthUserRequestDto(loginUsername);
                     User targetUser = UserFactory.user(2L, "testUser2");
                     String targetUsername = targetUser.getName();
@@ -481,7 +482,7 @@ class UserServiceTest {
                 //given
                 User loginUser = UserFactory.user(1L, "testUser");
                 String loginUsername = loginUser.getName();
-                AuthUserRequestDto authUserRequestDto =
+                AuthUserForUserRequestDto authUserRequestDto =
                     createLoginAuthUserRequestDto(loginUsername);
                 User targetUser = UserFactory.user(2L, "testUser2");
                 String targetUsername = targetUser.getName();
@@ -522,7 +523,7 @@ class UserServiceTest {
                 //given
                 User loginUser = UserFactory.user(1L, "testUser");
                 String loginUsername = loginUser.getName();
-                AuthUserRequestDto authUserRequestDto =
+                AuthUserForUserRequestDto authUserRequestDto =
                     createLoginAuthUserRequestDto(loginUsername);
                 User targetUser = UserFactory.user(2L, "testUser2");
                 String targetUsername = targetUser.getName();
@@ -568,7 +569,7 @@ class UserServiceTest {
             @Test
             void unfollow_Guest_Failure() {
                 // given
-                AuthUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
+                AuthUserForUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
 
                 FollowRequestDto requestDto = FollowRequestDto.builder()
                     .authUserRequestDto(authUserRequestDto)
@@ -592,7 +593,7 @@ class UserServiceTest {
                 //given
                 User loginUser = UserFactory.user(1L, "testUser");
                 String loginUsername = loginUser.getName();
-                AuthUserRequestDto authUserRequestDto =
+                AuthUserForUserRequestDto authUserRequestDto =
                     createLoginAuthUserRequestDto(loginUsername);
                 String invalidTargetName = "django";
 
@@ -632,7 +633,7 @@ class UserServiceTest {
                 //given
                 User loginUser = UserFactory.user(1L, "testUser");
                 String loginUsername = loginUser.getName();
-                AuthUserRequestDto authUserRequestDto =
+                AuthUserForUserRequestDto authUserRequestDto =
                     createLoginAuthUserRequestDto(loginUsername);
 
                 given(userRepository.findByBasicProfile_Name(loginUsername))
@@ -666,7 +667,7 @@ class UserServiceTest {
                 //given
                 User loginUser = UserFactory.user(1L, "testUser");
                 String loginUsername = loginUser.getName();
-                AuthUserRequestDto authUserRequestDto =
+                AuthUserForUserRequestDto authUserRequestDto =
                     createLoginAuthUserRequestDto(loginUsername);
                 User targetUser = UserFactory.user(2L, "testUser2");
                 String targetUsername = targetUser.getName();
@@ -708,7 +709,7 @@ class UserServiceTest {
                 //given
                 User loginUser = UserFactory.user(1L, "testUser");
                 String loginUsername = loginUser.getName();
-                AuthUserRequestDto authUserRequestDto =
+                AuthUserForUserRequestDto authUserRequestDto =
                     createLoginAuthUserRequestDto(loginUsername);
                 User targetUser = UserFactory.user(2L, "testUser2");
                 String targetUsername = targetUser.getName();
@@ -750,7 +751,7 @@ class UserServiceTest {
                 //given
                 User loginUser = UserFactory.user(1L, "testUser");
                 String loginUsername = loginUser.getName();
-                AuthUserRequestDto authUserRequestDto =
+                AuthUserForUserRequestDto authUserRequestDto =
                     createLoginAuthUserRequestDto(loginUsername);
                 User targetUser = UserFactory.user(2L, "testUser2");
                 String targetUsername = targetUser.getName();
@@ -792,7 +793,7 @@ class UserServiceTest {
                 //given
                 User loginUser = UserFactory.user(1L, "testUser");
                 String loginUsername = loginUser.getName();
-                AuthUserRequestDto authUserRequestDto =
+                AuthUserForUserRequestDto authUserRequestDto =
                     createLoginAuthUserRequestDto(loginUsername);
                 User targetUser = UserFactory.user(2L, "testUser2");
                 String targetUsername = targetUser.getName();
@@ -838,7 +839,7 @@ class UserServiceTest {
         @Test
         void editProfileImage_WithImage_Success() throws IOException {
             // given
-            AuthUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
+            AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
             File imageFile = FileFactory.getTestImage1File();
             byte[] imageSource = new FileInputStream(imageFile).readAllBytes();
 
@@ -874,7 +875,7 @@ class UserServiceTest {
         @Test
         void editProfileDescription_WithDescription_SuccesS() {
             // given
-            AuthUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
+            AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
             String description = "updated description";
 
             // mock
@@ -899,7 +900,7 @@ class UserServiceTest {
         // given
         MultipartFile image = FileFactory.getTestImage1();
         String updatedDescription = "updated description";
-        AuthUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
+        AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
 
         // mock
         given(userRepository.findByBasicProfile_Name("testUser"))
@@ -931,7 +932,7 @@ class UserServiceTest {
         // given
         User user = UserFactory.user(1L, "testUser");
         String updatedDescription = "updated descrption";
-        AuthUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
+        AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
 
         // mock
         given(userRepository.findByBasicProfile_Name("testUser"))
@@ -969,7 +970,7 @@ class UserServiceTest {
             .page(0L)
             .limit(5L)
             .build();
-        AuthUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto(loginUser.getName());
+        AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto(loginUser.getName());
 
         // mock
         given(userRepository.searchByUsernameLike(searchKeyword, PageRequest.of(page, limit)))
@@ -1009,7 +1010,7 @@ class UserServiceTest {
             .page(0L)
             .limit(5L)
             .build();
-        AuthUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
+        AuthUserForUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
 
         // mock
         given(userRepository.searchByUsernameLike(searchKeyword, PageRequest.of(page, limit)))
@@ -1104,7 +1105,7 @@ class UserServiceTest {
             @Test
             void searchFollowings_Guest_FollowingNull() {
                 // given
-                AuthUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
+                AuthUserForUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
                 FollowSearchRequestDto followSearchRequestDto =
                     FollowSearchRequestDto.builder()
                         .username("target")
@@ -1143,7 +1144,7 @@ class UserServiceTest {
             @Test
             void searchFollowings_TargetNotExists_ExceptionThrown() {
                 // given
-                AuthUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
+                AuthUserForUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
                 FollowSearchRequestDto followSearchRequestDto =
                     FollowSearchRequestDto.builder()
                         .username("target")
@@ -1172,7 +1173,7 @@ class UserServiceTest {
             @Test
             void searchFollowings_LoginUser_FollowingVarious() {
                 // given
-                AuthUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("source");
+                AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("source");
                 FollowSearchRequestDto followSearchRequestDto =
                     FollowSearchRequestDto.builder()
                         .username("target")
@@ -1218,7 +1219,7 @@ class UserServiceTest {
             @Test
             void searchFollowings_TargetNotExists_ExceptionThrown() {
                 // given
-                AuthUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("source");
+                AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("source");
                 FollowSearchRequestDto followSearchRequestDto =
                     FollowSearchRequestDto.builder()
                         .username("target")
@@ -1252,7 +1253,7 @@ class UserServiceTest {
             @Test
             void searchFollowers_Guest_FollowingNull() {
                 // given
-                AuthUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
+                AuthUserForUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
                 FollowSearchRequestDto followSearchRequestDto =
                     FollowSearchRequestDto.builder()
                         .username("target")
@@ -1291,7 +1292,7 @@ class UserServiceTest {
             @Test
             void searchFollowers_TargetNotExists_ExceptionThrown() {
                 // given
-                AuthUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
+                AuthUserForUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
                 FollowSearchRequestDto followSearchRequestDto =
                     FollowSearchRequestDto.builder()
                         .username("target")
@@ -1320,7 +1321,7 @@ class UserServiceTest {
             @Test
             void searchFollowers_LoginUser_FollowingVarious() {
                 // given
-                AuthUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("source");
+                AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("source");
                 FollowSearchRequestDto followSearchRequestDto =
                     FollowSearchRequestDto.builder()
                         .username("target")
@@ -1366,7 +1367,7 @@ class UserServiceTest {
             @Test
             void searchFollowers_TargetNotExists_ExceptionThrown() {
                 // given
-                AuthUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("source");
+                AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("source");
                 FollowSearchRequestDto followSearchRequestDto =
                     FollowSearchRequestDto.builder()
                         .username("target")
@@ -1388,12 +1389,12 @@ class UserServiceTest {
         }
     }
 
-    private AuthUserRequestDto createLoginAuthUserRequestDto(String username) {
+    private AuthUserForUserRequestDto createLoginAuthUserRequestDto(String username) {
         AppUser appUser = new LoginUser(username, "Bearer testToken");
-        return AuthUserRequestDto.from(appUser);
+        return AuthUserForUserRequestDto.from(appUser);
     }
 
-    private AuthUserRequestDto createGuestAuthUserRequestDto() {
-        return AuthUserRequestDto.from(new GuestUser());
+    private AuthUserForUserRequestDto createGuestAuthUserRequestDto() {
+        return AuthUserForUserRequestDto.from(new GuestUser());
     }
 }

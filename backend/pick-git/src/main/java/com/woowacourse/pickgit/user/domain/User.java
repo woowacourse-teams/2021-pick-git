@@ -79,8 +79,7 @@ public class User {
         this.basicProfile.setImage(imageUrl);
     }
 
-    public void
-    follow(User target) {
+    public void follow(User target) {
         Follow follow = new Follow(this, target);
         this.followings.add(follow);
         target.followers.add(follow);
