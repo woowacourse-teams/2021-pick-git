@@ -27,6 +27,7 @@ public class UserFactory {
         return createUser(id, name, imageUrl);
     }
 
+
     public static User user() {
         return createUser(null, "testUser");
     }
