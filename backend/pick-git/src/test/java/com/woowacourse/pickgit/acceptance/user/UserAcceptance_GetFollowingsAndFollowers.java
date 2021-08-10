@@ -9,6 +9,7 @@ import com.woowacourse.pickgit.common.request_builder.PickGitRequest;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.FollowRequestDto;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import com.woowacourse.pickgit.user.presentation.dto.response.UserSearchResponse;
@@ -66,12 +67,22 @@ class UserAcceptance_GetFollowingsAndFollowers {
         AuthUserRequestDto targetAuthDto =
             AuthUserRequestDto.from(new LoginUser(target.getName(), "token"));
         for (User user : usersInDb) {
-            userService.followUser(targetAuthDto, user.getName());
+            FollowRequestDto requestDto = FollowRequestDto.builder()
+                .authUserRequestDto(targetAuthDto)
+                .targetName(user.getName())
+                .githubFollowing(false)
+                .build();
+            userService.followUser(requestDto);
         }
         AuthUserRequestDto testerAuthDto =
             AuthUserRequestDto.from(new LoginUser("testUser", "token"));
         for (int i = 0; i < 3; i++) {
-            userService.followUser(testerAuthDto, usersInDb.get(i).getName());
+            FollowRequestDto requestDto = FollowRequestDto.builder()
+                .authUserRequestDto(testerAuthDto)
+                .targetName(usersInDb.get(i).getName())
+                .githubFollowing(false)
+                .build();
+            userService.followUser(requestDto);
         }
 
         // when
@@ -107,7 +118,12 @@ class UserAcceptance_GetFollowingsAndFollowers {
         AuthUserRequestDto targetAuthDto =
             AuthUserRequestDto.from(new LoginUser(target.getName(), "token"));
         for (User user : usersInDb) {
-            userService.followUser(targetAuthDto, user.getName());
+            FollowRequestDto requestDto = FollowRequestDto.builder()
+                .authUserRequestDto(targetAuthDto)
+                .targetName(user.getName())
+                .githubFollowing(false)
+                .build();
+            userService.followUser(requestDto);
         }
 
         // when
@@ -144,12 +160,22 @@ class UserAcceptance_GetFollowingsAndFollowers {
         for (User user : usersInDb) {
             AuthUserRequestDto mockUserAuthDto =
                 AuthUserRequestDto.from(new LoginUser(user.getName(), "token"));
-            userService.followUser(mockUserAuthDto, target.getName());
+            FollowRequestDto requestDto = FollowRequestDto.builder()
+                .authUserRequestDto(mockUserAuthDto)
+                .targetName(target.getName())
+                .githubFollowing(false)
+                .build();
+            userService.followUser(requestDto);
         }
         AuthUserRequestDto testerAuthDto =
             AuthUserRequestDto.from(new LoginUser("testUser", "token"));
         for (int i = 0; i < 3; i++) {
-            userService.followUser(testerAuthDto, usersInDb.get(i).getName());
+            FollowRequestDto requestDto = FollowRequestDto.builder()
+                .authUserRequestDto(testerAuthDto)
+                .targetName(usersInDb.get(i).getName())
+                .githubFollowing(false)
+                .build();
+            userService.followUser(requestDto);
         }
 
         // when
@@ -185,7 +211,12 @@ class UserAcceptance_GetFollowingsAndFollowers {
         for (User user : usersInDb) {
             AuthUserRequestDto mockUserAuthDto =
                 AuthUserRequestDto.from(new LoginUser(user.getName(), "token"));
-            userService.followUser(mockUserAuthDto, target.getName());
+            FollowRequestDto requestDto = FollowRequestDto.builder()
+                .authUserRequestDto(mockUserAuthDto)
+                .targetName(target.getName())
+                .githubFollowing(false)
+                .build();
+            userService.followUser(requestDto);
         }
 
         // when

@@ -6,6 +6,7 @@ import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.FollowRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileImageEditRequestDto;
@@ -95,11 +96,16 @@ public class UserController {
     @PostMapping("/{username}/followings")
     public ResponseEntity<FollowResponse> followUser(
         @Authenticated AppUser appUser,
-        @PathVariable String username
+        @PathVariable String username,
+        @RequestParam Boolean githubFollowing
     ) {
-        AuthUserRequestDto authUserRequestDto = AuthUserRequestDto.from(appUser);
+        FollowRequestDto followRequestDto = FollowRequestDto.builder()
+            .authUserRequestDto(AuthUserRequestDto.from(appUser))
+            .targetName(username)
+            .githubFollowing(githubFollowing)
+            .build();
         FollowResponseDto followResponseDto =
-            userService.followUser(authUserRequestDto, username);
+            userService.followUser(followRequestDto);
 
         return ResponseEntity.ok(createFollowResponse(followResponseDto));
     }
@@ -107,11 +113,16 @@ public class UserController {
     @DeleteMapping("/{username}/followings")
     public ResponseEntity<FollowResponse> unfollowUser(
         @Authenticated AppUser appUser,
-        @PathVariable String username
+        @PathVariable String username,
+        @RequestParam Boolean githubUnfollowing
     ) {
-        AuthUserRequestDto authUserRequestDto = AuthUserRequestDto.from(appUser);
+        FollowRequestDto unfollowRequestDto = FollowRequestDto.builder()
+            .authUserRequestDto(AuthUserRequestDto.from(appUser))
+            .targetName(username)
+            .githubFollowing(githubUnfollowing)
+            .build();
         FollowResponseDto followResponseDto =
-            userService.unfollowUser(authUserRequestDto, username);
+            userService.unfollowUser(unfollowRequestDto);
 
         return ResponseEntity.ok(createFollowResponse(followResponseDto));
     }

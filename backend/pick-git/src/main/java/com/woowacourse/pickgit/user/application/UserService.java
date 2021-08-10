@@ -6,6 +6,7 @@ import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.FollowRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileImageEditRequestDto;
@@ -20,6 +21,7 @@ import com.woowacourse.pickgit.user.domain.Contribution;
 import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.domain.follow.PlatformFollowingRequester;
 import com.woowacourse.pickgit.user.domain.profile.PickGitProfileStorage;
 import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
 import java.io.File;
@@ -41,15 +43,18 @@ public class UserService {
     private final UserRepository userRepository;
     private final PickGitProfileStorage pickGitProfileStorage;
     private final PlatformContributionCalculator platformContributionCalculator;
+    private final PlatformFollowingRequester platformFollowingRequester;
 
     public UserService(
         UserRepository userRepository,
-        PickGitProfileStorage pickGitProfileStorage,
-        PlatformContributionCalculator platformContributionCalculator
+        PickGitStorage pickGitStorage,
+        PlatformContributionCalculator platformContributionCalculator,
+        PlatformFollowingRequester platformFollowingRequester
     ) {
         this.userRepository = userRepository;
         this.pickGitProfileStorage = pickGitProfileStorage;
         this.platformContributionCalculator = platformContributionCalculator;
+        this.platformFollowingRequester = platformFollowingRequester;
     }
 
     @Transactional(readOnly = true)
@@ -171,16 +176,39 @@ public class UserService {
         validateIsGuest(requestDto);
         User source = findUserByName(requestDto.getUsername());
         User target = findUserByName(targetName);
+
         source.follow(target);
+        followInPlatform(requestDto);
         return generateFollowResponse(target, true);
     }
 
-    public FollowResponseDto unfollowUser(AuthUserRequestDto requestDto, String targetName) {
-        validateIsGuest(requestDto);
-        User source = findUserByName(requestDto.getUsername());
-        User target = findUserByName(targetName);
+    private void followInPlatform(FollowRequestDto requestDto) {
+        if (requestDto.isGithubFollowing()) {
+            platformFollowingRequester.follow(
+                requestDto.getTargetName(),
+                requestDto.getAccessToken()
+            );
+        }
+    }
+
+    public FollowResponseDto unfollowUser(FollowRequestDto requestDto) {
+        AuthUserRequestDto authUserRequestDto = requestDto.getAuthUserRequestDto();
+        validateIsGuest(authUserRequestDto);
+        User source = findUserByName(authUserRequestDto.getUsername());
+        User target = findUserByName(requestDto.getTargetName());
+
         source.unfollow(target);
+        unfollowInPlatform(requestDto);
         return generateFollowResponse(target, false);
+    }
+
+    private void unfollowInPlatform(FollowRequestDto requestDto) {
+        if (requestDto.isGithubFollowing()) {
+            platformFollowingRequester.unfollow(
+                requestDto.getTargetName(),
+                requestDto.getAccessToken()
+            );
+        }
     }
 
     private void validateIsGuest(AuthUserRequestDto requestDto) {

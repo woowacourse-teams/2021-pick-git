@@ -9,13 +9,19 @@ import lombok.Getter;
 public class AuthUserRequestDto {
 
     private String username;
+    private String accessToken;
     private boolean isGuest;
 
     private AuthUserRequestDto() {
     }
 
     private AuthUserRequestDto(String username, boolean isGuest) {
+        this(username, null, isGuest);
+    }
+
+    public AuthUserRequestDto(String username, String accessToken, boolean isGuest) {
         this.username = username;
+        this.accessToken = accessToken;
         this.isGuest = isGuest;
     }
 
@@ -23,6 +29,6 @@ public class AuthUserRequestDto {
         if (appUser.isGuest()) {
             return new AuthUserRequestDto(null, true);
         }
-        return new AuthUserRequestDto(appUser.getUsername(), false);
+        return new AuthUserRequestDto(appUser.getUsername(), appUser.getAccessToken(), false);
     }
 }

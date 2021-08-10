@@ -25,6 +25,9 @@ public class GithubOAuthClient implements OAuthClient {
     @Value("${security.github.client.secret}")
     private String clientSecret;
 
+    @Value("${security.github.client.scope}")
+    private String scope;
+
     @Value("${security.github.url.redirect}")
     private String redirectUrl;
 
@@ -33,9 +36,11 @@ public class GithubOAuthClient implements OAuthClient {
 
     @Override
     public String getLoginUrl() {
-        return "https://github.com/login/oauth/authorize?"
-            + "client_id=" + clientId
-            + "&redirect_url=" + redirectUrl;
+        return String.format("https://github.com/login/oauth/authorize"
+                + "?client_id=%s"
+                + "&redirect_uri=%s"
+                + "&scope=%s",
+            clientId, redirectUrl, scope);
     }
 
     @Override

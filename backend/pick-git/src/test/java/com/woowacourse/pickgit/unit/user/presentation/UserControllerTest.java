@@ -41,6 +41,7 @@ import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.FollowRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileImageEditRequestDto;
@@ -52,9 +53,12 @@ import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponse
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import com.woowacourse.pickgit.user.presentation.UserController;
 import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
+<<<<<<< HEAD
 import com.woowacourse.pickgit.user.presentation.dto.request.ProfileDescriptionRequest;
 import java.io.File;
 import java.io.FileInputStream;
+=======
+>>>>>>> b90308f8... feat: 팔로우/언팔로우시 깃헙 자동 연동 기능 구현
 import java.util.List;
 import java.util.Optional;
 import org.apache.http.HttpHeaders;
@@ -223,12 +227,12 @@ class UserControllerTest {
                 .willReturn(true);
             given(oAuthService.findRequestUserByToken("testToken"))
                 .willReturn(new LoginUser("loginUser", "Bearer testToken"));
-            given(userService.followUser(any(AuthUserRequestDto.class), eq("testUser")))
+            given(userService.followUser(any(FollowRequestDto.class)))
                 .willReturn(responseDto);
 
             // when
             ResultActions perform = mockMvc
-                .perform(post("/api/profiles/{userName}/followings", "testUser")
+                .perform(post("/api/profiles/{userName}/followings?githubFollowing={githubFollowing}", "testUser", false)
                     .header(HttpHeaders.AUTHORIZATION, "Bearer testToken")
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .accept(MediaType.ALL));
@@ -247,7 +251,7 @@ class UserControllerTest {
             verify(oAuthService, times(1))
                 .findRequestUserByToken("testToken");
             verify(userService, times(1))
-                .followUser(any(AuthUserRequestDto.class), eq("testUser"));
+                .followUser(any(FollowRequestDto.class));
 
             perform.andDo(document("following-LoggedIn",
                 getDocumentRequest(),
@@ -275,13 +279,13 @@ class UserControllerTest {
                 .willReturn(true);
             given(oAuthService.findRequestUserByToken("testToken"))
                 .willReturn(new LoginUser("loginUser", "Bearer testToken"));
-            given(userService.unfollowUser(any(AuthUserRequestDto.class), eq("testUser")))
+            given(userService.unfollowUser(any(FollowRequestDto.class)))
                 .willReturn(followResponseDto);
 
             // when
             ResultActions perform = mockMvc
                 .perform(RestDocumentationRequestBuilders
-                    .delete("/api/profiles/{userName}/followings", "testUser")
+                    .delete("/api/profiles/{userName}/followings?githubUnfollowing={githubUnfollowing}", "testUser", false)
                     .header(HttpHeaders.AUTHORIZATION, "Bearer testToken")
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .accept(MediaType.ALL));
@@ -300,7 +304,7 @@ class UserControllerTest {
             verify(oAuthService, times(1))
                 .findRequestUserByToken("testToken");
             verify(userService, times(1))
-                .unfollowUser(any(AuthUserRequestDto.class), eq("testUser"));
+                .unfollowUser(any(FollowRequestDto.class));
 
             perform.andDo(document("unfollowing-LoggedIn",
                 getDocumentRequest(),

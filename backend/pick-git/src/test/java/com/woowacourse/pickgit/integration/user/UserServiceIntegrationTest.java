@@ -18,6 +18,7 @@ import com.woowacourse.pickgit.exception.user.InvalidUserException;
 import com.woowacourse.pickgit.exception.user.SameSourceTargetUserException;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.FollowRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileImageEditRequestDto;
@@ -128,7 +129,13 @@ class UserServiceIntegrationTest {
         AuthUserRequestDto authUserRequestDto =
             createLoginAuthUserRequestDto(loginUser.getName());
 
-        userService.followUser(authUserRequestDto, target.getName());
+        FollowRequestDto requestDto = FollowRequestDto.builder()
+            .authUserRequestDto(authUserRequestDto)
+            .targetName(target.getName())
+            .githubFollowing(false)
+            .build();
+
+        userService.followUser(requestDto);
 
         UserProfileResponseDto responseDto =
             UserFactory.mockLoginUserProfileIsFollowingResponseDto();
@@ -186,10 +193,16 @@ class UserServiceIntegrationTest {
     @Test
     void follow_Guest_Failure() {
         // given
-        AuthUserRequestDto requestDto = createGuestAuthUserRequestDto();
+        AuthUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
+
+        FollowRequestDto requestDto = FollowRequestDto.builder()
+            .authUserRequestDto(authUserRequestDto)
+            .targetName("testUser")
+            .githubFollowing(false)
+            .build();
 
         // when, then
-        assertThatCode(() -> userService.followUser(requestDto, "testUser"))
+        assertThatCode(() -> userService.followUser(requestDto))
             .isInstanceOf(UnauthorizedException.class);
     }
 
@@ -201,8 +214,14 @@ class UserServiceIntegrationTest {
         AuthUserRequestDto authUserRequestDto =
             createLoginAuthUserRequestDto(loginUser.getName());
 
+        FollowRequestDto requestDto = FollowRequestDto.builder()
+            .authUserRequestDto(authUserRequestDto)
+            .targetName("kevin")
+            .githubFollowing(false)
+            .build();
+
         // when, then
-        assertThatCode(() -> userService.followUser(authUserRequestDto, "kevin"))
+        assertThatCode(() -> userService.followUser(requestDto))
             .isInstanceOf(InvalidUserException.class)
             .hasFieldOrPropertyWithValue("errorCode", "U0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
@@ -217,9 +236,15 @@ class UserServiceIntegrationTest {
         AuthUserRequestDto authUserRequestDto =
             createLoginAuthUserRequestDto(loginUser.getName());
 
+        FollowRequestDto requestDto = FollowRequestDto.builder()
+            .authUserRequestDto(authUserRequestDto)
+            .targetName(loginUser.getName())
+            .githubFollowing(false)
+            .build();
+
         // when, then
         assertThatCode(
-            () -> userService.followUser(authUserRequestDto, loginUser.getName()))
+            () -> userService.followUser(requestDto))
             .isInstanceOf(SameSourceTargetUserException.class)
             .hasFieldOrPropertyWithValue("errorCode", "U0004")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
@@ -235,9 +260,15 @@ class UserServiceIntegrationTest {
         AuthUserRequestDto authUserRequestDto =
             createLoginAuthUserRequestDto(loginUser.getName());
 
+        FollowRequestDto requestDto = FollowRequestDto.builder()
+            .authUserRequestDto(authUserRequestDto)
+            .targetName(target.getName())
+            .githubFollowing(false)
+            .build();
+
         // when
         FollowResponseDto responseDto = userService
-            .followUser(authUserRequestDto, target.getName());
+            .followUser(requestDto);
 
         // then
         assertThat(responseDto.getFollowerCount()).isOne();
@@ -253,11 +284,17 @@ class UserServiceIntegrationTest {
         AuthUserRequestDto authUserRequestDto =
             createLoginAuthUserRequestDto(loginUser.getName());
 
-        userService.followUser(authUserRequestDto, target.getName());
+        FollowRequestDto requestDto = FollowRequestDto.builder()
+            .authUserRequestDto(authUserRequestDto)
+            .targetName(target.getName())
+            .githubFollowing(false)
+            .build();
+
+        userService.followUser(requestDto);
 
         // when
         assertThatThrownBy(() ->
-            userService.followUser(authUserRequestDto, target.getName()))
+            userService.followUser(requestDto))
             .isInstanceOf(DuplicateFollowException.class)
             .hasFieldOrPropertyWithValue("errorCode", "U0002")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
@@ -268,10 +305,16 @@ class UserServiceIntegrationTest {
     @Test
     void unfollow_Guest_Failure() {
         // given
-        AuthUserRequestDto requestDto = createGuestAuthUserRequestDto();
+        AuthUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
+
+        FollowRequestDto requestDto = FollowRequestDto.builder()
+            .authUserRequestDto(authUserRequestDto)
+            .targetName("testUser")
+            .githubFollowing(false)
+            .build();
 
         // when, then
-        assertThatCode(() -> userService.unfollowUser(requestDto, "testUser"))
+        assertThatCode(() -> userService.unfollowUser(requestDto))
             .isInstanceOf(UnauthorizedException.class);
     }
 
@@ -283,8 +326,14 @@ class UserServiceIntegrationTest {
         AuthUserRequestDto authUserRequestDto =
             createLoginAuthUserRequestDto(loginUser.getName());
 
+        FollowRequestDto requestDto = FollowRequestDto.builder()
+            .authUserRequestDto(authUserRequestDto)
+            .targetName("kevin")
+            .githubFollowing(false)
+            .build();
+
         // when, then
-        assertThatCode(() -> userService.followUser(authUserRequestDto, "kevin"))
+        assertThatCode(() -> userService.followUser(requestDto))
             .isInstanceOf(InvalidUserException.class)
             .hasFieldOrPropertyWithValue("errorCode", "U0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
@@ -299,9 +348,15 @@ class UserServiceIntegrationTest {
         AuthUserRequestDto authUserRequestDto =
             createLoginAuthUserRequestDto(loginUser.getName());
 
+        FollowRequestDto requestDto = FollowRequestDto.builder()
+            .authUserRequestDto(authUserRequestDto)
+            .targetName(loginUser.getName())
+            .githubFollowing(false)
+            .build();
+
         // when, then
         assertThatCode(
-            () -> userService.unfollowUser(authUserRequestDto, loginUser.getName()))
+            () -> userService.unfollowUser(requestDto))
             .isInstanceOf(SameSourceTargetUserException.class)
             .hasFieldOrPropertyWithValue("errorCode", "U0004")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
@@ -317,9 +372,15 @@ class UserServiceIntegrationTest {
         AuthUserRequestDto authUserRequestDto =
             createLoginAuthUserRequestDto(loginUser.getName());
 
+        FollowRequestDto requestDto = FollowRequestDto.builder()
+            .authUserRequestDto(authUserRequestDto)
+            .targetName(target.getName())
+            .githubFollowing(false)
+            .build();
+
         // when, then
         assertThatThrownBy(
-            () -> userService.unfollowUser(authUserRequestDto, target.getName()))
+            () -> userService.unfollowUser(requestDto))
             .isInstanceOf(InvalidFollowException.class)
             .hasFieldOrPropertyWithValue("errorCode", "U0003")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
@@ -335,11 +396,17 @@ class UserServiceIntegrationTest {
         AuthUserRequestDto authUserRequestDto =
             createLoginAuthUserRequestDto(loginUser.getName());
 
-        userService.followUser(authUserRequestDto, target.getName());
+        FollowRequestDto requestDto = FollowRequestDto.builder()
+            .authUserRequestDto(authUserRequestDto)
+            .targetName(target.getName())
+            .githubFollowing(false)
+            .build();
+
+        userService.followUser(requestDto);
 
         // when
         FollowResponseDto responseDto = userService
-            .unfollowUser(authUserRequestDto, target.getName());
+            .unfollowUser(requestDto);
 
         // then
         assertThat(responseDto.getFollowerCount()).isZero();
@@ -488,8 +555,14 @@ class UserServiceIntegrationTest {
         userRepository.save(loginUser);
         searchedUsers.forEach(user -> userRepository.save(user));
 
+        FollowRequestDto requestDto = FollowRequestDto.builder()
+            .authUserRequestDto(authUserRequestDto)
+            .targetName(searchedUsers.get(0).getName())
+            .githubFollowing(false)
+            .build();
+
         // when
-        userService.followUser(authUserRequestDto, searchedUsers.get(0).getName());
+        userService.followUser(requestDto);
 
         List<UserSearchResponseDto> searchResult =
             userService.searchUser(authUserRequestDto, userSearchRequestDto);
@@ -554,10 +627,20 @@ class UserServiceIntegrationTest {
 
         usersInDb.forEach(mockUser -> {
             AuthUserRequestDto targetAuthDto = createLoginAuthUserRequestDto("target");
-            userService.followUser(targetAuthDto, mockUser.getName());
+            FollowRequestDto requestDto = FollowRequestDto.builder()
+                .authUserRequestDto(targetAuthDto)
+                .targetName(mockUser.getName())
+                .githubFollowing(false)
+                .build();
+            userService.followUser(requestDto);
         });
         for (int i = 0; i < 3; i++) {
-            userService.followUser(authUserRequestDto, usersInDb.get(i).getName());
+            FollowRequestDto requestDto = FollowRequestDto.builder()
+                .authUserRequestDto(authUserRequestDto)
+                .targetName(usersInDb.get(i).getName())
+                .githubFollowing(false)
+                .build();
+            userService.followUser(requestDto);
         }
 
         // when
@@ -595,7 +678,12 @@ class UserServiceIntegrationTest {
 
         usersInDb.forEach(mockUser -> {
             AuthUserRequestDto targetAuthDto = createLoginAuthUserRequestDto("target");
-            userService.followUser(targetAuthDto, mockUser.getName());
+            FollowRequestDto requestDto = FollowRequestDto.builder()
+                .authUserRequestDto(targetAuthDto)
+                .targetName(mockUser.getName())
+                .githubFollowing(false)
+                .build();
+            userService.followUser(requestDto);
         });
 
         // when
@@ -633,10 +721,20 @@ class UserServiceIntegrationTest {
 
         usersInDb.forEach(mockUser -> {
             AuthUserRequestDto mockUserAuthDto = createLoginAuthUserRequestDto(mockUser.getName());
-            userService.followUser(mockUserAuthDto, "target");
+            FollowRequestDto requestDto = FollowRequestDto.builder()
+                .authUserRequestDto(mockUserAuthDto)
+                .targetName("target")
+                .githubFollowing(false)
+                .build();
+            userService.followUser(requestDto);
         });
         for (int i = 0; i < 3; i++) {
-            userService.followUser(authUserRequestDto, usersInDb.get(i).getName());
+            FollowRequestDto requestDto = FollowRequestDto.builder()
+                .authUserRequestDto(authUserRequestDto)
+                .targetName(usersInDb.get(i).getName())
+                .githubFollowing(false)
+                .build();
+            userService.followUser(requestDto);
         }
 
         // when
@@ -674,7 +772,12 @@ class UserServiceIntegrationTest {
 
         usersInDb.forEach(mockUser -> {
             AuthUserRequestDto mockUserAuthDto = createLoginAuthUserRequestDto(mockUser.getName());
-            userService.followUser(mockUserAuthDto, "target");
+            FollowRequestDto requestDto = FollowRequestDto.builder()
+                .authUserRequestDto(mockUserAuthDto)
+                .targetName("target")
+                .githubFollowing(false)
+                .build();
+            userService.followUser(requestDto);
         });
 
         // when

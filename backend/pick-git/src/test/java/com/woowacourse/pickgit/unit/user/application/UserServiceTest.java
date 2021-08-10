@@ -23,6 +23,7 @@ import com.woowacourse.pickgit.exception.user.InvalidUserException;
 import com.woowacourse.pickgit.exception.user.SameSourceTargetUserException;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.FollowRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileImageEditRequestDto;
@@ -183,7 +184,7 @@ class UserServiceTest {
         @Nested
         class Context_LoginUser {
 
-            @DisplayName("팔로잉 중인 유저의 프로필을 조회할 수 있다.")
+            @DisplayName("팔로잉 중인 유저의 프로필을 조회할 수 있다. (Github 팔로잉 true)")
             @Test
             void getUserProfile_FindByNameInCaseOfLoginUserIsFollowing_Success() {
                 //given
@@ -199,10 +200,16 @@ class UserServiceTest {
                 given(userRepository.findByBasicProfile_Name(loginUsername))
                     .willReturn(Optional.of(loginUser));
 
+                FollowRequestDto requestDto = FollowRequestDto.builder()
+                    .authUserRequestDto(authUserRequestDto)
+                    .targetName(targetUsername)
+                    .githubFollowing(false)
+                    .build();
+
                 UserProfileResponseDto responseDto =
                     UserFactory.mockLoginUserProfileIsFollowingResponseDto();
 
-                userService.followUser(authUserRequestDto, targetUsername);
+                userService.followUser(requestDto);
 
                 //when
                 UserProfileResponseDto userProfile = userService
@@ -294,10 +301,15 @@ class UserServiceTest {
             @Test
             void follow_Guest_Failure() {
                 // given
-                AuthUserRequestDto requestDto = createGuestAuthUserRequestDto();
+                AuthUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
+
+                FollowRequestDto requestDto = FollowRequestDto.builder()
+                    .authUserRequestDto(authUserRequestDto)
+                    .targetName("testUSer")
+                    .build();
 
                 // when, then
-                assertThatCode(() -> userService.followUser(requestDto, "testUser"))
+                assertThatCode(() -> userService.followUser(requestDto))
                     .isInstanceOf(UnauthorizedException.class);
             }
         }
@@ -321,8 +333,14 @@ class UserServiceTest {
                 given(userRepository.findByBasicProfile_Name(invalidTargetName))
                     .willReturn(Optional.empty());
 
+                FollowRequestDto requestDto = FollowRequestDto.builder()
+                    .authUserRequestDto(authUserRequestDto)
+                    .targetName(invalidTargetName)
+                    .githubFollowing(false)
+                    .build();
+
                 // when, then
-                assertThatCode(() -> userService.followUser(authUserRequestDto, invalidTargetName))
+                assertThatCode(() -> userService.followUser(requestDto))
                     .isInstanceOf(InvalidUserException.class)
                     .hasFieldOrPropertyWithValue("errorCode", "U0001")
                     .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
@@ -351,8 +369,14 @@ class UserServiceTest {
                 given(userRepository.findByBasicProfile_Name(loginUsername))
                     .willReturn(Optional.of(loginUser));
 
+                FollowRequestDto requestDto = FollowRequestDto.builder()
+                    .authUserRequestDto(authUserRequestDto)
+                    .targetName(loginUsername)
+                    .githubFollowing(false)
+                    .build();
+
                 // when, then
-                assertThatCode(() -> userService.followUser(authUserRequestDto, loginUsername))
+                assertThatCode(() -> userService.followUser(requestDto))
                     .isInstanceOf(SameSourceTargetUserException.class)
                     .hasFieldOrPropertyWithValue("errorCode", "U0004")
                     .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
@@ -383,9 +407,15 @@ class UserServiceTest {
                 given(userRepository.findByBasicProfile_Name(targetUsername))
                     .willReturn(Optional.of(targetUser));
 
+                FollowRequestDto requestDto = FollowRequestDto.builder()
+                    .authUserRequestDto(authUserRequestDto)
+                    .targetName(targetUsername)
+                    .githubFollowing(false)
+                    .build();
+
                 //when
                 FollowResponseDto responseDto =
-                    userService.followUser(authUserRequestDto, targetUsername);
+                    userService.followUser(requestDto);
 
                 //then
                 assertThat(responseDto.getFollowerCount()).isEqualTo(1);
@@ -418,11 +448,17 @@ class UserServiceTest {
                 given(userRepository.findByBasicProfile_Name(targetUsername))
                     .willReturn(Optional.of(targetUser));
 
-                userService.followUser(authUserRequestDto, targetUsername);
+                FollowRequestDto requestDto = FollowRequestDto.builder()
+                    .authUserRequestDto(authUserRequestDto)
+                    .targetName(targetUsername)
+                    .githubFollowing(false)
+                    .build();
+
+                userService.followUser(requestDto);
 
                 //when, then
                 assertThatThrownBy(
-                    () -> userService.followUser(authUserRequestDto, targetUsername)
+                    () -> userService.followUser(requestDto)
                 ).isInstanceOf(DuplicateFollowException.class)
                     .hasFieldOrPropertyWithValue("errorCode", "U0002")
                     .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
@@ -448,10 +484,16 @@ class UserServiceTest {
             @Test
             void unfollow_Guest_Failure() {
                 // given
-                AuthUserRequestDto requestDto = createGuestAuthUserRequestDto();
+                AuthUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
+
+                FollowRequestDto requestDto = FollowRequestDto.builder()
+                    .authUserRequestDto(authUserRequestDto)
+                    .targetName("testUser")
+                    .githubFollowing(false)
+                    .build();
 
                 // when, then
-                assertThatCode(() -> userService.unfollowUser(requestDto, "testUser"))
+                assertThatCode(() -> userService.unfollowUser(requestDto))
                     .isInstanceOf(UnauthorizedException.class);
             }
         }
@@ -475,9 +517,15 @@ class UserServiceTest {
                 given(userRepository.findByBasicProfile_Name(invalidTargetName))
                     .willReturn(Optional.empty());
 
+                FollowRequestDto requestDto = FollowRequestDto.builder()
+                    .authUserRequestDto(authUserRequestDto)
+                    .targetName(invalidTargetName)
+                    .githubFollowing(false)
+                    .build();
+
                 // when, then
                 assertThatCode(
-                    () -> userService.unfollowUser(authUserRequestDto, invalidTargetName))
+                    () -> userService.unfollowUser(requestDto))
                     .isInstanceOf(InvalidUserException.class)
                     .hasFieldOrPropertyWithValue("errorCode", "U0001")
                     .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
@@ -506,8 +554,14 @@ class UserServiceTest {
                 given(userRepository.findByBasicProfile_Name(loginUsername))
                     .willReturn(Optional.of(loginUser));
 
+                FollowRequestDto requestDto = FollowRequestDto.builder()
+                    .authUserRequestDto(authUserRequestDto)
+                    .targetName(loginUsername)
+                    .githubFollowing(false)
+                    .build();
+
                 // when, then
-                assertThatCode(() -> userService.unfollowUser(authUserRequestDto, loginUsername))
+                assertThatCode(() -> userService.unfollowUser(requestDto))
                     .isInstanceOf(SameSourceTargetUserException.class)
                     .hasFieldOrPropertyWithValue("errorCode", "U0004")
                     .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
@@ -538,9 +592,15 @@ class UserServiceTest {
                 given(userRepository.findByBasicProfile_Name(targetUsername))
                     .willReturn(Optional.of(targetUser));
 
+                FollowRequestDto requestDto = FollowRequestDto.builder()
+                    .authUserRequestDto(authUserRequestDto)
+                    .targetName(targetUsername)
+                    .githubFollowing(false)
+                    .build();
+
                 //when
                 assertThatThrownBy(
-                    () -> userService.unfollowUser(authUserRequestDto, targetUsername)
+                    () -> userService.unfollowUser(requestDto)
                 ).isInstanceOf(InvalidFollowException.class)
                     .hasFieldOrPropertyWithValue("errorCode", "U0003")
                     .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
@@ -574,11 +634,17 @@ class UserServiceTest {
                 given(userRepository.findByBasicProfile_Name(targetUsername))
                     .willReturn(Optional.of(targetUser));
 
-                userService.followUser(authUserRequestDto, targetUsername);
+                FollowRequestDto requestDto = FollowRequestDto.builder()
+                    .authUserRequestDto(authUserRequestDto)
+                    .targetName(targetUsername)
+                    .githubFollowing(false)
+                    .build();
+
+                userService.followUser(requestDto);
 
                 //when
                 FollowResponseDto responseDto =
-                    userService.unfollowUser(authUserRequestDto, targetUsername);
+                    userService.unfollowUser(requestDto);
 
                 //then
                 assertThat(responseDto.getFollowerCount()).isZero();
