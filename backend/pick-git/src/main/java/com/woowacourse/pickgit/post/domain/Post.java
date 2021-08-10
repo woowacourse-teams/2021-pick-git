@@ -63,7 +63,7 @@ public class Post {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    private Post() {
+    protected Post() {
     }
 
     public Post(
