@@ -74,6 +74,24 @@ include::{snippets}/post-unlikePost-unlikedPost/http-request.adoc[]
 ==== Response
 include::{snippets}/post-unlikePost-unlikedPost/http-response.adoc[]
 
+=== 게시물 좋아요 리스트 조회 - 로그인
+==== Request
+include::{snippets}/post-likeUsers-loggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/post-likeUsers-loggedIn/http-response.adoc[]
+
+=== 게시물 좋아요 리스트 조회 - 비 로그인
+==== Request
+include::{snippets}/post-likeUsers-unLoggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/post-likeUsers-unLoggedIn/http-response.adoc[]
+
+=== 좋아요 없는 게시물 조회 - 비 로그인
+==== Request
+include::{snippets}/post-likeUsers-emptyLikes/http-request.adoc[]
+==== Response
+include::{snippets}/post-likeUsers-emptyLikes/http-response.adoc[]
+
 === 게시물 수정
 ==== Request
 include::{snippets}/post-update/http-request.adoc[]

@@ -1,9 +1,7 @@
 package com.woowacourse.pickgit.acceptance.post;
 
 import static java.util.stream.Collectors.toList;
-import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
@@ -99,6 +97,11 @@ public class PostAcceptanceTest_LikeUsers {
                     return new LikeUsersResponse(user.getImage(), user.getName(), false);
                 }
             ).collect(toList());
+    }
+
+    private boolean isFollowingUser(List<User> likeUsers, User user) {
+        return user.getName().equals(likeUsers.get(0).getName())
+            || user.getName().equals(likeUsers.get(1).getName());
     }
 
     @DisplayName("특정 게시물을 좋아요한 계정 리스트를 조회할 수 있다 - 비 로그인/성공")
@@ -213,11 +216,6 @@ public class PostAcceptanceTest_LikeUsers {
             .post("/api/profiles/{targetUserName}/followings", targetUserName)
             .then().log().all()
             .statusCode(HttpStatus.OK.value());
-    }
-
-    private boolean isFollowingUser(List<User> likeUsers, User user) {
-        return user.getName().equals(likeUsers.get(0).getName())
-            || user.getName().equals(likeUsers.get(1).getName());
     }
 
     @DisplayName("존재하지 않은 포스트를 조회하면 500예외가 발생한다. - 비 로그인/실")
