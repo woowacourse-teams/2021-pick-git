@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import useThrottle from "../../../services/hooks/@common/useThrottle";
 import Loader from "../Loader/Loader";
 import { Container, LoaderWrapper, ContentWrapper } from "./InfiniteScrollContainer.style";
 
@@ -8,6 +9,8 @@ export interface Props extends React.HTMLAttributes<HTMLSpanElement> {
 }
 
 const InfiniteScrollContainer = ({ isLoaderShown, onIntersect, children }: Props) => {
+  const handleIntersection = useThrottle(() => onIntersect(), 300);
+
   const loaderRef = useRef<HTMLDivElement>(null);
 
   const observer = new IntersectionObserver((entries) => {
@@ -17,7 +20,7 @@ const InfiniteScrollContainer = ({ isLoaderShown, onIntersect, children }: Props
       return;
     }
 
-    onIntersect();
+    handleIntersection();
   });
 
   useEffect(() => {

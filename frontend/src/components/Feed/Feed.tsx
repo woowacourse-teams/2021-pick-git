@@ -13,7 +13,7 @@ import { useHistory } from "react-router-dom";
 import { PAGE_URL } from "../../constants/urls";
 import usePostEdit from "../../services/hooks/usePostEdit";
 import { InfiniteData, QueryKey } from "react-query";
-import { getPostsFromPages } from "../../utils/feed";
+import { getItemsFromPages } from "../../utils/infiniteData";
 import useMessageModal from "../../services/hooks/@common/useMessageModal";
 import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
 
@@ -28,19 +28,10 @@ const Feed = ({ infinitePostsData, queryKey }: Props) => {
   const { addPostComment, addPostLike, deletePost, deletePostLike } = useFeedMutation(queryKey);
   const { setPostEditData } = usePostEdit();
   const { modalMessage, isModalShown, isCancelButtonShown, showConfirmModal, hideMessageModal } = useMessageModal();
-  const { isBottomSliderShown, showBottomSlider, hideBottomSlider, removeSlideEventHandler, setSlideEventHandler } =
-    useBottomSlider();
   const { isLoggedIn, currentUsername } = useContext(UserContext);
   const history = useHistory();
 
-  const posts = getPostsFromPages(infinitePostsData.pages);
-
-  const selectedPost = posts.find((post) => post.id === selectedPostId);
-
-  useEffect(() => {
-    setSlideEventHandler();
-    return removeSlideEventHandler;
-  }, []);
+  const posts = getItemsFromPages<Post>(infinitePostsData.pages);
 
   const handlePostEdit = async (post: Post) => {
     setPostEditData({ content: post.content, postId: post.id, tags: post.tags });
@@ -82,30 +73,33 @@ const Feed = ({ infinitePostsData, queryKey }: Props) => {
     }
   };
 
-  const handleCommentLike = (commentId: number) => {
-    pushSnackbarMessage("아직 구현되지 않은 기능입니다.");
-  };
-
   const handleCommentsClick = (postId: Post["id"]) => {
-    showBottomSlider();
-    setSelectedPostId(postId);
-  };
-
-  const handleCommentSliderClose = () => {
-    hideBottomSlider();
-  };
-
-  const handleCommentSave = async (value: string) => {
-    if (!selectedPostId) {
+    const selectedPost = posts.find((post) => post.id === postId);
+    if (!selectedPost) {
       return;
     }
 
-    try {
-      await addPostComment(selectedPostId, value);
-    } catch (error) {
-      pushSnackbarMessage(FAILURE_MESSAGE.COMMENT_SAVE_FAILED);
-    }
+    history.push({
+      pathname: PAGE_URL.POST_COMMENTS,
+      state: selectedPost,
+    });
   };
+
+  const handlePostLikeCountClick = (postId: Post["id"]) => {
+    const selectedPost = posts.find((post) => post.id === postId);
+    if (!selectedPost) {
+      return;
+    }
+
+    history.push({
+      pathname: PAGE_URL.POST_LIKE_PEOPLE,
+      state: selectedPost.id,
+    });
+  };
+
+  if (!infinitePostsData.pages) {
+    return <div>게시물이 존재하지 않습니다.</div>;
+  }
 
   return (
     <Container>
@@ -131,18 +125,12 @@ const Feed = ({ infinitePostsData, queryKey }: Props) => {
             onPostDelete={() => handlePostDeleteButtonClick(post.id)}
             onPostEdit={() => handlePostEdit(post)}
             onPostLike={() => handlePostLike(post.id)}
+            handlePostLikeCountClick={() => handlePostLikeCountClick(post.id)}
             onMoreCommentClick={() => handleCommentsClick(post.id)}
             onCommentInputClick={() => handleCommentsClick(post.id)}
-            onCommentLike={handleCommentLike}
           />
         </PostItemWrapper>
       ))}
-      <CommentSlider
-        onCommentSave={handleCommentSave}
-        post={selectedPost}
-        isSliderShown={isBottomSliderShown}
-        onSliderClose={handleCommentSliderClose}
-      />
       {isModalShown && isCancelButtonShown && (
         <MessageModalPortal
           heading={modalMessage}

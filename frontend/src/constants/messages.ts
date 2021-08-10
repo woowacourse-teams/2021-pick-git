@@ -21,7 +21,8 @@ export const FAILURE_MESSAGE = {
   POST_TAG_LENGTH_LIMIT_EXCEEDED: `태그는 ${LIMIT.POST_TAG_LENGTH}자 이하로만 입력할 수 있습니다.`,
   POST_DUPLICATED_TAG_EXIST: "해당 태그와 중복된 태그가 이미 입력되어 있습니다.",
   POST_TAG_SPECIAL_SYMBOL_EXIST: "태그에는 -, _ 를 제외한 특수문자가 포함될 수 없습니다.",
-  POST_REPOSITORY_NOT_SELECTED: "리포지터리를 선택해주세요",
+  POST_REPOSITORY_NOT_SELECTED: "리포지터리를 선택해주세요.",
+  POST_REPOSITORY_NOT_LOADABLE: "리포지터리 목록을 불러올 수 없습니다.",
   POST_FILE_AND_CONTENT_EMPTY: "이미지와 글 모두 작성되지 않았습니다.",
   POST_FILE: "이미지를 추가해주세요.",
   COMMENT_CONTENT_MAX_LENGTH_EXCEEDED: `댓글은 ${LIMIT.COMMENT_LENGTH}자 이하로만 입력할 수 있습니다.`,
@@ -34,6 +35,7 @@ export const WARNING_MESSAGE = {
   POST_DELETE: "정말로 게시물을 삭제하시겠습니까?",
   GITHUB_FOLLOWING: "깃허브 계정에서도 팔로우 하시겠습니까?",
   GITHUB_UNFOLLOWING: "깃허브 계정에서도 팔로우 취소 하시겠습니까?",
+  COMMENT_DELETE: "정말로 댓글을 삭제하시겠습니까?",
 };
 
 export const REDIRECT_MESSAGE = {

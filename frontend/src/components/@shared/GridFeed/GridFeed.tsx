@@ -1,7 +1,7 @@
 import { InfiniteData } from "react-query";
 import { Link } from "react-router-dom";
 import { Post } from "../../../@types";
-import { getPostsFromPages } from "../../../utils/feed";
+import { getItemsFromPages } from "../../../utils/infiniteData";
 
 import PageLoading from "../../@layout/PageLoading/PageLoading";
 import InfiniteScrollContainer from "../InfiniteScrollContainer/InfiniteScrollContainer";
@@ -36,7 +36,7 @@ const GridFeed = ({
     return <div>피드를 가져올 수 없습니다.</div>;
   }
 
-  const posts = getPostsFromPages(infinitePostsData.pages);
+  const posts = getItemsFromPages<Post>(infinitePostsData.pages);
 
   const Feed = () => {
     if (posts.length > 0) {

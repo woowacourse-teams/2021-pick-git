@@ -4,10 +4,9 @@ export interface Props {
   authorName: string;
   content: React.ReactNode;
   link?: string;
-  onCommentLike: () => void;
 }
 
-const Comment = ({ authorName, link, content, onCommentLike }: Props) => {
+const Comment = ({ authorName, link, content }: Props) => {
   return (
     <Container>
       <AuthorName to={link ? link : ""}>{authorName}</AuthorName>

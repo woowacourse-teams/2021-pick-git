@@ -1,5 +1,5 @@
 import { AxiosError } from "axios";
-import { QueryFunction, useQuery } from "react-query";
+import { QueryFunction, useInfiniteQuery, useQuery } from "react-query";
 import { ErrorResponse, GithubRepository, Tags } from "../../@types";
 import { QUERY } from "../../constants/queries";
 import { getAccessToken } from "../../storage/storage";
@@ -7,9 +7,19 @@ import { requestGetRepositories, requestGetTags } from "../requests/github";
 
 type GithubTagsQueryKey = readonly [typeof QUERY.GET_GITHUB_TAGS, string];
 
-export const useGithubRepositoriesQuery = (username: string) => {
-  return useQuery<GithubRepository[], AxiosError<ErrorResponse>>(QUERY.GET_GITHUB_REPOSITORIES, () =>
-    requestGetRepositories(username, getAccessToken())
+export const useGithubRepositoriesQuery = (keyword: string) => {
+  return useInfiniteQuery<GithubRepository[], AxiosError<ErrorResponse>, GithubRepository[], [string, string]>(
+    [QUERY.GET_GITHUB_REPOSITORIES, keyword],
+    async ({ pageParam = 0, queryKey }) => {
+      const [, keywordParam] = queryKey;
+      return requestGetRepositories(keywordParam, pageParam, getAccessToken());
+    },
+    {
+      getNextPageParam: (_, pages) => {
+        return pages.length;
+      },
+      cacheTime: 0,
+    }
   );
 };
 
