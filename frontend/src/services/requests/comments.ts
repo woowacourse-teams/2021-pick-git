@@ -4,11 +4,6 @@ import { LIMIT } from "../../constants/limits";
 import { API_URL } from "../../constants/urls";
 
 export const requestGetPostComments = async (postId: Post["id"], pageParam: number, accessToken: string | null) => {
-  // return await axios.get<CommentData[]>("http://localhost:3001/comments", {
-  //   headers: {
-  //     Authorization: `Bearer ${accessToken}`,
-  //   },
-  // });
   return await axios.get<CommentData[]>(API_URL.POST_COMMENTS(postId, pageParam, LIMIT.COMMENTS_COUNT_PER_FETCH), {
     headers: {
       Authorization: `Bearer ${accessToken}`,
