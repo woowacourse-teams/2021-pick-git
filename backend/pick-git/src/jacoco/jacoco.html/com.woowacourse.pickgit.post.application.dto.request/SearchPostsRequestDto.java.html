@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SearchPostsRequestDto.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pick-git</a> &gt; <a href="index.source.html" class="el_package">com.woowacourse.pickgit.post.application.dto.request</a> &gt; <span class="el_source">SearchPostsRequestDto.java</span></div><h1>SearchPostsRequestDto.java</h1><pre class="source lang-java linenums">package com.woowacourse.pickgit.post.application.dto.request;
+
+import com.woowacourse.pickgit.authentication.domain.user.AppUser;
+import lombok.Builder;
+
+<span class="pc" id="L6">@Builder</span>
+public class SearchPostsRequestDto {
+
+    private String type;
+    private String keyword;
+    private int page;
+    private int limit;
+    private String userName;
+    private boolean isGuest;
+
+    private SearchPostsRequestDto() {
+    }
+
+    public SearchPostsRequestDto(
+        String type,
+        String keyword,
+        int page,
+        int limit,
+        AppUser appUser
+<span class="fc" id="L25">    ) {</span>
+<span class="fc" id="L26">        this.type = type;</span>
+<span class="fc" id="L27">        this.keyword = keyword;</span>
+<span class="fc" id="L28">        this.page = page;</span>
+<span class="fc" id="L29">        this.limit = limit;</span>
+<span class="fc bfc" id="L30" title="All 2 branches covered.">        this.userName = appUser.isGuest() ? null : appUser.getUsername();</span>
+<span class="fc" id="L31">        this.isGuest = appUser.isGuest();</span>
+<span class="fc" id="L32">    }</span>
+
+    public SearchPostsRequestDto(
+        String type,
+        String keyword,
+        int page,
+        int limit,
+        String userName,
+        boolean isGuest
+<span class="fc" id="L41">    ) {</span>
+<span class="fc" id="L42">        this.type = type;</span>
+<span class="fc" id="L43">        this.keyword = keyword;</span>
+<span class="fc" id="L44">        this.page = page;</span>
+<span class="fc" id="L45">        this.limit = limit;</span>
+<span class="fc" id="L46">        this.userName = userName;</span>
+<span class="fc" id="L47">        this.isGuest = isGuest;</span>
+<span class="fc" id="L48">    }</span>
+
+    public String getType() {
+<span class="fc" id="L51">        return type;</span>
+    }
+
+    public String getKeyword() {
+<span class="fc" id="L55">        return keyword;</span>
+    }
+
+    public int getPage() {
+<span class="fc" id="L59">        return page;</span>
+    }
+
+    public int getLimit() {
+<span class="fc" id="L63">        return limit;</span>
+    }
+
+    public String getUserName() {
+<span class="fc" id="L67">        return userName;</span>
+    }
+
+    public boolean isGuest() {
+<span class="fc" id="L71">        return isGuest;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

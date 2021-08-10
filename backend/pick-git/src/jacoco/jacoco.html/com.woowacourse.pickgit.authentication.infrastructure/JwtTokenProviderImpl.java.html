@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JwtTokenProviderImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pick-git</a> &gt; <a href="index.source.html" class="el_package">com.woowacourse.pickgit.authentication.infrastructure</a> &gt; <span class="el_source">JwtTokenProviderImpl.java</span></div><h1>JwtTokenProviderImpl.java</h1><pre class="source lang-java linenums">package com.woowacourse.pickgit.authentication.infrastructure;
+
+import com.woowacourse.pickgit.authentication.application.JwtTokenProvider;
+import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import java.util.Date;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component
+public class JwtTokenProviderImpl implements JwtTokenProvider {
+
+    @Value(&quot;${security.jwt.secret-key}&quot;)
+    private String secretKey;
+    @Value(&quot;${security.jwt.expiration-time}&quot;)
+    private long expirationTimeInMilliSeconds;
+
+<span class="fc" id="L22">    public JwtTokenProviderImpl() {</span>
+<span class="fc" id="L23">    }</span>
+
+<span class="fc" id="L25">    public JwtTokenProviderImpl(String secretKey, long expirationTimeInMilliSeconds) {</span>
+<span class="fc" id="L26">        this.secretKey = secretKey;</span>
+<span class="fc" id="L27">        this.expirationTimeInMilliSeconds = expirationTimeInMilliSeconds;</span>
+<span class="fc" id="L28">    }</span>
+
+    @Override
+    public String createToken(String payload) {
+<span class="fc" id="L32">        Date now = new Date();</span>
+<span class="fc" id="L33">        Date expirationTime = new Date(now.getTime() + expirationTimeInMilliSeconds);</span>
+
+<span class="fc" id="L35">        return Jwts.builder()</span>
+<span class="fc" id="L36">            .claim(&quot;username&quot;, payload)</span>
+<span class="fc" id="L37">            .setIssuedAt(now)</span>
+<span class="fc" id="L38">            .setExpiration(expirationTime)</span>
+<span class="fc" id="L39">            .signWith(SignatureAlgorithm.HS256, secretKey)</span>
+<span class="fc" id="L40">            .compact();</span>
+    }
+
+    @Override
+    public boolean validateToken(String token) {
+        try {
+<span class="fc" id="L46">            Jws&lt;Claims&gt; claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);</span>
+
+<span class="pc bpc" id="L48" title="1 of 2 branches missed.">            return !claims.getBody().getExpiration().before(new Date());</span>
+<span class="fc" id="L49">        } catch (JwtException | IllegalArgumentException e) {</span>
+<span class="fc" id="L50">            return false;</span>
+        }
+    }
+
+    @Override
+    public String getPayloadByKey(String token, String key) {
+        try {
+<span class="fc" id="L57">            return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get(key, String.class);</span>
+<span class="fc" id="L58">        } catch (JwtException | IllegalArgumentException e) {</span>
+<span class="fc" id="L59">            throw new InvalidTokenException();</span>
+        }
+    }
+
+    @Override
+    public void changeExpirationTime(long expirationTimeInMilliSeconds) {
+<span class="fc" id="L65">        this.expirationTimeInMilliSeconds = expirationTimeInMilliSeconds;</span>
+<span class="fc" id="L66">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

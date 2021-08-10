@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OAuthConfiguration.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pick-git</a> &gt; <a href="index.source.html" class="el_package">com.woowacourse.pickgit.config</a> &gt; <span class="el_source">OAuthConfiguration.java</span></div><h1>OAuthConfiguration.java</h1><pre class="source lang-java linenums">package com.woowacourse.pickgit.config;
+
+import com.woowacourse.pickgit.authentication.application.OAuthService;
+import com.woowacourse.pickgit.authentication.presentation.AuthenticationPrincipalArgumentResolver;
+import com.woowacourse.pickgit.authentication.presentation.interceptor.AuthenticationInterceptor;
+import com.woowacourse.pickgit.authentication.presentation.interceptor.IgnoreAuthenticationInterceptor;
+import com.woowacourse.pickgit.authentication.presentation.interceptor.PathMatchInterceptor;
+import java.util.List;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class OAuthConfiguration implements WebMvcConfigurer {
+
+    private final OAuthService oAuthService;
+
+<span class="fc" id="L22">    public OAuthConfiguration(OAuthService oAuthService) {</span>
+<span class="fc" id="L23">        this.oAuthService = oAuthService;</span>
+<span class="fc" id="L24">    }</span>
+
+    @Bean
+    public AuthenticationInterceptor authenticationInterceptor() {
+<span class="fc" id="L28">        return new AuthenticationInterceptor(oAuthService);</span>
+    }
+
+    @Bean
+    public IgnoreAuthenticationInterceptor ignoreAuthenticationInterceptor() {
+<span class="fc" id="L33">        return new IgnoreAuthenticationInterceptor(oAuthService);</span>
+    }
+
+    @Bean
+    public AuthenticationPrincipalArgumentResolver authenticationPrincipalArgumentResolver() {
+<span class="fc" id="L38">        return new AuthenticationPrincipalArgumentResolver(oAuthService);</span>
+    }
+
+    @Override
+    public void addArgumentResolvers(List&lt;HandlerMethodArgumentResolver&gt; resolvers) {
+<span class="fc" id="L43">        resolvers.add(authenticationPrincipalArgumentResolver());</span>
+<span class="fc" id="L44">    }</span>
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+<span class="fc" id="L48">        HandlerInterceptor authenticationInterceptor = new PathMatchInterceptor(</span>
+<span class="fc" id="L49">            authenticationInterceptor())</span>
+<span class="fc" id="L50">            .addPathPatterns(&quot;/api/posts/me&quot;, HttpMethod.GET)</span>
+<span class="fc" id="L51">            .addPathPatterns(&quot;/api/github/repositories&quot;, HttpMethod.GET)</span>
+<span class="fc" id="L52">            .addPathPatterns(&quot;/api/github/repositories/*/tags/languages&quot;, HttpMethod.GET)</span>
+<span class="fc" id="L53">            .addPathPatterns(&quot;/api/posts&quot;, HttpMethod.POST)</span>
+<span class="fc" id="L54">            .addPathPatterns(&quot;/api/posts/*/likes&quot;, HttpMethod.PUT, HttpMethod.DELETE)</span>
+<span class="fc" id="L55">            .addPathPatterns(&quot;/api/posts/*/comments&quot;, HttpMethod.POST)</span>
+<span class="fc" id="L56">            .addPathPatterns(&quot;/api/profiles/me&quot;, HttpMethod.GET, HttpMethod.POST)</span>
+<span class="fc" id="L57">            .addPathPatterns(&quot;/api/profiles/me/*&quot;, HttpMethod.PUT)</span>
+<span class="fc" id="L58">            .addPathPatterns(&quot;/api/profiles/*/followings&quot;, HttpMethod.POST, HttpMethod.DELETE)</span>
+<span class="fc" id="L59">            .addPathPatterns(&quot;/api/posts/*&quot;, HttpMethod.PUT, HttpMethod.DELETE)</span>
+<span class="fc" id="L60">            .addPathPatterns(&quot;/api/profiles/*/contributions&quot;, HttpMethod.GET);</span>
+
+<span class="fc" id="L62">        HandlerInterceptor ignoreAuthenticationInterceptor = new PathMatchInterceptor(</span>
+<span class="fc" id="L63">            ignoreAuthenticationInterceptor())</span>
+<span class="fc" id="L64">            .addPathPatterns(&quot;/api/profiles/*&quot;, HttpMethod.GET)</span>
+<span class="fc" id="L65">            .addPathPatterns(&quot;/api/posts&quot;, HttpMethod.GET)</span>
+<span class="fc" id="L66">            .addPathPatterns(&quot;/api/posts/*&quot;, HttpMethod.GET)</span>
+<span class="fc" id="L67">            .addPathPatterns(&quot;/api/search/**&quot;, HttpMethod.GET)</span>
+<span class="fc" id="L68">            .addPathPatterns(&quot;/api/profiles/*/followings&quot;, HttpMethod.GET)</span>
+<span class="fc" id="L69">            .addPathPatterns(&quot;/api/profiles/*/followers&quot;, HttpMethod.GET)</span>
+<span class="fc" id="L70">            .excludePatterns(&quot;/api/profiles/*/followings&quot;, HttpMethod.POST, HttpMethod.DELETE)</span>
+<span class="fc" id="L71">            .excludePatterns(&quot;/api/profiles/me&quot;, HttpMethod.GET)</span>
+<span class="fc" id="L72">            .excludePatterns(&quot;/api/posts/me&quot;, HttpMethod.GET);</span>
+
+<span class="fc" id="L74">        registry.addInterceptor(authenticationInterceptor)</span>
+<span class="fc" id="L75">            .addPathPatterns(&quot;/**&quot;);</span>
+
+<span class="fc" id="L77">        registry.addInterceptor(ignoreAuthenticationInterceptor)</span>
+<span class="fc" id="L78">            .addPathPatterns(&quot;/**&quot;);</span>
+<span class="fc" id="L79">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

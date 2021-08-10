@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GithubTagExtractor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pick-git</a> &gt; <a href="index.source.html" class="el_package">com.woowacourse.pickgit.tag.infrastructure</a> &gt; <span class="el_source">GithubTagExtractor.java</span></div><h1>GithubTagExtractor.java</h1><pre class="source lang-java linenums">package com.woowacourse.pickgit.tag.infrastructure;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
+import com.woowacourse.pickgit.tag.domain.PlatformTagExtractor;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
+import org.springframework.stereotype.Component;
+
+@Component
+public class GithubTagExtractor implements PlatformTagExtractor {
+
+    private static final String GITHUB_TAG_API_FORMAT
+        = &quot;https://api.github.com/repos/%s/%s/languages&quot;;
+
+    private final PlatformTagApiRequester platformTagApiRequester;
+    private final ObjectMapper objectMapper;
+
+    public GithubTagExtractor(PlatformTagApiRequester platformTagApiRequester,
+<span class="fc" id="L24">        ObjectMapper objectMapper) {</span>
+<span class="fc" id="L25">        this.platformTagApiRequester = platformTagApiRequester;</span>
+<span class="fc" id="L26">        this.objectMapper = objectMapper;</span>
+<span class="fc" id="L27">    }</span>
+
+    public List&lt;String&gt; extractTags(String accessToken, String userName, String repositoryName) {
+<span class="fc" id="L30">        String url = generateApiUrl(userName, repositoryName);</span>
+<span class="fc" id="L31">        String response = platformTagApiRequester.requestTags(url, accessToken);</span>
+<span class="fc" id="L32">        return parseResponseIntoLanguageTags(response);</span>
+    }
+
+    private String generateApiUrl(String userName, String repositoryName) {
+<span class="fc" id="L36">        return String.format(GITHUB_TAG_API_FORMAT, userName, repositoryName);</span>
+    }
+
+    private List&lt;String&gt; parseResponseIntoLanguageTags(String response) {
+        try {
+<span class="fc" id="L41">            Set&lt;String&gt; tags = objectMapper</span>
+<span class="fc" id="L42">                .readValue(response, new TypeReference&lt;LinkedHashMap&lt;String, String&gt;&gt;() {</span>
+                })
+<span class="fc" id="L44">                .keySet();</span>
+<span class="fc" id="L45">            return new ArrayList&lt;&gt;(tags);</span>
+<span class="nc" id="L46">        } catch (JsonProcessingException e) {</span>
+<span class="nc" id="L47">            throw new PlatformHttpErrorException();</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

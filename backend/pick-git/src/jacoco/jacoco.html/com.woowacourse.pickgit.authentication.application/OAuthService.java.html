@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OAuthService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pick-git</a> &gt; <a href="index.source.html" class="el_package">com.woowacourse.pickgit.authentication.application</a> &gt; <span class="el_source">OAuthService.java</span></div><h1>OAuthService.java</h1><pre class="source lang-java linenums">package com.woowacourse.pickgit.authentication.application;
+
+import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
+import com.woowacourse.pickgit.authentication.application.dto.TokenDto;
+import com.woowacourse.pickgit.authentication.domain.OAuthAccessTokenDao;
+import com.woowacourse.pickgit.authentication.domain.OAuthClient;
+import com.woowacourse.pickgit.authentication.domain.user.AppUser;
+import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
+import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
+import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
+import com.woowacourse.pickgit.user.domain.User;
+import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
+import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+public class OAuthService {
+
+    private OAuthClient githubOAuthClient;
+    private JwtTokenProvider jwtTokenProvider;
+    private OAuthAccessTokenDao authAccessTokenDao;
+    private UserRepository userRepository;
+
+    public OAuthService(OAuthClient githubOAuthClient,
+        JwtTokenProvider jwtTokenProvider,
+        OAuthAccessTokenDao authAccessTokenDao,
+<span class="fc" id="L29">        UserRepository userRepository) {</span>
+<span class="fc" id="L30">        this.githubOAuthClient = githubOAuthClient;</span>
+<span class="fc" id="L31">        this.jwtTokenProvider = jwtTokenProvider;</span>
+<span class="fc" id="L32">        this.authAccessTokenDao = authAccessTokenDao;</span>
+<span class="fc" id="L33">        this.userRepository = userRepository;</span>
+<span class="fc" id="L34">    }</span>
+
+    public String getGithubAuthorizationUrl() {
+<span class="fc" id="L37">        return githubOAuthClient.getLoginUrl();</span>
+    }
+
+    @Transactional
+    public TokenDto createToken(String code) {
+<span class="fc" id="L42">        String githubAccessToken = githubOAuthClient.getAccessToken(code);</span>
+
+<span class="fc" id="L44">        OAuthProfileResponse githubProfileResponse = githubOAuthClient</span>
+<span class="fc" id="L45">            .getGithubProfile(githubAccessToken);</span>
+
+<span class="fc" id="L47">        updateUserOrCreateUser(githubProfileResponse);</span>
+
+<span class="fc" id="L49">        return new TokenDto(</span>
+<span class="fc" id="L50">            createTokenAndSave(</span>
+                githubAccessToken,
+<span class="fc" id="L52">                githubProfileResponse.getName()</span>
+            ),
+<span class="fc" id="L54">            githubProfileResponse.getName()</span>
+        );
+    }
+
+    private void updateUserOrCreateUser(OAuthProfileResponse githubProfileResponse) {
+<span class="fc" id="L59">        GithubProfile latestGithubProfile = githubProfileResponse.toGithubProfile();</span>
+
+<span class="fc" id="L61">        userRepository.findByBasicProfile_Name(githubProfileResponse.getName())</span>
+<span class="fc" id="L62">            .ifPresentOrElse(user -&gt; {</span>
+<span class="fc" id="L63">                user.changeGithubProfile(latestGithubProfile);</span>
+<span class="fc" id="L64">            }, () -&gt; {</span>
+<span class="fc" id="L65">                BasicProfile basicProfile = githubProfileResponse.toBasicProfile();</span>
+<span class="fc" id="L66">                User user = new User(basicProfile, latestGithubProfile);</span>
+<span class="fc" id="L67">                userRepository.save(user);</span>
+<span class="fc" id="L68">            });</span>
+<span class="fc" id="L69">    }</span>
+
+    private String createTokenAndSave(String githubAccessToken, String payload) {
+<span class="fc" id="L72">        String token = jwtTokenProvider.createToken(payload);</span>
+<span class="fc" id="L73">        authAccessTokenDao.insert(token, githubAccessToken);</span>
+<span class="fc" id="L74">        return token;</span>
+    }
+
+    @Transactional(readOnly = true)
+    public AppUser findRequestUserByToken(String authentication) {
+<span class="fc bfc" id="L79" title="All 2 branches covered.">        if (authentication == null) {</span>
+<span class="fc" id="L80">            return new GuestUser();</span>
+        }
+
+<span class="fc" id="L83">        String username = jwtTokenProvider.getPayloadByKey(authentication, &quot;username&quot;);</span>
+<span class="fc" id="L84">        String accessToken = authAccessTokenDao.findByKeyToken(authentication)</span>
+<span class="fc" id="L85">            .orElseThrow(InvalidTokenException::new);</span>
+<span class="fc" id="L86">        return new LoginUser(username, accessToken);</span>
+    }
+
+    public boolean validateToken(String authentication) {
+<span class="fc" id="L90">        return jwtTokenProvider.validateToken(authentication);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

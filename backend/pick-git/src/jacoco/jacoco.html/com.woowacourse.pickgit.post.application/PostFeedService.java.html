@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PostFeedService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pick-git</a> &gt; <a href="index.source.html" class="el_package">com.woowacourse.pickgit.post.application</a> &gt; <span class="el_source">PostFeedService.java</span></div><h1>PostFeedService.java</h1><pre class="source lang-java linenums">package com.woowacourse.pickgit.post.application;
+
+import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
+import com.woowacourse.pickgit.exception.user.UserNotFoundException;
+import com.woowacourse.pickgit.post.application.dto.request.HomeFeedRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.SearchPostsRequestDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
+import com.woowacourse.pickgit.post.application.search.SearchTypes;
+import com.woowacourse.pickgit.post.domain.Post;
+import com.woowacourse.pickgit.post.domain.repository.PostRepository;
+import com.woowacourse.pickgit.user.domain.User;
+import com.woowacourse.pickgit.user.domain.UserRepository;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@Transactional(readOnly = true)
+public class PostFeedService {
+
+    private final PostRepository postRepository;
+    private final UserRepository userRepository;
+    private final SearchTypes searchTypes;
+
+    public PostFeedService(
+        PostRepository postRepository,
+        UserRepository userRepository,
+        SearchTypes searchTypes
+<span class="fc" id="L33">    ) {</span>
+<span class="fc" id="L34">        this.postRepository = postRepository;</span>
+<span class="fc" id="L35">        this.userRepository = userRepository;</span>
+<span class="fc" id="L36">        this.searchTypes = searchTypes;</span>
+<span class="fc" id="L37">    }</span>
+
+    public List&lt;PostResponseDto&gt; homeFeed(HomeFeedRequestDto homeFeedRequestDto) {
+<span class="fc" id="L40">        return readFeed(homeFeedRequestDto, Optional.empty());</span>
+    }
+
+    public List&lt;PostResponseDto&gt; myFeed(HomeFeedRequestDto homeFeedRequestDto) {
+<span class="fc" id="L44">        String userName = homeFeedRequestDto.getRequestUserName();</span>
+
+<span class="fc bfc" id="L46" title="All 2 branches covered.">        if (Objects.isNull(userName)) {</span>
+<span class="fc" id="L47">            throw new UnauthorizedException();</span>
+        }
+
+<span class="fc" id="L50">        return readFeed(homeFeedRequestDto, Optional.of(userName));</span>
+    }
+
+    public List&lt;PostResponseDto&gt; userFeed(HomeFeedRequestDto homeFeedRequestDto, String userName) {
+<span class="fc" id="L54">        return readFeed(homeFeedRequestDto, Optional.of(userName));</span>
+    }
+
+    private List&lt;PostResponseDto&gt; readFeed(
+        HomeFeedRequestDto homeFeedRequestDto,
+        Optional&lt;String&gt; userName
+    ) {
+<span class="fc" id="L61">        int page = homeFeedRequestDto.getPage().intValue();</span>
+<span class="fc" id="L62">        int limit = homeFeedRequestDto.getLimit().intValue();</span>
+<span class="fc" id="L63">        String requestUserName = homeFeedRequestDto.getRequestUserName();</span>
+<span class="fc" id="L64">        boolean isGuest = homeFeedRequestDto.isGuest();</span>
+
+<span class="fc" id="L66">        Pageable pageable = PageRequest.of(page, limit);</span>
+<span class="fc" id="L67">        List&lt;Post&gt; result = getPostsBy(userName, pageable);</span>
+
+<span class="fc" id="L69">        User requestUser = findUserByName(requestUserName);</span>
+
+<span class="fc" id="L71">        return PostDtoAssembler.assembleFrom(requestUser, isGuest, result);</span>
+    }
+
+    private List&lt;Post&gt; getPostsBy(Optional&lt;String&gt; userName, Pageable pageable) {
+<span class="fc" id="L75">        return userName</span>
+<span class="fc" id="L76">            .map(this::findUserByName)</span>
+<span class="fc" id="L77">            .map(target -&gt; postRepository.findAllPostsByUser(target, pageable))</span>
+<span class="fc" id="L78">            .orElse(postRepository.findAllPosts(pageable));</span>
+    }
+
+    private User findUserByName(String userName) {
+<span class="fc bfc" id="L82" title="All 2 branches covered.">        if(Objects.isNull(userName)) {</span>
+<span class="fc" id="L83">            return null;</span>
+        }
+
+<span class="fc" id="L86">        return userRepository</span>
+<span class="fc" id="L87">            .findByBasicProfile_Name(userName)</span>
+<span class="fc" id="L88">            .orElseThrow(UserNotFoundException::new);</span>
+    }
+
+    public List&lt;PostResponseDto&gt; search(SearchPostsRequestDto searchPostsRequestDto) {
+<span class="fc" id="L92">        String keyword = searchPostsRequestDto.getKeyword();</span>
+<span class="fc" id="L93">        String type = searchPostsRequestDto.getType();</span>
+<span class="fc" id="L94">        int page = searchPostsRequestDto.getPage();</span>
+<span class="fc" id="L95">        int limit = searchPostsRequestDto.getLimit();</span>
+<span class="fc" id="L96">        String userName = searchPostsRequestDto.getUserName();</span>
+<span class="fc" id="L97">        boolean isGuest = searchPostsRequestDto.isGuest();</span>
+
+<span class="fc" id="L99">        PageRequest pageable = PageRequest.of(page, limit);</span>
+<span class="fc" id="L100">        String[] keywords = keyword.split(&quot; &quot;);</span>
+
+<span class="fc" id="L102">        List&lt;Post&gt; search = searchTypes.findByTypeName(type).search(keywords, pageable);</span>
+<span class="fc" id="L103">        User user = findUserByName(userName);</span>
+
+<span class="fc" id="L105">        return PostDtoAssembler.assembleFrom(user, isGuest, search);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>
