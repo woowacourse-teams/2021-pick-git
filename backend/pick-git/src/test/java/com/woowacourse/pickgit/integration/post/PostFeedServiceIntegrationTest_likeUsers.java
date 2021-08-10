@@ -22,12 +22,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 @Import(InfrastructureTestConfiguration.class)
 @Transactional
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
+@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @ActiveProfiles("test")
 public class PostFeedServiceIntegrationTest_likeUsers {
 
@@ -130,7 +133,7 @@ public class PostFeedServiceIntegrationTest_likeUsers {
         AuthUserForPostRequestDto authUserForPostRequestDto =
             new AuthUserForPostRequestDto(null, true);
 
-        Long postId = 1L;
+        Long postId = 10L;
 
         // when then
         assertThatThrownBy(
@@ -158,15 +161,15 @@ public class PostFeedServiceIntegrationTest_likeUsers {
     ) {
         return likeUsers.stream()
             .map(user -> {
-                    if (isFollowingUser(likeUsers, user)) {
-                        return new LikeUsersResponseDto(
-                            user.getImage(), user.getName(), true
-                        );
-                    }
+                if (isFollowingUser(likeUsers, user)) {
                     return new LikeUsersResponseDto(
-                        user.getImage(), user.getName(), false
+                        user.getImage(), user.getName(), true
                     );
-                }).collect(toList());
+                }
+                return new LikeUsersResponseDto(
+                    user.getImage(), user.getName(), false
+                );
+            }).collect(toList());
     }
 
     private boolean isFollowingUser(List<User> likeUsers, User user) {
@@ -181,3 +184,5 @@ public class PostFeedServiceIntegrationTest_likeUsers {
             ).collect(toList());
     }
 }
+
+

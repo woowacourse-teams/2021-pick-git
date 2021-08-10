@@ -101,7 +101,9 @@ public class PostFeedService {
     }
 
     @Transactional(readOnly = true)
-    public List<LikeUsersResponseDto> likeUsers(AuthUserForPostRequestDto authUserRequestDto, Long postId) {
+    public List<LikeUsersResponseDto> likeUsers(
+        AuthUserForPostRequestDto authUserRequestDto, Long postId
+    ) {
         Post post = findPostWithLikeUsers(postId);
         List<User> likeUsers = post.getLikeUsers();
 
@@ -110,8 +112,9 @@ public class PostFeedService {
         }
 
         User loginUser = findUserByName(authUserRequestDto.getUsername());
-        List<LikeUsersResponseDto> likeUsersResponseDtoOfLoginUser = createLikeUsersResponseDtoOfLoginUser(
-            loginUser, likeUsers);
+        List<LikeUsersResponseDto> likeUsersResponseDtoOfLoginUser =
+            createLikeUsersResponseDtoOfLoginUser(loginUser, likeUsers);
+
         return likeUsersResponseDtoOfLoginUser;
     }
 

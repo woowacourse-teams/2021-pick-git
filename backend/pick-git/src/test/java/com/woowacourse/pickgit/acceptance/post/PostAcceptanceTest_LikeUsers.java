@@ -218,7 +218,7 @@ public class PostAcceptanceTest_LikeUsers {
             .statusCode(HttpStatus.OK.value());
     }
 
-    @DisplayName("존재하지 않은 포스트를 조회하면 500예외가 발생한다. - 비 로그인/실")
+    @DisplayName("존재하지 않은 포스트를 조회하면 500예외가 발생한다. - 비 로그인/실패")
     @Test
     void searchLikeUsers_InvalidPostId_500Exception() {
         // given
