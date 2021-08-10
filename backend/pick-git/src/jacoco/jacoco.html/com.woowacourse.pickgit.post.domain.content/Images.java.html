@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Images.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pick-git</a> &gt; <a href="index.source.html" class="el_package">com.woowacourse.pickgit.post.domain.content</a> &gt; <span class="el_source">Images.java</span></div><h1>Images.java</h1><pre class="source lang-java linenums">package com.woowacourse.pickgit.post.domain.content;
+
+import static java.util.stream.Collectors.toUnmodifiableList;
+
+import com.woowacourse.pickgit.post.domain.Post;
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.CascadeType;
+import javax.persistence.Embeddable;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
+
+@Embeddable
+public class Images {
+
+<span class="fc" id="L16">    @OneToMany(</span>
+        mappedBy = &quot;post&quot;,
+        fetch = FetchType.LAZY,
+        cascade = {CascadeType.PERSIST, CascadeType.REMOVE}
+    )
+    private List&lt;Image&gt; images = new ArrayList&lt;&gt;();
+
+<span class="fc" id="L23">    protected Images() {</span>
+<span class="fc" id="L24">    }</span>
+
+<span class="fc" id="L26">    public Images(List&lt;Image&gt; images) {</span>
+<span class="fc" id="L27">        this.images = images;</span>
+<span class="fc" id="L28">    }</span>
+
+    public void belongTo(Post post) {
+<span class="fc" id="L31">        images.forEach(image -&gt; image.belongTo(post));</span>
+<span class="fc" id="L32">    }</span>
+
+    public List&lt;String&gt; getUrls() {
+<span class="fc" id="L35">        return images.stream()</span>
+<span class="fc" id="L36">            .map(Image::getUrl)</span>
+<span class="fc" id="L37">            .collect(toUnmodifiableList());</span>
+    }
+
+    public List&lt;String&gt; getImageUrls() {
+<span class="nc" id="L41">        return images.stream()</span>
+<span class="nc" id="L42">            .map(Image::getUrl)</span>
+<span class="nc" id="L43">            .collect(toUnmodifiableList());</span>
+    }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

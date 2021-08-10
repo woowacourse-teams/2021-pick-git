@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GithubContributionExtractor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pick-git</a> &gt; <a href="index.source.html" class="el_package">com.woowacourse.pickgit.user.infrastructure.extractor</a> &gt; <span class="el_source">GithubContributionExtractor.java</span></div><h1>GithubContributionExtractor.java</h1><pre class="source lang-java linenums">package com.woowacourse.pickgit.user.infrastructure.extractor;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.woowacourse.pickgit.exception.user.ContributionParseException;
+import com.woowacourse.pickgit.user.infrastructure.dto.CountDto;
+import com.woowacourse.pickgit.user.infrastructure.dto.ItemDto;
+import com.woowacourse.pickgit.user.infrastructure.requester.PlatformContributionApiRequester;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component
+public class GithubContributionExtractor implements PlatformContributionExtractor {
+
+    private final ObjectMapper objectMapper;
+    private final PlatformContributionApiRequester platformContributionApiRequester;
+    private final String apiUrlFormatForStar;
+    private final String apiUrlFormatForCount;
+
+    public GithubContributionExtractor(
+        ObjectMapper objectMapper,
+        PlatformContributionApiRequester platformContributionApiRequester,
+        @Value(&quot;${github.contribution.star-url}&quot;) String apiUrlFormatForStar,
+        @Value(&quot;${github.contribution.count-url}&quot;) String apiUrlFormatForCount
+<span class="fc" id="L26">    ) {</span>
+<span class="fc" id="L27">        this.objectMapper = objectMapper;</span>
+<span class="fc" id="L28">        this.platformContributionApiRequester = platformContributionApiRequester;</span>
+<span class="fc" id="L29">        this.apiUrlFormatForStar = apiUrlFormatForStar;</span>
+<span class="fc" id="L30">        this.apiUrlFormatForCount = apiUrlFormatForCount;</span>
+<span class="fc" id="L31">    }</span>
+
+    @Override
+    public ItemDto extractStars(String accessToken, String username) {
+<span class="fc" id="L35">        String apiUrl = generateUrl(username);</span>
+<span class="fc" id="L36">        String response = platformContributionApiRequester.request(apiUrl, accessToken);</span>
+
+<span class="fc" id="L38">        return parseToStars(response);</span>
+    }
+
+    private String generateUrl(String username) {
+<span class="fc" id="L42">        return String.format(apiUrlFormatForStar, username);</span>
+    }
+
+    private ItemDto parseToStars(String response) {
+        try {
+<span class="fc" id="L47">            return objectMapper.readValue(response, new TypeReference&lt;&gt;() {});</span>
+<span class="fc" id="L48">        } catch (JsonProcessingException e) {</span>
+<span class="fc" id="L49">            throw new ContributionParseException();</span>
+        }
+    }
+
+    @Override
+    public CountDto extractCount(String restUrl, String accessToken, String username) {
+<span class="fc" id="L55">        String apiUrl = generateUrl(restUrl, username);</span>
+<span class="fc" id="L56">        String response = platformContributionApiRequester.request(apiUrl, accessToken);</span>
+
+<span class="fc" id="L58">        return parseToCount(response);</span>
+    }
+
+    private String generateUrl(String restUrl, String username) {
+<span class="fc" id="L62">        return apiUrlFormatForCount + String.format(restUrl, username);</span>
+    }
+
+    private CountDto parseToCount(String response) {
+        try {
+<span class="fc" id="L67">            return objectMapper.readValue(response, new TypeReference&lt;&gt;() {});</span>
+<span class="fc" id="L68">        } catch (JsonProcessingException e) {</span>
+<span class="fc" id="L69">            throw new ContributionParseException();</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

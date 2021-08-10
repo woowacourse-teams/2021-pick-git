@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OAuthController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pick-git</a> &gt; <a href="index.source.html" class="el_package">com.woowacourse.pickgit.authentication.presentation</a> &gt; <span class="el_source">OAuthController.java</span></div><h1>OAuthController.java</h1><pre class="source lang-java linenums">package com.woowacourse.pickgit.authentication.presentation;
+
+import com.woowacourse.pickgit.authentication.application.OAuthService;
+import com.woowacourse.pickgit.authentication.application.dto.TokenDto;
+import com.woowacourse.pickgit.authentication.presentation.dto.OAuthLoginUrlResponse;
+import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping(&quot;/api&quot;)
+@CrossOrigin(value = &quot;*&quot;)
+public class OAuthController {
+
+    private final OAuthService oauthService;
+
+<span class="fc" id="L21">    public OAuthController(OAuthService oauthService) {</span>
+<span class="fc" id="L22">        this.oauthService = oauthService;</span>
+<span class="fc" id="L23">    }</span>
+
+    @GetMapping(&quot;/authorization/github&quot;)
+    public ResponseEntity&lt;OAuthLoginUrlResponse&gt; githubAuthorizationUrl() {
+<span class="fc" id="L27">        return ResponseEntity</span>
+<span class="fc" id="L28">            .ok()</span>
+<span class="fc" id="L29">            .body(new OAuthLoginUrlResponse(oauthService.getGithubAuthorizationUrl()));</span>
+    }
+
+    @GetMapping(&quot;/afterlogin&quot;)
+    public ResponseEntity&lt;OAuthTokenResponse&gt; afterAuthorizeGithubLogin(@RequestParam String code) {
+<span class="fc" id="L34">        TokenDto tokenDto = oauthService.createToken(code);</span>
+<span class="fc" id="L35">        return ResponseEntity</span>
+<span class="fc" id="L36">            .ok()</span>
+<span class="fc" id="L37">            .body(new OAuthTokenResponse(tokenDto.getToken(), tokenDto.getUsername()));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

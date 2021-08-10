@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RestTemplateClient.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pick-git</a> &gt; <a href="index.source.html" class="el_package">com.woowacourse.pickgit.common.network</a> &gt; <span class="el_source">RestTemplateClient.java</span></div><h1>RestTemplateClient.java</h1><pre class="source lang-java linenums">package com.woowacourse.pickgit.common.network;
+
+import com.woowacourse.pickgit.post.domain.util.RestClient;
+import java.net.URI;
+import java.util.Map;
+import java.util.Set;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RequestCallback;
+import org.springframework.web.client.ResponseExtractor;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
+
+@Component
+<span class="fc" id="L23">public class RestTemplateClient implements RestClient {</span>
+
+    private static final int READ_TIMEOUT = 5000;
+    private static final int CONNECTION_REQUEST_TIMEOUT = 3000;
+    private static final int MAX_CONN_TOTAL = 100;
+    private static final int MAX_CONN_PER_ROUTE = 50;
+
+<span class="fc" id="L30">    public final RestTemplate restTemplate = createRestTemplate();</span>
+
+    private static RestTemplate createRestTemplate() {
+<span class="fc" id="L33">        HttpComponentsClientHttpRequestFactory factory =</span>
+            new HttpComponentsClientHttpRequestFactory();
+        
+<span class="fc" id="L36">        factory.setReadTimeout(READ_TIMEOUT);</span>
+<span class="fc" id="L37">        factory.setConnectionRequestTimeout(CONNECTION_REQUEST_TIMEOUT);</span>
+
+<span class="fc" id="L39">        CloseableHttpClient httpClient = HttpClientBuilder.create()</span>
+<span class="fc" id="L40">            .setMaxConnTotal(MAX_CONN_TOTAL)</span>
+<span class="fc" id="L41">            .setMaxConnPerRoute(MAX_CONN_PER_ROUTE)</span>
+<span class="fc" id="L42">            .build();</span>
+
+<span class="fc" id="L44">        factory.setHttpClient(httpClient);</span>
+
+<span class="fc" id="L46">        return new RestTemplate(factory);</span>
+    }
+
+    @Override
+    public &lt;T&gt; T getForObject(String url, Class&lt;T&gt; responseType, Object... uriVariables)
+        throws RestClientException {
+<span class="nc" id="L52">        return this.restTemplate.getForObject(url, responseType, uriVariables);</span>
+    }
+
+    @Override
+    public &lt;T&gt; T getForObject(String url, Class&lt;T&gt; responseType, Map&lt;String, ?&gt; uriVariables)
+        throws RestClientException {
+<span class="nc" id="L58">        return this.restTemplate.getForObject(url, responseType, uriVariables);</span>
+    }
+
+    @Override
+    public &lt;T&gt; T getForObject(URI url, Class&lt;T&gt; responseType) throws RestClientException {
+<span class="nc" id="L63">        return this.restTemplate.getForObject(url, responseType);</span>
+    }
+
+    @Override
+    public &lt;T&gt; ResponseEntity&lt;T&gt; getForEntity(String url, Class&lt;T&gt; responseType,
+        Object... uriVariables) throws RestClientException {
+<span class="nc" id="L69">        return this.restTemplate.getForEntity(url, responseType, uriVariables);</span>
+    }
+
+    @Override
+    public &lt;T&gt; ResponseEntity&lt;T&gt; getForEntity(String url, Class&lt;T&gt; responseType,
+        Map&lt;String, ?&gt; uriVariables) throws RestClientException {
+<span class="nc" id="L75">        return this.restTemplate.getForEntity(url, responseType, uriVariables);</span>
+    }
+
+    @Override
+    public &lt;T&gt; ResponseEntity&lt;T&gt; getForEntity(URI url, Class&lt;T&gt; responseType)
+        throws RestClientException {
+<span class="nc" id="L81">        return this.restTemplate.getForEntity(url, responseType);</span>
+    }
+
+    @Override
+    public HttpHeaders headForHeaders(String url, Object... uriVariables)
+        throws RestClientException {
+<span class="nc" id="L87">        return this.restTemplate.headForHeaders(url, uriVariables);</span>
+    }
+
+    @Override
+    public HttpHeaders headForHeaders(String url, Map&lt;String, ?&gt; uriVariables)
+        throws RestClientException {
+<span class="nc" id="L93">        return this.restTemplate.headForHeaders(url, uriVariables);</span>
+    }
+
+    @Override
+    public HttpHeaders headForHeaders(URI url) throws RestClientException {
+<span class="nc" id="L98">        return this.restTemplate.headForHeaders(url);</span>
+    }
+
+    @Override
+    public URI postForLocation(String url, Object request, Object... uriVariables)
+        throws RestClientException {
+<span class="nc" id="L104">        return this.restTemplate.postForLocation(url, request, uriVariables);</span>
+    }
+
+    @Override
+    public URI postForLocation(String url, Object request, Map&lt;String, ?&gt; uriVariables)
+        throws RestClientException {
+<span class="nc" id="L110">        return this.restTemplate.postForLocation(url, request, uriVariables);</span>
+    }
+
+    @Override
+    public URI postForLocation(URI url, Object request) throws RestClientException {
+<span class="nc" id="L115">        return this.restTemplate.postForLocation(url, request);</span>
+    }
+
+    @Override
+    public &lt;T&gt; T postForObject(String url, Object request, Class&lt;T&gt; responseType,
+        Object... uriVariables) throws RestClientException {
+<span class="nc" id="L121">        return this.restTemplate.postForObject(url, request,responseType, uriVariables);</span>
+    }
+
+    @Override
+    public &lt;T&gt; T postForObject(String url, Object request, Class&lt;T&gt; responseType,
+        Map&lt;String, ?&gt; uriVariables) throws RestClientException {
+<span class="nc" id="L127">        return this.restTemplate.postForObject(url, request,responseType, uriVariables);</span>
+    }
+
+    @Override
+    public &lt;T&gt; T postForObject(URI url, Object request, Class&lt;T&gt; responseType)
+        throws RestClientException {
+<span class="nc" id="L133">        return this.restTemplate.postForObject(url, request, responseType);</span>
+    }
+
+    @Override
+    public &lt;T&gt; ResponseEntity&lt;T&gt; postForEntity(String url, Object request, Class&lt;T&gt; responseType,
+        Object... uriVariables) throws RestClientException {
+<span class="nc" id="L139">        return this.restTemplate.postForEntity(url, request, responseType, uriVariables);</span>
+    }
+
+    @Override
+    public &lt;T&gt; ResponseEntity&lt;T&gt; postForEntity(String url, Object request, Class&lt;T&gt; responseType,
+        Map&lt;String, ?&gt; uriVariables) throws RestClientException {
+<span class="nc" id="L145">        return this.restTemplate.postForEntity(url, request, responseType, uriVariables);</span>
+    }
+
+    @Override
+    public &lt;T&gt; ResponseEntity&lt;T&gt; postForEntity(URI url, Object request, Class&lt;T&gt; responseType)
+        throws RestClientException {
+<span class="nc" id="L151">        return this.restTemplate.postForEntity(url, request, responseType);</span>
+    }
+
+    @Override
+    public void put(String url, Object request, Object... uriVariables) throws RestClientException {
+<span class="nc" id="L156">        this.restTemplate.put(url, request, uriVariables);</span>
+<span class="nc" id="L157">    }</span>
+
+    @Override
+    public void put(String url, Object request, Map&lt;String, ?&gt; uriVariables)
+        throws RestClientException {
+<span class="nc" id="L162">        this.restTemplate.put(url, request);</span>
+<span class="nc" id="L163">    }</span>
+
+    @Override
+    public void put(URI url, Object request) throws RestClientException {
+<span class="nc" id="L167">        this.restTemplate.put(url, request);</span>
+<span class="nc" id="L168">    }</span>
+
+    @Override
+    public &lt;T&gt; T patchForObject(String url, Object request, Class&lt;T&gt; responseType,
+        Object... uriVariables) throws RestClientException {
+<span class="nc" id="L173">        return this.restTemplate.patchForObject(url, request, responseType, uriVariables);</span>
+    }
+
+    @Override
+    public &lt;T&gt; T patchForObject(String url, Object request, Class&lt;T&gt; responseType,
+        Map&lt;String, ?&gt; uriVariables) throws RestClientException {
+<span class="nc" id="L179">        return this.restTemplate.patchForObject(url, request, responseType, uriVariables);</span>
+    }
+
+    @Override
+    public &lt;T&gt; T patchForObject(URI url, Object request, Class&lt;T&gt; responseType)
+        throws RestClientException {
+<span class="nc" id="L185">        return this.restTemplate.patchForObject(url, request, responseType);</span>
+    }
+
+    @Override
+    public void delete(String url, Object... uriVariables) throws RestClientException {
+<span class="nc" id="L190">        this.restTemplate.delete(url, uriVariables);</span>
+<span class="nc" id="L191">    }</span>
+
+    @Override
+    public void delete(String url, Map&lt;String, ?&gt; uriVariables) throws RestClientException {
+<span class="nc" id="L195">        this.restTemplate.delete(url, uriVariables);</span>
+<span class="nc" id="L196">    }</span>
+
+    @Override
+    public void delete(URI url) throws RestClientException {
+<span class="nc" id="L200">        this.restTemplate.delete(url);</span>
+<span class="nc" id="L201">    }</span>
+
+    @Override
+    public Set&lt;HttpMethod&gt; optionsForAllow(String url, Object... uriVariables)
+        throws RestClientException {
+<span class="nc" id="L206">        return this.restTemplate.optionsForAllow(url, uriVariables);</span>
+    }
+
+    @Override
+    public Set&lt;HttpMethod&gt; optionsForAllow(String url, Map&lt;String, ?&gt; uriVariables)
+        throws RestClientException {
+<span class="nc" id="L212">        return this.restTemplate.optionsForAllow(url, uriVariables);</span>
+    }
+
+    @Override
+    public Set&lt;HttpMethod&gt; optionsForAllow(URI url) throws RestClientException {
+<span class="nc" id="L217">        return this.restTemplate.optionsForAllow(url);</span>
+    }
+
+    @Override
+    public &lt;T&gt; ResponseEntity&lt;T&gt; exchange(String url, HttpMethod method,
+        HttpEntity&lt;?&gt; requestEntity, Class&lt;T&gt; responseType, Object... uriVariables)
+        throws RestClientException {
+<span class="nc" id="L224">        return this.restTemplate.exchange(url, method, requestEntity, responseType, uriVariables);</span>
+    }
+
+    @Override
+    public &lt;T&gt; ResponseEntity&lt;T&gt; exchange(String url, HttpMethod method,
+        HttpEntity&lt;?&gt; requestEntity, Class&lt;T&gt; responseType, Map&lt;String, ?&gt; uriVariables)
+        throws RestClientException {
+<span class="nc" id="L231">        return this.restTemplate.exchange(url, method, requestEntity, responseType, uriVariables);</span>
+    }
+
+    @Override
+    public &lt;T&gt; ResponseEntity&lt;T&gt; exchange(URI url, HttpMethod method, HttpEntity&lt;?&gt; requestEntity,
+        Class&lt;T&gt; responseType) throws RestClientException {
+<span class="nc" id="L237">        return this.restTemplate.exchange(url, method, requestEntity, responseType);</span>
+    }
+
+    @Override
+    public &lt;T&gt; ResponseEntity&lt;T&gt; exchange(String url, HttpMethod method,
+        HttpEntity&lt;?&gt; requestEntity, ParameterizedTypeReference&lt;T&gt; responseType,
+        Object... uriVariables) throws RestClientException {
+<span class="nc" id="L244">        return this.restTemplate.exchange(url, method, requestEntity, responseType, uriVariables);</span>
+    }
+
+    @Override
+    public &lt;T&gt; ResponseEntity&lt;T&gt; exchange(String url, HttpMethod method,
+        HttpEntity&lt;?&gt; requestEntity, ParameterizedTypeReference&lt;T&gt; responseType,
+        Map&lt;String, ?&gt; uriVariables) throws RestClientException {
+<span class="nc" id="L251">        return this.restTemplate.exchange(url, method, requestEntity, responseType, uriVariables);</span>
+    }
+
+    @Override
+    public &lt;T&gt; ResponseEntity&lt;T&gt; exchange(URI url, HttpMethod method, HttpEntity&lt;?&gt; requestEntity,
+        ParameterizedTypeReference&lt;T&gt; responseType) throws RestClientException {
+<span class="nc" id="L257">        return this.restTemplate.exchange(url, method, requestEntity, responseType);</span>
+    }
+
+    @Override
+    public &lt;T&gt; ResponseEntity&lt;T&gt; exchange(RequestEntity&lt;?&gt; requestEntity, Class&lt;T&gt; responseType)
+        throws RestClientException {
+<span class="nc" id="L263">        return this.restTemplate.exchange(requestEntity, responseType);</span>
+    }
+
+    @Override
+    public &lt;T&gt; ResponseEntity&lt;T&gt; exchange(RequestEntity&lt;?&gt; requestEntity,
+        ParameterizedTypeReference&lt;T&gt; responseType) throws RestClientException {
+<span class="nc" id="L269">        return this.restTemplate.exchange(requestEntity, responseType);</span>
+    }
+
+    @Override
+    public &lt;T&gt; T execute(String url, HttpMethod method, RequestCallback requestCallback,
+        ResponseExtractor&lt;T&gt; responseExtractor, Object... uriVariables) throws RestClientException {
+<span class="nc" id="L275">        return this.restTemplate.execute(url, method, requestCallback, responseExtractor, uriVariables);</span>
+    }
+
+    @Override
+    public &lt;T&gt; T execute(String url, HttpMethod method, RequestCallback requestCallback,
+        ResponseExtractor&lt;T&gt; responseExtractor, Map&lt;String, ?&gt; uriVariables)
+        throws RestClientException {
+<span class="nc" id="L282">        return this.restTemplate.execute(url, method, requestCallback, responseExtractor, uriVariables);</span>
+    }
+
+    @Override
+    public &lt;T&gt; T execute(URI url, HttpMethod method, RequestCallback requestCallback,
+        ResponseExtractor&lt;T&gt; responseExtractor) throws RestClientException {
+<span class="nc" id="L288">        return this.restTemplate.execute(url, method, requestCallback, responseExtractor);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

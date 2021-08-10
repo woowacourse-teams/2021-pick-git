@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version '2.5.2'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
+	id 'jacoco'
 }
 
 group = 'com.woowacourse'
@@ -52,7 +53,7 @@ task copyProd(type: Copy) {
 	into './src/main/resources'
 }
 
-//restDocs setting
+// REST Docs setting
 ext {
 	snippetsDir = file('build/generated-snippets')
 }
@@ -70,9 +71,50 @@ bootJar {
 		into 'src/main/resources/static/docs'
 		include '*.html'
 	}
-
 }
 
 test {
 	useJUnitPlatform()
+
+	finalizedBy 'jacocoTestReport'
+}
+
+jacocoTestReport {
+	reports {
+		html.enabled true
+		xml.enabled true
+		csv.enabled false
+
+		html.destination file("src/jacoco/jacoco.html")
+		xml.destination file("src/jacoco/jacoco.xml")
+	}
+
+	finalizedBy 'jacocoTestCoverageVerification'
+}
+
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			element = 'CLASS'
+
+			limit {
+				counter = 'METHOD'
+				value = 'COVEREDRATIO'
+				minimum = 0.65
+			}
+
+			excludes = [
+					'**.*RestTemplate*',
+					'**.*PickGitApplication*',
+					'**.*Dto*',
+					'**.*Requester*',
+					'**.*Request*',
+					'**.*Response*',
+					'**.*OAuthClient*',
+					'**.*Exception*',
+					'**.*Storage*',
+					'**.*Interceptor*'
+			]
+		}
+	}
 }

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GuestUser.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pick-git</a> &gt; <a href="index.source.html" class="el_package">com.woowacourse.pickgit.authentication.domain.user</a> &gt; <span class="el_source">GuestUser.java</span></div><h1>GuestUser.java</h1><pre class="source lang-java linenums">package com.woowacourse.pickgit.authentication.domain.user;
+
+import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
+
+public class GuestUser extends AppUser {
+
+    private static final String DUMMY_USERNAME = &quot;anonymous&quot;;
+    private static final String DUMMY_ACCESSTOKEN = &quot;anonymous&quot;;
+
+    public GuestUser() {
+<span class="fc" id="L11">        super(DUMMY_USERNAME, DUMMY_ACCESSTOKEN);</span>
+<span class="fc" id="L12">    }</span>
+
+    @Override
+    public boolean isGuest() {
+<span class="fc" id="L16">        return true;</span>
+    }
+
+    @Override
+    public String getUsername() {
+<span class="fc" id="L21">        throw new UnauthorizedException();</span>
+    }
+
+    @Override
+    public String getAccessToken() {
+<span class="fc" id="L26">        throw new UnauthorizedException();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>
