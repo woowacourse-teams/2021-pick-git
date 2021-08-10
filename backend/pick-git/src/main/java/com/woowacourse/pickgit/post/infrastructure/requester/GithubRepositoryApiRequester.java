@@ -21,6 +21,7 @@ public class GithubRepositoryApiRequester implements PlatformRepositoryApiReques
     public String request(String token, String url) {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setBearerAuth(token);
+        httpHeaders.set("Accept", "application/vnd.github.v3+json");
 
         RequestEntity<Void> requestEntity = RequestEntity
             .get(url)

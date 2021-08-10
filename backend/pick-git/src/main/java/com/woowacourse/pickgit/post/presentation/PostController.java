@@ -11,6 +11,7 @@ import com.woowacourse.pickgit.post.application.dto.request.PostDeleteRequestDto
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.SearchRepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
@@ -139,6 +140,27 @@ public class PostController {
             .page(page)
             .limit(limit)
             .build();
+    }
+
+    @GetMapping("/github/search/repositories")
+    public ResponseEntity<List<RepositoryResponse>> userSearchedRepositories(
+        @Authenticated AppUser user,
+        @RequestParam String keyword,
+        @RequestParam int page,
+        @RequestParam int limit
+    ) {
+        SearchRepositoryRequestDto searchRepositoryRequestDto
+            = new SearchRepositoryRequestDto(
+                user.getAccessToken(), user.getUsername(), keyword, page, limit
+        );
+
+        RepositoryResponsesDto repositoryResponsesDtos =
+            postService.searchUserRepositories(searchRepositoryRequestDto);
+        List<RepositoryResponse> repositoryResponses = toRepositoryResponses(
+            repositoryResponsesDtos.getRepositoryResponsesDto()
+        );
+
+        return ResponseEntity.ok(repositoryResponses);
     }
 
     private List<RepositoryResponse> toRepositoryResponses(

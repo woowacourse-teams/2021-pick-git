@@ -97,3 +97,9 @@ include::{snippets}/post-update-Over500Content/http-response.adoc[]
 include::{snippets}/post-delete/http-request.adoc[]
 ==== Response
 include::{snippets}/post-delete/http-response.adoc[]
+
+=== 레포지토리 검색 요청 - 로그인
+==== Request
+include::{snippets}/post-searchRepositories-loggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/post-searchRepositories-loggedIn/http-response.adoc[]

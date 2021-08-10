@@ -49,6 +49,7 @@ public class OAuthConfiguration implements WebMvcConfigurer {
             authenticationInterceptor())
             .addPathPatterns("/api/posts/me", HttpMethod.GET)
             .addPathPatterns("/api/github/repositories", HttpMethod.GET)
+            .addPathPatterns("/api/github/search/repositories", HttpMethod.GET)
             .addPathPatterns("/api/github/repositories/*/tags/languages", HttpMethod.GET)
             .addPathPatterns("/api/posts", HttpMethod.POST)
             .addPathPatterns("/api/posts/*/likes", HttpMethod.PUT, HttpMethod.DELETE)

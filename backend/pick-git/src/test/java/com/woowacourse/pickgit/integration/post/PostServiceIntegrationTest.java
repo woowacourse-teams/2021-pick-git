@@ -26,6 +26,7 @@ import com.woowacourse.pickgit.post.application.dto.request.PostDeleteRequestDto
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.SearchRepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
@@ -237,7 +238,7 @@ class PostServiceIntegrationTest {
 
     @DisplayName("토큰이 유효하지 않은 경우 예외가 발생한다. - 500 예외")
     @Test
-    void showRepositories_InvalidAccessToken_401Exception() {
+    void showRepositories_InvalidAccessToken_500Exception() {
         // given
         RepositoryRequestDto requestDto = createRepositoryRequestDto("invalidToken", USERNAME);
 
@@ -248,7 +249,6 @@ class PostServiceIntegrationTest {
             .extracting("errorCode")
             .isEqualTo("V0001");
     }
-
     @DisplayName("사용자가 유효하지 않은 경우 예외가 발생한다. - 500 예외")
     @Test
     void showRepositories_InvalidUsername_404Exception() {
@@ -270,6 +270,42 @@ class PostServiceIntegrationTest {
             .page(0L)
             .limit(50L)
             .build();
+    }
+
+    @DisplayName("사용자는 Repository 목록을 검색해서 가져올 수 있다.")
+    @Test
+    void searchUserRepositories_LoginUser_Success() {
+        // given
+        SearchRepositoryRequestDto requestDto =
+            new SearchRepositoryRequestDto(
+                ACCESS_TOKEN, USERNAME, "woowa", 0, 2
+            );
+
+        // when
+        RepositoryResponsesDto repositoryResponsesDto = postService
+            .searchUserRepositories(requestDto);
+
+        // then
+        assertThat(repositoryResponsesDto.getRepositoryResponsesDto())
+            .hasSize(2);
+    }
+
+    @DisplayName("레포지토리 검색 시 토큰이 유효하지 않은 경우 예외가 발생한다. - 500 예외")
+    @Test
+    void searchUserRepositories_InvalidAccessToken_500Exception() {
+        // given
+        String invalidToken = "invalidToken";
+
+        SearchRepositoryRequestDto requestDto = new SearchRepositoryRequestDto(
+            invalidToken, USERNAME, "woowa", 0, 2
+        );
+
+        // then
+        assertThatThrownBy(() -> {
+            postService.searchUserRepositories(requestDto);
+        }).isInstanceOf(PlatformHttpErrorException.class)
+            .extracting("errorCode")
+            .isEqualTo("V0001");
     }
 
     @DisplayName("사용자는 특정 게시물을 좋아요 할 수 있다. - 성공")
