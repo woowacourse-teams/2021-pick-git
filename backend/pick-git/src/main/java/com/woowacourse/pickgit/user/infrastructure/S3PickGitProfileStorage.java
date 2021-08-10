@@ -5,9 +5,8 @@ import com.woowacourse.pickgit.post.domain.util.RestClient;
 import com.woowacourse.pickgit.post.infrastructure.S3Storage.StorageDto;
 import com.woowacourse.pickgit.user.domain.profile.PickGitProfileStorage;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
@@ -73,12 +72,11 @@ public class S3PickGitProfileStorage implements PickGitProfileStorage {
 
     private File fileFrom(byte[] image) {
         try {
-            Path path = Files.write(
-                Files.createTempFile(null, null),
-                image
-            );
-
-            return path.toFile();
+            File tempFile = File.createTempFile("temp", null, null);
+            try (FileOutputStream fos = new FileOutputStream(tempFile)) {
+                fos.write(image);
+                return tempFile;
+            }
         } catch (IOException e) {
             throw new PlatformHttpErrorException();
         }
