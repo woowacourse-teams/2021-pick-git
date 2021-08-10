@@ -6,7 +6,6 @@ import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.exception.post.PostNotBelongToUserException;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
-import com.woowacourse.pickgit.post.application.dto.request.CommentRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostDeleteRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
@@ -19,7 +18,6 @@ import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseD
 import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponsesDto;
 import com.woowacourse.pickgit.post.domain.Post;
-import com.woowacourse.pickgit.post.domain.comment.Comment;
 import com.woowacourse.pickgit.post.domain.repository.PickGitStorage;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.post.domain.util.PlatformRepositoryExtractor;
@@ -98,30 +96,6 @@ public class PostService {
             .images(imageUrls)
             .githubRepoUrl(githubRepoUrl)
             .author(user)
-            .build();
-    }
-
-    public CommentResponseDto addComment(CommentRequestDto commentRequestDto) {
-        String userName = commentRequestDto.getUserName();
-        Long postId = commentRequestDto.getPostId();
-        String content = commentRequestDto.getContent();
-
-        User user = findUserByName(userName);
-        Post post = findPostById(postId);
-
-        Comment comment = new Comment(content, user);
-        post.addComment(comment);
-
-        return createCommentResponseDto(comment);
-    }
-
-    private CommentResponseDto createCommentResponseDto(Comment comment) {
-        return CommentResponseDto.builder()
-            .id(comment.getId())
-            .profileImageUrl(comment.getProfileImageUrl())
-            .authorName(comment.getAuthorName())
-            .content(comment.getContent())
-            .liked(false)
             .build();
     }
 

@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.post.domain.comment;
+package com.woowacourse.pickgit.comment.domain;
 
 import com.woowacourse.pickgit.post.domain.Post;
 import java.util.ArrayList;

@@ -3,12 +3,13 @@ package com.woowacourse.pickgit.integration.post;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.woowacourse.pickgit.comment.application.CommentService;
 import com.woowacourse.pickgit.common.factory.PostFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.post.application.PostFeedService;
 import com.woowacourse.pickgit.post.application.PostService;
-import com.woowacourse.pickgit.post.application.dto.request.CommentRequestDto;
+import com.woowacourse.pickgit.comment.application.dto.request.CommentRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.HomeFeedRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
@@ -35,6 +36,9 @@ public class PostFeedServiceIntegrationTest {
 
     @Autowired
     private PostService postService;
+
+    @Autowired
+    private CommentService commentService;
 
     @Autowired
     private PostFeedService postFeedService;
@@ -88,7 +92,7 @@ public class PostFeedServiceIntegrationTest {
 
                 CommentRequestDto commentRequestDto =
                     new CommentRequestDto(user.getName(), "test comment" + index, postId);
-                postService.addComment(commentRequestDto);
+                commentService.addComment(commentRequestDto);
             });
     }
 

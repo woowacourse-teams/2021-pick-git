@@ -44,11 +44,12 @@ import com.woowacourse.pickgit.exception.post.CannotUnlikeException;
 import com.woowacourse.pickgit.exception.post.CommentFormatException;
 import com.woowacourse.pickgit.exception.post.DuplicatedLikeException;
 import com.woowacourse.pickgit.post.application.PostService;
-import com.woowacourse.pickgit.post.application.dto.request.CommentRequestDto;
+import com.woowacourse.pickgit.comment.application.dto.request.CommentRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostDeleteRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
+import com.woowacourse.pickgit.comment.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.post.application.dto.request.SearchRepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
@@ -57,13 +58,14 @@ import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseD
 import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponsesDto;
 import com.woowacourse.pickgit.post.presentation.PostController;
-import com.woowacourse.pickgit.post.presentation.dto.request.ContentRequest;
+import com.woowacourse.pickgit.comment.presentation.dto.request.ContentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
 import com.woowacourse.pickgit.post.presentation.dto.response.LikeResponse;
 import com.woowacourse.pickgit.post.presentation.dto.response.PostUpdateResponse;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -167,113 +169,6 @@ class PostControllerTest {
 
         verify(oAuthService, times(1))
             .validateToken(null);
-    }
-
-    @DisplayName("특정 Post에 Comment을 추가한다.")
-    @Test
-    void addComment_ValidContent_Success() throws Exception {
-        // given
-        LoginUser loginUser = new LoginUser("kevin", "token");
-        CommentResponseDto commentResponseDto = CommentResponseDto.builder()
-            .id(1L)
-            .profileImageUrl("kevin profile image url")
-            .authorName(loginUser.getUsername())
-            .content("test Comment")
-            .liked(false)
-            .build();
-        ContentRequest commentRequest = new ContentRequest("test Comment");
-
-        given(oAuthService.validateToken(anyString()))
-            .willReturn(true);
-        given(oAuthService.findRequestUserByToken(anyString()))
-            .willReturn(loginUser);
-        given(postService.addComment(any(CommentRequestDto.class)))
-            .willReturn(commentResponseDto);
-
-        String requestBody = objectMapper.writeValueAsString(commentRequest);
-        String responseBody = objectMapper.writeValueAsString(commentResponseDto);
-
-        // when
-        ResultActions perform = addCommentApi("/api/posts/{postId}/comments", 1L, requestBody);
-
-        // then
-        perform
-            .andExpect(status().isOk())
-            .andExpect(content().string(responseBody));
-
-        verify(postService, times(1)).addComment(any(CommentRequestDto.class));
-
-        // documentation
-        perform.andDo(document("comment-post",
-            getDocumentRequest(),
-            getDocumentResponse(),
-            requestHeaders(
-                headerWithName(HttpHeaders.AUTHORIZATION).description("bearer token")
-            ),
-            pathParameters(
-                parameterWithName("postId").description("포스트 id")
-            ),
-            requestFields(
-                fieldWithPath("content").type(STRING).description("댓글 내용")
-            ),
-            responseFields(
-                fieldWithPath("id").type(NUMBER).description("댓글 id"),
-                fieldWithPath("profileImageUrl").type(STRING).description("댓글 작성자 프로필 사진"),
-                fieldWithPath("authorName").type(STRING).description("작성자 이름"),
-                fieldWithPath("content").type(STRING).description("댓글 내용"),
-                fieldWithPath("liked").type(BOOLEAN).description("좋아요 여부")
-            )
-        ));
-    }
-
-    @DisplayName("특정 Post에 댓글 등록 실패한다. - 빈 Comment인 경우.")
-    @Test
-    void addComment_InValidContent_ExceptionThrown() throws Exception {
-        // given
-        ContentRequest commentRequest = new ContentRequest("");
-
-        LoginUser loginUser = new LoginUser("kevin", "token");
-        given(oAuthService.validateToken(anyString()))
-            .willReturn(true);
-        given(oAuthService.findRequestUserByToken(anyString()))
-            .willReturn(loginUser);
-        given(postService.addComment(any(CommentRequestDto.class)))
-            .willThrow(new CommentFormatException());
-
-        String requestBody = objectMapper.writeValueAsString(commentRequest);
-
-        // when
-        ResultActions perform = addCommentApi("/api/posts/{postId}/comments", 1L, requestBody);
-
-        // then
-        perform
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("errorCode").value("F0001"));
-
-        verify(postService, never()).addComment(any(CommentRequestDto.class));
-
-        // documentation
-        perform.andDo(document("comment-post-emptyContent",
-            getDocumentRequest(),
-            getDocumentResponse(),
-            requestHeaders(
-                headerWithName(HttpHeaders.AUTHORIZATION).description("bearer token")
-            ),
-            pathParameters(
-                parameterWithName("postId").description("포스트 id")
-            ),
-            responseFields(
-                fieldWithPath("errorCode").type(STRING).description("에러 코드")
-            )
-        ));
-    }
-
-    private ResultActions addCommentApi(String url, Long postId, String requestBody)
-        throws Exception {
-        return mockMvc.perform(post(url, postId)
-            .header(HttpHeaders.AUTHORIZATION, "Bearer test")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(requestBody));
     }
 
     @DisplayName("사용자는 Repository 목록을 가져올 수 있다.")

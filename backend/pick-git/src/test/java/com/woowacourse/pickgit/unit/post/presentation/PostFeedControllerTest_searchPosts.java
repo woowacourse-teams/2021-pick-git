@@ -26,7 +26,7 @@ import com.woowacourse.pickgit.post.application.PostDtoAssembler;
 import com.woowacourse.pickgit.post.application.PostFeedService;
 import com.woowacourse.pickgit.post.application.dto.request.SearchPostsRequestDto;
 import com.woowacourse.pickgit.post.domain.Post;
-import com.woowacourse.pickgit.post.domain.comment.Comment;
+import com.woowacourse.pickgit.comment.domain.Comment;
 import com.woowacourse.pickgit.post.presentation.PostFeedController;
 import com.woowacourse.pickgit.tag.domain.Tag;
 import com.woowacourse.pickgit.user.domain.User;

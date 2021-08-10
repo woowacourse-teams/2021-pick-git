@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.post.application.dto.response;
 
+import com.woowacourse.pickgit.comment.application.dto.response.CommentResponseDto;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
