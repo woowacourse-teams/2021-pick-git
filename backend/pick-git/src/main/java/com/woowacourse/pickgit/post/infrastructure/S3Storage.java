@@ -6,11 +6,9 @@ import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.post.domain.repository.PickGitStorage;
 import com.woowacourse.pickgit.post.domain.util.RestClient;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -86,11 +84,12 @@ public class S3Storage implements PickGitStorage {
 
     private File tryCreateTempFile(MultipartFile multipartFile) {
         try {
-            Path tempFile = Files.createTempFile(null, null);
-            Files.write(tempFile, multipartFile.getBytes());
-
-            return tempFile.toFile();
-        } catch (IOException ioException) {
+            File tempFile = File.createTempFile("temp", null, null);
+            try (FileOutputStream fos = new FileOutputStream(tempFile)) {
+                fos.write(multipartFile.getBytes());
+                return tempFile;
+            }
+        } catch (IOException e) {
             throw new PlatformHttpErrorException();
         }
     }
