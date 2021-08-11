@@ -25,8 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
 @Import(InfrastructureTestConfiguration.class)
@@ -83,7 +81,7 @@ public class CommentServiceIntegrationTest {
         User savedTestUser = userRepository.save(testUser);
 
         User kevin = UserFactory.user("kevin");
-        User savedKevin = userRepository.save(kevin);
+        userRepository.save(kevin);
 
         Post post = Post.builder()
             .content("testContent")

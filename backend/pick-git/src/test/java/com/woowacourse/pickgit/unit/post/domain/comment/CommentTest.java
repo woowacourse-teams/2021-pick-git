@@ -2,8 +2,8 @@ package com.woowacourse.pickgit.unit.post.domain.comment;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 
-import com.woowacourse.pickgit.exception.post.CommentFormatException;
 import com.woowacourse.pickgit.comment.domain.Comment;
+import com.woowacourse.pickgit.exception.post.CommentFormatException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
