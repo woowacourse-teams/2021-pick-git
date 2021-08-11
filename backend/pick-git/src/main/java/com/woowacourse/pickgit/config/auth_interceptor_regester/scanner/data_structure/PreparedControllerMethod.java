@@ -1,7 +1,6 @@
 package com.woowacourse.pickgit.config.auth_interceptor_regester.scanner.data_structure;
 
-import com.woowacourse.pickgit.config.auth_interceptor_regester.scanner.RegisterType;
-import java.util.List;
+import com.woowacourse.pickgit.config.auth_interceptor_regester.register_type.RegisterType;
 import org.springframework.http.HttpMethod;
 
 public class PreparedControllerMethod {

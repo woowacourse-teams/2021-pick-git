@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.woowacourse.pickgit.config.auth_interceptor_regester.scanner.ControllerScanner;
 import com.woowacourse.pickgit.config.auth_interceptor_regester.scanner.ForGuestScanner;
 import com.woowacourse.pickgit.config.auth_interceptor_regester.scanner.ForLoginUserScanner;
-import com.woowacourse.pickgit.config.auth_interceptor_regester.scanner.RegisterType;
+import com.woowacourse.pickgit.config.auth_interceptor_regester.register_type.RegisterType;
 import com.woowacourse.pickgit.config.auth_interceptor_regester.scanner.data_structure.PreparedControllerMethod;
 import com.woowacourse.pickgit.config.auth_interceptor_regester.scanner.test_classes.ClassOne;
 import com.woowacourse.pickgit.config.auth_interceptor_regester.scanner.test_classes.ClassThree;
@@ -34,10 +34,12 @@ class UriParserTest {
 
         List<PreparedControllerMethod> actual = uriParser
             .getPreparedControllerMethod();
-        actual.sort(comparing(PreparedControllerMethod::getUrls));
+        actual.sort(comparing(PreparedControllerMethod::getUrls)
+            .thenComparing(PreparedControllerMethod::getHttpMethod));
 
         List<PreparedControllerMethod> expected = expected();
-        expected.sort(comparing(PreparedControllerMethod::getUrls));
+        expected.sort(comparing(PreparedControllerMethod::getUrls)
+            .thenComparing(PreparedControllerMethod::getHttpMethod));
 
         assertThat(actual)
             .usingRecursiveComparison()
@@ -60,6 +62,9 @@ class UriParserTest {
             ),
             new PreparedControllerMethod(
                 "/test9", HttpMethod.DELETE, RegisterType.AUTHENTICATE
+            ),
+            new PreparedControllerMethod(
+                "/test9", HttpMethod.PUT, RegisterType.AUTHENTICATE
             )
         ));
     }

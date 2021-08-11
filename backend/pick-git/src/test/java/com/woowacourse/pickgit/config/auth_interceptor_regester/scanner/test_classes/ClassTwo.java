@@ -20,7 +20,8 @@ public class ClassTwo {
 
     }
 
-    @PutMapping("/test8")
+    @ForLoginUser
+    @PutMapping("/test9")
     public void test3() {
 
     }

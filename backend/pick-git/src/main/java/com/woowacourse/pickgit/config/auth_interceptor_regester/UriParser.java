@@ -7,7 +7,7 @@ import com.woowacourse.pickgit.config.auth_interceptor_regester.scanner.Controll
 import com.woowacourse.pickgit.config.auth_interceptor_regester.scanner.ForGuestScanner;
 import com.woowacourse.pickgit.config.auth_interceptor_regester.scanner.ForLoginUserScanner;
 import com.woowacourse.pickgit.config.auth_interceptor_regester.scanner.MethodMapper;
-import com.woowacourse.pickgit.config.auth_interceptor_regester.scanner.RegisterType;
+import com.woowacourse.pickgit.config.auth_interceptor_regester.register_type.RegisterType;
 import com.woowacourse.pickgit.config.auth_interceptor_regester.scanner.data_structure.PreparedControllerMethod;
 import com.woowacourse.pickgit.config.auth_interceptor_regester.scanner.data_structure.PrepreparedControllerMethod;
 import java.lang.annotation.Annotation;
