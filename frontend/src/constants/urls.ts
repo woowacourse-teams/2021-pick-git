@@ -38,7 +38,7 @@ export const API_URL = {
     GITHUB: "/authorization/github",
   },
   SELF_PROFILE: "/profiles/me",
-  SELF_PROFILE_IMAGE: (fileName: string) => `/profiles/me/image/${fileName}`,
+  SELF_PROFILE_IMAGE: "/profiles/me/image",
   SELF_PROFILE_DESCRIPTION: "/profiles/me/description",
   ADD_POSTS: "/posts",
   GITHUB_REPOSITORIES: (keyword: string, page: number, limit: number) =>
