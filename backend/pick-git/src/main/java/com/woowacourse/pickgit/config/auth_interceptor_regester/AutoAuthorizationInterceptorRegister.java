@@ -44,9 +44,9 @@ public class AutoAuthorizationInterceptorRegister {
 
         for (var storageForRegisterType : storageForRegisterTypes) {
             if (storageForRegisterType.isSatisfiedBy(RegisterType.AUTHENTICATE)) {
-                storageForRegisterType.appendTo(authenticationInterceptor);
+                storageForRegisterType.appendTo(authenticationInterceptor, ignoreAuthenticationInterceptor);
             } else {
-                storageForRegisterType.appendTo(ignoreAuthenticationInterceptor);
+                storageForRegisterType.appendTo(ignoreAuthenticationInterceptor, authenticationInterceptor);
             }
         }
     }

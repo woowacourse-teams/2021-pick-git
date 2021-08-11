@@ -4,7 +4,7 @@ import com.woowacourse.pickgit.authentication.presentation.interceptor.PathMatch
 import org.springframework.http.HttpMethod;
 
 public interface StorageForRegisterType {
-    void appendTo(PathMatchInterceptor pathMatchInterceptor);
+    void appendTo(PathMatchInterceptor include, PathMatchInterceptor exclude);
     boolean isSatisfiedBy(RegisterType registerType);
     void put(String key, HttpMethod value);
     RegisterType getType();
