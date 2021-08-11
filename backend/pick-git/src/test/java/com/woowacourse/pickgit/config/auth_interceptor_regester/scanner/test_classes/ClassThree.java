@@ -20,7 +20,7 @@ public class ClassThree {
     }
 
     @ForLoginUser
-    @PostMapping("/test2")
+    @PostMapping("/test2/{testId}/test")
     public void test2() {
 
     }
@@ -32,7 +32,7 @@ public class ClassThree {
     }
 
     @ForGuest
-    @DeleteMapping("/test4")
+    @DeleteMapping("/test4/{testId}")
     public void test4() {
 
     }

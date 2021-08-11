@@ -71,7 +71,7 @@ class AutoAuthorizationInterceptorRegisterTest {
     private List<Pair> authenticationExpected() {
         return new ArrayList<>(List.of(
             new Pair("/api/test1", List.of(HttpMethod.GET)),
-            new Pair("/api/test2", List.of(HttpMethod.POST)),
+            new Pair("/api/test2/*/test", List.of(HttpMethod.POST)),
             new Pair("/test9", List.of(HttpMethod.DELETE, HttpMethod.PUT))
         ));
     }
@@ -79,7 +79,7 @@ class AutoAuthorizationInterceptorRegisterTest {
     private List<Pair> ignoreAuthenticationExpected() {
         return new ArrayList<>(List.of(
             new Pair("/api/test3", List.of(HttpMethod.PUT)),
-            new Pair("/api/test4", List.of(HttpMethod.DELETE))
+            new Pair("/api/test4/*", List.of(HttpMethod.DELETE))
         ));
     }
 

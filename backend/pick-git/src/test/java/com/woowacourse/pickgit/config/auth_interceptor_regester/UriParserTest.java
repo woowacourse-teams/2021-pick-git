@@ -52,13 +52,13 @@ class UriParserTest {
                 "/api/test1", HttpMethod.GET, RegisterType.AUTHENTICATE
             ),
             new PreparedControllerMethod(
-                "/api/test2", HttpMethod.POST, RegisterType.AUTHENTICATE
+                "/api/test2/*/test", HttpMethod.POST, RegisterType.AUTHENTICATE
             ),
             new PreparedControllerMethod(
                 "/api/test3", HttpMethod.PUT, RegisterType.IGNORE_AUTHENTICATE
             ),
             new PreparedControllerMethod(
-                "/api/test4", HttpMethod.DELETE, RegisterType.IGNORE_AUTHENTICATE
+                "/api/test4/*", HttpMethod.DELETE, RegisterType.IGNORE_AUTHENTICATE
             ),
             new PreparedControllerMethod(
                 "/test9", HttpMethod.DELETE, RegisterType.AUTHENTICATE
