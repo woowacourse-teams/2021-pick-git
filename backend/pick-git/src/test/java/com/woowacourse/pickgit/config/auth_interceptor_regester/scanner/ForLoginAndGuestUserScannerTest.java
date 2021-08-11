@@ -15,9 +15,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class ForLoginUserScannerTest {
+class ForLoginAndGuestUserScannerTest {
 
-    @DisplayName("forLoginUser 어노테이션이 있는 method를 추출한다.")
+    @DisplayName("forGuest 어노테이션이 있는 method를 추출한다.")
     @ParameterizedTest
     @MethodSource("getParametersForParseMethods")
     void parseMethods(Class<?> classToken, int size) {
