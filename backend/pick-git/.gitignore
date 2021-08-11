@@ -39,3 +39,9 @@ out/
 ### Submodule ###
 src/main/resources/application-security.yml
 src/main/resources/application-prod.yml
+
+### REST Docs ###
+src/main/resources/static/docs/
+
+### JaCoCo ###
+src/jacoco/
