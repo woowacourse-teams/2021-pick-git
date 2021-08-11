@@ -19,3 +19,16 @@ include::{snippets}/comment-post/http-response.adoc[]
 include::{snippets}/comment-post-emptyContent/http-request.adoc[]
 ==== Response
 include::{snippets}/comment-post-emptyContent/http-response.adoc[]
+
+=== 댓글 요청 - 사용자
+==== Request
+include::{snippets}/comment-queryComments/http-request.adoc[]
+==== Response
+include::{snippets}/comment-queryComments/http-response.adoc[]
+
+=== 댓글 요청 - 게스트
+==== Request
+include::{snippets}/comment-queryComments-guest/http-request.adoc[]
+==== Response
+include::{snippets}/comment-queryComments-guest/http-response.adoc[]
+

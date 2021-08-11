@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.unit.comment;
+package com.woowacourse.pickgit.unit.comment.presentation;
 
 import static com.woowacourse.pickgit.docs.ApiDocumentUtils.getDocumentRequest;
 import static com.woowacourse.pickgit.docs.ApiDocumentUtils.getDocumentResponse;
