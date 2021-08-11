@@ -29,7 +29,6 @@ public class UriParser {
     private final ForGuestScanner forGuestScanner;
     private final ForLoginUserScanner forLoginUserScanner;
 
-
     public UriParser(ControllerScanner controllerScanner,
         ForGuestScanner forGuestScanner,
         ForLoginUserScanner forLoginUserScanner

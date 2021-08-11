@@ -4,6 +4,8 @@ import static java.util.stream.Collectors.toList;
 
 import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
+import com.woowacourse.pickgit.config.auth_interceptor_regester.ForLoginAndGuestUser;
+import com.woowacourse.pickgit.config.auth_interceptor_regester.ForOnlyLoginUser;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowRequestDto;
@@ -52,6 +54,7 @@ public class UserController {
         this.userService = userService;
     }
 
+    @ForOnlyLoginUser
     @GetMapping("/me")
     public ResponseEntity<UserProfileResponse> getAuthenticatedUserProfile(
         @Authenticated AppUser appUser
@@ -62,6 +65,7 @@ public class UserController {
         return ResponseEntity.ok(createUserProfileResponse(responseDto));
     }
 
+    @ForLoginAndGuestUser
     @GetMapping("/{username}")
     public ResponseEntity<UserProfileResponse> getUserProfile(
         @Authenticated AppUser appUser,
@@ -93,6 +97,7 @@ public class UserController {
             .build();
     }
 
+    @ForOnlyLoginUser
     @PostMapping("/{username}/followings")
     public ResponseEntity<FollowResponse> followUser(
         @Authenticated AppUser appUser,
@@ -111,6 +116,7 @@ public class UserController {
         return ResponseEntity.ok(createFollowResponse(followResponseDto));
     }
 
+    @ForOnlyLoginUser
     @DeleteMapping("/{username}/followings")
     public ResponseEntity<FollowResponse> unfollowUser(
         @Authenticated AppUser appUser,
@@ -136,6 +142,7 @@ public class UserController {
             .build();
     }
 
+    @ForOnlyLoginUser
     @PostMapping("/me")
     public ResponseEntity<ProfileEditResponse> editProfile(
         @Authenticated AppUser appUser,
@@ -158,6 +165,7 @@ public class UserController {
         );
     }
 
+    @ForOnlyLoginUser
     @PutMapping("/me/image")
     public ResponseEntity<ProfileImageEditResponse> editProfileImage(
         @Authenticated AppUser appUser,
@@ -173,6 +181,7 @@ public class UserController {
         return ResponseEntity.ok(new ProfileImageEditResponse(responseDto.getImageUrl()));
     }
 
+    @ForOnlyLoginUser
     @PutMapping("/me/description")
     public ResponseEntity<ProfileDescriptionResponse> editProfileDescription(
         @Authenticated AppUser appUser,
@@ -186,6 +195,7 @@ public class UserController {
         return ResponseEntity.ok(new ProfileDescriptionResponse(editResult));
     }
 
+    @ForOnlyLoginUser
     @GetMapping("/{username}/contributions")
     public ResponseEntity<ContributionResponse> getContributions(
         @Authenticated AppUser user,
@@ -214,6 +224,7 @@ public class UserController {
             .build();
     }
 
+    @ForLoginAndGuestUser
     @GetMapping("/{username}/followings")
     public ResponseEntity<List<UserSearchResponse>> searchFollowings(
         @Authenticated AppUser appUser,
@@ -232,6 +243,7 @@ public class UserController {
         return ResponseEntity.ok(createUserSearchResponses(userSearchResponseDtos));
     }
 
+    @ForLoginAndGuestUser
     @GetMapping("/{username}/followers")
     public ResponseEntity<List<UserSearchResponse>> searchFollowers(
         @Authenticated AppUser appUser,

@@ -13,9 +13,8 @@ public class AuthenticateStorageForRegisterType implements StorageForRegisterTyp
     private Map<String, List<HttpMethod>> cache = new HashMap<>();
 
     @Override
-    public void appendTo(PathMatchInterceptor include, PathMatchInterceptor exclude) {
+    public void appendTo(PathMatchInterceptor include) {
         cache.forEach(include::addPathPatterns);
-        cache.forEach(exclude::excludePatterns);
     }
 
     @Override
