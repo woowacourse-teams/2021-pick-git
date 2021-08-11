@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.unit.post.application;
+package com.woowacourse.pickgit.unit.comment.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
