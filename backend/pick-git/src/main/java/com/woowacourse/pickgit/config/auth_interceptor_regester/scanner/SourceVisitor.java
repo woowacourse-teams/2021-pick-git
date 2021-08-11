@@ -30,6 +30,9 @@ public class SourceVisitor implements FileVisitor<Path> {
     public FileVisitResult preVisitDirectory(
         Path dir, BasicFileAttributes attrs
     ) throws IOException {
+        if(dir.getFileName().toString().contains("test")) {
+            return FileVisitResult.SKIP_SUBTREE;
+        }
         return FileVisitResult.CONTINUE;
     }
 
