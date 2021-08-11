@@ -5,17 +5,16 @@ import static java.util.stream.Collectors.toList;
 import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.comment.application.CommentService;
+import com.woowacourse.pickgit.comment.application.dto.request.CommentDeleteRequestDto;
+import com.woowacourse.pickgit.comment.application.dto.request.CommentRequestDto;
 import com.woowacourse.pickgit.comment.application.dto.request.QueryCommentRequestDto;
+import com.woowacourse.pickgit.comment.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.comment.presentation.dto.request.ContentRequest;
 import com.woowacourse.pickgit.comment.presentation.dto.response.CommentResponse;
-import com.woowacourse.pickgit.comment.application.dto.request.CommentRequestDto;
-import com.woowacourse.pickgit.comment.application.dto.response.CommentResponseDto;
 import java.util.List;
 import javax.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -93,7 +92,6 @@ public class CommentController {
     }
 
     private CommentResponse createCommentResponse(CommentResponseDto commentResponseDto) {
-
         return CommentResponse.builder()
             .id(commentResponseDto.getId())
             .profileImageUrl(commentResponseDto.getProfileImageUrl())
@@ -103,4 +101,26 @@ public class CommentController {
             .build();
     }
 
+    @DeleteMapping("/posts/{postId}/comments/{commentId}")
+    public ResponseEntity<Void> delete(
+        @Authenticated AppUser user,
+        @PathVariable Long postId,
+        @PathVariable Long commentId
+    ) {
+        commentService.delete(createCommentDeleteRequestDto(user, postId, commentId));
+
+        return ResponseEntity.noContent().build();
+    }
+
+    private CommentDeleteRequestDto createCommentDeleteRequestDto(
+        AppUser user,
+        Long postId,
+        Long commentId
+    ) {
+        return CommentDeleteRequestDto.builder()
+            .username(user.getUsername())
+            .postId(postId)
+            .commentId(commentId)
+            .build();
+    }
 }

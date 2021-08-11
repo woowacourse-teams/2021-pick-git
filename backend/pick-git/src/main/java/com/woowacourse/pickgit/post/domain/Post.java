@@ -132,6 +132,10 @@ public class Post {
         addTags(tags);
     }
 
+    public void deleteComment(User user, Comment comment) {
+        comments.delete(this, user, comment);
+    }
+
     public Long getId() {
         return id;
     }

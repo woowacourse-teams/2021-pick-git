@@ -1,6 +1,8 @@
 package com.woowacourse.pickgit.comment.domain;
 
+import com.woowacourse.pickgit.exception.comment.CommentNotFoundException;
 import com.woowacourse.pickgit.post.domain.Post;
+import com.woowacourse.pickgit.user.domain.User;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
@@ -29,6 +31,16 @@ public class Comments {
     public void addComment(Comment comment, Post targetPost) {
         comment.belongTo(targetPost);
         comments.add(comment);
+    }
+
+    public void delete(Post post, User user, Comment comment) {
+        comments.stream()
+            .filter(postComment -> postComment.equals(comment))
+            .findAny()
+            .ifPresentOrElse(
+                postComment -> postComment.delete(this.getComments(), post, user),
+                CommentNotFoundException::new
+            );
     }
 
     public List<Comment> getComments() {

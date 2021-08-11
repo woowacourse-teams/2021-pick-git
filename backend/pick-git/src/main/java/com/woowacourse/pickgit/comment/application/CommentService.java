@@ -2,11 +2,13 @@ package com.woowacourse.pickgit.comment.application;
 
 import static java.util.stream.Collectors.toList;
 
+import com.woowacourse.pickgit.comment.application.dto.request.CommentDeleteRequestDto;
 import com.woowacourse.pickgit.comment.application.dto.request.CommentRequestDto;
 import com.woowacourse.pickgit.comment.application.dto.request.QueryCommentRequestDto;
 import com.woowacourse.pickgit.comment.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.comment.domain.Comment;
 import com.woowacourse.pickgit.comment.domain.CommentRepository;
+import com.woowacourse.pickgit.exception.comment.CommentNotFoundException;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
 import com.woowacourse.pickgit.post.domain.Post;
@@ -23,18 +25,18 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class CommentService {
 
+    private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
-    private final CommentRepository commentRepository;
 
     public CommentService(
+        CommentRepository commentRepository,
         UserRepository userRepository,
-        PostRepository postRepository,
-        CommentRepository commentRepository
+        PostRepository postRepository
     ) {
+        this.commentRepository = commentRepository;
         this.userRepository = userRepository;
         this.postRepository = postRepository;
-        this.commentRepository = commentRepository;
     }
 
     public List<CommentResponseDto> queryComments(QueryCommentRequestDto queryCommentRequestDto) {
@@ -75,8 +77,17 @@ public class CommentService {
             .build();
     }
 
-    private Post findPostById(Long id) {
-        return postRepository.findById(id)
+    public void delete(CommentDeleteRequestDto commentDeleteRequestDto) {
+        Post post = findPostById(commentDeleteRequestDto.getPostId());
+        User user = findUserByName(commentDeleteRequestDto.getUsername());
+        Comment comment = findCommentById(commentDeleteRequestDto.getCommentId());
+
+        post.deleteComment(user, comment);
+        commentRepository.delete(comment);
+    }
+
+    private Post findPostById(Long postId) {
+        return postRepository.findById(postId)
             .orElseThrow(PostNotFoundException::new);
     }
 
@@ -86,4 +97,8 @@ public class CommentService {
             .orElseThrow(UserNotFoundException::new);
     }
 
+    public Comment findCommentById(Long commentId) {
+        return commentRepository.findById(commentId)
+            .orElseThrow(CommentNotFoundException::new);
+    }
 }
