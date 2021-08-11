@@ -42,7 +42,9 @@ export const API_URL = {
   SELF_PROFILE_DESCRIPTION: "/profiles/me/description",
   ADD_POSTS: "/posts",
   GITHUB_REPOSITORIES: (keyword: string, page: number, limit: number) =>
-    `/github/repositories?keyword=${keyword}&page=${page}&limit=${limit}`,
+    keyword === ""
+      ? `/github/repositories?&page=${page}&limit=${limit}`
+      : `/github/search/repositories?keyword=${keyword}&page=${page}&limit=${limit}`,
   USER_PROFILE: (username: string) => `/profiles/${username}`,
   USER_PROFILE_FOLLOW: (username: string, githubFollowing: boolean) =>
     `/profiles/${username}/followings?githubFollowing=${githubFollowing}`,
