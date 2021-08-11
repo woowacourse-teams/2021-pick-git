@@ -58,7 +58,8 @@ public class CommentService {
         User user = findUserByName(commentRequestDto.getUserName());
         Post post = findPostById(commentRequestDto.getPostId());
 
-        Comment savedComment = commentRepository.save(new Comment(content, user, post));
+        Comment comment = post.addComment(content, user);
+        Comment savedComment = commentRepository.save(comment);
 
         return createCommentResponseDto(savedComment);
     }

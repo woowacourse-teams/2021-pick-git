@@ -23,6 +23,10 @@ public class Comments {
         this.comments = comments;
     }
 
+    public void add(Comment comment) {
+        comments.add(comment);
+    }
+
     public void delete(Post post, User user, Comment comment) {
         comments.stream()
             .filter(postComment -> postComment.equals(comment))

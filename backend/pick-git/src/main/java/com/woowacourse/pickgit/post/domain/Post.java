@@ -97,10 +97,6 @@ public class Post {
         return new Builder();
     }
 
-    public void addTags(List<Tag> tags) {
-        postTags.addAll(this, tags);
-    }
-
     public void like(User user) {
         Like like = new Like(this, user);
         likes.add(like);
@@ -127,6 +123,17 @@ public class Post {
     public void updateTags(List<Tag> tags) {
         postTags.clear();
         addTags(tags);
+    }
+
+    public void addTags(List<Tag> tags) {
+        postTags.addAll(this, tags);
+    }
+
+    public Comment addComment(String content, User user) {
+        Comment comment = new Comment(content, user, this);
+        comments.add(comment);
+
+        return comment;
     }
 
     public void deleteComment(User user, Comment comment) {

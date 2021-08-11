@@ -47,10 +47,14 @@ public class Comment {
     }
 
     public void delete(List<Comment> comments, Post post, User user) {
-        if (!post.isWrittenBy(user) && !this.user.equals(user)) {
+        if (!post.isWrittenBy(user) && !isCommentedBy(user)) {
             throw new CannotDeleteCommentException();
         }
         comments.remove(this);
+    }
+
+    private boolean isCommentedBy(User user) {
+        return this.user.equals(user);
     }
 
     public Long getId() {
