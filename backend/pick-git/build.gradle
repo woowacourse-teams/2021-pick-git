@@ -1,9 +1,9 @@
 plugins {
-	id "org.asciidoctor.convert" version "1.5.9.2"
+    id "org.asciidoctor.convert" version "1.5.9.2"
     id 'org.springframework.boot' version '2.5.2'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
-	id 'jacoco'
+    id 'jacoco'
 }
 
 group = 'com.woowacourse'
@@ -15,106 +15,130 @@ repositories {
 }
 
 dependencies {
-	implementation 'io.jsonwebtoken:jjwt:0.9.1'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.apache.httpcomponents:httpclient:4.5'
-	implementation 'net.rakugakibox.spring.boot:logback-access-spring-boot-starter:2.7.1'
+    implementation 'io.jsonwebtoken:jjwt:0.9.1'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.apache.httpcomponents:httpclient:4.5'
+    implementation 'net.rakugakibox.spring.boot:logback-access-spring-boot-starter:2.7.1'
 
-	compileOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.4'
+    compileOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.4'
 
-	runtimeOnly 'com.h2database:h2'
-	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 
-	asciidoctor 'org.springframework.restdocs:spring-restdocs-asciidoctor:1.2.6.RELEASE'
+    asciidoctor 'org.springframework.restdocs:spring-restdocs-asciidoctor:1.2.6.RELEASE'
 
-	compileOnly 'org.projectlombok:lombok:1.18.20'
-	annotationProcessor 'org.projectlombok:lombok:1.18.20'
+    compileOnly 'org.projectlombok:lombok:1.18.20'
+    annotationProcessor 'org.projectlombok:lombok:1.18.20'
 
-	testCompileOnly 'org.projectlombok:lombok:1.18.20'
-	testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
+    testCompileOnly 'org.projectlombok:lombok:1.18.20'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
 
-	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'io.rest-assured:rest-assured:4.4.0'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.rest-assured:rest-assured:4.4.0'
 }
 
 processResources.dependsOn('copySecurity')
 processResources.dependsOn('copyProd')
 
 task copySecurity(type: Copy) {
-	from './security/application-security.yml'
-	into './src/main/resources'
+    from './security/application-security.yml'
+    into './src/main/resources'
 }
 
 task copyProd(type: Copy) {
-	from './security/application-prod.yml'
-	into './src/main/resources'
-}
-
-// REST Docs setting
-ext {
-	snippetsDir = file('build/generated-snippets')
-}
-
-asciidoctor {
-	inputs.dir snippetsDir
-	dependsOn test
-}
-
-bootJar {
-	dependsOn asciidoctor
-
-	copy {
-		from 'build/asciidoc/html5'
-		into 'src/main/resources/static/docs'
-		include '*.html'
-	}
+    from './security/application-prod.yml'
+    into './src/main/resources'
 }
 
 test {
-	useJUnitPlatform()
+    useJUnitPlatform()
+}
 
-	finalizedBy 'jacocoTestReport'
+ext {
+    snippetsDir = file('build/generated-snippets')
+}
+
+asciidoctor {
+    dependsOn test
+
+    inputs.dir snippetsDir
+}
+
+bootJar {
+    dependsOn asciidoctor
+
+    copy {
+        from 'build/asciidoc/html5'
+        into 'src/main/resources/static/docs'
+        include '*.html'
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.5"
 }
 
 jacocoTestReport {
-	reports {
-		html.enabled true
-		xml.enabled true
-		csv.enabled false
+    dependsOn bootJar
 
-		html.destination file("src/jacoco/jacoco.html")
-		xml.destination file("src/jacoco/jacoco.xml")
-	}
+    reports {
+        html.enabled true
+        xml.enabled true
+        csv.enabled false
 
-	finalizedBy 'jacocoTestCoverageVerification'
+        html.destination file("src/jacoco/jacoco.html")
+        xml.destination file("src/jacoco/jacoco.xml")
+    }
+
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it,
+                    exclude: [
+                            '**/PickGitApplication*',
+                            '**/*Request*',
+                            '**/*Response*',
+                            '**/*Dto*',
+                            '**/*NameAndUrl*',
+                            '**/*Requester*',
+                            '**/*OAuthClient*',
+                            '**/common*',
+                            '**/format*',
+                            '**/*S3*'
+                    ])
+        }))
+    }
+
+    finalizedBy 'jacocoTestCoverageVerification'
 }
 
 jacocoTestCoverageVerification {
-	violationRules {
-		rule {
-			element = 'CLASS'
+    violationRules {
+        rule {
+            enabled = true
+            element = 'CLASS'
 
-			limit {
-				counter = 'METHOD'
-				value = 'COVEREDRATIO'
-				minimum = 0.65
-			}
+            limit {
+                counter = 'METHOD'
+                value = 'COVEREDRATIO'
+                minimum = 0.50
+            }
 
-			excludes = [
-					'**.*RestTemplate*',
-					'**.*PickGitApplication*',
-					'**.*Dto*',
-					'**.*Requester*',
-					'**.*Request*',
-					'**.*Response*',
-					'**.*OAuthClient*',
-					'**.*Exception*',
-					'**.*Storage*',
-					'**.*Interceptor*'
-			]
-		}
-	}
+            excludes = [
+                    '**.*RestTemplate*',
+                    '**.*PickGitApplication*',
+                    '**.*Request*',
+                    '**.*Response*',
+                    '**.*Dto*',
+                    '**.*NameAndUrl',
+                    '**.*Requester*',
+                    '**.*OAuthClient*',
+                    '**.*Interceptor*',
+                    '**.*Exception*',
+                    '**.*Storage*'
+            ]
+        }
+    }
 }
