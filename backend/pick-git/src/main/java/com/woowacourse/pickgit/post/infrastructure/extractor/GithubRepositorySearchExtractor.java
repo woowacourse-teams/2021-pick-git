@@ -7,6 +7,7 @@ import com.woowacourse.pickgit.exception.post.RepositoryParseException;
 import com.woowacourse.pickgit.post.domain.util.PlatformRepositoryApiRequester;
 import com.woowacourse.pickgit.post.domain.util.PlatformRepositorySearchExtractor;
 import com.woowacourse.pickgit.post.domain.util.dto.RepositoryNameAndUrl;
+import com.woowacourse.pickgit.post.infrastructure.dto.RepositoryItemDto;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -42,7 +43,7 @@ public class GithubRepositorySearchExtractor implements PlatformRepositorySearch
                 generateApiUrl(username, keyword, page + 1, limit)
         );
 
-        return parseToRepositories(response);
+        return parseToRepositories(response).getItems();
     }
 
     private String generateApiUrl(
@@ -61,7 +62,7 @@ public class GithubRepositorySearchExtractor implements PlatformRepositorySearch
         );
     }
 
-    private List<RepositoryNameAndUrl> parseToRepositories(String response) {
+    private RepositoryItemDto parseToRepositories(String response) {
         try {
             return objectMapper.readValue(response, new TypeReference<>() {
             });

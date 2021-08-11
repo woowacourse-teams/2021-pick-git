@@ -39,8 +39,8 @@ public class MockRepositoryApiRequester implements PlatformRepositoryApiRequeste
             return "[{\"name\": \"binghe-hi\", \"html_url\": \"https://github.com/jipark3/binghe-hi\"},"
                 + "{\"name\": \"doms-react\", \"html_url\": \"https://github.com/jipark3/doms-react\"}]";
         } else {
-            return "[{\"name\": \"woowa-binghe-hi\", \"html_url\": \"https://github.com/jipark3/woowa-binghe-hi\"},"
-                + "{\"name\": \"woowa-doms-react\", \"html_url\": \"https://github.com/jipark3/woowa-doms-react\"}]";
+            return "{\"items\": [{\"name\": \"woowa-binghe-hi\", \"html_url\": \"https://github.com/jipark3/woowa-binghe-hi\"},"
+                + "{\"name\": \"woowa-doms-react\", \"html_url\": \"https://github.com/jipark3/woowa-doms-react\"}]}";
         }
     }
 
