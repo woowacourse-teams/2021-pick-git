@@ -2,17 +2,18 @@ import styled from "styled-components";
 
 import defaultProfile from "../../../assets/images/default-profile.png";
 
-export const Container = styled.div`
-  display: inline-flex;
+export const Container = styled.div<React.CSSProperties>`
+  display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
+  height: 100%;
 `;
 
 export const CircleImage = styled.div<React.CSSProperties>`
   ${({ width, height, backgroundImage }) => `
     width: ${width};
-    height: ${height};
+    height: ${height};  
     background: no-repeat center/cover url(${backgroundImage ?? defaultProfile});
   `}
 

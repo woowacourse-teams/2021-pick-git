@@ -9,7 +9,7 @@ import { PAGE_URL } from "../../constants/urls";
 import useFollow from "../../services/hooks/useFollow";
 import useSearchPostData from "../../services/hooks/useSearchPostData";
 import useSearchUserData from "../../services/hooks/useSearchUserData";
-import { Container, Empty, KeywordsWrapper } from "./SearchPage.style";
+import { Container, ContentWrapper, Empty, KeywordsWrapper } from "./SearchPage.style";
 
 const tabNames = ["계정", "태그"];
 const searchTypeIndex = {
@@ -76,7 +76,7 @@ const SearchPage = () => {
       return <Empty>검색결과를 표시할 수 없습니다.</Empty>;
     }
 
-    return tabContents[tabIndex];
+    return <ContentWrapper>{tabContents[tabIndex]}</ContentWrapper>;
   };
 
   return (

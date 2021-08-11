@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { LAYOUT, Z_INDEX } from "../../constants/layout";
+import { setDesktopMediaQuery, setLaptopMediaQuery, setTabletMediaQuery, setMobileMediaQuery } from "./mediaQueries";
 
 export const Header = styled.header`
   position: fixed;
@@ -8,20 +9,27 @@ export const Header = styled.header`
   height: ${LAYOUT.HEADER_HEIGHT};
   background-color: ${({ theme }) => theme.color.white};
   z-index: ${Z_INDEX.LOWER};
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
 
-  @media (min-width: 425px) {
-    border-bottom: 1px solid ${({ theme }) => theme.color.borderColor};
-  }
+  ${setMobileMediaQuery`
+    box-shadow: none;
+  `}
 `;
 
 export const Page = styled.main`
   width: 100%;
   height: 100%;
-  max-width: 425px;
   padding-top: ${LAYOUT.HEADER_HEIGHT};
-  margin: 0 auto;
 
-  @media (min-width: 425px) {
-    padding-top: ${LAYOUT.PAGE_MARGIN_TOP};
-  }
+  ${setTabletMediaQuery`
+    padding: ${LAYOUT.PAGE_MARGIN_TOP} 3rem 0 3rem;
+  `}
+
+  ${setLaptopMediaQuery`
+    padding: ${LAYOUT.PAGE_MARGIN_TOP} 12rem 0 12rem;
+  `}
+
+  ${setDesktopMediaQuery`
+    padding: ${LAYOUT.PAGE_MARGIN_TOP} 24rem 0 24rem;
+  `}
 `;

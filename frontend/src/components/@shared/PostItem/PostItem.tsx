@@ -1,6 +1,6 @@
 import {
   Container,
-  CommentSliderToggleLink,
+  CommentPageMoveLink,
   CommentsWrapper,
   CommentWrapper,
   IconLink,
@@ -16,7 +16,7 @@ import {
   TagItemLinkButton,
   PostCreatedDateText,
   MoreContentLinkButton,
-  CommentSliderToggleLinkText,
+  CommentPageMoveLinkText,
   MoreCommentExistIndicator,
 } from "./PostItem.style";
 import Avatar from "../Avatar/Avatar";
@@ -181,10 +181,10 @@ const PostItem = ({
         </CommentsWrapper>
       </PostBody>
       <PostCreatedDateText>{currentTimeDiffText}</PostCreatedDateText>
-      <CommentSliderToggleLink onClick={onCommentInputClick}>
-        <CommentSliderToggleLinkText>{isLoggedIn ? "댓글 작성" : "댓글 보기"}</CommentSliderToggleLinkText>
+      <CommentPageMoveLink onClick={onCommentInputClick}>
+        <CommentPageMoveLinkText>{isLoggedIn ? "댓글 작성" : "댓글 보기"}</CommentPageMoveLinkText>
         <ArrowRightIcon />
-      </CommentSliderToggleLink>
+      </CommentPageMoveLink>
     </Container>
   );
 };

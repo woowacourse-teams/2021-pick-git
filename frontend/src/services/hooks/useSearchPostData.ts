@@ -32,7 +32,6 @@ const useSearchPostData = (type: string | null, prevData?: InfiniteData<Post[]>)
   } = useSearchPostResultQuery(type, keyword, queryKey);
 
   const handleIntersect = async () => {
-    console.log(isAllResultFetched);
     if (isAllResultFetched) return;
 
     await fetchNextPage();

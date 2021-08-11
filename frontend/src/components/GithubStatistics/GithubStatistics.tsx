@@ -7,7 +7,15 @@ import UserContext from "../../contexts/UserContext";
 import useGithubStatistics from "../../services/hooks/useGithubStatistics";
 import PageLoading from "../@layout/PageLoading/PageLoading";
 import CircleIcon from "../@shared/CircleIcon/CircleIcon";
-import { Container, ContributionGraphWrapper, GithubStatsWrapper, Stat, Empty } from "./GithubStatistics.style";
+import {
+  Container,
+  ContributionGraphWrapper,
+  GithubStatsWrapper,
+  Stat,
+  Empty,
+  StatsWrapper,
+  Heading,
+} from "./GithubStatistics.style";
 
 const stats: Stats = {
   stars: { name: "Stars", icon: <StarIcon />, countVariable: "starsCount" },
@@ -42,7 +50,7 @@ const GithubStatistics = ({ username, githubStatisticQueryResult }: Props) => {
       }
 
       return (
-        <>
+        <StatsWrapper>
           {Object.entries(stats).map(([key, content]) => (
             <Stat key={key}>
               <CircleIcon diameter="2.375rem" fontSize="0.625rem" name={content.name}>
@@ -51,13 +59,13 @@ const GithubStatistics = ({ username, githubStatisticQueryResult }: Props) => {
               <span>{data?.[content.countVariable] ?? 0}</span>
             </Stat>
           ))}
-        </>
+        </StatsWrapper>
       );
     };
 
     return (
       <>
-        <h2>Github Stats</h2>
+        <Heading>Github Stats</Heading>
         <GithubStatsWrapper>
           <Content />
         </GithubStatsWrapper>
@@ -80,7 +88,7 @@ const GithubStatistics = ({ username, githubStatisticQueryResult }: Props) => {
   return (
     <Container>
       <GithubStats />
-      <h2>Contribution Graph</h2>
+      <Heading>Contribution Graph</Heading>
       <ContributionGraphWrapper>
         <img
           src={`https://ghchart.rshah.org/${color.primaryColor.slice(1)}/${username}`}

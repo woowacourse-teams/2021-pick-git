@@ -74,13 +74,13 @@ const useComments = (selectedPostId: Post["id"]) => {
     setCommentsPages(newCommentsPages);
   };
 
-  const deletePostComment = async (commentId: CommentData["id"]) => {
+  const deletePostComment = async (postId: Post["id"], commentId: CommentData["id"]) => {
     if (!infiniteCommentsData) {
       return;
     }
 
     try {
-      await mutateDeleteComment({ postId: selectedPostId, commentId });
+      await mutateDeleteComment({ postId, commentId });
     } catch (error) {}
     const newCommentsPages = [...infiniteCommentsData.pages];
     const lastPage = newCommentsPages[newCommentsPages.length - 1];
