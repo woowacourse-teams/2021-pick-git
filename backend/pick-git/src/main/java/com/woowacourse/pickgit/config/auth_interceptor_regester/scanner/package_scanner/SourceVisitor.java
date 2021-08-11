@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.config.auth_interceptor_regester.scanner;
+package com.woowacourse.pickgit.config.auth_interceptor_regester.scanner.package_scanner;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
