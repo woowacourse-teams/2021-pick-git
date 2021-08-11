@@ -1,9 +1,10 @@
-import { Dispatch, SetStateAction, useContext, useState } from "react";
+import { Dispatch, SetStateAction, useContext, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { ThemeContext } from "styled-components";
 import { RepositoryIcon, SearchIcon } from "../../assets/icons";
 import { FAILURE_MESSAGE, REDIRECT_MESSAGE } from "../../constants/messages";
 import { PAGE_URL } from "../../constants/urls";
+import useDebounce from "../../services/hooks/@common/useDebounce";
 import useMessageModal from "../../services/hooks/@common/useMessageModal";
 import useThrottle from "../../services/hooks/@common/useThrottle";
 import { useGithubRepositoriesQuery } from "../../services/queries";
@@ -29,6 +30,7 @@ interface Props {
 }
 
 const RepositorySelector = ({ setGithubRepositoryName, goNextStep }: Props) => {
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [searchKeyword, setSearchKeyword] = useState("");
   const {
     data: infiniteRepositoriesData,
@@ -54,6 +56,8 @@ const RepositorySelector = ({ setGithubRepositoryName, goNextStep }: Props) => {
   const handleErrorConfirm = () => {
     history.push(PAGE_URL.HOME);
   };
+
+  const changeSearchKeyword = useDebounce(() => {}, 300);
 
   const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.currentTarget;
