@@ -33,7 +33,7 @@ public class Comments {
             .findAny()
             .ifPresentOrElse(
                 postComment -> postComment.delete(this.getComments(), post, user),
-                CommentNotFoundException::new
+                () -> { throw new CommentNotFoundException(); }
             );
     }
 
