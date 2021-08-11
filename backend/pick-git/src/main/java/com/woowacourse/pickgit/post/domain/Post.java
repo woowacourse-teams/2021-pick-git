@@ -2,8 +2,8 @@ package com.woowacourse.pickgit.post.domain;
 
 import static java.util.stream.Collectors.toList;
 
-import com.woowacourse.pickgit.post.domain.comment.Comment;
-import com.woowacourse.pickgit.post.domain.comment.Comments;
+import com.woowacourse.pickgit.comment.domain.Comment;
+import com.woowacourse.pickgit.comment.domain.Comments;
 import com.woowacourse.pickgit.post.domain.content.Image;
 import com.woowacourse.pickgit.post.domain.content.Images;
 import com.woowacourse.pickgit.post.domain.content.PostContent;

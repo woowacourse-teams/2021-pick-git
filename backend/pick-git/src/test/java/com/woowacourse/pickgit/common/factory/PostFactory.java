@@ -1,7 +1,7 @@
 package com.woowacourse.pickgit.common.factory;
 
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
-import com.woowacourse.pickgit.post.application.dto.response.CommentResponseDto;
+import com.woowacourse.pickgit.comment.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import java.time.LocalDateTime;
 import java.util.List;

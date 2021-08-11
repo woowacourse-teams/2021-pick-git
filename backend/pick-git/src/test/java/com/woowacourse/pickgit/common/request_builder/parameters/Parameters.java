@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.http.entity.ContentType;
 import org.springframework.http.HttpMethod;
 
 public abstract class Parameters {
@@ -24,6 +25,8 @@ public abstract class Parameters {
 
     private final Map<String, Object> formParams;
     private final List<File> multiparts;
+
+    private ContentType contentType;
 
     public Parameters(
         RequestSpecification spec,
@@ -38,6 +41,14 @@ public abstract class Parameters {
 
         this.formParams = new HashMap<>();
         this.multiparts = new ArrayList<>();
+
+        this.contentType = ContentType.APPLICATION_JSON;
+        changeContentType(contentType);
+    }
+
+    protected void changeContentType(ContentType contentType) {
+        spec.contentType(contentType.getMimeType());
+        this.contentType = contentType;
     }
 
     protected void setBody(File data) {
@@ -71,7 +82,12 @@ public abstract class Parameters {
     }
 
     public ExtractableResponse<Response> extract() {
-        var specWithParams = spec.formParams(formParams);
+        RequestSpecification specWithParams;
+        if(contentType.equals(ContentType.APPLICATION_JSON)) {
+            specWithParams = spec.body(formParams);
+        } else {
+            specWithParams = spec.formParams(formParams);
+        }
 
         for (File file : multiparts) {
             specWithParams = specWithParams.multiPart(IMAGES, file);

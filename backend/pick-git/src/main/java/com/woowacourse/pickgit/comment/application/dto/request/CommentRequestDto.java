@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.post.application.dto.request;
+package com.woowacourse.pickgit.comment.application.dto.request;
 
 import lombok.Builder;
 

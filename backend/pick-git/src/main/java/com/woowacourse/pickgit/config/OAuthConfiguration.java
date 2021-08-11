@@ -70,7 +70,8 @@ public class OAuthConfiguration implements WebMvcConfigurer {
             .addPathPatterns("/api/profiles/*/followers", HttpMethod.GET)
             .excludePatterns("/api/profiles/*/followings", HttpMethod.POST, HttpMethod.DELETE)
             .excludePatterns("/api/profiles/me", HttpMethod.GET)
-            .excludePatterns("/api/posts/me", HttpMethod.GET);
+            .excludePatterns("/api/posts/me", HttpMethod.GET)
+            .addPathPatterns("/api/posts/*/comments", HttpMethod.GET);
 
         registry.addInterceptor(authenticationInterceptor)
             .addPathPatterns("/**");

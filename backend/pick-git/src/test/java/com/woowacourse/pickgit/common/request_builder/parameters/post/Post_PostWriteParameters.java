@@ -9,6 +9,7 @@ import com.woowacourse.pickgit.common.request_builder.parameters.Parameters;
 import io.restassured.specification.RequestSpecification;
 import java.io.File;
 import java.util.List;
+import org.apache.http.entity.ContentType;
 import org.springframework.http.HttpMethod;
 
 public class Post_PostWriteParameters extends Parameters {
@@ -20,6 +21,7 @@ public class Post_PostWriteParameters extends Parameters {
         Object... params
     ) {
         super(spec, httpMethod, url, params);
+        changeContentType(ContentType.MULTIPART_FORM_DATA);
     }
 
     public Post_PostWriteParameters initAllParams() {

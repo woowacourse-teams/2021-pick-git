@@ -7,6 +7,7 @@ import com.woowacourse.pickgit.common.request_builder.parameters.Parameters;
 import io.restassured.specification.RequestSpecification;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import org.apache.http.entity.ContentType;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,7 +26,7 @@ public class LoginBuilder<T extends Parameters> {
         String url,
         Object... params
     ) {
-        spec = given().log().all();
+        spec = given().log().all().contentType(ContentType.APPLICATION_JSON.getMimeType());
         this.parameterType = parameterType;
         this.httpMethod = httpMethod;
         this.url = url;

@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.post.presentation.dto.request;
+package com.woowacourse.pickgit.comment.presentation.dto.request;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;

@@ -21,21 +21,17 @@ import com.woowacourse.pickgit.common.factory.PostFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.post.CannotUnlikeException;
-import com.woowacourse.pickgit.exception.post.CommentFormatException;
 import com.woowacourse.pickgit.exception.post.DuplicatedLikeException;
 import com.woowacourse.pickgit.exception.post.PostFormatException;
 import com.woowacourse.pickgit.exception.post.PostNotBelongToUserException;
-import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.post.RepositoryParseException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
 import com.woowacourse.pickgit.post.application.PostService;
-import com.woowacourse.pickgit.post.application.dto.request.CommentRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostDeleteRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.SearchRepositoryRequestDto;
-import com.woowacourse.pickgit.post.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
@@ -47,8 +43,8 @@ import com.woowacourse.pickgit.post.domain.content.Images;
 import com.woowacourse.pickgit.post.domain.repository.PickGitStorage;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.post.domain.util.PlatformRepositoryExtractor;
-import com.woowacourse.pickgit.post.domain.util.dto.RepositoryNameAndUrl;
 import com.woowacourse.pickgit.post.domain.util.PlatformRepositorySearchExtractor;
+import com.woowacourse.pickgit.post.domain.util.dto.RepositoryNameAndUrl;
 import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
 import com.woowacourse.pickgit.tag.application.TagService;
 import com.woowacourse.pickgit.tag.application.TagsDto;
@@ -187,101 +183,6 @@ class PostServiceTest {
         // when then
         assertThatCode(() -> postService.write(requestDto))
             .isInstanceOf(PostFormatException.class);
-    }
-
-    @DisplayName("게시물에 댓글을 정상 등록한다.")
-    @Test
-    void addComment_ValidContent_Success() {
-        //given
-        String comment_content = "test comment";
-        User user = UserFactory.user(1L, "testUser1");
-        Post post = Post.builder()
-            .id(1L)
-            .author(user)
-            .build();
-
-        given(postRepository.findById(anyLong()))
-            .willReturn(Optional.of(post));
-        given(userRepository.findByBasicProfile_Name(anyString()))
-            .willReturn(Optional.of(user));
-
-        CommentRequestDto commentRequestDto =
-            new CommentRequestDto(user.getName(), comment_content, post.getId());
-
-        //when
-        CommentResponseDto commentResponseDto = postService.addComment(commentRequestDto);
-
-        //then
-        assertThat(commentResponseDto.getAuthorName()).isEqualTo(user.getName());
-        assertThat(commentResponseDto.getContent()).isEqualTo(comment_content);
-
-        verify(postRepository, times(1)).findById(anyLong());
-        verify(userRepository, times(1)).findByBasicProfile_Name(anyString());
-    }
-
-    @DisplayName("게시물에 빈 댓글을 등록할 수 없다.")
-    @Test
-    void addComment_InvalidContent_ExceptionThrown() {
-        Post post = Post.builder()
-            .id(1L)
-            .build();
-
-        User user = UserFactory.user("testuser");
-
-        given(userRepository.findByBasicProfile_Name(user.getName()))
-            .willReturn(Optional.of(user));
-        given(postRepository.findById(post.getId()))
-            .willReturn(Optional.of(post));
-
-        CommentRequestDto commentRequestDto =
-            new CommentRequestDto(user.getName(), "", post.getId());
-
-        // then
-        assertThatCode(() -> postService.addComment(commentRequestDto))
-            .isInstanceOf(CommentFormatException.class)
-            .extracting("errorCode")
-            .isEqualTo("F0002");
-    }
-
-    @DisplayName("존재하지 않는 사용자는 댓글을 등록할 수 없다.")
-    @Test
-    void addComment_invalidUser_ExceptionOccur() {
-        //given
-        CommentRequestDto commentRequestDto =
-            new CommentRequestDto("invalidUser", "comment_content", 1L);
-
-        given(userRepository.findByBasicProfile_Name(anyString()))
-            .willThrow(new UserNotFoundException());
-
-        //when then
-        assertThatCode(() -> postService.addComment(commentRequestDto))
-            .isInstanceOf(UserNotFoundException.class)
-            .extracting("errorCode")
-            .isEqualTo("U0001");
-
-        verify(userRepository, times(1)).findByBasicProfile_Name(anyString());
-    }
-
-    @DisplayName("존재하지 않는 게시물에는 댓글을 등록할 수 없다.")
-    @Test
-    void addComment_invalidPost_ExceptionOccur() {
-        //given
-        CommentRequestDto commentRequestDto =
-            new CommentRequestDto("testUser", "comment_content", 1L);
-
-        given(userRepository.findByBasicProfile_Name(anyString()))
-            .willReturn(Optional.of(UserFactory.user()));
-        given(postRepository.findById(anyLong()))
-            .willThrow(new PostNotFoundException());
-
-        //when then
-        assertThatCode(() -> postService.addComment(commentRequestDto))
-            .isInstanceOf(PostNotFoundException.class)
-            .extracting("errorCode")
-            .isEqualTo("P0002");
-
-        verify(userRepository, times(1)).findByBasicProfile_Name(anyString());
-        verify(postRepository, times(1)).findById(anyLong());
     }
 
     @DisplayName("사용자는 해당하는 페이지에 퍼블릭 레포지토리가 있는 경우 퍼블릭 레포지토리 목록을 가져온다.")
