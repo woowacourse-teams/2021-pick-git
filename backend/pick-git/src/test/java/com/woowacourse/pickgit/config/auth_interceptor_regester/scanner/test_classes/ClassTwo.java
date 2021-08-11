@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.config.auth_interceptor_regester.scanner.test_classes;
 
+import com.woowacourse.pickgit.config.auth_interceptor_regester.ForLoginUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,7 @@ public class ClassTwo {
 
     }
 
+    @ForLoginUser
     @DeleteMapping("/test9")
     public void test4() {
 
