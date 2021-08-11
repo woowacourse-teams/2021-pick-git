@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { useQueryClient } from "react-query";
 import axios from "axios";
 
@@ -28,32 +28,8 @@ const useProfileModificationForm = (
   const queryClient = useQueryClient();
   const currentProfileQueryKey = [QUERY.GET_PROFILE, { isMyProfile: true, username }];
   const currentProfileQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
-  const {
-    mutateAsync: mutateImage,
-    isLoading: isMutateImageLoading,
-    isSuccess: isMutateImageSuccess,
-  } = useProfileImageMutation();
-  const {
-    mutateAsync: mutateDescription,
-    isLoading: isMutateDescriptionLoading,
-    isSuccess: isMutateDescriptionSuccess,
-  } = useProfileDescriptionMutation();
-
-  const submitValidation = () => {
-    if (!image && initialValue.description === description) {
-      messageViewer?.(FAILURE_MESSAGE.NO_CONTENT_MODIFIED);
-
-      return false;
-    }
-
-    if (!isValidProfileDescription(description)) {
-      messageViewer?.(FAILURE_MESSAGE.PROFILE_DESCRIPTION_MAX_LENGTH_EXCEEDED);
-
-      return false;
-    }
-
-    return true;
-  };
+  const { mutateAsync: mutateImage, isLoading: isMutateImageLoading } = useProfileImageMutation();
+  const { mutateAsync: mutateDescription, isLoading: isMutateDescriptionLoading } = useProfileDescriptionMutation();
 
   const setImageUrlQuery = (imageUrl: string) => {
     if (!currentProfileQueryData) {
@@ -91,6 +67,12 @@ const useProfileModificationForm = (
   };
 
   const handleDescriptionChange: React.ChangeEventHandler<HTMLTextAreaElement> = ({ target: { value } }) => {
+    if (!isValidProfileDescription(value)) {
+      messageViewer?.(FAILURE_MESSAGE.PROFILE_DESCRIPTION_MAX_LENGTH_EXCEEDED);
+
+      return false;
+    }
+
     setDescription(value);
   };
 
@@ -120,6 +102,7 @@ const useProfileModificationForm = (
             logout();
           },
         });
+
         pushSnackbarMessage(getClientErrorMessage(message));
       } else {
         pushSnackbarMessage(UNKNOWN_ERROR_MESSAGE);
@@ -134,14 +117,15 @@ const useProfileModificationForm = (
   const handleModificationSubmit: React.FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
 
-    if (!submitValidation()) {
+    if (!image && initialValue.description === description) {
+      messageViewer?.(FAILURE_MESSAGE.NO_CONTENT_MODIFIED);
+
       return;
     }
 
     try {
       if (image) {
         const response = await mutateImage({ image });
-
         response && setImageUrlQuery(response.imageUrl);
       }
 
