@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useContext, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useContext, useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { ThemeContext } from "styled-components";
 import { RepositoryIcon, SearchIcon } from "../../assets/icons";
@@ -6,7 +6,6 @@ import { FAILURE_MESSAGE, REDIRECT_MESSAGE } from "../../constants/messages";
 import { PAGE_URL } from "../../constants/urls";
 import useDebounce from "../../services/hooks/@common/useDebounce";
 import useMessageModal from "../../services/hooks/@common/useMessageModal";
-import useThrottle from "../../services/hooks/@common/useThrottle";
 import { useGithubRepositoriesQuery } from "../../services/queries";
 import { getAPIErrorMessage } from "../../utils/error";
 import { getRepositoriesFromPages } from "../../utils/infiniteData";
@@ -22,6 +21,8 @@ import {
   RepositoryListItem,
   RepositoryCircle,
   RepositoryName,
+  SearchResultNotFound,
+  GoBackLink,
 } from "./RepositorySelector.style";
 
 interface Props {
@@ -30,7 +31,7 @@ interface Props {
 }
 
 const RepositorySelector = ({ setGithubRepositoryName, goNextStep }: Props) => {
-  const searchInputRef = useRef<HTMLInputElement>(null);
+  const [temporarySearchKeyword, setTemporarySearchKeyword] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
   const {
     data: infiniteRepositoriesData,
@@ -43,6 +44,14 @@ const RepositorySelector = ({ setGithubRepositoryName, goNextStep }: Props) => {
 
   const { color } = useContext(ThemeContext);
   const history = useHistory();
+
+  const changeSearchKeyword = useDebounce(() => {
+    setSearchKeyword(temporarySearchKeyword);
+  }, 150);
+
+  useEffect(() => {
+    changeSearchKeyword();
+  }, [temporarySearchKeyword]);
 
   const handleRepositorySelect = (repositoryName: string) => {
     setGithubRepositoryName(repositoryName);
@@ -57,12 +66,10 @@ const RepositorySelector = ({ setGithubRepositoryName, goNextStep }: Props) => {
     history.push(PAGE_URL.HOME);
   };
 
-  const changeSearchKeyword = useDebounce(() => {}, 300);
-
   const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.currentTarget;
 
-    setSearchKeyword(value);
+    setTemporarySearchKeyword(value);
   };
 
   if (error) {
@@ -105,7 +112,7 @@ const RepositorySelector = ({ setGithubRepositoryName, goNextStep }: Props) => {
     ))
   );
 
-  if (repositories?.length === 0) {
+  if (repositories?.length === 0 && searchKeyword === "") {
     showAlertModal(REDIRECT_MESSAGE.NO_REPOSITORY_EXIST);
   }
 
@@ -114,11 +121,19 @@ const RepositorySelector = ({ setGithubRepositoryName, goNextStep }: Props) => {
       <SearchInputWrapper>
         <Input kind="borderBottom" icon={<SearchIcon />} onChange={handleSearchInputChange} />
       </SearchInputWrapper>
-      <RepositoryList>
-        <InfiniteScrollContainer isLoaderShown={isFetching} onIntersect={fetchNextPage}>
-          {searchedRepositoryListItems}
-        </InfiniteScrollContainer>
-      </RepositoryList>
+      {repositories?.length !== 0 ? (
+        <RepositoryList>
+          <InfiniteScrollContainer isLoaderShown={isFetching} onIntersect={fetchNextPage}>
+            {searchedRepositoryListItems}
+          </InfiniteScrollContainer>
+        </RepositoryList>
+      ) : (
+        <SearchResultNotFound>
+          검색 결과를 찾을 수 없습니다
+          <GoBackLink to={PAGE_URL.HOME}>홈으로 돌아가기</GoBackLink>
+        </SearchResultNotFound>
+      )}
+
       {isModalShown && <MessageModalPortal heading={modalMessage} onConfirm={goBackToHome} onClose={goBackToHome} />}
     </Container>
   );

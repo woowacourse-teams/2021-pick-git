@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 export const Container = styled.div`
@@ -39,4 +40,18 @@ export const RepositoryCircle = styled.a`
 export const RepositoryName = styled.span`
   font-weight: bold;
   color: ${({ theme }) => theme.color.textColor};
+`;
+
+export const SearchResultNotFound = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+`;
+
+export const GoBackLink = styled(Link)`
+  margin-top: 2rem;
+  font-weight: bold;
+  color: ${({ theme }) => theme.color.primaryColor};
 `;
