@@ -49,6 +49,7 @@ public class PostDtoAssembler {
         return post.getComments()
             .stream()
             .map(toCommentResponse())
+            .limit(3)
             .collect(toList());
     }
 
