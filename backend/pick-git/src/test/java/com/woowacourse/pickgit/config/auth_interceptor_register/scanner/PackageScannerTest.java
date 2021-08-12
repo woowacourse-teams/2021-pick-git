@@ -22,7 +22,7 @@ class PackageScannerTest {
 
     @DisplayName("루트 폴더 내부를 순회하며 Controller java파일의 이름을 추출한다.")
     @Test
-    void name() throws URISyntaxException {
+    void getAllClassNames_extractControllerJavaFilesName_Success() throws URISyntaxException {
         String resource = ClassOne.class.getResource(".")
             .toString()
             .replace("/build/classes/java/test", "/src/test/java");

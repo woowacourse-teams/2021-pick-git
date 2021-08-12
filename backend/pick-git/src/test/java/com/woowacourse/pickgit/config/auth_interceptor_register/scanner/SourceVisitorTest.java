@@ -23,6 +23,7 @@ class SourceVisitorTest {
         sourceVisitor = new SourceVisitor();
     }
 
+    @DisplayName("CONTINUE를 반환한다.")
     @Test
     void preVisitDirectory() throws IOException {
         Path file = createTempFile(".java");
@@ -68,6 +69,7 @@ class SourceVisitorTest {
         assertThat(classPaths).hasSize(0);
     }
 
+    @DisplayName("CONTINUE를 반환한다.")
     @Test
     void visitFileFailed() throws IOException {
         Path file = createTempFile(".java");
@@ -76,6 +78,7 @@ class SourceVisitorTest {
         assertThat(actual).isEqualTo(FileVisitResult.CONTINUE);
     }
 
+    @DisplayName("CONTINUE를 반환한다.")
     @Test
     void postVisitDirectory() throws IOException {
         Path file = createTempFile(".java");

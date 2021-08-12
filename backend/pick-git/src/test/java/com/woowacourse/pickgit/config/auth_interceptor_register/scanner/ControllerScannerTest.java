@@ -13,14 +13,16 @@ class ControllerScannerTest {
 
     @DisplayName("컨트롤러만 파싱한다.")
     @Test
-    void getControllers() {
+    void getControllers_ParseOnlyController_Success() {
         String classOne = ClassOne.class.getCanonicalName();
         String classTwo = ClassTwo.class.getCanonicalName();
         String classThree = ClassThree.class.getCanonicalName();
 
-        ControllerScanner controllerScanner = new ControllerScanner(
-            List.of(classOne, classTwo, classThree)
-        );
+        ControllerScanner controllerScanner = new ControllerScanner(List.of(
+            classOne,
+            classTwo,
+            classThree
+        ));
 
         List<Class<?>> controllers = controllerScanner.getControllers();
 

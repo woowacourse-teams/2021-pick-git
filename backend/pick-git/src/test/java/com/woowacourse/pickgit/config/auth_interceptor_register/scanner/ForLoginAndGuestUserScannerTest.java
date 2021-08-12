@@ -18,7 +18,7 @@ class ForLoginAndGuestUserScannerTest {
     @DisplayName("forGuest 어노테이션이 있는 method를 추출한다.")
     @ParameterizedTest
     @MethodSource("getParametersForParseMethods")
-    void parseMethods(Class<?> classToken, int size) {
+    void parseMethods_ExtractMethodHasForGeustAnnotation_Success(Class<?> classToken, int size) {
         ForGuestScanner forGuestScanner = new ForGuestScanner();
 
         List<Method> methods = forGuestScanner.parseMethods(classToken);

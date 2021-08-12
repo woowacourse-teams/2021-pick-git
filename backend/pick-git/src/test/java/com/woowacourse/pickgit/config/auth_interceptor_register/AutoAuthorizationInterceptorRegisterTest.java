@@ -16,14 +16,16 @@ import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.test_cla
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 class AutoAuthorizationInterceptorRegisterTest {
 
+    @DisplayName("서로 매핑되는 Url, Method들을 반환한다.")
     @Test
-    void execute() {
+    void execute_createUrlAndMethods_Success() {
         List<String> classNames = List.of(
             ClassOne.class.getCanonicalName(),
             ClassTwo.class.getCanonicalName(),

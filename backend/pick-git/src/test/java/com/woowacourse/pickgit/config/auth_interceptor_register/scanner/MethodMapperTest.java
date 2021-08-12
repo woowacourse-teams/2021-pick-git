@@ -24,7 +24,7 @@ class MethodMapperTest {
     @DisplayName("메서드에 매핑된 HttpMethod를 추출한다 - 성공")
     @ParameterizedTest
     @MethodSource("getParametersForFindHttpMethodByControllerMethod_Success")
-    void findHttpMethodByControllerMethod_Success(
+    void findHttpMethodByControllerMethod_ExtractMappedHttpMethod_Success(
         Class<?> classToken,
         String methodName,
         HttpMethod expected
@@ -46,7 +46,7 @@ class MethodMapperTest {
 
     @DisplayName("메서드에 매핑된 HttpMethod를 추출한다 - 실패")
     @Test
-    void findHttpMethodByControllerMethod_Fail() throws NoSuchMethodException {
+    void findHttpMethodByControllerMethod_ExtractMappedHttpMethod_Fail() throws NoSuchMethodException {
         Method method = ClassFour.class.getMethod("test1");
 
         assertThatThrownBy(() -> MethodMapper.findHttpMethodByControllerMethod(method))
@@ -56,7 +56,7 @@ class MethodMapperTest {
     @DisplayName("메서드에 매핑된 HttpMethodAnnotaion을 추출한다. - 성공")
     @ParameterizedTest
     @MethodSource("getParametersForFindAnnotatedHttpMethodAnnotation")
-    void findAnnotatedHttpMethodAnnotation_Success(
+    void findAnnotatedHttpMethodAnnotation_ExtractMappedHttpMethodAnnotation_Success(
         Class<?> classToken,
         String methodName,
         Class<? extends Annotation> expected
@@ -79,7 +79,7 @@ class MethodMapperTest {
 
     @DisplayName("메서드에 매핑된 HttpMethodAnnotaion을 추출한다. - 실패")
     @Test
-    void findAnnotatedHttpMethodAnnotation_Fail() throws NoSuchMethodException {
+    void findAnnotatedHttpMethodAnnotation_ExtractMappedHttpMethodAnnotation_Fail() throws NoSuchMethodException {
         Method method = ClassFour.class.getMethod("test1");
 
         assertThatThrownBy(() -> MethodMapper.findAnnotatedHttpMethodAnnotation(method))

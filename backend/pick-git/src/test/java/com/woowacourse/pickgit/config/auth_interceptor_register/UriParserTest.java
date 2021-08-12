@@ -13,13 +13,15 @@ import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.test_cla
 import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.test_classes.ClassTwo;
 import java.util.ArrayList;
 import java.util.List;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
 
 class UriParserTest {
 
+    @DisplayName("인터셉터에 등록할 url과 method를 반환한다..")
     @Test
-    void getPreparedControllerMethod() {
+    void getPreparedControllerMethod_returnUrlAndMethods_Success() {
         List<String> classNames = List.of(
             ClassOne.class.getCanonicalName(),
             ClassTwo.class.getCanonicalName(),
