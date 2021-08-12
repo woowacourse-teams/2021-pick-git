@@ -39,6 +39,7 @@ export const MOCK_USER: UserItem = {
   imageUrl: "imageUrl",
   following: true,
 };
+export const EMPTY_PAGE = [[]];
 
 export const INVALID_ERROR_CODE = "invalid_error_code";
 export const UNAUTHORIZED_TOKEN_ERROR = "A0001";

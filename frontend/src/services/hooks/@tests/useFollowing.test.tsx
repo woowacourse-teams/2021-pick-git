@@ -5,13 +5,6 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import SnackBarContext from "../../../contexts/SnackbarContext";
 import UserContext from "../../../contexts/UserContext";
 import {
-  followerListServer,
-  FOLLOWER_LIST_MAX_PAGE_LENGTH,
-  FOLLOWER_LIST_PAGES,
-  USER_WITH_FOLLOWERS,
-  USER_WITH_NO_FOLLOWERS,
-} from "../@mocks/mockFollowerList";
-import {
   EMPTY_PAGE,
   mockFn,
   setLocalStorageEmpty,
@@ -19,8 +12,15 @@ import {
   UNAUTHORIZED_TOKEN_ERROR,
   USERNAME,
 } from "../@mocks/shared";
-import useFollowerList from "../useFollowerList";
 import { API_ERROR_MESSAGE } from "../../../constants/messages";
+import useFollowingList from "../useFollowingList";
+import {
+  followingListServer,
+  USER_WITH_FOLLOWINGS,
+  FOLLOWING_LIST_PAGES,
+  USER_WITH_NO_FOLLOWINGS,
+  FOLLOWING_LIST_MAX_PAGE_LENGTH,
+} from "../@mocks/mockFollowingList";
 
 const queryClient = new QueryClient();
 
@@ -37,39 +37,39 @@ const wrapper = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const setupHook = (username: string) => renderHook(() => useFollowerList(username), { wrapper });
+const setupHook = (username: string) => renderHook(() => useFollowingList(username), { wrapper });
 
 beforeAll(() => {
-  followerListServer.listen();
+  followingListServer.listen();
 });
 
 afterAll(() => {
-  followerListServer.close();
+  followingListServer.close();
 });
 
 describe("Success Case", () => {
   test("success1: should load results", async () => {
-    const { result, waitFor } = setupHook(USER_WITH_FOLLOWERS);
+    const { result, waitFor } = setupHook(USER_WITH_FOLLOWINGS);
 
     await waitFor(() => !result.current.isLoading);
 
-    expect(result.current.results).toStrictEqual(FOLLOWER_LIST_PAGES[0]);
+    expect(result.current.results).toStrictEqual(FOLLOWING_LIST_PAGES[0]);
   });
 
   test("succeess2: should load next page", async () => {
-    const { result, waitFor } = setupHook(USER_WITH_FOLLOWERS);
+    const { result, waitFor } = setupHook(USER_WITH_FOLLOWINGS);
 
     await waitFor(() => !result.current.isLoading);
     await act(async () => await result.current.handleIntersect());
     await waitFor(() => !result.current.isFetchingNextPage);
 
-    expect(result.current.results).toStrictEqual([...FOLLOWER_LIST_PAGES[0], ...FOLLOWER_LIST_PAGES[1]]);
+    expect(result.current.results).toStrictEqual([...FOLLOWING_LIST_PAGES[0], ...FOLLOWING_LIST_PAGES[1]]);
   });
 });
 
 describe("Failure Case", () => {
   test("failure1: should handle empty data case", async () => {
-    const { result, waitFor } = setupHook(USER_WITH_NO_FOLLOWERS);
+    const { result, waitFor } = setupHook(USER_WITH_NO_FOLLOWINGS);
 
     await waitFor(() => !result.current.isLoading);
 
@@ -77,11 +77,11 @@ describe("Failure Case", () => {
   });
 
   test("failure2: should handle no extra page case", async () => {
-    const { result, waitFor } = setupHook(USER_WITH_FOLLOWERS);
+    const { result, waitFor } = setupHook(USER_WITH_FOLLOWINGS);
 
     await waitFor(() => !result.current.isLoading);
 
-    for (let i = 1; i < FOLLOWER_LIST_MAX_PAGE_LENGTH; i++) {
+    for (let i = 1; i < FOLLOWING_LIST_MAX_PAGE_LENGTH; i++) {
       await act(async () => await result.current.handleIntersect());
       await waitFor(() => !result.current.isFetchingNextPage);
     }
@@ -97,7 +97,7 @@ describe("Failure Case", () => {
   // test("failure3: should handle http error: 401", async () => {
   //   setLocalStorageInvalid();
 
-  //   const { result, waitFor } = setupHook(USER_WITH_FOLLOWERS);
+  //   const { result, waitFor } = setupHook(USER_WITH_FOLLOWINGS);
 
   //   await waitFor(() => !result.current.isLoading);
 
