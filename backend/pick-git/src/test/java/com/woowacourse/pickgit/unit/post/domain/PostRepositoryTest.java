@@ -1,6 +1,5 @@
 package com.woowacourse.pickgit.unit.post.domain;
 
-import static java.util.Comparator.comparing;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

@@ -66,7 +66,7 @@ public class Post {
     protected Post() {
     }
 
-    protected Post(
+    public Post(
         Long id,
         User user,
         Images images,
@@ -174,6 +174,14 @@ public class Post {
 
     public List<String> getTagNames() {
         return postTags.getTagNames();
+    }
+
+    public Likes getLikes() {
+        return likes;
+    }
+
+    public List<User> getLikeUsers() {
+        return likes.getLikeUsers();
     }
 
     @Override

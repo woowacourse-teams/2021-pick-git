@@ -211,6 +211,7 @@ class UserAcceptance_GetFollowingsAndFollowers {
         for (User user : usersInDb) {
             AuthUserForUserRequestDto mockUserAuthDto =
                 AuthUserForUserRequestDto.from(new LoginUser(user.getName(), "token"));
+
             FollowRequestDto requestDto = FollowRequestDto.builder()
                 .authUserRequestDto(mockUserAuthDto)
                 .targetName(target.getName())

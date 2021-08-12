@@ -3,8 +3,12 @@ package com.woowacourse.pickgit.common.factory;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.comment.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
+import com.woowacourse.pickgit.post.domain.Post;
+import com.woowacourse.pickgit.post.domain.like.Likes;
+import com.woowacourse.pickgit.user.domain.User;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.mockito.Mock;
 import org.springframework.web.multipart.MultipartFile;
 
 public class PostFactory {
@@ -153,5 +157,23 @@ public class PostFactory {
             .build();
 
         return List.of(fixture1);
+    }
+
+    public static Post post() {
+        return MockPost.builder()
+            .build();
+    }
+
+    public static Post post(User author) {
+        return MockPost.builder()
+            .user(author)
+            .build();
+    }
+
+    public static Post likedPost(User author, Likes likes) {
+        return MockPost.builder()
+            .user(author)
+            .likes(likes)
+            .build();
     }
 }

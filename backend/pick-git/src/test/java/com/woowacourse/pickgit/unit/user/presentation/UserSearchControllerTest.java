@@ -84,7 +84,7 @@ class UserSearchControllerTest {
                     .param("limit", "5")
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .accept(MediaType.ALL)
-            .header(HttpHeaders.AUTHORIZATION, "Bearer token"));
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer token"));
 
         // then
         perform

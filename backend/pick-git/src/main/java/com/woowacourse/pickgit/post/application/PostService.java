@@ -6,12 +6,14 @@ import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.exception.post.PostNotBelongToUserException;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
+import com.woowacourse.pickgit.post.application.dto.request.AuthUserForPostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostDeleteRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.SearchRepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.LikeUsersResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
@@ -196,6 +198,55 @@ public class PostService {
 
         user.delete(post);
         postRepository.delete(post);
+    }
+
+    @Transactional(readOnly = true)
+    public List<LikeUsersResponseDto> likeUsers(
+        AuthUserForPostRequestDto authUserRequestDto,
+        Long postId
+    ) {
+        Post post = findPostWithLikeUsers(postId);
+        List<User> likeUsers = post.getLikeUsers();
+
+        if (authUserRequestDto.isGuest()) {
+            return createLikeUsersResponseDtoOfGuest(likeUsers);
+        }
+
+        User loginUser = findUserByName(authUserRequestDto.getUsername());
+
+        return createLikeUsersResponseDtoOfLoginUser(loginUser, likeUsers);
+    }
+
+    private Post findPostWithLikeUsers(Long postId) {
+        return postRepository.findPostWithLikeUsers(postId)
+            .orElseThrow(PostNotFoundException::new);
+    }
+
+    private List<LikeUsersResponseDto> createLikeUsersResponseDtoOfGuest(
+        List<User> likeUsers
+    ) {
+        return likeUsers.stream()
+            .map(user ->
+                new LikeUsersResponseDto(
+                    user.getImage(),
+                    user.getName(),
+                    null
+                )
+            ).collect(toList());
+    }
+
+    private List<LikeUsersResponseDto> createLikeUsersResponseDtoOfLoginUser(
+        User loginUser,
+        List<User> likeUsers
+    ) {
+        return likeUsers.stream()
+            .map(user ->
+                new LikeUsersResponseDto(
+                    user.getImage(),
+                    user.getName(),
+                    loginUser.isFollowing(user)
+                )
+            ).collect(toList());
     }
 
     private Post findPostById(Long id) {

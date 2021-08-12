@@ -104,6 +104,7 @@ public class UserController {
             .targetName(username)
             .githubFollowing(githubFollowing)
             .build();
+
         FollowResponseDto followResponseDto =
             userService.followUser(followRequestDto);
 
@@ -121,6 +122,7 @@ public class UserController {
             .targetName(username)
             .githubFollowing(githubUnfollowing)
             .build();
+
         FollowResponseDto followResponseDto =
             userService.unfollowUser(unfollowRequestDto);
 
