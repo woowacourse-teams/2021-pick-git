@@ -3,10 +3,10 @@ package com.woowacourse.pickgit.config.auth_interceptor_regester;
 import static java.util.Comparator.comparing;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.woowacourse.pickgit.config.auth_interceptor_regester.register_type.RegisterType;
 import com.woowacourse.pickgit.config.auth_interceptor_regester.scanner.ControllerScanner;
 import com.woowacourse.pickgit.config.auth_interceptor_regester.scanner.ForGuestScanner;
 import com.woowacourse.pickgit.config.auth_interceptor_regester.scanner.ForLoginUserScanner;
-import com.woowacourse.pickgit.config.auth_interceptor_regester.register_type.RegisterType;
 import com.woowacourse.pickgit.config.auth_interceptor_regester.scanner.data_structure.PreparedControllerMethod;
 import com.woowacourse.pickgit.config.auth_interceptor_regester.scanner.test_classes.ClassOne;
 import com.woowacourse.pickgit.config.auth_interceptor_regester.scanner.test_classes.ClassThree;

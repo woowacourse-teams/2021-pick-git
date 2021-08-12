@@ -1,7 +1,6 @@
 package com.woowacourse.pickgit.config.auth_interceptor_regester.scanner;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 import com.woowacourse.pickgit.config.auth_interceptor_regester.scanner.test_classes.ClassOne;
 import com.woowacourse.pickgit.config.auth_interceptor_regester.scanner.test_classes.ClassThree;
