@@ -1,7 +1,7 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react";
 import { renderHook, act } from "@testing-library/react-hooks";
-import { QueryClient, QueryClientProvider } from "react-query";
+import { QueryClientProvider } from "react-query";
 
 import { ProfileData } from "../../../@types";
 import { QUERY } from "../../../constants/queries";
@@ -20,6 +20,7 @@ import {
   profileModificationServer,
 } from "../@mocks/mockProfileModification";
 import {
+  createQueryClient,
   DEFAULT_PROFILE_QUERY_DATA,
   File,
   mockFn,
@@ -32,7 +33,7 @@ import {
 import { LIMIT } from "../../../constants/limits";
 import { API_ERROR_MESSAGE, CLIENT_ERROR_MESSAGE, FAILURE_MESSAGE } from "../../../constants/messages";
 
-const queryClient = new QueryClient();
+const queryClient = createQueryClient();
 const currentProfileQueryKey = [QUERY.GET_PROFILE, { isMyProfile: true, username: USERNAME }];
 
 const wrapper = ({ children }: { children: React.ReactNode }) => {

@@ -1,10 +1,11 @@
 import React from "react";
 import { renderHook, act } from "@testing-library/react-hooks";
-import { QueryClient, QueryClientProvider } from "react-query";
+import { QueryClientProvider } from "react-query";
 
 import SnackBarContext from "../../../contexts/SnackbarContext";
 import UserContext from "../../../contexts/UserContext";
 import {
+  createQueryClient,
   EMPTY_PAGE,
   mockFn,
   setLocalStorageEmpty,
@@ -22,7 +23,7 @@ import {
   FOLLOWING_LIST_MAX_PAGE_LENGTH,
 } from "../@mocks/mockFollowingList";
 
-const queryClient = new QueryClient();
+const queryClient = createQueryClient();
 
 const wrapper = ({ children }: { children: React.ReactNode }) => {
   const userContextValue = { isLoggedIn: true, currentUsername: USERNAME, login: () => {}, logout: mockFn.logout };

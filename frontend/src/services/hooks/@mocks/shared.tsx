@@ -1,3 +1,4 @@
+import { QueryClient } from "react-query";
 import { UserItem } from "../../../@types";
 
 export class Blob {
@@ -64,3 +65,15 @@ export const setLocalStorageEmpty = () => {
   localStorage.setItem("username", "");
   localStorage.setItem("accessToken", "");
 };
+
+export const createQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: 0,
+      },
+      mutations: {
+        retry: 0,
+      },
+    },
+  });

@@ -1,5 +1,5 @@
 import React from "react";
-import { QueryClient, QueryClientProvider } from "react-query";
+import { QueryClientProvider } from "react-query";
 import { renderHook, act, WaitFor, RenderResult } from "@testing-library/react-hooks";
 
 import { ProfileData } from "../../../@types";
@@ -17,6 +17,7 @@ import {
   TARGET_USERNAME,
 } from "../@mocks/mockFollow";
 import {
+  createQueryClient,
   DEFAULT_PROFILE_QUERY_DATA,
   mockFn,
   setLocalStorageEmpty,
@@ -25,7 +26,7 @@ import {
   UNAUTHORIZED_TOKEN_ERROR,
 } from "../@mocks/shared";
 
-const queryClient = new QueryClient();
+const queryClient = createQueryClient();
 const currentProfileQueryKey = [QUERY.GET_PROFILE, { isMyProfile: false, username: TARGET_USERNAME }];
 
 const wrapper = ({ children }: { children: React.ReactNode }) => {
