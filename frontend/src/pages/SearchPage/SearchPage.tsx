@@ -53,7 +53,7 @@ const SearchPage = () => {
     if (isUserSearchError) {
       return <Empty>검색결과를 표시할 수 없습니다.</Empty>;
     }
-    
+
     if (userSearchResults.length === 0) {
       return <Empty>일치하는 계정이 없습니다.</Empty>;
     }
