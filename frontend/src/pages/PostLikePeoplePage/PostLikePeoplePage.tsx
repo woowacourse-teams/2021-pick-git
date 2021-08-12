@@ -1,4 +1,4 @@
-import { Container } from "./PostLikePeoplePage.style";
+import { Container, ContentWrapper } from "./PostLikePeoplePage.style";
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import usePostLikePeople from "../../services/hooks/usePostLikePeople";
 import { useLocation } from "react-router-dom";
@@ -26,14 +26,16 @@ const PostLikePeoplePage = () => {
 
   return (
     <Container>
-      <UserList
-        key="post-like-user"
-        users={postLikePeople}
-        isFetchingNextPage={false}
-        onIntersect={() => {}}
-        follow={follow}
-        refetch={refetch}
-      />
+      <ContentWrapper>
+        <UserList
+          key="post-like-user"
+          users={postLikePeople}
+          isFetchingNextPage={false}
+          onIntersect={() => {}}
+          follow={follow}
+          refetch={refetch}
+        />
+      </ContentWrapper>
     </Container>
   );
 };

@@ -2,14 +2,11 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { Page } from "../../components/@styled/layout";
 import { setDesktopMediaQuery, setLaptopMediaQuery, setTabletMediaQuery } from "../../components/@styled/mediaQueries";
-import { LAYOUT } from "../../constants/layout";
+import { LAYOUT, PAGE_WIDTH } from "../../constants/layout";
 
 export const Container = styled(Page)`
   padding-top: 0;
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   padding-bottom: ${LAYOUT.HEADER_HEIGHT};
   background-color: ${({ theme }) => theme.color.white};
 `;
@@ -21,20 +18,6 @@ export const SliderHeader = styled.div`
   width: 100%;
   min-height: ${LAYOUT.HEADER_HEIGHT};
   padding: 1.0625rem 1.375rem;
-
-  ${setTabletMediaQuery`
-    padding: 1.0625rem 0.5rem;
-  `}
-
-  ${setLaptopMediaQuery`
-    padding: 1.0625rem 0.5rem;
-    margin-bottom: 0.5rem
-  `}
-
-  ${setDesktopMediaQuery`
-    padding: 1.0625rem 0.5rem;
-    margin-bottom: 1rem
-  `}
 `;
 
 export const HorizontalSliderWrapper = styled.div`
@@ -166,6 +149,19 @@ export const CommentTextAreaWrapper = styled.div`
   `};
 
   ${setTabletMediaQuery`
+    width: ${PAGE_WIDTH.TABLET};
+    margin: 0 auto;
+  `}
+
+  ${setLaptopMediaQuery`
+    width: ${PAGE_WIDTH.LAPTOP};
+    margin: 0 auto;
+  `}
+
+  ${setDesktopMediaQuery`
+    width: ${PAGE_WIDTH.DESKTOP};
+    margin: 0 auto;
+  `} /* ${setTabletMediaQuery`
     padding: 0 3.5rem;
     border: none;
   `}
@@ -178,7 +174,7 @@ export const CommentTextAreaWrapper = styled.div`
   ${setDesktopMediaQuery`
     padding: 0 24.5rem;
     border: none;
-  `}
+  `} */
 `;
 
 export const CommentTextArea = styled.textarea`

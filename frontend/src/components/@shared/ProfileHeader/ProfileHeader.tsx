@@ -18,6 +18,7 @@ import CountIndicator from "../CountIndicator/CountIndicator";
 import {
   AvatarWrapper,
   ButtonLoader,
+  ButtonSpinnerWrapper,
   ButtonSpinner,
   Container,
   Indicators,
@@ -60,7 +61,9 @@ const ProfileHeader = ({ isMyProfile, profile, username }: Props) => {
       return (
         <ButtonLoader type="button" kind="squaredBlock" backgroundColor={theme.color.tertiaryColor}>
           {isFollowLoading ? "팔로우" : "팔로우 취소"}
-          <ButtonSpinner size="1rem" />
+          <ButtonSpinnerWrapper>
+            <ButtonSpinner size="1rem" />
+          </ButtonSpinnerWrapper>
         </ButtonLoader>
       );
     }

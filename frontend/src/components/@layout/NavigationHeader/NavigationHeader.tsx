@@ -5,6 +5,7 @@ import {
   NavigationItem,
   AuthNavigationWrapper,
   LogoIconWrapper,
+  HeaderContent,
 } from "./NavigationHeader.style";
 import { AddBoxIcon, HomeIcon, LoginIcon, LogoIcon, PersonIcon, SearchIcon } from "../../../assets/icons";
 import { PAGE_URL } from "../../../constants/urls";
@@ -47,31 +48,33 @@ const NavigationHeader = () => {
 
   return (
     <Container>
-      <HomeLink to={PAGE_URL.HOME}>
-        <LogoIconWrapper>
-          <LogoIcon />
-        </LogoIconWrapper>
-        깃들다
-      </HomeLink>
-      {isLoggedIn ? (
-        <>
-          <AuthenticatedNavigation />
-          <AuthNavigationWrapper>
-            <Button kind="roundedInline" padding="0.2rem 0.7rem 0.3rem" onClick={handleLogoutButtonClick}>
-              로그아웃
-            </Button>
-          </AuthNavigationWrapper>
-        </>
-      ) : (
-        <>
-          <UnAuthenticatedNavigation />
-          <AuthNavigationWrapper>
-            <NavigationItem to={PAGE_URL.LOGIN}>
-              <LoginIcon />
-            </NavigationItem>
-          </AuthNavigationWrapper>
-        </>
-      )}
+      <HeaderContent>
+        <HomeLink to={PAGE_URL.HOME}>
+          <LogoIconWrapper>
+            <LogoIcon />
+          </LogoIconWrapper>
+          깃들다
+        </HomeLink>
+        {isLoggedIn ? (
+          <>
+            <AuthenticatedNavigation />
+            <AuthNavigationWrapper>
+              <Button kind="roundedInline" padding="0.2rem 0.7rem 0.3rem" onClick={handleLogoutButtonClick}>
+                로그아웃
+              </Button>
+            </AuthNavigationWrapper>
+          </>
+        ) : (
+          <>
+            <UnAuthenticatedNavigation />
+            <AuthNavigationWrapper>
+              <NavigationItem to={PAGE_URL.LOGIN}>
+                <LoginIcon />
+              </NavigationItem>
+            </AuthNavigationWrapper>
+          </>
+        )}
+      </HeaderContent>
     </Container>
   );
 };

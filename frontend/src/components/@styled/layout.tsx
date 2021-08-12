@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { LAYOUT, Z_INDEX } from "../../constants/layout";
+import { LAYOUT, PAGE_WIDTH, Z_INDEX } from "../../constants/layout";
 import { setDesktopMediaQuery, setLaptopMediaQuery, setTabletMediaQuery, setMobileMediaQuery } from "./mediaQueries";
 
 export const Header = styled.header`
@@ -22,14 +22,20 @@ export const Page = styled.main`
   padding-top: ${LAYOUT.HEADER_HEIGHT};
 
   ${setTabletMediaQuery`
-    padding: ${LAYOUT.PAGE_MARGIN_TOP} 3rem 0 3rem;
+    padding-top: ${LAYOUT.PAGE_MARGIN_TOP};
+    width: ${PAGE_WIDTH.TABLET};
+    margin: 0 auto;
   `}
 
   ${setLaptopMediaQuery`
-    padding: ${LAYOUT.PAGE_MARGIN_TOP} 12rem 0 12rem;
+    padding-top: ${LAYOUT.PAGE_MARGIN_TOP};
+    width: ${PAGE_WIDTH.LAPTOP};
+    margin: 0 auto;
   `}
 
   ${setDesktopMediaQuery`
-    padding: ${LAYOUT.PAGE_MARGIN_TOP} 24rem 0 24rem;
+    padding-top: ${LAYOUT.PAGE_MARGIN_TOP};
+    width: ${PAGE_WIDTH.DESKTOP};
+    margin: 0 auto;
   `}
 `;

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { PAGE_WIDTH } from "../../../constants/layout";
 import { Header } from "../../@styled/layout";
 import {
   setLaptopMediaQuery,
@@ -8,24 +9,29 @@ import {
   setMobileMediaQuery,
 } from "../../@styled/mediaQueries";
 
-export const Container = styled(Header)<React.CSSProperties>`
+export const Container = styled(Header)<React.CSSProperties>``;
+
+export const HeaderContent = styled.div`
   display: flex;
   align-items: center;
   padding: 1.0625rem 1.375rem;
 
   ${setTabletMediaQuery`
-    padding: 1.2rem 3.5rem;
-    box-shadow: 0px 2px 4px rgba(0,0,0,0.2);
+    width: ${PAGE_WIDTH.TABLET};
+    margin: 0 auto;  
+    padding: 1.2rem 1.375rem;
   `}
 
   ${setLaptopMediaQuery`
-    padding: 1.2rem 12.5rem;
-    box-shadow: 0px 2px 4px rgba(0,0,0,0.2);
+    width: ${PAGE_WIDTH.LAPTOP};
+    margin: 0 auto;
+    padding: 1.2rem 1.375rem;
   `}
 
   ${setDesktopMediaQuery`
-    padding: 1.2rem 24.5rem;
-    box-shadow: 0px 2px 4px rgba(0,0,0,0.2);
+    width: ${PAGE_WIDTH.DESKTOP};
+    margin: 0 auto;  
+    padding: 1.2rem 1.375rem;
   `}
 `;
 

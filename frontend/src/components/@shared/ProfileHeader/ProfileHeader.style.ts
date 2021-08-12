@@ -59,9 +59,14 @@ export const ButtonLoader = styled(Button)`
   position: relative;
 `;
 
-export const ButtonSpinner = styled(Spinner)`
+export const ButtonSpinnerWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  top: 0;
+  width: 100%;
+  height: 100%;
 `;
+
+export const ButtonSpinner = styled(Spinner)``;
