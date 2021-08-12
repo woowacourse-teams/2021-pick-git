@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
 public class ClassOne {
+
     @ForOnlyLoginUser
     @GetMapping("/test5")
     public void test1() {
