@@ -2,7 +2,6 @@ package com.woowacourse.pickgit.post.domain.repository;
 
 import java.io.File;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface PickGitStorage {

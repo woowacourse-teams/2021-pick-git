@@ -2,10 +2,10 @@ package com.woowacourse.pickgit.user.infrastructure.calculator;
 
 import com.woowacourse.pickgit.user.domain.Contribution;
 import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
-import com.woowacourse.pickgit.user.infrastructure.extractor.PlatformContributionExtractor;
 import com.woowacourse.pickgit.user.infrastructure.dto.CountDto;
 import com.woowacourse.pickgit.user.infrastructure.dto.ItemDto;
 import com.woowacourse.pickgit.user.infrastructure.dto.StarsDto;
+import com.woowacourse.pickgit.user.infrastructure.extractor.PlatformContributionExtractor;
 import org.springframework.stereotype.Component;
 
 @Component

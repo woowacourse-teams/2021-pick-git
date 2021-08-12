@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.comment.domain;
 
+import com.woowacourse.pickgit.exception.comment.CannotDeleteCommentException;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.user.domain.User;
 import java.util.Objects;
@@ -15,7 +16,8 @@ import javax.persistence.ManyToOne;
 @Entity
 public class Comment {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Embedded
@@ -32,18 +34,25 @@ public class Comment {
     protected Comment() {
     }
 
-    public Comment(String content, User user) {
-        this(null, content, user);
+    public Comment(String content, User user, Post post) {
+        this(null, content, user, post);
     }
 
-    public Comment(Long id, String content, User user) {
+    public Comment(Long id, String content, User user, Post post) {
         this.id = id;
         this.content = new CommentContent(content);
         this.user = user;
+        this.post = post;
     }
 
-    public void belongTo(Post post) {
-        this.post = post;
+    public void validateDeletion(Post post, User user) {
+        if (post.isNotWrittenBy(user) && isNotCommentedBy(user)) {
+            throw new CannotDeleteCommentException();
+        }
+    }
+
+    private boolean isNotCommentedBy(User user) {
+        return !this.user.equals(user);
     }
 
     public Long getId() {
@@ -60,6 +69,14 @@ public class Comment {
 
     public String getContent() {
         return content.getContent();
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public Post getPost() {
+        return post;
     }
 
     @Override

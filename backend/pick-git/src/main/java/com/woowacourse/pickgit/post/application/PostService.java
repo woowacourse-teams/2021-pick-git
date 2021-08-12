@@ -90,8 +90,12 @@ public class PostService {
         return post;
     }
 
-    private Post createPost(String content, String githubRepoUrl, User user,
-        List<String> imageUrls) {
+    private Post createPost(
+        String content,
+        String githubRepoUrl,
+        User user,
+        List<String> imageUrls
+    ) {
         return Post.builder()
             .content(content)
             .images(imageUrls)
@@ -173,7 +177,7 @@ public class PostService {
         User user = findUserByName(updateRequestDto.getUsername());
         Post post = findPostById(updateRequestDto.getPostId());
 
-        if (!post.isWrittenBy(user)) {
+        if (post.isNotWrittenBy(user)) {
             throw new PostNotBelongToUserException();
         }
 
@@ -192,9 +196,7 @@ public class PostService {
         User user = findUserByName(deleteRequestDto.getUsername());
         Post post = findPostById(deleteRequestDto.getPostId());
 
-        if (!post.isWrittenBy(user)) {
-            throw new PostNotBelongToUserException();
-        }
+        post.validateDeletion(user);
 
         user.delete(post);
         postRepository.delete(post);

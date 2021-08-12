@@ -3,9 +3,9 @@ package com.woowacourse.pickgit.post.application;
 import static java.util.stream.Collectors.toList;
 
 import com.woowacourse.pickgit.comment.application.dto.response.CommentResponseDto;
+import com.woowacourse.pickgit.comment.domain.Comment;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.domain.Post;
-import com.woowacourse.pickgit.comment.domain.Comment;
 import com.woowacourse.pickgit.user.domain.User;
 import java.util.List;
 import java.util.function.Function;

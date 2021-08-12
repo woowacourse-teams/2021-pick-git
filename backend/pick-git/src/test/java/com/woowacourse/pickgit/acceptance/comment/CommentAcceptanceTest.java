@@ -42,7 +42,6 @@ import org.springframework.test.context.ActiveProfiles;
 public class CommentAcceptanceTest {
 
     private static final String ANOTHER_USERNAME = "pick-git-login";
-    private static final String USERNAME = "jipark3";
 
     private String githubRepoUrl;
     private String content;
@@ -227,5 +226,4 @@ public class CommentAcceptanceTest {
             .statusCode(HttpStatus.OK.value())
             .extract();
     }
-
 }

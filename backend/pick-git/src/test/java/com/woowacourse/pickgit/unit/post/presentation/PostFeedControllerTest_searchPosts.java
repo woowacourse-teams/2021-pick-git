@@ -21,12 +21,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
+import com.woowacourse.pickgit.comment.domain.Comment;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.post.application.PostDtoAssembler;
 import com.woowacourse.pickgit.post.application.PostFeedService;
 import com.woowacourse.pickgit.post.application.dto.request.SearchPostsRequestDto;
 import com.woowacourse.pickgit.post.domain.Post;
-import com.woowacourse.pickgit.comment.domain.Comment;
 import com.woowacourse.pickgit.post.presentation.PostFeedController;
 import com.woowacourse.pickgit.tag.domain.Tag;
 import com.woowacourse.pickgit.user.domain.User;
@@ -70,25 +70,23 @@ public class PostFeedControllerTest_searchPosts {
             .id(1L)
             .author(user)
             .content("content")
+            .comments(List.of(new Comment(1L, "content", user, null)))
             .tags(new Tag("tag1"), new Tag("tag3"))
             .githubRepoUrl("github url")
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
             .build();
 
-        post1.addComment(new Comment(1L, "content", user));
-
         post2 = Post.builder()
             .id(2L)
             .author(user)
             .content("content")
+            .comments(List.of(new Comment(2L, "content", user, null)))
             .tags(new Tag("tag2"), new Tag("tag4"))
             .githubRepoUrl("github url")
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
             .build();
-
-        post2.addComment(new Comment(2L, "content", user));
     }
 
     @DisplayName("게스트는 tag로 게시물을 검색할 수 있다.")
