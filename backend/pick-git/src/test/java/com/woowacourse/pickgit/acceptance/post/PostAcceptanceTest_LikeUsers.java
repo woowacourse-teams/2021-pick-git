@@ -213,7 +213,7 @@ public class PostAcceptanceTest_LikeUsers {
         RestAssured.given().log().all()
             .auth().oauth2(token)
             .when()
-            .post("/api/profiles/{targetUserName}/followings", targetUserName)
+            .post("/api/profiles/{targetUserName}/followings?githubFollowing=false", targetUserName)
             .then().log().all()
             .statusCode(HttpStatus.OK.value());
     }

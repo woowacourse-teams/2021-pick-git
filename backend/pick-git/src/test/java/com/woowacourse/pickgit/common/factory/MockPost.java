@@ -1,7 +1,7 @@
 package com.woowacourse.pickgit.common.factory;
 
+import com.woowacourse.pickgit.comment.domain.Comments;
 import com.woowacourse.pickgit.post.domain.Post;
-import com.woowacourse.pickgit.post.domain.comment.Comments;
 import com.woowacourse.pickgit.post.domain.content.Image;
 import com.woowacourse.pickgit.post.domain.content.Images;
 import com.woowacourse.pickgit.post.domain.content.PostContent;
