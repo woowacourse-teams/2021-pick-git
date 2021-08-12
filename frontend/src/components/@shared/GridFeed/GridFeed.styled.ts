@@ -2,7 +2,6 @@ import styled from "styled-components";
 import { setDesktopMediaQuery, setLaptopMediaQuery } from "../../@styled/mediaQueries";
 
 export const Container = styled.div`
-  height: 100%;
   min-height: 100vh;
   overflow-y: auto;
   ${setLaptopMediaQuery`

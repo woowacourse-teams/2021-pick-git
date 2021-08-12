@@ -4,7 +4,6 @@ import { Page } from "../../components/@styled/layout";
 export const Container = styled(Page)<React.CSSProperties>`
   background-color: ${({ theme }) => theme.color.white};
   height: 100vh;
-  overflow-y: hidden;
 `;
 
 export const Empty = styled.div`
