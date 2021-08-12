@@ -7,6 +7,7 @@ import UserContext from "../../../contexts/UserContext";
 import {
   createQueryClient,
   EMPTY_PAGE,
+  keyword,
   mockFn,
   setLocalStorageInvalid,
   setLocalStorageValid,
@@ -16,7 +17,6 @@ import {
 import useSearchUserData from "../useSearchUserData";
 import {
   searchUserDataServer,
-  keyword,
   SEARCH_USER_KEYWORD,
   SEARCH_RESULT_PAGES,
   EMPTY_RESULT_KEYWORD,

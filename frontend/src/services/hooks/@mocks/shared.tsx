@@ -77,3 +77,17 @@ export const createQueryClient = () =>
       },
     },
   });
+
+export const keyword = (() => {
+  let currentValue = "";
+
+  return {
+    get current() {
+      return currentValue;
+    },
+
+    change(value: string) {
+      currentValue = value;
+    },
+  };
+})();
