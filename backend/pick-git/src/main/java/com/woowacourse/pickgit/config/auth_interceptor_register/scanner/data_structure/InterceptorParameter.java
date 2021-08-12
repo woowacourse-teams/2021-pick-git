@@ -10,8 +10,11 @@ public class InterceptorParameter {
     private final HttpMethod httpMethod;
     private final RegisterType registerType;
 
-    public InterceptorParameter(List<String> urls, HttpMethod httpMethod,
-        RegisterType registerType) {
+    public InterceptorParameter(
+        List<String> urls,
+        HttpMethod httpMethod,
+        RegisterType registerType
+    ) {
         this.urls = urls;
         this.httpMethod = httpMethod;
         this.registerType = registerType;
