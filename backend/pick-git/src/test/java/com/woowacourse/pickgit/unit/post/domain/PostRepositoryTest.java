@@ -3,7 +3,6 @@ package com.woowacourse.pickgit.unit.post.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.woowacourse.pickgit.comment.domain.Comment;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.config.JpaTestConfiguration;
 import com.woowacourse.pickgit.post.domain.Post;
@@ -129,34 +128,6 @@ class PostRepositoryTest {
         post.addTags(tags);
         assertThatThrownBy(() -> postRepository.save(post))
             .isInstanceOf(InvalidDataAccessApiUsageException.class);
-    }
-
-    @DisplayName("Post에 Comment를 추가하면 Comment가 자동 영속화된다.")
-    @Test
-    void addComment_WhenSavingPost_CommentSavedTogether() {
-        // given
-        User testUser = UserFactory.user("testUser");
-        User savedTestUser = userRepository.save(testUser);
-
-        Post post = Post.builder()
-            .content("testContent")
-            .githubRepoUrl("https://github.com/bperhaps")
-            .author(savedTestUser)
-            .build();
-
-        // when
-        Comment comment = new Comment("test comment", testUser);
-        post.addComment(comment);
-
-        postRepository.save(post);
-        flushAndClear();
-
-        // then
-        Post findPost = postRepository.findById(post.getId())
-            .orElseThrow(IllegalArgumentException::new);
-
-        List<Comment> comments = findPost.getComments();
-        assertThat(comments).hasSize(1);
     }
 
     private void flushAndClear() {

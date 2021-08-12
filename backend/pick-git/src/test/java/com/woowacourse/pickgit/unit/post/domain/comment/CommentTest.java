@@ -19,7 +19,7 @@ class CommentTest {
         String content = "a".repeat(99);
 
         // when, then
-        assertThatCode(() -> new Comment(content, null))
+        assertThatCode(() -> new Comment(content, null, null))
             .doesNotThrowAnyException();
     }
 
@@ -30,7 +30,7 @@ class CommentTest {
         String content = "a".repeat(100);
 
         // when, then
-        assertThatCode(() -> new Comment(content, null))
+        assertThatCode(() -> new Comment(content, null, null))
             .isInstanceOf(CommentFormatException.class)
             .extracting("errorCode")
             .isEqualTo("F0002");
@@ -42,7 +42,7 @@ class CommentTest {
     @ValueSource(strings = {" ", "  "})
     void newComment_NullOrEmpty_ExceptionThrown(String content) {
         // when, then
-        assertThatCode(() -> new Comment(content, null))
+        assertThatCode(() -> new Comment(content, null, null))
             .isInstanceOf(CommentFormatException.class)
             .extracting("errorCode")
             .isEqualTo("F0002");

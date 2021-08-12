@@ -33,7 +33,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 public class Post {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -94,10 +95,6 @@ public class Post {
 
     public static Builder builder() {
         return new Builder();
-    }
-
-    public void addComment(Comment comment) {
-        comments.addComment(comment, this);
     }
 
     public void addTags(List<Tag> tags) {
@@ -246,6 +243,11 @@ public class Post {
 
         public Builder content(String content) {
             this.content = new PostContent(content);
+            return this;
+        }
+
+        public Builder comments(List<Comment> comments) {
+            this.comments = new Comments(comments);
             return this;
         }
 

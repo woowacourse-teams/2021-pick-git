@@ -99,7 +99,7 @@ public class CommentServiceTest_queryComments {
         User user = UserFactory.user();
 
         return IntStream.range(0, size)
-            .mapToObj(i ->new Comment(createRandomString(), user))
+            .mapToObj(i ->new Comment(createRandomString(), user, null))
             .collect(toList());
     }
 

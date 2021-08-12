@@ -5,7 +5,6 @@ import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.user.domain.User;
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
@@ -13,11 +12,7 @@ import javax.persistence.OneToMany;
 @Embeddable
 public class Comments {
 
-    @OneToMany(
-        mappedBy = "post",
-        fetch = FetchType.LAZY,
-        cascade = {CascadeType.PERSIST, CascadeType.REMOVE}
-    )
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Comment> comments;
 
     public Comments() {
@@ -26,11 +21,6 @@ public class Comments {
 
     public Comments(List<Comment> comments) {
         this.comments = comments;
-    }
-
-    public void addComment(Comment comment, Post targetPost) {
-        comment.belongTo(targetPost);
-        comments.add(comment);
     }
 
     public void delete(Post post, User user, Comment comment) {

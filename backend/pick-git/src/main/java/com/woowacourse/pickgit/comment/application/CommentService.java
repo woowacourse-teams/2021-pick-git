@@ -54,17 +54,13 @@ public class CommentService {
     }
 
     public CommentResponseDto addComment(CommentRequestDto commentRequestDto) {
-        String userName = commentRequestDto.getUserName();
-        Long postId = commentRequestDto.getPostId();
         String content = commentRequestDto.getContent();
+        User user = findUserByName(commentRequestDto.getUserName());
+        Post post = findPostById(commentRequestDto.getPostId());
 
-        User user = findUserByName(userName);
-        Post post = findPostById(postId);
+        Comment savedComment = commentRepository.save(new Comment(content, user, post));
 
-        Comment comment = new Comment(content, user);
-        post.addComment(comment);
-
-        return createCommentResponseDto(comment);
+        return createCommentResponseDto(savedComment);
     }
 
     private CommentResponseDto createCommentResponseDto(Comment comment) {

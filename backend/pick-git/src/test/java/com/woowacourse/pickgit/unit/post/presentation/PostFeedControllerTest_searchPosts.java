@@ -70,25 +70,23 @@ public class PostFeedControllerTest_searchPosts {
             .id(1L)
             .author(user)
             .content("content")
+            .comments(List.of(new Comment(1L, "content", user, null)))
             .tags(new Tag("tag1"), new Tag("tag3"))
             .githubRepoUrl("github url")
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
             .build();
 
-        post1.addComment(new Comment(1L, "content", user));
-
         post2 = Post.builder()
             .id(2L)
             .author(user)
             .content("content")
+            .comments(List.of(new Comment(2L, "content", user, null)))
             .tags(new Tag("tag2"), new Tag("tag4"))
             .githubRepoUrl("github url")
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
             .build();
-
-        post2.addComment(new Comment(2L, "content", user));
     }
 
     @DisplayName("게스트는 tag로 게시물을 검색할 수 있다.")

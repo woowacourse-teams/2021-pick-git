@@ -17,7 +17,8 @@ import javax.persistence.ManyToOne;
 @Entity
 public class Comment {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Embedded
@@ -34,17 +35,14 @@ public class Comment {
     protected Comment() {
     }
 
-    public Comment(String content, User user) {
-        this(null, content, user);
+    public Comment(String content, User user, Post post) {
+        this(null, content, user, post);
     }
 
-    public Comment(Long id, String content, User user) {
+    public Comment(Long id, String content, User user, Post post) {
         this.id = id;
         this.content = new CommentContent(content);
         this.user = user;
-    }
-
-    public void belongTo(Post post) {
         this.post = post;
     }
 

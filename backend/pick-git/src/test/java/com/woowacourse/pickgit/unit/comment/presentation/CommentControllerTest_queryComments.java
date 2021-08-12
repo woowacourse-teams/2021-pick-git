@@ -62,7 +62,7 @@ public class CommentControllerTest_queryComments {
         given(oAuthService.findRequestUserByToken(anyString()))
             .willReturn(new LoginUser("testUser", "token"));
         given(commentService.queryComments(any(QueryCommentRequestDto.class)))
-            .willReturn(createCommentResponseDtos(true));
+            .willReturn(createCommentResponsesDto(true));
 
         ResultActions perform = mockMvc.perform(
             get("/api/posts/{postId}/comments?page={page}&limit={limit}", 1L, 0, 1)
@@ -71,7 +71,7 @@ public class CommentControllerTest_queryComments {
         perform
             .andExpect(status().isOk())
             .andExpect(
-                content().string(objectMapper.writeValueAsString(createCommentResponseDtos(true))));
+                content().string(objectMapper.writeValueAsString(createCommentResponsesDto(true))));
 
         verify(commentService, times(1))
             .queryComments(any(QueryCommentRequestDto.class));
@@ -86,7 +86,7 @@ public class CommentControllerTest_queryComments {
         given(oAuthService.findRequestUserByToken(null))
             .willReturn(new LoginUser("testUser", "token"));
         given(commentService.queryComments(any(QueryCommentRequestDto.class)))
-            .willReturn(createCommentResponseDtos(null));
+            .willReturn(createCommentResponsesDto(null));
 
         ResultActions perform = mockMvc.perform(
             get("/api/posts/{postId}/comments?page={page}&limit={limit}", 1L, 0, 1)
@@ -95,7 +95,7 @@ public class CommentControllerTest_queryComments {
         perform
             .andExpect(status().isOk())
             .andExpect(
-                content().string(objectMapper.writeValueAsString(createCommentResponseDtos(null))));
+                content().string(objectMapper.writeValueAsString(createCommentResponsesDto(null))));
 
         verify(commentService, times(1))
             .queryComments(any(QueryCommentRequestDto.class));
@@ -125,7 +125,7 @@ public class CommentControllerTest_queryComments {
         ));
     }
 
-    private List<CommentResponseDto> createCommentResponseDtos(Boolean liked) {
+    private List<CommentResponseDto> createCommentResponsesDto(Boolean liked) {
         return createComments().stream()
             .map(comment -> createCommentResponseDto(comment, liked))
             .collect(toList());
@@ -133,8 +133,8 @@ public class CommentControllerTest_queryComments {
 
     private List<Comment> createComments() {
         return List.of(
-            new Comment(1L, "testContent1", UserFactory.user()),
-            new Comment(2L, "testContent2", UserFactory.user())
+            new Comment(1L, "testContent1", UserFactory.user(), null),
+            new Comment(2L, "testContent2", UserFactory.user(), null)
         );
     }
 
