@@ -1,3 +1,5 @@
+import { UserItem } from "../../../@types";
+
 export class Blob {
   size: number;
 
@@ -31,6 +33,11 @@ export const DEFAULT_PROFILE_QUERY_DATA = {
   website: "",
   twitter: "",
   following: false,
+};
+export const MOCK_USER: UserItem = {
+  username: "chris",
+  imageUrl: "imageUrl",
+  following: true,
 };
 
 export const INVALID_ERROR_CODE = "invalid_error_code";
