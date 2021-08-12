@@ -11,7 +11,7 @@ public class IgnoreAuthenticateStorageForRegisterType implements StorageForRegis
 
     private static final RegisterType TYPE = RegisterType.IGNORE_AUTHENTICATE;
 
-    private Map<String, List<HttpMethod>> cache = new HashMap<>();
+    private final Map<String, List<HttpMethod>> cache = new HashMap<>();
 
     @Override
     public void appendTo(PathMatchInterceptor include) {
@@ -25,11 +25,8 @@ public class IgnoreAuthenticateStorageForRegisterType implements StorageForRegis
 
     @Override
     public void put(String key, HttpMethod value) {
-        if(!cache.containsKey(key)) {
-            cache.put(key, new ArrayList<>());
-        }
-
-        cache.get(key).add(value);
+        List<HttpMethod> httpMethods = cache.computeIfAbsent(key, k -> new ArrayList<>());
+        httpMethods.add(value);
     }
 
     @Override

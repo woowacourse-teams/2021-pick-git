@@ -25,11 +25,8 @@ public class AuthenticateStorageForRegisterType implements StorageForRegisterTyp
 
     @Override
     public void put(String key, HttpMethod value) {
-        if(!cache.containsKey(key)) {
-            cache.put(key, new ArrayList<>());
-        }
-
-        cache.get(key).add(value);
+        List<HttpMethod> httpMethods = cache.computeIfAbsent(key, k -> new ArrayList<>());
+        httpMethods.add(value);
     }
 
     @Override
