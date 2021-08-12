@@ -43,15 +43,19 @@ public class SourceVisitor implements FileVisitor<Path> {
         }
 
         String classSource = file.toUri().toString();
+        int index = classSource.indexOf(startsWith);
+        if (index == -1) {
+            return FileVisitResult.CONTINUE;
+        }
 
-        String classPath = assemblePackage(classSource, file);
+        String classPath = assemblePackage(classSource, index);
         this.classPaths.add(classPath);
 
         return FileVisitResult.CONTINUE;
     }
 
-    private String assemblePackage(String base, Path file) {
-        base = base.substring(base.indexOf(startsWith));
+    private String assemblePackage(String base, int index) {
+        base = base.substring(index);
         base = base.replace("/", ".");
 
         return base.replace(".class", "");
