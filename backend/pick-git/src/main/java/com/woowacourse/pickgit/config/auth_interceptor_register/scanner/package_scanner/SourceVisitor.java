@@ -3,22 +3,22 @@ package com.woowacourse.pickgit.config.auth_interceptor_register.scanner.package
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class SourceVisitor implements FileVisitor<Path> {
 
+    private final String startsWith;
     private final List<String> classPaths;
 
-    public SourceVisitor() {
-        this(new ArrayList<>());
+    public SourceVisitor(String startsWith) {
+        this(startsWith, new ArrayList<>());
     }
 
-    public SourceVisitor(List<String> classPaths) {
+    public SourceVisitor(String startsWith, List<String> classPaths) {
+        this.startsWith = startsWith;
         this.classPaths = classPaths;
     }
 
@@ -30,7 +30,7 @@ public class SourceVisitor implements FileVisitor<Path> {
     public FileVisitResult preVisitDirectory(
         Path dir, BasicFileAttributes attrs
     ) throws IOException {
-        if(dir.getFileName().toString().contains("test")) {
+        if (dir.getFileName().toString().contains("test")) {
             return FileVisitResult.SKIP_SUBTREE;
         }
         return FileVisitResult.CONTINUE;
@@ -38,29 +38,23 @@ public class SourceVisitor implements FileVisitor<Path> {
 
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-        if(!file.toString().endsWith(".java")) {
+        if (!file.toString().endsWith(".class")) {
             return FileVisitResult.CONTINUE;
         }
 
-        try(Stream<String> lines = Files.lines(file)) {
-            String classPath = lines
-                .filter(line -> line.startsWith("package"))
-                .findAny()
-                .map(line -> assemblePackage(line, file))
-                .orElseThrow(() -> new IllegalArgumentException(".java 파일 파싱에 실패했습니다."));
+        String classSource = file.toUri().toString();
 
-            this.classPaths.add(classPath);
-        }
+        String classPath = assemblePackage(classSource, file);
+        this.classPaths.add(classPath);
 
         return FileVisitResult.CONTINUE;
     }
 
     private String assemblePackage(String base, Path file) {
-        base = base.replace(";", "");
-        base = base.replace("package ", "");
-        String fileName = file.getFileName().toString().replace(".java", "");
+        base = base.substring(base.indexOf(startsWith));
+        base = base.replace("/", ".");
 
-        return String.format("%s.%s", base, fileName);
+        return base.replace(".class", "");
     }
 
     @Override

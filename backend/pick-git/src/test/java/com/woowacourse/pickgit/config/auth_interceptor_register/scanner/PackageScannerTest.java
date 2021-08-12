@@ -28,7 +28,7 @@ class PackageScannerTest {
             .replace("/build/classes/java/test", "/src/test/java");
 
         Path rootPath = Path.of(new URI(resource));
-        PackageScanner packageScanner = new PackageScanner(rootPath, new TestSourceVisitor());
+        PackageScanner packageScanner = new PackageScanner(rootPath, new TestSourceVisitor("com"));
         List<String> allClassNames = packageScanner.getAllClassNames();
 
         assertThat(allClassNames)
@@ -41,6 +41,10 @@ class PackageScannerTest {
     }
 
     private static class TestSourceVisitor extends SourceVisitor {
+
+        public TestSourceVisitor(String startsWith) {
+            super(startsWith);
+        }
 
         public List<String> getClassPaths() {
             return super.getClassPaths();
