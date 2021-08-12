@@ -36,6 +36,7 @@ export const WARNING_MESSAGE = {
   GITHUB_FOLLOWING: "깃허브 계정에서도 팔로우 하시겠습니까?",
   GITHUB_UNFOLLOWING: "깃허브 계정에서도 팔로우 취소 하시겠습니까?",
   COMMENT_DELETE: "정말로 댓글을 삭제하시겠습니까?",
+  NO_ONE_LIKE_POST: "해당 포스트에 좋아요를 누른 사람이 없습니다.",
 };
 
 export const REDIRECT_MESSAGE = {
