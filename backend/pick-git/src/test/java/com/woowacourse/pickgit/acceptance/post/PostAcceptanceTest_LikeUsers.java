@@ -91,9 +91,12 @@ public class PostAcceptanceTest_LikeUsers {
             .map(user -> {
                     if (isFollowingUser(likeUsers, user)) {
                         return new LikeUsersResponse(user.getImage(), user.getName(), true);
-                    } else if (user.getName().equals("author")) {
+                    }
+
+                    if (user.getName().equals("author")) {
                         return new LikeUsersResponse(user.getImage(), user.getName(), null);
                     }
+
                     return new LikeUsersResponse(user.getImage(), user.getName(), false);
                 }
             ).collect(toList());

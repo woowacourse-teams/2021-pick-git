@@ -116,28 +116,4 @@ public class PostFeedController {
             .liked(postResponseDto.getLiked())
             .build();
     }
-
-    @GetMapping("/posts/{postId}/likes")
-    public ResponseEntity<List<LikeUsersResponse>> searchLikeUsers(
-        @Authenticated AppUser appUser,
-        @PathVariable Long postId
-    ) {
-        AuthUserForPostRequestDto authUserRequestDto = AuthUserForPostRequestDto.from(appUser);
-
-        List<LikeUsersResponseDto> likeUsersResponseDtos = postFeedService
-            .likeUsers(authUserRequestDto, postId);
-
-        return ResponseEntity.ok(createLikeUsersResponse(likeUsersResponseDtos));
-    }
-
-    private List<LikeUsersResponse> createLikeUsersResponse(
-        List<LikeUsersResponseDto> likeUsersResponseDtos) {
-        return likeUsersResponseDtos.stream()
-            .map(dto -> LikeUsersResponse.builder()
-                .username(dto.getUsername())
-                .imageUrl(dto.getImageUrl())
-                .following(dto.getFollowing())
-                .build()
-            ).collect(toList());
-    }
 }

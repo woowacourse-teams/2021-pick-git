@@ -100,56 +100,6 @@ public class PostFeedService {
         return PostDtoAssembler.assembleFrom(user, isGuest, search);
     }
 
-    @Transactional(readOnly = true)
-    public List<LikeUsersResponseDto> likeUsers(
-        AuthUserForPostRequestDto authUserRequestDto, Long postId
-    ) {
-        Post post = findPostWithLikeUsers(postId);
-        List<User> likeUsers = post.getLikeUsers();
-
-        if (authUserRequestDto.isGuest()) {
-            return createLikeUsersResponseDtoOfGuest(likeUsers);
-        }
-
-        User loginUser = findUserByName(authUserRequestDto.getUsername());
-        List<LikeUsersResponseDto> likeUsersResponseDtoOfLoginUser =
-            createLikeUsersResponseDtoOfLoginUser(loginUser, likeUsers);
-
-        return likeUsersResponseDtoOfLoginUser;
-    }
-
-    private Post findPostWithLikeUsers(Long postId) {
-        return postRepository.findPostWithLikeUsers(postId)
-            .orElseThrow(PostNotFoundException::new);
-    }
-
-    private List<LikeUsersResponseDto> createLikeUsersResponseDtoOfGuest(
-        List<User> likeUsers
-    ) {
-        return likeUsers.stream()
-            .map(user ->
-                new LikeUsersResponseDto(
-                    user.getImage(),
-                    user.getName(),
-                    null
-                )
-            ).collect(toList());
-    }
-
-    private List<LikeUsersResponseDto> createLikeUsersResponseDtoOfLoginUser(
-        User loginUser,
-        List<User> likeUsers
-    ) {
-        return likeUsers.stream()
-            .map(user ->
-                new LikeUsersResponseDto(
-                    user.getImage(),
-                    user.getName(),
-                    loginUser.isFollowing(user)
-                )
-            ).collect(toList());
-    }
-
     private User findUserByName(String userName) {
         if(Objects.isNull(userName)) {
             return null;

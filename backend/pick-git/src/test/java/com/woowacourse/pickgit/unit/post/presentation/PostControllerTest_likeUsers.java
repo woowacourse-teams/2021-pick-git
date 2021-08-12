@@ -27,9 +27,10 @@ import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
-import com.woowacourse.pickgit.post.application.PostFeedService;
+import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.request.AuthUserForPostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeUsersResponseDto;
+import com.woowacourse.pickgit.post.presentation.PostController;
 import com.woowacourse.pickgit.post.presentation.PostFeedController;
 import com.woowacourse.pickgit.user.domain.User;
 import java.util.List;
@@ -48,9 +49,9 @@ import org.springframework.test.web.servlet.ResultActions;
 
 @AutoConfigureRestDocs
 @Import(InfrastructureTestConfiguration.class)
-@WebMvcTest(PostFeedController.class)
+@WebMvcTest(PostController.class)
 @ActiveProfiles("test")
-public class PostFeedControllerTest_likeUsers {
+public class PostControllerTest_likeUsers {
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -59,7 +60,7 @@ public class PostFeedControllerTest_likeUsers {
     private MockMvc mockMvc;
 
     @MockBean
-    private PostFeedService postfeedService;
+    private PostService postService;
 
     @MockBean
     private OAuthService oAuthService;
@@ -78,7 +79,7 @@ public class PostFeedControllerTest_likeUsers {
         given(oAuthService.validateToken(token)).willReturn(true);
         given(oAuthService.findRequestUserByToken(token))
             .willReturn(new LoginUser("author", "token"));
-        given(postfeedService.likeUsers(any(AuthUserForPostRequestDto.class), anyLong()))
+        given(postService.likeUsers(any(AuthUserForPostRequestDto.class), anyLong()))
             .willReturn(likeUsersResponseDto);
 
         // when
@@ -104,7 +105,7 @@ public class PostFeedControllerTest_likeUsers {
         verify(oAuthService, times(1)).validateToken("token");
         verify(oAuthService, times(1))
             .findRequestUserByToken("token");
-        verify(postfeedService, times(1))
+        verify(postService, times(1))
             .likeUsers(any(AuthUserForPostRequestDto.class), anyLong());
 
         // restdocs
@@ -134,7 +135,7 @@ public class PostFeedControllerTest_likeUsers {
         // mock
         given(oAuthService.findRequestUserByToken(any()))
             .willReturn(new GuestUser());
-        given(postfeedService.likeUsers(any(AuthUserForPostRequestDto.class), anyLong()))
+        given(postService.likeUsers(any(AuthUserForPostRequestDto.class), anyLong()))
             .willReturn(likeUsersResponseDto);
 
         // when
@@ -158,7 +159,7 @@ public class PostFeedControllerTest_likeUsers {
 
         verify(oAuthService, times(1))
             .findRequestUserByToken(any());
-        verify(postfeedService, times(1))
+        verify(postService, times(1))
             .likeUsers(any(AuthUserForPostRequestDto.class), anyLong());
 
         // restdocs
@@ -182,7 +183,7 @@ public class PostFeedControllerTest_likeUsers {
         // mock
         given(oAuthService.findRequestUserByToken(any()))
             .willReturn(new GuestUser());
-        given(postfeedService.likeUsers(any(AuthUserForPostRequestDto.class), anyLong()))
+        given(postService.likeUsers(any(AuthUserForPostRequestDto.class), anyLong()))
             .willReturn(likeUsersResponseDto);
 
         // when
@@ -206,7 +207,7 @@ public class PostFeedControllerTest_likeUsers {
 
         verify(oAuthService, times(1))
             .findRequestUserByToken(any());
-        verify(postfeedService, times(1))
+        verify(postService, times(1))
             .likeUsers(any(AuthUserForPostRequestDto.class), anyLong());
 
         // restdocs

@@ -12,6 +12,7 @@ import com.woowacourse.pickgit.common.factory.PostFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.post.application.PostFeedService;
+import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.request.AuthUserForPostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeUsersResponseDto;
 import com.woowacourse.pickgit.post.domain.Post;
@@ -30,12 +31,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class PostFeedServiceTest_likeUsers {
+public class PostServiceTest_likeUsers {
 
     private static final String IMAGE_URL = "http://img.com";
 
     @InjectMocks
-    private PostFeedService postFeedService;
+    private PostService postService;
 
     @Mock
     private UserRepository userRepository;
@@ -75,7 +76,7 @@ public class PostFeedServiceTest_likeUsers {
             createLikeUserResponseDtoForLoginUser(post.getLikeUsers());
 
         // when
-        List<LikeUsersResponseDto> actualResponse = postFeedService
+        List<LikeUsersResponseDto> actualResponse = postService
             .likeUsers(authUserForPostRequestDto, postId);
 
         // then
@@ -119,7 +120,7 @@ public class PostFeedServiceTest_likeUsers {
             createLikeUserResponseForGuest(post.getLikeUsers());
 
         // when
-        List<LikeUsersResponseDto> actualResponse = postFeedService
+        List<LikeUsersResponseDto> actualResponse = postService
             .likeUsers(authUserForPostRequestDto, postId);
 
         // then
@@ -147,7 +148,7 @@ public class PostFeedServiceTest_likeUsers {
             .willReturn(Optional.of(post));
 
         // when
-        List<LikeUsersResponseDto> actualResponse = postFeedService
+        List<LikeUsersResponseDto> actualResponse = postService
             .likeUsers(authUserForPostRequestDto, postId);
 
         // then
@@ -173,7 +174,7 @@ public class PostFeedServiceTest_likeUsers {
 
         // when then
         assertThatThrownBy(
-            () -> postFeedService.likeUsers(authUserForPostRequestDto, postId)
+            () -> postService.likeUsers(authUserForPostRequestDto, postId)
         ).isInstanceOf(PostNotFoundException.class)
             .hasFieldOrPropertyWithValue("errorCode", "P0002");
 

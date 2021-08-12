@@ -6,12 +6,14 @@ import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.post.application.PostService;
+import com.woowacourse.pickgit.post.application.dto.request.AuthUserForPostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostDeleteRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.SearchRepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.LikeUsersResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
@@ -19,6 +21,7 @@ import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponses
 import com.woowacourse.pickgit.post.presentation.dto.request.PostRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
 import com.woowacourse.pickgit.post.presentation.dto.response.LikeResponse;
+import com.woowacourse.pickgit.post.presentation.dto.response.LikeUsersResponse;
 import com.woowacourse.pickgit.post.presentation.dto.response.PostUpdateResponse;
 import com.woowacourse.pickgit.post.presentation.dto.response.RepositoryResponse;
 import java.net.URI;
@@ -226,5 +229,29 @@ public class PostController {
 
     private PostDeleteRequestDto createPostDeleteRequestDto(AppUser user, Long postId) {
         return new PostDeleteRequestDto(user, postId);
+    }
+
+    @GetMapping("/posts/{postId}/likes")
+    public ResponseEntity<List<LikeUsersResponse>> searchLikeUsers(
+        @Authenticated AppUser appUser,
+        @PathVariable Long postId
+    ) {
+        AuthUserForPostRequestDto authUserRequestDto = AuthUserForPostRequestDto.from(appUser);
+
+        List<LikeUsersResponseDto> likeUsersResponseDtos = postService
+            .likeUsers(authUserRequestDto, postId);
+
+        return ResponseEntity.ok(createLikeUsersResponse(likeUsersResponseDtos));
+    }
+
+    private List<LikeUsersResponse> createLikeUsersResponse(
+        List<LikeUsersResponseDto> likeUsersResponseDtos) {
+        return likeUsersResponseDtos.stream()
+            .map(dto -> LikeUsersResponse.builder()
+                .username(dto.getUsername())
+                .imageUrl(dto.getImageUrl())
+                .following(dto.getFollowing())
+                .build()
+            ).collect(toList());
     }
 }
