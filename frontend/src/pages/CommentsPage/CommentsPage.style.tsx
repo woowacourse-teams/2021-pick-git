@@ -1,17 +1,16 @@
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { Page } from "../../components/@styled/layout";
+import { setDesktopMediaQuery, setLaptopMediaQuery, setTabletMediaQuery } from "../../components/@styled/mediaQueries";
 import { LAYOUT } from "../../constants/layout";
 
-export const Container = styled.div`
+export const Container = styled(Page)`
+  padding-top: 0;
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
-  height: 100%;
   padding-bottom: ${LAYOUT.HEADER_HEIGHT};
-  overflow-x: hidden;
-  overflow-y: scroll;
   background-color: ${({ theme }) => theme.color.white};
 `;
 
@@ -22,12 +21,29 @@ export const SliderHeader = styled.div`
   width: 100%;
   min-height: ${LAYOUT.HEADER_HEIGHT};
   padding: 1.0625rem 1.375rem;
+
+  ${setTabletMediaQuery`
+    padding: 1.0625rem 0.5rem;
+  `}
+
+  ${setLaptopMediaQuery`
+    padding: 1.0625rem 0.5rem;
+    margin-bottom: 0.5rem
+  `}
+
+  ${setDesktopMediaQuery`
+    padding: 1.0625rem 0.5rem;
+    margin-bottom: 1rem
+  `}
+`;
+
+export const HorizontalSliderWrapper = styled.div`
+  overflow-x: hidden;
 `;
 
 export const HorizontalSlider = styled.div<{ stepIndex: number; stepCount: number }>`
   position: relative;
   display: flex;
-  left: 100%;
   transition: transform 0.5s;
 
   ${({ stepCount, stepIndex }) => `
@@ -139,14 +155,30 @@ export const CommentTextAreaWrapper = styled.div`
   display: flex;
   align-items: center;
   transition: background-color 0.5s;
+  padding-right: 1rem;
 
   ${({ theme }) => `
     border-top: 1px solid ${theme.color.borderColor};
+    background-color: ${theme.color.white};
     :focus-within {
       background-color: ${theme.color.secondaryColor};
     }
   `};
-  padding-right: 1rem;
+
+  ${setTabletMediaQuery`
+    padding: 0 3.5rem;
+    border: none;
+  `}
+
+  ${setLaptopMediaQuery`
+    padding: 0 12.5rem;
+    border: none;
+  `}
+
+  ${setDesktopMediaQuery`
+    padding: 0 24.5rem;
+    border: none;
+  `}
 `;
 
 export const CommentTextArea = styled.textarea`

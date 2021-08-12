@@ -27,6 +27,7 @@ export const StepContainer = styled.div<{ stepCount: number; isShown: boolean }>
   ${({ stepCount, isShown }) => `
     width: ${100 / stepCount}%;
     opacity: ${isShown ? 1 : 0};
+    pointer-events: ${isShown ? "initial" : "none"}
   `}
 `;
 

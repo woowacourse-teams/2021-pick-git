@@ -32,7 +32,7 @@ export const GlobalStyle = createGlobalStyle`
   }
 
   body {
-    background-color: #efefef;
+    /* background-color: #fef9f8; */
   }
    
   svg {
@@ -70,19 +70,17 @@ export const GlobalStyle = createGlobalStyle`
     display: block;
     margin: 20px;
     all: unset;
+    color: #3f464d;
   }
   
   a:link {
     text-decoration: none;
-    color: #3f464d;
   }
   a:visited {
     text-decoration: none;
-    color: #3f464d;
   }
   a:active {
     text-decoration: none;
-    color: #3f464d;
   }
   a:hover {
     text-decoration: none;

@@ -1,8 +1,16 @@
 import styled from "styled-components";
+import { setDesktopMediaQuery, setLaptopMediaQuery } from "../../@styled/mediaQueries";
 
 export const Container = styled.div`
   height: 100%;
   overflow-y: auto;
+  ${setLaptopMediaQuery`
+    margin-top: 1rem;
+  `}
+
+  ${setDesktopMediaQuery`
+    margin-top: 1rem;
+  `}
 `;
 
 export const Grid = styled.div`

@@ -15,7 +15,14 @@ import ProfileModificationForm from "../../ProfileModificationForm/ProfileModifi
 import Avatar from "../Avatar/Avatar";
 import Button from "../Button/Button";
 import CountIndicator from "../CountIndicator/CountIndicator";
-import { ButtonLoader, ButtonSpinner, Container, Indicators } from "./ProfileHeader.style";
+import {
+  AvatarWrapper,
+  ButtonLoader,
+  ButtonSpinner,
+  Container,
+  Indicators,
+  IndicatorsWrapper,
+} from "./ProfileHeader.style";
 
 export interface Props {
   isMyProfile: boolean;
@@ -88,8 +95,10 @@ const ProfileHeader = ({ isMyProfile, profile, username }: Props) => {
 
   return (
     <Container>
-      <Avatar diameter="3.75rem" fontSize="0.875rem" imageUrl={profile?.imageUrl} name={profile?.name} />
-      <div>
+      <AvatarWrapper>
+        <Avatar diameter="100%" fontSize="0.875rem" imageUrl={profile?.imageUrl} name={profile?.name} />
+      </AvatarWrapper>
+      <IndicatorsWrapper>
         <Indicators>
           <CountIndicator name="게시물" count={profile?.postCount ?? 0} />
           <Link to={PAGE_URL.FOLLOWERS(username)}>
@@ -100,7 +109,7 @@ const ProfileHeader = ({ isMyProfile, profile, username }: Props) => {
           </Link>
         </Indicators>
         <ProfileButton />
-      </div>
+      </IndicatorsWrapper>
       {isModalShown && isLoggedIn && (
         <ModalPortal onClose={hideModal} isCloseButtonShown={true}>
           <ProfileModificationForm

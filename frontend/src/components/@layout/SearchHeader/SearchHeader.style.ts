@@ -1,11 +1,24 @@
 import styled from "styled-components";
 import { Header } from "../../@styled/layout";
+import { setDesktopMediaQuery, setLaptopMediaQuery, setTabletMediaQuery } from "../../@styled/mediaQueries";
 
 export const Container = styled(Header)<React.CSSProperties>`
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0.4rem 1.4375rem;
+
+  ${setTabletMediaQuery`
+    padding: 0.4rem 3.5rem;
+  `}
+
+  ${setLaptopMediaQuery`
+    padding: 0.4rem 12.5rem;
+  `}
+
+  ${setDesktopMediaQuery`
+    padding: 0.4rem 24.5rem;
+  `}
 `;
 
 export const GoBackLink = styled.a`

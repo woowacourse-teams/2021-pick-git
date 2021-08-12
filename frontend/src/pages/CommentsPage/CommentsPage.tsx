@@ -24,6 +24,7 @@ import {
   SendIconWrapper,
   DeleteIconWrapper,
   CommentContentWrapper,
+  HorizontalSliderWrapper,
 } from "./CommentsPage.style";
 import { CommentData, Post, TabItem } from "../../@types";
 import { COMMENT_SLIDE_STEPS } from "../../constants/steps";
@@ -117,7 +118,7 @@ const CommentsPage = ({}: Props) => {
   };
 
   const handleCommentDelete = async () => {
-    await deletePostComment(selectedCommentId);
+    await deletePostComment(selectedPost.id, selectedCommentId);
     hideMessageModal();
   };
 
@@ -183,14 +184,14 @@ const CommentsPage = ({}: Props) => {
         </CloseLinkButton>
       </SliderHeader>
       {isPostShown && (
-        <>
+        <HorizontalSliderWrapper>
           <HorizontalSlider stepCount={COMMENT_SLIDE_STEPS.length} stepIndex={stepIndex}>
             {horizontalSliderItems}
           </HorizontalSlider>
           <TabsWrapper>
             <Tabs tabIndicatorKind="pill" tabItems={tabItems} />
           </TabsWrapper>
-        </>
+        </HorizontalSliderWrapper>
       )}
       <InfiniteScrollContainer isLoaderShown={isFetching} onIntersect={getNextComments}>
         <CommentList>{commentListItems}</CommentList>

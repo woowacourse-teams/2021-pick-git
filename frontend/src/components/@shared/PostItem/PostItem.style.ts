@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { setDesktopMediaQuery, setMobileMediaQuery } from "../../@styled/mediaQueries";
 
-export const Container = styled.div``;
+export const Container = styled.div`
+  color: ${({ theme }) => theme.color.textColor};
+`;
 
 export const PostHeader = styled.div`
   display: flex;
@@ -76,12 +79,27 @@ export const MoreContentLinkButton = styled.a`
 
 export const PostContentAuthorLink = styled(Link)`
   margin-right: 0.4375rem;
-  font-size: 0.75rem;
+
+  font-size: 0.8rem;
+  ${setMobileMediaQuery`
+    font-size: 0.7rem;
+  `}
+  ${setDesktopMediaQuery`
+    font-size: 0.9rem;
+  `}
+
   font-weight: bold;
 `;
 
 export const PostContent = styled.span`
-  font-size: 0.625rem;
+  font-size: 0.7rem;
+  ${setMobileMediaQuery`
+    font-size: 0.625rem;
+  `}
+  ${setDesktopMediaQuery`
+    font-size: 0.8rem;
+  `}
+
   line-height: 1.5rem;
   margin-bottom: 1rem;
 `;
@@ -117,23 +135,25 @@ export const CommentWrapper = styled.div`
   margin-bottom: 0.5rem;
 `;
 
-export const CommentSliderToggleLink = styled.a`
+export const CommentPageMoveLink = styled.a`
   display: flex;
   justify-content: flex-end;
   align-items: center;
   padding: 0 1rem;
-  font-size: 10px;
+  font-size: 0.625rem;
   transition: opacity 0.5s;
+  padding-bottom: 1rem;
 
   :hover {
     opacity: 0.5;
   }
 `;
 
-export const CommentSliderToggleLinkText = styled.span`
-  font-size: 12px;
+export const CommentPageMoveLinkText = styled.span`
+  font-size: 0.75rem;
   font-weight: bold;
   margin-right: 0.5rem;
+  margin-bottom: 0.1rem;
 `;
 
 export const MoreCommentExistIndicator = styled.div`

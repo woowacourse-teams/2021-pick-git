@@ -66,7 +66,7 @@ export const API_URL = {
   POST_LIKE_PEOPLE: (postId: number, page: number, limit: number) =>
     `/posts/${postId}/likes?page=${page}&limit=${limit}`,
   POST_LIKES: (postId: number) => `/posts/${postId}/likes`,
-  POST_COMMENT: (postId: number, commentId?: number) => `/posts/${postId}/comments/${commentId ?? ""}`,
+  POST_COMMENT: (postId: number, commentId?: number) => `/posts/${postId}/comments${commentId ? `/${commentId}` : ""}`,
   POST_COMMENTS: (postId: number, page: number, limit: number) =>
     `/posts/${postId}/comments?page=${page}&limit=${limit}`,
   GITHUB_STATS: (username: string) => `/profiles/${username}/contributions`,

@@ -1,5 +1,12 @@
-import { Container, Navigation, HomeLink, NavigationItem, FlexWrapper } from "./NavigationHeader.style";
-import { AddBoxIcon, HomeIcon, LoginIcon, PersonIcon, SearchIcon } from "../../../assets/icons";
+import {
+  Container,
+  Navigation,
+  HomeLink,
+  NavigationItem,
+  AuthNavigationWrapper,
+  LogoIconWrapper,
+} from "./NavigationHeader.style";
+import { AddBoxIcon, HomeIcon, LoginIcon, LogoIcon, PersonIcon, SearchIcon } from "../../../assets/icons";
 import { PAGE_URL } from "../../../constants/urls";
 import { useContext } from "react";
 import UserContext from "../../../contexts/UserContext";
@@ -17,9 +24,6 @@ const NavigationHeader = () => {
       </NavigationItem>
       <NavigationItem to={PAGE_URL.SEARCH}>
         <SearchIcon />
-      </NavigationItem>
-      <NavigationItem to={PAGE_URL.LOGIN}>
-        <LoginIcon />
       </NavigationItem>
     </Navigation>
   );
@@ -43,16 +47,30 @@ const NavigationHeader = () => {
 
   return (
     <Container>
-      <HomeLink to={PAGE_URL.HOME}>깃들다</HomeLink>
+      <HomeLink to={PAGE_URL.HOME}>
+        <LogoIconWrapper>
+          <LogoIcon />
+        </LogoIconWrapper>
+        깃들다
+      </HomeLink>
       {isLoggedIn ? (
-        <FlexWrapper>
+        <>
           <AuthenticatedNavigation />
-          <Button kind="roundedInline" padding="0.1rem 0.7rem 0.2rem" onClick={handleLogoutButtonClick}>
-            로그아웃
-          </Button>
-        </FlexWrapper>
+          <AuthNavigationWrapper>
+            <Button kind="roundedInline" padding="0.2rem 0.7rem 0.3rem" onClick={handleLogoutButtonClick}>
+              로그아웃
+            </Button>
+          </AuthNavigationWrapper>
+        </>
       ) : (
-        <UnAuthenticatedNavigation />
+        <>
+          <UnAuthenticatedNavigation />
+          <AuthNavigationWrapper>
+            <NavigationItem to={PAGE_URL.LOGIN}>
+              <LoginIcon />
+            </NavigationItem>
+          </AuthNavigationWrapper>
+        </>
       )}
     </Container>
   );
