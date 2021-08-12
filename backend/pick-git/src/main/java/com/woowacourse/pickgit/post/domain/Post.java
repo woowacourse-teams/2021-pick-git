@@ -112,8 +112,8 @@ public class Post {
         return likes.contains(like);
     }
 
-    public boolean isWrittenBy(User user) {
-        return this.user.equals(user);
+    public boolean isNotWrittenBy(User user) {
+        return !this.user.equals(user);
     }
 
     public void updateContent(String content) {
@@ -127,17 +127,6 @@ public class Post {
 
     public void addTags(List<Tag> tags) {
         postTags.addAll(this, tags);
-    }
-
-    public Comment addComment(String content, User user) {
-        Comment comment = new Comment(content, user, this);
-        comments.add(comment);
-
-        return comment;
-    }
-
-    public void deleteComment(User user, Comment comment) {
-        comments.delete(this, user, comment);
     }
 
     public Long getId() {

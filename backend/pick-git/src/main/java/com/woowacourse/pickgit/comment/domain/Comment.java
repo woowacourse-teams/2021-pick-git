@@ -3,7 +3,6 @@ package com.woowacourse.pickgit.comment.domain;
 import com.woowacourse.pickgit.exception.comment.CannotDeleteCommentException;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.user.domain.User;
-import java.util.List;
 import java.util.Objects;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -46,15 +45,17 @@ public class Comment {
         this.post = post;
     }
 
-    public void delete(List<Comment> comments, Post post, User user) {
-        if (!post.isWrittenBy(user) && !isCommentedBy(user)) {
+    public void deleteFrom(Post post, User user) {
+        if (post.isNotWrittenBy(user) && isNotCommentedBy(user)) {
             throw new CannotDeleteCommentException();
         }
-        comments.remove(this);
+
+        this.user = null;
+        this.post = null;
     }
 
-    private boolean isCommentedBy(User user) {
-        return this.user.equals(user);
+    private boolean isNotCommentedBy(User user) {
+        return !this.user.equals(user);
     }
 
     public Long getId() {
@@ -71,6 +72,14 @@ public class Comment {
 
     public String getContent() {
         return content.getContent();
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public Post getPost() {
+        return post;
     }
 
     @Override

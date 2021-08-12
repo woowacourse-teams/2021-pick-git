@@ -39,6 +39,17 @@ public class CommentService {
         this.postRepository = postRepository;
     }
 
+    public CommentResponseDto addComment(CommentRequestDto commentRequestDto) {
+        String content = commentRequestDto.getContent();
+        User user = findUserByName(commentRequestDto.getUserName());
+        Post post = findPostById(commentRequestDto.getPostId());
+
+        Comment comment = new Comment(content, user, post);
+        Comment savedComment = commentRepository.save(comment);
+
+        return createCommentResponseDto(savedComment);
+    }
+
     public List<CommentResponseDto> queryComments(QueryCommentRequestDto queryCommentRequestDto) {
         Long postId = queryCommentRequestDto.getPostId();
         int page = queryCommentRequestDto.getPage();
@@ -51,17 +62,6 @@ public class CommentService {
         return comments.stream()
             .map(this::createCommentResponseDto)
             .collect(toList());
-    }
-
-    public CommentResponseDto addComment(CommentRequestDto commentRequestDto) {
-        String content = commentRequestDto.getContent();
-        User user = findUserByName(commentRequestDto.getUserName());
-        Post post = findPostById(commentRequestDto.getPostId());
-
-        Comment comment = post.addComment(content, user);
-        Comment savedComment = commentRepository.save(comment);
-
-        return createCommentResponseDto(savedComment);
     }
 
     private CommentResponseDto createCommentResponseDto(Comment comment) {
@@ -79,7 +79,7 @@ public class CommentService {
         User user = findUserByName(commentDeleteRequestDto.getUsername());
         Comment comment = findCommentById(commentDeleteRequestDto.getCommentId());
 
-        post.deleteComment(user, comment);
+        comment.deleteFrom(post, user);
         commentRepository.delete(comment);
     }
 

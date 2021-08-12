@@ -103,10 +103,6 @@ public class User {
         this.githubProfile = githubProfile;
     }
 
-    public boolean isSameAs(User user) {
-        return this.id.equals(user.getId());
-    }
-
     public void delete(Post post) {
         List<Post> posts = this.posts.getPosts();
         posts.remove(post);
