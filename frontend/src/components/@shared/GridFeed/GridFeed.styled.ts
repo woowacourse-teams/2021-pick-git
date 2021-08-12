@@ -3,6 +3,7 @@ import { setDesktopMediaQuery, setLaptopMediaQuery } from "../../@styled/mediaQu
 
 export const Container = styled.div`
   height: 100%;
+  min-height: 100vh;
   overflow-y: auto;
   ${setLaptopMediaQuery`
     margin-top: 1rem;
@@ -47,7 +48,7 @@ export const GridItem = styled.div<{ imageUrl: string }>`
 
 export const Empty = styled.div`
   width: 100%;
-  height: 23.5625rem;
+  height: 100vh;
 
   display: flex;
   flex-direction: column;

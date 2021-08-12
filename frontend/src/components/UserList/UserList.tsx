@@ -68,7 +68,7 @@ const UserList = ({ isFetchingNextPage, onIntersect, users, follow, refetch }: P
   };
 
   if (!users.length) {
-    return <Empty>검색결과가 없습니다.</Empty>;
+    return <Empty>일치하는 계정이 없습니다.</Empty>;
   }
 
   return (

@@ -41,41 +41,60 @@ const SearchPage = () => {
   } = useSearchPostData("tags");
   const follow = useFollow();
 
-  const tabItems = tabNames.map((name, index) => ({ name, onTabChange: () => setTabIndex(index) }));
-  const tabContents = [
-    <UserList
-      key="user"
-      users={userSearchResults}
-      isFetchingNextPage={isUserSearchFetchingNextPage}
-      onIntersect={handleUserSearchIntersect}
-      follow={follow}
-      refetch={userSearchRefetch}
-    />,
-    <>
-      <KeywordsWrapper>
-        {postSearchKeyword.split(" ").map((keyword, index) => keyword && <Chip key={index}>{keyword}</Chip>)}
-      </KeywordsWrapper>
-      <GridFeed
-        key="posts"
-        feedPagePath={PAGE_URL.SEARCH_RESULT_POST("tags")}
-        infinitePostsData={postSearchResults}
-        isLoading={isPostSearchLoading}
-        isError={isPostSearchError}
-        isFetchingNextPage={isPostSearchFetchingNextPage}
-        handleIntersect={handlePostSearchIntersect}
-      />
-    </>,
-  ];
-
-  const Content = ({ tabIndex }: { tabIndex: number }) => {
+  const SearchUserResult = () => {
     if (isUserSearchLoading) {
-      return <PageLoading />;
+      return (
+        <Empty>
+          <PageLoading />
+        </Empty>
+      );
     }
 
     if (isUserSearchError) {
       return <Empty>검색결과를 표시할 수 없습니다.</Empty>;
     }
 
+    return (
+      <UserList
+        users={userSearchResults}
+        isFetchingNextPage={isUserSearchFetchingNextPage}
+        onIntersect={handleUserSearchIntersect}
+        follow={follow}
+        refetch={userSearchRefetch}
+      />
+    );
+  };
+
+  const SearchPostResult = () => {
+    return (
+      <>
+        <KeywordsWrapper>
+          {postSearchKeyword.split(" ").map((keyword, index) => keyword && <Chip key={index}>{keyword}</Chip>)}
+        </KeywordsWrapper>
+        {isPostSearchLoading ? (
+          <Empty>
+            <PageLoading />
+          </Empty>
+        ) : isPostSearchError ? (
+          <Empty>검색결과를 표시할 수 없습니다.</Empty>
+        ) : (
+          <GridFeed
+            feedPagePath={PAGE_URL.SEARCH_RESULT_FEED("tags")}
+            infinitePostsData={postSearchResults}
+            isLoading={isPostSearchLoading}
+            isError={isPostSearchError}
+            isFetchingNextPage={isPostSearchFetchingNextPage}
+            handleIntersect={handlePostSearchIntersect}
+          />
+        )}
+      </>
+    );
+  };
+
+  const tabItems = tabNames.map((name, index) => ({ name, onTabChange: () => setTabIndex(index) }));
+  const tabContents = [<SearchUserResult key="user" />, <SearchPostResult key="posts" />];
+
+  const Content = ({ tabIndex }: { tabIndex: number }) => {
     return <ContentWrapper>{tabContents[tabIndex]}</ContentWrapper>;
   };
 
