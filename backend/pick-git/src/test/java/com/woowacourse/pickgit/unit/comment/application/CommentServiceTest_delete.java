@@ -11,7 +11,6 @@ import com.woowacourse.pickgit.comment.application.CommentService;
 import com.woowacourse.pickgit.comment.application.dto.request.CommentDeleteRequestDto;
 import com.woowacourse.pickgit.comment.domain.Comment;
 import com.woowacourse.pickgit.comment.domain.CommentRepository;
-import com.woowacourse.pickgit.comment.domain.Comments;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.exception.comment.CannotDeleteCommentException;
 import com.woowacourse.pickgit.exception.comment.CommentNotFoundException;
@@ -49,42 +48,35 @@ public class CommentServiceTest_delete {
         // given
         User me = UserFactory.user(1L, "dani");
 
-        Comment comment1 = new Comment(1L, "comment1", me, null);
-        Comment comment2 = new Comment(2L, "comment2", me, null);
-
-        Comments comments = new Comments();
-        comments.add(comment1);
-        comments.add(comment2);
-
         Post postByMe = Post.builder()
             .id(1L)
-            .comments(comments.getComments())
             .author(me)
             .build();
+
+        Comment comment = new Comment(1L, "comment1", me, postByMe);
 
         given(postRepository.findById(1L))
             .willReturn(Optional.of(postByMe));
         given(userRepository.findByBasicProfile_Name("dani"))
             .willReturn(Optional.of(me));
         given(commentRepository.findById(1L))
-            .willReturn(Optional.of(comment1));
+            .willReturn(Optional.of(comment));
         willDoNothing()
             .given(commentRepository)
-            .delete(comment1);
+            .delete(comment);
 
         CommentDeleteRequestDto commentDeleteRequestDto = CommentDeleteRequestDto.builder()
             .username(me.getName())
             .postId(postByMe.getId())
-            .commentId(comment1.getId())
+            .commentId(comment.getId())
             .build();
 
         // when
         commentService.delete(commentDeleteRequestDto);
 
         // then
-        assertThat(comments.getComments())
-            .hasSize(1)
-            .containsExactly(comment2);
+        assertThat(comment.getUser()).isNull();
+        assertThat(comment.getPost()).isNull();
 
         verify(postRepository, times(1))
             .findById(1L);
@@ -93,7 +85,7 @@ public class CommentServiceTest_delete {
         verify(commentRepository, times(1))
             .findById(1L);
         verify(commentRepository, times(1))
-            .delete(comment1);
+            .delete(comment);
     }
 
     @DisplayName("내 게시물, 남 댓글을 삭제한다.")
@@ -103,51 +95,44 @@ public class CommentServiceTest_delete {
         User me = UserFactory.user(1L, "dani");
         User other = UserFactory.user(2L, "dada");
 
-        Comment comment1 = new Comment(1L, "comment1", other, null);
-        Comment comment2 = new Comment(2L, "comment2", other, null);
-
-        Comments comments = new Comments();
-        comments.add(comment1);
-        comments.add(comment2);
-
         Post postByMe = Post.builder()
             .id(1L)
-            .comments(comments.getComments())
             .author(me)
             .build();
+
+        Comment comment = new Comment(1L, "comment1", other, postByMe);
 
         given(postRepository.findById(1L))
             .willReturn(Optional.of(postByMe));
         given(userRepository.findByBasicProfile_Name("dani"))
             .willReturn(Optional.of(me));
-        given(commentRepository.findById(2L))
-            .willReturn(Optional.of(comment2));
+        given(commentRepository.findById(1L))
+            .willReturn(Optional.of(comment));
         willDoNothing()
             .given(commentRepository)
-            .delete(comment2);
+            .delete(comment);
 
         CommentDeleteRequestDto commentDeleteRequestDto = CommentDeleteRequestDto.builder()
             .username(me.getName())
             .postId(postByMe.getId())
-            .commentId(comment2.getId())
+            .commentId(comment.getId())
             .build();
 
         // when
         commentService.delete(commentDeleteRequestDto);
 
         // then
-        assertThat(comments.getComments())
-            .hasSize(1)
-            .containsExactly(comment1);
+        assertThat(comment.getUser()).isNull();
+        assertThat(comment.getPost()).isNull();
 
         verify(postRepository, times(1))
             .findById(1L);
         verify(userRepository, times(1))
             .findByBasicProfile_Name("dani");
         verify(commentRepository, times(1))
-            .findById(2L);
+            .findById(1L);
         verify(commentRepository, times(1))
-            .delete(comment2);
+            .delete(comment);
     }
 
     @DisplayName("남 게시물, 내 댓글을 삭제한다.")
@@ -157,51 +142,44 @@ public class CommentServiceTest_delete {
         User me = UserFactory.user(1L, "dani");
         User other = UserFactory.user(2L, "dada");
 
-        Comment comment1 = new Comment(1L, "comment1", me, null);
-        Comment comment2 = new Comment(2L, "comment2", me, null);
-
-        Comments comments = new Comments();
-        comments.add(comment1);
-        comments.add(comment2);
-
         Post postByOther = Post.builder()
             .id(1L)
-            .comments(comments.getComments())
             .author(other)
             .build();
+
+        Comment comment = new Comment(1L, "comment1", me, postByOther);
 
         given(postRepository.findById(1L))
             .willReturn(Optional.of(postByOther));
         given(userRepository.findByBasicProfile_Name("dani"))
             .willReturn(Optional.of(me));
-        given(commentRepository.findById(2L))
-            .willReturn(Optional.of(comment2));
+        given(commentRepository.findById(1L))
+            .willReturn(Optional.of(comment));
         willDoNothing()
             .given(commentRepository)
-            .delete(comment2);
+            .delete(comment);
 
         CommentDeleteRequestDto commentDeleteRequestDto = CommentDeleteRequestDto.builder()
             .username(me.getName())
             .postId(postByOther.getId())
-            .commentId(comment2.getId())
+            .commentId(comment.getId())
             .build();
 
         // when
         commentService.delete(commentDeleteRequestDto);
 
         // then
-        assertThat(comments.getComments())
-            .hasSize(1)
-            .containsExactly(comment1);
+        assertThat(comment.getUser()).isNull();
+        assertThat(comment.getPost()).isNull();
 
         verify(postRepository, times(1))
             .findById(1L);
         verify(userRepository, times(1))
             .findByBasicProfile_Name("dani");
         verify(commentRepository, times(1))
-            .findById(2L);
+            .findById(1L);
         verify(commentRepository, times(1))
-            .delete(comment2);
+            .delete(comment);
     }
 
     @DisplayName("남 게시물, 남 댓글은 삭제할 수 없다. - 401 예외")
@@ -211,30 +189,24 @@ public class CommentServiceTest_delete {
         User me = UserFactory.user(1L, "dani");
         User other = UserFactory.user(2L, "dada");
 
-        Comment comment1 = new Comment(1L, "comment1", other, null);
-        Comment comment2 = new Comment(2L, "comment2", other, null);
-
-        Comments comments = new Comments();
-        comments.add(comment1);
-        comments.add(comment2);
-
         Post postByOther = Post.builder()
             .id(1L)
-            .comments(comments.getComments())
             .author(other)
             .build();
+
+        Comment comment = new Comment(1L, "comment1", other, postByOther);
 
         given(postRepository.findById(1L))
             .willReturn(Optional.of(postByOther));
         given(userRepository.findByBasicProfile_Name("dani"))
             .willReturn(Optional.of(me));
-        given(commentRepository.findById(2L))
-            .willReturn(Optional.of(comment2));
+        given(commentRepository.findById(1L))
+            .willReturn(Optional.of(comment));
 
         CommentDeleteRequestDto commentDeleteRequestDto = CommentDeleteRequestDto.builder()
             .username(me.getName())
             .postId(postByOther.getId())
-            .commentId(comment2.getId())
+            .commentId(comment.getId())
             .build();
 
         // when
@@ -251,7 +223,7 @@ public class CommentServiceTest_delete {
         verify(userRepository, times(1))
             .findByBasicProfile_Name("dani");
         verify(commentRepository, times(1))
-            .findById(2L);
+            .findById(1L);
     }
 
     @DisplayName("존재하지 않는 댓글은 삭제할 수 없다. - 400 예외")
@@ -261,16 +233,8 @@ public class CommentServiceTest_delete {
         User me = UserFactory.user(1L, "dani");
         User other = UserFactory.user(2L, "dada");
 
-        Comment comment1 = new Comment(1L, "comment1", me, null);
-        Comment comment2 = new Comment(2L, "comment2", me, null);
-
-        Comments comments = new Comments();
-        comments.add(comment1);
-        comments.add(comment2);
-
         Post postByOther = Post.builder()
             .id(1L)
-            .comments(comments.getComments())
             .author(other)
             .build();
 

@@ -10,7 +10,6 @@ import com.woowacourse.pickgit.exception.comment.CannotDeleteCommentException;
 import com.woowacourse.pickgit.exception.post.CommentFormatException;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.user.domain.User;
-import java.util.ArrayList;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -62,26 +61,19 @@ class CommentTest {
         // given
         User me = UserFactory.user(1L, "dani");
 
-        Comment comment1 = new Comment(1L, "comment1", me, null);
-        Comment comment2 = new Comment(2L, "comment2", me, null);
-
-        ArrayList<Comment> comments = new ArrayList<>();
-        comments.add(comment1);
-        comments.add(comment2);
-
         Post postByMe = Post.builder()
             .content("hi")
-            .comments(comments)
             .author(me)
             .build();
 
+        Comment comment = new Comment(1L, "comment1", me, postByMe);
+
         // when
-        comment1.delete(comments, postByMe, me);
+        comment.deleteFrom(postByMe, me);
 
         // then
-        assertThat(comments)
-            .hasSize(1)
-            .containsExactly(comment2);
+        assertThat(comment.getUser()).isNull();
+        assertThat(comment.getPost()).isNull();
     }
 
     @DisplayName("내 게시물, 남 댓글을 삭제한다.")
@@ -91,26 +83,20 @@ class CommentTest {
         User me = UserFactory.user(1L, "dani");
         User other = UserFactory.user(2L, "dada");
 
-        Comment comment1 = new Comment(1L, "comment1", other, null);
-        Comment comment2 = new Comment(2L, "comment2", other, null);
-
-        ArrayList<Comment> comments = new ArrayList<>();
-        comments.add(comment1);
-        comments.add(comment2);
-
         Post postByMe = Post.builder()
+            .id(1L)
             .content("hi")
-            .comments(comments)
             .author(me)
             .build();
 
+        Comment comment = new Comment(1L, "comment1", other, postByMe);
+
         // when
-        comment1.delete(comments, postByMe, me);
+        comment.deleteFrom(postByMe, me);
 
         // then
-        assertThat(comments)
-            .hasSize(1)
-            .containsExactly(comment2);
+        assertThat(comment.getUser()).isNull();
+        assertThat(comment.getPost()).isNull();
     }
 
     @DisplayName("남 게시물, 내 댓글을 삭제한다.")
@@ -120,26 +106,19 @@ class CommentTest {
         User me = UserFactory.user(1L, "dani");
         User other = UserFactory.user(2L, "dada");
 
-        Comment comment1 = new Comment(1L, "comment1", me, null);
-        Comment comment2 = new Comment(2L, "comment2", me, null);
-
-        ArrayList<Comment> comments = new ArrayList<>();
-        comments.add(comment1);
-        comments.add(comment2);
-
         Post postByOther = Post.builder()
             .content("hi")
-            .comments(comments)
             .author(other)
             .build();
 
+        Comment comment = new Comment(1L, "comment1", me, postByOther);
+
         // when
-        comment2.delete(comments, postByOther, me);
+        comment.deleteFrom(postByOther, me);
 
         // then
-        assertThat(comments)
-            .hasSize(1)
-            .containsExactly(comment1);
+        assertThat(comment.getUser()).isNull();
+        assertThat(comment.getPost()).isNull();
     }
 
     @DisplayName("남 게시물, 남 댓글은 삭제할 수 없다. - 401 예외")
@@ -149,22 +128,16 @@ class CommentTest {
         User me = UserFactory.user(1L, "dani");
         User other = UserFactory.user(2L, "dada");
 
-        Comment comment1 = new Comment(1L, "comment1", other, null);
-        Comment comment2 = new Comment(2L, "comment2", other, null);
-
-        ArrayList<Comment> comments = new ArrayList<>();
-        comments.add(comment1);
-        comments.add(comment2);
-
         Post postByOther = Post.builder()
             .content("hi")
-            .comments(comments)
             .author(other)
             .build();
 
+        Comment comment = new Comment(1L, "comment2", other, postByOther);
+
         // when
         assertThatThrownBy(() -> {
-            comment2.delete(comments, postByOther, me);
+            comment.deleteFrom(postByOther, me);
         }).isInstanceOf(CannotDeleteCommentException.class)
             .hasFieldOrPropertyWithValue("errorCode", "P0007")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)

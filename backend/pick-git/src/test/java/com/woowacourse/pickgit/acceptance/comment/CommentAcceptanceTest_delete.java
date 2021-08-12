@@ -206,8 +206,14 @@ public class CommentAcceptanceTest_delete {
         String accessToken = "oauth.access.token";
 
         OAuthProfileResponse oAuthProfileResponse = new OAuthProfileResponse(
-            name, "image", "hi~", "github.com/",
-            null, null, null, null
+            name,
+            "image",
+            "hi~",
+            "github.com/",
+            null,
+            null,
+            null,
+            null
         );
 
         given(oAuthClient.getAccessToken(oauthCode))

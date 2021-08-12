@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import com.woowacourse.pickgit.comment.application.CommentService;
+import com.woowacourse.pickgit.comment.application.dto.request.CommentRequestDto;
 import com.woowacourse.pickgit.comment.application.dto.request.QueryCommentRequestDto;
 import com.woowacourse.pickgit.comment.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.comment.domain.Comment;
@@ -44,16 +45,51 @@ public class CommentServiceIntegrationTest_queryComments {
     @Autowired
     private PostRepository postRepository;
 
+    private static Stream<Arguments> getParametersForQueryComments() {
+        return Stream.of(
+            createArguments(1, 3, 3),
+            createArguments(0, 1, 1),
+            createArguments(2, 4, 6),
+            createArguments(0, 6, 0)
+        );
+    }
+
+    private static Arguments createArguments(int page, int limit, int commentSize) {
+        User user = UserFactory.user();
+
+        List<Comment> comments = createUserAndRandomComments(commentSize, user);
+
+        return Arguments.of(page, limit, comments, user);
+    }
+
+    private static List<Comment> createUserAndRandomComments(int size, User user) {
+        return IntStream
+            .range(0, size)
+            .mapToObj(i -> new Comment(createRandomString(), user, null))
+            .collect(toList());
+    }
+
+    private static String createRandomString() {
+        String seed = String.valueOf(LocalDateTime.now().getNano());
+
+        return DigestUtils.md5DigestAsHex(seed.getBytes());
+    }
+
     @DisplayName("PostId를 기준으로 comment 목록을 불러올 수 있다.")
     @ParameterizedTest
     @MethodSource("getParametersForQueryComments")
     @Transactional
-    void queryComments_UserCanQueryComments_Success(int page, int limit, List<Comment> comments, User commentAuthor) {
+    void queryComments_UserCanQueryComments_Success(
+        int page,
+        int limit,
+        List<Comment> comments,
+        User commentAuthor
+    ) {
         // given
         Long postId = preparingTestFixtures(comments, commentAuthor);
 
         QueryCommentRequestDto queryCommentRequestDto =
-            createQueryCommentRequestDto(postId, limit, page);
+            createQueryCommentRequestDto(postId, page, limit);
 
         // when
         List<CommentResponseDto> commentResponsesDto = commentService
@@ -64,19 +100,37 @@ public class CommentServiceIntegrationTest_queryComments {
 
         assertThat(commentResponsesDto)
             .usingRecursiveComparison()
+            .ignoringFields("id")
             .isEqualTo(expected);
     }
 
     private Long preparingTestFixtures(List<Comment> comments, User commentAuthor) {
-        //todo will use this line
-        //comments.forEach(commentRepository::save);
-
         userRepository.save(commentAuthor);
 
         Post post = Post.builder()
             .build();
+        Post savedPost = postRepository.save(post);
 
-        return postRepository.save(post).getId();
+        comments.forEach(
+            comment -> commentService.addComment(
+                CommentRequestDto.builder()
+                    .userName(commentAuthor.getName())
+                    .content(comment.getContent())
+                    .postId(savedPost.getId())
+                    .build()
+            )
+        );
+
+        return savedPost.getId();
+    }
+
+    private QueryCommentRequestDto createQueryCommentRequestDto(Long postId, int page, int limit) {
+        return QueryCommentRequestDto.builder()
+            .postId(postId)
+            .isGuest(false)
+            .page(page)
+            .limit(limit)
+            .build();
     }
 
     private List<CommentResponseDto> createExpected(List<Comment> comments, int page, int limit) {
@@ -84,18 +138,10 @@ public class CommentServiceIntegrationTest_queryComments {
             .map(this::createCommentResponseDto)
             .collect(toList());
 
-        return IntStream.range(page * limit, Math.min(commentResponsesDto.size(), page * limit + limit))
+        return IntStream
+            .range(page * limit, Math.min(commentResponsesDto.size(), page * limit + limit))
             .mapToObj(commentResponsesDto::get)
             .collect(toList());
-    }
-
-    private QueryCommentRequestDto createQueryCommentRequestDto(Long postId, int limit, int page) {
-        return QueryCommentRequestDto.builder()
-            .postId(postId)
-            .isGuest(false)
-            .page(page)
-            .limit(limit)
-            .build();
     }
 
     private CommentResponseDto createCommentResponseDto(Comment comment) {
@@ -106,32 +152,5 @@ public class CommentServiceIntegrationTest_queryComments {
             .content(comment.getContent())
             .liked(false)
             .build();
-    }
-
-    private static Stream<Arguments> getParametersForQueryComments() {
-        return Stream.of(
-            createArguments(1,3,3),
-//            createArguments(0,1,1),
-            createArguments(2,4,6),
-            createArguments(0,6,0)
-        );
-    }
-
-    private static Arguments createArguments(int page, int limit, int commentSize) {
-        User user = UserFactory.user();
-        List<Comment> comments = createUserAndRandomComments(commentSize, user);
-        return Arguments.of(page, limit, comments, user);
-    }
-
-    private static List<Comment> createUserAndRandomComments(int size, User user) {
-        return IntStream.range(0, size)
-            .mapToObj(i -> new Comment(createRandomString(), user, null))
-            .collect(toList());
-    }
-
-    private static String createRandomString() {
-        String seed = String.valueOf(LocalDateTime.now().getNano());
-
-        return DigestUtils.md5DigestAsHex(seed.getBytes());
     }
 }
