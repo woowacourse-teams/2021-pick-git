@@ -88,7 +88,7 @@ class UserAcceptance_GetFollowingsAndFollowers {
         // when
         List<UserSearchResponse> response = PickGitRequest
             .get(FOLLOWINGS_API_URL, "target", "0", "10")
-            .withUser()
+            .withUser("testUser")
             .extract()
             .as(new TypeRef<>() {
             });
@@ -181,7 +181,7 @@ class UserAcceptance_GetFollowingsAndFollowers {
         // when
         List<UserSearchResponse> response = PickGitRequest
             .get(FOLLOWERS_API_URL, "target", "0", "10")
-            .withUser()
+            .withUser("testUser")
             .extract()
             .as(new TypeRef<>() {
             });
