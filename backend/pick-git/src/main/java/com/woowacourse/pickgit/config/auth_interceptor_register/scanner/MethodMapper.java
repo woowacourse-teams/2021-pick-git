@@ -39,7 +39,7 @@ public enum MethodMapper {
     public static HttpMethod findHttpMethodByControllerMethod(Method method) {
         return Arrays.stream(values())
             .filter(
-                httpMethod -> !Objects.isNull(method.getAnnotation(httpMethod.mappingAnnotation)))
+                httpMethod -> Objects.nonNull(method.getAnnotation(httpMethod.mappingAnnotation)))
             .map(httpMethod -> httpMethod.httpMethod)
             .findAny()
             .orElseThrow(() -> new IllegalArgumentException("매칭되는 http method가 없습니다."));
@@ -48,7 +48,7 @@ public enum MethodMapper {
     public static Class<? extends Annotation> findAnnotatedHttpMethodAnnotation(Method method) {
         return Arrays.stream(values())
             .filter(
-                httpMethod -> !Objects.isNull(method.getAnnotation(httpMethod.mappingAnnotation)))
+                httpMethod -> Objects.nonNull(method.getAnnotation(httpMethod.mappingAnnotation)))
             .map(httpMethod -> httpMethod.mappingAnnotation)
             .findAny()
             .orElseThrow(() -> new IllegalArgumentException("매칭되는 http methodAnnotation이 없습니다."));
