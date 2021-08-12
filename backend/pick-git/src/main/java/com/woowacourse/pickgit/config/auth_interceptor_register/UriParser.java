@@ -60,6 +60,16 @@ public class UriParser {
         return preparedControllerMethods;
     }
 
+    private List<String> getPrefixUrlsFromController(Class<?> typeToken) {
+        RequestMapping requestMapping = typeToken.getDeclaredAnnotation(RequestMapping.class);
+
+        if (requestMapping == null) {
+            return List.of("");
+        }
+
+        return List.of(requestMapping.value());
+    }
+
     private List<PrepreparedControllerMethod> getUrlsFromMethodsWithMethod(Class<?> controller) {
         List<PrepreparedControllerMethod> result = new ArrayList<>();
 
@@ -72,6 +82,25 @@ public class UriParser {
             RegisterType.IGNORE_AUTHENTICATE));
 
         return result;
+    }
+
+    private List<PrepreparedControllerMethod> createUrlsAndMethods(
+        List<Method> methods,
+        RegisterType registerType
+    ) {
+        return methods.stream()
+            .map(toPrepreparedControllerMethod(registerType))
+            .collect(toList());
+    }
+
+    private Function<Method, PrepreparedControllerMethod> toPrepreparedControllerMethod(
+        RegisterType registerType
+    ) {
+        return method -> new PrepreparedControllerMethod(
+            parseUrlsFromMethod(method),
+            parseHttpMethod(method),
+            registerType
+        );
     }
 
     private List<PreparedControllerMethod> createPreparedControllerMethods(
@@ -96,43 +125,13 @@ public class UriParser {
 
     private List<PreparedControllerMethod> createPreparedControllerMethod(String prefix,
         HttpMethod httpMethod, RegisterType registerType, List<String> urls) {
-        List<PreparedControllerMethod> values = urls.stream()
+        return urls.stream()
             .map(url -> createUri(prefix, url))
             .map(completeUrl ->
                 new PreparedControllerMethod(completeUrl, httpMethod, registerType))
             .collect(toList());
-        return values;
     }
 
-    private List<String> getPrefixUrlsFromController(Class<?> typeToken) {
-        RequestMapping requestMapping = typeToken.getDeclaredAnnotation(RequestMapping.class);
-
-        if (requestMapping == null) {
-            return List.of("");
-        }
-
-        return List.of(requestMapping.value());
-    }
-
-
-    private List<PrepreparedControllerMethod> createUrlsAndMethods(
-        List<Method> methods,
-        RegisterType registerType
-    ) {
-        return methods.stream()
-            .map(toPrepreparedControllerMethod(registerType))
-            .collect(toList());
-    }
-
-    private Function<Method, PrepreparedControllerMethod> toPrepreparedControllerMethod(
-        RegisterType registerType
-    ) {
-        return method -> new PrepreparedControllerMethod(
-            parseUrlsFromMethod(method),
-            parseHttpMethod(method),
-            registerType
-        );
-    }
 
     private List<String> parseUrlsFromMethod(Method method) {
         Class<? extends Annotation> annotatedHttpMethodAnnotation = MethodMapper
