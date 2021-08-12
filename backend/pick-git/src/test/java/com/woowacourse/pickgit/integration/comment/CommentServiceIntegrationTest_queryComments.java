@@ -1,7 +1,6 @@
 package com.woowacourse.pickgit.integration.comment;
 
 import static java.util.stream.Collectors.toList;
-import static org.assertj.core.api.AssertionsForClassTypes.in;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import com.woowacourse.pickgit.comment.application.CommentService;
@@ -9,6 +8,7 @@ import com.woowacourse.pickgit.comment.application.dto.request.QueryCommentReque
 import com.woowacourse.pickgit.comment.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.comment.domain.Comment;
 import com.woowacourse.pickgit.common.factory.UserFactory;
+import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.user.domain.User;
@@ -18,17 +18,19 @@ import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.transaction.Transactional;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.DigestUtils;
 
+@Import(InfrastructureTestConfiguration.class)
 @SpringBootTest
+@ActiveProfiles("test")
 public class CommentServiceIntegrationTest_queryComments {
     @Autowired
     private CommentService commentService;
