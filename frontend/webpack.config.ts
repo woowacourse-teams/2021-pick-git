@@ -67,7 +67,7 @@ const config = {
     }),
     new HTMLWebpackPlugin({
       template: "./public/index.html",
-      favicon: "./public/favicon.ico"
+      favicon: "./public/favicon.ico",
     }),
   ],
 };

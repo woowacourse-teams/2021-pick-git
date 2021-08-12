@@ -1,138 +1,167 @@
 import React from "react";
-import { QueryClient, QueryClientProvider, useQueryClient } from "react-query";
-import { renderHook, act } from "@testing-library/react-hooks";
-import nock from "nock";
+import { QueryClientProvider } from "react-query";
+import { renderHook, act, WaitFor, RenderResult } from "@testing-library/react-hooks";
 
 import { ProfileData } from "../../../@types";
 import { QUERY } from "../../../constants/queries";
 import useFollow from "../useFollow";
-import { getClientErrorMessage } from "../../../utils/error";
 import UserContext from "../../../contexts/UserContext";
 import SnackBarContext from "../../../contexts/SnackbarContext";
+import { API_ERROR_MESSAGE, CLIENT_ERROR_MESSAGE } from "../../../constants/messages";
+import {
+  ADDED_FOLLOWER_COUNT,
+  DELETED_FOLLOWER_COUNT,
+  followServer,
+  PREV_FOLLOWER_COUNT,
+  PREV_FOLLOWING,
+  TARGET_USERNAME,
+} from "../@mocks/mockFollow";
+import {
+  createQueryClient,
+  DEFAULT_PROFILE_QUERY_DATA,
+  mockFn,
+  setLocalStorageEmpty,
+  setLocalStorageInvalid,
+  setLocalStorageValid,
+  UNAUTHORIZED_TOKEN_ERROR,
+} from "../@mocks/shared";
 
-const username = "aaaa";
-const currentProfileQueryKey = [QUERY.GET_PROFILE, { isMyProfile: false, username }];
-const prevQueryData = {
-  name: username,
-  imageUrl: "",
-  description: "",
-  followerCount: 3,
-  followingCount: 2,
-  postCount: 0,
-  githubUrl: "",
-  company: "",
-  location: "",
-  website: "",
-  twitter: "",
-  following: false,
-};
-const addedFollowerCount = prevQueryData.followerCount + 1;
-const deletedFollowerCount = prevQueryData.followerCount - 1;
+const queryClient = createQueryClient();
+const currentProfileQueryKey = [QUERY.GET_PROFILE, { isMyProfile: false, username: TARGET_USERNAME }];
 
-const pushSnackbarMessage = jest.fn();
-const logout = jest.fn();
-
-const queryClient = new QueryClient();
 const wrapper = ({ children }: { children: React.ReactNode }) => {
-  const QueryClientSetting = () => {
-    const queryClient = useQueryClient();
-    queryClient.setQueryData<ProfileData>(currentProfileQueryKey, prevQueryData);
+  const userContextValue = { isLoggedIn: true, currentUsername: "beuccol", login: () => {}, logout: mockFn.logout };
+  const snackbarContextValue = { pushSnackbarMessage: mockFn.pushSnackbarMessage };
 
-    return <></>;
-  };
-
-  const userContextValue = { isLoggedIn: true, currentUsername: "beuccol", login: () => {}, logout };
-  const snackbarContextValue = { pushSnackbarMessage };
+  queryClient.setQueryData<ProfileData>(currentProfileQueryKey, {
+    ...DEFAULT_PROFILE_QUERY_DATA,
+    followerCount: PREV_FOLLOWER_COUNT,
+    following: PREV_FOLLOWING,
+  });
 
   return (
     <QueryClientProvider client={queryClient}>
       <UserContext.Provider value={userContextValue}>
-        <SnackBarContext.Provider value={snackbarContextValue}>
-          <QueryClientSetting />
-          {children}
-        </SnackBarContext.Provider>
+        <SnackBarContext.Provider value={snackbarContextValue}>{children}</SnackBarContext.Provider>
       </UserContext.Provider>
     </QueryClientProvider>
   );
 };
 
-const addFollowExpectation = nock("http://localhost:3000").post(`/api/profiles/${username}/followings`).reply(200, {
-  followerCount: addedFollowerCount,
-  following: true,
-});
-
-const deleteFollowExpectation = nock("http://localhost:3000")
-  .delete(`/api/profiles/${username}/followings`)
-  .reply(200, {
-    followerCount: deletedFollowerCount,
-    following: false,
-  });
+const actions = {
+  follow: async (username: string, result: RenderResult<ReturnType<typeof useFollow>>, waitFor: WaitFor) => {
+    await result.current.toggleFollow(username, false, false);
+    await waitFor(() => !result.current.isFollowLoading);
+  },
+  unFollow: async (username: string, result: RenderResult<ReturnType<typeof useFollow>>, waitFor: WaitFor) => {
+    await result.current.toggleFollow(username, true, false);
+    await waitFor(() => !result.current.isFollowLoading);
+  },
+};
 
 beforeAll(() => {
-  const localStorageMock = (() => {
-    const store: { [k: string]: string } = {
-      username: "chris",
-      accessToken: "asdfasdf",
-    };
-
-    return {
-      getItem: (key: string) => {
-        return store[key] || null;
-      },
-      setItem: (key: string, value: string) => {
-        store[key] = value;
-      },
-    };
-  })();
-
-  Object.defineProperty(global, "localStorage", {
-    value: localStorageMock,
-  });
-});
-
-test("should add Follow", async () => {
-  const { result, waitFor } = renderHook(() => useFollow(), { wrapper });
-
-  await act(() => result.current.toggleFollow(username, false, false));
-  await waitFor(() => !result.current.isFollowLoading);
-
-  const currentQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
-
-  expect(currentQueryData?.followerCount).toBe(addedFollowerCount);
-  expect(currentQueryData?.following).toBe(true);
-});
-
-test("should add Unfollow", async () => {
-  const { result, waitFor } = renderHook(() => useFollow(), { wrapper });
-
-  await act(() => result.current.toggleFollow(username, true, false));
-  await waitFor(() => !result.current.isFollowLoading);
-
-  const currentQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
-
-  expect(currentQueryData?.followerCount).toBe(deletedFollowerCount);
-  expect(currentQueryData?.following).toBe(false);
-});
-
-test("should handle empty accessToken error", async () => {
-  localStorage.setItem("accessToken", "");
-
-  const { result, waitFor } = renderHook(() => useFollow(), { wrapper });
-
-  await act(() => result.current.toggleFollow(username, false, false));
-  await waitFor(() => !result.current.isFollowLoading);
-
-  const currentQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
-
-  expect(currentQueryData?.followerCount).toBe(prevQueryData.followerCount);
-  expect(currentQueryData?.following).toBe(prevQueryData.following);
-  expect(pushSnackbarMessage.mock.calls[0][0]).toBe(getClientErrorMessage("C0001"));
-  expect(logout.mock.calls.length).toBe(1);
-
-  localStorage.setItem("accessToken", "asdfasdf");
+  setLocalStorageValid();
+  followServer.listen();
 });
 
 afterAll(() => {
-  addFollowExpectation.done();
-  deleteFollowExpectation.done();
+  followServer.close();
+});
+
+describe("Success Case", () => {
+  test("success1: should add Follow", async () => {
+    const { result, waitFor } = renderHook(() => useFollow(), { wrapper });
+
+    await act(() => actions.follow(TARGET_USERNAME, result, waitFor));
+
+    const currentQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
+
+    expect(currentQueryData?.followerCount).toBe(ADDED_FOLLOWER_COUNT);
+    expect(currentQueryData?.following).toBe(!PREV_FOLLOWING);
+  });
+
+  test("success2: should add Unfollow", async () => {
+    const { result, waitFor } = renderHook(() => useFollow(), { wrapper });
+
+    await act(() => actions.unFollow(TARGET_USERNAME, result, waitFor));
+
+    const currentQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
+
+    expect(currentQueryData?.followerCount).toBe(DELETED_FOLLOWER_COUNT);
+    expect(currentQueryData?.following).toBe(PREV_FOLLOWING);
+  });
+});
+
+describe("FAILURE CASE", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test("failure1: should handle empty accessToken error while one follow", async () => {
+    setLocalStorageEmpty();
+
+    const { result, waitFor } = renderHook(() => useFollow(), { wrapper });
+
+    await act(() => actions.follow(TARGET_USERNAME, result, waitFor));
+
+    const currentQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
+
+    expect(currentQueryData?.followerCount).toBe(PREV_FOLLOWER_COUNT);
+    expect(currentQueryData?.following).toBe(PREV_FOLLOWING);
+    expect(mockFn.pushSnackbarMessage.mock.calls[0][0]).toBe(CLIENT_ERROR_MESSAGE.C0001);
+    expect(mockFn.logout.mock.calls.length).toBe(1);
+
+    setLocalStorageValid();
+  });
+
+  test("failure2: should handle empty accessToken error while one unfollow", async () => {
+    setLocalStorageEmpty();
+
+    const { result, waitFor } = renderHook(() => useFollow(), { wrapper });
+
+    await act(() => actions.unFollow(TARGET_USERNAME, result, waitFor));
+
+    const currentQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
+
+    expect(currentQueryData?.followerCount).toBe(PREV_FOLLOWER_COUNT);
+    expect(currentQueryData?.following).toBe(PREV_FOLLOWING);
+    expect(mockFn.pushSnackbarMessage.mock.calls[0][0]).toBe(CLIENT_ERROR_MESSAGE.C0001);
+    expect(mockFn.logout.mock.calls.length).toBe(1);
+
+    setLocalStorageValid();
+  });
+
+  test("failure3: should handle http error while one follow: 401", async () => {
+    setLocalStorageInvalid();
+
+    const { result, waitFor } = renderHook(() => useFollow(), { wrapper });
+
+    await act(() => actions.follow(TARGET_USERNAME, result, waitFor));
+
+    const currentQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
+
+    expect(mockFn.pushSnackbarMessage.mock.calls[0][0]).toBe(API_ERROR_MESSAGE[UNAUTHORIZED_TOKEN_ERROR]);
+    expect(mockFn.logout.mock.calls.length).toBe(1);
+    expect(currentQueryData?.followerCount).toBe(PREV_FOLLOWER_COUNT);
+    expect(currentQueryData?.following).toBe(PREV_FOLLOWING);
+
+    setLocalStorageValid();
+  });
+
+  test("failure4: should handle http error while one unfollow: 401", async () => {
+    setLocalStorageInvalid();
+
+    const { result, waitFor } = renderHook(() => useFollow(), { wrapper });
+
+    await act(() => actions.unFollow(TARGET_USERNAME, result, waitFor));
+
+    const currentQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
+
+    expect(mockFn.pushSnackbarMessage.mock.calls[0][0]).toBe(API_ERROR_MESSAGE[UNAUTHORIZED_TOKEN_ERROR]);
+    expect(mockFn.logout.mock.calls.length).toBe(1);
+    expect(currentQueryData?.followerCount).toBe(PREV_FOLLOWER_COUNT);
+    expect(currentQueryData?.following).toBe(PREV_FOLLOWING);
+
+    setLocalStorageValid();
+  });
 });

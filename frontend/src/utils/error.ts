@@ -1,6 +1,6 @@
 import { APIErrorCode, ClientErrorCode, ClientErrorHandler, HTTPErrorHandler, HTTPErrorStatus } from "../@types";
 import { clientErrorCodeMap, httpErrorStatus } from "../constants/error";
-import { API_ERROR_MESSAGE, CLIENT_ERROR_MESSAGE } from "../constants/messages";
+import { API_ERROR_MESSAGE, CLIENT_ERROR_MESSAGE, UNKNOWN_ERROR_MESSAGE } from "../constants/messages";
 
 export const handleHTTPError = (errorStatus: HTTPErrorStatus, handler: HTTPErrorHandler) => {
   const currentHandler = handler[httpErrorStatus[errorStatus]];
@@ -23,11 +23,11 @@ export const handleClientError = (errorCode: ClientErrorCode, handler: ClientErr
 };
 
 export const getAPIErrorMessage = (errorCode: APIErrorCode) => {
-  return API_ERROR_MESSAGE[errorCode];
+  return API_ERROR_MESSAGE[errorCode] ?? UNKNOWN_ERROR_MESSAGE;
 };
 
 export const getClientErrorMessage = (errorCode: ClientErrorCode) => {
-  return CLIENT_ERROR_MESSAGE[errorCode];
+  return CLIENT_ERROR_MESSAGE[errorCode] ?? UNKNOWN_ERROR_MESSAGE;
 };
 
 export const customError = {
