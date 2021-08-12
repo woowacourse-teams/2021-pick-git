@@ -236,12 +236,20 @@ public class PostController {
         @Authenticated AppUser appUser,
         @PathVariable Long postId
     ) {
-        AuthUserForPostRequestDto authUserRequestDto = AuthUserForPostRequestDto.from(appUser);
+        AuthUserForPostRequestDto authUserRequestDto = createAuthUserForPostRequestDto(appUser);
 
         List<LikeUsersResponseDto> likeUsersResponseDtos = postService
             .likeUsers(authUserRequestDto, postId);
 
         return ResponseEntity.ok(createLikeUsersResponse(likeUsersResponseDtos));
+    }
+
+    private AuthUserForPostRequestDto createAuthUserForPostRequestDto(AppUser appUser) {
+         if (appUser.isGuest()) {
+             return new AuthUserForPostRequestDto(null, true);
+         }
+
+         return new AuthUserForPostRequestDto(appUser.getUsername(), false);
     }
 
     private List<LikeUsersResponse> createLikeUsersResponse(

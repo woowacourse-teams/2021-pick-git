@@ -18,12 +18,5 @@ public class AuthUserForPostRequestDto {
         this.username = username;
         this.isGuest = isGuest;
     }
-
-    public static AuthUserForPostRequestDto from(AppUser appUser) {
-        if (appUser.isGuest()) {
-            return new AuthUserForPostRequestDto(null, true);
-        }
-        return new AuthUserForPostRequestDto(appUser.getUsername(), false);
-    }
 }
 
