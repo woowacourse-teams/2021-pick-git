@@ -83,7 +83,8 @@ public class OAuthConfiguration implements WebMvcConfigurer {
             .build();
 
         autoAuthorizationInterceptorRegister.execute();
-        ignoreAuthenticationInterceptor.excludePatterns("/api/profiles/me", HttpMethod.GET);
+        ignoreAuthenticationInterceptor
+            .excludePatterns("/api/profiles/me", HttpMethod.GET);
 
         registry.addInterceptor(authenticationInterceptor)
             .addPathPatterns("/**");
