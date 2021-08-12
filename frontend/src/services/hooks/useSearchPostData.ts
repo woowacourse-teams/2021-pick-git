@@ -17,7 +17,7 @@ const useSearchPostData = (type: string | null, prevData?: InfiniteData<Post[]>)
   const { pushSnackbarMessage } = useContext(SnackBarContext);
   const { logout } = useContext(UserContext);
   const queryClient = useQueryClient();
-  const formattedKeyword = keyword.trim().replace(",", " ").replace(/\s+/g, " ");
+  const formattedKeyword = keyword.trim().replace(/,/g, " ").replace(/\s+/g, " ");
   const queryKey = [QUERY.GET_SEARCH_POST_RESULT, { type, formattedKeyword }];
 
   const [isAllResultFetched, setIsAllResultFetched] = useState(false);
@@ -29,7 +29,7 @@ const useSearchPostData = (type: string | null, prevData?: InfiniteData<Post[]>)
     fetchNextPage,
     isFetchingNextPage,
     refetch,
-  } = useSearchPostResultQuery(type, keyword, queryKey);
+  } = useSearchPostResultQuery(type, formattedKeyword, queryKey);
 
   const handleIntersect = async () => {
     if (isAllResultFetched) return;
