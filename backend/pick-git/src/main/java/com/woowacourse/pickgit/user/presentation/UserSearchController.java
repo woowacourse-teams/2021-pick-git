@@ -2,6 +2,7 @@ package com.woowacourse.pickgit.user.presentation;
 
 import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
+import com.woowacourse.pickgit.config.auth_interceptor_register.ForLoginAndGuestUser;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.UserSearchRequestDto;
@@ -25,6 +26,7 @@ public class UserSearchController {
         this.userService = userService;
     }
 
+    @ForLoginAndGuestUser
     @GetMapping("/search/users")
     public ResponseEntity<List<UserSearchResponseDto>> searchUser(
         @Authenticated AppUser appUser,

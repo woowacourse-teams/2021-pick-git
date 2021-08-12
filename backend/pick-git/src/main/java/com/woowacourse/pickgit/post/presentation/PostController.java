@@ -4,6 +4,8 @@ import static java.util.stream.Collectors.toList;
 
 import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
+import com.woowacourse.pickgit.config.auth_interceptor_register.ForLoginAndGuestUser;
+import com.woowacourse.pickgit.config.auth_interceptor_register.ForOnlyLoginUser;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.request.AuthUserForPostRequestDto;
@@ -53,6 +55,7 @@ public class PostController {
         this.postService = postService;
     }
 
+    @ForOnlyLoginUser
     @PostMapping("/posts")
     public ResponseEntity<Void> write(@Authenticated AppUser user, PostRequest request) {
         PostImageUrlResponseDto postImageUrlResponseDto =
@@ -81,6 +84,7 @@ public class PostController {
 
 
 
+    @ForOnlyLoginUser
     @GetMapping("/github/repositories")
     public ResponseEntity<List<RepositoryResponse>> userRepositories(
         @Authenticated AppUser user,
@@ -108,6 +112,7 @@ public class PostController {
             .build();
     }
 
+    @ForOnlyLoginUser
     @GetMapping("/github/search/repositories")
     public ResponseEntity<List<RepositoryResponse>> userSearchedRepositories(
         @Authenticated AppUser user,
@@ -144,6 +149,7 @@ public class PostController {
             .build();
     }
 
+    @ForOnlyLoginUser
     @PutMapping("/posts/{postId}/likes")
     public ResponseEntity<LikeResponse> likePost(
         @Authenticated AppUser user,
@@ -158,6 +164,7 @@ public class PostController {
         return ResponseEntity.ok(likeResponse);
     }
 
+    @ForOnlyLoginUser
     @DeleteMapping("/posts/{postId}/likes")
     public ResponseEntity<LikeResponse> unlikePost(
         @Authenticated AppUser user,
@@ -178,6 +185,7 @@ public class PostController {
         }
     }
 
+    @ForOnlyLoginUser
     @PutMapping("/posts/{postId}")
     public ResponseEntity<PostUpdateResponse> update(
         @Authenticated AppUser user,
@@ -215,6 +223,7 @@ public class PostController {
         return URI.create(String.format(REDIRECT_URL, username, postId));
     }
 
+    @ForOnlyLoginUser
     @DeleteMapping("/posts/{postId}")
     public ResponseEntity<Void> delete(
         @Authenticated AppUser user,
@@ -231,6 +240,7 @@ public class PostController {
         return new PostDeleteRequestDto(user, postId);
     }
 
+    @ForLoginAndGuestUser
     @GetMapping("/posts/{postId}/likes")
     public ResponseEntity<List<LikeUsersResponse>> searchLikeUsers(
         @Authenticated AppUser appUser,

@@ -11,6 +11,8 @@ import com.woowacourse.pickgit.comment.application.dto.request.QueryCommentReque
 import com.woowacourse.pickgit.comment.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.comment.presentation.dto.request.ContentRequest;
 import com.woowacourse.pickgit.comment.presentation.dto.response.CommentResponse;
+import com.woowacourse.pickgit.config.auth_interceptor_register.ForLoginAndGuestUser;
+import com.woowacourse.pickgit.config.auth_interceptor_register.ForOnlyLoginUser;
 import java.util.List;
 import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +37,7 @@ public class CommentController {
         this.commentService = commentService;
     }
 
+    @ForLoginAndGuestUser
     @GetMapping("/posts/{postId}/comments")
     public ResponseEntity<List<CommentResponse>> comment(
         @Authenticated AppUser appUser,
@@ -68,6 +71,7 @@ public class CommentController {
             .build();
     }
 
+    @ForOnlyLoginUser
     @PostMapping("/posts/{postId}/comments")
     public ResponseEntity<CommentResponse> addComment(
         @Authenticated AppUser user,
@@ -103,6 +107,7 @@ public class CommentController {
             .build();
     }
 
+    @ForOnlyLoginUser
     @DeleteMapping("/posts/{postId}/comments/{commentId}")
     public ResponseEntity<Void> delete(
         @Authenticated AppUser user,

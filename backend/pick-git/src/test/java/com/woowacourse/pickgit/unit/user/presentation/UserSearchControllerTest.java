@@ -72,8 +72,10 @@ class UserSearchControllerTest {
         given(oAuthService.validateToken("token")).willReturn(true);
         given(oAuthService.findRequestUserByToken("token"))
             .willReturn(new LoginUser("pick-git", "token"));
-        given(userService.searchUser(any(AuthUserForUserRequestDto.class), any(UserSearchRequestDto.class)))
-            .willReturn(userSearchRespons);
+        given(userService.searchUser(
+            any(AuthUserForUserRequestDto.class),
+            any(UserSearchRequestDto.class))
+        ).willReturn(userSearchRespons);
 
         // when
         ResultActions perform = mockMvc
@@ -134,7 +136,8 @@ class UserSearchControllerTest {
         // mock
         given(oAuthService.findRequestUserByToken(any()))
             .willReturn(new GuestUser());
-        given(userService.searchUser(any(AuthUserForUserRequestDto.class), any(UserSearchRequestDto.class)))
+        given(userService
+            .searchUser(any(AuthUserForUserRequestDto.class), any(UserSearchRequestDto.class)))
             .willReturn(userSearchRespons);
 
         // when
