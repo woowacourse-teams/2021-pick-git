@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 
 import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
+import com.woowacourse.pickgit.config.auth_interceptor_register.ForLoginAndGuestUser;
 import com.woowacourse.pickgit.config.auth_interceptor_register.ForOnlyLoginUser;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.post.application.PostService;
@@ -239,6 +240,7 @@ public class PostController {
         return new PostDeleteRequestDto(user, postId);
     }
 
+    @ForLoginAndGuestUser
     @GetMapping("/posts/{postId}/likes")
     public ResponseEntity<List<LikeUsersResponse>> searchLikeUsers(
         @Authenticated AppUser appUser,
