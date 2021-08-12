@@ -7,7 +7,7 @@ import com.woowacourse.pickgit.config.auth_interceptor_register.register_type.Re
 import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.ControllerScanner;
 import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.ForGuestScanner;
 import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.ForLoginUserScanner;
-import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.data_structure.PreparedControllerMethod;
+import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.data_structure.MergedInterceptorParameterByMethod;
 import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.test_classes.ClassOne;
 import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.test_classes.ClassThree;
 import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.test_classes.ClassTwo;
@@ -32,38 +32,38 @@ class UriParserTest {
             new ForLoginUserScanner()
         );
 
-        List<PreparedControllerMethod> actual = uriParser
-            .getPreparedControllerMethod();
-        actual.sort(comparing(PreparedControllerMethod::getUrls)
-            .thenComparing(PreparedControllerMethod::getHttpMethod));
+        List<MergedInterceptorParameterByMethod> actual = uriParser
+            .getMergedInterceptorParameterByMethod();
+        actual.sort(comparing(MergedInterceptorParameterByMethod::getUrls)
+            .thenComparing(MergedInterceptorParameterByMethod::getHttpMethod));
 
-        List<PreparedControllerMethod> expected = expected();
-        expected.sort(comparing(PreparedControllerMethod::getUrls)
-            .thenComparing(PreparedControllerMethod::getHttpMethod));
+        List<MergedInterceptorParameterByMethod> expected = expected();
+        expected.sort(comparing(MergedInterceptorParameterByMethod::getUrls)
+            .thenComparing(MergedInterceptorParameterByMethod::getHttpMethod));
 
         assertThat(actual)
             .usingRecursiveComparison()
             .isEqualTo(expected);
     }
 
-    private List<PreparedControllerMethod> expected() {
+    private List<MergedInterceptorParameterByMethod> expected() {
         return new ArrayList<>(List.of(
-            new PreparedControllerMethod(
+            new MergedInterceptorParameterByMethod(
                 "/api/test1", HttpMethod.GET, RegisterType.AUTHENTICATE
             ),
-            new PreparedControllerMethod(
+            new MergedInterceptorParameterByMethod(
                 "/api/test2/*/test", HttpMethod.POST, RegisterType.AUTHENTICATE
             ),
-            new PreparedControllerMethod(
+            new MergedInterceptorParameterByMethod(
                 "/api/test3", HttpMethod.PUT, RegisterType.IGNORE_AUTHENTICATE
             ),
-            new PreparedControllerMethod(
+            new MergedInterceptorParameterByMethod(
                 "/api/test4/*", HttpMethod.DELETE, RegisterType.IGNORE_AUTHENTICATE
             ),
-            new PreparedControllerMethod(
+            new MergedInterceptorParameterByMethod(
                 "/test9", HttpMethod.DELETE, RegisterType.AUTHENTICATE
             ),
-            new PreparedControllerMethod(
+            new MergedInterceptorParameterByMethod(
                 "/test9", HttpMethod.PUT, RegisterType.AUTHENTICATE
             )
         ));

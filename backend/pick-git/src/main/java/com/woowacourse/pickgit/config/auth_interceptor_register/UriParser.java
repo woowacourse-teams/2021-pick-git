@@ -8,19 +8,14 @@ import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.Controll
 import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.ForGuestScanner;
 import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.ForLoginUserScanner;
 import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.MethodMapper;
-import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.data_structure.PreparedControllerMethod;
-import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.data_structure.PrepreparedControllerMethod;
-import java.lang.annotation.Annotation;
+import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.data_structure.MergedInterceptorParameterByMethod;
+import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.data_structure.InterceptorParameter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import org.springframework.http.HttpMethod;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 public class UriParser {
@@ -39,26 +34,27 @@ public class UriParser {
         this.forLoginUserScanner = forLoginUserScanner;
     }
 
-    public List<PreparedControllerMethod> getPreparedControllerMethod() {
+    public List<MergedInterceptorParameterByMethod> getMergedInterceptorParameterByMethod() {
         return controllerScanner.getControllers().stream()
-            .flatMap(controller -> generatePreparedControllerMethod(controller).stream())
+            .flatMap(controller -> createMergedInterceptorParameterByMethods(controller).stream())
             .collect(toList());
     }
 
-    private List<PreparedControllerMethod> generatePreparedControllerMethod(Class<?> controller) {
+    private List<MergedInterceptorParameterByMethod> createMergedInterceptorParameterByMethods(
+        Class<?> controller) {
         var prefixUrlsFromController = getPrefixUrlsFromController(controller);
         var urlsFromMethodsWithHttpMethod =
-            getUrlsFromMethodsWithMethod(controller);
+            interceptorParameter(controller);
 
-        List<PreparedControllerMethod> preparedControllerMethods = new ArrayList<>();
+        List<MergedInterceptorParameterByMethod> mergedInterceptorParameterByMethods = new ArrayList<>();
 
         prefixUrlsFromController.forEach(
-            prefix -> preparedControllerMethods.addAll(
-                createPreparedControllerMethods(urlsFromMethodsWithHttpMethod, prefix)
+            prefix -> mergedInterceptorParameterByMethods.addAll(
+                createMergedInterceptorParameterByMethod(urlsFromMethodsWithHttpMethod, prefix)
             )
         );
 
-        return preparedControllerMethods;
+        return mergedInterceptorParameterByMethods;
     }
 
     private List<String> getPrefixUrlsFromController(Class<?> typeToken) {
@@ -71,65 +67,67 @@ public class UriParser {
         return List.of(requestMapping.value());
     }
 
-    private List<PrepreparedControllerMethod> getUrlsFromMethodsWithMethod(Class<?> controller) {
-        List<PrepreparedControllerMethod> result = new ArrayList<>();
+    private List<InterceptorParameter> interceptorParameter(Class<?> controller) {
+        List<InterceptorParameter> result = new ArrayList<>();
 
-        result.addAll(createUrlsAndMethods(
+        result.addAll(createInterceptorParameter(
             forLoginUserScanner.parseMethods(controller),
             RegisterType.AUTHENTICATE));
 
-        result.addAll(createUrlsAndMethods(
+        result.addAll(createInterceptorParameter(
             forGuestScanner.parseMethods(controller),
             RegisterType.IGNORE_AUTHENTICATE));
 
         return result;
     }
 
-    private List<PrepreparedControllerMethod> createUrlsAndMethods(
+    private List<InterceptorParameter> createInterceptorParameter(
         List<Method> methods,
         RegisterType registerType
     ) {
         return methods.stream()
-            .map(toPrepreparedControllerMethod(registerType))
+            .map(toInterceptorParameter(registerType))
             .collect(toList());
     }
 
-    private Function<Method, PrepreparedControllerMethod> toPrepreparedControllerMethod(
+    private Function<Method, InterceptorParameter> toInterceptorParameter(
         RegisterType registerType
     ) {
-        return method -> new PrepreparedControllerMethod(
+        return method -> new InterceptorParameter(
             parseUrlsFromMethod(method),
             parseHttpMethod(method),
             registerType
         );
     }
 
-    private List<PreparedControllerMethod> createPreparedControllerMethods(
-        List<PrepreparedControllerMethod> urlsFromMethodsWithHttpMethod,
+    private List<MergedInterceptorParameterByMethod> createMergedInterceptorParameterByMethod(
+        List<InterceptorParameter> interceptorParameters,
         String prefix
     ) {
-        List<PreparedControllerMethod> preparedControllerMethods = new ArrayList<>();
+        List<MergedInterceptorParameterByMethod> mergedInterceptorParameterByMethods = new ArrayList<>();
 
-        for (PrepreparedControllerMethod prepreparedControllerMethod : urlsFromMethodsWithHttpMethod) {
-            var httpMethod = prepreparedControllerMethod.getHttpMethod();
-            var registerType = prepreparedControllerMethod.getRegisterType();
-            var urls = prepreparedControllerMethod.getUrls();
+        for (InterceptorParameter interceptorParameter : interceptorParameters) {
+            var httpMethod = interceptorParameter.getHttpMethod();
+            var registerType = interceptorParameter.getRegisterType();
+            var urls = interceptorParameter.getUrls();
 
-            List<PreparedControllerMethod> values =
-                createPreparedControllerMethod(prefix, httpMethod, registerType, urls);
+            List<MergedInterceptorParameterByMethod> values =
+                createMergedInterceptorParameterByMethods(prefix, httpMethod, registerType, urls);
 
-            preparedControllerMethods.addAll(values);
+            mergedInterceptorParameterByMethods.addAll(values);
         }
 
-        return preparedControllerMethods;
+        return mergedInterceptorParameterByMethods;
     }
 
-    private List<PreparedControllerMethod> createPreparedControllerMethod(String prefix,
-        HttpMethod httpMethod, RegisterType registerType, List<String> urls) {
+    private List<MergedInterceptorParameterByMethod> createMergedInterceptorParameterByMethods(
+        String prefix,
+        HttpMethod httpMethod, RegisterType registerType, List<String> urls
+    ) {
         return urls.stream()
             .map(url -> createUri(prefix, url))
             .map(completeUrl ->
-                new PreparedControllerMethod(completeUrl, httpMethod, registerType))
+                new MergedInterceptorParameterByMethod(completeUrl, httpMethod, registerType))
             .collect(toList());
     }
 

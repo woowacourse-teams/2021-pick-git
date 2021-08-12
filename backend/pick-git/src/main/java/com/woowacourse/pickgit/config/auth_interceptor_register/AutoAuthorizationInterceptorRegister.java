@@ -3,7 +3,7 @@ package com.woowacourse.pickgit.config.auth_interceptor_register;
 import com.woowacourse.pickgit.authentication.presentation.interceptor.PathMatchInterceptor;
 import com.woowacourse.pickgit.config.auth_interceptor_register.register_type.RegisterType;
 import com.woowacourse.pickgit.config.auth_interceptor_register.register_type.StorageForRegisterType;
-import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.data_structure.PreparedControllerMethod;
+import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.data_structure.MergedInterceptorParameterByMethod;
 import java.util.List;
 
 public class AutoAuthorizationInterceptorRegister {
@@ -26,13 +26,13 @@ public class AutoAuthorizationInterceptorRegister {
     }
 
     public void execute() {
-        var preparedControllerMethods =
-            uriParser.getPreparedControllerMethod();
-        addPathPatterns(preparedControllerMethods);
+        var mergedInterceptorParameterByMethod =
+            uriParser.getMergedInterceptorParameterByMethod();
+        addPathPatterns(mergedInterceptorParameterByMethod);
     }
 
-    private void addPathPatterns(List<PreparedControllerMethod> preparedControllerMethods) {
-        for (PreparedControllerMethod registerCandidate : preparedControllerMethods) {
+    private void addPathPatterns(List<MergedInterceptorParameterByMethod> mergedInterceptorParameterByMethods) {
+        for (MergedInterceptorParameterByMethod registerCandidate : mergedInterceptorParameterByMethods) {
             var storageForRegisterType = storageForRegisterTypes.stream()
                 .filter(storage -> storage.isSatisfiedBy(registerCandidate.getRegisterType()))
                 .findAny()
