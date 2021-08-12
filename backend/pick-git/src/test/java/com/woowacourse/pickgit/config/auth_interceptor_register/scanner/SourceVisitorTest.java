@@ -91,7 +91,7 @@ class SourceVisitorTest {
         return Files.write(
             Files.createTempFile("temp", suffix),
             String.join(System.lineSeparator(), List.of(
-                "package com.woowacourse.pickgit.config.auth_interceptor_regester.scanner;",
+                "package com.woowacourse.pickgit.config.auth_interceptor_register.scanner;",
                 "test",
                 "test2",
                 "test3"
