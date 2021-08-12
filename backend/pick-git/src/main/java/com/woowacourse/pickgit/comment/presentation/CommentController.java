@@ -14,6 +14,7 @@ import com.woowacourse.pickgit.comment.presentation.dto.response.CommentResponse
 import java.util.List;
 import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/api")
 @RestController
+@CrossOrigin(value = "*")
 public class CommentController {
 
     private final CommentService commentService;
