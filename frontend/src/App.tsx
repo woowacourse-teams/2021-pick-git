@@ -62,6 +62,9 @@ const App = () => {
         <Route exact path={PAGE_URL.FOLLOWERS_BASE}>
           <OneDepthStepHeader title="팔로우 목록" />
         </Route>
+        <Route exact path={PAGE_URL.SEARCH_RESULT_FEED_BASE}>
+          <OneDepthStepHeader title="검색결과" />
+        </Route>
         <Route path={PAGE_URL.ADD_POST}>
           <PostAddStepHeader />
         </Route>
@@ -82,7 +85,7 @@ const App = () => {
         <Route exact path={PAGE_URL.SEARCH}>
           <SearchPage />
         </Route>
-        <Route exact path={PAGE_URL.SEARCH_RESULT_POST_BASE}>
+        <Route exact path={PAGE_URL.SEARCH_RESULT_FEED_BASE}>
           <SearchPostResultPage />
         </Route>
         <Route exact path={PAGE_URL.LOGIN}>
