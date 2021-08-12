@@ -9,11 +9,10 @@ import useFollow from "../../services/hooks/useFollow";
 
 const PostLikePeoplePage = () => {
   const { state: postId } = useLocation<Post["id"]>();
-  const { infinitePostLikePeople, isLoading, isFetching, isError, getNextPostLikePeople, refetch } =
-    usePostLikePeople(postId);
+  const { postLikePeople, isLoading, isError, refetch } = usePostLikePeople(postId);
   const follow = useFollow();
 
-  if (isError || !infinitePostLikePeople) {
+  if (isError || !postLikePeople) {
     return <div>에러!!</div>;
   }
 
@@ -25,15 +24,13 @@ const PostLikePeoplePage = () => {
     );
   }
 
-  const postLikePeople = getItemsFromPages<UserItem>(infinitePostLikePeople.pages);
-
   return (
     <Container>
       <UserList
         key="post-like-user"
         users={postLikePeople}
-        isFetchingNextPage={isFetching}
-        onIntersect={getNextPostLikePeople}
+        isFetchingNextPage={false}
+        onIntersect={() => {}}
         follow={follow}
         refetch={refetch}
       />

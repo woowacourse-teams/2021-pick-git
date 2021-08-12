@@ -20,7 +20,7 @@ export interface Props {
   follow: ReturnType<typeof useFollow>;
   refetch: (
     options?: RefetchOptions | undefined
-  ) => Promise<QueryObserverResult<InfiniteData<UserItem[] | null>, AxiosError<ErrorResponse>>>;
+  ) => Promise<QueryObserverResult<InfiniteData<UserItem[] | null> | UserItem[], AxiosError<ErrorResponse>>>;
 }
 
 const UserList = ({ isFetchingNextPage, onIntersect, users, follow, refetch }: Props) => {
