@@ -10,6 +10,7 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,8 @@ class SourceVisitorTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        sourceVisitor = new SourceVisitor();
+        String startsWith = getClass().getCanonicalName().split("\\.")[0];
+        sourceVisitor = new SourceVisitor(startsWith);
     }
 
     @DisplayName("CONTINUE를 반환한다.")
@@ -44,9 +46,11 @@ class SourceVisitorTest {
 
     @DisplayName(".java 파일에서 package name을 추출한다.")
     @Test
-    void visitFile_javaFile() throws IOException {
-        Path file = createTempFile(".java");
-        String fileName = file.getFileName().toString().replace(".java", "");
+    void visitFile_javaFile() throws IOException, URISyntaxException {
+        String fileName = getClass().getSimpleName();
+        String src =
+            Objects.requireNonNull(getClass().getResource(".")).toURI() + fileName + ".class";
+        Path file = Path.of(new URI(src));
 
         FileVisitResult actual = sourceVisitor.visitFile(file, null);
         List<String> classPaths = sourceVisitor.getClassPaths();

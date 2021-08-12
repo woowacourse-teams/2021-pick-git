@@ -51,7 +51,9 @@ public class OAuthConfiguration implements WebMvcConfigurer {
     }
 
     public List<String> parseClassesNames() {
-        PackageScanner packageScanner = new PackageScanner(new SourceVisitor());
+        String startsWith = getClass().getCanonicalName().split("\\.")[0];
+
+        PackageScanner packageScanner = new PackageScanner(new SourceVisitor(startsWith));
         return packageScanner.getAllClassNames();
     }
 

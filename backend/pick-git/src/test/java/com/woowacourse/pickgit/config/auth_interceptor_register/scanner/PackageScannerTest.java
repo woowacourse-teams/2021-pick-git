@@ -20,15 +20,13 @@ import org.junit.jupiter.api.Test;
 
 class PackageScannerTest {
 
-    @DisplayName("루트 폴더 내부를 순회하며 Controller java파일의 이름을 추출한다.")
+    @DisplayName("루트 폴더 내부를 순회하며 Controller class파일의 이름을 추출한다.")
     @Test
     void getAllClassNames_extractControllerJavaFilesName_Success() throws URISyntaxException {
-        String resource = ClassOne.class.getResource(".")
-            .toString()
-            .replace("/build/classes/java/test", "/src/test/java");
+        String resource = ClassOne.class.getResource(".").toString();
 
         Path rootPath = Path.of(new URI(resource));
-        PackageScanner packageScanner = new PackageScanner(rootPath, new TestSourceVisitor());
+        PackageScanner packageScanner = new PackageScanner(rootPath, new TestSourceVisitor("com"));
         List<String> allClassNames = packageScanner.getAllClassNames();
 
         assertThat(allClassNames)
@@ -41,6 +39,10 @@ class PackageScannerTest {
     }
 
     private static class TestSourceVisitor extends SourceVisitor {
+
+        public TestSourceVisitor(String startsWith) {
+            super(startsWith);
+        }
 
         public List<String> getClassPaths() {
             return super.getClassPaths();
