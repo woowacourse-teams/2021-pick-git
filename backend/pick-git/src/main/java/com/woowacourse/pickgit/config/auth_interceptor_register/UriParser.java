@@ -29,7 +29,8 @@ public class UriParser {
     private final ForGuestScanner forGuestScanner;
     private final ForLoginUserScanner forLoginUserScanner;
 
-    public UriParser(ControllerScanner controllerScanner,
+    public UriParser(
+        ControllerScanner controllerScanner,
         ForGuestScanner forGuestScanner,
         ForLoginUserScanner forLoginUserScanner
     ) {
@@ -52,7 +53,7 @@ public class UriParser {
         List<PreparedControllerMethod> preparedControllerMethods = new ArrayList<>();
 
         prefixUrlsFromController.forEach(
-            prefix ->preparedControllerMethods.addAll(
+            prefix -> preparedControllerMethods.addAll(
                 createPreparedControllerMethods(urlsFromMethodsWithHttpMethod, prefix)
             )
         );
@@ -134,28 +135,7 @@ public class UriParser {
 
 
     private List<String> parseUrlsFromMethod(Method method) {
-        Class<? extends Annotation> annotatedHttpMethodAnnotation = MethodMapper
-            .findAnnotatedHttpMethodAnnotation(method);
-
-        String name = annotatedHttpMethodAnnotation.getName();
-
-        if (name.contains("Post")) {
-            return List.of(method.getAnnotation(PostMapping.class).value());
-        }
-
-        if (name.contains("Get")) {
-            return List.of(method.getAnnotation(GetMapping.class).value());
-        }
-
-        if (name.contains("Delete")) {
-            return List.of(method.getAnnotation(DeleteMapping.class).value());
-        }
-
-        if (name.contains("Put")) {
-            return List.of(method.getAnnotation(PutMapping.class).value());
-        }
-
-        throw new IllegalArgumentException("일치하는 Method mapping을 찾을 수 없습니다.");
+        return MethodMapper.extractMappingValues(method);
     }
 
     private HttpMethod parseHttpMethod(Method method) {
