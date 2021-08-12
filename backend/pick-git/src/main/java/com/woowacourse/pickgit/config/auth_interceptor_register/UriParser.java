@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 public class UriParser {
 
+    public static final String REGEX = "\\{.*?.}";
+
     private final ControllerScanner controllerScanner;
     private final ForGuestScanner forGuestScanner;
     private final ForLoginUserScanner forLoginUserScanner;
@@ -146,6 +148,6 @@ public class UriParser {
             .filter(urlPiece -> !urlPiece.isBlank())
             .collect(joining("/"));
 
-        return createdUri.replaceAll("\\{.*?.}", "*");
+        return createdUri.replaceAll(REGEX, "*");
     }
 }
