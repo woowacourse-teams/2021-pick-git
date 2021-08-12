@@ -1,6 +1,5 @@
 package com.woowacourse.pickgit.unit.comment.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -69,11 +68,7 @@ class CommentTest {
         Comment comment = new Comment(1L, "comment1", me, postByMe);
 
         // when
-        comment.deleteFrom(postByMe, me);
-
-        // then
-        assertThat(comment.getUser()).isNull();
-        assertThat(comment.getPost()).isNull();
+        comment.validateDeletion(postByMe, me);
     }
 
     @DisplayName("내 게시물, 남 댓글을 삭제한다.")
@@ -92,11 +87,7 @@ class CommentTest {
         Comment comment = new Comment(1L, "comment1", other, postByMe);
 
         // when
-        comment.deleteFrom(postByMe, me);
-
-        // then
-        assertThat(comment.getUser()).isNull();
-        assertThat(comment.getPost()).isNull();
+        comment.validateDeletion(postByMe, me);
     }
 
     @DisplayName("남 게시물, 내 댓글을 삭제한다.")
@@ -114,11 +105,7 @@ class CommentTest {
         Comment comment = new Comment(1L, "comment1", me, postByOther);
 
         // when
-        comment.deleteFrom(postByOther, me);
-
-        // then
-        assertThat(comment.getUser()).isNull();
-        assertThat(comment.getPost()).isNull();
+        comment.validateDeletion(postByOther, me);
     }
 
     @DisplayName("남 게시물, 남 댓글은 삭제할 수 없다. - 401 예외")
@@ -137,7 +124,7 @@ class CommentTest {
 
         // when
         assertThatThrownBy(() -> {
-            comment.deleteFrom(postByOther, me);
+            comment.validateDeletion(postByOther, me);
         }).isInstanceOf(CannotDeleteCommentException.class)
             .hasFieldOrPropertyWithValue("errorCode", "P0007")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)

@@ -196,9 +196,7 @@ public class PostService {
         User user = findUserByName(deleteRequestDto.getUsername());
         Post post = findPostById(deleteRequestDto.getPostId());
 
-        if (post.isNotWrittenBy(user)) {
-            throw new PostNotBelongToUserException();
-        }
+        post.validateDeletion(user);
 
         user.delete(post);
         postRepository.delete(post);

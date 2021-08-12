@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 
 import com.woowacourse.pickgit.comment.domain.Comment;
 import com.woowacourse.pickgit.comment.domain.Comments;
+import com.woowacourse.pickgit.exception.post.PostNotBelongToUserException;
 import com.woowacourse.pickgit.post.domain.content.Image;
 import com.woowacourse.pickgit.post.domain.content.Images;
 import com.woowacourse.pickgit.post.domain.content.PostContent;
@@ -110,6 +111,12 @@ public class Post {
     public boolean isLikedBy(User user) {
         Like like = new Like(this, user);
         return likes.contains(like);
+    }
+
+    public void validateDeletion(User user) {
+        if (this.isNotWrittenBy(user)) {
+            throw new PostNotBelongToUserException();
+        }
     }
 
     public boolean isNotWrittenBy(User user) {

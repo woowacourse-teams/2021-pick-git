@@ -75,9 +75,6 @@ public class CommentServiceTest_delete {
         commentService.delete(commentDeleteRequestDto);
 
         // then
-        assertThat(comment.getUser()).isNull();
-        assertThat(comment.getPost()).isNull();
-
         verify(postRepository, times(1))
             .findById(1L);
         verify(userRepository, times(1))
@@ -122,9 +119,6 @@ public class CommentServiceTest_delete {
         commentService.delete(commentDeleteRequestDto);
 
         // then
-        assertThat(comment.getUser()).isNull();
-        assertThat(comment.getPost()).isNull();
-
         verify(postRepository, times(1))
             .findById(1L);
         verify(userRepository, times(1))
@@ -169,9 +163,6 @@ public class CommentServiceTest_delete {
         commentService.delete(commentDeleteRequestDto);
 
         // then
-        assertThat(comment.getUser()).isNull();
-        assertThat(comment.getPost()).isNull();
-
         verify(postRepository, times(1))
             .findById(1L);
         verify(userRepository, times(1))

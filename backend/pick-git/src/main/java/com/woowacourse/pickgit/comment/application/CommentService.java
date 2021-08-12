@@ -79,7 +79,8 @@ public class CommentService {
         User user = findUserByName(commentDeleteRequestDto.getUsername());
         Comment comment = findCommentById(commentDeleteRequestDto.getCommentId());
 
-        comment.deleteFrom(post, user);
+        comment.validateDeletion(post, user);
+
         commentRepository.delete(comment);
     }
 
