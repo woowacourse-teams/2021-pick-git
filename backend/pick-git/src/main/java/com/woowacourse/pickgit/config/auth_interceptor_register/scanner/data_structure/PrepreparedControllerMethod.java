@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpMethod;
 
 public class PrepreparedControllerMethod {
+
     private final List<String> urls;
     private final HttpMethod httpMethod;
     private final RegisterType registerType;

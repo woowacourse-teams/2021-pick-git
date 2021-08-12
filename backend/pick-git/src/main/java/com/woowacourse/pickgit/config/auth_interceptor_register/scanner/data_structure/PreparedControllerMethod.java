@@ -4,6 +4,7 @@ import com.woowacourse.pickgit.config.auth_interceptor_register.register_type.Re
 import org.springframework.http.HttpMethod;
 
 public class PreparedControllerMethod {
+
     private final String urls;
     private final HttpMethod httpMethod;
     private final RegisterType registerType;

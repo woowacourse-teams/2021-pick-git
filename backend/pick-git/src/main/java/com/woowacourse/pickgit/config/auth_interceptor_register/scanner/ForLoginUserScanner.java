@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ForLoginUserScanner {
+
     public List<Method> parseMethods(Class<?> controller) {
         return Arrays.stream(controller.getMethods())
             .filter(method -> method.isAnnotationPresent(ForOnlyLoginUser.class))

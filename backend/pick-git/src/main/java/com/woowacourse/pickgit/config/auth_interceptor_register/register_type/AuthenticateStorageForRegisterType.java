@@ -8,6 +8,7 @@ import java.util.Map;
 import org.springframework.http.HttpMethod;
 
 public class AuthenticateStorageForRegisterType implements StorageForRegisterType {
+
     private static final RegisterType TYPE = RegisterType.AUTHENTICATE;
 
     private Map<String, List<HttpMethod>> cache = new HashMap<>();
