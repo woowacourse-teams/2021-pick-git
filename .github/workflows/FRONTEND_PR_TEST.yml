@@ -28,7 +28,7 @@ jobs:
         uses: actions/github-script
         with:
           github-token: ${{github.token}}
-          script:
+          script: |
             const ref = "${{github.ref}}";
             const pull_number = Number(ref.split("/")[2]);
 
@@ -36,7 +36,7 @@ jobs:
               ...context.repo,
               pull_number,
               body:"테스트에 성공했습니다.",
-              event: "COMMENT"
+              event: "APPROVE"
             });
         if: success()
 
@@ -44,7 +44,7 @@ jobs:
         uses: actions/github-script
         with:
           github-token: ${{github.token}}
-          script:
+          script: |
             const ref = "${{github.ref}}";
             const pull_number = Number(ref.split("/")[2]);
 
