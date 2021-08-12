@@ -63,8 +63,7 @@ export const API_URL = {
   AFTER_LOGIN: (code: string) => `afterlogin?code=${code}`,
   POST: (postId: number) => `/posts/${postId}`,
   POSTS: (page: number, limit: number) => `/posts?page=${page}&limit=${limit}`,
-  POST_LIKE_PEOPLE: (postId: number, page: number, limit: number) =>
-    `/posts/${postId}/likes?page=${page}&limit=${limit}`,
+  POST_LIKE_PEOPLE: (postId: number) => `/posts/${postId}/likes`,
   POST_LIKES: (postId: number) => `/posts/${postId}/likes`,
   POST_COMMENT: (postId: number, commentId?: number) => `/posts/${postId}/comments${commentId ? `/${commentId}` : ""}`,
   POST_COMMENTS: (postId: number, page: number, limit: number) =>

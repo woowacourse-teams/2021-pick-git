@@ -26,6 +26,7 @@ import FollowingList from "./pages/FollowingUserListPage/FollowingList";
 import FollowerList from "./pages/FollowerList/FollowerList";
 import OneDepthStepHeader from "./components/OneDepthStepHeader/OneDepthStepHeader";
 import CommentsPage from "./pages/CommentsPage/CommentsPage";
+import PostLikePeoplePage from "./pages/PostLikePeoplePage/PostLikePeoplePage";
 
 const App = () => {
   const { currentUsername, login, logout } = useContext(UserContext);
@@ -114,6 +115,9 @@ const App = () => {
         </Route>
         <Route path={PAGE_URL.POST_COMMENTS}>
           <CommentsPage />
+        </Route>
+        <Route path={PAGE_URL.POST_LIKE_PEOPLE}>
+          <PostLikePeoplePage />
         </Route>
         <Redirect to="/" />
       </Switch>

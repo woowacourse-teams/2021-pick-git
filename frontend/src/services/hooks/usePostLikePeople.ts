@@ -2,25 +2,12 @@ import { Post } from "../../@types";
 import { usePostLikePeopleQuery } from "../queries/postLikePeople";
 
 const usePostLikePeople = (postId: Post["id"]) => {
-  const {
-    data: infinitePostLikePeople,
-    isError,
-    isLoading,
-    isFetching,
-    fetchNextPage,
-    refetch,
-  } = usePostLikePeopleQuery(postId);
-
-  const getNextPostLikePeople = () => {
-    fetchNextPage();
-  };
+  const { data: postLikePeople, isError, isLoading, refetch } = usePostLikePeopleQuery(postId);
 
   return {
-    infinitePostLikePeople,
+    postLikePeople,
     isError,
     isLoading,
-    isFetching,
-    getNextPostLikePeople,
     refetch,
   };
 };

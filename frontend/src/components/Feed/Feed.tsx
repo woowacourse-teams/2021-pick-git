@@ -91,6 +91,11 @@ const Feed = ({ infinitePostsData, queryKey }: Props) => {
       return;
     }
 
+    if (selectedPost.likesCount === 0) {
+      pushSnackbarMessage(WARNING_MESSAGE.NO_ONE_LIKE_POST);
+      return;
+    }
+
     history.push({
       pathname: PAGE_URL.POST_LIKE_PEOPLE,
       state: selectedPost.id,
