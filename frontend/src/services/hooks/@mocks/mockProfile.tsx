@@ -1,6 +1,5 @@
 import { rest } from "msw";
 import { setupServer } from "msw/node";
-import { useHistory } from "react-router-dom";
 
 import { ProfileData } from "../../../@types";
 import { DEFAULT_PROFILE_QUERY_DATA, INVALID_ACCESS_TOKEN, UNAUTHORIZED_TOKEN_ERROR } from "./shared";
