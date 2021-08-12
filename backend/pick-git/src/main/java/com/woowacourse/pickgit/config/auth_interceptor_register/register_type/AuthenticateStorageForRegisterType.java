@@ -11,7 +11,7 @@ public class AuthenticateStorageForRegisterType implements StorageForRegisterTyp
 
     private static final RegisterType TYPE = RegisterType.AUTHENTICATE;
 
-    private Map<String, List<HttpMethod>> cache = new HashMap<>();
+    private final Map<String, List<HttpMethod>> cache = new HashMap<>();
 
     @Override
     public void appendTo(PathMatchInterceptor include) {
