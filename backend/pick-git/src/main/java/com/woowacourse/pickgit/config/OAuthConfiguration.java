@@ -75,7 +75,8 @@ public class OAuthConfiguration implements WebMvcConfigurer {
         PathMatchInterceptor ignoreAuthenticationInterceptor =
             new PathMatchInterceptor(ignoreAuthenticationInterceptor());
 
-        var autoAuthorizationInterceptorRegister = AutoAuthorizationInterceptorRegister.builder()
+        AutoAuthorizationInterceptorRegister autoAuthorizationInterceptorRegister =
+            AutoAuthorizationInterceptorRegister.builder()
             .storageForRegisterTypes(getStorageForRegisterTypes())
             .authenticationInterceptor(authenticationInterceptor)
             .ignoreAuthenticationInterceptor(ignoreAuthenticationInterceptor)

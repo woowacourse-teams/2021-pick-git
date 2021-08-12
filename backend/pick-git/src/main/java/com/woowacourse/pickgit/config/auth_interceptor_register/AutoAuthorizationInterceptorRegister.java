@@ -26,14 +26,14 @@ public class AutoAuthorizationInterceptorRegister {
     }
 
     public void execute() {
-        var mergedInterceptorParameterByMethod =
+        List<MergedInterceptorParameterByMethod> mergedInterceptorParameterByMethod =
             uriParser.getMergedInterceptorParameterByMethod();
         addPathPatterns(mergedInterceptorParameterByMethod);
     }
 
     private void addPathPatterns(List<MergedInterceptorParameterByMethod> mergedInterceptorParameterByMethods) {
         for (MergedInterceptorParameterByMethod registerCandidate : mergedInterceptorParameterByMethods) {
-            var storageForRegisterType = storageForRegisterTypes.stream()
+            StorageForRegisterType storageForRegisterType = storageForRegisterTypes.stream()
                 .filter(storage -> storage.isSatisfiedBy(registerCandidate.getRegisterType()))
                 .findAny()
                 .orElseThrow(() -> new IllegalArgumentException("registerType을 컨트롤 할 수 없습니다."));
@@ -42,7 +42,7 @@ public class AutoAuthorizationInterceptorRegister {
                 .put(registerCandidate.getUrls(), registerCandidate.getHttpMethod());
         }
 
-        for (var storageForRegisterType : storageForRegisterTypes) {
+        for (StorageForRegisterType storageForRegisterType : storageForRegisterTypes) {
             if (storageForRegisterType.isSatisfiedBy(RegisterType.AUTHENTICATE)) {
                 storageForRegisterType.appendTo(authenticationInterceptor);
             } else {

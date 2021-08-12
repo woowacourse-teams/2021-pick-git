@@ -35,7 +35,8 @@ class AutoAuthorizationInterceptorRegisterTest {
         TestPathMatchInterceptor ignoreAuthenticationInterceptor =
             new TestPathMatchInterceptor(null);
 
-        var autoAuthorizationInterceptorRegister = AutoAuthorizationInterceptorRegister.builder()
+        AutoAuthorizationInterceptorRegister autoAuthorizationInterceptorRegister =
+            AutoAuthorizationInterceptorRegister.builder()
             .storageForRegisterTypes(
                 List.of(new AuthenticateStorageForRegisterType(),
                     new IgnoreAuthenticateStorageForRegisterType()))

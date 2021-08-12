@@ -44,15 +44,14 @@ public class UriParser {
 
     private List<MergedInterceptorParameterByMethod> createMergedInterceptorParameterByMethods(
         Class<?> controller) {
-        var prefixUrlsFromController = getPrefixUrlsFromController(controller);
-        var urlsFromMethodsWithHttpMethod =
-            interceptorParameter(controller);
+        List<String> prefixUrlsFromController = getPrefixUrlsFromController(controller);
+        List<InterceptorParameter> interceptorParameters = interceptorParameter(controller);
 
         List<MergedInterceptorParameterByMethod> mergedInterceptorParameterByMethods = new ArrayList<>();
 
         prefixUrlsFromController.forEach(
             prefix -> mergedInterceptorParameterByMethods.addAll(
-                createMergedInterceptorParameterByMethod(urlsFromMethodsWithHttpMethod, prefix)
+                createMergedInterceptorParameterByMethod(interceptorParameters, prefix)
             )
         );
 
@@ -109,9 +108,9 @@ public class UriParser {
         List<MergedInterceptorParameterByMethod> mergedInterceptorParameterByMethods = new ArrayList<>();
 
         for (InterceptorParameter interceptorParameter : interceptorParameters) {
-            var httpMethod = interceptorParameter.getHttpMethod();
-            var registerType = interceptorParameter.getRegisterType();
-            var urls = interceptorParameter.getUrls();
+            HttpMethod httpMethod = interceptorParameter.getHttpMethod();
+            RegisterType registerType = interceptorParameter.getRegisterType();
+            List<String> urls = interceptorParameter.getUrls();
 
             List<MergedInterceptorParameterByMethod> values =
                 createMergedInterceptorParameterByMethods(prefix, httpMethod, registerType, urls);
