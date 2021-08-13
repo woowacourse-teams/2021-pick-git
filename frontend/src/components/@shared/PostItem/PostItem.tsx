@@ -121,7 +121,7 @@ const PostItem = ({
   ));
 
   const tagList = tags.map((tag: string) => (
-    <TagItemLinkButton type="button" key={tag} to={PAGE_URL.SEARCH_POST_BY_TAG(tag)}>
+    <TagItemLinkButton key={tag} to={PAGE_URL.SEARCH_POST_BY_TAG(tag)}>
       <Chip>{tag}</Chip>
     </TagItemLinkButton>
   ));
