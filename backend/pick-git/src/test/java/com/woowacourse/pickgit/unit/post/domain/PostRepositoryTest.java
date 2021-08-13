@@ -132,34 +132,6 @@ class PostRepositoryTest {
             .isInstanceOf(InvalidDataAccessApiUsageException.class);
     }
 
-    @DisplayName("Post에 Comment를 추가하면 Comment가 자동 영속화된다.")
-    @Test
-    void addComment_WhenSavingPost_CommentSavedTogether() {
-        // given
-        User testUser = UserFactory.user("testUser");
-        User savedTestUser = userRepository.save(testUser);
-
-        Post post = Post.builder()
-            .content("testContent")
-            .githubRepoUrl("https://github.com/bperhaps")
-            .author(savedTestUser)
-            .build();
-
-        // when
-        Comment comment = new Comment("test comment", testUser);
-        post.addComment(comment);
-
-        postRepository.save(post);
-        flushAndClear();
-
-        // then
-        Post findPost = postRepository.findById(post.getId())
-            .orElseThrow(IllegalArgumentException::new);
-
-        List<Comment> comments = findPost.getComments();
-        assertThat(comments).hasSize(1);
-    }
-
     @DisplayName("나를 포함하여 내가 팔로잉하는 유저들의 게시글을 최신순으로 가져온다.")
     @Test
     void findAllAssociatedPostsByUser_FollowingsLatestIncludingMe_Success() {

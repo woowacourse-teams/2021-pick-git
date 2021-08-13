@@ -71,7 +71,7 @@ public class PostFeedService_search {
 
         assertThat(actual)
             .usingRecursiveComparison()
-            .isEqualTo(PostDtoAssembler.assembleFrom(requestUser, false, List.of(post)));
+            .isEqualTo(PostDtoAssembler.assembleFrom(requestUser, List.of(post)));
 
         verify(searchTypes, times(1))
             .findByTypeName(type);
@@ -104,7 +104,7 @@ public class PostFeedService_search {
         // then
         assertThat(actual)
             .usingRecursiveComparison()
-            .isEqualTo(PostDtoAssembler.assembleFrom(null, true, List.of(post)));
+            .isEqualTo(PostDtoAssembler.assembleFrom(null, List.of(post)));
 
         verify(searchTypes, times(1))
             .findByTypeName(type);

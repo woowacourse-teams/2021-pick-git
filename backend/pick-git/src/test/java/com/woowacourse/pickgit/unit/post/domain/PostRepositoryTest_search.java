@@ -66,7 +66,7 @@ public class PostRepositoryTest_search {
         List<Post> savedPosts = postRepository.findAllPostsByTagNames(keywords, pageRequest);
 
         List<PostResponseDto> actual =
-            PostDtoAssembler.assembleFrom(user, false, savedPosts);
+            PostDtoAssembler.assembleFrom(user, savedPosts);
 
         actual.sort(comparing(PostResponseDto::getAuthorName));
         expected.sort(comparing(PostResponseDto::getAuthorName));
@@ -125,7 +125,7 @@ public class PostRepositoryTest_search {
             user,
             List.of(tags),
             keyword,
-            PostDtoAssembler.assembleFrom(user, false, expected)
+            PostDtoAssembler.assembleFrom(user, expected)
         );
     }
 

@@ -1,14 +1,9 @@
 package com.woowacourse.pickgit.post.application;
 
-import static java.util.stream.Collectors.toList;
-
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
-import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
-import com.woowacourse.pickgit.post.application.dto.request.AuthUserForPostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.HomeFeedRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.SearchPostsRequestDto;
-import com.woowacourse.pickgit.post.application.dto.response.LikeUsersResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.search.SearchTypes;
 import com.woowacourse.pickgit.post.domain.Post;
@@ -82,20 +77,21 @@ public class PostFeedService {
     }
 
     public List<PostResponseDto> search(SearchPostsRequestDto searchPostsRequestDto) {
+        PageRequest pageable = PageRequest.of(
+            searchPostsRequestDto.getPage(),
+            searchPostsRequestDto.getLimit()
+        );
         String keyword = searchPostsRequestDto.getKeyword();
         String type = searchPostsRequestDto.getType();
-        int page = searchPostsRequestDto.getPage();
-        int limit = searchPostsRequestDto.getLimit();
-        String userName = searchPostsRequestDto.getUserName();
-        boolean isGuest = searchPostsRequestDto.isGuest();
-
-        PageRequest pageable = PageRequest.of(page, limit);
         String[] keywords = keyword.split(" ");
 
         List<Post> search = searchTypes.findByTypeName(type).search(keywords, pageable);
-        User user = findUserByName(userName);
+        if (searchPostsRequestDto.isGuest()) {
+            return PostDtoAssembler.assembleFrom(null, search);
+        }
 
-        return PostDtoAssembler.assembleFrom(user, isGuest, search);
+        User user = findUserByName(searchPostsRequestDto.getUserName());
+        return PostDtoAssembler.assembleFrom(user, search);
     }
 
     private User findUserByName(String userName) {

@@ -95,7 +95,7 @@ public class PostFeedControllerTest_searchPosts {
         given(oAuthService.findRequestUserByToken(any()))
             .willReturn(new GuestUser());
         given(postFeedService.search(any(SearchPostsRequestDto.class)))
-            .willReturn(PostDtoAssembler.assembleFrom(null, true, List.of(post1, post2)));
+            .willReturn(PostDtoAssembler.assembleFrom(null,  List.of(post1, post2)));
 
         ResultActions perform = mockMvc.perform(
             get("/api/search/posts")
@@ -143,7 +143,7 @@ public class PostFeedControllerTest_searchPosts {
         given(oAuthService.findRequestUserByToken(any()))
             .willReturn(new GuestUser());
         given(postFeedService.search(any(SearchPostsRequestDto.class)))
-            .willReturn(PostDtoAssembler.assembleFrom(user, false, List.of(post1, post2)));
+            .willReturn(PostDtoAssembler.assembleFrom(user, List.of(post1, post2)));
 
         ResultActions perform = mockMvc.perform(
             get("/api/search/posts")

@@ -4,9 +4,9 @@ import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
+import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.comment.application.CommentService;
 import com.woowacourse.pickgit.comment.application.dto.request.CommentRequestDto;
-import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.PostFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
@@ -18,6 +18,8 @@ import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.user.application.UserService;
+import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.FollowRequestDto;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import java.util.List;
@@ -90,7 +92,7 @@ class PostFeedServiceIntegrationTest {
             .page(0L)
             .limit(10L)
             .build();
-        AuthUserRequestDto authDto = AuthUserRequestDto.from(new LoginUser("kevin", "token"));
+        AuthUserForUserRequestDto authDto = AuthUserForUserRequestDto.from(new LoginUser("kevin", "token"));
 
         User requester = userRepository.save(UserFactory.user("kevin"));
         List<User> mockUsers = userRepository.saveAll(UserFactory.mockSearchUsers());
@@ -99,7 +101,7 @@ class PostFeedServiceIntegrationTest {
         List<Post> mockPostsBy = postRepository.saveAll(PostFactory.mockPostsBy(mockUsers));
 
         for (User mockUser : mockUsers) {
-            userService.followUser(authDto, mockUser.getName());
+            userService.followUser(new FollowRequestDto(authDto, mockUser.getName(), false));
         }
         for (int i = 0; i < mockPostsBy.size(); i += 2) {
             postService.like(new LoginUser("kevin", "token"), mockPostsBy.get(i).getId());
