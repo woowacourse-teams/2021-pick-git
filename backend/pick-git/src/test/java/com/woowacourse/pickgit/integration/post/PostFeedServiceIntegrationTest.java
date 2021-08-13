@@ -2,7 +2,9 @@ package com.woowacourse.pickgit.integration.post;
 
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
+import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.comment.application.CommentService;
 import com.woowacourse.pickgit.comment.application.dto.request.CommentRequestDto;
 import com.woowacourse.pickgit.common.factory.PostFactory;
@@ -13,6 +15,11 @@ import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.request.HomeFeedRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
+import com.woowacourse.pickgit.post.domain.Post;
+import com.woowacourse.pickgit.post.domain.repository.PostRepository;
+import com.woowacourse.pickgit.user.application.UserService;
+import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.FollowRequestDto;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import java.util.List;
@@ -31,7 +38,7 @@ import org.springframework.test.context.ActiveProfiles;
 @Transactional
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @ActiveProfiles("test")
-public class PostFeedServiceIntegrationTest {
+class PostFeedServiceIntegrationTest {
 
     @Autowired
     private PostService postService;
@@ -43,18 +50,22 @@ public class PostFeedServiceIntegrationTest {
     private PostFeedService postFeedService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private UserRepository userRepository;
 
-    @DisplayName("저장된 게시물 중 3, 4번째 글을 최신날짜순으로 가져온다.")
-    @Test
-    void readHomeFeed_Success() {
-        //given
-        createMockPosts();
+    @Autowired
+    private PostRepository postRepository;
 
-        userRepository.save(UserFactory.user("kevin"));
+    @DisplayName("비로그인 홈피드 - 전체 게시물 중 3, 4번째 글을 최신순으로 가져온다. (좋아요 여부 null)")
+    @Test
+    void readHomeFeed_Guest_LatestPosts() {
+        // given
+        createMockPosts();
         HomeFeedRequestDto homeFeedRequestDto = HomeFeedRequestDto.builder()
-            .requestUserName("kevin")
-            .isGuest(false)
+            .requestUserName(null)
+            .isGuest(true)
             .page(1L)
             .limit(2L)
             .build();
@@ -62,16 +73,54 @@ public class PostFeedServiceIntegrationTest {
         // when
         List<PostResponseDto> postResponseDtos = postFeedService.homeFeed(homeFeedRequestDto);
 
-        //then
-        List<String> postNames = postResponseDtos.stream()
-            .map(PostResponseDto::getAuthorName)
-            .collect(toList());
+        // then
+        assertThat(postResponseDtos)
+            .extracting("authorName", "githubRepoUrl", "liked")
+            .containsExactly(
+                tuple("dani", "java-racingcar", null),
+                tuple("ginger", "jwp-chess", null)
+            );
+    }
 
-        List<String> repoNames = extractGithubRepoUrls(postResponseDtos);
+    @DisplayName("로그인 홈피드 - 내가 팔로잉하는 사람들과 내 글을 최신순으로 가져온다. (좋아요 여부 true/false)")
+    @Test
+    void readHomeFeed_Login_FollowingsLatestPosts() {
+        // given
+        HomeFeedRequestDto homeFeedRequestDto = HomeFeedRequestDto.builder()
+            .requestUserName("kevin")
+            .isGuest(false)
+            .page(0L)
+            .limit(10L)
+            .build();
+        AuthUserForUserRequestDto authDto = AuthUserForUserRequestDto.from(new LoginUser("kevin", "token"));
 
-        assertThat(postResponseDtos).hasSize(2);
-        assertThat(postNames).containsExactly("dani", "ginger");
-        assertThat(repoNames).containsExactly("java-racingcar", "jwp-chess");
+        User requester = userRepository.save(UserFactory.user("kevin"));
+        List<User> mockUsers = userRepository.saveAll(UserFactory.mockSearchUsers());
+
+        postRepository.save(PostFactory.mockPostBy(requester));
+        List<Post> mockPostsBy = postRepository.saveAll(PostFactory.mockPostsBy(mockUsers));
+
+        for (User mockUser : mockUsers) {
+            userService.followUser(new FollowRequestDto(authDto, mockUser.getName(), false));
+        }
+        for (int i = 0; i < mockPostsBy.size(); i += 2) {
+            postService.like(new LoginUser("kevin", "token"), mockPostsBy.get(i).getId());
+        }
+
+        // when
+        List<PostResponseDto> postResponseDtos = postFeedService.homeFeed(homeFeedRequestDto);
+
+        // then
+        assertThat(postResponseDtos)
+            .extracting("authorName", "githubRepoUrl", "liked")
+            .containsExactly(
+                tuple("bingbing", "url4", true),
+                tuple("bbbbinghe", "url3", false),
+                tuple("jinbinghe", "url2", true),
+                tuple("bing", "url1", false),
+                tuple("binghe", "url0", true),
+                tuple("kevin", "mock-url", false)
+            );
     }
 
     private void createMockPosts() {

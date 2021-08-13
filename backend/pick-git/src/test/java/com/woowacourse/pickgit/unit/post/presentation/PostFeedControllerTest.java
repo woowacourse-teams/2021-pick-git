@@ -8,6 +8,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
+import static org.springframework.restdocs.payload.JsonFieldType.NULL;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -40,7 +41,7 @@ import org.springframework.test.web.servlet.ResultActions;
 @Import(InfrastructureTestConfiguration.class)
 @WebMvcTest(PostFeedController.class)
 @ActiveProfiles("test")
-public class PostFeedControllerTest {
+class PostFeedControllerTest {
 
     private static final String API_ACCESS_TOKEN = "oauth.access.token";
 
@@ -60,7 +61,7 @@ public class PostFeedControllerTest {
         given(oAuthService.findRequestUserByToken(any()))
             .willReturn(new GuestUser());
         given(postfeedService.homeFeed(any(HomeFeedRequestDto.class)))
-            .willReturn(PostFactory.mockPostResponseDtos());
+            .willReturn(PostFactory.mockPostResponseDtosForGuest());
 
         // when
         ResultActions perform = mockMvc.perform(get("/api/posts")
@@ -95,8 +96,8 @@ public class PostFeedControllerTest {
                     .description("댓글 작성자 프로필 사진"),
                 fieldWithPath("[].comments[].authorName").type(STRING).description("댓글 작성자 이름"),
                 fieldWithPath("[].comments[].content").type(STRING).description("댓글 내용"),
-                fieldWithPath("[].comments[].liked").type(BOOLEAN).description("댓글 좋아요 여부"),
-                fieldWithPath("[].liked").type(BOOLEAN).description("좋아요 여부")
+                fieldWithPath("[].comments[].liked").type(NULL).description("댓글 좋아요 여부"),
+                fieldWithPath("[].liked").type(NULL).description("좋아요 여부")
             )
             )
         );
@@ -114,7 +115,7 @@ public class PostFeedControllerTest {
         given(oAuthService.findRequestUserByToken(any()))
             .willReturn(loginUser);
         given(postfeedService.homeFeed(any(HomeFeedRequestDto.class)))
-            .willReturn(PostFactory.mockPostResponseDtos());
+            .willReturn(PostFactory.mockPostResponseDtosForLogin());
 
         // when
         ResultActions perform = mockMvc.perform(get("/api/posts")

@@ -1,14 +1,9 @@
 package com.woowacourse.pickgit.post.application;
 
-import static java.util.stream.Collectors.toList;
-
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
-import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
-import com.woowacourse.pickgit.post.application.dto.request.AuthUserForPostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.HomeFeedRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.SearchPostsRequestDto;
-import com.woowacourse.pickgit.post.application.dto.response.LikeUsersResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.search.SearchTypes;
 import com.woowacourse.pickgit.post.domain.Post;
@@ -16,8 +11,6 @@ import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -42,69 +35,66 @@ public class PostFeedService {
     }
 
     public List<PostResponseDto> homeFeed(HomeFeedRequestDto homeFeedRequestDto) {
-        return readFeed(homeFeedRequestDto, Optional.empty());
+        Pageable pageable = getPagination(homeFeedRequestDto);
+        if (homeFeedRequestDto.isGuest()) {
+            return PostDtoAssembler.assembleFrom(null,  postRepository.findAllPosts(pageable));
+        }
+        User requestUser = findUserByName(homeFeedRequestDto.getRequestUserName());
+        List<Post> result = postRepository.findAllAssociatedPostsByUser(requestUser, pageable);
+        return PostDtoAssembler.assembleFrom(requestUser, result);
     }
 
     public List<PostResponseDto> myFeed(HomeFeedRequestDto homeFeedRequestDto) {
-        String userName = homeFeedRequestDto.getRequestUserName();
-
-        if (Objects.isNull(userName)) {
+        if (homeFeedRequestDto.isGuest()) {
             throw new UnauthorizedException();
         }
-
-        return readFeed(homeFeedRequestDto, Optional.of(userName));
+        return readUserFeed(homeFeedRequestDto, homeFeedRequestDto.getRequestUserName());
     }
 
     public List<PostResponseDto> userFeed(HomeFeedRequestDto homeFeedRequestDto, String userName) {
-        return readFeed(homeFeedRequestDto, Optional.of(userName));
+        return readUserFeed(homeFeedRequestDto, userName);
     }
 
-    private List<PostResponseDto> readFeed(
+    private List<PostResponseDto> readUserFeed(
         HomeFeedRequestDto homeFeedRequestDto,
-        Optional<String> userName
+        String targetUserName
     ) {
-        int page = homeFeedRequestDto.getPage().intValue();
-        int limit = homeFeedRequestDto.getLimit().intValue();
-        String requestUserName = homeFeedRequestDto.getRequestUserName();
-        boolean isGuest = homeFeedRequestDto.isGuest();
-
-        Pageable pageable = PageRequest.of(page, limit);
-        List<Post> result = getPostsBy(userName, pageable);
-
-        User requestUser = findUserByName(requestUserName);
-
-        return PostDtoAssembler.assembleFrom(requestUser, isGuest, result);
+        Pageable pageable = getPagination(homeFeedRequestDto);
+        User target = findUserByName(targetUserName);
+        List<Post> result = postRepository.findAllPostsByUser(target, pageable);
+        if (homeFeedRequestDto.isGuest()) {
+            return PostDtoAssembler.assembleFrom(null, result);
+        }
+        User requestUser = findUserByName(homeFeedRequestDto.getRequestUserName());
+        return PostDtoAssembler.assembleFrom(requestUser, result);
     }
 
-    private List<Post> getPostsBy(Optional<String> userName, Pageable pageable) {
-        return userName
-            .map(this::findUserByName)
-            .map(target -> postRepository.findAllPostsByUser(target, pageable))
-            .orElse(postRepository.findAllPosts(pageable));
+    private PageRequest getPagination(HomeFeedRequestDto homeFeedRequestDto) {
+        return PageRequest.of(
+            homeFeedRequestDto.getPage().intValue(),
+            homeFeedRequestDto.getLimit().intValue()
+        );
     }
 
     public List<PostResponseDto> search(SearchPostsRequestDto searchPostsRequestDto) {
+        PageRequest pageable = PageRequest.of(
+            searchPostsRequestDto.getPage(),
+            searchPostsRequestDto.getLimit()
+        );
         String keyword = searchPostsRequestDto.getKeyword();
         String type = searchPostsRequestDto.getType();
-        int page = searchPostsRequestDto.getPage();
-        int limit = searchPostsRequestDto.getLimit();
-        String userName = searchPostsRequestDto.getUserName();
-        boolean isGuest = searchPostsRequestDto.isGuest();
-
-        PageRequest pageable = PageRequest.of(page, limit);
         String[] keywords = keyword.split(" ");
 
         List<Post> search = searchTypes.findByTypeName(type).search(keywords, pageable);
-        User user = findUserByName(userName);
+        if (searchPostsRequestDto.isGuest()) {
+            return PostDtoAssembler.assembleFrom(null, search);
+        }
 
-        return PostDtoAssembler.assembleFrom(user, isGuest, search);
+        User user = findUserByName(searchPostsRequestDto.getUserName());
+        return PostDtoAssembler.assembleFrom(user, search);
     }
 
     private User findUserByName(String userName) {
-        if(Objects.isNull(userName)) {
-            return null;
-        }
-
         return userRepository
             .findByBasicProfile_Name(userName)
             .orElseThrow(UserNotFoundException::new);

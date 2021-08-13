@@ -109,7 +109,7 @@ public class PostFeedServiceIntegrationTest_search {
         // then
         List<Post> allPosts = postRepository.findAll();
         List<PostResponseDto> allPostResponseDtos = PostDtoAssembler
-            .assembleFrom(user, false, allPosts);
+            .assembleFrom(user, allPosts);
         List<PostResponseDto> expected = findPostResponseByTags(allPostResponseDtos, keyword);
 
         assertThat(actual)
@@ -132,7 +132,7 @@ public class PostFeedServiceIntegrationTest_search {
         // then
         List<Post> allPosts = postRepository.findAll();
         List<PostResponseDto> allPostResponseDtos = PostDtoAssembler
-            .assembleFrom(null, true, allPosts);
+            .assembleFrom(null, allPosts);
         List<PostResponseDto> expected = findPostResponseByTags(allPostResponseDtos, keyword);
 
         assertThat(actual)

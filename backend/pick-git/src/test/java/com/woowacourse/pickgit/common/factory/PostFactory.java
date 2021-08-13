@@ -7,6 +7,7 @@ import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.like.Likes;
 import com.woowacourse.pickgit.user.domain.User;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import org.mockito.Mock;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,6 +19,33 @@ public class PostFactory {
 
     public static class Builder {
 
+    }
+
+    public static Post mockPostBy(User user) {
+        return Post.builder()
+            .content("mock post content")
+            .author(user)
+            .githubRepoUrl("mock-url")
+            .images(new ArrayList<>())
+            .tags(new ArrayList<>())
+            .build();
+    }
+
+    public static List<Post> mockPostsBy(List<User> users) {
+        List<Post> posts = new ArrayList<>();
+        int userCounts = users.size();
+        for (int i = 0; i < userCounts; i++) {
+            posts.add(
+                Post.builder()
+                    .content("abc" + i)
+                    .author(users.get(i))
+                    .githubRepoUrl("url" + i)
+                    .images(new ArrayList<>())
+                    .tags(new ArrayList<>())
+                    .build()
+            );
+        }
+        return posts;
     }
 
     public static List<PostRequestDto> mockPostRequestDtos() {
@@ -124,7 +152,42 @@ public class PostFactory {
         return List.of(fixture1, fixture2, fixture3, fixture4, fixture5);
     }
 
-    public static List<PostResponseDto> mockPostResponseDtos() {
+    public static List<PostResponseDto> mockPostResponseDtosForGuest() {
+        CommentResponseDto commentFixture1 = CommentResponseDto.builder()
+            .id(1L)
+            .profileImageUrl("commentAuthorProfileImageUrl")
+            .authorName("commentAuthorName1")
+            .content("commentContent1")
+            .liked(null)
+            .build();
+
+        CommentResponseDto commentFixture2 = CommentResponseDto.builder()
+            .id(2L)
+            .profileImageUrl("commentAuthorProfileImageUrl")
+            .authorName("commentAuthorName2")
+            .content("commentContent2")
+            .liked(null)
+            .build();
+
+        PostResponseDto fixture1 = PostResponseDto.builder()
+            .id(1L)
+            .imageUrls(List.of("image1Url", "image2Url"))
+            .githubRepoUrl("githubRepoUrl")
+            .content("content")
+            .authorName("authorName")
+            .profileImageUrl("profileImageUrl")
+            .likesCount(1)
+            .tags(List.of("tag1", "tag2"))
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
+            .comments(List.of(commentFixture1, commentFixture2))
+            .liked(null)
+            .build();
+
+        return List.of(fixture1);
+    }
+
+    public static List<PostResponseDto> mockPostResponseDtosForLogin() {
         CommentResponseDto commentFixture1 = CommentResponseDto.builder()
             .id(1L)
             .profileImageUrl("commentAuthorProfileImageUrl")

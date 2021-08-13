@@ -61,7 +61,7 @@ public class PostAcceptanceTest_searchPost {
     private void createPost(String... tags) {
         int statusCode = PickGitRequest.post("/api/posts")
             .api_posts()
-            .withUser()
+            .withUser("testUser")
             .initAllParams()
             .tags(tags)
             .extract().statusCode();
@@ -71,7 +71,7 @@ public class PostAcceptanceTest_searchPost {
 
     private List<PostResponse> getAllPostsWithUser(int size) {
         return PickGitRequest.get("/api/posts?page={page}&limit={limit}", 0, size)
-            .withUser()
+            .withUser("testUser")
             .extract()
             .as(new TypeRef<>() {
             });
@@ -92,7 +92,7 @@ public class PostAcceptanceTest_searchPost {
         ExtractableResponse<Response> extract = PickGitRequest
             .get("/api/search/posts?type=tags&keyword={keyword}&page={page}&limit={limit}",
                 keyword, page, limit
-            ).withUser()
+            ).withUser("testUser")
             .extract();
 
         assertThat(extract.statusCode()).isEqualTo(HttpStatus.OK.value());
