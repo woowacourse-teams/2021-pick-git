@@ -8,7 +8,7 @@ export const Header = styled.header`
   width: 100%;
   height: ${LAYOUT.HEADER_HEIGHT};
   background-color: ${({ theme }) => theme.color.white};
-  z-index: ${Z_INDEX.LOWER};
+  z-index: ${Z_INDEX.LOW};
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
 
   ${setMobileMediaQuery`

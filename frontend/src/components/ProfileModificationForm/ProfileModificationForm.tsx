@@ -3,6 +3,7 @@ import { ThemeContext } from "styled-components";
 
 import { CameraIcon } from "../../assets/icons";
 import { LIMIT } from "../../constants/limits";
+import SnackBarContext from "../../contexts/SnackbarContext";
 import useMessageModal from "../../services/hooks/@common/useMessageModal";
 import useProfileModificationForm from "../../services/hooks/useProfileModificationForm";
 import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
@@ -21,6 +22,7 @@ export interface Props {
 
 const ProfileModificationForm = ({ username, profileImageUrl, prevDescription, onTerminate }: Props) => {
   const theme = useContext(ThemeContext);
+  const { pushSnackbarMessage } = useContext(SnackBarContext);
   const { modalMessage, isModalShown, hideMessageModal, showAlertModal } = useMessageModal();
   const { values, handlers, isLoading } = useProfileModificationForm(
     username,
@@ -41,6 +43,9 @@ const ProfileModificationForm = ({ username, profileImageUrl, prevDescription, o
 
   return (
     <Container onSubmit={handleModificationSubmit}>
+      <button type="button" onClick={() => pushSnackbarMessage("test")}>
+        click
+      </button>
       <Heading>프로필 수정</Heading>
       <Label htmlFor="profile-image" avatarDiameter="5rem">
         <Avatar diameter="5rem" imageUrl={imageUrl} fontSize="1rem" name={username} />

@@ -8,13 +8,7 @@ import { requestAddPostComment, requestDeletePostComment, requestGetPostComments
 export const usePostCommentsQuery = (postId: Post["id"]) => {
   return useInfiniteQuery<CommentData[], AxiosError<ErrorResponse>, CommentData[], [string, Post["id"]]>(
     [QUERY.GET_POST_COMMENTS, postId],
-    async ({ pageParam = 0, queryKey }) => {
-      const [, postIdParam] = queryKey;
-
-      const response = await requestGetPostComments(postIdParam, pageParam, getAccessToken());
-
-      return response.data;
-    },
+    ({ pageParam = 0 }) => requestGetPostComments(postId, pageParam, getAccessToken()),
     {
       getNextPageParam: (_, pages) => {
         return pages.length;
@@ -25,10 +19,9 @@ export const usePostCommentsQuery = (postId: Post["id"]) => {
 };
 
 export const useAddPostCommentMutation = () => {
-  return useMutation<CommentData, AxiosError<ErrorResponse>, CommentAddData>(async (commentAddData) => {
-    const response = await requestAddPostComment(commentAddData, getAccessToken());
-    return response.data;
-  });
+  return useMutation<CommentData, AxiosError<ErrorResponse>, CommentAddData>((commentAddData) =>
+    requestAddPostComment(commentAddData, getAccessToken())
+  );
 };
 
 export const useDeletePostCommentMutation = () => {

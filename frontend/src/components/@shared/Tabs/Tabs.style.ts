@@ -56,7 +56,7 @@ export const TabIndicator = styled.div<{
     tabIndicatorKind === "line"
       ? `
         border-bottom: 2px solid ${tabIndicatorColor ?? theme.color.primaryColor};
-        z-index: ${Z_INDEX.LOW};
+        z-index: ${Z_INDEX.LOWER};
       `
       : `
         background-color: ${tabIndicatorColor ?? theme.color.primaryColor};

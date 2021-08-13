@@ -2,6 +2,7 @@ package com.woowacourse.pickgit.tag.presentation;
 
 import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
+import com.woowacourse.pickgit.config.auth_interceptor_register.ForOnlyLoginUser;
 import com.woowacourse.pickgit.tag.application.ExtractionRequestDto;
 import com.woowacourse.pickgit.tag.application.TagService;
 import com.woowacourse.pickgit.tag.application.TagsDto;
@@ -24,6 +25,7 @@ public class TagController {
         this.tagService = tagService;
     }
 
+    @ForOnlyLoginUser
     @GetMapping("/github/repositories/{repositoryName}/tags/languages")
     public ResponseEntity<List<String>> extractLanguageTags(@Authenticated AppUser appUser,
         @PathVariable String repositoryName) {
