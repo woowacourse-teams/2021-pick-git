@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { Page } from "../../components/@styled/layout";
 import { setDesktopMediaQuery, setLaptopMediaQuery, setTabletMediaQuery } from "../../components/@styled/mediaQueries";
-import { LAYOUT, PAGE_WIDTH } from "../../constants/layout";
+import { LAYOUT, PAGE_WIDTH, Z_INDEX } from "../../constants/layout";
 
 export const Container = styled(Page)`
   padding-top: 0;
@@ -134,6 +134,7 @@ export const SendIconWrapper = styled.div`
 export const CommentTextAreaWrapper = styled.div`
   position: fixed;
   bottom: 0;
+  z-index: ${Z_INDEX.HIGH};
   width: 100%;
   display: flex;
   align-items: center;
@@ -161,20 +162,7 @@ export const CommentTextAreaWrapper = styled.div`
   ${setDesktopMediaQuery`
     width: ${PAGE_WIDTH.DESKTOP};
     margin: 0 auto;
-  `} /* ${setTabletMediaQuery`
-    padding: 0 3.5rem;
-    border: none;
   `}
-
-  ${setLaptopMediaQuery`
-    padding: 0 12.5rem;
-    border: none;
-  `}
-
-  ${setDesktopMediaQuery`
-    padding: 0 24.5rem;
-    border: none;
-  `} */
 `;
 
 export const CommentTextArea = styled.textarea`
