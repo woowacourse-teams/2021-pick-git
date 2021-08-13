@@ -5,7 +5,7 @@ export const Container = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 3.125rem 2.0625rem;
+  padding: 3.125rem 2.0625rem 0;
 `;
 
 export const SearchInputWrapper = styled.div`

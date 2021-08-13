@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 
 import Input from "../../@shared/Input/Input";
-import { Container, GoBackLink, SearchInputWrapper } from "./SearchHeader.style";
+import { Container, HeaderContent, GoBackLink, SearchInputWrapper } from "./SearchHeader.style";
 import { GoBackIcon, SearchIcon } from "../../../assets/icons";
 import SearchContext from "../../../contexts/SearchContext";
 import useDebounce from "../../../services/hooks/@common/useDebounce";
@@ -33,18 +33,20 @@ const SearchHeader = () => {
 
   return (
     <Container>
-      <GoBackLink onClick={handleGoBack}>
-        <GoBackIcon color="#5a5a5a" />
-      </GoBackLink>
-      <SearchInputWrapper>
-        <Input
-          kind="rounded"
-          value={localKeyword}
-          onChange={handleKeywordChange}
-          icon={<SearchIcon />}
-          placeholder="검색하기"
-        />
-      </SearchInputWrapper>
+      <HeaderContent>
+        <GoBackLink onClick={handleGoBack}>
+          <GoBackIcon color="#5a5a5a" />
+        </GoBackLink>
+        <SearchInputWrapper>
+          <Input
+            kind="rounded"
+            value={localKeyword}
+            onChange={handleKeywordChange}
+            icon={<SearchIcon />}
+            placeholder="검색하기"
+          />
+        </SearchInputWrapper>
+      </HeaderContent>
     </Container>
   );
 };

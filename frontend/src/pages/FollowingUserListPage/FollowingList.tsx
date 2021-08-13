@@ -2,7 +2,7 @@ import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import UserList from "../../components/UserList/UserList";
 import useFollow from "../../services/hooks/useFollow";
 import useFollowingList from "../../services/hooks/useFollowingList";
-import { Container } from "./FollowingList.style";
+import { Container, ContentWrapper } from "./FollowingList.style";
 
 const FollowingList = () => {
   const username = new URLSearchParams(location.search).get("username");
@@ -19,13 +19,15 @@ const FollowingList = () => {
 
   return (
     <Container>
-      <UserList
-        users={results}
-        isFetchingNextPage={isFetchingNextPage}
-        onIntersect={handleIntersect}
-        follow={follow}
-        refetch={refetch}
-      ></UserList>
+      <ContentWrapper>
+        <UserList
+          users={results}
+          isFetchingNextPage={isFetchingNextPage}
+          onIntersect={handleIntersect}
+          follow={follow}
+          refetch={refetch}
+        ></UserList>
+      </ContentWrapper>
     </Container>
   );
 };

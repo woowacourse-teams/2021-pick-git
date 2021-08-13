@@ -4,6 +4,12 @@ export const LAYOUT = {
   COMMENT_INPUT_HEIGHT: "3.625rem",
 };
 
+export const PAGE_WIDTH = {
+  TABLET: "425px",
+  LAPTOP: "640px",
+  DESKTOP: "860px",
+};
+
 export const LayoutInPx = {
   HEADER_HEIGHT: 58,
   PAGE_MARGIN_TOP: 74,
