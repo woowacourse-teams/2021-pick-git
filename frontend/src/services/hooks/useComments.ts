@@ -100,7 +100,6 @@ const useComments = (selectedPostId: Post["id"]) => {
     }
 
     await mutateDeleteComment({ postId, commentId });
-
     const newCommentsPages = [...infiniteCommentsData.pages];
     const targetPage = newCommentsPages.find((page) => page.find((comment) => comment.id === commentId));
     const targetItemIndex = targetPage?.findIndex((comment) => comment.id === commentId);

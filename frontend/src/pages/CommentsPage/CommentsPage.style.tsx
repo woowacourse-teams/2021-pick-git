@@ -152,6 +152,8 @@ export const CommentTextAreaWrapper = styled.div`
   ${setTabletMediaQuery`
     width: ${PAGE_WIDTH.TABLET};
     margin: 0 auto;
+<<<<<<< HEAD
+=======
   `}
 
   ${setLaptopMediaQuery`
@@ -162,7 +164,27 @@ export const CommentTextAreaWrapper = styled.div`
   ${setDesktopMediaQuery`
     width: ${PAGE_WIDTH.DESKTOP};
     margin: 0 auto;
+  `} /* ${setTabletMediaQuery`
+    padding: 0 3.5rem;
+    border: none;
+>>>>>>> ee70067 ([#457] 네번째 데모에서 발견된 버그를 해결한다. (#458))
   `}
+
+  ${setLaptopMediaQuery`
+    width: ${PAGE_WIDTH.LAPTOP};
+    margin: 0 auto;
+  `}
+
+  ${setDesktopMediaQuery`
+<<<<<<< HEAD
+    width: ${PAGE_WIDTH.DESKTOP};
+    margin: 0 auto;
+  `}
+=======
+    padding: 0 24.5rem;
+    border: none;
+  `} */
+>>>>>>> ee70067 ([#457] 네번째 데모에서 발견된 버그를 해결한다. (#458))
 `;
 
 export const CommentTextArea = styled.textarea`
