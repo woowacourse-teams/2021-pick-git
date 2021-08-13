@@ -104,11 +104,12 @@ const useComments = (selectedPostId: Post["id"]) => {
     const targetPage = newCommentsPages.find((page) => page.find((comment) => comment.id === commentId));
     const targetItemIndex = targetPage?.findIndex((comment) => comment.id === commentId);
 
-    if (!targetItemIndex) {
+    if (targetItemIndex === undefined) {
       return;
     }
 
     targetPage?.splice(targetItemIndex, 1);
+    console.log(newCommentsPages);
     setCommentsPages(newCommentsPages);
   };
 

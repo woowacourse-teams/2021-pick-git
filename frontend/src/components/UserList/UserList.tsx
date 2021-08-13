@@ -11,7 +11,8 @@ import useFollow from "../../services/hooks/useFollow";
 import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
 import Avatar from "../@shared/Avatar/Avatar";
 import InfiniteScrollContainer from "../@shared/InfiniteScrollContainer/InfiniteScrollContainer";
-import { Button, Empty, NameTag, List, ButtonLoader, ButtonSpinner } from "./UserList.style";
+import { Spinner } from "../@shared/Loader/Loader.style";
+import { Button, Empty, NameTag, List, ButtonLoader, ButtonSpinnerWrapper } from "./UserList.style";
 
 export interface Props {
   isFetchingNextPage: boolean;
@@ -59,7 +60,9 @@ const UserList = ({ isFetchingNextPage, onIntersect, users, follow, refetch }: P
       return (
         <ButtonLoader type="button" follow={isFollowLoading}>
           {isFollowLoading ? "팔로우" : "팔로우 취소"}
-          <ButtonSpinner size="1rem" />
+          <ButtonSpinnerWrapper>
+            <Spinner size="1rem" />
+          </ButtonSpinnerWrapper>
         </ButtonLoader>
       );
     }
