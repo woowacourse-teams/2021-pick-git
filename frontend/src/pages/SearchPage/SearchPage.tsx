@@ -54,6 +54,10 @@ const SearchPage = () => {
       return <Empty>검색결과를 표시할 수 없습니다.</Empty>;
     }
 
+    if (userSearchResults.length === 0) {
+      return <Empty>일치하는 계정이 없습니다.</Empty>;
+    }
+
     return (
       <UserList
         users={userSearchResults}
@@ -77,6 +81,8 @@ const SearchPage = () => {
           </Empty>
         ) : isPostSearchError ? (
           <Empty>검색결과를 표시할 수 없습니다.</Empty>
+        ) : postSearchResults?.pages.length === 0 ? (
+          <Empty>게시물이 없습니다.</Empty>
         ) : (
           <GridFeed
             feedPagePath={PAGE_URL.SEARCH_RESULT_FEED("tags")}
