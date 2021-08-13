@@ -34,9 +34,19 @@ class SourceVisitorTest {
         assertThat(actual).isEqualTo(FileVisitResult.CONTINUE);
     }
 
-    @DisplayName("package name을 추출한다.")
+    @DisplayName("test 폴더인 경우 무시하고 탐색한다.")
     @Test
-    void visitFile_pakcageName() throws IOException, URISyntaxException {
+    void preVisitDirectory_testDirectory() throws IOException, URISyntaxException {
+        String uri = getClass().getResource(".").toURI().toASCIIString();
+        Path file = Path.of(new URI(uri.substring(0, uri.indexOf("test") + 4)));
+        FileVisitResult actual = sourceVisitor.preVisitDirectory(file, null);
+
+        assertThat(actual).isEqualTo(FileVisitResult.SKIP_SUBTREE);
+    }
+
+    @DisplayName(".java 파일에서 package name을 추출한다.")
+    @Test
+    void visitFile_javaFile() throws IOException, URISyntaxException {
         String fileName = getClass().getSimpleName();
         String src =
             Objects.requireNonNull(getClass().getResource(".")).toURI() + fileName + ".class";
@@ -51,7 +61,7 @@ class SourceVisitorTest {
         );
     }
 
-    @DisplayName(".class 파일이 아니라면 무시한다")
+    @DisplayName(".java 파일이 아니라면 무시한다")
     @Test
     void visitFile_otherFiles() throws IOException {
         Path file = createTempFile(".tmp");

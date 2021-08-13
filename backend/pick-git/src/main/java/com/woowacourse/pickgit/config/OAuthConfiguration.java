@@ -53,8 +53,7 @@ public class OAuthConfiguration implements WebMvcConfigurer {
     public List<String> parseClassesNames() {
         String startsWith = getClass().getCanonicalName().split("\\.")[0];
 
-        PackageScanner packageScanner =
-            new PackageScanner("com.woowacourse.pickgit", new SourceVisitor(startsWith));
+        PackageScanner packageScanner = new PackageScanner(new SourceVisitor(startsWith));
         return packageScanner.getAllClassNames();
     }
 
@@ -80,11 +79,11 @@ public class OAuthConfiguration implements WebMvcConfigurer {
 
         AutoAuthorizationInterceptorRegister autoAuthorizationInterceptorRegister =
             AutoAuthorizationInterceptorRegister.builder()
-                .storageForRegisterTypes(getStorageForRegisterTypes())
-                .authenticationInterceptor(authenticationInterceptor)
-                .ignoreAuthenticationInterceptor(ignoreAuthenticationInterceptor)
-                .uriParser(getUriParser())
-                .build();
+            .storageForRegisterTypes(getStorageForRegisterTypes())
+            .authenticationInterceptor(authenticationInterceptor)
+            .ignoreAuthenticationInterceptor(ignoreAuthenticationInterceptor)
+            .uriParser(getUriParser())
+            .build();
 
         autoAuthorizationInterceptorRegister.execute();
         ignoreAuthenticationInterceptor

@@ -1,4 +1,5 @@
 import styled, { css } from "styled-components";
+import { Z_INDEX } from "../../../constants/layout";
 import { bottomToBottom } from "../../@styled/keyframes";
 
 export const Container = styled.div<{ snackbarDuration: number } & React.CSSProperties>`
@@ -11,6 +12,7 @@ export const Container = styled.div<{ snackbarDuration: number } & React.CSSProp
   bottom: ${({ bottom }) => bottom};
   opacity: 0;
   transform: translateX(-50%) translateY(50%);
+  z-index: ${Z_INDEX.HIGH};
 
   min-width: 20rem;
   height: 2.3rem;

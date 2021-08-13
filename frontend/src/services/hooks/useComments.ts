@@ -3,14 +3,17 @@ import { useContext, useEffect } from "react";
 import { InfiniteData, useQueryClient } from "react-query";
 import { CommentData, Post } from "../../@types";
 import { LIMIT } from "../../constants/limits";
+import { UNKNOWN_ERROR_MESSAGE } from "../../constants/messages";
 import { QUERY } from "../../constants/queries";
+import SnackBarContext from "../../contexts/SnackbarContext";
 import UserContext from "../../contexts/UserContext";
-import { handleHTTPError } from "../../utils/error";
-import { isHttpErrorStatus } from "../../utils/typeGuard";
+import { getAPIErrorMessage, getClientErrorMessage, handleClientError, handleHTTPError } from "../../utils/error";
+import { isClientErrorCode, isHttpErrorStatus } from "../../utils/typeGuard";
 import { useAddPostCommentMutation, useDeletePostCommentMutation, usePostCommentsQuery } from "../queries";
 
 const useComments = (selectedPostId: Post["id"]) => {
   const { logout } = useContext(UserContext);
+  const { pushSnackbarMessage } = useContext(SnackBarContext);
   const {
     data: infiniteCommentsData,
     isLoading,
@@ -29,7 +32,7 @@ const useComments = (selectedPostId: Post["id"]) => {
     if (!error) return;
 
     if (axios.isAxiosError(error)) {
-      const { status } = error.response ?? {};
+      const { status, data } = error.response ?? {};
 
       if (status && isHttpErrorStatus(status)) {
         handleHTTPError(status, {
@@ -38,6 +41,21 @@ const useComments = (selectedPostId: Post["id"]) => {
             queryClient.refetchQueries(QUERY.GET_POST_COMMENTS, { active: true });
           },
         });
+      }
+
+      pushSnackbarMessage(data ? getAPIErrorMessage(data.errorCode) : UNKNOWN_ERROR_MESSAGE);
+    } else {
+      const { message } = error;
+
+      if (isClientErrorCode(message)) {
+        handleClientError(message, {
+          noAccessToken: () => {
+            pushSnackbarMessage(getClientErrorMessage(message));
+            logout();
+          },
+        });
+      } else {
+        pushSnackbarMessage(UNKNOWN_ERROR_MESSAGE);
       }
     }
   };
@@ -86,7 +104,7 @@ const useComments = (selectedPostId: Post["id"]) => {
     const targetPage = newCommentsPages.find((page) => page.find((comment) => comment.id === commentId));
     const targetItemIndex = targetPage?.findIndex((comment) => comment.id === commentId);
 
-    if (!targetItemIndex) {
+    if (targetItemIndex === undefined) {
       return;
     }
 

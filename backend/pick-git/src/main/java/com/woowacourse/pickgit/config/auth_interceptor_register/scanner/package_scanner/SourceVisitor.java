@@ -10,15 +10,15 @@ import java.util.List;
 
 public class SourceVisitor implements FileVisitor<Path> {
 
-    private final String basePackage;
+    private final String startsWith;
     private final List<String> classPaths;
 
-    public SourceVisitor(String basePackage) {
-        this(basePackage, new ArrayList<>());
+    public SourceVisitor(String startsWith) {
+        this(startsWith, new ArrayList<>());
     }
 
-    public SourceVisitor(String basePackage, List<String> classPaths) {
-        this.basePackage = basePackage;
+    public SourceVisitor(String startsWith, List<String> classPaths) {
+        this.startsWith = startsWith;
         this.classPaths = classPaths;
     }
 
@@ -30,6 +30,9 @@ public class SourceVisitor implements FileVisitor<Path> {
     public FileVisitResult preVisitDirectory(
         Path dir, BasicFileAttributes attrs
     ) throws IOException {
+        if (dir.getFileName().toString().contains("test")) {
+            return FileVisitResult.SKIP_SUBTREE;
+        }
         return FileVisitResult.CONTINUE;
     }
 
@@ -40,7 +43,7 @@ public class SourceVisitor implements FileVisitor<Path> {
         }
 
         String classSource = file.toUri().toString();
-        int index = classSource.indexOf(basePackage);
+        int index = classSource.indexOf(startsWith);
         if (index == -1) {
             return FileVisitResult.CONTINUE;
         }

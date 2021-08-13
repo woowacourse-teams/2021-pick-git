@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { Spinner } from "../@shared/Loader/Loader.style";
 
 export const List = styled.li`
   display: flex;
@@ -41,13 +40,19 @@ export const NameTag = styled(Link)`
 `;
 
 export const ButtonLoader = styled(Button)`
+  height: 2rem;
   opacity: 0.6;
   position: relative;
 `;
 
-export const ButtonSpinner = styled(Spinner)`
+export const ButtonSpinnerWrapper = styled.div`
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;

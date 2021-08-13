@@ -7,7 +7,7 @@ export const Container = styled(Page)<React.CSSProperties>`
 `;
 
 export const Empty = styled.div`
-  height: 100vh;
+  height: 80vh;
   display: flex;
   justify-content: center;
   align-items: center;
