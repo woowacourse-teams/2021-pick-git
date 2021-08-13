@@ -80,11 +80,11 @@ public class OAuthConfiguration implements WebMvcConfigurer {
 
         AutoAuthorizationInterceptorRegister autoAuthorizationInterceptorRegister =
             AutoAuthorizationInterceptorRegister.builder()
-            .storageForRegisterTypes(getStorageForRegisterTypes())
-            .authenticationInterceptor(authenticationInterceptor)
-            .ignoreAuthenticationInterceptor(ignoreAuthenticationInterceptor)
-            .uriParser(getUriParser())
-            .build();
+                .storageForRegisterTypes(getStorageForRegisterTypes())
+                .authenticationInterceptor(authenticationInterceptor)
+                .ignoreAuthenticationInterceptor(ignoreAuthenticationInterceptor)
+                .uriParser(getUriParser())
+                .build();
 
         autoAuthorizationInterceptorRegister.execute();
         ignoreAuthenticationInterceptor
