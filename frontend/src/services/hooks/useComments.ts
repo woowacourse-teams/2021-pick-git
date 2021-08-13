@@ -18,6 +18,7 @@ const useComments = (selectedPostId: Post["id"]) => {
     isError,
     isFetching,
     fetchNextPage,
+    refetch,
   } = usePostCommentsQuery(selectedPostId);
   const queryClient = useQueryClient();
 
@@ -47,7 +48,7 @@ const useComments = (selectedPostId: Post["id"]) => {
   }, [error]);
 
   const setCommentsPages = (commentsPages: CommentData[][]) => {
-    queryClient.setQueryData<InfiniteData<CommentData[]>>(QUERY.GET_POST_COMMENTS, (data) => {
+    queryClient.setQueryData<InfiniteData<CommentData[]>>([QUERY.GET_POST_COMMENTS, selectedPostId], (data) => {
       return {
         ...data,
         pages: commentsPages,
@@ -61,6 +62,7 @@ const useComments = (selectedPostId: Post["id"]) => {
     }
 
     const newCommentsPages = [...infiniteCommentsData.pages];
+
     const newComment = await mutateAddComment({ postId, commentContent: commentValue });
 
     const lastPage = newCommentsPages[newCommentsPages.length - 1];
@@ -79,16 +81,16 @@ const useComments = (selectedPostId: Post["id"]) => {
       return;
     }
 
-    try {
-      await mutateDeleteComment({ postId, commentId });
-    } catch (error) {}
+    await mutateDeleteComment({ postId, commentId });
     const newCommentsPages = [...infiniteCommentsData.pages];
-    const lastPage = newCommentsPages[newCommentsPages.length - 1];
+    const targetPage = newCommentsPages.find((page) => page.find((comment) => comment.id === commentId));
+    const targetItemIndex = targetPage?.findIndex((comment) => comment.id === commentId);
 
-    if (lastPage.length > 0) {
-      newCommentsPages[newCommentsPages.length - 1] = lastPage.filter((comment) => comment.id !== commentId);
+    if (!targetItemIndex) {
+      return;
     }
 
+    targetPage?.splice(targetItemIndex, 1);
     setCommentsPages(newCommentsPages);
   };
 

@@ -73,3 +73,7 @@ export const Empty = styled.div`
   justify-content: center;
   align-items: center;
 `;
+
+export const ContributionGraph = styled.img`
+  width: 100%;
+`;

@@ -40,6 +40,7 @@ import SnackBarContext from "../../contexts/SnackbarContext";
 import { FAILURE_MESSAGE, WARNING_MESSAGE } from "../../constants/messages";
 import useMessageModal from "../../services/hooks/@common/useMessageModal";
 import MessageModalPortal from "../../components/@layout/MessageModalPortal/MessageModalPortal";
+import { getTextElementsWithWithBr } from "../../utils/text";
 
 export interface Props {}
 
@@ -93,7 +94,7 @@ const CommentsPage = ({}: Props) => {
       <PostContentAuthorLink to={PAGE_URL.USER_PROFILE(selectedPost.authorName)}>
         {selectedPost.authorName}
       </PostContentAuthorLink>
-      {selectedPost.content}
+      {getTextElementsWithWithBr(selectedPost.content)}
     </PostContent>,
     <TagListWrapper key="tags">{tagListItems}</TagListWrapper>,
   ];
@@ -134,8 +135,8 @@ const CommentsPage = ({}: Props) => {
     }
 
     commentTextAreaRef.current.value = "";
-    containerRef.current.scroll({
-      top: containerRef.current.offsetHeight,
+    window.scroll({
+      top: window.outerHeight,
       behavior: "smooth",
     });
   };
@@ -165,7 +166,7 @@ const CommentsPage = ({}: Props) => {
           {comment.content}
         </CommentText>
       </CommentContentWrapper>
-      {currentUsername === comment.authorName && (
+      {(currentUsername === comment.authorName || selectedPost.authorName === currentUsername) && (
         <DeleteIconWrapper onClick={() => handleCommentDeleteClick(comment.id)}>
           <DeleteIcon />
         </DeleteIconWrapper>

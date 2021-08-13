@@ -3,6 +3,8 @@ import { Page } from "../../components/@styled/layout";
 
 export const Container = styled(Page)<React.CSSProperties>`
   background-color: ${({ theme }) => theme.color.white};
-  padding-left: 1.4375rem;
-  padding-right: 1.4375rem;
+`;
+
+export const ContentWrapper = styled.div`
+  padding: 1.4375rem;
 `;

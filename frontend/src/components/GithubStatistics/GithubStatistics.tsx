@@ -15,6 +15,7 @@ import {
   Empty,
   StatsWrapper,
   Heading,
+  ContributionGraph,
 } from "./GithubStatistics.style";
 
 const stats: Stats = {
@@ -90,7 +91,7 @@ const GithubStatistics = ({ username, githubStatisticQueryResult }: Props) => {
       <GithubStats />
       <Heading>Contribution Graph</Heading>
       <ContributionGraphWrapper>
-        <img
+        <ContributionGraph
           src={`https://ghchart.rshah.org/${color.primaryColor.slice(1)}/${username}`}
           alt={`${username}의 contribution`}
         />

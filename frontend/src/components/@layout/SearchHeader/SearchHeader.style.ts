@@ -1,23 +1,29 @@
 import styled from "styled-components";
+import { PAGE_WIDTH } from "../../../constants/layout";
 import { Header } from "../../@styled/layout";
 import { setDesktopMediaQuery, setLaptopMediaQuery, setTabletMediaQuery } from "../../@styled/mediaQueries";
 
-export const Container = styled(Header)<React.CSSProperties>`
+export const Container = styled(Header)<React.CSSProperties>``;
+
+export const HeaderContent = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0.4rem 1.4375rem;
 
   ${setTabletMediaQuery`
-    padding: 0.4rem 3.5rem;
+    width: ${PAGE_WIDTH.TABLET};
+    margin: 0 auto;  
   `}
 
   ${setLaptopMediaQuery`
-    padding: 0.4rem 12.5rem;
+    width: ${PAGE_WIDTH.LAPTOP};
+    margin: 0 auto;
   `}
 
   ${setDesktopMediaQuery`
-    padding: 0.4rem 24.5rem;
+    width: ${PAGE_WIDTH.DESKTOP};
+    margin: 0 auto;  
   `}
 `;
 

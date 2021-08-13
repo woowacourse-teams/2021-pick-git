@@ -1,4 +1,4 @@
-import { Container, Content, EmptySpace, StepLink } from "./StepHeader.style";
+import { Container, HeaderContent, Content, EmptySpace, StepLink } from "./StepHeader.style";
 import { GoBackIcon, GoForwardIcon } from "../../../assets/icons";
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
@@ -10,17 +10,19 @@ export interface Props extends React.HTMLAttributes<HTMLDivElement> {
 const StepHeader = ({ isNextStepExist, children, onGoBack, onNextStepClick }: Props) => {
   return (
     <Container>
-      <StepLink onClick={onGoBack}>
-        <GoBackIcon />
-      </StepLink>
-      <Content>{children}</Content>
-      {isNextStepExist ? (
-        <StepLink onClick={onNextStepClick}>
-          <GoForwardIcon />
+      <HeaderContent>
+        <StepLink onClick={onGoBack}>
+          <GoBackIcon />
         </StepLink>
-      ) : (
-        <EmptySpace />
-      )}
+        <Content>{children}</Content>
+        {isNextStepExist ? (
+          <StepLink onClick={onNextStepClick}>
+            <GoForwardIcon />
+          </StepLink>
+        ) : (
+          <EmptySpace />
+        )}
+      </HeaderContent>
     </Container>
   );
 };
