@@ -109,7 +109,6 @@ const useComments = (selectedPostId: Post["id"]) => {
     }
 
     targetPage?.splice(targetItemIndex, 1);
-    console.log(newCommentsPages);
     setCommentsPages(newCommentsPages);
   };
 
