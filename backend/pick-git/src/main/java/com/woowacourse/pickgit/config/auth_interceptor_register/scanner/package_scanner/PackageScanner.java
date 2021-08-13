@@ -33,7 +33,7 @@ public class PackageScanner {
             URI baseUri = Objects.requireNonNull(ClassLoader.getSystemResource(".")).toURI();
             String stringBaseUri = baseUri.normalize().getPath();
 
-            stringBaseUri = stringBaseUri.replaceAll("\\/test\\/", "/production/");
+            stringBaseUri = stringBaseUri.replaceAll("\\/test\\/", "/main/");
             String uri = basePackage.replaceAll("[.]", "/");
 
             return new File(stringBaseUri + uri).toPath();
