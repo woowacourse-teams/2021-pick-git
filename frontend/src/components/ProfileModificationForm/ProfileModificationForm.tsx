@@ -43,9 +43,6 @@ const ProfileModificationForm = ({ username, profileImageUrl, prevDescription, o
 
   return (
     <Container onSubmit={handleModificationSubmit}>
-      <button type="button" onClick={() => pushSnackbarMessage("test")}>
-        click
-      </button>
       <Heading>프로필 수정</Heading>
       <Label htmlFor="profile-image" avatarDiameter="5rem">
         <Avatar diameter="5rem" imageUrl={imageUrl} fontSize="1rem" name={username} />
