@@ -37,7 +37,7 @@ public class PackageScanner {
     }
 
     private List<Path> getBaseURLs() throws URISyntaxException {
-        if(getCurrentPath().endsWith(".jar")) {
+        if (getCurrentPath().endsWith(".jar")) {
             return getBaseURLsOnJar();
         }
 
@@ -58,7 +58,7 @@ public class PackageScanner {
 
             ArrayList<Path> urls = new ArrayList<>();
 
-            while(resources.hasMoreElements()) {
+            while (resources.hasMoreElements()) {
                 String url = resources.nextElement().getPath();
                 urls.add(Path.of(url));
             }
@@ -70,12 +70,20 @@ public class PackageScanner {
     }
 
     private String getCurrentPath() throws URISyntaxException {
-        return getClass()
+        String path = getClass()
             .getProtectionDomain()
             .getCodeSource()
             .getLocation()
             .toURI()
-            .getPath();
+            .toString();
+
+        path = path.replace("file:", "");
+        if (path.startsWith("jar")) {
+            path = path.replace("jar:", "");
+            path = path.substring(0, path.indexOf("!/"));
+        }
+
+        return path;
     }
 
 }

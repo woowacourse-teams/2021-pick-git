@@ -26,6 +26,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class OAuthConfiguration implements WebMvcConfigurer {
 
     private final OAuthService oAuthService;
+    private String PACKAGE;
 
     public OAuthConfiguration(OAuthService oAuthService) {
         this.oAuthService = oAuthService;
@@ -51,9 +52,9 @@ public class OAuthConfiguration implements WebMvcConfigurer {
     }
 
     public List<String> parseClassesNames() {
-        String startsWith = getClass().getCanonicalName().split("\\.")[0];
+        PACKAGE = "com.woowacourse.pickgit";
 
-        PackageScanner packageScanner = new PackageScanner(new SourceVisitor(startsWith));
+        PackageScanner packageScanner = new PackageScanner(PACKAGE, new SourceVisitor(PACKAGE));
         return packageScanner.getAllClassNames();
     }
 
