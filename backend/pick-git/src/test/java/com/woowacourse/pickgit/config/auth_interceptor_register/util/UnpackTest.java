@@ -22,7 +22,7 @@ class UnpackTest {
         URL systemResource = ClassLoader.getSystemResource("testjar.jar");
         File unpackedDirectory = null;
         try {
-            unpackedDirectory = Unpack.jar(new File(systemResource.getFile()));
+            unpackedDirectory = new Unpack().jar(new File(systemResource.getFile()));
             assertThat(unpackedDirectory).exists();
         } finally {
             Path unpackedDirectoryPath = unpackedDirectory.toPath();

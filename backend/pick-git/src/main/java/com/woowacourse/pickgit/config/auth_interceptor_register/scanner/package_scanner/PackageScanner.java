@@ -46,7 +46,7 @@ public class PackageScanner {
 
     private List<Path> getBaseURLsOnJar() throws URISyntaxException {
         String currentPath = getCurrentPath();
-        File jar = Unpack.jar(new File(currentPath));
+        File jar = new Unpack().jar(new File(currentPath));
         return List.of(jar.toPath());
     }
 
