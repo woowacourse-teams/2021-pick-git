@@ -3,6 +3,7 @@ package com.woowacourse.pickgit.acceptance.tag;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import com.woowacourse.pickgit.acceptance.AcceptanceTest;
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
@@ -27,14 +28,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
-@Import(InfrastructureTestConfiguration.class)
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
-@ActiveProfiles("test")
-class TagAcceptanceTest {
-
-    @LocalServerPort
-    private int port;
+class TagAcceptanceTest extends AcceptanceTest {
 
     @MockBean
     private OAuthClient oAuthClient;
@@ -44,7 +38,6 @@ class TagAcceptanceTest {
 
     @BeforeEach
     void setUp() {
-        RestAssured.port = port;
         OAuthTokenResponse tokenResponse = 로그인_되어있음();
         accessToken = tokenResponse.getToken();
     }
