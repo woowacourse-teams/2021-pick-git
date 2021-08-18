@@ -7,7 +7,7 @@ import com.woowacourse.pickgit.config.auth_interceptor_register.register_type.Re
 import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.ControllerScanner;
 import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.ForGuestScanner;
 import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.ForLoginUserScanner;
-import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.MethodMapper;
+import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.HttpMethodMapper;
 import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.data_structure.MergedInterceptorParameterByMethod;
 import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.data_structure.InterceptorParameter;
 import java.lang.reflect.Method;
@@ -134,11 +134,11 @@ public class UriParser {
 
 
     private List<String> parseUrlsFromMethod(Method method) {
-        return MethodMapper.extractMappingValues(method);
+        return HttpMethodMapper.extractMappingValues(method);
     }
 
     private HttpMethod parseHttpMethod(Method method) {
-        return MethodMapper.findHttpMethodByControllerMethod(method);
+        return HttpMethodMapper.findHttpMethodByControllerMethod(method);
     }
 
     private String createUri(String... urlPieces) {
