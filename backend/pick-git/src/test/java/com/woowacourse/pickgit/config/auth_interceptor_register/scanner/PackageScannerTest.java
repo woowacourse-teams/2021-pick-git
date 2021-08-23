@@ -15,7 +15,7 @@ class PackageScannerTest {
     @Test
     void getAllClassNames_extractControllerJavaFilesName_Success() throws URISyntaxException {
         PackageScanner packageScanner =
-            new PackageScanner("com.woowacourse.pickgit", new SourceVisitor("com"));
+            new PackageScanner("com.woowacourse.pickgit");
         List<String> allClassNames = packageScanner.getAllClassNames();
 
         assertThat(allClassNames).isNotEmpty();

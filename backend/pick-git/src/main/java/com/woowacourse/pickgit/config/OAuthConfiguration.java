@@ -54,7 +54,7 @@ public class OAuthConfiguration implements WebMvcConfigurer {
     public List<String> parseClassesNames() {
         PACKAGE = "com.woowacourse.pickgit";
 
-        PackageScanner packageScanner = new PackageScanner(PACKAGE, new SourceVisitor(PACKAGE));
+        PackageScanner packageScanner = new PackageScanner(PACKAGE);
         return packageScanner.getAllClassNames();
     }
 
