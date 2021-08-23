@@ -54,7 +54,7 @@ public class DatabaseCleaner implements InitializingBean {
 
         for (String tableName : tableNames) {
             statement.executeUpdate("TRUNCATE TABLE " + tableName);
-            statement.executeUpdate("ALTER TABLE " + tableName + " ALTER COLUMN ID RESTART WITH 1");
+            statement.executeUpdate("ALTER TABLE " + tableName + " ALTER COLUMN id RESTART WITH 1");
         }
 
         statement.executeUpdate("SET REFERENTIAL_INTEGRITY TRUE");
