@@ -4,6 +4,7 @@ import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.woowacourse.pickgit.acceptance.AcceptanceTest;
 import com.woowacourse.pickgit.common.request_builder.PickGitRequest;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
@@ -29,22 +30,13 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@Import(InfrastructureTestConfiguration.class)
-@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
-@ActiveProfiles("test")
-public class PostAcceptanceTest_searchPost {
+class PostAcceptanceTest_searchPost extends AcceptanceTest {
 
     private List<PostResponse> allPostsWithUser;
     private List<PostResponse> allPostsWithGuest;
 
-    @LocalServerPort
-    private int port;
-
     @BeforeEach
     void setUp() {
-        RestAssured.port = port;
-
         List<String[]> tags = List.of(
             new String[]{"tag1", "tag2"},
             new String[]{"tag1"},

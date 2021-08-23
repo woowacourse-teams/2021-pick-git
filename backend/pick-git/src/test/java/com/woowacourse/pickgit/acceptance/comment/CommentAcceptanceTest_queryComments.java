@@ -3,6 +3,7 @@ package com.woowacourse.pickgit.acceptance.comment;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.woowacourse.pickgit.acceptance.AcceptanceTest;
 import com.woowacourse.pickgit.comment.domain.CommentRepository;
 import com.woowacourse.pickgit.comment.presentation.dto.response.CommentResponse;
 import com.woowacourse.pickgit.common.request_builder.PickGitRequest;
@@ -31,13 +32,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.DigestUtils;
 
-@Import(InfrastructureTestConfiguration.class)
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-public class CommentAcceptanceTest_queryComments {
-
-    @LocalServerPort
-    int port;
+public class CommentAcceptanceTest_queryComments extends AcceptanceTest {
 
     @Autowired
     private PostRepository postRepository;
@@ -50,7 +45,6 @@ public class CommentAcceptanceTest_queryComments {
 
     @BeforeEach
     void setUp() {
-        RestAssured.port = port;
         postRepository.deleteAll();
         commentRepository.deleteAll();
         userRepository.deleteAll();

@@ -4,6 +4,7 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
+import com.woowacourse.pickgit.acceptance.AcceptanceTest;
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
@@ -42,11 +43,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
-@Import(InfrastructureTestConfiguration.class)
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
-@ActiveProfiles("test")
-class PostAcceptanceTest {
+class PostAcceptanceTest extends AcceptanceTest {
 
     private static final String ANOTHER_USERNAME = "pick-git-login";
     private static final String USERNAME = "jipark3";
@@ -58,13 +55,8 @@ class PostAcceptanceTest {
     @MockBean
     private OAuthClient oAuthClient;
 
-    @LocalServerPort
-    int port;
-
     @BeforeEach
     void setUp() {
-        RestAssured.port = port;
-
         githubRepoUrl = "https://github.com/woowacourse-teams/2021-pick-git";
         List<String> tags = List.of("java", "spring");
         content = "this is content";
