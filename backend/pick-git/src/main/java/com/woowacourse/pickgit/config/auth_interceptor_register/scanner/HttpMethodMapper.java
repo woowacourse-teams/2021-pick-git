@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
-public enum MethodMapper {
+public enum HttpMethodMapper {
     GET(GetMapping.class, HttpMethod.GET,
         method -> List.of(method.getAnnotation(GetMapping.class).value())),
     POST(PostMapping.class, HttpMethod.POST,
@@ -26,7 +26,7 @@ public enum MethodMapper {
     private final HttpMethod httpMethod;
     private final Function<Method, List<String>> extractValues;
 
-    MethodMapper(
+    HttpMethodMapper(
         Class<? extends Annotation> mappingAnnotation,
         HttpMethod httpMethod,
         Function<Method, List<String>> extractValues

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
-class MethodMapperTest {
+class HttpMethodMapperTest {
 
     @DisplayName("메서드에 매핑된 HttpMethod를 추출한다 - 성공")
     @ParameterizedTest
@@ -30,7 +30,7 @@ class MethodMapperTest {
         HttpMethod expected
     ) throws NoSuchMethodException {
         Method method = classToken.getMethod(methodName);
-        HttpMethod httpMethod = MethodMapper.findHttpMethodByControllerMethod(method);
+        HttpMethod httpMethod = HttpMethodMapper.findHttpMethodByControllerMethod(method);
 
         assertThat(httpMethod).isEqualTo(expected);
     }
@@ -49,7 +49,7 @@ class MethodMapperTest {
     void findHttpMethodByControllerMethod_ExtractMappedHttpMethod_Fail() throws NoSuchMethodException {
         Method method = ClassFour.class.getMethod("test1");
 
-        assertThatThrownBy(() -> MethodMapper.findHttpMethodByControllerMethod(method))
+        assertThatThrownBy(() -> HttpMethodMapper.findHttpMethodByControllerMethod(method))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -62,7 +62,7 @@ class MethodMapperTest {
         Class<? extends Annotation> expected
     ) throws NoSuchMethodException {
         Method method = classToken.getMethod(methodName);
-        Class<? extends Annotation> methodMapping = MethodMapper
+        Class<? extends Annotation> methodMapping = HttpMethodMapper
             .findAnnotatedHttpMethodAnnotation(method);
 
         assertThat(methodMapping).isEqualTo(expected);
@@ -82,7 +82,7 @@ class MethodMapperTest {
     void findAnnotatedHttpMethodAnnotation_ExtractMappedHttpMethodAnnotation_Fail() throws NoSuchMethodException {
         Method method = ClassFour.class.getMethod("test1");
 
-        assertThatThrownBy(() -> MethodMapper.findAnnotatedHttpMethodAnnotation(method))
+        assertThatThrownBy(() -> HttpMethodMapper.findAnnotatedHttpMethodAnnotation(method))
             .isInstanceOf(IllegalArgumentException.class);
     }
 }
