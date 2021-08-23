@@ -3,6 +3,7 @@ package com.woowacourse.pickgit.acceptance.user;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
+import com.woowacourse.pickgit.acceptance.AcceptanceTest;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.common.request_builder.PickGitRequest;
@@ -29,30 +30,18 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
-@Import(InfrastructureTestConfiguration.class)
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
-@ActiveProfiles("test")
-class UserAcceptance_GetFollowingsAndFollowers {
+class UserAcceptance_GetFollowingsAndFollowers extends AcceptanceTest {
 
     private static final String FOLLOWINGS_API_URL =
         "/api/profiles/{username}/followings?page={page}&limit={limit}";
     private static final String FOLLOWERS_API_URL =
         "/api/profiles/{username}/followers?page={page}&limit={limit}";
 
-    @LocalServerPort
-    private int port;
-
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private UserService userService;
-
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-    }
 
     @DisplayName("로그인 - 특정 유저의 팔로잉 목록을 조회한다. (팔로잉 여부 true/false, 본인은 null)")
     @Test
