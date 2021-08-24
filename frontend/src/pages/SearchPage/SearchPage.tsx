@@ -1,16 +1,28 @@
 import { useState } from "react";
 
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
+import Chip from "../../components/@shared/Chip/Chip";
+import GridFeed from "../../components/@shared/GridFeed/GridFeed";
 import Tabs from "../../components/@shared/Tabs/Tabs";
-import SearchListUser from "../../components/SearchListUser/SearchListUser";
+import UserList from "../../components/UserList/UserList";
+import { PAGE_URL } from "../../constants/urls";
 import useFollow from "../../services/hooks/useFollow";
+import useSearchPostData from "../../services/hooks/useSearchPostData";
 import useSearchUserData from "../../services/hooks/useSearchUserData";
-import { Container, Empty } from "./SearchPage.style";
+import { Container, ContentWrapper, Empty, KeywordsWrapper } from "./SearchPage.style";
 
 const tabNames = ["계정", "태그"];
+const searchTypeIndex = {
+  tags: 1,
+};
+
+const isSearchTypeValid = (type: string | null): type is keyof typeof searchTypeIndex =>
+  type !== null && type in searchTypeIndex;
 
 const SearchPage = () => {
-  const [tabIndex, setTabIndex] = useState(0);
+  const type = new URLSearchParams(location.search).get("type");
+  const defaultTabIndex = isSearchTypeValid(type) ? searchTypeIndex[type] : 0;
+  const [tabIndex, setTabIndex] = useState(defaultTabIndex);
   const {
     results: userSearchResults,
     isError: isUserSearchError,
@@ -19,36 +31,82 @@ const SearchPage = () => {
     handleIntersect: handleUserSearchIntersect,
     refetch: userSearchRefetch,
   } = useSearchUserData();
+  const {
+    infinitePostsData: postSearchResults,
+    isError: isPostSearchError,
+    isLoading: isPostSearchLoading,
+    isFetchingNextPage: isPostSearchFetchingNextPage,
+    handleIntersect: handlePostSearchIntersect,
+    formattedKeyword: postSearchKeyword,
+  } = useSearchPostData("tags");
   const follow = useFollow();
 
-  const tabItems = tabNames.map((name, index) => ({ name, onTabChange: () => setTabIndex(index) }));
-  const tabContents = [
-    <SearchListUser
-      key="user"
-      users={userSearchResults}
-      isFetchingNextPage={isUserSearchFetchingNextPage}
-      onIntersect={handleUserSearchIntersect}
-      follow={follow}
-      refetch={userSearchRefetch}
-    />,
-    <Empty key="tag">서비스 준비중입니다.</Empty>,
-  ];
-
-  const Content = ({ tabIndex }: { tabIndex: number }) => {
+  const SearchUserResult = () => {
     if (isUserSearchLoading) {
-      return <PageLoading />;
+      return (
+        <Empty>
+          <PageLoading />
+        </Empty>
+      );
     }
 
     if (isUserSearchError) {
       return <Empty>검색결과를 표시할 수 없습니다.</Empty>;
     }
+    
+    if (userSearchResults.length === 0) {
+      return <Empty>일치하는 계정이 없습니다.</Empty>;
+    }
 
-    return tabContents[tabIndex];
+    return (
+      <UserList
+        users={userSearchResults}
+        isFetchingNextPage={isUserSearchFetchingNextPage}
+        onIntersect={handleUserSearchIntersect}
+        follow={follow}
+        refetch={userSearchRefetch}
+      />
+    );
+  };
+
+  const SearchPostResult = () => {
+    return (
+      <>
+        <KeywordsWrapper>
+          {postSearchKeyword.split(" ").map((keyword, index) => keyword && <Chip key={index}>{keyword}</Chip>)}
+        </KeywordsWrapper>
+        {isPostSearchLoading ? (
+          <Empty>
+            <PageLoading />
+          </Empty>
+        ) : isPostSearchError ? (
+          <Empty>검색결과를 표시할 수 없습니다.</Empty>
+        ) : postSearchResults?.pages.length === 0 ? (
+          <Empty>게시물이 없습니다.</Empty>
+        ) : (
+          <GridFeed
+            feedPagePath={PAGE_URL.SEARCH_RESULT_FEED("tags")}
+            infinitePostsData={postSearchResults}
+            isLoading={isPostSearchLoading}
+            isError={isPostSearchError}
+            isFetchingNextPage={isPostSearchFetchingNextPage}
+            handleIntersect={handlePostSearchIntersect}
+          />
+        )}
+      </>
+    );
+  };
+
+  const tabItems = tabNames.map((name, index) => ({ name, onTabChange: () => setTabIndex(index) }));
+  const tabContents = [<SearchUserResult key="user" />, <SearchPostResult key="posts" />];
+
+  const Content = ({ tabIndex }: { tabIndex: number }) => {
+    return <ContentWrapper>{tabContents[tabIndex]}</ContentWrapper>;
   };
 
   return (
     <Container>
-      <Tabs tabItems={tabItems} tabIndicatorKind="line" />
+      <Tabs tabItems={tabItems} defaultTabIndex={defaultTabIndex} tabIndicatorKind="line" />
       <Content tabIndex={tabIndex} />
     </Container>
   );

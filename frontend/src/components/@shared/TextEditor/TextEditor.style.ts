@@ -12,10 +12,11 @@ export const Container = styled.div<React.CSSProperties>`
 `;
 
 export const TextArea = styled.textarea<React.CSSProperties>`
-  ${({ width, height, fontSize }) => `
+  ${({ width, height, fontSize, lineHeight }) => `
     width: ${width ?? "100%"};
     height: ${height === "" ? "100%" : height};
     font-size: ${fontSize ?? "1rem"};
+    line-height: ${lineHeight ?? "initial"};
 `}
 
   height: 100%;

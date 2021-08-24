@@ -14,6 +14,8 @@ export const requestGetHomeFeedPosts = async (pageParam: number, accessToken: st
       }
     : {};
 
+  // const response = await axios.get<Post[]>("http://localhost:3001/posts", config);
+
   const response = await axios.get<Post[]>(API_URL.POSTS(pageParam, LIMIT.FEED_COUNT_PER_FETCH), config);
 
   return response.data;
@@ -47,7 +49,7 @@ export const requestAddPostLike = async (postId: Post["id"], accessToken: string
     throw customError.noAccessToken;
   }
 
-  const response = await axios.put<{ likesCount: number; liked: boolean }>(API_URL.POSTS_LIKES(postId), null, {
+  const response = await axios.put<{ likesCount: number; liked: boolean }>(API_URL.POST_LIKES(postId), null, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -73,7 +75,7 @@ export const requestDeletePostLike = async (postId: Post["id"], accessToken: str
     throw customError.noAccessToken;
   }
 
-  const response = await axios.delete<{ likesCount: number; liked: boolean }>(API_URL.POSTS_LIKES(postId), {
+  const response = await axios.delete<{ likesCount: number; liked: boolean }>(API_URL.POST_LIKES(postId), {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },

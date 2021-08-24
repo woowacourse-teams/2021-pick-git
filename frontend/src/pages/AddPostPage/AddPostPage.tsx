@@ -52,7 +52,6 @@ const AddPostPage = () => {
       key="repository-selector"
       setGithubRepositoryName={setGithubRepositoryName}
       goNextStep={goNextStep}
-      currentUsername={currentUsername}
     />,
     <PostContentUploader
       key="post-content-uploader"

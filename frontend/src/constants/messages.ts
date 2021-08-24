@@ -21,7 +21,8 @@ export const FAILURE_MESSAGE = {
   POST_TAG_LENGTH_LIMIT_EXCEEDED: `태그는 ${LIMIT.POST_TAG_LENGTH}자 이하로만 입력할 수 있습니다.`,
   POST_DUPLICATED_TAG_EXIST: "해당 태그와 중복된 태그가 이미 입력되어 있습니다.",
   POST_TAG_SPECIAL_SYMBOL_EXIST: "태그에는 -, _ 를 제외한 특수문자가 포함될 수 없습니다.",
-  POST_REPOSITORY_NOT_SELECTED: "리포지터리를 선택해주세요",
+  POST_REPOSITORY_NOT_SELECTED: "리포지터리를 선택해주세요.",
+  POST_REPOSITORY_NOT_LOADABLE: "리포지터리 목록을 불러올 수 없습니다.",
   POST_FILE_AND_CONTENT_EMPTY: "이미지와 글 모두 작성되지 않았습니다.",
   POST_FILE: "이미지를 추가해주세요.",
   COMMENT_CONTENT_MAX_LENGTH_EXCEEDED: `댓글은 ${LIMIT.COMMENT_LENGTH}자 이하로만 입력할 수 있습니다.`,
@@ -32,6 +33,10 @@ export const WARNING_MESSAGE = {
   POST_FILE_NOT_UPLOADED: "아무런 파일도 업로드 되지 않았습니다. 이대로 진행할까요?",
   POST_CONTENT_EMPTY: "글 내용이 비었습니다. 이대로 진행할까요?",
   POST_DELETE: "정말로 게시물을 삭제하시겠습니까?",
+  GITHUB_FOLLOWING: "깃허브 계정에서도 팔로우 하시겠습니까?",
+  GITHUB_UNFOLLOWING: "깃허브 계정에서도 팔로우 취소 하시겠습니까?",
+  COMMENT_DELETE: "정말로 댓글을 삭제하시겠습니까?",
+  NO_ONE_LIKE_POST: "해당 포스트에 좋아요를 누른 사람이 없습니다.",
 };
 
 export const REDIRECT_MESSAGE = {
@@ -56,6 +61,7 @@ export const API_ERROR_MESSAGE = {
 
 export const CLIENT_ERROR_MESSAGE = {
   C0001: "로그인이 만료되었습니다",
+  C0002: "파일을 읽을 수 없습니다. 다시 시도해주세요.",
 };
 
 export const UNKNOWN_ERROR_MESSAGE = "알 수 없는 에러가 발생하였습니다.";

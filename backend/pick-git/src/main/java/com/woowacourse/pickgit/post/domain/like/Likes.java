@@ -1,9 +1,13 @@
 package com.woowacourse.pickgit.post.domain.like;
 
+import static java.util.stream.Collectors.toList;
+
 import com.woowacourse.pickgit.exception.post.CannotUnlikeException;
 import com.woowacourse.pickgit.exception.post.DuplicatedLikeException;
+import com.woowacourse.pickgit.user.domain.User;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.FetchType;
@@ -49,5 +53,15 @@ public class Likes {
             throw new CannotUnlikeException();
         }
         likes.remove(like);
+    }
+
+    public List<User> getLikeUsers() {
+        return likes.stream()
+            .map(Like::getUser)
+            .collect(toList());
+    }
+
+    public List<Like> getLikes() {
+        return likes;
     }
 }

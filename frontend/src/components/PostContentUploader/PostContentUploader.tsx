@@ -62,8 +62,8 @@ const PostContentUploader = ({ isImageUploaderShown, content, setFiles, setConte
           height="100%"
           onChange={handlePostContentChange}
           value={content}
+          lineHeight="1.8rem"
           placeholder="내용을 작성해주세요..."
-          autoGrow
           maxLength={LIMIT.POST_CONTENT_MAX_LENGTH}
         />
       </TextEditorWrapper>

@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { useQueryClient } from "react-query";
 import axios from "axios";
 
@@ -7,10 +7,10 @@ import { FAILURE_MESSAGE, SUCCESS_MESSAGE, UNKNOWN_ERROR_MESSAGE } from "../../c
 import { QUERY } from "../../constants/queries";
 import SnackBarContext from "../../contexts/SnackbarContext";
 import UserContext from "../../contexts/UserContext";
-import { useProfileMutation } from "../../services/queries";
 import { getAPIErrorMessage, getClientErrorMessage, handleClientError, handleHTTPError } from "../../utils/error";
 import { isValidFileSize, isValidProfileDescription } from "../../utils/profileModification";
 import { isClientErrorCode, isHttpErrorStatus } from "../../utils/typeGuard";
+import { useProfileDescriptionMutation, useProfileImageMutation } from "../queries";
 
 const useProfileModificationForm = (
   username: string,
@@ -28,7 +28,30 @@ const useProfileModificationForm = (
   const queryClient = useQueryClient();
   const currentProfileQueryKey = [QUERY.GET_PROFILE, { isMyProfile: true, username }];
   const currentProfileQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
-  const { mutate, data, error, isLoading, isSuccess } = useProfileMutation();
+  const { mutateAsync: mutateImage, isLoading: isMutateImageLoading } = useProfileImageMutation();
+  const { mutateAsync: mutateDescription, isLoading: isMutateDescriptionLoading } = useProfileDescriptionMutation();
+
+  const setImageUrlQuery = (imageUrl: string) => {
+    if (!currentProfileQueryData) {
+      return;
+    }
+
+    queryClient.setQueryData<ProfileData>(currentProfileQueryKey, {
+      ...currentProfileQueryData,
+      imageUrl,
+    });
+  };
+
+  const setDescriptionQuery = (description: string) => {
+    if (!currentProfileQueryData) {
+      return;
+    }
+
+    queryClient.setQueryData<ProfileData>(currentProfileQueryKey, {
+      ...currentProfileQueryData,
+      description,
+    });
+  };
 
   const handleImageChange: React.ChangeEventHandler<HTMLInputElement> = ({ currentTarget: { files } }) => {
     if (!files) return;
@@ -44,54 +67,16 @@ const useProfileModificationForm = (
   };
 
   const handleDescriptionChange: React.ChangeEventHandler<HTMLTextAreaElement> = ({ target: { value } }) => {
-    setDescription(value);
-  };
-
-  const submitValidation = () => {
-    if (!image && initialValue.description === description) {
-      messageViewer?.(FAILURE_MESSAGE.NO_CONTENT_MODIFIED);
-
-      return false;
-    }
-
-    if (!isValidProfileDescription(description)) {
+    if (!isValidProfileDescription(value)) {
       messageViewer?.(FAILURE_MESSAGE.PROFILE_DESCRIPTION_MAX_LENGTH_EXCEEDED);
 
       return false;
     }
 
-    return true;
+    setDescription(value);
   };
 
-  const handleModificationSubmit: React.FormEventHandler<HTMLFormElement> = async (event) => {
-    event.preventDefault();
-
-    if (!submitValidation()) {
-      return;
-    }
-
-    mutate({ image, description });
-  };
-
-  const handleMutationResultFetch = () => {
-    if (!data || !currentProfileQueryData) {
-      return;
-    }
-
-    queryClient.setQueryData<ProfileData>(currentProfileQueryKey, {
-      ...currentProfileQueryData,
-      imageUrl: data.imageUrl,
-      description: data.description,
-    });
-
-    pushSnackbarMessage(SUCCESS_MESSAGE.SET_PROFILE);
-  };
-
-  const handleError = () => {
-    if (!error) {
-      return;
-    }
-
+  const handleError = (error: unknown) => {
     if (axios.isAxiosError(error)) {
       const { status, data } = error.response ?? {};
 
@@ -104,7 +89,11 @@ const useProfileModificationForm = (
       }
 
       pushSnackbarMessage(data ? getAPIErrorMessage(data.errorCode) : UNKNOWN_ERROR_MESSAGE);
-    } else {
+
+      return;
+    }
+
+    if (error instanceof Error) {
       const { message } = error;
 
       if (isClientErrorCode(message)) {
@@ -113,31 +102,50 @@ const useProfileModificationForm = (
             logout();
           },
         });
+
         pushSnackbarMessage(getClientErrorMessage(message));
       } else {
         pushSnackbarMessage(UNKNOWN_ERROR_MESSAGE);
       }
+
+      return;
     }
+
+    pushSnackbarMessage(UNKNOWN_ERROR_MESSAGE);
   };
 
-  useEffect(() => {
-    if (isSuccess) {
-      submitEffect?.();
+  const handleModificationSubmit: React.FormEventHandler<HTMLFormElement> = async (event) => {
+    event.preventDefault();
+
+    if (!image && initialValue.description === description) {
+      messageViewer?.(FAILURE_MESSAGE.NO_CONTENT_MODIFIED);
+
+      return;
     }
-  }, [isSuccess]);
 
-  useEffect(() => {
-    handleMutationResultFetch();
-  }, [data]);
+    try {
+      if (image) {
+        const response = await mutateImage({ image });
+        response && setImageUrlQuery(response.imageUrl);
+      }
 
-  useEffect(() => {
-    handleError();
-  }, [error]);
+      if (initialValue.description !== description) {
+        const response = await mutateDescription({ description });
+
+        setDescriptionQuery(response.description);
+      }
+
+      submitEffect?.();
+      pushSnackbarMessage(SUCCESS_MESSAGE.SET_PROFILE);
+    } catch (error) {
+      handleError(error);
+    }
+  };
 
   return {
     values: { image, imageUrl, description },
     handlers: { handleImageChange, handleDescriptionChange, handleModificationSubmit },
-    isLoading,
+    isLoading: isMutateImageLoading || isMutateDescriptionLoading,
   };
 };
 

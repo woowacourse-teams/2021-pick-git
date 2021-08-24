@@ -16,7 +16,6 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.responseH
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
@@ -29,6 +28,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.requestP
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -38,25 +38,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
-import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.exception.post.CannotUnlikeException;
-import com.woowacourse.pickgit.exception.post.CommentFormatException;
 import com.woowacourse.pickgit.exception.post.DuplicatedLikeException;
 import com.woowacourse.pickgit.post.application.PostService;
-import com.woowacourse.pickgit.post.application.dto.request.CommentRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostDeleteRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
-import com.woowacourse.pickgit.post.application.dto.response.CommentResponseDto;
+import com.woowacourse.pickgit.post.application.dto.request.SearchRepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
-import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDtos;
+import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponsesDto;
 import com.woowacourse.pickgit.post.presentation.PostController;
-import com.woowacourse.pickgit.post.presentation.dto.request.ContentRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
 import com.woowacourse.pickgit.post.presentation.dto.response.LikeResponse;
 import com.woowacourse.pickgit.post.presentation.dto.response.PostUpdateResponse;
@@ -80,9 +76,7 @@ import org.springframework.test.web.servlet.ResultActions;
 @ActiveProfiles("test")
 class PostControllerTest {
 
-    private static final String USERNAME = "jipark3";
     private static final String ACCESS_TOKEN = "testToken";
-    private static final String API_ACCESS_TOKEN = "oauth.access.token";
 
     @Autowired
     private MockMvc mockMvc;
@@ -112,8 +106,8 @@ class PostControllerTest {
 
         // when
         ResultActions perform = mockMvc.perform(multipart("/api/posts")
-            .file(FileFactory.getTestImage1())
-            .file(FileFactory.getTestImage2())
+            .file("images", "testImage1".getBytes())
+            .file("images", "testImage2".getBytes())
             .param(PickGit.GITHUB_REPO_URL, "https://github.com/bperhaps")
             .param(PickGit.CONTENT, "content")
             .param(PickGit.TAGS, new String[]{"tag1", "tag2"})
@@ -145,8 +139,8 @@ class PostControllerTest {
 
         // when
         ResultActions perform = mockMvc.perform(multipart("/api/posts")
-            .file(FileFactory.getTestImage1())
-            .file(FileFactory.getTestImage2())
+            .file("images", "testImage1".getBytes())
+            .file("images", "testImage2".getBytes())
             .param(PickGit.GITHUB_REPO_URL, "https://github.com/bperhaps")
             .param(PickGit.CONTENT, "content")
             .param(PickGit.TAGS, new String[]{"tag1", "tag2"}));
@@ -170,116 +164,56 @@ class PostControllerTest {
             .validateToken(null);
     }
 
-    @DisplayName("특정 Post에 Comment을 추가한다.")
+    @DisplayName("사용자는 Repository 목록을 가져올 수 있다.")
     @Test
-    void addComment_ValidContent_Success() throws Exception {
+    void userRepositories_LoginUser_Success() throws Exception {
         // given
-        LoginUser loginUser = new LoginUser("kevin", "token");
-        CommentResponseDto commentResponseDto = CommentResponseDto.builder()
-            .id(1L)
-            .profileImageUrl("kevin profile image url")
-            .authorName(loginUser.getUsername())
-            .content("test Comment")
-            .liked(false)
-            .build();
-        ContentRequest commentRequest = new ContentRequest("test Comment");
+        RepositoryResponsesDto responseDto = new RepositoryResponsesDto(List.of(
+            new RepositoryResponseDto("https://github.com/jipark3/pick", "pick"),
+            new RepositoryResponseDto("https://github.com/jipark3/git", "git")
+        ));
 
-        given(oAuthService.validateToken(anyString()))
+        given(oAuthService.validateToken(any()))
             .willReturn(true);
-        given(oAuthService.findRequestUserByToken(anyString()))
-            .willReturn(loginUser);
-        given(postService.addComment(any(CommentRequestDto.class)))
-            .willReturn(commentResponseDto);
+        given(oAuthService.findRequestUserByToken(any()))
+            .willReturn(new LoginUser("testUser", ACCESS_TOKEN));
+        given(postService.userRepositories(any(RepositoryRequestDto.class)))
+            .willReturn(responseDto);
 
-        String requestBody = objectMapper.writeValueAsString(commentRequest);
-        String responseBody = objectMapper.writeValueAsString(commentResponseDto);
+        String repositories = objectMapper
+            .writeValueAsString(responseDto.getRepositoryResponsesDto());
 
         // when
-        ResultActions perform = addCommentApi("/api/posts/{postId}/comments", 1L, requestBody);
+        ResultActions perform = mockMvc.perform(get("/api/github/repositories")
+            .header(HttpHeaders.AUTHORIZATION, "Bearer " + ACCESS_TOKEN)
+            .queryParam("page", "0")
+            .queryParam("limit", "50"));
 
         // then
         perform
             .andExpect(status().isOk())
-            .andExpect(content().string(responseBody));
+            .andExpect(content().string(repositories));
 
-        verify(postService, times(1)).addComment(any(CommentRequestDto.class));
+        verify(postService, times(1))
+            .userRepositories(any(RepositoryRequestDto.class));
 
-        // documentation
-        perform.andDo(document("comment-post",
+        //documentation
+        perform.andDo(document("post-repositories-loggedIn",
             getDocumentRequest(),
             getDocumentResponse(),
             requestHeaders(
-                headerWithName(HttpHeaders.AUTHORIZATION).description("bearer token")
-            ),
-            pathParameters(
-                parameterWithName("postId").description("포스트 id")
-            ),
-            requestFields(
-                fieldWithPath("content").type(STRING).description("댓글 내용")
+                headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer token")
             ),
             responseFields(
-                fieldWithPath("id").type(NUMBER).description("댓글 id"),
-                fieldWithPath("profileImageUrl").type(STRING).description("댓글 작성자 프로필 사진"),
-                fieldWithPath("authorName").type(STRING).description("작성자 이름"),
-                fieldWithPath("content").type(STRING).description("댓글 내용"),
-                fieldWithPath("liked").type(BOOLEAN).description("좋아요 여부")
+                fieldWithPath("[].html_url").type(STRING).description("레포지토리 주소"),
+                fieldWithPath("[].name").type(STRING).description("레포지토리 이름")
             )
         ));
     }
 
-    @DisplayName("특정 Post에 댓글 등록 실패한다. - 빈 Comment인 경우.")
+    @DisplayName("사용자는 Repository 목록을 검색할 수 있다. - 성공")
     @Test
-    void addComment_InValidContent_ExceptionThrown() throws Exception {
-        // given
-        ContentRequest commentRequest = new ContentRequest("");
-
-        LoginUser loginUser = new LoginUser("kevin", "token");
-        given(oAuthService.validateToken(anyString()))
-            .willReturn(true);
-        given(oAuthService.findRequestUserByToken(anyString()))
-            .willReturn(loginUser);
-        given(postService.addComment(any(CommentRequestDto.class)))
-            .willThrow(new CommentFormatException());
-
-        String requestBody = objectMapper.writeValueAsString(commentRequest);
-
-        // when
-        ResultActions perform = addCommentApi("/api/posts/{postId}/comments", 1L, requestBody);
-
-        // then
-        perform
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("errorCode").value("F0001"));
-
-        verify(postService, never()).addComment(any(CommentRequestDto.class));
-
-        // documentation
-        perform.andDo(document("comment-post-emptyContent",
-            getDocumentRequest(),
-            getDocumentResponse(),
-            requestHeaders(
-                headerWithName(HttpHeaders.AUTHORIZATION).description("bearer token")
-            ),
-            pathParameters(
-                parameterWithName("postId").description("포스트 id")
-            ),
-            responseFields(
-                fieldWithPath("errorCode").type(STRING).description("에러 코드")
-            )
-        ));
-    }
-
-    private ResultActions addCommentApi(String url, Long postId, String requestBody)
-        throws Exception {
-        return mockMvc.perform(post(url, postId)
-            .header(HttpHeaders.AUTHORIZATION, "Bearer test")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(requestBody));
-    }
-
-    @DisplayName("사용자는 Repository 목록을 가져올 수 있다.")
-    @Test
-    void showRepositories_LoginUser_Success() throws Exception {
+    void userSearchedRepositories_LoginUser_Success() throws Exception {
         // given
         LoginUser loginUser = new LoginUser("testUser", "at");
 
@@ -288,31 +222,37 @@ class PostControllerTest {
         given(oAuthService.findRequestUserByToken(any()))
             .willReturn(loginUser);
 
-        RepositoryResponseDtos responseDto = new RepositoryResponseDtos(List.of(
+        RepositoryResponsesDto responseDto = new RepositoryResponsesDto(List.of(
             new RepositoryResponseDto("pick", "https://github.com/jipark3/pick"),
-            new RepositoryResponseDto("git", "https://github.com/jipark3/git")
+            new RepositoryResponseDto("pick-git", "https://github.com/jipark3/pick-git")
         ));
-        String repositories = objectMapper.writeValueAsString(responseDto.getRepositoryResponseDtos());
+        String repositories = objectMapper.writeValueAsString(responseDto.getRepositoryResponsesDto());
 
-        given(postService.userRepositories(any(RepositoryRequestDto.class)))
+        given(postService.searchUserRepositories(any(SearchRepositoryRequestDto.class)))
             .willReturn(responseDto);
 
         // then
         ResultActions perform = mockMvc
-            .perform(get("/api/github/${userName}/repositories", USERNAME)
-                .header(HttpHeaders.AUTHORIZATION, API_ACCESS_TOKEN))
+            .perform(get("/api/github/search/repositories")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + ACCESS_TOKEN)
+                .param("keyword", "pick")
+                .param("page", "1")
+                .param("limit", "2")
+            )
             .andExpect(status().isOk())
             .andExpect(content().string(repositories));
 
         //documentation
-        perform.andDo(document("repositories-loggedIn",
+        perform.andDo(document("post-searchRepositories-loggedIn",
             getDocumentRequest(),
             getDocumentResponse(),
             requestHeaders(
                 headerWithName(HttpHeaders.AUTHORIZATION).description("bearer token")
             ),
-            pathParameters(
-                parameterWithName("userName").description("유저 이름")
+            requestParameters(
+                parameterWithName("keyword").description("검색 키워드"),
+                parameterWithName("page").description("page"),
+                parameterWithName("limit").description("limit")
             ),
             responseFields(
                 fieldWithPath("[].name").type(STRING).description("레포지토리 이름"),

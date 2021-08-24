@@ -1,0 +1,58 @@
+name: FRONTEND_PR_TEST
+on:
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  RUN_JEST:
+    name: RUN_JEST
+    runs-on: ubuntu-latest
+    strategy:
+    matrix:
+      node-version: [12.x, 14.x, 16.x]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: npm install yarn
+        run: npm install -g yarn
+
+      - name: yarn install
+        run: yarn
+
+      - name: run test
+        run: yarn test
+
+      - name: handle failure
+        uses: actions/github-script
+        with:
+          github-token: ${{github.token}}
+          script: |
+            const ref = "${{github.ref}}";
+            const pull_number = Number(ref.split("/")[2]);
+
+            await github.pulls.createReview({
+              ...context.repo,
+              pull_number,
+              body:"테스트에 성공했습니다.",
+              event: "APPROVE"
+            });
+        if: success()
+
+      - name: handle failure
+        uses: actions/github-script
+        with:
+          github-token: ${{github.token}}
+          script: |
+            const ref = "${{github.ref}}";
+            const pull_number = Number(ref.split("/")[2]);
+
+            await github.pulls.createReview({
+              ...context.repo,
+              pull_number,
+              body:"테스트에 실패했습니다.",
+              event: "REQUEST_CHANGES"
+            });
+        if: failure()
+

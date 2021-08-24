@@ -21,6 +21,12 @@ import SnackBarContext from "./contexts/SnackbarContext";
 import { SUCCESS_MESSAGE } from "./constants/messages";
 import EditPostPage from "./pages/EditPostPage/EditPostPage";
 import { PostEditStepContextProvider } from "./contexts/PostEditStepContext";
+import SearchPostResultPage from "./pages/SearchPostResultPage/SearchPostResultPage";
+import FollowingList from "./pages/FollowingUserListPage/FollowingList";
+import FollowerList from "./pages/FollowerList/FollowerList";
+import OneDepthStepHeader from "./components/OneDepthStepHeader/OneDepthStepHeader";
+import CommentsPage from "./pages/CommentsPage/CommentsPage";
+import PostLikePeoplePage from "./pages/PostLikePeoplePage/PostLikePeoplePage";
 
 const App = () => {
   const { currentUsername, login, logout } = useContext(UserContext);
@@ -47,13 +53,22 @@ const App = () => {
   return (
     <BrowserRouter>
       <Switch>
-        <Route exact path={[PAGE_URL.HOME, PAGE_URL.PROFILE, PAGE_URL.MY_PROFILE, PAGE_URL.USER_FEED]}>
+        <Route exact path={[PAGE_URL.HOME, PAGE_URL.PROFILE, PAGE_URL.MY_PROFILE, PAGE_URL.USER_FEED_BASE]}>
           <NavigationHeader />
+        </Route>
+        <Route exact path={PAGE_URL.FOLLOWINGS_BASE}>
+          <OneDepthStepHeader title="팔로잉 목록" />
+        </Route>
+        <Route exact path={PAGE_URL.FOLLOWERS_BASE}>
+          <OneDepthStepHeader title="팔로우 목록" />
+        </Route>
+        <Route exact path={PAGE_URL.SEARCH_RESULT_FEED_BASE}>
+          <OneDepthStepHeader title="검색결과" />
         </Route>
         <Route path={PAGE_URL.ADD_POST}>
           <PostAddStepHeader />
         </Route>
-        <Route path={PAGE_URL.SEARCH}>
+        <Route path={[PAGE_URL.SEARCH, PAGE_URL.POST_LIKE_PEOPLE]}>
           <SearchHeader />
         </Route>
       </Switch>
@@ -61,7 +76,7 @@ const App = () => {
         <Route exact path={[PAGE_URL.HOME, PAGE_URL.HOME_FEED]}>
           <HomeFeedPage />
         </Route>
-        <Route exact path={PAGE_URL.USER_FEED}>
+        <Route exact path={PAGE_URL.USER_FEED_BASE}>
           <UserFeedPage />
         </Route>
         <Route exact path={PAGE_URL.TAG_FEED_BASE}>
@@ -69,6 +84,9 @@ const App = () => {
         </Route>
         <Route exact path={PAGE_URL.SEARCH}>
           <SearchPage />
+        </Route>
+        <Route exact path={PAGE_URL.SEARCH_RESULT_FEED_BASE}>
+          <SearchPostResultPage />
         </Route>
         <Route exact path={PAGE_URL.LOGIN}>
           <LoginPage />
@@ -82,6 +100,12 @@ const App = () => {
         <Route path={PAGE_URL.PROFILE}>
           <ProfilePage isMyProfile={false} />
         </Route>
+        <Route path={PAGE_URL.FOLLOWINGS_BASE}>
+          <FollowingList />
+        </Route>
+        <Route path={PAGE_URL.FOLLOWERS_BASE}>
+          <FollowerList />
+        </Route>
         <Route path={PAGE_URL.ADD_POST}>
           <PostAddDataContextProvider>
             <AddPostPage />
@@ -91,6 +115,12 @@ const App = () => {
           <PostEditStepContextProvider>
             <EditPostPage />
           </PostEditStepContextProvider>
+        </Route>
+        <Route path={PAGE_URL.POST_COMMENTS}>
+          <CommentsPage />
+        </Route>
+        <Route path={PAGE_URL.POST_LIKE_PEOPLE}>
+          <PostLikePeoplePage />
         </Route>
         <Redirect to="/" />
       </Switch>

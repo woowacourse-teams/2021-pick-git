@@ -4,9 +4,16 @@ import static java.util.stream.Collectors.toList;
 
 import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
+import com.woowacourse.pickgit.config.auth_interceptor_register.ForLoginAndGuestUser;
+import com.woowacourse.pickgit.config.auth_interceptor_register.ForOnlyLoginUser;
 import com.woowacourse.pickgit.post.application.PostFeedService;
+import com.woowacourse.pickgit.post.application.dto.request.AuthUserForPostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.HomeFeedRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.SearchPostsRequestDto;
+import com.woowacourse.pickgit.post.application.dto.response.LikeUsersResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
+import com.woowacourse.pickgit.post.presentation.dto.request.SearchPostsRequest;
+import com.woowacourse.pickgit.post.presentation.dto.response.LikeUsersResponse;
 import com.woowacourse.pickgit.post.presentation.dto.response.PostResponse;
 import java.util.List;
 import java.util.function.Function;
@@ -29,6 +36,7 @@ public class PostFeedController {
         this.postFeedService = postFeedService;
     }
 
+    @ForLoginAndGuestUser
     @GetMapping("/posts")
     public ResponseEntity<List<PostResponse>> readHomeFeed(
         @Authenticated AppUser appUser,
@@ -42,6 +50,7 @@ public class PostFeedController {
         return ResponseEntity.ok(postResponses);
     }
 
+    @ForOnlyLoginUser
     @GetMapping("/posts/me")
     public ResponseEntity<List<PostResponse>> readMyFeed(
         @Authenticated AppUser appUser,
@@ -55,6 +64,7 @@ public class PostFeedController {
         return ResponseEntity.ok(postResponses);
     }
 
+    @ForLoginAndGuestUser
     @GetMapping("/posts/{username}")
     public ResponseEntity<List<PostResponse>> readUserFeed(
         @Authenticated AppUser appUser,
@@ -65,6 +75,26 @@ public class PostFeedController {
         HomeFeedRequestDto homeFeedRequestDto = new HomeFeedRequestDto(appUser, page, limit);
         List<PostResponseDto> postResponseDtos =
             postFeedService.userFeed(homeFeedRequestDto, username);
+        List<PostResponse> postResponses = createPostResponses(postResponseDtos);
+
+        return ResponseEntity.ok(postResponses);
+    }
+
+    @ForLoginAndGuestUser
+    @GetMapping("/search/posts")
+    public ResponseEntity<List<PostResponse>> searchPosts(
+        @Authenticated AppUser appUser,
+        SearchPostsRequest searchPostsByTagRequest
+    ) {
+        String type = searchPostsByTagRequest.getType();
+        String keyword = searchPostsByTagRequest.getKeyword();
+        int page = searchPostsByTagRequest.getPage();
+        int limit = searchPostsByTagRequest.getLimit();
+
+        SearchPostsRequestDto searchPostsRequestDto =
+            new SearchPostsRequestDto(type, keyword, page, limit, appUser);
+
+        List<PostResponseDto> postResponseDtos = postFeedService.search(searchPostsRequestDto);
         List<PostResponse> postResponses = createPostResponses(postResponseDtos);
 
         return ResponseEntity.ok(postResponses);

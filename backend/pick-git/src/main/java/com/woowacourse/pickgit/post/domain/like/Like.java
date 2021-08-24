@@ -44,7 +44,7 @@ public class Like {
         return post;
     }
 
-    private User getUser() {
+    public User getUser() {
         return user;
     }
 

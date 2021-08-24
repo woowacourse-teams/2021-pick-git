@@ -3,6 +3,7 @@ package com.woowacourse.pickgit.common.factory;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
+import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
 import java.util.List;
 
 public class UserFactory {
@@ -10,13 +11,22 @@ public class UserFactory {
     private UserFactory() {
     }
 
+    public static User user(String name) {
+        return createUser(null, name);
+    }
+
     public static User user(Long id, String name) {
         return createUser(id, name);
     }
 
-    public static User user(String name) {
-        return createUser(null, name);
+    public static User user(String name, String imageUrl) {
+        return createUser(null, name, imageUrl);
     }
+
+    public static User user(Long id, String name, String imageUrl) {
+        return createUser(id, name, imageUrl);
+    }
+
 
     public static User user() {
         return createUser(null, "testUser");
@@ -26,6 +36,14 @@ public class UserFactory {
         return MockUser.builder()
             .id(id)
             .name(name)
+            .build();
+    }
+
+    public static User createUser(Long id, String name, String imageUrl) {
+        return MockUser.builder()
+            .id(id)
+            .name(name)
+            .image(imageUrl)
             .build();
     }
 
@@ -97,6 +115,13 @@ public class UserFactory {
             .build();
     }
 
+    public static ContributionRequestDto mockContributionRequestDto() {
+        return ContributionRequestDto.builder()
+            .accessToken("oauth.access.token")
+            .username("testUser")
+            .build();
+    }
+
     public static ContributionResponseDto mockContributionResponseDto() {
         return ContributionResponseDto.builder()
             .starsCount(11)
@@ -108,11 +133,11 @@ public class UserFactory {
     }
 
     public static List<User> mockSearchUsers() {
-        User user1 = user( "binghe");
-        User user2 = user( "bing");
-        User user3 = user( "jinbinghe");
-        User user4 = user( "bbbbinghe");
-        User user5 = user( "bingbing");
+        User user1 = user("binghe");
+        User user2 = user("bing");
+        User user3 = user("jinbinghe");
+        User user4 = user("bbbbinghe");
+        User user5 = user("bingbing");
 
         return List.of(
             user1, user2, user3, user4, user5
@@ -125,6 +150,43 @@ public class UserFactory {
         User user3 = user(3L,"jinbinghe");
         User user4 = user(4L,"bbbbinghe");
         User user5 = user(5L,"bingbing");
+
+        return List.of(
+            user1, user2, user3, user4, user5
+        );
+    }
+
+    public static List<User> mockLikeUsersIncludingAuthor() {
+        User user1 = user("user1");
+        User user2 = user("user2");
+        User user3 = user("user3");
+        User user4 = user("user4");
+        User user5 = user("user5");
+        User author = user("author");
+
+        return List.of(
+            user1, user2, user3, user4, user5, author
+        );
+    }
+
+    public static List<User> mockLikeUsers() {
+        User user1 = user("user1", "http://img.com");
+        User user2 = user("user2", "http://img.com");
+        User user3 = user("user3", "http://img.com");
+        User user4 = user("user4", "http://img.com");
+        User user5 = user("user5", "http://img.com");
+
+        return List.of(
+            user1, user2, user3, user4, user5
+        );
+    }
+
+    public static List<User> mockLikeUsersWithId() {
+        User user1 = user(1L, "user1", "http://img.com");
+        User user2 = user(2L, "user2", "http://img.com");
+        User user3 = user(3L, "user3", "http://img.com");
+        User user4 = user(4L, "user4", "http://img.com");
+        User user5 = user(5L, "user5", "http://img.com");
 
         return List.of(
             user1, user2, user3, user4, user5

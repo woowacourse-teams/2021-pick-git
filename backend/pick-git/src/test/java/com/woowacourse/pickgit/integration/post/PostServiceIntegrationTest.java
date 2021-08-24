@@ -4,9 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.woowacourse.pickgit.acceptance.AcceptanceTest;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
+import com.woowacourse.pickgit.comment.application.CommentService;
+import com.woowacourse.pickgit.comment.application.dto.request.CommentRequestDto;
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.PostFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
@@ -15,22 +18,18 @@ import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.post.CannotAddTagException;
 import com.woowacourse.pickgit.exception.post.CannotUnlikeException;
-import com.woowacourse.pickgit.exception.post.CommentFormatException;
 import com.woowacourse.pickgit.exception.post.DuplicatedLikeException;
 import com.woowacourse.pickgit.exception.post.PostNotBelongToUserException;
-import com.woowacourse.pickgit.exception.post.PostNotFoundException;
-import com.woowacourse.pickgit.exception.user.UserNotFoundException;
 import com.woowacourse.pickgit.post.application.PostService;
-import com.woowacourse.pickgit.post.application.dto.request.CommentRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostDeleteRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
-import com.woowacourse.pickgit.post.application.dto.response.CommentResponseDto;
+import com.woowacourse.pickgit.post.application.dto.request.SearchRepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
-import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDtos;
+import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponsesDto;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.user.domain.User;
@@ -38,9 +37,6 @@ import com.woowacourse.pickgit.user.domain.UserRepository;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -50,11 +46,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
-@Import(InfrastructureTestConfiguration.class)
-@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
-@SpringBootTest(webEnvironment = WebEnvironment.NONE)
-@ActiveProfiles("test")
-class PostServiceIntegrationTest {
+class PostServiceIntegrationTest extends AcceptanceTest {
+
     private static final String USERNAME = "jipark3";
     private static final String ACCESS_TOKEN = "oauth.access.token";
 
@@ -66,108 +59,9 @@ class PostServiceIntegrationTest {
 
     @Autowired
     private UserRepository userRepository;
-    
-    @DisplayName("게시물에 댓글을 정상 등록한다.")
-    @Test
-    void addComment_ValidContent_Success() {
-        User testUser = UserFactory.user("testUser");
-        User savedTestUser = userRepository.save(testUser);
 
-        User kevin = UserFactory.user("kevin");
-        User savedKevin = userRepository.save(kevin);
-
-        Post post = Post.builder()
-            .content("testContent")
-            .githubRepoUrl("https://github.com/bperhaps")
-            .author(savedTestUser)
-            .build();
-        Post savedPost = postRepository.save(post);
-
-        // when
-        CommentRequestDto commentRequestDto = CommentRequestDto.builder()
-            .userName("kevin")
-            .content("test comment")
-            .postId(savedPost.getId())
-            .build();
-
-        CommentResponseDto commentResponseDto = postService.addComment(commentRequestDto);
-
-        // then
-        assertThat(commentResponseDto.getAuthorName()).isEqualTo(savedKevin.getName());
-        assertThat(commentResponseDto.getContent()).isEqualTo("test comment");
-    }
-
-    @DisplayName("Post에 빈 Comment은 등록할 수 없다.")
-    @ParameterizedTest
-    @NullAndEmptySource
-    @ValueSource(strings = {" ", "  "})
-    void addComment_InvalidContent_ExceptionThrown(String content) {
-        User testUser = UserFactory.user("testUser");
-        User savedTestUser = userRepository.save(testUser);
-
-        User kevin = UserFactory.user("kevin");
-        User savedKevin = userRepository.save(kevin);
-
-        Post post = Post.builder()
-            .content("testContent")
-            .githubRepoUrl("https://github.com/bperhaps")
-            .author(savedTestUser)
-            .build();
-        Post savedPost = postRepository.save(post);
-
-        CommentRequestDto commentRequestDto = CommentRequestDto.builder()
-            .userName("kevin")
-            .content(content)
-            .postId(savedPost.getId())
-            .build();
-
-        // then
-        assertThatCode(() -> postService.addComment(commentRequestDto))
-            .isInstanceOf(CommentFormatException.class)
-            .extracting("errorCode")
-            .isEqualTo("F0002");
-    }
-
-    @DisplayName("존재하지 않는 Post에 Comment를 등록할 수 없다.")
-    @Test
-    void addComment_PostNotFound_ExceptionThrown() {
-        userRepository.save(UserFactory.user("kevin"));
-
-        // when
-        CommentRequestDto commentRequestDto = CommentRequestDto.builder()
-            .userName("kevin")
-            .content("content")
-            .postId(-1L)
-            .build();
-
-        // then
-        assertThatCode(() -> postService.addComment(commentRequestDto))
-            .isInstanceOf(PostNotFoundException.class)
-            .extracting("errorCode")
-            .isEqualTo("P0002");
-    }
-
-    @DisplayName("존재하지 않는 User는 Comment를 등록할 수 없다.")
-    @Test
-    void addComment_UserNotFound_ExceptionThrown() {
-        // given
-        Post post = Post.builder()
-            .build();
-        Post savedPost = postRepository.save(post);
-
-        // when
-        CommentRequestDto commentRequestDto = CommentRequestDto.builder()
-            .userName("anonymous")
-            .content("content")
-            .postId(savedPost.getId())
-            .build();
-
-        // then
-        assertThatCode(() -> postService.addComment(commentRequestDto))
-            .isInstanceOf(UserNotFoundException.class)
-            .extracting("errorCode")
-            .isEqualTo("U0001");
-    }
+    @Autowired
+    private CommentService commentService;
 
     @DisplayName("사용자는 게시물을 등록할 수 있다.")
     @Test
@@ -225,23 +119,20 @@ class PostServiceIntegrationTest {
     @Test
     void showRepositories_LoginUser_Success() {
         // given
-        RepositoryRequestDto requestDto = new RepositoryRequestDto(ACCESS_TOKEN, USERNAME);
+        RepositoryRequestDto requestDto = createRepositoryRequestDto(ACCESS_TOKEN, USERNAME);
 
         // when
-        RepositoryResponseDtos responseDto = postService.userRepositories(requestDto);
+        RepositoryResponsesDto responseDto = postService.userRepositories(requestDto);
 
         // then
-        assertThat(responseDto.getRepositoryResponseDtos()).hasSize(2);
+        assertThat(responseDto.getRepositoryResponsesDto()).hasSize(2);
     }
 
     @DisplayName("토큰이 유효하지 않은 경우 예외가 발생한다. - 500 예외")
     @Test
-    void showRepositories_InvalidAccessToken_401Exception() {
+    void showRepositories_InvalidAccessToken_500Exception() {
         // given
-        String invalidToken = "invalidToken";
-
-        RepositoryRequestDto requestDto =
-            new RepositoryRequestDto(invalidToken, USERNAME);
+        RepositoryRequestDto requestDto = createRepositoryRequestDto("invalidToken", USERNAME);
 
         // then
         assertThatThrownBy(() -> {
@@ -255,15 +146,57 @@ class PostServiceIntegrationTest {
     @Test
     void showRepositories_InvalidUsername_404Exception() {
         // given
-        String invalidUserName = "invalidUser";
-
-        RepositoryRequestDto requestDto =
-            new RepositoryRequestDto(ACCESS_TOKEN, invalidUserName);
+        RepositoryRequestDto requestDto = createRepositoryRequestDto(ACCESS_TOKEN, "invalidUser");
 
         // then
         assertThatThrownBy(() ->
             postService.userRepositories(requestDto)
         ).isInstanceOf(PlatformHttpErrorException.class)
+            .extracting("errorCode")
+            .isEqualTo("V0001");
+    }
+
+    private RepositoryRequestDto createRepositoryRequestDto(String token, String username) {
+        return RepositoryRequestDto.builder()
+            .token(token)
+            .username(username)
+            .page(0L)
+            .limit(50L)
+            .build();
+    }
+
+    @DisplayName("사용자는 Repository 목록을 검색해서 가져올 수 있다.")
+    @Test
+    void searchUserRepositories_LoginUser_Success() {
+        // given
+        SearchRepositoryRequestDto requestDto =
+            new SearchRepositoryRequestDto(
+                ACCESS_TOKEN, USERNAME, "woowa", 0, 2
+            );
+
+        // when
+        RepositoryResponsesDto repositoryResponsesDto = postService
+            .searchUserRepositories(requestDto);
+
+        // then
+        assertThat(repositoryResponsesDto.getRepositoryResponsesDto())
+            .hasSize(2);
+    }
+
+    @DisplayName("레포지토리 검색 시 토큰이 유효하지 않은 경우 예외가 발생한다. - 500 예외")
+    @Test
+    void searchUserRepositories_InvalidAccessToken_500Exception() {
+        // given
+        String invalidToken = "invalidToken";
+
+        SearchRepositoryRequestDto requestDto = new SearchRepositoryRequestDto(
+            invalidToken, USERNAME, "woowa", 0, 2
+        );
+
+        // then
+        assertThatThrownBy(() -> {
+            postService.searchUserRepositories(requestDto);
+        }).isInstanceOf(PlatformHttpErrorException.class)
             .extracting("errorCode")
             .isEqualTo("V0001");
     }
@@ -614,7 +547,7 @@ class PostServiceIntegrationTest {
             .postId(savedPost.getId())
             .build();
 
-        postService.addComment(request);
+        commentService.addComment(request);
 
         PostDeleteRequestDto deleteRequestDto = new PostDeleteRequestDto(loginUser,
             savedPost.getId());

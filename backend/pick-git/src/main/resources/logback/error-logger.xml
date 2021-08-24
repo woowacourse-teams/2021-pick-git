@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <included>
-  <property name="home" value="logs/"/>
+  <property name="home" value="logs/error/"/>
   <appender name="error-logger" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${home}error.log</file>
+    <filter class="ch.qos.logback.classic.filter.LevelFilter">
+      <level>ERROR</level>
+      <onMatch>ACCEPT</onMatch>
+      <onMismatch>DENY</onMismatch>
+    </filter>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <fileNamePattern>${home}error-%d{yyyyMMdd}-%i.log</fileNamePattern>
       <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
@@ -13,7 +18,7 @@
     <encoder>
       <charset>utf8</charset>
       <Pattern>
-        %d{yyyy-MM-dd HH:mm:ss.SSS} %boldGreen(%-5level) %boldCyan(%t) %boldYellow(%class{36}).%boldMagenta(%M) %boldWhite(L:%L) %n %boldRed(     >) %m%n
+        %d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %t %class{36}.%M L:%L %n      > %m%n
       </Pattern>
     </encoder>
   </appender>

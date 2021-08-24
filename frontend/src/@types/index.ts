@@ -21,7 +21,7 @@ export interface MutateResponseFollow {
   following: boolean;
 }
 
-export interface SearchResultUser {
+export interface UserItem {
   imageUrl: string;
   username: string;
   following: boolean | null;
@@ -40,6 +40,11 @@ export interface CommentData {
 export interface CommentAddData {
   postId: Post["id"];
   commentContent: CommentData["content"];
+}
+
+export interface CommentDeleteData {
+  postId: Post["id"];
+  commentId: CommentData["id"];
 }
 
 export interface Post {
@@ -75,7 +80,7 @@ export interface GithubStats {
   commitsCount: number;
   prsCount: number;
   issuesCount: number;
-  contributesCount: number;
+  reposCount: number;
 }
 
 export interface GithubRepository {

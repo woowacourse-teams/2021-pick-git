@@ -1,6 +1,8 @@
 import styled from "styled-components";
 
-export const Container = styled.div<React.CSSProperties>``;
+export const Container = styled.div<React.CSSProperties>`
+  width: 100%;
+`;
 
 export const ContentWrapper = styled.div``;
 

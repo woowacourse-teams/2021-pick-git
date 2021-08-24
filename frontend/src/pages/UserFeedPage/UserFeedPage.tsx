@@ -1,13 +1,13 @@
 import { useContext, useEffect, useState } from "react";
+import { InfiniteData } from "react-query";
+import { useLocation } from "react-router-dom";
 
 import Feed from "../../components/Feed/Feed";
 import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import useUserFeed from "../../services/hooks/useUserFeed";
 import { Container } from "./UserFeedPage.style";
-import { InfiniteData } from "react-query";
 import { Post } from "../../@types";
-import { useLocation } from "react-router-dom";
 
 import UserContext from "../../contexts/UserContext";
 import { LayoutInPx } from "../../constants/layout";

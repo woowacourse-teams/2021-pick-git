@@ -3,7 +3,7 @@ import Chip from "../@shared/Chip/Chip";
 import Avatar from "../@shared/Avatar/Avatar";
 import Tabs from "../@shared/Tabs/Tabs";
 
-import { GoDownIcon, HeartIcon, HeartLineIcon, SendIcon } from "../../assets/icons";
+import { GoDownIcon, SendIcon } from "../../assets/icons";
 import BottomSliderPortal from "../@layout/BottomSliderPortal/BottomSliderPortal";
 import {
   CommentList,
@@ -20,7 +20,6 @@ import {
   HorizontalSlider,
   HorizontalSliderItemWrapper,
   CommentText,
-  CommentContent,
   CommentTextAreaWrapper,
   SendIconWrapper,
 } from "./CommentSlider.styles";
@@ -83,16 +82,13 @@ const CommentSlider = ({ post, isSliderShown, onSliderClose, onCommentSave }: Pr
 
   const commentListItems = sliderPost.comments.map((comment) => (
     <CommentListItem key={comment.id}>
-      <CommentContent>
-        <Avatar diameter="2.5rem" imageUrl={comment.profileImageUrl} />
-        <CommentText>
-          <PostContentAuthorLink to={PAGE_URL.USER_PROFILE(comment.authorName)}>
-            {comment.authorName}
-          </PostContentAuthorLink>
-          {comment.content}
-        </CommentText>
-      </CommentContent>
-      {comment.liked ? <HeartIcon /> : <HeartLineIcon />}
+      <Avatar diameter="2.5rem" imageUrl={comment.profileImageUrl} />
+      <CommentText>
+        <PostContentAuthorLink to={PAGE_URL.USER_PROFILE(comment.authorName)}>
+          {comment.authorName}
+        </PostContentAuthorLink>
+        {comment.content}
+      </CommentText>
     </CommentListItem>
   ));
 

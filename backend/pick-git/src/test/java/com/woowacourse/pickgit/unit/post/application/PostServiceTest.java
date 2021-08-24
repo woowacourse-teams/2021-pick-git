@@ -21,38 +21,37 @@ import com.woowacourse.pickgit.common.factory.PostFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.post.CannotUnlikeException;
-import com.woowacourse.pickgit.exception.post.CommentFormatException;
 import com.woowacourse.pickgit.exception.post.DuplicatedLikeException;
 import com.woowacourse.pickgit.exception.post.PostFormatException;
 import com.woowacourse.pickgit.exception.post.PostNotBelongToUserException;
-import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.post.RepositoryParseException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
 import com.woowacourse.pickgit.post.application.PostService;
-import com.woowacourse.pickgit.post.application.dto.request.CommentRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostDeleteRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
-import com.woowacourse.pickgit.post.application.dto.response.CommentResponseDto;
+import com.woowacourse.pickgit.post.application.dto.request.SearchRepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
-import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDtos;
+import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponsesDto;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.content.Image;
 import com.woowacourse.pickgit.post.domain.content.Images;
 import com.woowacourse.pickgit.post.domain.repository.PickGitStorage;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.post.domain.util.PlatformRepositoryExtractor;
-import com.woowacourse.pickgit.post.domain.util.dto.RepositoryUrlAndName;
+import com.woowacourse.pickgit.post.domain.util.PlatformRepositorySearchExtractor;
+import com.woowacourse.pickgit.post.domain.util.dto.RepositoryNameAndUrl;
 import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
 import com.woowacourse.pickgit.tag.application.TagService;
 import com.woowacourse.pickgit.tag.application.TagsDto;
 import com.woowacourse.pickgit.tag.domain.Tag;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -61,6 +60,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -81,6 +82,9 @@ class PostServiceTest {
 
     @Mock
     private PlatformRepositoryExtractor platformRepositoryExtractor;
+
+    @Mock
+    private PlatformRepositorySearchExtractor platformRepositorySearchExtractor;
 
     @Mock
     private TagService tagService;
@@ -181,172 +185,262 @@ class PostServiceTest {
             .isInstanceOf(PostFormatException.class);
     }
 
-    @DisplayName("게시물에 댓글을 정상 등록한다.")
+    @DisplayName("사용자는 해당하는 페이지에 퍼블릭 레포지토리가 있는 경우 퍼블릭 레포지토리 목록을 가져온다.")
     @Test
-    void addComment_ValidContent_Success() {
-        //given
-        String comment_content = "test comment";
-        User user = UserFactory.user(1L, "testUser1");
-        Post post = Post.builder()
-            .id(1L)
-            .author(user)
-            .build();
-
-        given(postRepository.findById(anyLong()))
-            .willReturn(Optional.of(post));
-        given(userRepository.findByBasicProfile_Name(anyString()))
-            .willReturn(Optional.of(user));
-
-        CommentRequestDto commentRequestDto =
-            new CommentRequestDto(user.getName(), comment_content, post.getId());
-
-        //when
-        CommentResponseDto commentResponseDto = postService.addComment(commentRequestDto);
-
-        //then
-        assertThat(commentResponseDto.getAuthorName()).isEqualTo(user.getName());
-        assertThat(commentResponseDto.getContent()).isEqualTo(comment_content);
-
-        verify(postRepository, times(1)).findById(anyLong());
-        verify(userRepository, times(1)).findByBasicProfile_Name(anyString());
-    }
-
-    @DisplayName("게시물에 빈 댓글을 등록할 수 없다.")
-    @Test
-    void addComment_InvalidContent_ExceptionThrown() {
-        Post post = Post.builder()
-            .id(1L)
-            .build();
-
-        User user = UserFactory.user("testuser");
-
-        given(userRepository.findByBasicProfile_Name(user.getName()))
-            .willReturn(Optional.of(user));
-        given(postRepository.findById(post.getId()))
-            .willReturn(Optional.of(post));
-
-        CommentRequestDto commentRequestDto =
-            new CommentRequestDto(user.getName(), "", post.getId());
-
-        // then
-        assertThatCode(() -> postService.addComment(commentRequestDto))
-            .isInstanceOf(CommentFormatException.class)
-            .extracting("errorCode")
-            .isEqualTo("F0002");
-    }
-
-    @DisplayName("존재하지 않는 사용자는 댓글을 등록할 수 없다.")
-    @Test
-    void addComment_invalidUser_ExceptionOccur() {
-        //given
-        CommentRequestDto commentRequestDto =
-            new CommentRequestDto("invalidUser", "comment_content", 1L);
-
-        given(userRepository.findByBasicProfile_Name(anyString()))
-            .willThrow(new UserNotFoundException());
-
-        //when then
-        assertThatCode(() -> postService.addComment(commentRequestDto))
-            .isInstanceOf(UserNotFoundException.class)
-            .extracting("errorCode")
-            .isEqualTo("U0001");
-
-        verify(userRepository, times(1)).findByBasicProfile_Name(anyString());
-    }
-
-    @DisplayName("존재하지 않는 게시물에는 댓글을 등록할 수 없다.")
-    @Test
-    void addComment_invalidPost_ExceptionOccur() {
-        //given
-        CommentRequestDto commentRequestDto =
-            new CommentRequestDto("testUser", "comment_content", 1L);
-
-        given(userRepository.findByBasicProfile_Name(anyString()))
-            .willReturn(Optional.of(UserFactory.user()));
-        given(postRepository.findById(anyLong()))
-            .willThrow(new PostNotFoundException());
-
-        //when then
-        assertThatCode(() -> postService.addComment(commentRequestDto))
-            .isInstanceOf(PostNotFoundException.class)
-            .extracting("errorCode")
-            .isEqualTo("P0002");
-
-        verify(userRepository, times(1)).findByBasicProfile_Name(anyString());
-        verify(postRepository, times(1)).findById(anyLong());
-    }
-
-    @DisplayName("사용자는 Repository 목록을 가져올 수 있다.")
-    @Test
-    void showRepositories_LoginUser_Success() {
+    void userRepositories_ValidRepositoriesInCaseOfLoginUser_Success() {
         // given
-        String accessToken = "bearer token";
-        String userName = "testUserName";
+        String token = "Bearer testToken";
+        String username = "testUser";
 
-        RepositoryRequestDto requestDto = new RepositoryRequestDto(accessToken, userName);
-        List<RepositoryUrlAndName> repositories = List.of(
-            new RepositoryUrlAndName("pick", "https://github.com/jipark3/pick"),
-            new RepositoryUrlAndName("git", "https://github.com/jipark3/git")
+        RepositoryRequestDto requestDto = createRepositoryRequestDto(token, username, 0L, 50L);
+        Pageable pageable = PageRequest.of(0, 50);
+
+        List<RepositoryNameAndUrl> repositories = List.of(
+            new RepositoryNameAndUrl("pick", "https://github.com/jipark3/pick"),
+            new RepositoryNameAndUrl("git", "https://github.com/jipark3/git")
         );
 
         given(platformRepositoryExtractor
-            .extract(requestDto.getToken(), requestDto.getUsername()))
+            .extract(requestDto.getToken(), requestDto.getUsername(), pageable))
             .willReturn(repositories);
 
         // when
-        RepositoryResponseDtos repositoryResponseDtos = postService.userRepositories(requestDto);
-        List<RepositoryResponseDto> responseDtos = repositoryResponseDtos.getRepositoryResponseDtos();
+        RepositoryResponsesDto repositoryResponsesDto = postService.userRepositories(requestDto);
+
+        List<RepositoryResponseDto> responsesDto =
+            repositoryResponsesDto.getRepositoryResponsesDto();
+
+        // then
+        assertThat(responsesDto).hasSize(2);
+        assertThat(responsesDto)
+            .usingRecursiveComparison()
+            .isEqualTo(repositories);
+
+        verify(platformRepositoryExtractor, times(1))
+            .extract(requestDto.getToken(), requestDto.getUsername(), pageable);
+    }
+
+    @DisplayName("사용자는 해당하는 페이지에 퍼블릭 레포지토리가 없는 경우 빈 배열을 가져온다.")
+    @Test
+    void userRepositories_EmptyRepositoriesInCaseOfLoginUser_Success() {
+        // given
+        String token = "Bearer testToken";
+        String username = "testUser";
+
+        RepositoryRequestDto requestDto = createRepositoryRequestDto(token, username, 59L, 50L);
+        Pageable pageable = PageRequest.of(59, 50);
+
+        List<RepositoryNameAndUrl> repositories = new ArrayList<>();
+
+        given(platformRepositoryExtractor
+            .extract(requestDto.getToken(), requestDto.getUsername(), pageable))
+            .willReturn(repositories);
+
+        // when
+        RepositoryResponsesDto repositoryResponsesDto = postService.userRepositories(requestDto);
+
+        List<RepositoryResponseDto> responsesDto = repositoryResponsesDto
+            .getRepositoryResponsesDto();
+
+        // then
+        assertThat(responsesDto).hasSize(0);
+        assertThat(responsesDto)
+            .usingRecursiveComparison()
+            .isEqualTo(repositories);
+
+        verify(platformRepositoryExtractor, times(1))
+            .extract(requestDto.getToken(), requestDto.getUsername(), pageable);
+    }
+
+    @DisplayName("유효하지 않은 토큰인 경우 퍼블릭 레포지토리 목록을 가져올 수 없다. - 500 예외")
+    @Test
+    void userRepositories_InvalidToken_500Exception() {
+        // given
+        String token = "Bearer invalidToken";
+        String username = "testUser";
+
+        RepositoryRequestDto requestDto = createRepositoryRequestDto(token, username, 0L, 50L);
+        Pageable pageable = PageRequest.of(0, 50);
+
+        given(platformRepositoryExtractor
+            .extract(requestDto.getToken(), requestDto.getUsername(), pageable))
+            .willThrow(new RepositoryParseException());
+
+        // when
+        assertThatCode(() -> postService.userRepositories(requestDto))
+            .isInstanceOf(RepositoryParseException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "V0001")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
+            .hasMessage("레포지토리 목록을 불러올 수 없습니다.");
+
+        // then
+        verify(platformRepositoryExtractor, times(1))
+            .extract(requestDto.getToken(), requestDto.getUsername(), pageable);
+    }
+
+    @DisplayName("유효하지 않은 유저 이름인 경우 퍼블릭 레포지토리 목록을 가져올 수 없다 - 500 예외")
+    @Test
+    void userRepositories_InvalidUsername_500Exception() {
+        // given
+        String token = "Bearer testToken";
+        String username = "invalidUser";
+
+        RepositoryRequestDto requestDto = createRepositoryRequestDto(token, username, 0L, 50L);
+        Pageable pageable = PageRequest.of(0, 50);
+
+        given(platformRepositoryExtractor
+            .extract(requestDto.getToken(), requestDto.getUsername(), pageable))
+            .willThrow(new RepositoryParseException());
+
+        // when
+        assertThatCode(() -> postService.userRepositories(requestDto))
+            .isInstanceOf(RepositoryParseException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "V0001")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
+            .hasMessage("레포지토리 목록을 불러올 수 없습니다.");
+
+        // then
+        verify(platformRepositoryExtractor, times(1))
+            .extract(requestDto.getToken(), requestDto.getUsername(), pageable);
+    }
+
+    private RepositoryRequestDto createRepositoryRequestDto(String token, String username,
+        Long page, Long limit) {
+        return RepositoryRequestDto.builder()
+            .token(token)
+            .username(username)
+            .page(page)
+            .limit(limit)
+            .build();
+    }
+
+    @DisplayName("사용자는 Repository 목록을 검색해서 가져올 수 있다.")
+    @Test
+    void searchUserRepositories_LoginUser_Success() {
+        // given
+        String accessToken = "bearer token";
+        String userName = "testUserName";
+        String keyword = "pick";
+        int page = 1;
+        int limit = 2;
+
+        SearchRepositoryRequestDto searchRepositoryRequestDto = new SearchRepositoryRequestDto(
+            accessToken, userName, keyword, page, limit
+        );
+
+        List<RepositoryNameAndUrl> repositories = List.of(
+            new RepositoryNameAndUrl("pick", "https://github.com/jipark3/pick"),
+            new RepositoryNameAndUrl("pick-git", "https://github.com/jipark3/pick-git")
+        );
+
+        given(platformRepositorySearchExtractor
+            .extract(
+                searchRepositoryRequestDto.getToken(),
+                searchRepositoryRequestDto.getUsername(),
+                searchRepositoryRequestDto.getKeyword(),
+                searchRepositoryRequestDto.getPage(),
+                searchRepositoryRequestDto.getLimit()
+            )
+        ).willReturn(repositories);
+
+        // when
+
+        RepositoryResponsesDto repositoryResponsesDto =
+            postService.searchUserRepositories(searchRepositoryRequestDto);
+        List<RepositoryResponseDto> responseDtos =
+            repositoryResponsesDto.getRepositoryResponsesDto();
 
         // then
         assertThat(responseDtos)
             .usingRecursiveComparison()
             .isEqualTo(repositories);
-        verify(platformRepositoryExtractor, times(1))
-            .extract(requestDto.getToken(), requestDto.getUsername());
+        verify(platformRepositorySearchExtractor, times(1))
+            .extract(
+                searchRepositoryRequestDto.getToken(),
+                searchRepositoryRequestDto.getUsername(),
+                searchRepositoryRequestDto.getKeyword(),
+                searchRepositoryRequestDto.getPage(),
+                searchRepositoryRequestDto.getLimit()
+            );
     }
 
-    @DisplayName("AccessToken이 잘못되었다면, Repository 목록을 가져올 수 없다.")
+    @DisplayName("AccessToken이 잘못되었다면, Repository 목록을 검색할 수 없다.")
     @Test
-    void showRepositories_InvalidAccessToken_Fail() {
+    void searchUserRepositories_InvalidAccessToken_Fail() {
         // given
         String accessToken = "bearer invalid token";
         String userName = "testUserName";
+        String keyword = "pick";
+        int page = 1;
+        int limit = 2;
 
-        RepositoryRequestDto requestDto = new RepositoryRequestDto(accessToken, userName);
+        SearchRepositoryRequestDto searchRepositoryRequestDto =
+            new SearchRepositoryRequestDto(
+                accessToken, userName, keyword, page, limit
+            );
 
-        given(platformRepositoryExtractor.extract(requestDto.getToken(), requestDto.getUsername()))
-            .willThrow(new RepositoryParseException());
+        given(platformRepositorySearchExtractor
+            .extract(
+                searchRepositoryRequestDto.getToken(),
+                searchRepositoryRequestDto.getUsername(),
+                searchRepositoryRequestDto.getKeyword(),
+                searchRepositoryRequestDto.getPage(),
+                searchRepositoryRequestDto.getLimit()
+            )
+        ).willThrow(new RepositoryParseException());
 
         // when then
-        assertThatCode(() -> postService.userRepositories(requestDto))
-            .isInstanceOf(RepositoryParseException.class);
+        assertThatCode(() ->
+            postService.searchUserRepositories(searchRepositoryRequestDto)
+        ).isInstanceOf(RepositoryParseException.class);
 
-        verify(platformRepositoryExtractor, times(1))
-            .extract(requestDto.getToken(), requestDto.getUsername());
+        verify(platformRepositorySearchExtractor, times(1))
+            .extract(
+                searchRepositoryRequestDto.getToken(),
+                searchRepositoryRequestDto.getUsername(),
+                searchRepositoryRequestDto.getKeyword(),
+                searchRepositoryRequestDto.getPage(),
+                searchRepositoryRequestDto.getLimit()
+            );
     }
 
-    @DisplayName("UserName이 잘못되었다면, Repository 목록을 가져올 수 없다.")
+    @DisplayName("UserName이 잘못되었다면, Repository 목록을 검색할 수 없다.")
     @Test
-    void showRepositories_InvalidUserName_Fail() {
+    void searchUserRepositories_InvalidUserName_Fail() {
         // given
         String accessToken = "bearer test token";
         String userName = "invalidName";
+        String keyword = "pick";
+        int page = 1;
+        int limit = 2;
 
-        RepositoryRequestDto requestDto = new RepositoryRequestDto(accessToken, userName);
+        SearchRepositoryRequestDto searchRepositoryRequestDto = new SearchRepositoryRequestDto(
+            accessToken, userName, keyword, page, limit
+        );
 
-        given(platformRepositoryExtractor.extract(requestDto.getToken(), requestDto.getUsername()))
-            .willThrow(new RepositoryParseException(
-                "V0001",
-                HttpStatus.BAD_REQUEST,
-                "레포지토리 목록을 불러올 수 없습니다."
-            ));
+        given(platformRepositorySearchExtractor
+            .extract(
+                searchRepositoryRequestDto.getToken(),
+                searchRepositoryRequestDto.getUsername(),
+                searchRepositoryRequestDto.getKeyword(),
+                searchRepositoryRequestDto.getPage(),
+                searchRepositoryRequestDto.getLimit()
+            )
+        ).willThrow(new RepositoryParseException());
 
         // when then
-        assertThatCode(() -> postService.userRepositories(requestDto))
-            .isInstanceOf(RepositoryParseException.class);
+        assertThatCode(() ->
+            postService.searchUserRepositories(searchRepositoryRequestDto)
+        ).isInstanceOf(RepositoryParseException.class);
 
-        verify(platformRepositoryExtractor, times(1))
-            .extract(requestDto.getToken(), requestDto.getUsername());
+        verify(platformRepositorySearchExtractor, times(1))
+            .extract(
+                searchRepositoryRequestDto.getToken(),
+                searchRepositoryRequestDto.getUsername(),
+                searchRepositoryRequestDto.getKeyword(),
+                searchRepositoryRequestDto.getPage(),
+                searchRepositoryRequestDto.getLimit()
+            );
     }
 
     @DisplayName("사용자는 특정 게시물을 좋아요 할 수 있다.")

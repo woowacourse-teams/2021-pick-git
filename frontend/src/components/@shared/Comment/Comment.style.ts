@@ -1,27 +1,33 @@
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { setDesktopMediaQuery, setMobileMediaQuery } from "../../@styled/mediaQueries";
 
 export const Container = styled.div`
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  color: ${({ theme }) => theme.color.textColor};
 `;
 
 export const AuthorName = styled(Link)`
   font-weight: bold;
-  font-size: 0.75rem;
+
+  font-size: 0.8rem;
+  ${setMobileMediaQuery`
+    font-size: 0.75rem;
+  `}
+  ${setDesktopMediaQuery`
+    font-size: 0.9rem;
+  `}
+
   margin-right: 0.75rem;
 `;
 
 export const Content = styled.span`
-  font-size: 0.625rem;
-`;
-
-export const LikeIconWrapper = styled.button`
-  padding-top: 2px;
-  transition: opacity 0.5s;
-
-  :hover {
-    opacity: 0.7;
-  }
+  font-size: 0.7rem;
+  ${setMobileMediaQuery`
+    font-size: 0.625rem;
+  `}
+  ${setDesktopMediaQuery`
+    font-size: 0.8rem;
+  `}
 `;

@@ -9,5 +9,4 @@ public class PickGitApplication {
     public static void main(String[] args) {
         SpringApplication.run(PickGitApplication.class, args);
     }
-
 }

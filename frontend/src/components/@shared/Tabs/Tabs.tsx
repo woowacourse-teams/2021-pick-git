@@ -6,12 +6,13 @@ import { Container, TabIndicator, TabButton, TabButtonWrapper } from "./Tabs.sty
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   tabItems: TabItem[];
+  defaultTabIndex?: number;
   tabIndicatorColor?: string;
   tabIndicatorKind: TabIndicatorKind;
 }
 
-const Tabs = ({ tabIndicatorKind, tabItems, tabIndicatorColor, ...props }: Props) => {
-  const [tabIndex, setTabIndex] = useState(0);
+const Tabs = ({ tabIndicatorKind, defaultTabIndex = 0, tabItems, tabIndicatorColor, ...props }: Props) => {
+  const [tabIndex, setTabIndex] = useState(defaultTabIndex);
 
   const handleTabIndexChange = (index: number, onTabChange: () => void) => {
     setTabIndex(index);

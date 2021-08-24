@@ -1,6 +1,6 @@
 import {
   Container,
-  CommentSliderToggleLink,
+  CommentPageMoveLink,
   CommentsWrapper,
   CommentWrapper,
   IconLink,
@@ -16,7 +16,7 @@ import {
   TagItemLinkButton,
   PostCreatedDateText,
   MoreContentLinkButton,
-  CommentSliderToggleLinkText,
+  CommentPageMoveLinkText,
   MoreCommentExistIndicator,
 } from "./PostItem.style";
 import Avatar from "../Avatar/Avatar";
@@ -57,12 +57,12 @@ export interface Props {
   tags: string[];
   createdAt: string;
   isLoggedIn: boolean;
+  handlePostLikeCountClick: () => void;
   onMoreCommentClick: () => void;
   onCommentInputClick: () => void;
   onPostEdit: () => void;
   onPostDelete: () => void;
   onPostLike: () => void;
-  onCommentLike: (commentId: CommentData["id"]) => void;
 }
 
 const timeDiffTextTable = {
@@ -86,9 +86,9 @@ const PostItem = ({
   tags,
   createdAt,
   isLoggedIn,
+  handlePostLikeCountClick,
   onMoreCommentClick,
   onCommentInputClick,
-  onCommentLike,
   onPostEdit,
   onPostDelete,
   onPostLike,
@@ -114,17 +114,14 @@ const PostItem = ({
     <CommentWrapper key={comment.id}>
       <Comment
         content={comment.content}
-        liked={comment.liked}
         authorName={comment.authorName}
         link={currentUserName === comment.authorName ? PAGE_URL.MY_PROFILE : PAGE_URL.USER_PROFILE(comment.authorName)}
-        onCommentLike={() => onCommentLike(comment.id)}
       />
     </CommentWrapper>
   ));
 
-  const tagList = tags.map((tag: string, index: number) => (
-    // TODO: key prop 수정 => tag가 unique임이 보장된 후에!
-    <TagItemLinkButton key={index} to={PAGE_URL.POSTS_WITH_TAG(tag)}>
+  const tagList = tags.map((tag: string) => (
+    <TagItemLinkButton key={tag} to={PAGE_URL.SEARCH_POST_BY_TAG(tag)}>
       <Chip>{tag}</Chip>
     </TagItemLinkButton>
   ));
@@ -160,7 +157,7 @@ const PostItem = ({
             </CircleIcon>
           </IconLink>
         </IconLinkButtonsWrapper>
-        <LikeCountText>좋아요 {likeCount}개</LikeCountText>
+        <LikeCountText onClick={handlePostLikeCountClick}>좋아요 {likeCount}개</LikeCountText>
         <PostContent>
           <PostContentAuthorLink to={PAGE_URL.USER_PROFILE(authorName)}>{authorName}</PostContentAuthorLink>
           {shouldHideContent
@@ -184,10 +181,10 @@ const PostItem = ({
         </CommentsWrapper>
       </PostBody>
       <PostCreatedDateText>{currentTimeDiffText}</PostCreatedDateText>
-      <CommentSliderToggleLink onClick={onCommentInputClick}>
-        <CommentSliderToggleLinkText>{isLoggedIn ? "댓글 작성" : "댓글 보기"}</CommentSliderToggleLinkText>
+      <CommentPageMoveLink onClick={onCommentInputClick}>
+        <CommentPageMoveLinkText>{isLoggedIn ? "댓글 작성" : "댓글 보기"}</CommentPageMoveLinkText>
         <ArrowRightIcon />
-      </CommentSliderToggleLink>
+      </CommentPageMoveLink>
     </Container>
   );
 };

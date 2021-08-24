@@ -1,22 +1,27 @@
 import { AxiosError } from "axios";
 
-import { useInfiniteQuery } from "react-query";
-import { ErrorResponse, SearchResultUser } from "../../@types";
+import { QueryKey, useInfiniteQuery } from "react-query";
+import { ErrorResponse, Post, UserItem } from "../../@types";
 import { QUERY } from "../../constants/queries";
 import { getAccessToken } from "../../storage/storage";
-import { requestGetSearchUserResult } from "../requests";
+import { requestGetSearchUserResult, requestGetSearchPostResult } from "../requests";
 
-export const useSearchUserResultQuery = (keyword: string) => {
-  const accessToken = getAccessToken();
-
-  return useInfiniteQuery<SearchResultUser[] | null, AxiosError<ErrorResponse>>(
-    [QUERY.GET_SEARCH_RESULT, { keyword }],
-    async ({ pageParam = 0 }) => await requestGetSearchUserResult(keyword, pageParam, accessToken),
+export const useSearchUserResultQuery = (keyword: string) =>
+  useInfiniteQuery<UserItem[] | null, AxiosError<ErrorResponse>>(
+    [QUERY.GET_SEARCH_USER_RESULT, { keyword }],
+    async ({ pageParam = 0 }) => await requestGetSearchUserResult(keyword, pageParam, getAccessToken()),
     {
       cacheTime: 0,
-      getNextPageParam: (_, pages) => {
-        return pages.length;
-      },
+      getNextPageParam: (_, pages) => pages.length,
     }
   );
-};
+
+export const useSearchPostResultQuery = (type: string | null, keyword: string, queryKey: QueryKey) =>
+  useInfiniteQuery<Post[] | null, AxiosError<ErrorResponse>>(
+    queryKey,
+    async ({ pageParam = 0 }) => await requestGetSearchPostResult(type, keyword, pageParam, getAccessToken()),
+    {
+      cacheTime: 0,
+      getNextPageParam: (_, pages) => pages.length,
+    }
+  );

@@ -9,8 +9,10 @@ export const PAGE_URL = {
   HOME: "/",
   HOME_FEED: "/posts",
   TAG_FEED_BASE: "/posts/tag",
-  USER_FEED: "/posts/user",
-  TAG_FEED: (tag: string) => `/posts/tag?tag=${tag}`,
+  USER_FEED_BASE: "/posts/user",
+  USER_FEED: (username: string) => `/posts/user?username=${username}`,
+  SEARCH_RESULT_FEED_BASE: "/search/posts",
+  SEARCH_RESULT_FEED: (type: string) => `/search/posts?type=${type}`,
   LOGIN: "/login",
   AUTH_PROCESSING: "/auth",
   ADD_POST: "/add-post",
@@ -18,10 +20,17 @@ export const PAGE_URL = {
   EDIT_POST: "/edit-post",
   EDIT_POST_FIRST_STEP: `/edit-post/${POST_EDIT_STEPS[0].path}`,
   SEARCH: "/search",
+  SEARCH_POST_BY_TAG: (tag: string) => `/search?type=tags&keyword=${tag}`,
   PROFILE: "/profile",
   MY_PROFILE: "/profile/me",
+  POST_COMMENTS: "/comments",
+  POST_LIKE_PEOPLE: "/post-like-people",
+  TAG_FEED: (tag: string) => `/posts/tag?tag=${tag}`,
   USER_PROFILE: (username: string) => `/profile?username=${username}`,
-  POSTS_WITH_TAG: (tag: string) => `/posts/${tag}`,
+  FOLLOWINGS_BASE: "/followings",
+  FOLLOWERS_BASE: "/followers",
+  FOLLOWINGS: (username: string) => `/followings?username=${username}`,
+  FOLLOWERS: (username: string) => `/followers?username=${username}`,
 };
 
 export const API_URL = {
@@ -29,19 +38,36 @@ export const API_URL = {
     GITHUB: "/authorization/github",
   },
   SELF_PROFILE: "/profiles/me",
+  SELF_PROFILE_IMAGE: "/profiles/me/image",
+  SELF_PROFILE_DESCRIPTION: "/profiles/me/description",
   ADD_POSTS: "/posts",
-  GITHUB_REPOSITORIES: (username: string) => `/github/${username}/repositories`,
+  GITHUB_REPOSITORIES: (keyword: string, page: number, limit: number) =>
+    keyword === ""
+      ? `/github/repositories?&page=${page}&limit=${limit}`
+      : `/github/search/repositories?keyword=${keyword}&page=${page}&limit=${limit}`,
   USER_PROFILE: (username: string) => `/profiles/${username}`,
-  USER_PROFILE_FOLLOW: (username: string) => `/profiles/${username}/followings`,
+  USER_PROFILE_FOLLOW: (username: string, githubFollowing: boolean) =>
+    `/profiles/${username}/followings?githubFollowing=${githubFollowing}`,
+  USER_PROFILE_UNFOLLOW: (username: string, githubUnfollowing: boolean) =>
+    `/profiles/${username}/followings?githubUnfollowing=${githubUnfollowing}`,
+  USER_PROFILE_FOLLOWINGS: (username: string, pageParam: number, limit: number) =>
+    `/profiles/${username}/followings?page=${pageParam}&limit=${limit}`,
+  USER_PROFILE_FOLLOWERS: (username: string, pageParam: number, limit: number) =>
+    `/profiles/${username}/followers?page=${pageParam}&limit=${limit}`,
   MY_POSTS: (page: number, limit: number) => `/posts/me?page=${page}&limit=${limit}`,
   USER_POSTS: (username: string, page: number, limit: number) => `/posts/${username}?page=${page}&limit=${limit}`,
   SEARCH_USER: (keyword: string, page: number, limit: number) =>
     `/search/users?keyword=${keyword}&page=${page}&limit=${limit}`,
+  SEARCH_POST: (type: string, keyword: string, page: number, limit: number) =>
+    `/search/posts?type=${type}&keyword=${keyword}&page=${page}&limit=${limit}`,
   AFTER_LOGIN: (code: string) => `afterlogin?code=${code}`,
   POST: (postId: number) => `/posts/${postId}`,
   POSTS: (page: number, limit: number) => `/posts?page=${page}&limit=${limit}`,
-  POSTS_LIKES: (postId: number) => `/posts/${postId}/likes`,
-  POSTS_COMMENTS: (postId: number) => `/posts/${postId}/comments`,
+  POST_LIKE_PEOPLE: (postId: number) => `/posts/${postId}/likes`,
+  POST_LIKES: (postId: number) => `/posts/${postId}/likes`,
+  POST_COMMENT: (postId: number, commentId?: number) => `/posts/${postId}/comments${commentId ? `/${commentId}` : ""}`,
+  POST_COMMENTS: (postId: number, page: number, limit: number) =>
+    `/posts/${postId}/comments?page=${page}&limit=${limit}`,
   GITHUB_STATS: (username: string) => `/profiles/${username}/contributions`,
   GITHUB_TAGS: (repositoryName: string) => `/github/repositories/${repositoryName}/tags/languages`,
 };

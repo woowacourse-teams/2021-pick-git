@@ -3,10 +3,10 @@ package com.woowacourse.pickgit.unit.post.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.woowacourse.pickgit.common.factory.PostFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.config.JpaTestConfiguration;
 import com.woowacourse.pickgit.post.domain.Post;
-import com.woowacourse.pickgit.post.domain.comment.Comment;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.tag.domain.Tag;
 import com.woowacourse.pickgit.tag.domain.TagRepository;
@@ -22,11 +22,12 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.data.domain.PageRequest;
 
 @Import(JpaTestConfiguration.class)
 @DataJpaTest
 class PostRepositoryTest {
-    
+
     @Autowired
     private UserRepository userRepository;
 
@@ -131,32 +132,48 @@ class PostRepositoryTest {
             .isInstanceOf(InvalidDataAccessApiUsageException.class);
     }
 
-    @DisplayName("Post에 Comment를 추가하면 Comment가 자동 영속화된다.")
+    @DisplayName("나를 포함하여 내가 팔로잉하는 유저들의 게시글을 최신순으로 가져온다.")
     @Test
-    void addComment_WhenSavingPost_CommentSavedTogether() {
-        // given
-        User testUser = UserFactory.user("testUser");
-        User savedTestUser = userRepository.save(testUser);
+    void findAllAssociatedPostsByUser_FollowingsLatestIncludingMe_Success() {
+        // given - mockUsers
+        User tester = UserFactory.user("tester");
+        List<User> mockUsers = List.of(
+            UserFactory.user("a1"),
+            UserFactory.user("a2"),
+            UserFactory.user("a3"),
+            UserFactory.user("a4"),
+            UserFactory.user("a5"),
+            UserFactory.user("a6"),
+            UserFactory.user("a7"),
+            UserFactory.user("a8")
+        );
+        userRepository.save(tester);
+        userRepository.saveAll(mockUsers);
 
-        Post post = Post.builder()
-            .content("testContent")
-            .githubRepoUrl("https://github.com/bperhaps")
-            .author(savedTestUser)
-            .build();
+        // given - follow
+        int mockUserCounts = mockUsers.size();
+        for (int i = 0; i < mockUserCounts; i += 2) {
+            tester.follow(mockUsers.get(i));
+        }
 
-        // when
-        Comment comment = new Comment("test comment", testUser);
-        post.addComment(comment);
+        // given - mockPosts
+        List<Post> mockPosts = PostFactory.mockPostsBy(mockUsers);
+        Post testerPost = PostFactory.mockPostBy(tester);
+        postRepository.saveAll(mockPosts);
+        postRepository.save(testerPost);
 
-        postRepository.save(post);
         flushAndClear();
 
-        // then
-        Post findPost = postRepository.findById(post.getId())
-            .orElseThrow(IllegalArgumentException::new);
+        // when
+        List<Post> feeds =
+            postRepository.findAllAssociatedPostsByUser(tester, PageRequest.of(0, 10));
 
-        List<Comment> comments = findPost.getComments();
-        assertThat(comments).hasSize(1);
+        // then
+        assertThat(feeds)
+            .extracting("user")
+            .extracting("basicProfile")
+            .extracting("name")
+            .containsExactly("tester", "a7", "a5", "a3", "a1");
     }
 
     private void flushAndClear() {
@@ -164,3 +181,4 @@ class PostRepositoryTest {
         testEntityManager.clear();
     }
 }
+

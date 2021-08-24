@@ -9,6 +9,7 @@ export const Container = styled.div`
 `;
 
 export const ImageUploaderWrapper = styled.div`
+  width: 100%;
   margin-top: 1.5625rem;
 `;
 

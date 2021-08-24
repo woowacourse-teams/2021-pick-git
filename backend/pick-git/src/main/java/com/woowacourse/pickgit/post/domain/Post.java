@@ -2,9 +2,9 @@ package com.woowacourse.pickgit.post.domain;
 
 import static java.util.stream.Collectors.toList;
 
+import com.woowacourse.pickgit.comment.domain.Comment;
+import com.woowacourse.pickgit.comment.domain.Comments;
 import com.woowacourse.pickgit.exception.post.PostNotBelongToUserException;
-import com.woowacourse.pickgit.post.domain.comment.Comment;
-import com.woowacourse.pickgit.post.domain.comment.Comments;
 import com.woowacourse.pickgit.post.domain.content.Image;
 import com.woowacourse.pickgit.post.domain.content.Images;
 import com.woowacourse.pickgit.post.domain.content.PostContent;
@@ -34,7 +34,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 public class Post {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -67,7 +68,7 @@ public class Post {
     protected Post() {
     }
 
-    protected Post(
+    public Post(
         Long id,
         User user,
         Images images,
@@ -97,14 +98,6 @@ public class Post {
         return new Builder();
     }
 
-    public void addComment(Comment comment) {
-        comments.addComment(comment, this);
-    }
-
-    public void addTags(List<Tag> tags) {
-        postTags.addAll(this, tags);
-    }
-
     public void like(User user) {
         Like like = new Like(this, user);
         likes.add(like);
@@ -120,8 +113,14 @@ public class Post {
         return likes.contains(like);
     }
 
-    public boolean isWrittenBy(User user) {
-        return this.user.equals(user);
+    public void validateDeletion(User user) {
+        if (this.isNotWrittenBy(user)) {
+            throw new PostNotBelongToUserException();
+        }
+    }
+
+    public boolean isNotWrittenBy(User user) {
+        return !this.user.equals(user);
     }
 
     public void updateContent(String content) {
@@ -131,6 +130,10 @@ public class Post {
     public void updateTags(List<Tag> tags) {
         postTags.clear();
         addTags(tags);
+    }
+
+    public void addTags(List<Tag> tags) {
+        postTags.addAll(this, tags);
     }
 
     public Long getId() {
@@ -175,6 +178,14 @@ public class Post {
 
     public List<String> getTagNames() {
         return postTags.getTagNames();
+    }
+
+    public Likes getLikes() {
+        return likes;
+    }
+
+    public List<User> getLikeUsers() {
+        return likes.getLikeUsers();
     }
 
     @Override
@@ -235,6 +246,11 @@ public class Post {
 
         public Builder content(String content) {
             this.content = new PostContent(content);
+            return this;
+        }
+
+        public Builder comments(List<Comment> comments) {
+            this.comments = new Comments(comments);
             return this;
         }
 

@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,11 +19,6 @@ public class MockPickGitStorage implements PickGitStorage {
         return files.stream()
             .map(File::getName)
             .collect(toList());
-    }
-
-    @Override
-    public Optional<String> store(File file, String userName) {
-        return Optional.ofNullable(file.getName());
     }
 
     @Override

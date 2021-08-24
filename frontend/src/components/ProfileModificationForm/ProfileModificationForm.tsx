@@ -3,6 +3,7 @@ import { ThemeContext } from "styled-components";
 
 import { CameraIcon } from "../../assets/icons";
 import { LIMIT } from "../../constants/limits";
+import SnackBarContext from "../../contexts/SnackbarContext";
 import useMessageModal from "../../services/hooks/@common/useMessageModal";
 import useProfileModificationForm from "../../services/hooks/useProfileModificationForm";
 import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
@@ -21,6 +22,7 @@ export interface Props {
 
 const ProfileModificationForm = ({ username, profileImageUrl, prevDescription, onTerminate }: Props) => {
   const theme = useContext(ThemeContext);
+  const { pushSnackbarMessage } = useContext(SnackBarContext);
   const { modalMessage, isModalShown, hideMessageModal, showAlertModal } = useMessageModal();
   const { values, handlers, isLoading } = useProfileModificationForm(
     username,

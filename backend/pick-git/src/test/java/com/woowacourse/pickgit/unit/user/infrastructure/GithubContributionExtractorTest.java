@@ -5,12 +5,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woowacourse.pickgit.common.mockapi.MockContributionApiRequester;
+import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.user.ContributionParseException;
-import com.woowacourse.pickgit.user.domain.PlatformContributionExtractor;
 import com.woowacourse.pickgit.user.infrastructure.dto.CountDto;
 import com.woowacourse.pickgit.user.infrastructure.dto.ItemDto;
 import com.woowacourse.pickgit.user.infrastructure.dto.StarsDto;
 import com.woowacourse.pickgit.user.infrastructure.extractor.GithubContributionExtractor;
+import com.woowacourse.pickgit.user.infrastructure.extractor.PlatformContributionExtractor;
 import com.woowacourse.pickgit.user.infrastructure.requester.PlatformContributionApiRequester;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +19,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 class GithubContributionExtractorTest {
+
+    private static final String ACCESS_TOKEN = "oauth.access.token";
+    private static final String INVALID_ACCESS_TOKEN = "invalid" + ACCESS_TOKEN;
+    private static final String USERNAME = "testUser";
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final String apiUrlFormatForStar = "https://api.github.com/search/repositories?q=user:%s stars:>=1";
@@ -39,7 +44,7 @@ class GithubContributionExtractorTest {
     @Test
     void extractStars_Stars_Success() {
         // when
-        ItemDto stars = platformContributionExtractor.extractStars("testUser");
+        ItemDto stars = platformContributionExtractor.extractStars(ACCESS_TOKEN, USERNAME);
 
         // then
         assertThat(stars.getItems()
@@ -47,6 +52,26 @@ class GithubContributionExtractorTest {
             .mapToInt(StarsDto::getStars)
             .sum())
             .isEqualTo(11);
+    }
+
+    @DisplayName("유효하지 않은 OAuth 토큰인 경우 스타 개수를 추출할 수 없다. - 500 예외")
+    @Test
+    void extractStars_InvalidTokenInCaseOfStars_500Exception() {
+        // given
+        platformContributionExtractor = new GithubContributionExtractor(
+            objectMapper,
+            new MockContributionApiErrorRequester(),
+            apiUrlFormatForStar,
+            apiUrlFormatForCount
+        );
+
+        // when
+        assertThatThrownBy(() -> {
+            platformContributionExtractor.extractStars(INVALID_ACCESS_TOKEN, USERNAME);
+        }).isInstanceOf(PlatformHttpErrorException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "V0001")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
+            .hasMessage("외부 플랫폼 연동에 실패");
     }
 
     @DisplayName("JSON key 값이 다른 경우 스타 개수를 추출할 수 없다. - 500 예외")
@@ -62,7 +87,7 @@ class GithubContributionExtractorTest {
 
         // when
         assertThatThrownBy(() -> {
-            platformContributionExtractor.extractStars("testUser");
+            platformContributionExtractor.extractStars(ACCESS_TOKEN, USERNAME);
         }).isInstanceOf(ContributionParseException.class)
             .hasFieldOrPropertyWithValue("errorCode", "V0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
@@ -74,10 +99,31 @@ class GithubContributionExtractorTest {
     void extractCount_Commits_Success() {
         // when
         CountDto commits = platformContributionExtractor
-            .extractCount("/commits?q=committer:%s", "testUser");
+            .extractCount("/commits?q=committer:%s", ACCESS_TOKEN, USERNAME);
 
         // then
         assertThat(commits.getCount()).isEqualTo(48);
+    }
+
+    @DisplayName("유효하지 않은 OAuth 토큰인 경우 커밋 개수를 추출할 수 없다. - 500 예외")
+    @Test
+    void extractCount_InvalidTokenInCaseOfCommits_500Exception() {
+        // given
+        platformContributionExtractor = new GithubContributionExtractor(
+            objectMapper,
+            new MockContributionApiErrorRequester(),
+            apiUrlFormatForStar,
+            apiUrlFormatForCount
+        );
+
+        // when
+        assertThatThrownBy(() -> {
+            platformContributionExtractor
+                .extractCount("/commits?q=committer:%s", INVALID_ACCESS_TOKEN, USERNAME);
+        }).isInstanceOf(PlatformHttpErrorException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "V0001")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
+            .hasMessage("외부 플랫폼 연동에 실패");
     }
 
     @DisplayName("JSON key 값이 다른 경우 커밋 개수를 추출할 수 없다. - 500 예외")
@@ -93,7 +139,8 @@ class GithubContributionExtractorTest {
 
         // when
         assertThatThrownBy(() -> {
-            platformContributionExtractor.extractCount("/commits?q=committer:%s", "testUser");
+            platformContributionExtractor
+                .extractCount("/commits?q=committer:%s", ACCESS_TOKEN, USERNAME);
         }).isInstanceOf(ContributionParseException.class)
             .hasFieldOrPropertyWithValue("errorCode", "V0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
@@ -105,10 +152,31 @@ class GithubContributionExtractorTest {
     void extractCount_PRs_Success() {
         // when
         CountDto prs = platformContributionExtractor
-            .extractCount("/issues?q=author:%s type:pr", "testUser");
+            .extractCount("/issues?q=author:%s type:pr", ACCESS_TOKEN, USERNAME);
 
         // then
         assertThat(prs.getCount()).isEqualTo(48);
+    }
+
+    @DisplayName("유효하지 않은 OAuth 토큰인 경우 PR 개수를 추출할 수 없다. - 500 예외")
+    @Test
+    void extractCount_InvalidTokenInCaseOfPRs_500Exception() {
+        // given
+        platformContributionExtractor = new GithubContributionExtractor(
+            objectMapper,
+            new MockContributionApiErrorRequester(),
+            apiUrlFormatForStar,
+            apiUrlFormatForCount
+        );
+
+        // when
+        assertThatThrownBy(() -> {
+            platformContributionExtractor
+                .extractCount("/issues?q=author:%s type:pr", INVALID_ACCESS_TOKEN, USERNAME);
+        }).isInstanceOf(PlatformHttpErrorException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "V0001")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
+            .hasMessage("외부 플랫폼 연동에 실패");
     }
 
     @DisplayName("JSON key 값이 다른 경우 PR 개수를 추출할 수 없다. - 500 예외")
@@ -124,7 +192,8 @@ class GithubContributionExtractorTest {
 
         // when
         assertThatThrownBy(() -> {
-            platformContributionExtractor.extractCount("/issues?q=author:%s type:pr", "testUser");
+            platformContributionExtractor
+                .extractCount("/issues?q=author:%s type:pr", ACCESS_TOKEN, USERNAME);
         }).isInstanceOf(ContributionParseException.class)
             .hasFieldOrPropertyWithValue("errorCode", "V0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
@@ -136,10 +205,31 @@ class GithubContributionExtractorTest {
     void extractCount_Issues_Success() {
         // when
         CountDto issues = platformContributionExtractor
-            .extractCount("/issues?q=author:%s type:issue", "testUser");
+            .extractCount("/issues?q=author:%s type:issue", ACCESS_TOKEN, USERNAME);
 
         // then
         assertThat(issues.getCount()).isEqualTo(48);
+    }
+
+    @DisplayName("유효하지 않은 OAuth 토큰인 경우 이슈 개수를 추출할 수 없다. - 500 예외")
+    @Test
+    void extractCount_InvalidTokenInCaseOfIssues_500Exception() {
+        // given
+        platformContributionExtractor = new GithubContributionExtractor(
+            objectMapper,
+            new MockContributionApiErrorRequester(),
+            apiUrlFormatForStar,
+            apiUrlFormatForCount
+        );
+
+        // when
+        assertThatThrownBy(() -> {
+            platformContributionExtractor
+                .extractCount("/issues?q=author:%s type:issue", INVALID_ACCESS_TOKEN, USERNAME);
+        }).isInstanceOf(PlatformHttpErrorException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "V0001")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
+            .hasMessage("외부 플랫폼 연동에 실패");
     }
 
     @DisplayName("JSON key 값이 다른 경우 이슈 개수를 추출할 수 없다. - 500 예외")
@@ -156,7 +246,7 @@ class GithubContributionExtractorTest {
         // when
         assertThatThrownBy(() -> {
             platformContributionExtractor
-                .extractCount("/issues?q=author:%s type:issue", "testUser");
+                .extractCount("/issues?q=author:%s type:issue", ACCESS_TOKEN, USERNAME);
         }).isInstanceOf(ContributionParseException.class)
             .hasFieldOrPropertyWithValue("errorCode", "V0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
@@ -168,10 +258,31 @@ class GithubContributionExtractorTest {
     void extractCount_Repos_Success() {
         // when
         CountDto repos = platformContributionExtractor
-            .extractCount("/repositories?q=user:%s is:public", "testUser");
+            .extractCount("/repositories?q=user:%s is:public", ACCESS_TOKEN, USERNAME);
 
         // then
         assertThat(repos.getCount()).isEqualTo(48);
+    }
+
+    @DisplayName("유효하지 않은 OAuth 토큰인 경우 퍼블릭 레포지토리 개수를 추출할 수 없다. - 500 예외")
+    @Test
+    void extractCount_InvalidTokenInCaseOfRepos_500Exception() {
+        // given
+        platformContributionExtractor = new GithubContributionExtractor(
+            objectMapper,
+            new MockContributionApiErrorRequester(),
+            apiUrlFormatForStar,
+            apiUrlFormatForCount
+        );
+
+        // when
+        assertThatThrownBy(() -> {
+            platformContributionExtractor
+                .extractCount("/repositories?q=user:%s is:public", INVALID_ACCESS_TOKEN, USERNAME);
+        }).isInstanceOf(PlatformHttpErrorException.class)
+            .hasFieldOrPropertyWithValue("errorCode", "V0001")
+            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
+            .hasMessage("외부 플랫폼 연동에 실패");
     }
 
     @DisplayName("JSON key 값이 다른 경우 퍼블릭 레포지토리 개수를 추출할 수 없다. - 500 예외")
@@ -188,7 +299,7 @@ class GithubContributionExtractorTest {
         // when
         assertThatThrownBy(() -> {
             platformContributionExtractor
-                .extractCount("/repositories?q=user:%s is:public", "testUser");
+                .extractCount("/repositories?q=user:%s is:public", ACCESS_TOKEN, USERNAME);
         }).isInstanceOf(ContributionParseException.class)
             .hasFieldOrPropertyWithValue("errorCode", "V0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
@@ -199,7 +310,11 @@ class GithubContributionExtractorTest {
         implements PlatformContributionApiRequester {
 
         @Override
-        public String request(String url) {
+        public String request(String url, String accessToken) {
+            if (!ACCESS_TOKEN.equals(accessToken)) {
+                throw new PlatformHttpErrorException();
+            }
+
             if (url.contains("stars")) {
                 return "{\"items\": [{\"stargazers\": \"5\"}, {\"stargazers\": \"6\"}]}";
             }

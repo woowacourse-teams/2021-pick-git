@@ -5,23 +5,28 @@ import static java.util.stream.Collectors.toList;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
-import com.woowacourse.pickgit.post.domain.repository.PickGitStorage;
-import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.FollowRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.FollowSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.ProfileImageEditRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.UserSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.ProfileEditResponseDto;
+import com.woowacourse.pickgit.user.application.dto.response.ProfileImageEditResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import com.woowacourse.pickgit.user.domain.Contribution;
 import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.domain.follow.PlatformFollowingRequester;
+import com.woowacourse.pickgit.user.domain.profile.PickGitProfileStorage;
+import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -36,28 +41,31 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final PickGitStorage pickGitStorage;
+    private final PickGitProfileStorage pickGitProfileStorage;
     private final PlatformContributionCalculator platformContributionCalculator;
+    private final PlatformFollowingRequester platformFollowingRequester;
 
     public UserService(
         UserRepository userRepository,
-        PickGitStorage pickGitStorage,
-        PlatformContributionCalculator platformContributionCalculator
+        PickGitProfileStorage pickGitProfileStorage,
+        PlatformContributionCalculator platformContributionCalculator,
+        PlatformFollowingRequester platformFollowingRequester
     ) {
         this.userRepository = userRepository;
-        this.pickGitStorage = pickGitStorage;
+        this.pickGitProfileStorage = pickGitProfileStorage;
         this.platformContributionCalculator = platformContributionCalculator;
+        this.platformFollowingRequester = platformFollowingRequester;
     }
 
     @Transactional(readOnly = true)
-    public UserProfileResponseDto getMyUserProfile(AuthUserRequestDto requestDto) {
+    public UserProfileResponseDto getMyUserProfile(AuthUserForUserRequestDto requestDto) {
         validateIsGuest(requestDto);
         User user = findUserByName(requestDto.getUsername());
         return generateUserProfileResponse(user, null);
     }
 
     @Transactional(readOnly = true)
-    public UserProfileResponseDto getUserProfile(AuthUserRequestDto requestDto, String targetName) {
+    public UserProfileResponseDto getUserProfile(AuthUserForUserRequestDto requestDto, String targetName) {
         User target = findUserByName(targetName);
         if (requestDto.isGuest()) {
             return generateUserProfileResponse(target, null);
@@ -84,7 +92,7 @@ public class UserService {
     }
 
     public ProfileEditResponseDto editProfile(
-        AuthUserRequestDto authUserRequestDto,
+        AuthUserForUserRequestDto authUserRequestDto,
         ProfileEditRequestDto profileEditRequestDto
     ) {
         validateIsGuest(authUserRequestDto);
@@ -124,35 +132,90 @@ public class UserService {
 
     private File tryCreateTempFile(MultipartFile multipartFile) {
         try {
-            Path tempFile = Files.createTempFile(null, null);
-            Files.write(tempFile, multipartFile.getBytes());
-
-            return tempFile.toFile();
-        } catch (IOException ioException) {
+            File tempFile = File.createTempFile("temp", null, null);
+            try (FileOutputStream fos = new FileOutputStream(tempFile)) {
+                fos.write(multipartFile.getBytes());
+                return tempFile;
+            }
+        } catch (IOException e) {
             throw new PlatformHttpErrorException();
         }
     }
 
     private String saveImageAndGetUrl(File file, String username) {
-        return pickGitStorage
+        return pickGitProfileStorage
             .store(file, username)
             .orElseThrow(PlatformHttpErrorException::new);
     }
 
-    public FollowResponseDto followUser(AuthUserRequestDto requestDto, String targetName) {
-        validateIsGuest(requestDto);
-        User source = findUserByName(requestDto.getUsername());
-        User target = findUserByName(targetName);
+    public ProfileImageEditResponseDto editProfileImage(
+        AuthUserForUserRequestDto authUserRequestDto,
+        ProfileImageEditRequestDto profileImageEditRequestDto
+    ) {
+        User user = findUserByName(authUserRequestDto.getUsername());
+
+        String userImageUrl = pickGitProfileStorage.storeByteFile(
+            profileImageEditRequestDto.getImage(),
+            user.getName()
+        );
+        user.updateProfileImage(userImageUrl);
+        return new ProfileImageEditResponseDto(userImageUrl);
+    }
+
+    public String editProfileDescription(
+        AuthUserForUserRequestDto authUserRequestDto,
+        String description
+    ) {
+        User user = findUserByName(authUserRequestDto.getUsername());
+
+        user.updateDescription(description);
+        return description;
+    }
+
+    public FollowResponseDto followUser(FollowRequestDto requestDto) {
+        AuthUserForUserRequestDto authUserRequestDto = requestDto.getAuthUserRequestDto();
+        validateIsGuest(authUserRequestDto);
+        User source = findUserByName(authUserRequestDto.getUsername());
+        User target = findUserByName(requestDto.getTargetName());
+
         source.follow(target);
+        followInPlatform(requestDto);
         return generateFollowResponse(target, true);
     }
 
-    public FollowResponseDto unfollowUser(AuthUserRequestDto requestDto, String targetName) {
-        validateIsGuest(requestDto);
-        User source = findUserByName(requestDto.getUsername());
-        User target = findUserByName(targetName);
+    private void followInPlatform(FollowRequestDto requestDto) {
+        if (requestDto.isGithubFollowing()) {
+            platformFollowingRequester.follow(
+                requestDto.getTargetName(),
+                requestDto.getAccessToken()
+            );
+        }
+    }
+
+    public FollowResponseDto unfollowUser(FollowRequestDto requestDto) {
+        AuthUserForUserRequestDto authUserRequestDto = requestDto.getAuthUserRequestDto();
+        validateIsGuest(authUserRequestDto);
+        User source = findUserByName(authUserRequestDto.getUsername());
+        User target = findUserByName(requestDto.getTargetName());
+
         source.unfollow(target);
+        unfollowInPlatform(requestDto);
         return generateFollowResponse(target, false);
+    }
+
+    private void unfollowInPlatform(FollowRequestDto requestDto) {
+        if (requestDto.isGithubFollowing()) {
+            platformFollowingRequester.unfollow(
+                requestDto.getTargetName(),
+                requestDto.getAccessToken()
+            );
+        }
+    }
+
+    private void validateIsGuest(AuthUserForUserRequestDto requestDto) {
+        if (requestDto.isGuest()) {
+            throw new UnauthorizedException();
+        }
     }
 
     private FollowResponseDto generateFollowResponse(User target, boolean isFollowing) {
@@ -162,10 +225,11 @@ public class UserService {
             .build();
     }
 
-    public ContributionResponseDto calculateContributions(String username) {
-        User user = findUserByName(username);
+    public ContributionResponseDto calculateContributions(ContributionRequestDto requestDto) {
+        User user = findUserByName(requestDto.getUsername());
 
-        Contribution contribution = platformContributionCalculator.calculate(user.getName());
+        Contribution contribution = platformContributionCalculator
+            .calculate(requestDto.getAccessToken(), user.getName());
 
         return ContributionResponseDto.builder()
             .starsCount(contribution.getStarsCount())
@@ -178,7 +242,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public List<UserSearchResponseDto> searchUser(
-        AuthUserRequestDto authUserRequestDto,
+        AuthUserForUserRequestDto authUserRequestDto,
         UserSearchRequestDto userSearchRequestDto
     ) {
         Pageable pageable = PageRequest.of(
@@ -199,15 +263,77 @@ public class UserService {
         return convertToUserSearchResponseDtoWithFollowing(loginUser, users);
     }
 
+    @Transactional(readOnly = true)
+    public List<UserSearchResponseDto> searchFollowings(
+        AuthUserForUserRequestDto authUserRequestDto,
+        FollowSearchRequestDto followSearchRequestDto
+    ) {
+        User target = findUserByName(followSearchRequestDto.getUsername());
+        Pageable pageable = PageRequest.of(
+            Math.toIntExact(followSearchRequestDto.getPage()),
+            Math.toIntExact(followSearchRequestDto.getLimit())
+        );
+        List<User> followings = userRepository.searchFollowingsOf(target, pageable);
+
+        if (authUserRequestDto.isGuest()) {
+            return convertToUserSearchResponseDtoWithoutFollowing(followings);
+        }
+
+        User loginUser = findUserByName(authUserRequestDto.getUsername());
+        return convertToUserSearchResponseDtoWithFollowingAndIncludingMe(loginUser, followings);
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserSearchResponseDto> searchFollowers(
+        AuthUserForUserRequestDto authUserRequestDto,
+        FollowSearchRequestDto followSearchRequestDto
+    ) {
+        User target = findUserByName(followSearchRequestDto.getUsername());
+        Pageable pageable = PageRequest.of(
+            Math.toIntExact(followSearchRequestDto.getPage()),
+            Math.toIntExact(followSearchRequestDto.getLimit())
+        );
+        List<User> followers = userRepository.searchFollowersOf(target, pageable);
+
+        if (authUserRequestDto.isGuest()) {
+            return convertToUserSearchResponseDtoWithoutFollowing(followers);
+        }
+
+        User loginUser = findUserByName(authUserRequestDto.getUsername());
+        return convertToUserSearchResponseDtoWithFollowingAndIncludingMe(loginUser, followers);
+    }
+
+    private List<UserSearchResponseDto> convertToUserSearchResponseDtoWithFollowingAndIncludingMe(
+        User loginUser,
+        List<User> followings
+    ) {
+        return followings.stream()
+            .map(followUser -> convert(loginUser, followUser))
+            .collect(toList());
+    }
+
+    private UserSearchResponseDto convert(User loginUser, User followUser) {
+        if (loginUser.equals(followUser)) {
+            return new UserSearchResponseDto(loginUser.getImage(), loginUser.getName(), null);
+        }
+        return new UserSearchResponseDto(
+            followUser.getImage(),
+            followUser.getName(),
+            loginUser.isFollowing(followUser)
+        );
+    }
+
     private List<UserSearchResponseDto> convertToUserSearchResponseDtoWithoutFollowing(
         List<User> users
     ) {
         return users.stream()
-            .map(user -> new UserSearchResponseDto(
-                user.getImage(),
-                user.getName(),
-                null))
+            .map(user -> new UserSearchResponseDto(user.getImage(), user.getName(), null))
             .collect(toList());
+    }
+
+    private User findUserByName(String githubName) {
+        return userRepository.findByBasicProfile_Name(githubName)
+            .orElseThrow(InvalidUserException::new);
     }
 
     private List<UserSearchResponseDto> convertToUserSearchResponseDtoWithFollowing(
@@ -226,16 +352,5 @@ public class UserService {
 
     private Predicate<User> isLoginUser(User loginUser) {
         return user -> !user.equals(loginUser);
-    }
-
-    private void validateIsGuest(AuthUserRequestDto requestDto) {
-        if (requestDto.isGuest()) {
-            throw new UnauthorizedException();
-        }
-    }
-
-    private User findUserByName(String githubName) {
-        return userRepository.findByBasicProfile_Name(githubName)
-            .orElseThrow(InvalidUserException::new);
     }
 }

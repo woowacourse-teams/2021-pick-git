@@ -3,7 +3,10 @@ package com.woowacourse.pickgit.unit.user.presentation;
 import static com.woowacourse.pickgit.docs.ApiDocumentUtils.getDocumentRequest;
 import static com.woowacourse.pickgit.docs.ApiDocumentUtils.getDocumentResponse;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -18,28 +21,43 @@ import static org.springframework.restdocs.payload.JsonFieldType.NULL;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestPartBody;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
+import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.user.application.UserService;
-import com.woowacourse.pickgit.user.application.dto.request.AuthUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.FollowRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.FollowSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
+import com.woowacourse.pickgit.user.application.dto.request.ProfileImageEditRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.ProfileEditResponseDto;
+import com.woowacourse.pickgit.user.application.dto.response.ProfileImageEditResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
+import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import com.woowacourse.pickgit.user.presentation.UserController;
+import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
+import com.woowacourse.pickgit.user.presentation.dto.request.ProfileDescriptionRequest;
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.List;
+import java.util.Optional;
 import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -86,7 +104,7 @@ class UserControllerTest {
                 .willReturn(true);
             given(oAuthService.findRequestUserByToken("testToken"))
                 .willReturn(new LoginUser("loginUser", "testToken"));
-            given(userService.getMyUserProfile(any(AuthUserRequestDto.class)))
+            given(userService.getMyUserProfile(any(AuthUserForUserRequestDto.class)))
                 .willReturn(responseDto);
 
             // when
@@ -109,9 +127,9 @@ class UserControllerTest {
             verify(oAuthService, times(1))
                 .findRequestUserByToken("testToken");
             verify(userService, times(1))
-                .getMyUserProfile(any(AuthUserRequestDto.class));
+                .getMyUserProfile(any(AuthUserForUserRequestDto.class));
 
-            perform.andDo(document("profilesMe",
+            perform.andDo(document("profiles-me",
                 getDocumentRequest(),
                 getDocumentResponse(),
                 requestHeaders(
@@ -145,7 +163,7 @@ class UserControllerTest {
                 .willReturn(true);
             given(oAuthService.findRequestUserByToken("testToken"))
                 .willReturn(new LoginUser("loginUser", "Bearer testToken"));
-            given(userService.getUserProfile(any(AuthUserRequestDto.class), eq("testUser2")))
+            given(userService.getUserProfile(any(AuthUserForUserRequestDto.class), eq("testUser2")))
                 .willReturn(responseDto);
 
             // when
@@ -168,7 +186,7 @@ class UserControllerTest {
             verify(oAuthService, times(1))
                 .findRequestUserByToken("testToken");
             verify(userService, times(1))
-                .getUserProfile(any(AuthUserRequestDto.class), eq("testUser2"));
+                .getUserProfile(any(AuthUserForUserRequestDto.class), eq("testUser2"));
 
             perform.andDo(document("profiles-LoggedIn",
                 getDocumentRequest(),
@@ -206,12 +224,12 @@ class UserControllerTest {
                 .willReturn(true);
             given(oAuthService.findRequestUserByToken("testToken"))
                 .willReturn(new LoginUser("loginUser", "Bearer testToken"));
-            given(userService.followUser(any(AuthUserRequestDto.class), eq("testUser")))
+            given(userService.followUser(any(FollowRequestDto.class)))
                 .willReturn(responseDto);
 
             // when
             ResultActions perform = mockMvc
-                .perform(post("/api/profiles/{userName}/followings", "testUser")
+                .perform(post("/api/profiles/{userName}/followings?githubFollowing={githubFollowing}", "testUser", false)
                     .header(HttpHeaders.AUTHORIZATION, "Bearer testToken")
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .accept(MediaType.ALL));
@@ -230,13 +248,16 @@ class UserControllerTest {
             verify(oAuthService, times(1))
                 .findRequestUserByToken("testToken");
             verify(userService, times(1))
-                .followUser(any(AuthUserRequestDto.class), eq("testUser"));
+                .followUser(any(FollowRequestDto.class));
 
             perform.andDo(document("following-LoggedIn",
                 getDocumentRequest(),
                 getDocumentResponse(),
                 requestHeaders(
                     headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer token")
+                ),
+                requestParameters(
+                    parameterWithName("githubFollowing").description("깃헙 자동 팔로우 여부")
                 ),
                 pathParameters(
                     parameterWithName("userName").description("다른 사용자 이름")
@@ -258,13 +279,13 @@ class UserControllerTest {
                 .willReturn(true);
             given(oAuthService.findRequestUserByToken("testToken"))
                 .willReturn(new LoginUser("loginUser", "Bearer testToken"));
-            given(userService.unfollowUser(any(AuthUserRequestDto.class), eq("testUser")))
+            given(userService.unfollowUser(any(FollowRequestDto.class)))
                 .willReturn(followResponseDto);
 
             // when
             ResultActions perform = mockMvc
                 .perform(RestDocumentationRequestBuilders
-                    .delete("/api/profiles/{userName}/followings", "testUser")
+                    .delete("/api/profiles/{userName}/followings?githubUnfollowing={githubUnfollowing}", "testUser", false)
                     .header(HttpHeaders.AUTHORIZATION, "Bearer testToken")
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .accept(MediaType.ALL));
@@ -283,7 +304,7 @@ class UserControllerTest {
             verify(oAuthService, times(1))
                 .findRequestUserByToken("testToken");
             verify(userService, times(1))
-                .unfollowUser(any(AuthUserRequestDto.class), eq("testUser"));
+                .unfollowUser(any(FollowRequestDto.class));
 
             perform.andDo(document("unfollowing-LoggedIn",
                 getDocumentRequest(),
@@ -291,12 +312,72 @@ class UserControllerTest {
                 requestHeaders(
                     headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer token")
                 ),
+                requestParameters(
+                    parameterWithName("githubUnfollowing").description("깃헙 자동 언팔로우 여부")
+                ),
                 pathParameters(
                     parameterWithName("userName").description("다른 사용자 이름")
                 ),
                 responseFields(
                     fieldWithPath("followerCount").description("팔로워 수"),
                     fieldWithPath("following").description("팔로잉 여부")
+                )
+            ));
+        }
+
+        @DisplayName("사용자는 활동 통계를 조회할 수 있다.")
+        @Test
+        void getContributions_LoginUser_Success() throws Exception {
+            // given
+            LoginUser loginUser = new LoginUser("testUser", "oauth.access.token");
+
+            ContributionResponseDto responseDto = UserFactory.mockContributionResponseDto();
+
+            given(oAuthService.validateToken("test.access.token"))
+                .willReturn(true);
+            given(oAuthService.findRequestUserByToken("test.access.token"))
+                .willReturn(loginUser);
+            given(userService.calculateContributions(any(ContributionRequestDto.class)))
+                .willReturn(responseDto);
+
+            // when
+            ResultActions perform = mockMvc
+                .perform(get("/api/profiles/{username}/contributions", "testUser")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer test.access.token")
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .accept(MediaType.ALL));
+
+            // then
+            String body = perform
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+            assertThat(body).isEqualTo(objectMapper.writeValueAsString(responseDto));
+
+            verify(oAuthService, times(1))
+                .validateToken("test.access.token");
+            verify(oAuthService, times(1))
+                .findRequestUserByToken("test.access.token");
+            verify(userService, times(1))
+                .calculateContributions(any(ContributionRequestDto.class));
+
+            perform.andDo(document("profiles-contributions-LoggedIn",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                requestHeaders(
+                    headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer accessToken")
+                ),
+                pathParameters(
+                    parameterWithName("username").description("사용자 이름")
+                ),
+                responseFields(
+                    fieldWithPath("starsCount").description("스타 개수"),
+                    fieldWithPath("commitsCount").description("커밋 개수"),
+                    fieldWithPath("prsCount").description("PR 개수"),
+                    fieldWithPath("issuesCount").description("이슈 개수"),
+                    fieldWithPath("reposCount").description("퍼블릭 레포지토리 개수")
                 )
             ));
         }
@@ -319,12 +400,12 @@ class UserControllerTest {
             given(oAuthService.findRequestUserByToken("token"))
                 .willReturn(loginUser);
             given(userService
-                .editProfile(any(AuthUserRequestDto.class), any(ProfileEditRequestDto.class)))
+                .editProfile(any(AuthUserForUserRequestDto.class), any(ProfileEditRequestDto.class)))
                 .willReturn(responseDto);
 
             // when
             ResultActions perform = mockMvc.perform(multipart("/api/profiles/me")
-                .file(image)
+                .file("images", "testImage1".getBytes())
                 .param("description", description)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer token")
             );
@@ -338,10 +419,10 @@ class UserControllerTest {
             verify(oAuthService, times(1)).validateToken("token");
             verify(oAuthService, times(1)).findRequestUserByToken("token");
             verify(userService, times(1))
-                .editProfile(any(AuthUserRequestDto.class), any(ProfileEditRequestDto.class));
+                .editProfile(any(AuthUserForUserRequestDto.class), any(ProfileEditRequestDto.class));
 
             // restdocs
-            perform.andDo(document("edit-profile",
+            perform.andDo(document("profiles-edit",
                 getDocumentRequest(),
                 getDocumentResponse(),
                 requestHeaders(
@@ -350,6 +431,90 @@ class UserControllerTest {
                 requestPartBody("images"),
                 responseFields(
                     fieldWithPath("imageUrl").type(STRING).description("변경된 프로필 이미지 url"),
+                    fieldWithPath("description").type(STRING).description("변경된 한 줄 소개")
+                ))
+            );
+        }
+
+        @DisplayName("자신의 프로필 이미지를 수정할 수 있다.")
+        @Test
+        void editUserProfileImage_LoginUserWithImage_Success() throws Exception {
+            // given
+            AppUser loginUser = new LoginUser("testUser", "token");
+            File file = FileFactory.getTestImage1File();
+
+            // mock
+            given(oAuthService.validateToken("token"))
+                .willReturn(true);
+            given(oAuthService.findRequestUserByToken("token"))
+                .willReturn(loginUser);
+            given(userService
+                .editProfileImage(any(AuthUserForUserRequestDto.class), any(ProfileImageEditRequestDto.class)))
+                .willReturn(new ProfileImageEditResponseDto(file.getName()));
+
+            // when
+            ResultActions perform = mockMvc.perform(
+                put("/api/profiles/me/image")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer token")
+                    .content(new FileInputStream(file).readAllBytes())
+            );
+
+            // then
+            perform
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("imageUrl").value(file.getName()));
+
+            verify(oAuthService, times(1)).validateToken("token");
+            verify(oAuthService, times(1)).findRequestUserByToken("token");
+            verify(userService, times(1))
+                .editProfileImage(any(AuthUserForUserRequestDto.class), any(ProfileImageEditRequestDto.class));
+        }
+
+        @DisplayName("자신의 프로필 한 줄 소개를 수정할 수 있다.")
+        @Test
+        void editUserProfileDescrption_LoginUserWithDescrption_Success()
+            throws Exception {
+            // given
+            AppUser loginUser = new LoginUser("testUser", "token");
+            String description = "updated description";
+
+            // mock
+            given(oAuthService.validateToken("token"))
+                .willReturn(true);
+            given(oAuthService.findRequestUserByToken("token"))
+                .willReturn(loginUser);
+            given(userService.editProfileDescription(any(AuthUserForUserRequestDto.class), anyString()))
+                .willReturn(description);
+
+            // when
+            ResultActions perform = mockMvc.perform(
+                put("/api/profiles/me/description")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer token")
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .content(objectMapper.writeValueAsString(new ProfileDescriptionRequest(description)))
+            );
+
+            // then
+            perform
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("description").value(description));
+
+            verify(oAuthService, times(1)).validateToken("token");
+            verify(oAuthService, times(1)).findRequestUserByToken("token");
+            verify(userService, times(1))
+                .editProfileDescription(any(AuthUserForUserRequestDto.class), anyString());
+
+            // restdocs
+            perform.andDo(document("edit-profile-description",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                requestHeaders(
+                    headerWithName(HttpHeaders.AUTHORIZATION).description("bearer token")
+                ),
+                requestFields(
+                    fieldWithPath("description").type(STRING).description("프로필 한 줄 소개")
+                ),
+                responseFields(
                     fieldWithPath("description").type(STRING).description("변경된 한 줄 소개")
                 ))
             );
@@ -381,7 +546,7 @@ class UserControllerTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("errorCode").value("A0001"));
 
-            perform.andDo(document("profilesMe",
+            perform.andDo(document("profiles-me-unLoggedIn",
                 getDocumentRequest(),
                 getDocumentResponse(),
                 requestHeaders(
@@ -401,7 +566,7 @@ class UserControllerTest {
 
             given(oAuthService.findRequestUserByToken(any()))
                 .willCallRealMethod();
-            given(userService.getUserProfile(any(AuthUserRequestDto.class), eq("testUser")))
+            given(userService.getUserProfile(any(AuthUserForUserRequestDto.class), eq("testUser")))
                 .willReturn(responseDto);
 
             // when
@@ -421,7 +586,7 @@ class UserControllerTest {
             verify(oAuthService, times(1))
                 .findRequestUserByToken(any());
             verify(userService, times(1))
-                .getUserProfile(any(AuthUserRequestDto.class), eq("testUser"));
+                .getUserProfile(any(AuthUserForUserRequestDto.class), eq("testUser"));
 
             perform.andDo(document("profiles-unLoggedIn",
                 getDocumentRequest(),
@@ -517,15 +682,13 @@ class UserControllerTest {
         @Test
         void editUserProfile_GuestUser_Fail() throws Exception {
             // given
-            MockMultipartFile image = FileFactory.getTestImage1();
-
             // mock
             given(oAuthService.validateToken(any()))
                 .willReturn(false);
 
             // when
             ResultActions perform = mockMvc.perform(multipart("/api/profiles/me")
-                .file(image)
+                .file("images", "testImage1".getBytes())
                 .param("description", "updated description")
             );
 
@@ -535,46 +698,270 @@ class UserControllerTest {
                 .andExpect(jsonPath("errorCode").value("A0001"));
 
             verify(oAuthService, times(1)).validateToken(any());
+
+            perform.andDo(document("profiles-edit-unLoggedIn",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                requestPartBody("images"),
+                responseFields(
+                    fieldWithPath("errorCode").type(STRING).description("에러 코드")
+                )
+            ));
+        }
+
+        @DisplayName("게스트는 활동 통계를 조회할 수 없다. - 401 예외")
+        @Test
+        void getContributions_GuestUser_401Exception() throws Exception {
+            // given
+            GuestUser guestUser = new GuestUser();
+
+            given(oAuthService.validateToken(null))
+                .willReturn(true);
+            given(oAuthService.findRequestUserByToken(null))
+                .willReturn(guestUser);
+
+            // when
+            ResultActions perform = mockMvc
+                .perform(get("/api/profiles/{username}/contributions", "testUser")
+                    .header(HttpHeaders.AUTHORIZATION, Optional.empty())
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .accept(MediaType.ALL));
+
+            // then
+            perform
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("errorCode").value("A0002"));
+
+            verify(oAuthService, times(1))
+                .validateToken(null);
+            verify(oAuthService, times(1))
+                .findRequestUserByToken(null);
+
+            perform.andDo(document("profiles-contributions-unLoggedIn",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                requestHeaders(
+                    headerWithName(HttpHeaders.AUTHORIZATION).description(Optional.empty())
+                ),
+                responseFields(
+                    fieldWithPath("errorCode").type(STRING).description("에러 코드")
+                )
+            ));
         }
     }
 
-    @DisplayName("누구든지 활동 통계를 조회할 수 있다.")
+    @DisplayName("로그인 - 특정 유저의 팔로잉 목록을 조회한다.")
     @Test
-    void getContributions_Anyone_Success() throws Exception {
+    void searchFollowings_LoginUser_Success() throws Exception {
         // given
-        ContributionResponseDto responseDto = UserFactory.mockContributionResponseDto();
-
-        given(userService.calculateContributions("testUser"))
-            .willReturn(responseDto);
+        List<UserSearchResponseDto> userSearchResponseDtos = List.of(
+            new UserSearchResponseDto("image1", "kevin", true),
+            new UserSearchResponseDto("image2", "koda", false),
+            new UserSearchResponseDto("image3", "source", null)
+        );
+        given(oAuthService.validateToken("token"))
+            .willReturn(true);
+        given(oAuthService.findRequestUserByToken("token"))
+            .willReturn(new LoginUser("source", "token"));
+        given(userService.searchFollowings(
+            any(AuthUserForUserRequestDto.class),
+            any(FollowSearchRequestDto.class)
+        )).willReturn(userSearchResponseDtos);
 
         // when
-        ResultActions perform = mockMvc
-            .perform(get("/api/profiles/{username}/contributions", "testUser")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .accept(MediaType.ALL));
+        ResultActions resultActions = mockMvc.perform(
+            get("/api/profiles/{username}/followings", "mark")
+                .param("page", "0")
+                .param("limit", "3")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer token")
+        );
 
         // then
-        String body = perform
-            .andExpect(status().isOk())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
+        resultActions.andExpect(status().isOk())
+            .andExpect(jsonPath("$[*].imageUrl", contains("image1", "image2", "image3")))
+            .andExpect(jsonPath("$[*].username", contains("kevin", "koda", "source")))
+            .andExpect(jsonPath("$[*].following", contains(true, false, null)));
 
-        assertThat(body).isEqualTo(objectMapper.writeValueAsString(responseDto));
-        verify(userService, times(1)).calculateContributions("testUser");
+        verify(oAuthService, times(1)).validateToken("token");
+        verify(oAuthService, times(1)).findRequestUserByToken("token");
+        verify(userService, times(1))
+            .searchFollowings(any(AuthUserForUserRequestDto.class), any(FollowSearchRequestDto.class));
 
-        perform.andDo(document("contributions-LoggedIn",
+        // restdocs
+        resultActions.andDo(document("search-followings-LoggedIn",
             getDocumentRequest(),
             getDocumentResponse(),
             pathParameters(
-                parameterWithName("username").description("사용자 이름")
+                parameterWithName("username").description("팔로잉 목록 조회 대상 유저 이름")
+            ),
+            requestParameters(
+                parameterWithName("page").description("page"),
+                parameterWithName("limit").description("limit")
             ),
             responseFields(
-                fieldWithPath("starsCount").description("스타 개수"),
-                fieldWithPath("commitsCount").description("커밋 개수"),
-                fieldWithPath("prsCount").description("PR 개수"),
-                fieldWithPath("issuesCount").description("이슈 개수"),
-                fieldWithPath("reposCount").description("퍼블릭 레포지토리 개수")
+                fieldWithPath("[].imageUrl").type(STRING).description("팔로잉 유저 이미지 url"),
+                fieldWithPath("[].username").type(STRING).description("팔로잉 유저 이름"),
+                fieldWithPath("[].following").type(BOOLEAN).optional().description("로그인시 검색된 유저 팔로잉 여부")
+            )
+        ));
+    }
+
+    @DisplayName("비로그인 - 특정 유저의 팔로잉 목록을 조회한다.")
+    @Test
+    void searchFollowings_GuestUser_Success() throws Exception {
+        // given
+        List<UserSearchResponseDto> userSearchResponseDtos = List.of(
+            new UserSearchResponseDto("image1", "kevin", null),
+            new UserSearchResponseDto("image2", "koda", null),
+            new UserSearchResponseDto("image3", "source", null)
+        );
+        given(oAuthService.findRequestUserByToken(null))
+            .willReturn(new GuestUser());
+        given(userService.searchFollowings(
+            any(AuthUserForUserRequestDto.class),
+            any(FollowSearchRequestDto.class)
+        )).willReturn(userSearchResponseDtos);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+            get("/api/profiles/{username}/followings", "mark")
+                .param("page", "0")
+                .param("limit", "3")
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+            .andExpect(jsonPath("$[*].imageUrl", contains("image1", "image2", "image3")))
+            .andExpect(jsonPath("$[*].username", contains("kevin", "koda", "source")))
+            .andExpect(jsonPath("$[*].following", contains(nullValue(), nullValue(), nullValue())));
+
+        verify(oAuthService, times(1)).findRequestUserByToken(null);
+        verify(userService, times(1))
+            .searchFollowings(any(AuthUserForUserRequestDto.class), any(FollowSearchRequestDto.class));
+
+        // restdocs
+        resultActions.andDo(document("search-followings-unLoggedIn",
+            getDocumentRequest(),
+            getDocumentResponse(),
+            pathParameters(
+                parameterWithName("username").description("팔로잉 목록 조회 대상 유저 이름")
+            ),
+            requestParameters(
+                parameterWithName("page").description("page"),
+                parameterWithName("limit").description("limit")
+            ),
+            responseFields(
+                fieldWithPath("[].imageUrl").type(STRING).description("팔로잉 유저 이미지 url"),
+                fieldWithPath("[].username").type(STRING).description("팔로잉 유저 이름"),
+                fieldWithPath("[].following").type(NULL).description("비로그인시 검색된 유저 팔로잉 여부")
+            )
+        ));
+    }
+
+    @DisplayName("로그인 - 특정 유저의 팔로워 목록을 조회한다.")
+    @Test
+    void searchFollowers_LoginUser_Success() throws Exception {
+        // given
+        List<UserSearchResponseDto> userSearchResponseDtos = List.of(
+            new UserSearchResponseDto("image1", "kevin", true),
+            new UserSearchResponseDto("image2", "koda", false),
+            new UserSearchResponseDto("image3", "source", null)
+        );
+        given(oAuthService.validateToken("token"))
+            .willReturn(true);
+        given(oAuthService.findRequestUserByToken("token"))
+            .willReturn(new LoginUser("source", "token"));
+        given(userService.searchFollowers(
+            any(AuthUserForUserRequestDto.class),
+            any(FollowSearchRequestDto.class)
+        )).willReturn(userSearchResponseDtos);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+            get("/api/profiles/{username}/followers", "mark")
+                .param("page", "0")
+                .param("limit", "3")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer token")
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+            .andExpect(jsonPath("$[*].imageUrl", contains("image1", "image2", "image3")))
+            .andExpect(jsonPath("$[*].username", contains("kevin", "koda", "source")))
+            .andExpect(jsonPath("$[*].following", contains(true, false, null)));
+
+        verify(oAuthService, times(1)).validateToken("token");
+        verify(oAuthService, times(1)).findRequestUserByToken("token");
+        verify(userService, times(1))
+            .searchFollowers(any(AuthUserForUserRequestDto.class), any(FollowSearchRequestDto.class));
+
+        // restdocs
+        resultActions.andDo(document("search-followers-LoggedIn",
+            getDocumentRequest(),
+            getDocumentResponse(),
+            pathParameters(
+                parameterWithName("username").description("팔로워 목록 조회 대상 유저 이름")
+            ),
+            requestParameters(
+                parameterWithName("page").description("page"),
+                parameterWithName("limit").description("limit")
+            ),
+            responseFields(
+                fieldWithPath("[].imageUrl").type(STRING).description("팔로워 유저 이미지 url"),
+                fieldWithPath("[].username").type(STRING).description("팔로워 유저 이름"),
+                fieldWithPath("[].following").type(BOOLEAN).optional().description("로그인시 검색된 유저 팔로잉 여부")
+            )
+        ));
+    }
+
+    @DisplayName("비로그인 - 특정 유저의 팔로워 목록을 조회한다.")
+    @Test
+    void searchFollowers_GuestUser_Success() throws Exception {
+        // given
+        List<UserSearchResponseDto> userSearchResponseDtos = List.of(
+            new UserSearchResponseDto("image1", "kevin", null),
+            new UserSearchResponseDto("image2", "koda", null),
+            new UserSearchResponseDto("image3", "source", null)
+        );
+        given(oAuthService.findRequestUserByToken(null))
+            .willReturn(new GuestUser());
+        given(userService.searchFollowers(
+            any(AuthUserForUserRequestDto.class),
+            any(FollowSearchRequestDto.class)
+        )).willReturn(userSearchResponseDtos);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+            get("/api/profiles/{username}/followers", "mark")
+                .param("page", "0")
+                .param("limit", "3")
+        );
+
+        // then
+        resultActions.andExpect(status().isOk())
+            .andExpect(jsonPath("$[*].imageUrl", contains("image1", "image2", "image3")))
+            .andExpect(jsonPath("$[*].username", contains("kevin", "koda", "source")))
+            .andExpect(jsonPath("$[*].following", contains(nullValue(), nullValue(), nullValue())));
+
+        verify(oAuthService, times(1)).findRequestUserByToken(null);
+        verify(userService, times(1))
+            .searchFollowers(any(AuthUserForUserRequestDto.class), any(FollowSearchRequestDto.class));
+
+        // restdocs
+        resultActions.andDo(document("search-followers-unLoggedIn",
+            getDocumentRequest(),
+            getDocumentResponse(),
+            pathParameters(
+                parameterWithName("username").description("팔로워 목록 조회 대상 유저 이름")
+            ),
+            requestParameters(
+                parameterWithName("page").description("page"),
+                parameterWithName("limit").description("limit")
+            ),
+            responseFields(
+                fieldWithPath("[].imageUrl").type(STRING).description("팔로워 유저 이미지 url"),
+                fieldWithPath("[].username").type(STRING).description("팔로워 유저 이름"),
+                fieldWithPath("[].following").type(NULL).description("비로그인시 검색된 유저 팔로잉 여부")
             )
         ));
     }

@@ -1,22 +1,20 @@
-import { QueryFunction, useMutation, useQuery, useQueryClient } from "react-query";
-import axios, { AxiosError } from "axios";
+import { QueryFunction, useInfiniteQuery, useMutation, useQuery } from "react-query";
+import { AxiosError } from "axios";
 
-import { ErrorResponse, MutateResponseFollow, ProfileData } from "../../@types";
+import { ErrorResponse, MutateResponseFollow, ProfileData, UserItem } from "../../@types";
 import { QUERY } from "../../constants/queries";
 import {
   requestAddFollow,
   requestDeleteFollow,
+  requestGetFollowers,
+  requestGetFollowings,
   requestGetSelfProfile,
   requestGetUserProfile,
-  requestSetProfile,
+  requestSetProfileDescription,
+  requestSetProfileImage,
 } from "../requests";
-import UserContext from "../../contexts/UserContext";
-import { useContext } from "react";
 import { getAccessToken } from "../../storage/storage";
-import SnackBarContext from "../../contexts/SnackbarContext";
-import { SUCCESS_MESSAGE, UNKNOWN_ERROR_MESSAGE } from "../../constants/messages";
-import { customError, handleHTTPError } from "../../utils/error";
-import { isHttpErrorStatus } from "../../utils/typeGuard";
+import { customError } from "../../utils/error";
 
 type ProfileQueryKey = readonly [
   typeof QUERY.GET_PROFILE,
@@ -26,14 +24,9 @@ type ProfileQueryKey = readonly [
   }
 ];
 
-interface SetProfileVariable {
-  image: File | null;
-  description: string;
-}
-
-interface SetProfileResponse {
-  imageUrl: string;
-  description: string;
+interface MutateFollowVariable {
+  username: string;
+  applyGithub: boolean;
 }
 
 export const useProfileQuery = (isMyProfile: boolean, username: string | null) => {
@@ -59,17 +52,39 @@ export const useProfileQuery = (isMyProfile: boolean, username: string | null) =
 };
 
 export const useFollowingMutation = () =>
-  useMutation<MutateResponseFollow, AxiosError<ErrorResponse>, string>((username) =>
-    requestAddFollow(username, getAccessToken())
+  useMutation<MutateResponseFollow, AxiosError<ErrorResponse>, MutateFollowVariable>(({ username, applyGithub }) =>
+    requestAddFollow(username, applyGithub, getAccessToken())
   );
 
 export const useUnfollowingMutation = () =>
-  useMutation<MutateResponseFollow, AxiosError<ErrorResponse>, string>((username) =>
-    requestDeleteFollow(username, getAccessToken())
+  useMutation<MutateResponseFollow, AxiosError<ErrorResponse>, MutateFollowVariable>(({ username, applyGithub }) =>
+    requestDeleteFollow(username, applyGithub, getAccessToken())
   );
 
-export const useProfileMutation = () => {
-  return useMutation<SetProfileResponse, AxiosError<ErrorResponse> | Error, SetProfileVariable>(
-    ({ image, description }) => requestSetProfile(image, description, getAccessToken())
+export const useProfileImageMutation = () => {
+  return useMutation<{ imageUrl: string } | null, AxiosError<ErrorResponse> | Error, { image: File }>(({ image }) =>
+    requestSetProfileImage(image, getAccessToken())
+  );
+};
+
+export const useProfileDescriptionMutation = () => {
+  return useMutation<{ description: string }, AxiosError<ErrorResponse> | Error, { description: string }>(
+    ({ description }) => requestSetProfileDescription(description, getAccessToken())
+  );
+};
+
+export const useFollowingsQuery = (username: string | null) => {
+  return useInfiniteQuery<UserItem[] | null, AxiosError<ErrorResponse>>(
+    [QUERY.GET_PROFILE_FOLLOWING, { username }],
+    async ({ pageParam = 0 }) => await requestGetFollowings(username, pageParam, getAccessToken()),
+    { getNextPageParam: (_, pages) => pages.length }
+  );
+};
+
+export const useFollowersQuery = (username: string | null) => {
+  return useInfiniteQuery<UserItem[] | null, AxiosError<ErrorResponse>>(
+    [QUERY.GET_PROFILE_FOLLOWER, { username }],
+    async ({ pageParam = 0 }) => await requestGetFollowers(username, pageParam, getAccessToken()),
+    { getNextPageParam: (_, pages) => pages.length }
   );
 };

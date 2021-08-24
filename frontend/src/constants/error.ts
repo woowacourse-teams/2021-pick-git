@@ -13,6 +13,7 @@ export const httpErrorStatusName = Object.values(httpErrorStatus);
 
 export const clientErrorCodeMap = {
   C0001: "noAccessToken",
+  C0002: "fileReader",
 } as const;
 
 export const clientErrorCodeName = Object.values(clientErrorCodeMap);

@@ -1,5 +1,6 @@
 import styled from "styled-components";
-import { LAYOUT, Z_INDEX } from "../../constants/layout";
+import { LAYOUT, PAGE_WIDTH, Z_INDEX } from "../../constants/layout";
+import { setDesktopMediaQuery, setLaptopMediaQuery, setTabletMediaQuery, setMobileMediaQuery } from "./mediaQueries";
 
 export const Header = styled.header`
   position: fixed;
@@ -7,21 +8,34 @@ export const Header = styled.header`
   width: 100%;
   height: ${LAYOUT.HEADER_HEIGHT};
   background-color: ${({ theme }) => theme.color.white};
-  z-index: ${Z_INDEX.LOWER};
+  z-index: ${Z_INDEX.LOW};
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
 
-  @media (min-width: 425px) {
-    border-bottom: 1px solid ${({ theme }) => theme.color.borderColor};
-  }
+  ${setMobileMediaQuery`
+    box-shadow: none;
+  `}
 `;
 
 export const Page = styled.main`
   width: 100%;
   height: 100%;
-  max-width: 425px;
   padding-top: ${LAYOUT.HEADER_HEIGHT};
-  margin: 0 auto;
 
-  @media (min-width: 425px) {
+  ${setTabletMediaQuery`
     padding-top: ${LAYOUT.PAGE_MARGIN_TOP};
-  }
+    width: ${PAGE_WIDTH.TABLET};
+    margin: 0 auto;
+  `}
+
+  ${setLaptopMediaQuery`
+    padding-top: ${LAYOUT.PAGE_MARGIN_TOP};
+    width: ${PAGE_WIDTH.LAPTOP};
+    margin: 0 auto;
+  `}
+
+  ${setDesktopMediaQuery`
+    padding-top: ${LAYOUT.PAGE_MARGIN_TOP};
+    width: ${PAGE_WIDTH.DESKTOP};
+    margin: 0 auto;
+  `}
 `;

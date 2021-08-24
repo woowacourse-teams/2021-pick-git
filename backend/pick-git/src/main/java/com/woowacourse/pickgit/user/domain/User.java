@@ -2,7 +2,6 @@ package com.woowacourse.pickgit.user.domain;
 
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.Posts;
-import com.woowacourse.pickgit.post.domain.comment.Comment;
 import com.woowacourse.pickgit.user.domain.follow.Follow;
 import com.woowacourse.pickgit.user.domain.follow.Followers;
 import com.woowacourse.pickgit.user.domain.follow.Followings;
@@ -93,15 +92,15 @@ public class User {
     }
 
     public Boolean isFollowing(User targetUser) {
+        if (this.equals(targetUser)) {
+            return null;
+        }
+
         return this.followings.isFollowing(targetUser);
     }
 
     public void changeGithubProfile(GithubProfile githubProfile) {
         this.githubProfile = githubProfile;
-    }
-
-    public boolean isSameAs(User user) {
-        return this.id.equals(user.getId());
     }
 
     public void delete(Post post) {
@@ -162,11 +161,13 @@ public class User {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!(o instanceof User)) {
             return false;
         }
+
         User user = (User) o;
-        return Objects.equals(getId(), user.getId());
+
+        return id != null ? id.equals(user.getId()) : user.getId() == null;
     }
 
     @Override

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <included>
-  <property name="home" value="logs/"/>
+  <property name="home" value="logs/access/"/>
   <appender name="access-logger" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${home}access.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -13,7 +13,7 @@
     <encoder>
       <charset>utf8</charset>
       <Pattern>
-        %n%boldGreen(###### HTTP Request ######) %n%fullRequest%boldCyan(###### HTTP Response ######) %n%fullResponse
+        %n###### HTTP Request ###### %n%fullRequest###### HTTP Response ###### %n%fullResponse
       </Pattern>
     </encoder>
   </appender>

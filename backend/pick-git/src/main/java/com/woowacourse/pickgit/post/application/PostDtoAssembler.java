@@ -2,13 +2,13 @@ package com.woowacourse.pickgit.post.application;
 
 import static java.util.stream.Collectors.toList;
 
-import com.woowacourse.pickgit.post.application.dto.response.CommentResponseDto;
+import com.woowacourse.pickgit.comment.application.dto.response.CommentResponseDto;
+import com.woowacourse.pickgit.comment.domain.Comment;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.domain.Post;
-import com.woowacourse.pickgit.post.domain.comment.Comment;
-import com.woowacourse.pickgit.tag.domain.Tag;
 import com.woowacourse.pickgit.user.domain.User;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 
 public class PostDtoAssembler {
@@ -18,15 +18,14 @@ public class PostDtoAssembler {
 
     public static List<PostResponseDto> assembleFrom(
         User requestUser,
-        boolean isGuest,
         List<Post> posts
     ) {
         return posts.stream()
-            .map(post -> convertFrom(requestUser, isGuest, post))
+            .map(post -> convertFrom(requestUser, post))
             .collect(toList());
     }
 
-    private static PostResponseDto convertFrom(User requestUser, boolean isGuest, Post post) {
+    private static PostResponseDto convertFrom(User requestUser, Post post) {
         List<String> tags = createTagsFrom(post);
         List<CommentResponseDto> comments = createCommentResponsesFrom(post);
 
@@ -42,7 +41,7 @@ public class PostDtoAssembler {
             .createdAt(post.getCreatedAt())
             .updatedAt(post.getUpdatedAt())
             .comments(comments)
-            .liked(isLikedBy(requestUser, post, isGuest))
+            .liked(isLikedBy(requestUser, post))
             .build();
     }
 
@@ -50,6 +49,7 @@ public class PostDtoAssembler {
         return post.getComments()
             .stream()
             .map(toCommentResponse())
+            .limit(3)
             .collect(toList());
     }
 
@@ -67,8 +67,8 @@ public class PostDtoAssembler {
         return post.getTagNames();
     }
 
-    private static Boolean isLikedBy(User requestUser, Post post, boolean isGuest) {
-        if (isGuest) {
+    private static Boolean isLikedBy(User requestUser, Post post) {
+        if (Objects.isNull(requestUser)) {
             return null;
         }
 
