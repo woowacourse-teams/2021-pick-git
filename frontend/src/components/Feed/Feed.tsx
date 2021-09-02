@@ -4,10 +4,8 @@ import SnackBarContext from "../../contexts/SnackbarContext";
 import UserContext from "../../contexts/UserContext";
 import PostItem from "../@shared/PostItem/PostItem";
 import { Container, PostItemWrapper } from "./Feed.style";
-import useBottomSlider from "../../services/hooks/@common/useBottomSlider";
-import CommentSlider from "../CommentSlider/CommentSlider";
 import useFeedMutation from "../../services/hooks/useFeedMutation";
-import { FAILURE_MESSAGE, SUCCESS_MESSAGE, WARNING_MESSAGE } from "../../constants/messages";
+import { SUCCESS_MESSAGE, WARNING_MESSAGE } from "../../constants/messages";
 import { getAPIErrorMessage } from "../../utils/error";
 import { useHistory } from "react-router-dom";
 import { PAGE_URL } from "../../constants/urls";
@@ -25,7 +23,8 @@ interface Props {
 const Feed = ({ infinitePostsData, queryKey }: Props) => {
   const [selectedPostId, setSelectedPostId] = useState<Post["id"]>();
   const { pushSnackbarMessage } = useContext(SnackBarContext);
-  const { addPostComment, addPostLike, deletePost, deletePostLike } = useFeedMutation(queryKey);
+  const { addPostLike, deletePost, deletePostLike, isDeletePostLikeLoading, isAddPostLikeLoading } =
+    useFeedMutation(queryKey);
   const { setPostEditData } = usePostEdit();
   const { modalMessage, isModalShown, isCancelButtonShown, showConfirmModal, hideMessageModal } = useMessageModal();
   const { isLoggedIn, currentUsername } = useContext(UserContext);
@@ -130,6 +129,8 @@ const Feed = ({ infinitePostsData, queryKey }: Props) => {
             onPostDelete={() => handlePostDeleteButtonClick(post.id)}
             onPostEdit={() => handlePostEdit(post)}
             onPostLike={() => handlePostLike(post.id)}
+            isDeletePostLikeLoading={isDeletePostLikeLoading}
+            isAddPostLikeLoading={isAddPostLikeLoading}
             handlePostLikeCountClick={() => handlePostLikeCountClick(post.id)}
             onMoreCommentClick={() => handleCommentsClick(post.id)}
             onCommentInputClick={() => handleCommentsClick(post.id)}

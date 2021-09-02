@@ -41,6 +41,7 @@ import { getTimeDiffFromCurrent } from "../../../utils/date";
 import EmptyPostImage from "../../../assets/images/empty-post-image.png";
 import ButtonDrawer from "../ButtonDrawer/ButtonDrawer";
 import { getTextElementsWithWithBr } from "../../../utils/text";
+import { Spinner } from "../Loader/Loader.style";
 
 export interface Props {
   currentUserName: string;
@@ -57,6 +58,8 @@ export interface Props {
   tags: string[];
   createdAt: string;
   isLoggedIn: boolean;
+  isDeletePostLikeLoading: boolean;
+  isAddPostLikeLoading: boolean;
   handlePostLikeCountClick: () => void;
   onMoreCommentClick: () => void;
   onCommentInputClick: () => void;
@@ -92,6 +95,8 @@ const PostItem = ({
   onPostEdit,
   onPostDelete,
   onPostLike,
+  isDeletePostLikeLoading,
+  isAddPostLikeLoading,
 }: Props) => {
   const [shouldHideContent, setShouldHideContent] = useState(true);
   const { color } = useContext(ThemeContext);
@@ -126,6 +131,18 @@ const PostItem = ({
     </TagItemLinkButton>
   ));
 
+  const LikeButton = () => {
+    return isLoggedIn ? (
+      isDeletePostLikeLoading || isAddPostLikeLoading ? (
+        <Spinner size="1rem" />
+      ) : (
+        <IconLink onClick={onPostLike}>{liked ? <PostHeartIcon /> : <PostHeartLineIcon />}</IconLink>
+      )
+    ) : (
+      <></>
+    );
+  };
+
   const handleMoreContentShow = () => {
     setShouldHideContent(false);
   };
@@ -146,11 +163,7 @@ const PostItem = ({
       <ImageSlider imageUrls={imageUrls.length !== 0 ? imageUrls : [EmptyPostImage]} slideButtonKind="in-box" />
       <PostBody>
         <IconLinkButtonsWrapper>
-          {isLoggedIn ? (
-            <IconLink onClick={onPostLike}>{liked ? <PostHeartIcon /> : <PostHeartLineIcon />}</IconLink>
-          ) : (
-            <div></div>
-          )}
+          <LikeButton />
           <IconLink href={authorGithubUrl} target="_blank">
             <CircleIcon diameter="1.625rem" backgroundColor={color.tertiaryColor}>
               <GithubIcon />

@@ -10,8 +10,8 @@ import {
 } from "../queries";
 
 const useFeedMutation = (queryKey: QueryKey) => {
-  const { mutateAsync: mutateDeletePostLike } = useDeletePostLikeMutation();
-  const { mutateAsync: mutateAddPostLike } = useAddPostLikeMutation();
+  const { mutateAsync: mutateDeletePostLike, isLoading: isDeletePostLikeLoading } = useDeletePostLikeMutation();
+  const { mutateAsync: mutateAddPostLike, isLoading: isAddPostLikeLoading } = useAddPostLikeMutation();
   const { mutateAsync: mutateDeletePost } = useDeletePostMutation();
   const { mutateAsync: mutateAddComment } = useAddPostCommentMutation();
   const { mutateAsync: mutateDeleteComment } = useDeletePostCommentMutation();
@@ -92,6 +92,8 @@ const useFeedMutation = (queryKey: QueryKey) => {
     addPostComment,
     deletePost,
     deletePostLike,
+    isDeletePostLikeLoading,
+    isAddPostLikeLoading,
   };
 };
 
