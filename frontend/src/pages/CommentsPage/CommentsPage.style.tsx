@@ -131,6 +131,10 @@ export const SendIconWrapper = styled.div`
   }
 `;
 
+export const CommentLoadingWrapper = styled.div`
+  padding-top: 6.25rem;
+`;
+
 export const CommentTextAreaWrapper = styled.div`
   position: fixed;
   bottom: 0;

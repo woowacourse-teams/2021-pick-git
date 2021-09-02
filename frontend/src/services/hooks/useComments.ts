@@ -25,8 +25,8 @@ const useComments = (selectedPostId: Post["id"]) => {
   } = usePostCommentsQuery(selectedPostId);
   const queryClient = useQueryClient();
 
-  const { mutateAsync: mutateAddComment } = useAddPostCommentMutation();
-  const { mutateAsync: mutateDeleteComment } = useDeletePostCommentMutation();
+  const { mutateAsync: mutateAddComment, isLoading: isAddCommentLoading } = useAddPostCommentMutation();
+  const { mutateAsync: mutateDeleteComment, isLoading: isDeleteCommentLoading } = useDeletePostCommentMutation();
 
   const handleError = () => {
     if (!error) return;
@@ -125,6 +125,8 @@ const useComments = (selectedPostId: Post["id"]) => {
     getNextComments,
     addPostComment,
     deletePostComment,
+    isAddCommentLoading,
+    isDeleteCommentLoading,
   };
 };
 
