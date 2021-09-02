@@ -1,12 +1,12 @@
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import UserList from "../../components/UserList/UserList";
 import useFollow from "../../services/hooks/useFollow";
-import useFollowingList from "../../services/hooks/useFollowingList";
-import { Container, ContentWrapper } from "./FollowingList.style";
+import useFollowerList from "../../services/hooks/useFollowerList";
+import { Container, ContentWrapper } from "./FollowerListPage.style";
 
-const FollowingList = () => {
+const FollowerList = () => {
   const username = new URLSearchParams(location.search).get("username");
-  const { results, isError, isLoading, isFetchingNextPage, handleIntersect, refetch } = useFollowingList(username);
+  const { results, isError, isLoading, isFetchingNextPage, handleIntersect, refetch } = useFollowerList(username);
   const follow = useFollow();
 
   if (isLoading) {
@@ -32,4 +32,4 @@ const FollowingList = () => {
   );
 };
 
-export default FollowingList;
+export default FollowerList;
