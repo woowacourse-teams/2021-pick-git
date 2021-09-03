@@ -32,3 +32,4 @@ export { ReactComponent as VerticalDotsIcon } from "./vertical-dots.svg";
 export { ReactComponent as TrashIcon } from "./trash.svg";
 export { ReactComponent as ArrowRightIcon } from "./arrow-right.svg";
 export { ReactComponent as LogoIcon } from "./logo.svg";
+export { ReactComponent as LogoLargeIcon } from "./logo-large.svg";
