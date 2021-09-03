@@ -20,12 +20,13 @@ import { useLocation } from "react-router-dom";
 import usePostEditStep from "../../services/hooks/usePostEditStep";
 import UserContext from "../../contexts/UserContext";
 import SnackBarContext from "../../contexts/SnackbarContext";
+import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithText/PageLoadingWithLogo";
 
 const EditPostPage = () => {
   const { search } = useLocation();
   const { currentUsername } = useContext(UserContext);
   const { pushSnackbarMessage } = useContext(SnackBarContext);
-  const { postId, content, tags, setTags, setContent, editPost, resetPostEditData } = usePostEdit();
+  const { postId, content, tags, setTags, setContent, editPost, resetPostEditData, uploading } = usePostEdit();
   const { stepIndex, goNextStep, setStepMoveEventHandler, removeStepMoveEventHandler, completeStep } = usePostEditStep(
     POST_EDIT_STEPS,
     {
@@ -85,6 +86,10 @@ const EditPostPage = () => {
     hideMessageModal();
     goNextStep();
   };
+
+  if (uploading) {
+    return <PageLoadingWithLogo />;
+  }
 
   return (
     <Container>
