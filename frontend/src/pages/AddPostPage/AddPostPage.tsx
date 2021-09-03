@@ -22,7 +22,7 @@ import { getAPIErrorMessage } from "../../utils/error";
 import usePostAddStep from "../../services/hooks/usePostAddStep";
 import { useGithubTagsQuery } from "../../services/queries";
 import SnackBarContext from "../../contexts/SnackbarContext";
-import UserContext from "../../contexts/UserContext";
+import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithText/PageLoadingWithLogo";
 
 const AddPostPage = () => {
   const { stepIndex, goNextStep, setStepMoveEventHandler, removeStepMoveEventHandler, completeStep } = usePostAddStep(
@@ -40,12 +40,12 @@ const AddPostPage = () => {
     setTags,
     uploadPost,
     resetPostUploadData,
+    uploading,
   } = usePostUpload();
   const { pushSnackbarMessage } = useContext(SnackBarContext);
   const { modalMessage, isModalShown, isCancelButtonShown, showAlertModal, showConfirmModal, hideMessageModal } =
     useMessageModal();
   const tagsQueryResult = useGithubTagsQuery(githubRepositoryName);
-  const { currentUsername } = useContext(UserContext);
 
   const stepComponents = [
     <RepositorySelector
@@ -124,6 +124,9 @@ const AddPostPage = () => {
     goNextStep();
   };
 
+  if (uploading) {
+    return <PageLoadingWithLogo />;
+  }
   return (
     <Container>
       <StepSlider stepCount={POST_ADD_STEPS.length} stepIndex={stepIndex}>
