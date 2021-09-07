@@ -29,6 +29,15 @@ export const ImageList = styled.li<React.CSSProperties>`
   }
 `;
 
+export const ImageView = styled.div<{ imageUrl: string }>`
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background-image: url(${({ imageUrl }) => imageUrl});
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+`;
+
 export const SlideButton = styled.button<{
   direction: "left" | "right";
 }>`

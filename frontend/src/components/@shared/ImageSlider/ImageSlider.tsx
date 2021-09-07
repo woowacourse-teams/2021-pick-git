@@ -3,7 +3,7 @@ import { ThemeContext } from "styled-components";
 
 import { GoBackIcon, GoForwardIcon } from "../../../assets/icons/index";
 import useThrottle from "../../../services/hooks/@common/useThrottle";
-import { Container, ImageList, ImageListSlider, Indicator, SlideButton } from "./ImageSlider.style";
+import { Container, ImageList, ImageListSlider, ImageView, Indicator, SlideButton } from "./ImageSlider.style";
 
 export interface Props extends React.CSSProperties {
   imageUrls: string[];
@@ -59,7 +59,7 @@ const ImageSlider = ({ imageUrls, width, slideButtonKind }: Props) => {
       >
         {imageUrls.map((imageUrl, index) => (
           <ImageList key={imageUrl}>
-            <img src={imageUrl} alt={`${index}번째 사진`} width="100%" />
+            <ImageView imageUrl={imageUrl} role="img" aria-label={`${index + 1}번째 사진`} />
           </ImageList>
         ))}
       </ImageListSlider>
