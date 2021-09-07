@@ -7,7 +7,7 @@ import SnackBarContext from "../../contexts/SnackbarContext";
 import useMessageModal from "../../services/hooks/@common/useMessageModal";
 import useProfileModificationForm from "../../services/hooks/useProfileModificationForm";
 import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
-import PageLoading from "../@layout/PageLoading/PageLoading";
+import PageLoadingWithCover from "../@layout/PageLoadingWithCover/PageLoadingWithCover";
 import Avatar from "../@shared/Avatar/Avatar";
 import Button from "../@shared/Button/Button";
 import TextEditor from "../@shared/TextEditor/TextEditor";
@@ -32,14 +32,6 @@ const ProfileModificationForm = ({ username, profileImageUrl, prevDescription, o
   );
   const { imageUrl, description } = values;
   const { handleImageChange, handleDescriptionChange, handleModificationSubmit } = handlers;
-
-  if (isLoading) {
-    return (
-      <Container>
-        <PageLoading />
-      </Container>
-    );
-  }
 
   return (
     <Container onSubmit={handleModificationSubmit}>
@@ -71,6 +63,7 @@ const ProfileModificationForm = ({ username, profileImageUrl, prevDescription, o
       {isModalShown && (
         <MessageModalPortal heading={modalMessage} onConfirm={hideMessageModal} onClose={hideMessageModal} />
       )}
+      {isLoading && <PageLoadingWithCover description="수정중" />}
     </Container>
   );
 };
