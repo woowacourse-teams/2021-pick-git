@@ -17,6 +17,7 @@ repositories {
 dependencies {
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.apache.httpcomponents:httpclient:4.5'
@@ -24,14 +25,15 @@ dependencies {
     implementation 'org.reflections:reflections:0.9.10'
 
     compileOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.4'
+    compileOnly 'org.projectlombok:lombok:1.18.20'
 
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 
     asciidoctor 'org.springframework.restdocs:spring-restdocs-asciidoctor:1.2.6.RELEASE'
 
-    compileOnly 'org.projectlombok:lombok:1.18.20'
     annotationProcessor 'org.projectlombok:lombok:1.18.20'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
     testCompileOnly 'org.projectlombok:lombok:1.18.20'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
@@ -42,11 +44,17 @@ dependencies {
 }
 
 processResources.dependsOn('copySecurity')
+processResources.dependsOn('copyDev')
 processResources.dependsOn('copyProd')
 processResources.dependsOn('copyDB')
 
 task copySecurity(type: Copy) {
     from './security/application-security.yml'
+    into './src/main/resources'
+}
+
+task copyDev(type: Copy) {
+    from './security/application-dev.yml'
     into './src/main/resources'
 }
 

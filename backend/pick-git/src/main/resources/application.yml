@@ -1,6 +1,6 @@
 spring:
   profiles:
-    include: security
+    include: security, db
 
 github:
   contribution:
