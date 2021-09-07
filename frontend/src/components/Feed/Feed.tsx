@@ -14,6 +14,7 @@ import { InfiniteData, QueryKey } from "react-query";
 import { getItemsFromPages } from "../../utils/infiniteData";
 import useMessageModal from "../../services/hooks/@common/useMessageModal";
 import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
+import PageLoadingWithCover from "../@layout/PageLoadingWithCover/PageLoadingWithCover";
 
 interface Props {
   infinitePostsData: InfiniteData<Post[] | null>;
@@ -23,8 +24,14 @@ interface Props {
 const Feed = ({ infinitePostsData, queryKey }: Props) => {
   const [selectedPostId, setSelectedPostId] = useState<Post["id"]>();
   const { pushSnackbarMessage } = useContext(SnackBarContext);
-  const { addPostLike, deletePost, deletePostLike, isDeletePostLikeLoading, isAddPostLikeLoading } =
-    useFeedMutation(queryKey);
+  const {
+    addPostLike,
+    deletePost,
+    deletePostLike,
+    isDeletePostLikeLoading,
+    isAddPostLikeLoading,
+    isDeletePostLoading,
+  } = useFeedMutation(queryKey);
   const { setPostEditData } = usePostEdit();
   const { modalMessage, isModalShown, isCancelButtonShown, showConfirmModal, hideMessageModal } = useMessageModal();
   const { isLoggedIn, currentUsername } = useContext(UserContext);
@@ -135,6 +142,7 @@ const Feed = ({ infinitePostsData, queryKey }: Props) => {
             onMoreCommentClick={() => handleCommentsClick(post.id)}
             onCommentInputClick={() => handleCommentsClick(post.id)}
           />
+          {isDeletePostLoading && <PageLoadingWithCover description="삭제중" />}
         </PostItemWrapper>
       ))}
       {isModalShown && isCancelButtonShown && (

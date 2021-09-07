@@ -12,7 +12,7 @@ import {
 const useFeedMutation = (queryKey: QueryKey) => {
   const { mutateAsync: mutateDeletePostLike, isLoading: isDeletePostLikeLoading } = useDeletePostLikeMutation();
   const { mutateAsync: mutateAddPostLike, isLoading: isAddPostLikeLoading } = useAddPostLikeMutation();
-  const { mutateAsync: mutateDeletePost } = useDeletePostMutation();
+  const { mutateAsync: mutateDeletePost, isLoading: isDeletePostLoading } = useDeletePostMutation();
   const { mutateAsync: mutateAddComment } = useAddPostCommentMutation();
   const { mutateAsync: mutateDeleteComment } = useDeletePostCommentMutation();
   const queryClient = useQueryClient();
@@ -94,6 +94,7 @@ const useFeedMutation = (queryKey: QueryKey) => {
     deletePostLike,
     isDeletePostLikeLoading,
     isAddPostLikeLoading,
+    isDeletePostLoading,
   };
 };
 
