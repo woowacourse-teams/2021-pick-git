@@ -43,6 +43,7 @@ dependencies {
 
 processResources.dependsOn('copySecurity')
 processResources.dependsOn('copyProd')
+processResources.dependsOn('copyDB')
 
 task copySecurity(type: Copy) {
     from './security/application-security.yml'
@@ -51,6 +52,11 @@ task copySecurity(type: Copy) {
 
 task copyProd(type: Copy) {
     from './security/application-prod.yml'
+    into './src/main/resources'
+}
+
+task copyDB(type: Copy) {
+    from './security/application-db.yml'
     into './src/main/resources'
 }
 
