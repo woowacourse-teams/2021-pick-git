@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import Button from "../../components/@shared/Button/Button";
 import { Page } from "../../components/@styled/layout";
 import { setLaptopMediaQuery, setDesktopMediaQuery, setTabletMediaQuery } from "../../components/@styled/mediaQueries";
 
@@ -51,4 +52,19 @@ export const Inner = styled.div`
 export const HomeLinkText = styled.span`
   font-size: 0.9rem;
   color: ${({ theme }) => theme.color.darkBorderColor};
+`;
+
+export const ButtonLoader = styled(Button)`
+  opacity: 0.6;
+  position: relative;
+`;
+
+export const ButtonSpinnerWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
 `;
