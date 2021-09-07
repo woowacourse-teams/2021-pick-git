@@ -47,7 +47,8 @@ export const useProfileQuery = (isMyProfile: boolean, username: string | null) =
 
   return useQuery<ProfileData, AxiosError<ErrorResponse>>(
     [QUERY.GET_PROFILE, { isMyProfile, username }],
-    profileQueryFunction
+    profileQueryFunction,
+    { suspense: true }
   );
 };
 

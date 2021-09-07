@@ -1,13 +1,14 @@
-import { useContext, useState } from "react";
+import { Suspense, useContext, useState } from "react";
 import { Redirect, useLocation } from "react-router-dom";
 import { TabItem } from "../../@types";
+import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithText/PageLoadingWithLogo";
 
 import Tabs from "../../components/@shared/Tabs/Tabs";
 import Profile from "../../components/Profile/Profile";
 import ProfileTabContents from "../../components/ProfileTabContents/ProfileTabContents";
 import { PAGE_URL } from "../../constants/urls";
 import UserContext from "../../contexts/UserContext";
-import { Container } from "./ProfilePage.style";
+import { Container, LoadingWrapper } from "./ProfilePage.style";
 
 export interface Props {
   isMyProfile: boolean;
@@ -29,9 +30,17 @@ const ProfilePage = ({ isMyProfile }: Props) => {
 
   return (
     <Container>
-      <Profile isMyProfile={isMyProfile} username={fixedUsername} />
-      <Tabs tabIndicatorKind="line" tabItems={tabItems} />
-      <ProfileTabContents isMyProfile={isMyProfile} username={fixedUsername} tabIndex={tabIndex} />
+      <Suspense
+        fallback={
+          <LoadingWrapper>
+            <PageLoadingWithLogo />
+          </LoadingWrapper>
+        }
+      >
+        <Profile isMyProfile={isMyProfile} username={fixedUsername} />
+        <Tabs tabIndicatorKind="line" tabItems={tabItems} />
+        <ProfileTabContents isMyProfile={isMyProfile} username={fixedUsername} tabIndex={tabIndex} />
+      </Suspense>
     </Container>
   );
 };

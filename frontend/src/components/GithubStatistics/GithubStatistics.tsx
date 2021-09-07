@@ -1,10 +1,11 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ThemeContext } from "styled-components";
 
 import { GithubStats } from "../../@types";
 import { BookIcon, ClockIcon, IssueIcon, PrIcon, StarIcon } from "../../assets/icons";
 import UserContext from "../../contexts/UserContext";
 import useGithubStatistics from "../../services/hooks/useGithubStatistics";
+import { getImagePreloadPromise } from "../../utils/preloaders";
 import PageLoading from "../@layout/PageLoading/PageLoading";
 import CircleIcon from "../@shared/CircleIcon/CircleIcon";
 import {
@@ -40,9 +41,11 @@ export interface Props {
 }
 
 const GithubStatistics = ({ username, githubStatisticQueryResult }: Props) => {
+  const [isContributionGraphLoading, setIsContributionGraphLoading] = useState(true);
   const { color } = useContext(ThemeContext);
   const { isLoggedIn } = useContext(UserContext);
-  const { data, isLoading, isError } = githubStatisticQueryResult;
+  const { data, isError } = githubStatisticQueryResult;
+  const contributionGraphUrl = `https://ghchart.rshah.org/${color.primaryColor.slice(1)}/${username}`;
 
   const GithubStats = () => {
     const Content = () => {
@@ -74,16 +77,14 @@ const GithubStatistics = ({ username, githubStatisticQueryResult }: Props) => {
     );
   };
 
+  useEffect(() => {
+    if (!contributionGraphUrl) return;
+
+    getImagePreloadPromise(contributionGraphUrl).then(() => setIsContributionGraphLoading(false));
+  }, [contributionGraphUrl]);
+
   if (!isLoggedIn) {
     return <Empty>로그인 후 이용할 수 있는 서비스입니다.</Empty>;
-  }
-
-  if (isLoading) {
-    return (
-      <Empty>
-        <PageLoading />
-      </Empty>
-    );
   }
 
   return (
@@ -91,10 +92,15 @@ const GithubStatistics = ({ username, githubStatisticQueryResult }: Props) => {
       <GithubStats />
       <Heading>Contribution Graph</Heading>
       <ContributionGraphWrapper>
-        <ContributionGraph
-          src={`https://ghchart.rshah.org/${color.primaryColor.slice(1)}/${username}`}
-          alt={`${username}의 contribution`}
-        />
+        {isContributionGraphLoading ? (
+          <PageLoading />
+        ) : (
+          <ContributionGraph
+            src={contributionGraphUrl}
+            alt={`${username}의 contribution`}
+            onLoad={() => setIsContributionGraphLoading(false)}
+          />
+        )}
       </ContributionGraphWrapper>
     </Container>
   );

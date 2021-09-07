@@ -60,6 +60,7 @@ export const useUserPostsQuery = (isMyFeed: boolean, username: string | null) =>
       getNextPageParam: (_, pages) => {
         return pages.length;
       },
+      suspense: true,
     }
   );
 };

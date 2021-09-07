@@ -1,6 +1,5 @@
 import { CompanyIcon, GithubDarkIcon, LocationIcon, WebsiteLinkIcon, TwitterIcon } from "../../assets/icons";
 import useProfile from "../../services/hooks/useProfile";
-import PageLoading from "../@layout/PageLoading/PageLoading";
 import ProfileHeader from "../@shared/ProfileHeader/ProfileHeader";
 import { Container, Description, DetailInfo } from "./Profile.style";
 
@@ -10,11 +9,7 @@ export interface Props {
 }
 
 const Profile = ({ isMyProfile, username }: Props) => {
-  const { data, isLoading } = useProfile(isMyProfile, username);
-
-  if (isLoading) {
-    return <PageLoading />;
-  }
+  const { data } = useProfile(isMyProfile, username);
 
   return (
     <Container>
