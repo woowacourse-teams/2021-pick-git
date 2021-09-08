@@ -76,7 +76,7 @@ public class CommentControllerTest_queryComments {
         verify(commentService, times(1))
             .queryComments(any(QueryCommentRequestDto.class));
 
-        createDocument("comment-queryComments-loginMember", true, perform);
+        createDocument("comment-queryComments-user", true, perform);
     }
 
     @DisplayName("게스트는 특정 Post의 Comment를 요청할 수 있다.")
