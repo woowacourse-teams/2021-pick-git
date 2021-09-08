@@ -14,6 +14,10 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    snippetsDir = file('build/generated-snippets')
+}
+
 dependencies {
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -43,6 +47,10 @@ dependencies {
     testImplementation 'io.rest-assured:rest-assured:4.4.0'
 }
 
+test {
+    useJUnitPlatform()
+}
+
 processResources.dependsOn('copySubmodule')
 
 task copySubmodule(type: Copy) {
@@ -51,28 +59,16 @@ task copySubmodule(type: Copy) {
     into './src/main/resources'
 }
 
-test {
-    useJUnitPlatform()
-}
-
-ext {
-    snippetsDir = file('build/generated-snippets')
-}
-
 asciidoctor {
-    dependsOn test
-
     inputs.dir snippetsDir
+    finalizedBy 'copyRestDocs'
 }
 
-bootJar {
-    dependsOn asciidoctor
-
-    copy {
-        from 'build/asciidoc/html5'
-        into 'src/main/resources/static/docs'
-        include '*.html'
-    }
+task copyRestDocs(type: Copy) {
+    dependsOn('asciidoctor')
+    from 'build/asciidoc/html5'
+    include '*.html'
+    into 'src/main/resources/static/docs'
 }
 
 jacoco {
@@ -80,8 +76,6 @@ jacoco {
 }
 
 jacocoTestReport {
-    dependsOn bootJar
-
     reports {
         html.enabled true
         xml.enabled true
@@ -104,7 +98,12 @@ jacocoTestReport {
                             '**/*OAuthClient*',
                             '**/common*',
                             '**/format*',
-                            '**/*S3*'
+                            '**/*Exception*',
+                            '**/*Content*',
+                            '**/content*',
+                            '**/*S3*',
+                            '**/*DataSource*',
+                            '**/*Slave*'
                     ])
         }))
     }
@@ -119,9 +118,9 @@ jacocoTestCoverageVerification {
             element = 'CLASS'
 
             limit {
-                counter = 'METHOD'
+                counter = 'CLASS'
                 value = 'COVEREDRATIO'
-                minimum = 0.65
+                minimum = 0.75
             }
 
             excludes = [
@@ -135,7 +134,10 @@ jacocoTestCoverageVerification {
                     '**.*OAuthClient*',
                     '**.*Interceptor*',
                     '**.*Exception*',
-                    '**.*Storage*'
+                    '**.*Content*',
+                    '**.*Storage*',
+                    '**.*DataSource*',
+                    '**.*Slave*'
             ]
         }
     }
