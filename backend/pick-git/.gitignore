@@ -41,6 +41,7 @@ src/main/resources/application-security.yml
 src/main/resources/application-dev.yml
 src/main/resources/application-prod.yml
 src/main/resources/application-db.yml
+src/main/resources/application-local.yml
 
 ### REST Docs ###
 src/main/resources/static/docs/
