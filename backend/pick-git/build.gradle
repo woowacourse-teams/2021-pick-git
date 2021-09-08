@@ -43,28 +43,11 @@ dependencies {
     testImplementation 'io.rest-assured:rest-assured:4.4.0'
 }
 
-processResources.dependsOn('copySecurity')
-processResources.dependsOn('copyDev')
-processResources.dependsOn('copyProd')
-processResources.dependsOn('copyDB')
+processResources.dependsOn('copySubmodule')
 
-task copySecurity(type: Copy) {
-    from './security/application-security.yml'
-    into './src/main/resources'
-}
-
-task copyDev(type: Copy) {
-    from './security/application-dev.yml'
-    into './src/main/resources'
-}
-
-task copyProd(type: Copy) {
-    from './security/application-prod.yml'
-    into './src/main/resources'
-}
-
-task copyDB(type: Copy) {
-    from './security/application-db.yml'
+task copySubmodule(type: Copy) {
+    from './security'
+    include '*.yml'
     into './src/main/resources'
 }
 
