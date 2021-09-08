@@ -14,6 +14,10 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    snippetsDir = file('build/generated-snippets')
+}
+
 dependencies {
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -43,53 +47,28 @@ dependencies {
     testImplementation 'io.rest-assured:rest-assured:4.4.0'
 }
 
-processResources.dependsOn('copySecurity')
-processResources.dependsOn('copyDev')
-processResources.dependsOn('copyProd')
-processResources.dependsOn('copyDB')
-
-task copySecurity(type: Copy) {
-    from './security/application-security.yml'
-    into './src/main/resources'
-}
-
-task copyDev(type: Copy) {
-    from './security/application-dev.yml'
-    into './src/main/resources'
-}
-
-task copyProd(type: Copy) {
-    from './security/application-prod.yml'
-    into './src/main/resources'
-}
-
-task copyDB(type: Copy) {
-    from './security/application-db.yml'
-    into './src/main/resources'
-}
-
 test {
     useJUnitPlatform()
 }
 
-ext {
-    snippetsDir = file('build/generated-snippets')
+processResources.dependsOn('copySubmodule')
+
+task copySubmodule(type: Copy) {
+    from './security'
+    include '*.yml'
+    into './src/main/resources'
 }
 
 asciidoctor {
-    dependsOn test
-
     inputs.dir snippetsDir
+    finalizedBy 'copyRestDocs'
 }
 
-bootJar {
-    dependsOn asciidoctor
-
-    copy {
-        from 'build/asciidoc/html5'
-        into 'src/main/resources/static/docs'
-        include '*.html'
-    }
+task copyRestDocs(type: Copy) {
+    dependsOn('asciidoctor')
+    from 'build/asciidoc/html5'
+    include '*.html'
+    into 'src/main/resources/static/docs'
 }
 
 jacoco {
@@ -97,8 +76,6 @@ jacoco {
 }
 
 jacocoTestReport {
-    dependsOn bootJar
-
     reports {
         html.enabled true
         xml.enabled true
