@@ -121,7 +121,12 @@ jacocoTestReport {
                             '**/*OAuthClient*',
                             '**/common*',
                             '**/format*',
-                            '**/*S3*'
+                            '**/*Exception*',
+                            '**/*Content*',
+                            '**/content*',
+                            '**/*S3*',
+                            '**/*DataSource*',
+                            '**/*Slave*'
                     ])
         }))
     }
@@ -136,9 +141,9 @@ jacocoTestCoverageVerification {
             element = 'CLASS'
 
             limit {
-                counter = 'METHOD'
+                counter = 'CLASS'
                 value = 'COVEREDRATIO'
-                minimum = 0.65
+                minimum = 0.75
             }
 
             excludes = [
@@ -152,7 +157,10 @@ jacocoTestCoverageVerification {
                     '**.*OAuthClient*',
                     '**.*Interceptor*',
                     '**.*Exception*',
-                    '**.*Storage*'
+                    '**.*Content*',
+                    '**.*Storage*',
+                    '**.*DataSource*',
+                    '**.*Slave*'
             ]
         }
     }
