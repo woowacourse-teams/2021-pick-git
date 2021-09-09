@@ -3,7 +3,7 @@ import Feed from "../../components/Feed/Feed";
 import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
 import useHomeFeed from "../../services/hooks/useHomeFeed";
 import { QUERY } from "../../constants/queries";
-import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithText/PageLoadingWithLogo";
+import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
 import useInfiniteImagePreloader from "../../services/hooks/@common/useInfiniteImagePreloader";
 
 const HomeFeedPage = () => {

@@ -9,7 +9,7 @@ import { Container } from "./SearchPostResultPage.style";
 import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
 import Feed from "../../components/Feed/Feed";
 import useInfiniteImagePreloader from "../../services/hooks/@common/useInfiniteImagePreloader";
-import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithText/PageLoadingWithLogo";
+import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
 
 interface LocationState {
   prevData?: InfiniteData<Post[]>;

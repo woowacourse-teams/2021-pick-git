@@ -10,7 +10,7 @@ import { PostAddDataContextProvider } from "./contexts/PostAddDataContext";
 import UserContext from "./contexts/UserContext";
 import SnackBarContext from "./contexts/SnackbarContext";
 import { PostEditStepContextProvider } from "./contexts/PostEditStepContext";
-import PageLoadingWithLogo from "./components/@layout/PageLoadingWithText/PageLoadingWithLogo";
+import PageLoadingWithLogo from "./components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
 
 const NavigationHeader = lazy(() => import("./components/@layout/NavigationHeader/NavigationHeader"));
 const OneDepthStepHeader = lazy(() => import("./components/OneDepthStepHeader/OneDepthStepHeader"));

@@ -1,7 +1,7 @@
 import { Suspense, useContext, useState } from "react";
 import { Redirect, useLocation } from "react-router-dom";
 import { TabItem } from "../../@types";
-import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithText/PageLoadingWithLogo";
+import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
 
 import Tabs from "../../components/@shared/Tabs/Tabs";
 import Profile from "../../components/Profile/Profile";

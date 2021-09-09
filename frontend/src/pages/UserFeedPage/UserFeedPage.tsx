@@ -12,7 +12,7 @@ import UserContext from "../../contexts/UserContext";
 import { LayoutInPx } from "../../constants/layout";
 import { QUERY } from "../../constants/queries";
 import useInfiniteImagePreloader from "../../services/hooks/@common/useInfiniteImagePreloader";
-import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithText/PageLoadingWithLogo";
+import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
 
 interface LocationState {
   prevData?: InfiniteData<Post[]>;
