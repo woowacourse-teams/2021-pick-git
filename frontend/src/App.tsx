@@ -5,12 +5,12 @@ import { PAGE_URL } from "./constants/urls";
 import { SUCCESS_MESSAGE } from "./constants/messages";
 import { getAccessToken } from "./storage/storage";
 import { requestGetSelfProfile } from "./services/requests";
-import PageLoading from "./components/@layout/PageLoading/PageLoading";
 
 import { PostAddDataContextProvider } from "./contexts/PostAddDataContext";
 import UserContext from "./contexts/UserContext";
 import SnackBarContext from "./contexts/SnackbarContext";
 import { PostEditStepContextProvider } from "./contexts/PostEditStepContext";
+import PageLoadingWithLogo from "./components/@layout/PageLoadingWithText/PageLoadingWithLogo";
 
 const NavigationHeader = lazy(() => import("./components/@layout/NavigationHeader/NavigationHeader"));
 const OneDepthStepHeader = lazy(() => import("./components/OneDepthStepHeader/OneDepthStepHeader"));
@@ -56,7 +56,7 @@ const App = () => {
 
   return (
     <BrowserRouter>
-      <Suspense fallback={<></>}>
+      <Suspense fallback={<PageLoadingWithLogo />}>
         <Switch>
           <Route exact path={[PAGE_URL.HOME, PAGE_URL.PROFILE, PAGE_URL.MY_PROFILE, PAGE_URL.USER_FEED_BASE]}>
             <NavigationHeader />
@@ -77,8 +77,6 @@ const App = () => {
             <SearchHeader />
           </Route>
         </Switch>
-      </Suspense>
-      <Suspense fallback={<PageLoading />}>
         <Switch>
           <Route exact path={[PAGE_URL.HOME, PAGE_URL.HOME_FEED]}>
             <HomeFeedPage />
