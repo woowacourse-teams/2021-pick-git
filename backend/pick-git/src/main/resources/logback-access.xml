@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <springProfile name="prod, local">
+  <springProfile name="prod, dev">
     <include resource="logback/access-logger.xml"/>
     <appender-ref ref="access-logger"/>
   </springProfile>
 
-  <springProfile name="test">
+  <springProfile name="local, test">
     <include resource="logback/test/test-access-logger.xml"/>
     <appender-ref ref="test-access-logger"/>
   </springProfile>
