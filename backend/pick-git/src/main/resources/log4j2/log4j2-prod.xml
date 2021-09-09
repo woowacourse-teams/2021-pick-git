@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+  <Properties>
+    <Property name="info-log">logs/info/info</Property>
+    <Property name="warn-log">logs/warn/warn</Property>
+    <Property name="error-log">logs/error/error</Property>
+    <Property name="db-log">logs/db/db</Property>
+    <Property name="log-pattern">%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %t %class{36}.%M L:%L %n      > %m%n</Property>
+    <Property name="file-pattern">%d{yyyy-MM-dd}-%i.log.gz</Property>
+  </Properties>
+
+  <Appenders>
+    <RollingFile name="InfoFileAppender" fileName="${info-log}.log" filePattern="${info-log}-${file-pattern}">
+      <Filters>
+        <ThresholdFilter level="FATAL" onMatch="DENY" onMismatch="NEUTRAL"/>
+        <ThresholdFilter level="ERROR" onMatch="DENY" onMismatch="NEUTRAL"/>
+        <ThresholdFilter level="WARN" onMatch="DENY" onMismatch="NEUTRAL"/>
+        <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+      </Filters>
+      <PatternLayout pattern="${log-pattern}"/>
+      <Policies>
+        <SizeBasedTriggeringPolicy size="15MB"/>
+        <TimeBasedTriggeringPolicy modulate="true" interval="1"/>
+      </Policies>
+      <DefaultRolloverStrategy>
+        <Delete basePath="logs/info" maxDepth="1">
+          <IfLastModified age="30d"/>
+        </Delete>
+      </DefaultRolloverStrategy>
+    </RollingFile>
+
+    <RollingFile name="WarnFileAppender" fileName="${warn-log}.log" filePattern="${warn-log}-${file-pattern}">
+      <Filters>
+        <ThresholdFilter level="FATAL" onMatch="DENY" onMismatch="NEUTRAL"/>
+        <ThresholdFilter level="ERROR" onMatch="DENY" onMismatch="NEUTRAL"/>
+        <ThresholdFilter level="WARN" onMatch="ACCEPT" onMismatch="DENY"/>
+      </Filters>
+      <PatternLayout pattern="${log-pattern}"/>
+      <Policies>
+        <SizeBasedTriggeringPolicy size="15MB"/>
+        <TimeBasedTriggeringPolicy modulate="true" interval="1"/>
+      </Policies>
+      <DefaultRolloverStrategy>
+        <Delete basePath="logs/warn" maxDepth="1">
+          <IfLastModified age="30d"/>
+        </Delete>
+      </DefaultRolloverStrategy>
+    </RollingFile>
+
+    <RollingFile name="ErrorFileAppender" fileName="${error-log}.log" filePattern="${error-log}-${file-pattern}">
+      <Filters>
+        <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+      </Filters>
+      <PatternLayout pattern="${log-pattern}"/>
+      <Policies>
+        <SizeBasedTriggeringPolicy size="15MB"/>
+        <TimeBasedTriggeringPolicy modulate="true" interval="1"/>
+      </Policies>
+      <DefaultRolloverStrategy>
+        <Delete basePath="logs/error" maxDepth="1">
+          <IfLastModified age="30d"/>
+        </Delete>
+      </DefaultRolloverStrategy>
+    </RollingFile>
+
+    <RollingFile name="DbFileAppender" fileName="${db-log}.log" filePattern="${db-log}-${file-pattern}">
+      <PatternLayout pattern="${log-pattern}"/>
+      <Policies>
+        <SizeBasedTriggeringPolicy size="15MB"/>
+        <TimeBasedTriggeringPolicy modulate="true" interval="1"/>
+      </Policies>
+      <DefaultRolloverStrategy>
+        <Delete basePath="logs/db" maxDepth="1">
+          <IfLastModified age="30d"/>
+        </Delete>
+      </DefaultRolloverStrategy>
+    </RollingFile>
+  </Appenders>
+
+  <Loggers>
+    <Logger name="com.woowacourse.pickgit" level="info" additivity="false">
+      <AppenderRef ref="InfoFileAppender"/>
+      <AppenderRef ref="WarnFileAppender"/>
+      <AppenderRef ref="ErrorFileAppender"/>
+    </Logger>
+    <Logger name="org.springframework" level="info" additivity="false">
+      <AppenderRef ref="InfoFileAppender"/>
+      <AppenderRef ref="WarnFileAppender"/>
+      <AppenderRef ref="ErrorFileAppender"/>
+    </Logger>
+    <Logger name="org.hibernate.tool.hbm2ddl" level="debug" additivity="false">
+      <appender-ref ref="DbFileAppender"/>
+    </Logger>
+    <Root level="error">
+      <AppenderRef ref="ErrorFileAppender"/>
+    </Root>
+  </Loggers>
+</Configuration>
