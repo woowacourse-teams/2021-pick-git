@@ -4,7 +4,6 @@ import { useLocation } from "react-router-dom";
 
 import Feed from "../../components/Feed/Feed";
 import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
-import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import useUserFeed from "../../services/hooks/useUserFeed";
 import { Container } from "./UserFeedPage.style";
 import { Post } from "../../@types";
@@ -12,6 +11,8 @@ import { Post } from "../../@types";
 import UserContext from "../../contexts/UserContext";
 import { LayoutInPx } from "../../constants/layout";
 import { QUERY } from "../../constants/queries";
+import useInfiniteImagePreloader from "../../services/hooks/@common/useInfiniteImagePreloader";
+import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithText/PageLoadingWithLogo";
 
 interface LocationState {
   prevData?: InfiniteData<Post[]>;
@@ -28,11 +29,24 @@ const UserFeedPage = () => {
     state: { prevData, postId },
   } = useLocation<LocationState>();
 
-  const { infinitePostsData, isLoading, isError, isFetchingNextPage, handleIntersect } = useUserFeed(
-    isMyFeed,
-    username,
-    prevData
-  );
+  const {
+    infinitePostsData,
+    isLoading,
+    isError,
+    isFetchingNextPage,
+    handleIntersect: handlePostsEndIntersect,
+  } = useUserFeed(isMyFeed, username, prevData);
+
+  const infiniteImageUrls =
+    infinitePostsData?.pages.map((posts) => posts.reduce<string[]>((acc, post) => [...acc, ...post.imageUrls], [])) ??
+    [];
+  const { isFirstImagesLoading, isImagesFetching, activateImageFetchingState } =
+    useInfiniteImagePreloader(infiniteImageUrls);
+
+  const handleIntersect = () => {
+    handlePostsEndIntersect();
+    activateImageFetchingState();
+  };
 
   useEffect(() => {
     if (!isMountedOnce) {
@@ -46,8 +60,8 @@ const UserFeedPage = () => {
     }
   }, [postId, isMountedOnce]);
 
-  if (isLoading) {
-    return <PageLoading />;
+  if (isLoading || isFirstImagesLoading) {
+    return <PageLoadingWithLogo />;
   }
 
   if (isError || !infinitePostsData) {
@@ -56,8 +70,12 @@ const UserFeedPage = () => {
 
   return (
     <Container>
-      <InfiniteScrollContainer isLoaderShown={isFetchingNextPage} onIntersect={handleIntersect}>
-        <Feed infinitePostsData={infinitePostsData} queryKey={[QUERY.GET_USER_FEED_POSTS, { username, isMyFeed }]} />
+      <InfiniteScrollContainer isLoaderShown={isFetchingNextPage || isImagesFetching} onIntersect={handleIntersect}>
+        <Feed
+          infinitePostsData={infinitePostsData}
+          queryKey={[QUERY.GET_USER_FEED_POSTS, { username, isMyFeed }]}
+          isFetching={isFetchingNextPage || isImagesFetching}
+        />
       </InfiniteScrollContainer>
     </Container>
   );

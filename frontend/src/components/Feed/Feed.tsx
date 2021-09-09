@@ -1,4 +1,5 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+
 import { Post } from "../../@types";
 import SnackBarContext from "../../contexts/SnackbarContext";
 import UserContext from "../../contexts/UserContext";
@@ -19,9 +20,10 @@ import PageLoadingWithCover from "../@layout/PageLoadingWithCover/PageLoadingWit
 interface Props {
   infinitePostsData: InfiniteData<Post[] | null>;
   queryKey: QueryKey;
+  isFetching: boolean;
 }
 
-const Feed = ({ infinitePostsData, queryKey }: Props) => {
+const Feed = ({ infinitePostsData, queryKey, isFetching }: Props) => {
   const [selectedPostId, setSelectedPostId] = useState<Post["id"]>();
   const { pushSnackbarMessage } = useContext(SnackBarContext);
   const {
@@ -32,12 +34,11 @@ const Feed = ({ infinitePostsData, queryKey }: Props) => {
     isAddPostLikeLoading,
     isDeletePostLoading,
   } = useFeedMutation(queryKey);
+  const [posts, setPosts] = useState<Post[]>([]);
   const { setPostEditData } = usePostEdit();
   const { modalMessage, isModalShown, isCancelButtonShown, showConfirmModal, hideMessageModal } = useMessageModal();
   const { isLoggedIn, currentUsername } = useContext(UserContext);
   const history = useHistory();
-
-  const posts = getItemsFromPages<Post>(infinitePostsData.pages);
 
   const handlePostEdit = async (post: Post) => {
     setPostEditData({ content: post.content, postId: post.id, tags: post.tags });
@@ -107,6 +108,14 @@ const Feed = ({ infinitePostsData, queryKey }: Props) => {
       state: selectedPost.id,
     });
   };
+
+  useEffect(() => {
+    if (isFetching) {
+      return;
+    }
+
+    setPosts(getItemsFromPages<Post>(infinitePostsData.pages));
+  }, [infinitePostsData, isFetching]);
 
   if (!infinitePostsData.pages) {
     return <div>게시물이 존재하지 않습니다.</div>;
