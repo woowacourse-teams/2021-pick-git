@@ -29,7 +29,7 @@ class GithubTagExtractorTest {
         platformTagExtractor = new GithubTagExtractor(platformTagApiRequester, objectMapper);
     }
 
-    @DisplayName("명시된 User의 Repository에 기술된 Language Tags를 추출한다.")
+    @DisplayName("명시된 User의 Repository에 기술된 Language Tags(Other 제외)를 추출한다.")
     @Test
     void extractTags_ValidRepository_ExtractionSuccess() {
         List<String> tags = platformTagExtractor

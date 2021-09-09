@@ -19,6 +19,6 @@ public class MockTagApiRequester implements PlatformTagApiRequester {
         if (!url.equals(validUrl)) {
             throw new PlatformHttpErrorException();
         }
-        return "{\"JavaScript\": \"91949\", \"HTML\": \"13\", \"CSS\": \"9\"}";
+        return "{\"JavaScript\": \"91949\", \"HTML\": \"13\", \"CSS\": \"9\", \"Other\": \"13\"}";
     }
 }
