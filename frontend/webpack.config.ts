@@ -47,13 +47,6 @@ const config = {
     port: 3000,
     historyApiFallback: true,
     hot: true,
-    proxy: {
-      "/api": {
-        target: "https://api.pick-git.com",
-        changeOrigin: true,
-        secure: false,
-      },
-    },
   },
 
   plugins: [
