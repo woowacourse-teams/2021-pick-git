@@ -47,6 +47,13 @@ const config = {
     port: 3000,
     historyApiFallback: true,
     hot: true,
+    proxy: {
+      "/api": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
 
   plugins: [

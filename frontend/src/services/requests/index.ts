@@ -8,7 +8,7 @@ switch (process.env.DEPLOY) {
     axios.defaults.baseURL = "http://devapi.pick-git.com:8080/api";
     break;
   default:
-    axios.defaults.baseURL = "http://localhost:8080/api/";
+    axios.defaults.baseURL = "http://localhost:3000/api/";
 }
 
 export * from "./profile";
