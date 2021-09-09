@@ -20,7 +20,7 @@ import { useLocation } from "react-router-dom";
 import usePostEditStep from "../../services/hooks/usePostEditStep";
 import UserContext from "../../contexts/UserContext";
 import SnackBarContext from "../../contexts/SnackbarContext";
-import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithText/PageLoadingWithLogo";
+import PageLoadingWithCover from "../../components/@layout/PageLoadingWithCover/PageLoadingWithCover";
 
 const EditPostPage = () => {
   const { search } = useLocation();
@@ -87,10 +87,6 @@ const EditPostPage = () => {
     goNextStep();
   };
 
-  if (uploading) {
-    return <PageLoadingWithLogo />;
-  }
-
   return (
     <Container>
       <StepSlider stepCount={POST_EDIT_STEPS.length} stepIndex={stepIndex}>
@@ -122,6 +118,7 @@ const EditPostPage = () => {
           />
         )}
       </NextStepButtonWrapper>
+      {uploading && <PageLoadingWithCover description="수정중" />}
     </Container>
   );
 };

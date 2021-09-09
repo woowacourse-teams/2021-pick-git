@@ -22,7 +22,7 @@ import { getAPIErrorMessage } from "../../utils/error";
 import usePostAddStep from "../../services/hooks/usePostAddStep";
 import { useGithubTagsQuery } from "../../services/queries";
 import SnackBarContext from "../../contexts/SnackbarContext";
-import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithText/PageLoadingWithLogo";
+import PageLoadingWithCover from "../../components/@layout/PageLoadingWithCover/PageLoadingWithCover";
 
 const AddPostPage = () => {
   const { stepIndex, goNextStep, setStepMoveEventHandler, removeStepMoveEventHandler, completeStep } = usePostAddStep(
@@ -124,9 +124,6 @@ const AddPostPage = () => {
     goNextStep();
   };
 
-  if (uploading) {
-    return <PageLoadingWithLogo />;
-  }
   return (
     <Container>
       <StepSlider stepCount={POST_ADD_STEPS.length} stepIndex={stepIndex}>
@@ -158,6 +155,7 @@ const AddPostPage = () => {
           />
         )}
       </NextStepButtonWrapper>
+      {uploading && <PageLoadingWithCover description="게시중" />}
     </Container>
   );
 };
