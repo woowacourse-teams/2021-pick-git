@@ -29,10 +29,9 @@ const LoginPage = () => {
 
   const LoginButton = () =>
     isRequesting ? (
-      <ButtonLoader type="button" kind="roundedBlock" padding="0.875rem">
-        깃허브 로그인
+      <ButtonLoader type="button" kind="roundedBlock">
         <ButtonSpinnerWrapper>
-          <Loader kind="spinner" size="1rem" />
+          <Loader kind="dots" size="1rem" />
         </ButtonSpinnerWrapper>
       </ButtonLoader>
     ) : (

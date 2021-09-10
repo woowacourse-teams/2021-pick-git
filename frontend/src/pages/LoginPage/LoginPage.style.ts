@@ -55,6 +55,7 @@ export const HomeLinkText = styled.span`
 `;
 
 export const ButtonLoader = styled(Button)`
+  height: 2.86rem;
   opacity: 0.6;
   position: relative;
 `;
@@ -65,6 +66,7 @@ export const ButtonSpinnerWrapper = styled.div`
   align-items: center;
   position: absolute;
   top: 0;
-  width: 100%;
-  height: 100%;
+  right: 0;
+  bottom: 0;
+  left: 0;
 `;
