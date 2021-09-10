@@ -1,14 +1,15 @@
-import path from "path";
-import webpack from "webpack";
-import HTMLWebpackPlugin from "html-webpack-plugin";
-import { CleanWebpackPlugin } from "clean-webpack-plugin";
-import CssMinimizerPlugin from "css-minimizer-webpack-plugin";
-import CompressionPlugin from "compression-webpack-plugin";
-import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
+/* eslint-disable @typescript-eslint/no-var-requires */
+const path = require("path");
+const webpack = require("webpack");
+const HTMLWebpackPlugin = require("html-webpack-plugin");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const CompressionPlugin = require("compression-webpack-plugin");
+const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 
 const isProduction = process.env.NODE_ENV === "production";
 
-const config = {
+module.exports = {
   mode: process.env.NODE_ENV,
   devtool: isProduction ? "hidden-source-map" : "eval",
 
@@ -16,7 +17,7 @@ const config = {
   output: {
     path: path.resolve("./dist"),
     filename: "[name].[contenthash].js",
-    chunkFilename: "[id].[contenthash].js",
+    chunkFilename: "[name].[contenthash].js",
   },
 
   resolve: {
@@ -87,34 +88,21 @@ const config = {
     minimizer: ["...", new CssMinimizerPlugin()],
     splitChunks: {
       cacheGroups: {
-        default: false,
-        vendors: false,
         defaultVendors: false,
-        asyncVendors: {
-          chunks: "async",
-          priority: 40,
+        vendors: {
+          chunks: "all",
+          name: "vendors",
+          test: /[\\/]node_modules[\\/]/,
+          priority: 10,
+          reuseExistingChunk: true,
         },
         react: {
           chunks: "all",
           name: "react",
           test: /(?<!node_modules.*)[\\/]node_modules[\\/](react|react-dom|react-router-dom)[\\/]/,
-          priority: 30,
-        },
-        duplicates: {
-          name: "duplicates",
-          minChunks: 2,
-          priority: 20,
-        },
-        commonVendors: {
-          chunks: "all",
-          name: "commonVendors",
-          test: /[\\/]node_modules[\\/]/,
-          minChunks: 1,
-          priority: 10,
+          priority: 40,
         },
       },
     },
   },
 };
-
-export default config;
