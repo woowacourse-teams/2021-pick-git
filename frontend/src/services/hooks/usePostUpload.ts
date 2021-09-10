@@ -12,10 +12,11 @@ const usePostUpload = () => {
 
   const accessToken = getAccessToken();
 
+  const activateUploadingState = () => setUploading(true);
+  const deactivateUploadingState = () => setUploading(false);
+
   const uploadPost = async () => {
-    setUploading(true);
     await requestAddPost(currentUsername, { content, files, tags, githubRepositoryName }, accessToken);
-    setUploading(false);
   };
 
   const resetPostUploadData = () => {
@@ -37,6 +38,8 @@ const usePostUpload = () => {
     uploadPost,
     resetPostUploadData,
     uploading,
+    activateUploadingState,
+    deactivateUploadingState,
   };
 };
 

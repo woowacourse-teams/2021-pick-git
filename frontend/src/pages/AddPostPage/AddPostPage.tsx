@@ -41,38 +41,13 @@ const AddPostPage = () => {
     uploadPost,
     resetPostUploadData,
     uploading,
+    activateUploadingState,
+    deactivateUploadingState,
   } = usePostUpload();
   const { pushSnackbarMessage } = useContext(SnackBarContext);
   const { modalMessage, isModalShown, isCancelButtonShown, showAlertModal, showConfirmModal, hideMessageModal } =
     useMessageModal();
   const tagsQueryResult = useGithubTagsQuery(githubRepositoryName);
-
-  const stepComponents = [
-    <RepositorySelector
-      key="repository-selector"
-      setGithubRepositoryName={setGithubRepositoryName}
-      goNextStep={goNextStep}
-    />,
-    <PostContentUploader
-      key="post-content-uploader"
-      isImageUploaderShown={true}
-      content={content}
-      setContent={setContent}
-      setFiles={setFiles}
-    />,
-    <TagInputForm
-      key="tag-input-form"
-      tagsQueryResult={tagsQueryResult}
-      githubRepositoryName={githubRepositoryName}
-      tags={tags}
-      setTags={setTags}
-    />,
-  ];
-
-  useEffect(() => {
-    setStepMoveEventHandler();
-    return removeStepMoveEventHandler;
-  }, [stepIndex]);
 
   const handlePostAddComplete = async () => {
     if (!isValidPostUploadData({ content, githubRepositoryName, tags, files })) {
@@ -81,12 +56,16 @@ const AddPostPage = () => {
     }
 
     try {
+      activateUploadingState();
       await uploadPost();
+
+      deactivateUploadingState();
       resetPostUploadData();
       pushSnackbarMessage(SUCCESS_MESSAGE.POST_ADDED);
       completeStep();
     } catch (error) {
       showAlertModal(getAPIErrorMessage(error.response?.data.errorCode));
+      deactivateUploadingState();
     }
   };
 
@@ -124,6 +103,33 @@ const AddPostPage = () => {
     goNextStep();
   };
 
+  useEffect(() => {
+    setStepMoveEventHandler();
+    return removeStepMoveEventHandler;
+  }, [stepIndex]);
+
+  const stepComponents = [
+    <RepositorySelector
+      key="repository-selector"
+      setGithubRepositoryName={setGithubRepositoryName}
+      goNextStep={goNextStep}
+    />,
+    <PostContentUploader
+      key="post-content-uploader"
+      isImageUploaderShown={true}
+      content={content}
+      setContent={setContent}
+      setFiles={setFiles}
+    />,
+    <TagInputForm
+      key="tag-input-form"
+      tagsQueryResult={tagsQueryResult}
+      githubRepositoryName={githubRepositoryName}
+      tags={tags}
+      setTags={setTags}
+    />,
+  ];
+
   return (
     <Container>
       <StepSlider stepCount={POST_ADD_STEPS.length} stepIndex={stepIndex}>
@@ -155,7 +161,7 @@ const AddPostPage = () => {
           />
         )}
       </NextStepButtonWrapper>
-      {uploading && <PageLoadingWithCover description="게시중" />}
+      {uploading && stepIndex === POST_ADD_STEPS.length - 1 && <PageLoadingWithCover description="게시중" />}
     </Container>
   );
 };
