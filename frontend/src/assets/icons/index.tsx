@@ -32,3 +32,7 @@ export { ReactComponent as VerticalDotsIcon } from "./vertical-dots.svg";
 export { ReactComponent as TrashIcon } from "./trash.svg";
 export { ReactComponent as ArrowRightIcon } from "./arrow-right.svg";
 export { ReactComponent as LogoIcon } from "./logo.svg";
+export { ReactComponent as AddCircleLargeIcon } from "./add-circle-large.svg";
+export { ReactComponent as AddCircleIcon } from "./add-circle.svg";
+export { ReactComponent as DeleteCircleIcon } from "./delete-circle.svg";
+export { ReactComponent as ArrowDownIcon } from "./arrow-down.svg";
