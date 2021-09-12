@@ -123,3 +123,31 @@ export type ClientErrorCodeName = typeof clientErrorCodeName[number];
 export type ClientErrorHandler = {
   [V in ClientErrorCodeName]?: () => void;
 };
+
+export type PortfolioProject = {
+  name: string;
+  startDate: string;
+  endDate: string;
+  type: "team" | "individual";
+  imageUrl: string;
+  content: string;
+  tags: string[];
+};
+
+export type PortfolioSectionItem = {
+  category: string;
+  descriptions: string[];
+};
+
+export type PortfolioSection = {
+  name: string;
+  items: PortfolioSectionItem[];
+};
+
+export type Portfolio = {
+  introduction: string;
+  projects: PortfolioProject[];
+  sections: PortfolioSection[];
+};
+
+export type PortfolioSectionList = string[];
