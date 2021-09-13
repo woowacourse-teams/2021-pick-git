@@ -39,3 +39,13 @@ export const Page = styled.main`
     margin: 0 auto;
   `}
 `;
+
+export const NoneStyledTextarea = styled.textarea`
+  background: none;
+  border: none;
+  margin: 0;
+
+  :focus {
+    outline: none;
+  }
+`;

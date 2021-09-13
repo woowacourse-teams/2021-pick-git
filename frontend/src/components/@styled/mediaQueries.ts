@@ -22,9 +22,25 @@ export const setTabletMediaQuery = (literals: TemplateStringsArray, ...args: str
   `;
 };
 
+export const setTabletAboveMediaQuery = (literals: TemplateStringsArray, ...args: string[]): CSSProp => {
+  return css`
+    @media only screen and (min-width: ${device.mobile}) {
+      ${css(literals, ...args)}
+    }
+  `;
+};
+
 export const setLaptopMediaQuery = (literals: TemplateStringsArray, ...args: string[]): CSSProp => {
   return css`
     @media only screen and (min-width: ${device.tablet}) and (max-width: ${device.laptop}) {
+      ${css(literals, ...args)}
+    }
+  `;
+};
+
+export const setLaptopAboveMediaQuery = (literals: TemplateStringsArray, ...args: string[]): CSSProp => {
+  return css`
+    @media only screen and (min-width: ${device.tablet}) {
       ${css(literals, ...args)}
     }
   `;
