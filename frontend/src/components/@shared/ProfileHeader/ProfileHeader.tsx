@@ -1,9 +1,12 @@
 import { useContext } from "react";
+import { useQueryClient } from "react-query";
 import { Link } from "react-router-dom";
 import { ThemeContext } from "styled-components";
 import { ProfileData } from "../../../@types";
 import { WARNING_MESSAGE } from "../../../constants/messages";
+import { QUERY } from "../../../constants/queries";
 import { PAGE_URL } from "../../../constants/urls";
+import SnackBarContext from "../../../contexts/SnackbarContext";
 
 import UserContext from "../../../contexts/UserContext";
 import useMessageModal from "../../../services/hooks/@common/useMessageModal";
@@ -15,15 +18,7 @@ import ProfileModificationForm from "../../ProfileModificationForm/ProfileModifi
 import Avatar from "../Avatar/Avatar";
 import Button from "../Button/Button";
 import CountIndicator from "../CountIndicator/CountIndicator";
-import {
-  AvatarWrapper,
-  ButtonLoader,
-  ButtonSpinnerWrapper,
-  ButtonSpinner,
-  Container,
-  Indicators,
-  IndicatorsWrapper,
-} from "./ProfileHeader.style";
+import { AvatarWrapper, Container, Indicators, IndicatorsWrapper } from "./ProfileHeader.style";
 
 export interface Props {
   isMyProfile: boolean;
@@ -34,16 +29,36 @@ export interface Props {
 const ProfileHeader = ({ isMyProfile, profile, username }: Props) => {
   const theme = useContext(ThemeContext);
   const { isLoggedIn } = useContext(UserContext);
+  const queryClient = useQueryClient();
+
   const { isModalShown, showModal, hideModal } = useModal(false);
   const { modalMessage, isModalShown: isMessageModalShown, hideMessageModal, showConfirmModal } = useMessageModal();
-  const { toggleFollow, isFollowLoading, isUnfollowLoading } = useFollow();
+
+  const setProfileQueryData = (following: boolean) => {
+    const currentProfileQueryKey = [QUERY.GET_PROFILE, { isMyProfile: false, username }];
+    const currentProfileQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
+
+    if (currentProfileQueryData) {
+      const { followerCount: currentFollowerCount } = currentProfileQueryData;
+      const followerCount = following ? currentFollowerCount + 1 : currentFollowerCount - 1;
+
+      queryClient.setQueryData<ProfileData>(currentProfileQueryKey, {
+        ...currentProfileQueryData,
+        followerCount,
+        following,
+      });
+    }
+  };
+
+  const { toggleFollow } = useFollow(setProfileQueryData);
 
   const toggleFollowWithGithubFollowing = (applyGithub: boolean) => () => {
-    if (profile && profile.following !== null) {
-      toggleFollow(username, profile.following, applyGithub);
+    if (!profile || profile.following === null) {
+      return;
     }
 
     hideMessageModal();
+    toggleFollow(username, profile.following, applyGithub);
   };
 
   const handleFollowButtonClick = () => {
@@ -55,17 +70,6 @@ const ProfileHeader = ({ isMyProfile, profile, username }: Props) => {
   const ProfileButton = () => {
     if (!isLoggedIn) {
       return <></>;
-    }
-
-    if (isFollowLoading || isUnfollowLoading) {
-      return (
-        <ButtonLoader type="button" kind="squaredBlock" backgroundColor={theme.color.tertiaryColor}>
-          {isFollowLoading ? "팔로우" : "팔로우 취소"}
-          <ButtonSpinnerWrapper>
-            <ButtonSpinner size="1rem" />
-          </ButtonSpinnerWrapper>
-        </ButtonLoader>
-      );
     }
 
     if (isMyProfile) {

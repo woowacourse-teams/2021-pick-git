@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import Chip from "../../components/@shared/Chip/Chip";
 import GridFeed from "../../components/@shared/GridFeed/GridFeed";
 import Tabs from "../../components/@shared/Tabs/Tabs";
 import UserList from "../../components/UserList/UserList";
+import { QUERY } from "../../constants/queries";
 import { PAGE_URL } from "../../constants/urls";
-import useFollow from "../../services/hooks/useFollow";
+import SearchContext from "../../contexts/SearchContext";
 import useSearchPostData from "../../services/hooks/useSearchPostData";
 import useSearchUserData from "../../services/hooks/useSearchUserData";
 import { Container, ContentWrapper, Empty, KeywordsWrapper } from "./SearchPage.style";
@@ -23,13 +24,13 @@ const SearchPage = () => {
   const type = new URLSearchParams(location.search).get("type");
   const defaultTabIndex = isSearchTypeValid(type) ? searchTypeIndex[type] : 0;
   const [tabIndex, setTabIndex] = useState(defaultTabIndex);
+  const { keyword } = useContext(SearchContext);
   const {
     results: userSearchResults,
     isError: isUserSearchError,
     isLoading: isUserSearchLoading,
     isFetchingNextPage: isUserSearchFetchingNextPage,
     handleIntersect: handleUserSearchIntersect,
-    refetch: userSearchRefetch,
   } = useSearchUserData();
   const {
     infinitePostsData: postSearchResults,
@@ -39,7 +40,6 @@ const SearchPage = () => {
     handleIntersect: handlePostSearchIntersect,
     formattedKeyword: postSearchKeyword,
   } = useSearchPostData("tags");
-  const follow = useFollow();
 
   const SearchUserResult = () => {
     if (isUserSearchLoading) {
@@ -53,7 +53,7 @@ const SearchPage = () => {
     if (isUserSearchError) {
       return <Empty>검색결과를 표시할 수 없습니다.</Empty>;
     }
-    
+
     if (userSearchResults.length === 0) {
       return <Empty>일치하는 계정이 없습니다.</Empty>;
     }
@@ -63,8 +63,7 @@ const SearchPage = () => {
         users={userSearchResults}
         isFetchingNextPage={isUserSearchFetchingNextPage}
         onIntersect={handleUserSearchIntersect}
-        follow={follow}
-        refetch={userSearchRefetch}
+        queryKey={[QUERY.GET_SEARCH_USER_RESULT, { keyword }]}
       />
     );
   };

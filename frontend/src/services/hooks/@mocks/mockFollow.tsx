@@ -8,6 +8,8 @@ export const PREV_FOLLOWING = false;
 export const ADDED_FOLLOWER_COUNT = PREV_FOLLOWER_COUNT + 1;
 export const DELETED_FOLLOWER_COUNT = PREV_FOLLOWER_COUNT - 1;
 
+export const mockQuerySetter = jest.fn();
+
 const URL = {
   FOLLOWINGS: "http://localhost:3000/api/profiles/:username/followings",
 };
