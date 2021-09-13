@@ -5,10 +5,11 @@ import { useLocation } from "react-router-dom";
 import { Post } from "../../@types";
 import useSearchPostData from "../../services/hooks/useSearchPostData";
 import { LayoutInPx } from "../../constants/layout";
-import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import { Container } from "./SearchPostResultPage.style";
 import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
 import Feed from "../../components/Feed/Feed";
+import useInfiniteImagePreloader from "../../services/hooks/@common/useInfiniteImagePreloader";
+import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
 
 interface LocationState {
   prevData?: InfiniteData<Post[]>;
@@ -22,10 +23,26 @@ const SearchPostResultPage = () => {
     state: { prevData, postId },
   } = useLocation<LocationState>();
 
-  const { infinitePostsData, isError, isLoading, isFetchingNextPage, handleIntersect, queryKey } = useSearchPostData(
-    type,
-    prevData
-  );
+  const {
+    infinitePostsData,
+    isError,
+    isLoading,
+    isFetchingNextPage,
+    handleIntersect: handlePostsEndIntersect,
+    queryKey,
+  } = useSearchPostData(type, prevData);
+
+  const infiniteImageUrls =
+    infinitePostsData?.pages.map(
+      (posts) => posts?.reduce<string[]>((acc, post) => [...acc, ...post.imageUrls], []) ?? []
+    ) ?? [];
+  const { isFirstImagesLoading, isImagesFetching, activateImageFetchingState } =
+    useInfiniteImagePreloader(infiniteImageUrls);
+
+  const handleIntersect = () => {
+    handlePostsEndIntersect();
+    activateImageFetchingState();
+  };
 
   useEffect(() => {
     if (!isMountedOnce) {
@@ -39,8 +56,8 @@ const SearchPostResultPage = () => {
     }
   }, [postId, isMountedOnce]);
 
-  if (isLoading) {
-    return <PageLoading />;
+  if (isLoading || isFirstImagesLoading) {
+    return <PageLoadingWithLogo />;
   }
 
   if (isError || !infinitePostsData) {
@@ -49,8 +66,12 @@ const SearchPostResultPage = () => {
 
   return (
     <Container>
-      <InfiniteScrollContainer isLoaderShown={isFetchingNextPage} onIntersect={handleIntersect}>
-        <Feed infinitePostsData={infinitePostsData} queryKey={queryKey} />
+      <InfiniteScrollContainer isLoaderShown={isFetchingNextPage || isImagesFetching} onIntersect={handleIntersect}>
+        <Feed
+          infinitePostsData={infinitePostsData}
+          queryKey={queryKey}
+          isFetching={isFetchingNextPage || isImagesFetching}
+        />
       </InfiniteScrollContainer>
     </Container>
   );

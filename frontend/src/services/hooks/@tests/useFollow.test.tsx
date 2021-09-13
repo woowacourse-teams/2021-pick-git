@@ -9,9 +9,8 @@ import UserContext from "../../../contexts/UserContext";
 import SnackBarContext from "../../../contexts/SnackbarContext";
 import { API_ERROR_MESSAGE, CLIENT_ERROR_MESSAGE } from "../../../constants/messages";
 import {
-  ADDED_FOLLOWER_COUNT,
-  DELETED_FOLLOWER_COUNT,
   followServer,
+  mockQuerySetter,
   PREV_FOLLOWER_COUNT,
   PREV_FOLLOWING,
   TARGET_USERNAME,
@@ -51,11 +50,11 @@ const wrapper = ({ children }: { children: React.ReactNode }) => {
 const actions = {
   follow: async (username: string, result: RenderResult<ReturnType<typeof useFollow>>, waitFor: WaitFor) => {
     await result.current.toggleFollow(username, false, false);
-    await waitFor(() => !result.current.isFollowLoading);
+    await waitFor(() => !result.current.isLoading);
   },
   unFollow: async (username: string, result: RenderResult<ReturnType<typeof useFollow>>, waitFor: WaitFor) => {
     await result.current.toggleFollow(username, true, false);
-    await waitFor(() => !result.current.isFollowLoading);
+    await waitFor(() => !result.current.isLoading);
   },
 };
 
@@ -69,26 +68,24 @@ afterAll(() => {
 });
 
 describe("Success Case", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   test("success1: should add Follow", async () => {
-    const { result, waitFor } = renderHook(() => useFollow(), { wrapper });
+    const { result, waitFor } = renderHook(() => useFollow(mockQuerySetter), { wrapper });
 
     await act(() => actions.follow(TARGET_USERNAME, result, waitFor));
 
-    const currentQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
-
-    expect(currentQueryData?.followerCount).toBe(ADDED_FOLLOWER_COUNT);
-    expect(currentQueryData?.following).toBe(!PREV_FOLLOWING);
+    expect(mockQuerySetter.mock.calls[0][0]).toBe(true);
   });
 
   test("success2: should add Unfollow", async () => {
-    const { result, waitFor } = renderHook(() => useFollow(), { wrapper });
+    const { result, waitFor } = renderHook(() => useFollow(mockQuerySetter), { wrapper });
 
     await act(() => actions.unFollow(TARGET_USERNAME, result, waitFor));
 
-    const currentQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
-
-    expect(currentQueryData?.followerCount).toBe(DELETED_FOLLOWER_COUNT);
-    expect(currentQueryData?.following).toBe(PREV_FOLLOWING);
+    expect(mockQuerySetter.mock.calls[0][0]).toBe(false);
   });
 });
 
@@ -100,14 +97,12 @@ describe("FAILURE CASE", () => {
   test("failure1: should handle empty accessToken error while one follow", async () => {
     setLocalStorageEmpty();
 
-    const { result, waitFor } = renderHook(() => useFollow(), { wrapper });
+    const { result, waitFor } = renderHook(() => useFollow(mockQuerySetter), { wrapper });
 
     await act(() => actions.follow(TARGET_USERNAME, result, waitFor));
 
-    const currentQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
-
-    expect(currentQueryData?.followerCount).toBe(PREV_FOLLOWER_COUNT);
-    expect(currentQueryData?.following).toBe(PREV_FOLLOWING);
+    expect(mockQuerySetter.mock.calls[0][0]).toBe(true);
+    expect(mockQuerySetter.mock.calls[1][0]).toBe(false);
     expect(mockFn.pushSnackbarMessage.mock.calls[0][0]).toBe(CLIENT_ERROR_MESSAGE.C0001);
     expect(mockFn.logout.mock.calls.length).toBe(1);
 
@@ -117,14 +112,12 @@ describe("FAILURE CASE", () => {
   test("failure2: should handle empty accessToken error while one unfollow", async () => {
     setLocalStorageEmpty();
 
-    const { result, waitFor } = renderHook(() => useFollow(), { wrapper });
+    const { result, waitFor } = renderHook(() => useFollow(mockQuerySetter), { wrapper });
 
     await act(() => actions.unFollow(TARGET_USERNAME, result, waitFor));
 
-    const currentQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
-
-    expect(currentQueryData?.followerCount).toBe(PREV_FOLLOWER_COUNT);
-    expect(currentQueryData?.following).toBe(PREV_FOLLOWING);
+    expect(mockQuerySetter.mock.calls[0][0]).toBe(false);
+    expect(mockQuerySetter.mock.calls[1][0]).toBe(true);
     expect(mockFn.pushSnackbarMessage.mock.calls[0][0]).toBe(CLIENT_ERROR_MESSAGE.C0001);
     expect(mockFn.logout.mock.calls.length).toBe(1);
 
@@ -134,16 +127,14 @@ describe("FAILURE CASE", () => {
   test("failure3: should handle http error while one follow: 401", async () => {
     setLocalStorageInvalid();
 
-    const { result, waitFor } = renderHook(() => useFollow(), { wrapper });
+    const { result, waitFor } = renderHook(() => useFollow(mockQuerySetter), { wrapper });
 
     await act(() => actions.follow(TARGET_USERNAME, result, waitFor));
 
-    const currentQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
-
+    expect(mockQuerySetter.mock.calls[0][0]).toBe(true);
+    expect(mockQuerySetter.mock.calls[1][0]).toBe(false);
     expect(mockFn.pushSnackbarMessage.mock.calls[0][0]).toBe(API_ERROR_MESSAGE[UNAUTHORIZED_TOKEN_ERROR]);
     expect(mockFn.logout.mock.calls.length).toBe(1);
-    expect(currentQueryData?.followerCount).toBe(PREV_FOLLOWER_COUNT);
-    expect(currentQueryData?.following).toBe(PREV_FOLLOWING);
 
     setLocalStorageValid();
   });
@@ -151,16 +142,14 @@ describe("FAILURE CASE", () => {
   test("failure4: should handle http error while one unfollow: 401", async () => {
     setLocalStorageInvalid();
 
-    const { result, waitFor } = renderHook(() => useFollow(), { wrapper });
+    const { result, waitFor } = renderHook(() => useFollow(mockQuerySetter), { wrapper });
 
     await act(() => actions.unFollow(TARGET_USERNAME, result, waitFor));
 
-    const currentQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
-
+    expect(mockQuerySetter.mock.calls[0][0]).toBe(false);
+    expect(mockQuerySetter.mock.calls[1][0]).toBe(true);
     expect(mockFn.pushSnackbarMessage.mock.calls[0][0]).toBe(API_ERROR_MESSAGE[UNAUTHORIZED_TOKEN_ERROR]);
     expect(mockFn.logout.mock.calls.length).toBe(1);
-    expect(currentQueryData?.followerCount).toBe(PREV_FOLLOWER_COUNT);
-    expect(currentQueryData?.following).toBe(PREV_FOLLOWING);
 
     setLocalStorageValid();
   });

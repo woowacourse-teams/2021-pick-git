@@ -7,3 +7,10 @@ export const Container = styled(Page)`
   min-height: 100vh;
   overflow-y: auto;
 `;
+
+export const LoadingWrapper = styled.div`
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;

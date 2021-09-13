@@ -8,18 +8,25 @@ import { useQueryClient } from "react-query";
 import { useContext } from "react";
 import UserContext from "../../contexts/UserContext";
 import { QUERY } from "../../constants/queries";
+import useInfiniteImagePreloader from "../../services/hooks/@common/useInfiniteImagePreloader";
 
 const TagFeedPage = () => {
   const { data: infinitePostsData, isLoading, error, isFetching, fetchNextPage } = useHomeFeedPostsQuery();
   const queryClient = useQueryClient();
   const { logout } = useContext(UserContext);
+  const infiniteImageUrls =
+    infinitePostsData?.pages.map((posts) => posts.reduce<string[]>((acc, post) => [...acc, ...post.imageUrls], [])) ??
+    [];
+  const { isFirstImagesLoading, isImagesFetching, activateImageFetchingState } =
+    useInfiniteImagePreloader(infiniteImageUrls);
 
-  const handlePostsEndIntersect = () => {
+  const handleIntersect = () => {
     fetchNextPage();
+    activateImageFetchingState();
   };
 
-  if (error) {
-    if (axios.isAxiosError(error)) {
+  if (error || !infinitePostsData) {
+    if (error && axios.isAxiosError(error)) {
       const { status } = error.response ?? {};
 
       if (status === 401) {
@@ -31,14 +38,14 @@ const TagFeedPage = () => {
     return <div>에러!!</div>;
   }
 
-  if (isLoading || !infinitePostsData) {
+  if (isLoading || isFirstImagesLoading) {
     return <PageLoading />;
   }
 
   return (
     <Container>
-      <InfiniteScrollContainer isLoaderShown={isFetching} onIntersect={handlePostsEndIntersect}>
-        <Feed infinitePostsData={infinitePostsData} queryKey="" />
+      <InfiniteScrollContainer isLoaderShown={isFetching || isImagesFetching} onIntersect={handleIntersect}>
+        <Feed infinitePostsData={infinitePostsData} queryKey="" isFetching={isFetching || isImagesFetching} />
       </InfiniteScrollContainer>
     </Container>
   );

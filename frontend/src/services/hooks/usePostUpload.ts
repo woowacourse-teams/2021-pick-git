@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import PostAddDataContext from "../../contexts/PostAddDataContext";
 import UserContext from "../../contexts/UserContext";
 import { getAccessToken } from "../../storage/storage";
@@ -8,8 +8,12 @@ const usePostUpload = () => {
   const { content, files, tags, githubRepositoryName, setContent, setFiles, setGithubRepositoryName, setTags } =
     useContext(PostAddDataContext);
   const { currentUsername } = useContext(UserContext);
+  const [uploading, setUploading] = useState(false);
 
   const accessToken = getAccessToken();
+
+  const activateUploadingState = () => setUploading(true);
+  const deactivateUploadingState = () => setUploading(false);
 
   const uploadPost = async () => {
     await requestAddPost(currentUsername, { content, files, tags, githubRepositoryName }, accessToken);
@@ -33,6 +37,9 @@ const usePostUpload = () => {
     setTags,
     uploadPost,
     resetPostUploadData,
+    uploading,
+    activateUploadingState,
+    deactivateUploadingState,
   };
 };
 

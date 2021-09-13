@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { PostEditData } from "../../@types";
 import PostEditDataContext from "../../contexts/PostEditDataContext";
 import { getAccessToken } from "../../storage/storage";
@@ -6,11 +6,14 @@ import { requestEditPost } from "../requests";
 
 const usePostEdit = () => {
   const { postId, content, tags, setPostId, setContent, setTags } = useContext(PostEditDataContext);
+  const [uploading, setUploading] = useState(false);
 
   const accessToken = getAccessToken();
 
   const editPost = async () => {
+    setUploading(true);
     await requestEditPost({ postId, content, tags }, accessToken);
+    setUploading(false);
   };
 
   const setPostEditData = ({ content, postId, tags }: PostEditData) => {
@@ -34,6 +37,7 @@ const usePostEdit = () => {
     editPost,
     setPostEditData,
     resetPostEditData,
+    uploading,
   };
 };
 

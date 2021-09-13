@@ -3,11 +3,11 @@ import { bounceAnimation, spinAnimation } from "../../@styled/keyframes";
 
 export const LoadingDots = styled.div<React.CSSProperties>``;
 
-const LoadingDot = styled.div<{ size: string }>`
-  ${({ theme, size }) => `
+const LoadingDot = styled.div<{ size: string; loaderColor?: string }>`
+  ${({ theme, size, loaderColor }) => `
     width: ${size};
     height: ${size};  
-    background-color: ${theme.color.tagItemColor}
+    background-color: ${loaderColor ?? theme.color.tagItemColor}
   `};
   border-radius: 50%;
   display: inline-block;
@@ -27,12 +27,12 @@ export const ThirdLoadingDot = styled(LoadingDot)`
   animation-delay: 0.3s;
 `;
 
-export const Spinner = styled.div<{ size: string }>`
-  ${({ theme, size }) => `
+export const Spinner = styled.div<{ size: string; loaderColor?: string }>`
+  ${({ theme, size, loaderColor }) => `
     width: ${size};
     height: ${size};  
-    border: 3px solid ${theme.color.tagItemColor};
-    border-top-color: ${theme.color.primaryColor};
+    border: 3px solid ${loaderColor ? "transparent" : theme.color.tagItemColor};
+    border-top-color: ${loaderColor ?? theme.color.primaryColor};
   `};
 
   display: inline-block;

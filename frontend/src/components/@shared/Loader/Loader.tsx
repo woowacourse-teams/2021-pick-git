@@ -3,18 +3,19 @@ import { LoadingDots, FirstLoadingDot, SecondLoadingDot, ThirdLoadingDot, Spinne
 export interface Props extends React.HTMLAttributes<HTMLSpanElement> {
   kind: "dots" | "spinner";
   size: string;
+  loaderColor?: string;
 }
 
-const Loader = ({ kind, size, ...props }: Props) => {
+const Loader = ({ kind, size, loaderColor, ...props }: Props) => {
   if (kind === "spinner") {
-    return <Spinner size={size} />;
+    return <Spinner size={size} loaderColor={loaderColor} />;
   }
 
   return (
     <LoadingDots {...props}>
-      <FirstLoadingDot size={size} />
-      <SecondLoadingDot size={size} />
-      <ThirdLoadingDot size={size} />
+      <FirstLoadingDot size={size} loaderColor={loaderColor} />
+      <SecondLoadingDot size={size} loaderColor={loaderColor} />
+      <ThirdLoadingDot size={size} loaderColor={loaderColor} />
     </LoadingDots>
   );
 };
