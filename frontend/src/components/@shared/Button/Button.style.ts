@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { css, CSSProp } from "styled-components";
 
 const Button = styled.button<React.CSSProperties>`
   ${({ theme, backgroundColor, color }) => `
@@ -27,18 +27,30 @@ const BlockButton = styled(Button)`
   font-size: 1rem;
 `;
 
-export const SquaredInlineButton = styled(InlineButton)<React.CSSProperties>`
-  border-radius: 4px;
-`;
+export const SquaredInlineButton = styled(InlineButton)<{ cssProp?: CSSProp }>(
+  ({ cssProp }) => css`
+    border-radius: 4px;
+    ${cssProp}
+  `
+);
 
-export const SquaredBlockButton = styled(BlockButton)`
-  border-radius: 4px;
-`;
+export const SquaredBlockButton = styled(BlockButton)<{ cssProp?: CSSProp }>(
+  ({ cssProp }) => css`
+    border-radius: 4px;
+    ${cssProp}
+  `
+);
 
-export const RoundedInlineButton = styled(InlineButton)`
-  border-radius: 24px;
-`;
+export const RoundedInlineButton = styled(InlineButton)<{ cssProp?: CSSProp }>(
+  ({ cssProp }) => css`
+    border-radius: 24px;
+    ${cssProp}
+  `
+);
 
-export const RoundedBlockButton = styled(BlockButton)`
-  border-radius: 24px;
-`;
+export const RoundedBlockButton = styled(BlockButton)<{ cssProp?: CSSProp }>(
+  ({ cssProp }) => css`
+    border-radius: 24px;
+    ${cssProp}
+  `
+);

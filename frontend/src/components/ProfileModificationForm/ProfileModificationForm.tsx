@@ -10,8 +10,8 @@ import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal
 import PageLoading from "../@layout/PageLoading/PageLoading";
 import Avatar from "../@shared/Avatar/Avatar";
 import Button from "../@shared/Button/Button";
-import TextEditor from "../@shared/TextEditor/TextEditor";
-import { Container, Heading, Label, TextEditorWrapper } from "./ProfileModificationForm.style";
+import PostTextEditor from "../PostTextEditor/PostTextEditor";
+import { Container, Heading, Label, TextEditorCSS, TextEditorWrapper } from "./ProfileModificationForm.style";
 
 export interface Props {
   username: string;
@@ -56,13 +56,13 @@ const ProfileModificationForm = ({ username, profileImageUrl, prevDescription, o
         />
       </Label>
       <TextEditorWrapper>
-        <TextEditor
-          height="100%"
-          fontSize="1rem"
+        <PostTextEditor
+          cssProp={TextEditorCSS}
           placeholder="한 줄 소개"
           maxLength={LIMIT.PROFILE_DESCRIPTION_LENGTH}
           value={description}
           onChange={handleDescriptionChange}
+          autoGrow={false}
         />
       </TextEditorWrapper>
       <Button kind="roundedBlock" padding="0.875rem">
