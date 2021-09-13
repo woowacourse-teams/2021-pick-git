@@ -1,5 +1,6 @@
-package com.woowacourse.pickgit.portfolio;
+package com.woowacourse.pickgit.portfolio.domain;
 
+import com.woowacourse.pickgit.portfolio.domain.Item;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;

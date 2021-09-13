@@ -1,6 +1,6 @@
-package com.woowacourse.pickgit.portfolio;
+package com.woowacourse.pickgit.portfolio.domain;
 
-import com.woowacourse.pickgit.tag.domain.Tag;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -10,16 +10,18 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class ProjectTag {
+public class Contact {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_id")
-    private Project project;
+    @Column(nullable = false)
+    private String category;
+
+    @Column(nullable = false)
+    private String value;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tag_id")
-    private Tag tag;
+    @JoinColumn(name = "portfolio_id", nullable = false)
+    private Portfolio portfolio;
 }

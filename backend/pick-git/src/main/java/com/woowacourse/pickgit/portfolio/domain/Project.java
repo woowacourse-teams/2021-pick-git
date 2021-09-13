@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.portfolio;
+package com.woowacourse.pickgit.portfolio.domain;
 
 import java.time.LocalDateTime;
 import java.util.List;

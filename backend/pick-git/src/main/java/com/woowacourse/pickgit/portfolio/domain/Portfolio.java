@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.portfolio;
+package com.woowacourse.pickgit.portfolio.domain;
 
 import java.util.List;
 import javax.persistence.Column;
@@ -25,7 +25,7 @@ public class Portfolio {
     private String introduction;
 
     @OneToMany(mappedBy = "portfolio", fetch = FetchType.LAZY)
-    private List<Contract> contracts;
+    private List<Contact> contacts;
 
     @OneToMany(mappedBy = "portfolio", fetch = FetchType.LAZY)
     private List<Project> projects;
