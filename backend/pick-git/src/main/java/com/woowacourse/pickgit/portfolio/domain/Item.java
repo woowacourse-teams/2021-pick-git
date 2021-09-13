@@ -24,4 +24,35 @@ public class Item {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "section_id")
     private Section section;
+
+    protected Item() {
+    }
+
+    public Item(
+        Long id,
+        String category,
+        List<Description> descriptions,
+        Section section
+    ) {
+        this.id = id;
+        this.category = category;
+        this.descriptions = descriptions;
+        this.section = section;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public List<Description> getDescriptions() {
+        return descriptions;
+    }
+
+    public Section getSection() {
+        return section;
+    }
 }

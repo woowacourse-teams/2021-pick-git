@@ -41,4 +41,59 @@ public class Project {
 
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
     private List<ProjectTag> tags;
+
+    protected Project() {
+    }
+
+    public Project(
+        Long id,
+        String name,
+        LocalDateTime startDate,
+        LocalDateTime endDate,
+        ProjectType type,
+        String imageUrl,
+        String content,
+        List<ProjectTag> tags
+    ) {
+        this.id = id;
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.type = type;
+        this.imageUrl = imageUrl;
+        this.content = content;
+        this.tags = tags;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public LocalDateTime getStartDate() {
+        return startDate;
+    }
+
+    public LocalDateTime getEndDate() {
+        return endDate;
+    }
+
+    public ProjectType getType() {
+        return type;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public List<ProjectTag> getTags() {
+        return tags;
+    }
 }

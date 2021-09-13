@@ -24,4 +24,35 @@ public class Contact {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "portfolio_id", nullable = false)
     private Portfolio portfolio;
+
+    protected Contact() {
+    }
+
+    public Contact(
+        Long id,
+        String category,
+        String value,
+        Portfolio portfolio
+    ) {
+        this.id = id;
+        this.category = category;
+        this.value = value;
+        this.portfolio = portfolio;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public Portfolio getPortfolio() {
+        return portfolio;
+    }
 }

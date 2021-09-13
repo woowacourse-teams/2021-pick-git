@@ -21,4 +21,29 @@ public class Section {
 
     @OneToMany(mappedBy = "section", fetch = FetchType.LAZY)
     private List<Item> items;
+
+    protected Section() {
+    }
+
+    public Section(
+        Long id,
+        String name,
+        List<Item> items
+    ) {
+        this.id = id;
+        this.name = name;
+        this.items = items;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<Item> getItems() {
+        return items;
+    }
 }

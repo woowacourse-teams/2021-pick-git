@@ -1,6 +1,5 @@
 package com.woowacourse.pickgit.portfolio.domain;
 
-import com.woowacourse.pickgit.portfolio.domain.Item;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -20,4 +19,25 @@ public class Description {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     private Item item;
+
+    protected Description() {
+    }
+
+    public Description(Long id, String value, Item item) {
+        this.id = id;
+        this.value = value;
+        this.item = item;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public Item getItem() {
+        return item;
+    }
 }
