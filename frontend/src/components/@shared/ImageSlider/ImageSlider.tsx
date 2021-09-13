@@ -59,7 +59,7 @@ const ImageSlider = ({ imageUrls, width, slideButtonKind }: Props) => {
       >
         {imageUrls.map((imageUrl, index) => (
           <ImageList key={imageUrl}>
-            <ImageView imageUrl={imageUrl} role="img" aria-label={`${index + 1}번째 사진`} />
+            <img src={imageUrl} alt={`${index + 1}번째 사진`} />
           </ImageList>
         ))}
       </ImageListSlider>
