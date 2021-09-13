@@ -1,10 +1,10 @@
 import { Story } from "@storybook/react";
 import { ChangeEventHandler, useState } from "react";
 
-import TextEditor, { Props } from "./TextEditor";
+import TextEditor, { TextEditorProps } from "./TextEditor";
 import { TextEditorWrapper } from "../../../../.storybook/utils/components";
 
-type ContainerProps = Omit<Props, "value" | "onChange">;
+type ContainerProps = Omit<TextEditorProps, "value" | "onChange">;
 
 const Container = (args: ContainerProps) => {
   const [value, setValue] = useState("");
@@ -35,31 +35,16 @@ const TransparentTemplate: Story<ContainerProps> = (args) => <TransparentContain
 
 export const Default = Template.bind({});
 Default.args = {
-  width: "100%",
-  height: "200px",
   placeholder: "내용을 입력해주세요",
 };
 
 export const AutoGrow = Template.bind({});
 AutoGrow.args = {
-  width: "100%",
-  height: "200px",
   placeholder: "내용을 입력해주세요",
   autoGrow: true,
 };
 
 export const Transparent = TransparentTemplate.bind({});
 Transparent.args = {
-  width: "100%",
-  height: "200px",
-  placeholder: "내용을 입력해주세요",
   autoGrow: true,
-};
-
-export const WithIndicator = Template.bind({});
-WithIndicator.args = {
-  width: "100%",
-  height: "200px",
-  placeholder: "내용을 입력해주세요",
-  maxLength: 50,
 };

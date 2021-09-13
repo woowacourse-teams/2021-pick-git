@@ -6,8 +6,8 @@ import { isValidFilesSize, isValidFilesSizeCount } from "../../utils/postUpload"
 import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
 import ImageSlider from "../@shared/ImageSlider/ImageSlider";
 import ImageUploader from "../@shared/ImageUploader/ImageUploader";
-import TextEditor from "../@shared/TextEditor/TextEditor";
-import { Container, ImageUploaderWrapper, TextEditorWrapper } from "./PostContentUploader.style";
+import PostTextEditor from "../PostTextEditor/PostTextEditor";
+import { Container, ImageUploaderWrapper, PostTextEditorCSS, TextEditorWrapper } from "./PostContentUploader.style";
 
 interface Props {
   isImageUploaderShown: boolean;
@@ -58,13 +58,13 @@ const PostContentUploader = ({ isImageUploaderShown, content, setFiles, setConte
         </ImageUploaderWrapper>
       )}
       <TextEditorWrapper>
-        <TextEditor
-          height="100%"
+        <PostTextEditor
           onChange={handlePostContentChange}
           value={content}
-          lineHeight="1.8rem"
           placeholder="내용을 작성해주세요..."
           maxLength={LIMIT.POST_CONTENT_MAX_LENGTH}
+          cssProp={PostTextEditorCSS}
+          autoGrow={false}
         />
       </TextEditorWrapper>
       {isModalShown && (
