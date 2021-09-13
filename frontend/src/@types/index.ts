@@ -128,7 +128,7 @@ export type PortfolioProject = {
   name: string;
   startDate: string;
   endDate: string;
-  type: "team" | "individual";
+  type: "team" | "personal";
   imageUrl: string;
   content: string;
   tags: string[];
