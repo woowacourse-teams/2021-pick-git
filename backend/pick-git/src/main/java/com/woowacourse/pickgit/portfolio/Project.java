@@ -33,6 +33,6 @@ public class Project {
 
     private String content;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
     private List<ProjectTag> tags;
 }
