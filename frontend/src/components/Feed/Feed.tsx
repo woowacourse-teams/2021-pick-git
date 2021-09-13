@@ -26,14 +26,7 @@ interface Props {
 const Feed = ({ infinitePostsData, queryKey, isFetching }: Props) => {
   const [selectedPostId, setSelectedPostId] = useState<Post["id"]>();
   const { pushSnackbarMessage } = useContext(SnackBarContext);
-  const {
-    addPostLike,
-    deletePost,
-    deletePostLike,
-    isDeletePostLikeLoading,
-    isAddPostLikeLoading,
-    isDeletePostLoading,
-  } = useFeedMutation(queryKey);
+  const { addPostLike, deletePost, deletePostLike, isDeletePostLoading } = useFeedMutation(queryKey);
   const [posts, setPosts] = useState<Post[]>([]);
   const { setPostEditData } = usePostEdit();
   const { modalMessage, isModalShown, isCancelButtonShown, showConfirmModal, hideMessageModal } = useMessageModal();
@@ -145,8 +138,6 @@ const Feed = ({ infinitePostsData, queryKey, isFetching }: Props) => {
             onPostDelete={() => handlePostDeleteButtonClick(post.id)}
             onPostEdit={() => handlePostEdit(post)}
             onPostLike={() => handlePostLike(post.id)}
-            isDeletePostLikeLoading={isDeletePostLikeLoading}
-            isAddPostLikeLoading={isAddPostLikeLoading}
             handlePostLikeCountClick={() => handlePostLikeCountClick(post.id)}
             onMoreCommentClick={() => handleCommentsClick(post.id)}
             onCommentInputClick={() => handleCommentsClick(post.id)}

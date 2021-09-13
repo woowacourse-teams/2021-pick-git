@@ -58,8 +58,6 @@ export interface Props {
   tags: string[];
   createdAt: string;
   isLoggedIn: boolean;
-  isDeletePostLikeLoading: boolean;
-  isAddPostLikeLoading: boolean;
   handlePostLikeCountClick: () => void;
   onMoreCommentClick: () => void;
   onCommentInputClick: () => void;
@@ -95,8 +93,6 @@ const PostItem = ({
   onPostEdit,
   onPostDelete,
   onPostLike,
-  isDeletePostLikeLoading,
-  isAddPostLikeLoading,
 }: Props) => {
   const [shouldHideContent, setShouldHideContent] = useState(true);
   const { color } = useContext(ThemeContext);
@@ -133,11 +129,7 @@ const PostItem = ({
 
   const LikeButton = () => {
     return isLoggedIn ? (
-      isDeletePostLikeLoading || isAddPostLikeLoading ? (
-        <Spinner size="1rem" />
-      ) : (
-        <IconLink onClick={onPostLike}>{liked ? <PostHeartIcon /> : <PostHeartLineIcon />}</IconLink>
-      )
+      <IconLink onClick={onPostLike}>{liked ? <PostHeartIcon /> : <PostHeartLineIcon />}</IconLink>
     ) : (
       <></>
     );
