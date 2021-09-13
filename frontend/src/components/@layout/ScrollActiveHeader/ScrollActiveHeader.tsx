@@ -37,7 +37,6 @@ const ScrollActiveHeader = ({ containerRef, children }: Props) => {
     }
 
     containerRef.current.onscroll = activateHeader;
-    // containerRef.current.onclick = toggleHeader;
   }, [lastScrollY, isHeaderShown]);
 
   return (
