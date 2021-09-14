@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+  <Appenders>
+    <Console name="ConsoleAppender" target="SYSTEM_OUT">
+      <PatternLayout
+        pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %t %class{36}.%M L:%L %n      > %m%n"/>
+    </Console>
+  </Appenders>
+  <Loggers>
+    <Logger name="com.woowacourse.pickgit" level="info" additivity="false">
+      <AppenderRef ref="ConsoleAppender"/>
+    </Logger>
+    <Logger name="org.springframework" level="info" additivity="false">
+      <AppenderRef ref="ConsoleAppender"/>
+    </Logger>
+    <!--    <Logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" additivity="false">-->
+    <!--      <AppenderRef ref="ConsoleAppender"/>-->
+    <!--    </Logger>-->
+    <!--    <Logger name="org.hibernate.type.descriptor.sql.BasicExtractor" level="TRACE"-->
+    <!--      additivity="false">-->
+    <!--      <AppenderRef ref="ConsoleAppender"/>-->
+    <!--    </Logger>-->
+    <Root level="error">
+      <AppenderRef ref="ConsoleAppender"/>
+    </Root>
+  </Loggers>
+</Configuration>

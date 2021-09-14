@@ -1,15 +1,16 @@
-import styled from "styled-components";
+import styled, { css, CSSProp } from "styled-components";
 
-export const Container = styled.span<React.CSSProperties>`
-  ${({ backgroundColor, theme }) => `
-      background-color: ${backgroundColor ?? theme.color.tagItemColor};
-      color: ${theme.color.white};
-    `};
-  padding: 0.4375rem 0.9375rem;
-  border-radius: 24px;
-  display: inline-flex;
-  align-items: center;
-`;
+export const Container = styled.span<{ cssProp?: CSSProp; backgroundColor?: string }>(
+  ({ theme, backgroundColor, cssProp }) => css`
+    background-color: ${backgroundColor ?? theme.color.tagItemColor};
+    color: ${theme.color.white};
+    padding: 0.4375rem 0.9375rem;
+    border-radius: 24px;
+    display: inline-flex;
+    align-items: center;
+    ${cssProp}
+  `
+);
 
 export const Text = styled.span`
   display: inline-flex;

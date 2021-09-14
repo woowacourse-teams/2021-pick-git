@@ -25,6 +25,7 @@ import {
   DeleteIconWrapper,
   CommentContentWrapper,
   HorizontalSliderWrapper,
+  CommentLoadingWrapper,
 } from "./CommentsPage.style";
 import { CommentData, Post, TabItem } from "../../@types";
 import { COMMENT_SLIDE_STEPS } from "../../constants/steps";
@@ -42,9 +43,7 @@ import useMessageModal from "../../services/hooks/@common/useMessageModal";
 import MessageModalPortal from "../../components/@layout/MessageModalPortal/MessageModalPortal";
 import { getTextElementsWithWithBr } from "../../utils/text";
 
-export interface Props {}
-
-const CommentsPage = ({}: Props) => {
+const CommentsPage = () => {
   const [selectedCommentId, setSelectedCommentId] = useState<CommentData["id"]>(0);
   const [isPostShown, setIsPostShown] = useState(true);
   const [stepIndex, setStepIndex] = useState(0);
@@ -54,8 +53,17 @@ const CommentsPage = ({}: Props) => {
   const { currentUsername } = useContext(UserContext);
   const { modalMessage, isModalShown, isCancelButtonShown, showConfirmModal, hideMessageModal } = useMessageModal();
 
-  const { infiniteCommentsData, isFetching, isError, isLoading, getNextComments, addPostComment, deletePostComment } =
-    useComments(selectedPost.id);
+  const {
+    infiniteCommentsData,
+    isFetching,
+    isError,
+    isLoading,
+    isAddCommentLoading,
+    isDeleteCommentLoading,
+    getNextComments,
+    addPostComment,
+    deletePostComment,
+  } = useComments(selectedPost.id);
 
   const { isLoggedIn } = useContext(UserContext);
   const commentTextAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -119,8 +127,8 @@ const CommentsPage = ({}: Props) => {
   };
 
   const handleCommentDelete = async () => {
-    await deletePostComment(selectedPost.id, selectedCommentId);
     hideMessageModal();
+    await deletePostComment(selectedPost.id, selectedCommentId);
   };
 
   const handleCommentSave = async () => {
@@ -128,17 +136,19 @@ const CommentsPage = ({}: Props) => {
       return;
     }
 
-    try {
-      await addPostComment(selectedPost.id, commentTextAreaRef.current.value);
-    } catch (error) {
-      pushSnackbarMessage(FAILURE_MESSAGE.COMMENT_SAVE_FAILED);
-    }
+    const newComment = commentTextAreaRef.current.value;
 
     commentTextAreaRef.current.value = "";
     window.scroll({
       top: window.outerHeight,
       behavior: "smooth",
     });
+
+    try {
+      await addPostComment(selectedPost.id, newComment);
+    } catch (error) {
+      pushSnackbarMessage(FAILURE_MESSAGE.COMMENT_SAVE_FAILED);
+    }
   };
 
   if (isLoading) {
@@ -194,9 +204,15 @@ const CommentsPage = ({}: Props) => {
           </TabsWrapper>
         </HorizontalSliderWrapper>
       )}
-      <InfiniteScrollContainer isLoaderShown={isFetching} onIntersect={getNextComments}>
-        <CommentList>{commentListItems}</CommentList>
-      </InfiniteScrollContainer>
+      {isAddCommentLoading || isDeleteCommentLoading ? (
+        <CommentLoadingWrapper>
+          <PageLoading />
+        </CommentLoadingWrapper>
+      ) : (
+        <InfiniteScrollContainer isLoaderShown={isFetching} onIntersect={getNextComments}>
+          <CommentList>{commentListItems}</CommentList>
+        </InfiniteScrollContainer>
+      )}
       {isLoggedIn && (
         <CommentTextAreaWrapper>
           <CommentTextArea placeholder="댓글 입력..." ref={commentTextAreaRef} />

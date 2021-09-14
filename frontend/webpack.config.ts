@@ -1,18 +1,23 @@
-import path from "path";
-import webpack from "webpack";
-import HTMLWebpackPlugin from "html-webpack-plugin";
-import { CleanWebpackPlugin } from "clean-webpack-plugin";
+/* eslint-disable @typescript-eslint/no-var-requires */
+const path = require("path");
+const webpack = require("webpack");
+const HTMLWebpackPlugin = require("html-webpack-plugin");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const CompressionPlugin = require("compression-webpack-plugin");
+const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 
 const isProduction = process.env.NODE_ENV === "production";
 
-const config = {
-  mode: isProduction ? "production" : "development",
+module.exports = {
+  mode: process.env.NODE_ENV,
   devtool: isProduction ? "hidden-source-map" : "eval",
 
   entry: "./src/index.tsx",
   output: {
     path: path.resolve("./dist"),
-    filename: "bundle.js",
+    filename: "[name].[contenthash].js",
+    chunkFilename: "[name].[contenthash].js",
   },
 
   resolve: {
@@ -69,7 +74,35 @@ const config = {
       template: "./public/index.html",
       favicon: "./public/favicon.ico",
     }),
+    new BundleAnalyzerPlugin({
+      analyzerMode: "static",
+      reportFilename: "docs/report.html",
+      openAnalyzer: false,
+    }),
+    new CompressionPlugin({
+      test: /\.(js|js\.map)?$/i,
+    }),
   ],
+  optimization: {
+    minimize: true,
+    minimizer: ["...", new CssMinimizerPlugin()],
+    splitChunks: {
+      cacheGroups: {
+        defaultVendors: false,
+        vendors: {
+          chunks: "all",
+          name: "vendors",
+          test: /[\\/]node_modules[\\/]/,
+          priority: 10,
+          reuseExistingChunk: true,
+        },
+        react: {
+          chunks: "all",
+          name: "react",
+          test: /(?<!node_modules.*)[\\/]node_modules[\\/](react|react-dom|react-router-dom)[\\/]/,
+          priority: 40,
+        },
+      },
+    },
+  },
 };
-
-export default config;

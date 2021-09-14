@@ -17,7 +17,9 @@ const Template: Story = (args) => {
     return <PageLoading />;
   }
 
-  return <Feed {...args} infinitePostsData={infinitePostsData} queryKey={QUERY.GET_HOME_FEED_POSTS} />;
+  return (
+    <Feed {...args} infinitePostsData={infinitePostsData} queryKey={QUERY.GET_HOME_FEED_POSTS} isFetching={false} />
+  );
 };
 
 export const Default = Template.bind({});

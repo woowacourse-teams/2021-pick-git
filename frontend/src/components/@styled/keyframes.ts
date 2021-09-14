@@ -49,3 +49,17 @@ export const spinAnimation = keyframes`
     transform: rotate(360deg);
   }
 `;
+
+export const breathingAnimation = keyframes`
+  from {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.3;
+  }
+
+  to {
+    opacity: 1;
+  }
+`;

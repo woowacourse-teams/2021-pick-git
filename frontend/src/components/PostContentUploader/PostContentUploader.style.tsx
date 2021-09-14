@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
 export const Container = styled.div`
   display: flex;
@@ -25,4 +25,10 @@ export const TextEditorWrapper = styled.div`
   width: 100%;
   flex-grow: 1;
   margin-top: 1.5625rem;
+`;
+
+export const PostTextEditorCSS = css`
+  width: 100%;
+  height: 100%;
+  line-height: 1.8rem;
 `;

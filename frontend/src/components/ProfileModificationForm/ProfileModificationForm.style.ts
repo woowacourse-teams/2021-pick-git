@@ -1,10 +1,11 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
 interface AvatarWrapperProps extends React.CSSProperties {
   avatarDiameter: string;
 }
 
 export const Container = styled.form`
+  position: relative;
   width: 20.5rem;
   height: 39rem;
   padding: 2rem 0;
@@ -39,4 +40,9 @@ export const TextEditorWrapper = styled.div`
   height: 14.125rem;
   padding: 0.75rem;
   background-color: ${({ theme }) => theme.color.secondaryColor};
+`;
+
+export const TextEditorCSS = css`
+  height: 100%;
+  font-size: 1rem;
 `;

@@ -37,7 +37,7 @@ export const Description = styled.p`
   font-size: 0.7rem;
   margin: 1.25rem 0;
   padding: 0.2rem 0.5rem;
-  line-height: 1;
+  line-height: 1.2rem;
 `;
 
 export const DetailInfo = styled.div`

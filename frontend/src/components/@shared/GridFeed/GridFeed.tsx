@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { Post } from "../../../@types";
 import { getItemsFromPages } from "../../../utils/infiniteData";
 
-import PageLoading from "../../@layout/PageLoading/PageLoading";
 import InfiniteScrollContainer from "../InfiniteScrollContainer/InfiniteScrollContainer";
 import { Container, Empty, Grid, GridItem } from "./GridFeed.styled";
 
@@ -16,22 +15,7 @@ export interface Props {
   handleIntersect: () => void;
 }
 
-const GridFeed = ({
-  feedPagePath,
-  infinitePostsData,
-  isLoading,
-  isError,
-  isFetchingNextPage,
-  handleIntersect,
-}: Props) => {
-  if (isLoading) {
-    return (
-      <Empty>
-        <PageLoading />
-      </Empty>
-    );
-  }
-
+const GridFeed = ({ feedPagePath, infinitePostsData, isError, isFetchingNextPage, handleIntersect }: Props) => {
   if (isError || !infinitePostsData) {
     return <div>피드를 가져올 수 없습니다.</div>;
   }

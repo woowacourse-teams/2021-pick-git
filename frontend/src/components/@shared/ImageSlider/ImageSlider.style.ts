@@ -4,6 +4,7 @@ export const Container = styled.div<React.CSSProperties>`
   ${({ width }) => `
     width: ${width};
   `}
+  height: fit-content;
 
   overflow: hidden;
   position: relative;
@@ -27,6 +28,14 @@ export const ImageList = styled.li<React.CSSProperties>`
   img {
     width: 100%;
   }
+`;
+
+export const ImageView = styled.div<{ imageUrl: string }>`
+  width: 100%;
+  background-image: url(${({ imageUrl }) => imageUrl});
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
 `;
 
 export const SlideButton = styled.button<{

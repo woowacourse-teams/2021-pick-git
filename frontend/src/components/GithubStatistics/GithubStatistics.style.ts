@@ -62,6 +62,7 @@ export const ContributionGraphWrapper = styled.div`
   overflow-x: auto;
   display: flex;
   justify-content: center;
+  align-items: center;
 `;
 
 export const Empty = styled.div`

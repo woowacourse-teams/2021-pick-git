@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { Page } from "../../components/@styled/layout";
 
 export const Container = styled(Page)<React.CSSProperties>`
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: space-between;

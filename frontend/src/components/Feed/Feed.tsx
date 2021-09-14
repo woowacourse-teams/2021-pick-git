@@ -1,13 +1,12 @@
 import { useContext, useEffect, useState } from "react";
+
 import { Post } from "../../@types";
 import SnackBarContext from "../../contexts/SnackbarContext";
 import UserContext from "../../contexts/UserContext";
 import PostItem from "../@shared/PostItem/PostItem";
 import { Container, PostItemWrapper } from "./Feed.style";
-import useBottomSlider from "../../services/hooks/@common/useBottomSlider";
-import CommentSlider from "../CommentSlider/CommentSlider";
 import useFeedMutation from "../../services/hooks/useFeedMutation";
-import { FAILURE_MESSAGE, SUCCESS_MESSAGE, WARNING_MESSAGE } from "../../constants/messages";
+import { SUCCESS_MESSAGE, WARNING_MESSAGE } from "../../constants/messages";
 import { getAPIErrorMessage } from "../../utils/error";
 import { useHistory } from "react-router-dom";
 import { PAGE_URL } from "../../constants/urls";
@@ -16,22 +15,23 @@ import { InfiniteData, QueryKey } from "react-query";
 import { getItemsFromPages } from "../../utils/infiniteData";
 import useMessageModal from "../../services/hooks/@common/useMessageModal";
 import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
+import PageLoadingWithCover from "../@layout/PageLoadingWithCover/PageLoadingWithCover";
 
 interface Props {
   infinitePostsData: InfiniteData<Post[] | null>;
   queryKey: QueryKey;
+  isFetching: boolean;
 }
 
-const Feed = ({ infinitePostsData, queryKey }: Props) => {
+const Feed = ({ infinitePostsData, queryKey, isFetching }: Props) => {
   const [selectedPostId, setSelectedPostId] = useState<Post["id"]>();
   const { pushSnackbarMessage } = useContext(SnackBarContext);
-  const { addPostComment, addPostLike, deletePost, deletePostLike } = useFeedMutation(queryKey);
+  const { addPostLike, deletePost, deletePostLike, isDeletePostLoading } = useFeedMutation(queryKey);
+  const [posts, setPosts] = useState<Post[]>([]);
   const { setPostEditData } = usePostEdit();
   const { modalMessage, isModalShown, isCancelButtonShown, showConfirmModal, hideMessageModal } = useMessageModal();
   const { isLoggedIn, currentUsername } = useContext(UserContext);
   const history = useHistory();
-
-  const posts = getItemsFromPages<Post>(infinitePostsData.pages);
 
   const handlePostEdit = async (post: Post) => {
     setPostEditData({ content: post.content, postId: post.id, tags: post.tags });
@@ -102,6 +102,14 @@ const Feed = ({ infinitePostsData, queryKey }: Props) => {
     });
   };
 
+  useEffect(() => {
+    if (isFetching) {
+      return;
+    }
+
+    setPosts(getItemsFromPages<Post>(infinitePostsData.pages));
+  }, [infinitePostsData, isFetching]);
+
   if (!infinitePostsData.pages) {
     return <div>게시물이 존재하지 않습니다.</div>;
   }
@@ -134,6 +142,7 @@ const Feed = ({ infinitePostsData, queryKey }: Props) => {
             onMoreCommentClick={() => handleCommentsClick(post.id)}
             onCommentInputClick={() => handleCommentsClick(post.id)}
           />
+          {isDeletePostLoading && <PageLoadingWithCover description="삭제중" />}
         </PostItemWrapper>
       ))}
       {isModalShown && isCancelButtonShown && (
