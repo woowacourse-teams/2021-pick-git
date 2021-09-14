@@ -1,30 +1,30 @@
-package com.woowacourse.pickgit.portfolio.application.dto.request;
+package com.woowacourse.pickgit.portfolio.presentation.dto.request;
 
 import java.util.List;
 import lombok.Builder;
 
 @Builder
-public class PortfolioRequestDto {
+public class PortfolioRequest {
 
     private Long id;
     private boolean profileImageShown;
     private String profileImageUrl;
     private String introduction;
-    private List<ContactRequestDto> contacts;
-    private List<ProjectRequestDto> projects;
-    private List<SectionRequestDto> sections;
+    private List<ContactRequest> contacts;
+    private List<ProjectRequest> projects;
+    private List<SectionRequest> sections;
 
-    private PortfolioRequestDto() {
+    private PortfolioRequest() {
     }
 
-    public PortfolioRequestDto(
+    public PortfolioRequest(
         Long id,
         boolean profileImageShown,
         String profileImageUrl,
         String introduction,
-        List<ContactRequestDto> contacts,
-        List<ProjectRequestDto> projects,
-        List<SectionRequestDto> sections
+        List<ContactRequest> contacts,
+        List<ProjectRequest> projects,
+        List<SectionRequest> sections
     ) {
         this.id = id;
         this.profileImageShown = profileImageShown;
@@ -51,15 +51,15 @@ public class PortfolioRequestDto {
         return introduction;
     }
 
-    public List<ContactRequestDto> getContacts() {
+    public List<ContactRequest> getContacts() {
         return contacts;
     }
 
-    public List<ProjectRequestDto> getProjects() {
+    public List<ProjectRequest> getProjects() {
         return projects;
     }
 
-    public List<SectionRequestDto> getSections() {
+    public List<SectionRequest> getSections() {
         return sections;
     }
 }

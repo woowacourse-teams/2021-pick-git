@@ -1,12 +1,11 @@
-package com.woowacourse.pickgit.portfolio.application.dto.request;
+package com.woowacourse.pickgit.portfolio.presentation.dto.request;
 
-import com.woowacourse.pickgit.portfolio.presentation.dto.request.ProjectRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
 
 @Builder
-public class ProjectRequestDto {
+public class ProjectRequest {
 
     private Long id;
     private String name;
@@ -17,10 +16,10 @@ public class ProjectRequestDto {
     private String content;
     private List<String> tags;
 
-    private ProjectRequestDto() {
+    private ProjectRequest() {
     }
 
-    public ProjectRequestDto(
+    public ProjectRequest(
         Long id,
         String name,
         LocalDateTime startDate,
@@ -38,19 +37,6 @@ public class ProjectRequestDto {
         this.imageUrl = imageUrl;
         this.content = content;
         this.tags = tags;
-    }
-
-    public static ProjectRequestDto of(ProjectRequest request) {
-        return ProjectRequestDto.builder()
-            .id(request.getId())
-            .name(request.getName())
-            .startDate(request.getStartDate())
-            .endDate(request.getEndDate())
-            .type(request.getType())
-            .imageUrl(request.getImageUrl())
-            .content(request.getContent())
-            .tags(request.getTags())
-            .build();
     }
 
     public Long getId() {

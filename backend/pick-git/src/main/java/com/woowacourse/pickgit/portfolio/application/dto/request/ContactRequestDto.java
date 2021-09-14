@@ -1,19 +1,34 @@
 package com.woowacourse.pickgit.portfolio.application.dto.request;
 
+import com.woowacourse.pickgit.portfolio.presentation.dto.request.ContactRequest;
 import lombok.Builder;
 
 @Builder
 public class ContactRequestDto {
 
+    private Long id;
     private String category;
     private String value;
 
     private ContactRequestDto() {
     }
 
-    public ContactRequestDto(String category, String value) {
+    public ContactRequestDto(Long id, String category, String value) {
+        this.id = id;
         this.category = category;
         this.value = value;
+    }
+
+    public static ContactRequestDto of(ContactRequest request) {
+        return ContactRequestDto.builder()
+            .id(request.getId())
+            .category(request.getCategory())
+            .value(request.getValue())
+            .build();
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getCategory() {
