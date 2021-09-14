@@ -16,8 +16,7 @@ import javax.persistence.OneToMany;
 @Entity
 public class Portfolio {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
