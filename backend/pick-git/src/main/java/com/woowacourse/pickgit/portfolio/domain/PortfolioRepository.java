@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.portfolio.infrastructure;
+package com.woowacourse.pickgit.portfolio.domain;
 
 import com.woowacourse.pickgit.portfolio.domain.Portfolio;
 import org.springframework.data.jpa.repository.JpaRepository;
