@@ -129,7 +129,7 @@ jacocoTestCoverageVerification {
             limit {
                 counter = 'CLASS'
                 value = 'COVEREDRATIO'
-                minimum = 0.75
+                minimum = 0.70
             }
 
             excludes = [
