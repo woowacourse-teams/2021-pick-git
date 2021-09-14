@@ -65,6 +65,34 @@ public class Project {
         this.tags = tags;
     }
 
+    public void updateName(String name) {
+        this.name = name;
+    }
+
+    public void updateStartDate(LocalDateTime startDate) {
+        this.startDate = startDate;
+    }
+
+    public void updateEndDate(LocalDateTime endDate) {
+        this.endDate = endDate;
+    }
+
+    public void updateType(ProjectType type) {
+        this.type = type;
+    }
+
+    public void updateImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
+
+    public void updateTags(List<ProjectTag> sources) {
+        tags.removeIf(tag -> !sources.contains(tag));
+    }
+
     public Long getId() {
         return id;
     }

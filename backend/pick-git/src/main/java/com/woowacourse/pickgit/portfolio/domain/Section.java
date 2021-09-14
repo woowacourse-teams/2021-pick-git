@@ -1,6 +1,11 @@
 package com.woowacourse.pickgit.portfolio.domain;
 
+import static java.util.stream.Collectors.*;
+
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -38,6 +43,47 @@ public class Section {
         this.id = id;
         this.name = name;
         this.items = items;
+    }
+
+    public void updateName(String name) {
+        this.name = name;
+    }
+
+    public void updateItems(List<Item> sources) {
+        updateExistingItems(sources);
+        addNonExistingItems(sources);
+        removeUselessItems(sources);
+    }
+
+    private void updateExistingItems(List<Item> sources) {
+        for (Item source : sources) {
+            updateExistingItem(source, getItemsWithId());
+        }
+    }
+
+    private void updateExistingItem(Item source, Map<Long, Item> itemsWithId) {
+        if (itemsWithId.containsKey(source.getId())) {
+            Item item = itemsWithId.get(source.getId());
+
+            item.updateCategory(source.getCategory());
+            item.updateDescriptions(source.getDescriptions());
+        }
+    }
+
+    private Map<Long, Item> getItemsWithId() {
+        return items.stream()
+            .collect(toMap(Item::getId, Function.identity()));
+    }
+
+    private void addNonExistingItems(List<Item> sources) {
+        List<Item> nonExistingItems = sources.stream()
+            .filter(source -> !items.contains(source))
+            .collect(toList());
+        items.addAll(nonExistingItems);
+    }
+
+    private void removeUselessItems(List<Item> sources) {
+        items.removeIf(item -> !sources.contains(item));
     }
 
     public Long getId() {

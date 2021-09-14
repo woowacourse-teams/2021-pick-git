@@ -40,6 +40,14 @@ public class Contact {
         this.portfolio = portfolio;
     }
 
+    public void updateCategory(String category) {
+        this.category = category;
+    }
+
+    public void updateValue(String value) {
+        this.value = value;
+    }
+
     public Long getId() {
         return id;
     }

@@ -29,6 +29,10 @@ public class Description {
         this.item = item;
     }
 
+    public void updateValue(String value) {
+        this.value = value;
+    }
+
     public Long getId() {
         return id;
     }

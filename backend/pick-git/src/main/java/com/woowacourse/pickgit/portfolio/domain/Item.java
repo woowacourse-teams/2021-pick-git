@@ -1,6 +1,11 @@
 package com.woowacourse.pickgit.portfolio.domain;
 
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -38,6 +43,49 @@ public class Item {
         this.category = category;
         this.descriptions = descriptions;
         this.section = section;
+    }
+
+    public void updateCategory(String category) {
+        this.category = category;
+    }
+
+    public void updateDescriptions(List<Description> sources) {
+        updateExistingDescriptions(sources);
+        addNonExistingDescriptions(sources);
+        removeUselessDescriptions(sources);
+    }
+
+    private void updateExistingDescriptions(List<Description> sources) {
+        for (Description source : sources) {
+            updateExistingDescription(source, getDescriptionsWithId());
+        }
+    }
+
+    private void updateExistingDescription(
+        Description source,
+        Map<Long, Description> descriptionsWithId
+    ) {
+        if (descriptionsWithId.containsKey(source.getId())) {
+            Description description = descriptionsWithId.get(source.getId());
+
+            description.updateValue(source.getValue());
+        }
+    }
+
+    private Map<Long, Description> getDescriptionsWithId() {
+        return descriptions.stream()
+            .collect(toMap(Description::getId, Function.identity()));
+    }
+
+    private void addNonExistingDescriptions(List<Description> sources) {
+        List<Description> nonExistingDescriptions = sources.stream()
+            .filter(source -> !descriptions.contains(source))
+            .collect(toList());
+        descriptions.addAll(nonExistingDescriptions);
+    }
+
+    private void removeUselessDescriptions(List<Description> sources) {
+        descriptions.removeIf(description -> !sources.contains(description));
     }
 
     public Long getId() {
