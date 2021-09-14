@@ -18,8 +18,6 @@ const usePortfolioIntro = (name?: string, description?: string) => {
     };
     newPortfolioIntro.name = newName;
 
-    console.log("newName", newName);
-
     setPortfolioIntro(newPortfolioIntro);
   };
 
