@@ -143,84 +143,84 @@ alter table tag
 alter table comment
     add constraint fk_comment_to_post
         foreign key (post_id)
-            references post;
+            references post (id);
 
 alter table comment
     add constraint fk_comment_to_user
         foreign key (user_id)
-            references user;
+            references user (id);
 
 alter table contact
     add constraint fk_contact_to_portfolio
         foreign key (portfolio_id)
-            references portfolio;
+            references portfolio (id);
 
 alter table description
     add constraint fk_description_to_item
         foreign key (item_id)
-            references item;
+            references item (id);
 
 alter table follow
     add constraint fk_follow_to_source
         foreign key (source_id)
-            references user;
+            references user (id);
 
 alter table follow
     add constraint fk_follow_to_target
         foreign key (target_id)
-            references user;
+            references user (id);
 
 alter table image
     add constraint fk_image_to_post
         foreign key (post_id)
-            references post;
+            references post (id);
 
 alter table item
     add constraint fk_item_to_section
         foreign key (section_id)
-            references section;
+            references section (id);
 
 alter table likes
     add constraint fk_like_to_post
         foreign key (post_id)
-            references post;
+            references post (id);
 
 alter table likes
     add constraint fk_like_to_user
         foreign key (user_id)
-            references user;
+            references user (id);
 
 alter table post
     add constraint fk_post_to_user
         foreign key (user_id)
-            references user;
+            references user (id);
 
 alter table post_tag
     add constraint fk_post_tag_to_post
         foreign key (post_id)
-            references post;
+            references post (id);
 
 alter table post_tag
     add constraint fk_post_tag_to_tag
         foreign key (tag_id)
-            references tag;
+            references tag (id);
 
 alter table project
     add constraint fk_project_to_portfolio
         foreign key (portfolio_id)
-            references portfolio;
+            references portfolio (id);
 
 alter table project_tag
     add constraint fk_project_tag_to_project
         foreign key (project_id)
-            references project;
+            references project (id);
 
 alter table project_tag
     add constraint fk_project_tag_to_tag
         foreign key (tag_id)
-            references tag;
+            references tag (id);
 
 alter table section
     add constraint fk_section_to_portfolio
         foreign key (portfolio_id)
-            references portfolio;
+            references portfolio (id);
