@@ -1,6 +1,6 @@
 package com.woowacourse.pickgit.authentication.infrastructure;
 
-import com.woowacourse.pickgit.authentication.application.JwtTokenProvider;
+import com.woowacourse.pickgit.authentication.domain.JwtTokenProvider;
 import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;

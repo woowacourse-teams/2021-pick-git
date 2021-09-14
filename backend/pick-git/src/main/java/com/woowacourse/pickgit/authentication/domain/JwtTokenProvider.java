@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.authentication.application;
+package com.woowacourse.pickgit.authentication.domain;
 
 public interface JwtTokenProvider {
 
