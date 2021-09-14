@@ -1,6 +1,5 @@
 package com.woowacourse.pickgit.portfolio.domain;
 
-import com.woowacourse.pickgit.portfolio.domain.Item;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,6 +7,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 @Entity
@@ -18,6 +19,10 @@ public class Section {
 
     @Column(nullable = false)
     private String name;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "portfolio_id")
+    private Portfolio portfolio;
 
     @OneToMany(mappedBy = "section", fetch = FetchType.LAZY)
     private List<Item> items;
