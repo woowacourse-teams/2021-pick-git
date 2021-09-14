@@ -16,6 +16,7 @@ public class GithubTagExtractor implements PlatformTagExtractor {
 
     private static final String GITHUB_TAG_API_FORMAT
         = "https://api.github.com/repos/%s/%s/languages";
+    private static final String OTHER_TAG = "Other";
 
     private final PlatformTagApiRequester platformTagApiRequester;
     private final ObjectMapper objectMapper;
@@ -42,6 +43,7 @@ public class GithubTagExtractor implements PlatformTagExtractor {
                 .readValue(response, new TypeReference<LinkedHashMap<String, String>>() {
                 })
                 .keySet();
+            tags.remove(OTHER_TAG);
             return new ArrayList<>(tags);
         } catch (JsonProcessingException e) {
             throw new PlatformHttpErrorException();
