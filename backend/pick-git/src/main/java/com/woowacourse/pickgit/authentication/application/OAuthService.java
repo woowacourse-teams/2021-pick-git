@@ -10,7 +10,9 @@ import com.woowacourse.pickgit.authentication.domain.TokenRepository;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
-import com.woowacourse.pickgit.authentication.infrastructure.token.TokenBodyType;
+import com.woowacourse.pickgit.authentication.infrastructure.StringEncryptor;
+import com.woowacourse.pickgit.authentication.infrastructure.TokenBodyType;
+import com.woowacourse.pickgit.exception.authentication.InvalidRefreshTokenException;
 import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
@@ -78,7 +80,11 @@ public class OAuthService {
 
     private String createTokenAndSave(String githubAccessToken, String username) {
         String refreshToken = refreshTokenProvider.issueRefreshToken(username);
-        Token token = new Token(username, refreshToken, githubAccessToken);
+        Token token = new Token(
+            StringEncryptor.encryptToSHA256(username),
+            refreshToken,
+            githubAccessToken
+        );
         tokenRepository.save(token);
 
         return refreshTokenProvider.reissueAccessToken(refreshToken);
@@ -92,7 +98,7 @@ public class OAuthService {
 
         String username =
             jwtTokenProvider.getPayloadByKey(authentication, TokenBodyType.USERNAME.getValue());
-        Token token = tokenRepository.findById(username)
+        Token token = tokenRepository.findById(StringEncryptor.encryptToSHA256(username))
             .orElseThrow(InvalidTokenException::new);
         String accessToken = token.getOauthToken();
         return new LoginUser(username, accessToken);
@@ -100,5 +106,12 @@ public class OAuthService {
 
     public boolean validateToken(String authentication) {
         return jwtTokenProvider.validateToken(authentication);
+    }
+
+    public String reissueAccessToken(String key) {
+        Token token = tokenRepository.findById(key)
+            .orElseThrow(InvalidRefreshTokenException::new);
+        String refreshToken = token.getRefreshToken();
+        return refreshTokenProvider.reissueAccessToken(refreshToken);
     }
 }

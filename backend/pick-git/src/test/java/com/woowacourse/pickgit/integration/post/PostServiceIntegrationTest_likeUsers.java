@@ -7,9 +7,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;
 import com.woowacourse.pickgit.common.factory.PostFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
-import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
-import com.woowacourse.pickgit.post.application.PostFeedService;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.request.AuthUserForPostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeUsersResponseDto;
@@ -21,12 +19,6 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional

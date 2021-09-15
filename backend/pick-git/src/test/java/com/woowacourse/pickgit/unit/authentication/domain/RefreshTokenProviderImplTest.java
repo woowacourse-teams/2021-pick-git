@@ -7,8 +7,8 @@ import com.woowacourse.pickgit.authentication.domain.JwtTokenProvider;
 import com.woowacourse.pickgit.authentication.domain.RefreshTokenProvider;
 import com.woowacourse.pickgit.authentication.infrastructure.JwtTokenProviderImpl;
 import com.woowacourse.pickgit.authentication.infrastructure.RefreshTokenProviderImpl;
-import com.woowacourse.pickgit.authentication.infrastructure.token.TokenBodyType;
-import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
+import com.woowacourse.pickgit.authentication.infrastructure.TokenBodyType;
+import com.woowacourse.pickgit.exception.authentication.InvalidRefreshTokenException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -54,7 +54,7 @@ class RefreshTokenProviderImplTest {
         // when, then
         assertThatCode(() -> {
             refreshTokenProvider.issueRefreshToken(username);
-        }).isInstanceOf(InvalidTokenException.class);
+        }).isInstanceOf(InvalidRefreshTokenException.class);
     }
 
     @DisplayName("유효한 RefreshToken으로 새로운 AccessToken을 발급할 수 있다.")
@@ -83,6 +83,6 @@ class RefreshTokenProviderImplTest {
         // when
         assertThatCode(() -> {
             refreshTokenProvider.reissueAccessToken(refreshToken);
-        }).isInstanceOf(InvalidTokenException.class);
+        }).isInstanceOf(InvalidRefreshTokenException.class);
     }
 }

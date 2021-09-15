@@ -1,18 +1,17 @@
 package com.woowacourse.pickgit.config;
 
-import org.hibernate.Session;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.stereotype.Component;
-import org.springframework.test.context.ActiveProfiles;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import org.hibernate.Session;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.stereotype.Component;
+import org.springframework.test.context.ActiveProfiles;
 
 @Component
 @ActiveProfiles("test")

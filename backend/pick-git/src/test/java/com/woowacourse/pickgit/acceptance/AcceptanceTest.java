@@ -1,6 +1,5 @@
 package com.woowacourse.pickgit.acceptance;
 
-import com.woowacourse.pickgit.common.request_builder.PickGitRequest;
 import com.woowacourse.pickgit.config.DatabaseCleaner;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import io.restassured.RestAssured;

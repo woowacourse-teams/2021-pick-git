@@ -1,20 +1,24 @@
-package com.woowacourse.pickgit.common.mockapi;
+package com.woowacourse.pickgit.authentication.infrastructure;
 
 import com.woowacourse.pickgit.authentication.domain.Token;
 import com.woowacourse.pickgit.authentication.domain.TokenRepository;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 
-public class MockTokenRepository implements TokenRepository {
+@Component
+@Profile("!prod")
+public class InMemoryTokenRepository implements TokenRepository {
 
     private final Map<String, Token> values;
 
-    public MockTokenRepository() {
+    public InMemoryTokenRepository() {
         this(new ConcurrentHashMap<>());
     }
 
-    public MockTokenRepository(Map<String, Token> values) {
+    public InMemoryTokenRepository(Map<String, Token> values) {
         this.values = values;
     }
 

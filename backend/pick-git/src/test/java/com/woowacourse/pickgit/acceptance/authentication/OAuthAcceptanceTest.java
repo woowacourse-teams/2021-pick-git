@@ -8,23 +8,16 @@ import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileRespon
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.presentation.dto.OAuthLoginUrlResponse;
 import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
-import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
+import com.woowacourse.pickgit.authentication.presentation.dto.ReissueAccessTokenResponse;
+import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import org.springframework.test.context.ActiveProfiles;
 
 class OAuthAcceptanceTest extends AcceptanceTest {
 
@@ -92,6 +85,73 @@ class OAuthAcceptanceTest extends AcceptanceTest {
         OAuthTokenResponse tokenResponse = 로그인_되어있음(afterOAuthProfileResponse);
         assertThat(tokenResponse.getToken()).isNotBlank();
         assertThat(tokenResponse.getUsername()).isEqualTo("pick-git-login");
+    }
+
+    @DisplayName("로그인 - accessToken와 함께 쿠키로 RefreshToken를 반환한다.")
+    @Test
+    void afterAuthorizationGithubLogin_Login_ReturnAccessTokenAndRefreshToken() {
+        // given
+        OAuthProfileResponse oAuthProfileResponse = OAuthProfileResponse.builder()
+            .name("pick-git-login")
+            .description("hi~")
+            .githubUrl("github.com/")
+            .build();
+
+        // when
+        ExtractableResponse<Response> response = 로그인_요청(oAuthProfileResponse);
+
+        // then
+        assertThat(response.as(OAuthTokenResponse.class).getToken())
+            .isNotBlank();
+        assertThat(response.cookie("refreshToken"))
+            .isNotBlank();
+    }
+
+    @DisplayName("AccessToken 재발급 - 유효한 RefreshToken이면 새로운 AccessToken을 반환한다.")
+    @Test
+    void requestReissueAccessToken_ValidToken_ReturnReissuedAccessToken() {
+        // given
+        OAuthProfileResponse oAuthProfileResponse = OAuthProfileResponse.builder()
+            .name("pick-git-login")
+            .description("hi~")
+            .githubUrl("github.com/")
+            .build();
+        ExtractableResponse<Response> response = 로그인_요청(oAuthProfileResponse);
+
+        // when
+        String refreshToken = response.cookie("refreshToken");
+        ReissueAccessTokenResponse reissueAccessTokenResponse = RestAssured
+            .given().log().all()
+            .cookie("refreshToken", refreshToken)
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .get("/api/token")
+            .then().log().all()
+            .statusCode(HttpStatus.OK.value())
+            .extract()
+            .as(ReissueAccessTokenResponse.class);
+
+        // then
+        assertThat(reissueAccessTokenResponse.getAccessToken()).isNotBlank();
+    }
+
+    @DisplayName("AccessToken 재발급 - 유효하지 않은 RefreshToken일 경우 401 예외가 발생한다.")
+    @Test
+    void requestReissueAccessToken_InValidToken_ReturnReissuedAccessToken() {
+        // when
+        ApiErrorResponse response = RestAssured
+            .given().log().all()
+            .cookie("refreshToken", "invalidToken")
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .get("/api/token")
+            .then().log().all()
+            .statusCode(HttpStatus.UNAUTHORIZED.value())
+            .extract()
+            .as(ApiErrorResponse.class);
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("A0003");
     }
 
     private OAuthTokenResponse 로그인_되어있음(OAuthProfileResponse oAuthProfileResponse) {

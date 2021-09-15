@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.authentication.infrastructure.token;
+package com.woowacourse.pickgit.authentication.infrastructure;
 
 public enum TokenBodyType {
     USERNAME("username"),

@@ -2,8 +2,7 @@ package com.woowacourse.pickgit.authentication.infrastructure;
 
 import com.woowacourse.pickgit.authentication.domain.JwtTokenProvider;
 import com.woowacourse.pickgit.authentication.domain.RefreshTokenProvider;
-import com.woowacourse.pickgit.authentication.infrastructure.token.TokenBodyType;
-import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
+import com.woowacourse.pickgit.exception.authentication.InvalidRefreshTokenException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
@@ -55,14 +54,14 @@ public class RefreshTokenProviderImpl implements RefreshTokenProvider {
 
     private void validateRefreshTokenPayload(String username) {
         if (Objects.isNull(username) || username.isBlank()) {
-            throw new InvalidTokenException();
+            throw new InvalidRefreshTokenException();
         }
     }
 
     @Override
     public String reissueAccessToken(String refreshToken) {
         if (!validateToken(refreshToken)) {
-            throw new InvalidTokenException();
+            throw new InvalidRefreshTokenException();
         }
 
         Claims payloads = parsePayloads(refreshToken);
@@ -85,7 +84,7 @@ public class RefreshTokenProviderImpl implements RefreshTokenProvider {
         try {
             return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(refreshToken).getBody();
         } catch (JwtException | IllegalArgumentException e) {
-            throw new InvalidTokenException();
+            throw new InvalidRefreshTokenException();
         }
     }
 

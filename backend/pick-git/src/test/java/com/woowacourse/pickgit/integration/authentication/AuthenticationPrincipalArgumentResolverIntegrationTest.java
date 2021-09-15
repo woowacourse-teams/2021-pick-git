@@ -12,6 +12,7 @@ import com.woowacourse.pickgit.authentication.domain.TokenRepository;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.infrastructure.JwtTokenProviderImpl;
 import com.woowacourse.pickgit.authentication.infrastructure.RefreshTokenProviderImpl;
+import com.woowacourse.pickgit.authentication.infrastructure.StringEncryptor;
 import com.woowacourse.pickgit.authentication.presentation.AuthenticationPrincipalArgumentResolver;
 import com.woowacourse.pickgit.authentication.presentation.interceptor.AuthHeader;
 import com.woowacourse.pickgit.common.mockapi.MockTokenRepository;
@@ -64,7 +65,7 @@ class AuthenticationPrincipalArgumentResolverIntegrationTest {
         String accessToken = "oauth access token";
         String jwtToken = jwtTokenProvider.createToken(username);
 
-        tokenRepository.save(new Token(username, jwtToken, accessToken));
+        tokenRepository.save(new Token(StringEncryptor.encryptToSHA256(username), jwtToken, accessToken));
 
         // mock
         given(httpServletRequest.getAttribute(AuthHeader.AUTHENTICATION)).willReturn(jwtToken);

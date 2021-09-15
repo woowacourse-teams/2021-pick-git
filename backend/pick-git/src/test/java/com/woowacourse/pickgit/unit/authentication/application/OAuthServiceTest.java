@@ -1,6 +1,7 @@
 package com.woowacourse.pickgit.unit.authentication.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -9,10 +10,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.woowacourse.pickgit.authentication.domain.JwtTokenProvider;
 import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
 import com.woowacourse.pickgit.authentication.application.dto.TokenDto;
+import com.woowacourse.pickgit.authentication.domain.JwtTokenProvider;
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.domain.RefreshTokenProvider;
 import com.woowacourse.pickgit.authentication.domain.Token;
@@ -20,13 +21,12 @@ import com.woowacourse.pickgit.authentication.domain.TokenRepository;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
-import com.woowacourse.pickgit.authentication.infrastructure.dao.CollectionOAuthAccessTokenDao;
-import com.woowacourse.pickgit.common.mockapi.MockTokenRepository;
+import com.woowacourse.pickgit.authentication.infrastructure.StringEncryptor;
+import com.woowacourse.pickgit.exception.authentication.InvalidRefreshTokenException;
 import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -182,7 +182,7 @@ class OAuthServiceTest {
         // mock
         given(jwtTokenProvider.getPayloadByKey(JWT_TOKEN, "username"))
             .willReturn(username);
-        given(tokenRepository.findById(username))
+        given(tokenRepository.findById(StringEncryptor.encryptToSHA256(username)))
             .willReturn(Optional.ofNullable(
                 new Token(username, "refreshtoken", OAUTH_ACCESS_TOKEN)
             ));
@@ -206,7 +206,7 @@ class OAuthServiceTest {
         // mock
         given(jwtTokenProvider.getPayloadByKey(notSavedToken, "username"))
             .willReturn(username);
-        given(tokenRepository.findById(username))
+        given(tokenRepository.findById(StringEncryptor.encryptToSHA256(username)))
             .willReturn(Optional.empty());
 
         // then
@@ -225,5 +225,58 @@ class OAuthServiceTest {
 
         // then
         assertThat(appUser).isInstanceOf(GuestUser.class);
+    }
+
+    @DisplayName("Refresh Token에 접근하는 키를 이용해 RefreshToken을 찾고, AccessToken을 재발급한다.")
+    @Test
+    void reissueAccessToken_ValidKey_ReturnReissuedAccessToken() {
+        // given
+        String key = StringEncryptor.encryptToSHA256("hi~");
+
+        // mock
+        given(tokenRepository.findById(key))
+            .willReturn(Optional.ofNullable(new Token(key, "refreshToken", "oauthToken")));
+        given(refreshTokenProvider.reissueAccessToken("refreshToken"))
+            .willReturn("reissuedAccessToken");
+
+        // when
+        String reissuedAccessToken = oAuthService.reissueAccessToken(key);
+
+        // then
+        assertThat(reissuedAccessToken).isEqualTo("reissuedAccessToken");
+    }
+
+    @DisplayName("Refresh Token을 접근하는 키가 없으면 401 예외가 발생한다.")
+    @Test
+    void reissueAccessToken_InValidKey_ReturnReissuedAccessToken() {
+        // given
+        String key = "";
+
+        // mock
+        given(tokenRepository.findById(anyString()))
+            .willReturn(Optional.empty());
+
+        // when, then
+        assertThatCode(() -> {
+            oAuthService.reissueAccessToken(key);
+        }).isInstanceOf(InvalidRefreshTokenException.class);
+    }
+
+    @DisplayName("유효하지 않은 Refresh Token이면 401 예외가 발생한다.")
+    @Test
+    void reissueAccessToken_InvalidRefreshToken_ReturnReissuedAccessToken() {
+        // given
+        String key = StringEncryptor.encryptToSHA256("hi~");
+
+        // mock
+        given(tokenRepository.findById(key))
+            .willReturn(Optional.ofNullable(new Token(key, "refreshToken", "oauthToken")));
+        given(refreshTokenProvider.reissueAccessToken("refreshToken"))
+            .willThrow(new InvalidRefreshTokenException());
+
+        // when, then
+        assertThatCode(() -> {
+            oAuthService.reissueAccessToken(key);
+        }).isInstanceOf(InvalidRefreshTokenException.class);
     }
 }

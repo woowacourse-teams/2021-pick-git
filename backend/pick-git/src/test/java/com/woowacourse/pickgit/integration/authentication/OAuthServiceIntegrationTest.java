@@ -1,14 +1,14 @@
 package com.woowacourse.pickgit.integration.authentication;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
-import com.woowacourse.pickgit.authentication.domain.JwtTokenProvider;
 import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
 import com.woowacourse.pickgit.authentication.application.dto.TokenDto;
-import com.woowacourse.pickgit.authentication.domain.OAuthAccessTokenDao;
+import com.woowacourse.pickgit.authentication.domain.JwtTokenProvider;
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.domain.RefreshTokenProvider;
 import com.woowacourse.pickgit.authentication.domain.Token;
@@ -18,9 +18,10 @@ import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.authentication.infrastructure.JwtTokenProviderImpl;
 import com.woowacourse.pickgit.authentication.infrastructure.RefreshTokenProviderImpl;
-import com.woowacourse.pickgit.authentication.infrastructure.dao.CollectionOAuthAccessTokenDao;
+import com.woowacourse.pickgit.authentication.infrastructure.StringEncryptor;
 import com.woowacourse.pickgit.common.mockapi.MockTokenRepository;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
+import com.woowacourse.pickgit.exception.authentication.InvalidRefreshTokenException;
 import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.user.domain.User;
@@ -176,7 +177,7 @@ class OAuthServiceIntegrationTest {
         String token = jwtTokenProvider.createToken(username);
         String accessToken = "oauth access token";
 
-        tokenRepository.save(new Token(username, token, accessToken));
+        tokenRepository.save(new Token(StringEncryptor.encryptToSHA256(username), token, accessToken));
 
         // when
         AppUser appUser = oAuthService.findRequestUserByToken(token);
@@ -212,5 +213,47 @@ class OAuthServiceIntegrationTest {
             .isInstanceOf(UnauthorizedException.class);
         assertThatThrownBy(() -> appUser.getAccessToken())
             .isInstanceOf(UnauthorizedException.class);
+    }
+
+    @DisplayName("Refresh Token에 접근하는 키를 이용해 RefreshToken을 찾고, AccessToken을 재발급한다.")
+    @Test
+    void reissueAccessToken_ValidKey_ReturnReissuedAccessToken() {
+        // given
+        String key = StringEncryptor.encryptToSHA256("hi~");
+        String refreshToken = refreshTokenProvider.issueRefreshToken("hi~");
+        Token token = new Token(key, refreshToken, "oauthToken");
+        tokenRepository.save(token);
+
+        // when
+        String reissuedAccessToken = oAuthService.reissueAccessToken(key);
+
+        // then
+        assertThat(reissuedAccessToken).isNotBlank();
+    }
+
+    @DisplayName("Refresh Token을 접근하는 키가 없으면 401 예외가 발생한다.")
+    @Test
+    void reissueAccessToken_InValidKey_ReturnReissuedAccessToken() {
+        // given
+        String key = "";
+
+        // when, then
+        assertThatCode(() -> {
+            oAuthService.reissueAccessToken(key);
+        }).isInstanceOf(InvalidRefreshTokenException.class);
+    }
+
+    @DisplayName("유효하지 않은 Refresh Token이면 401 예외가 발생한다.")
+    @Test
+    void reissueAccessToken_InvalidRefreshToken_ReturnReissuedAccessToken() {
+        // given
+        String key = StringEncryptor.encryptToSHA256("hi~");
+        Token token = new Token(key, "invalidRefreshToken", "oauthToken");
+        tokenRepository.save(token);
+
+        // when, then
+        assertThatCode(() -> {
+            oAuthService.reissueAccessToken(key);
+        }).isInstanceOf(InvalidRefreshTokenException.class);
     }
 }
