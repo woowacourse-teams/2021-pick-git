@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.unit.authentication.dao;
+package com.woowacourse.pickgit.unit.authentication.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

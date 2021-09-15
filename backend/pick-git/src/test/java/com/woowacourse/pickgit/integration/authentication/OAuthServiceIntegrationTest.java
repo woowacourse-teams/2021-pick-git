@@ -10,11 +10,16 @@ import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileRespon
 import com.woowacourse.pickgit.authentication.application.dto.TokenDto;
 import com.woowacourse.pickgit.authentication.domain.OAuthAccessTokenDao;
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
+import com.woowacourse.pickgit.authentication.domain.RefreshTokenProvider;
+import com.woowacourse.pickgit.authentication.domain.Token;
+import com.woowacourse.pickgit.authentication.domain.TokenRepository;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.authentication.infrastructure.JwtTokenProviderImpl;
+import com.woowacourse.pickgit.authentication.infrastructure.RefreshTokenProviderImpl;
 import com.woowacourse.pickgit.authentication.infrastructure.dao.CollectionOAuthAccessTokenDao;
+import com.woowacourse.pickgit.common.mockapi.MockTokenRepository;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
@@ -45,21 +50,29 @@ class OAuthServiceIntegrationTest {
 
     private JwtTokenProvider jwtTokenProvider;
 
-    private OAuthAccessTokenDao oAuthAccessTokenDao;
+    private RefreshTokenProvider refreshTokenProvider;
+
+    private TokenRepository tokenRepository;
 
     private OAuthService oAuthService;
 
     @BeforeEach
     void setUp() {
-        this.jwtTokenProvider = new JwtTokenProviderImpl(
+        jwtTokenProvider = new JwtTokenProviderImpl(
             SECRET_KEY,
             EXPIRATION_TIME_IN_MILLISECONDS
         );
-        this.oAuthAccessTokenDao = new CollectionOAuthAccessTokenDao();
-        this.oAuthService = new OAuthService(
+        refreshTokenProvider = new RefreshTokenProviderImpl(
+            SECRET_KEY,
+            EXPIRATION_TIME_IN_MILLISECONDS * 100,
+            jwtTokenProvider
+        );
+        tokenRepository = new MockTokenRepository();
+        oAuthService = new OAuthService(
             oAuthClient,
             jwtTokenProvider,
-            oAuthAccessTokenDao,
+            refreshTokenProvider,
+            tokenRepository,
             userRepository
         );
     }
@@ -163,7 +176,7 @@ class OAuthServiceIntegrationTest {
         String token = jwtTokenProvider.createToken(username);
         String accessToken = "oauth access token";
 
-        oAuthAccessTokenDao.insert(token, accessToken);
+        tokenRepository.save(new Token(username, token, accessToken));
 
         // when
         AppUser appUser = oAuthService.findRequestUserByToken(token);

@@ -4,14 +4,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
-import com.woowacourse.pickgit.authentication.domain.JwtTokenProvider;
 import com.woowacourse.pickgit.authentication.application.OAuthService;
-import com.woowacourse.pickgit.authentication.domain.OAuthAccessTokenDao;
+import com.woowacourse.pickgit.authentication.domain.JwtTokenProvider;
+import com.woowacourse.pickgit.authentication.domain.RefreshTokenProvider;
+import com.woowacourse.pickgit.authentication.domain.Token;
+import com.woowacourse.pickgit.authentication.domain.TokenRepository;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.infrastructure.JwtTokenProviderImpl;
-import com.woowacourse.pickgit.authentication.infrastructure.dao.CollectionOAuthAccessTokenDao;
+import com.woowacourse.pickgit.authentication.infrastructure.RefreshTokenProviderImpl;
 import com.woowacourse.pickgit.authentication.presentation.AuthenticationPrincipalArgumentResolver;
 import com.woowacourse.pickgit.authentication.presentation.interceptor.AuthHeader;
+import com.woowacourse.pickgit.common.mockapi.MockTokenRepository;
 import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import javax.servlet.http.HttpServletRequest;
@@ -28,7 +31,9 @@ class AuthenticationPrincipalArgumentResolverIntegrationTest {
 
     private JwtTokenProvider jwtTokenProvider;
 
-    private OAuthAccessTokenDao oAuthAccessTokenDao;
+    private RefreshTokenProvider refreshTokenProvider;
+
+    private TokenRepository tokenRepository;
 
     @Mock
     private HttpServletRequest httpServletRequest;
@@ -41,10 +46,12 @@ class AuthenticationPrincipalArgumentResolverIntegrationTest {
     void setUp() {
         jwtTokenProvider =
             new JwtTokenProviderImpl("pick-git", 3600000);
-        oAuthAccessTokenDao =
-            new CollectionOAuthAccessTokenDao();
+        refreshTokenProvider =
+            new RefreshTokenProviderImpl("refresh pick-git", 3600000 * 12, jwtTokenProvider);
+        tokenRepository =
+            new MockTokenRepository();
         oAuthService =
-            new OAuthService(null, jwtTokenProvider, oAuthAccessTokenDao, null);
+            new OAuthService(null, jwtTokenProvider, refreshTokenProvider, tokenRepository, null);
         authenticationPrincipalArgumentResolver =
             new AuthenticationPrincipalArgumentResolver(oAuthService);
     }
@@ -57,7 +64,7 @@ class AuthenticationPrincipalArgumentResolverIntegrationTest {
         String accessToken = "oauth access token";
         String jwtToken = jwtTokenProvider.createToken(username);
 
-        oAuthAccessTokenDao.insert(jwtToken, accessToken);
+        tokenRepository.save(new Token(username, jwtToken, accessToken));
 
         // mock
         given(httpServletRequest.getAttribute(AuthHeader.AUTHENTICATION)).willReturn(jwtToken);

@@ -8,15 +8,16 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class JwtTokenProviderImpl implements JwtTokenProvider {
 
-    @Value("${security.jwt.secret-key}")
+    @Value("${security.jwt.access.secret-key}")
     private String secretKey;
-    @Value("${security.jwt.expiration-time}")
+    @Value("${security.jwt.access.expiration-time}")
     private long expirationTimeInMilliSeconds;
 
     public JwtTokenProviderImpl() {
@@ -34,6 +35,19 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
 
         return Jwts.builder()
             .claim("username", payload)
+            .setIssuedAt(now)
+            .setExpiration(expirationTime)
+            .signWith(SignatureAlgorithm.HS256, secretKey)
+            .compact();
+    }
+
+    @Override
+    public String createToken(Map<String, Object> payload) {
+        Date now = new Date();
+        Date expirationTime = new Date(now.getTime() + expirationTimeInMilliSeconds);
+
+        return Jwts.builder()
+            .setClaims(payload)
             .setIssuedAt(now)
             .setExpiration(expirationTime)
             .signWith(SignatureAlgorithm.HS256, secretKey)

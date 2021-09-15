@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import com.woowacourse.pickgit.authentication.domain.JwtTokenProvider;
 import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.infrastructure.JwtTokenProviderImpl;
+import com.woowacourse.pickgit.authentication.infrastructure.RefreshTokenProviderImpl;
 import com.woowacourse.pickgit.authentication.presentation.interceptor.AuthenticationInterceptor;
 import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import java.util.Collections;
@@ -41,7 +42,11 @@ class AuthenticationInterceptorIntegrationTest {
     @BeforeEach
     void setUp() {
         jwtTokenProvider = new JwtTokenProviderImpl("pick-git", 3600000);
-        oAuthService = new OAuthService(null, jwtTokenProvider, null, null);
+        oAuthService = new OAuthService(null,
+            jwtTokenProvider,
+            new RefreshTokenProviderImpl(null, 0L, jwtTokenProvider),
+            null,
+            null);
         authenticationInterceptor = new AuthenticationInterceptor(oAuthService);
     }
 
