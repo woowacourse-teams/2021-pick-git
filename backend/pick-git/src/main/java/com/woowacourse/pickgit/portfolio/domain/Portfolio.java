@@ -1,5 +1,11 @@
 package com.woowacourse.pickgit.portfolio.domain;
 
+import com.woowacourse.pickgit.portfolio.domain.contact.Contact;
+import com.woowacourse.pickgit.portfolio.domain.contact.Contacts;
+import com.woowacourse.pickgit.portfolio.domain.project.Project;
+import com.woowacourse.pickgit.portfolio.domain.project.Projects;
+import com.woowacourse.pickgit.portfolio.domain.section.Section;
+import com.woowacourse.pickgit.portfolio.domain.section.Sections;
 import com.woowacourse.pickgit.user.domain.User;
 import java.util.List;
 import javax.persistence.Column;

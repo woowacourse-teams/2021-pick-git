@@ -1,8 +1,9 @@
-package com.woowacourse.pickgit.portfolio.domain;
+package com.woowacourse.pickgit.portfolio.domain.section;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
+import com.woowacourse.pickgit.portfolio.domain.section.Section;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

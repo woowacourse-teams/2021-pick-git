@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.portfolio.domain;
+package com.woowacourse.pickgit.portfolio.domain.project;
 
 import com.woowacourse.pickgit.tag.domain.Tag;
 import javax.persistence.Entity;

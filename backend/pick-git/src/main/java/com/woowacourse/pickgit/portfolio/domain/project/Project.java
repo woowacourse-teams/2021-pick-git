@@ -1,5 +1,6 @@
-package com.woowacourse.pickgit.portfolio.domain;
+package com.woowacourse.pickgit.portfolio.domain.project;
 
+import com.woowacourse.pickgit.portfolio.domain.Portfolio;
 import java.time.LocalDateTime;
 import java.util.List;
 import javax.persistence.Column;

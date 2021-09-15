@@ -2,8 +2,8 @@ package com.woowacourse.pickgit.portfolio.application.dto.response;
 
 import static java.util.stream.Collectors.toList;
 
-import com.woowacourse.pickgit.portfolio.domain.Description;
-import com.woowacourse.pickgit.portfolio.domain.Item;
+import com.woowacourse.pickgit.portfolio.domain.section.item.Description;
+import com.woowacourse.pickgit.portfolio.domain.section.item.Item;
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.DescriptionRequest;
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.ItemRequest;
 import java.util.List;

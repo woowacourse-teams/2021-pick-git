@@ -1,6 +1,6 @@
 package com.woowacourse.pickgit.portfolio.application.dto.response;
 
-import com.woowacourse.pickgit.portfolio.domain.ProjectTag;
+import com.woowacourse.pickgit.portfolio.domain.project.ProjectTag;
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.TagRequest;
 import lombok.Builder;
 

@@ -2,8 +2,8 @@ package com.woowacourse.pickgit.portfolio.application.dto.response;
 
 import static java.util.stream.Collectors.toList;
 
-import com.woowacourse.pickgit.portfolio.domain.Project;
-import com.woowacourse.pickgit.portfolio.domain.ProjectTag;
+import com.woowacourse.pickgit.portfolio.domain.project.Project;
+import com.woowacourse.pickgit.portfolio.domain.project.ProjectTag;
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.ProjectRequest;
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.TagRequest;
 import java.time.LocalDateTime;

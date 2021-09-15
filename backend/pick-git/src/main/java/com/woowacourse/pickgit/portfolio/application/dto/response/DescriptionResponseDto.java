@@ -1,6 +1,6 @@
 package com.woowacourse.pickgit.portfolio.application.dto.response;
 
-import com.woowacourse.pickgit.portfolio.domain.Description;
+import com.woowacourse.pickgit.portfolio.domain.section.item.Description;
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.DescriptionRequest;
 import lombok.Builder;
 
