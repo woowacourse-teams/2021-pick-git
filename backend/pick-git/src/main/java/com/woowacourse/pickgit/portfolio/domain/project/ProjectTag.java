@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.portfolio.domain.project;
 
+import com.woowacourse.pickgit.portfolio.domain.common.Updatable;
 import com.woowacourse.pickgit.tag.domain.Tag;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -10,29 +11,33 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class ProjectTag {
+public class ProjectTag implements Updatable<ProjectTag> {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_id")
-    private Project project;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tag_id")
     private Tag tag;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id")
+    private Project project;
 
     protected ProjectTag() {
     }
 
-    public ProjectTag(Long id, Project project, Tag tag) {
-        this.id = id;
-        this.project = project;
-        this.tag = tag;
+    public ProjectTag(Long id, Tag tag) {
+        this(id, tag, null);
     }
 
-    public void addProject(Project project) {
+    public ProjectTag(Long id, Tag tag, Project project) {
+        this.id = id;
+        this.tag = tag;
+        this.project = project;
+    }
+
+    public void appendTo(Project project) {
         this.project = project;
     }
 
@@ -44,11 +49,16 @@ public class ProjectTag {
         return id;
     }
 
+    public Tag getTag() {
+        return tag;
+    }
+
     public Project getProject() {
         return project;
     }
 
-    public Tag getTag() {
-        return tag;
+    @Override
+    public void update(ProjectTag projectTag) {
+        this.tag = projectTag.tag;
     }
 }

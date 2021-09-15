@@ -3,10 +3,13 @@ package com.woowacourse.pickgit.portfolio.domain.section.item;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
+import com.woowacourse.pickgit.portfolio.domain.common.Updatable;
+import com.woowacourse.pickgit.portfolio.domain.common.UpdateUtil;
 import com.woowacourse.pickgit.portfolio.domain.section.Section;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -17,14 +20,19 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 @Entity
-public class Item {
+public class Item implements Updatable<Item> {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String category;
 
-    @OneToMany(mappedBy = "item", fetch = FetchType.LAZY)
+    @OneToMany(
+        mappedBy = "item",
+        fetch = FetchType.LAZY,
+        cascade = CascadeType.PERSIST,
+        orphanRemoval = true
+    )
     private List<Description> descriptions;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -32,6 +40,10 @@ public class Item {
     private Section section;
 
     protected Item() {
+    }
+
+    public Item(Long id, String category, List<Description> descriptions) {
+        this(id, category, descriptions, null);
     }
 
     public Item(
@@ -44,56 +56,9 @@ public class Item {
         this.category = category;
         this.descriptions = descriptions;
         this.section = section;
-
-        for (Description description : descriptions) {
-            description.addItem(this);
-        }
     }
 
-    public void updateCategory(String category) {
-        this.category = category;
-    }
-
-    public void updateDescriptions(List<Description> sources) {
-        updateExistingDescriptions(sources);
-        addNonExistingDescriptions(sources);
-        removeUselessDescriptions(sources);
-    }
-
-    private void updateExistingDescriptions(List<Description> sources) {
-        for (Description source : sources) {
-            updateExistingDescription(source, getDescriptionsWithId());
-        }
-    }
-
-    private void updateExistingDescription(
-        Description source,
-        Map<Long, Description> descriptionsWithId
-    ) {
-        if (descriptionsWithId.containsKey(source.getId())) {
-            Description description = descriptionsWithId.get(source.getId());
-
-            description.updateValue(source.getValue());
-        }
-    }
-
-    private Map<Long, Description> getDescriptionsWithId() {
-        return descriptions.stream()
-            .collect(toMap(Description::getId, Function.identity()));
-    }
-
-    private void addNonExistingDescriptions(List<Description> sources) {
-        List<Description> nonExistingDescriptions = sources.stream()
-            .filter(source -> !descriptions.contains(source))
-            .collect(toList());
-        descriptions.addAll(nonExistingDescriptions);
-    }
-
-    private void removeUselessDescriptions(List<Description> sources) {
-        descriptions.removeIf(description -> !sources.contains(description));
-    }
-
-    public void addSection(Section section) {
+    public void appendTo(Section section) {
         this.section = section;
     }
 
@@ -111,5 +76,12 @@ public class Item {
 
     public Section getSection() {
         return section;
+    }
+
+    @Override
+    public void update(Item item) {
+        item.descriptions.forEach(description -> description.appendTo(this));
+
+        UpdateUtil.execute(item.descriptions, this.descriptions);
     }
 }

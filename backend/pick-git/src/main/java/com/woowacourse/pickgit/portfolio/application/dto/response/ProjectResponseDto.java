@@ -2,9 +2,6 @@ package com.woowacourse.pickgit.portfolio.application.dto.response;
 
 import static java.util.stream.Collectors.toList;
 
-import com.woowacourse.pickgit.portfolio.domain.project.Project;
-import com.woowacourse.pickgit.portfolio.domain.project.ProjectTag;
-import com.woowacourse.pickgit.portfolio.presentation.dto.request.ProjectRequest;
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.TagRequest;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -45,44 +42,10 @@ public class ProjectResponseDto {
         this.tags = tags;
     }
 
-    public static ProjectResponseDto of(ProjectRequest request) {
-        return ProjectResponseDto.builder()
-            .id(request.getId())
-            .name(request.getName())
-            .startDate(request.getStartDate())
-            .endDate(request.getEndDate())
-            .type(request.getType())
-            .imageUrl(request.getImageUrl())
-            .content(request.getContent())
-            .tags(getTagResponsesDtoFromTagRequests(request.getTags()))
-            .build();
-    }
-
     private static List<TagResponseDto> getTagResponsesDtoFromTagRequests(
         List<TagRequest> requests
     ) {
         return requests.stream()
-            .map(TagResponseDto::of)
-            .collect(toList());
-    }
-
-    public static ProjectResponseDto of(Project project) {
-        return ProjectResponseDto.builder()
-            .id(project.getId())
-            .name(project.getName())
-            .startDate(project.getStartDate())
-            .endDate(project.getEndDate())
-            .type(project.getType().getValue())
-            .imageUrl(project.getImageUrl())
-            .content(project.getContent())
-            .tags(getTagResponsesDtoFromProjectTags(project.getTags()))
-            .build();
-    }
-
-    private static List<TagResponseDto> getTagResponsesDtoFromProjectTags(
-        List<ProjectTag> tags
-    ) {
-        return tags.stream()
             .map(TagResponseDto::of)
             .collect(toList());
     }

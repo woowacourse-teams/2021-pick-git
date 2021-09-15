@@ -1,6 +1,8 @@
 package com.woowacourse.pickgit.portfolio.domain.contact;
 
 import com.woowacourse.pickgit.portfolio.domain.Portfolio;
+import com.woowacourse.pickgit.portfolio.domain.common.Updatable;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -11,7 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class Contact {
+public class Contact implements Updatable<Contact> {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,6 +31,10 @@ public class Contact {
     protected Contact() {
     }
 
+    public Contact(Long id, String category, String value) {
+        this(id, category, value, null);
+    }
+
     public Contact(
         Long id,
         String category,
@@ -41,12 +47,8 @@ public class Contact {
         this.portfolio = portfolio;
     }
 
-    public void updateCategory(String category) {
-        this.category = category;
-    }
-
-    public void updateValue(String value) {
-        this.value = value;
+    public void appendTo(Portfolio portfolio) {
+        this.portfolio = portfolio;
     }
 
     public Long getId() {
@@ -65,14 +67,26 @@ public class Contact {
         return portfolio;
     }
 
-    public void linkPortfolio(Portfolio portfolio) {
-        if (portfolio != null) {
-            portfolio.removeContact(this);
-        }
-        this.portfolio = portfolio;
+    @Override
+    public void update(Contact contact) {
+        this.category = contact.category;
+        this.value = contact.value;
     }
 
-    public void unlinkPortfolio(Portfolio portfolio) {
-        this.portfolio = null;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Contact)) {
+            return false;
+        }
+        Contact contact = (Contact) o;
+        return Objects.equals(getId(), contact.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
     }
 }

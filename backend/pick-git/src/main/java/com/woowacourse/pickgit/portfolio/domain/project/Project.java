@@ -1,8 +1,11 @@
 package com.woowacourse.pickgit.portfolio.domain.project;
 
 import com.woowacourse.pickgit.portfolio.domain.Portfolio;
+import com.woowacourse.pickgit.portfolio.domain.common.Updatable;
+import com.woowacourse.pickgit.portfolio.domain.common.UpdateUtil;
 import java.time.LocalDateTime;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
@@ -13,9 +16,10 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Persistence;
 
 @Entity
-public class Project {
+public class Project implements Updatable<Project> {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,7 +40,12 @@ public class Project {
 
     private String content;
 
-    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
+    @OneToMany(
+        mappedBy = "project",
+        fetch = FetchType.LAZY,
+        cascade = CascadeType.PERSIST,
+        orphanRemoval = true
+    )
     private List<ProjectTag> tags;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -54,8 +63,7 @@ public class Project {
         String type,
         String imageUrl,
         String content,
-        List<ProjectTag> tags,
-        Portfolio portfolio
+        List<ProjectTag> tags
     ) {
         this(
             id,
@@ -66,15 +74,11 @@ public class Project {
             imageUrl,
             content,
             tags,
-            portfolio
+            null
         );
-
-        for (ProjectTag tag : tags) {
-            tag.addProject(this);
-        }
     }
 
-    private Project(
+    public Project(
         Long id,
         String name,
         LocalDateTime startDate,
@@ -96,32 +100,8 @@ public class Project {
         this.portfolio = portfolio;
     }
 
-    public void updateName(String name) {
-        this.name = name;
-    }
-
-    public void updateStartDate(LocalDateTime startDate) {
-        this.startDate = startDate;
-    }
-
-    public void updateEndDate(LocalDateTime endDate) {
-        this.endDate = endDate;
-    }
-
-    public void updateType(ProjectType type) {
-        this.type = type;
-    }
-
-    public void updateImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public void updateContent(String content) {
-        this.content = content;
-    }
-
-    public void updateTags(List<ProjectTag> sources) {
-        tags.removeIf(tag -> !sources.contains(tag));
+    public void appendTo(Portfolio portfolio) {
+        this.portfolio = portfolio;
     }
 
     public Long getId() {
@@ -156,14 +136,16 @@ public class Project {
         return tags;
     }
 
-    public void linkPortfolio(Portfolio portfolio) {
-        if (portfolio != null) {
-            portfolio.removeProject(this);
-        }
-        this.portfolio = portfolio;
-    }
+    @Override
+    public void update(Project project) {
+        this.name = project.name;
+        this.startDate = project.startDate;
+        this.endDate = project.endDate;
+        this.type = project.type;
+        this.imageUrl = project.imageUrl;
+        this.content = project.content;
 
-    public void unlinkPortfolio(Portfolio portfolio) {
-        this.portfolio = null;
+        project.tags.forEach(tag -> tag.appendTo(this));
+        UpdateUtil.execute(this.tags, project.tags);
     }
 }

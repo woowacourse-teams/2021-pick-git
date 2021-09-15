@@ -3,6 +3,8 @@ package com.woowacourse.pickgit.portfolio.domain.contact;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
+import com.woowacourse.pickgit.portfolio.domain.Portfolio;
+import com.woowacourse.pickgit.portfolio.domain.common.UpdateUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,52 +33,10 @@ public class Contacts {
         this.contacts = contacts;
     }
 
-    public List<Contact> updateContacts(List<Contact> sources) {
-        updateExistingContacts(sources);
-        addNonExistingContacts(sources);
-        removeUselessContacts(sources);
+    public void update(Contacts source, Portfolio portfolio) {
+        source.contacts.forEach(contact -> contact.appendTo(portfolio));
 
-        return contacts;
-    }
-
-    private void updateExistingContacts(List<Contact> sources) {
-        for (Contact source : sources) {
-            updateExistingContact(source, getContactsWithId());
-        }
-    }
-
-    private void updateExistingContact(Contact source, Map<Long, Contact> contactsWithId) {
-        if (contactsWithId.containsKey(source.getId())) {
-            Contact target = contactsWithId.get(source.getId());
-
-            target.updateCategory(source.getCategory());
-            target.updateValue(source.getValue());
-        }
-    }
-
-    private Map<Long, Contact> getContactsWithId() {
-        return contacts.stream()
-            .collect(toMap(Contact::getId, Function.identity()));
-    }
-
-    private void addNonExistingContacts(List<Contact> sources) {
-        List<Contact> nonExistingContacts = sources.stream()
-            .filter(source -> !contacts.contains(source))
-            .collect(toList());
-        contacts.addAll(nonExistingContacts);
-    }
-
-    private void removeUselessContacts(List<Contact> sources) {
-        contacts.removeIf(contact -> !sources.contains(contact));
-    }
-
-    public void add(Contact contact) {
-        contacts.add(contact);
-    }
-
-
-    public void remove(Contact contact) {
-        contacts.remove(contact);
+        UpdateUtil.execute(this.contacts, source.contacts);
     }
 
     public List<Contact> getContacts() {

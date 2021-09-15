@@ -1,13 +1,9 @@
 package com.woowacourse.pickgit.portfolio.domain.section;
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-
-import com.woowacourse.pickgit.portfolio.domain.section.Section;
+import com.woowacourse.pickgit.portfolio.domain.Portfolio;
+import com.woowacourse.pickgit.portfolio.domain.common.UpdateUtil;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.FetchType;
@@ -22,64 +18,31 @@ public class Sections {
         cascade = CascadeType.PERSIST,
         orphanRemoval = true
     )
-    private List<Section> sections;
+    private List<Section> values;
 
     protected Sections() {
         this(new ArrayList<>());
     }
 
-    public Sections(List<Section> sections) {
-        this.sections = sections;
+    public Sections(List<Section> values) {
+        this.values = values;
     }
 
-    public List<Section> updateSections(List<Section> sources) {
-        updateExistingSections(sources);
-        addNonExistingSections(sources);
-        removeUselessSections(sources);
+    public void update(Sections sources, Portfolio portfolio) {
+        sources.values.forEach(source -> source.appendTo(portfolio));
 
-        return sections;
-    }
-
-    private void updateExistingSections(List<Section> sources) {
-        for (Section source : sources) {
-            updateExistingSection(source, getSectionsWithId());
-        }
-    }
-
-    private void updateExistingSection(Section source, Map<Long, Section> sectionsWithId) {
-        if (sectionsWithId.containsKey(source.getId())) {
-            Section section = sectionsWithId.get(source.getId());
-
-            section.updateName(section.getName());
-            section.updateItems(section.getItems());
-        }
-    }
-
-    private Map<Long, Section> getSectionsWithId() {
-        return sections.stream()
-            .collect(toMap(Section::getId, Function.identity()));
-    }
-
-    private void addNonExistingSections(List<Section> sources) {
-        List<Section> nonExistingSections = sources.stream()
-            .filter(source -> !sections.contains(source))
-            .collect(toList());
-        sections.addAll(nonExistingSections);
-    }
-
-    private void removeUselessSections(List<Section> sources) {
-        sections.removeIf(section -> !sources.contains(section));
+        UpdateUtil.execute(this.values, sources.values);
     }
 
     public void add(Section section) {
-        sections.add(section);
+        values.add(section);
     }
 
     public void remove(Section section) {
-        sections.remove(section);
+        values.remove(section);
     }
 
-    public List<Section> getSections() {
-        return sections;
+    public List<Section> getValues() {
+        return values;
     }
 }

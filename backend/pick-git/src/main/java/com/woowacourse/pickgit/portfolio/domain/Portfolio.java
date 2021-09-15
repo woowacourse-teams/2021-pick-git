@@ -26,7 +26,7 @@ public class Portfolio {
     private Long id;
 
     @Column(nullable = false)
-    private boolean profileImageShown;
+    private Boolean profileImageShown;
 
     @Column(nullable = false)
     private String profileImageUrl;
@@ -51,79 +51,52 @@ public class Portfolio {
 
     public Portfolio(
         Long id,
-        boolean profileImageShown,
+        Boolean profileImageShown,
         String profileImageUrl,
         String introduction,
-        List<Contact> contacts,
-        List<Project> projects,
-        List<Section> sections,
+        Contacts contacts,
+        Projects projects,
+        Sections sections
+    ) {
+        this(
+            id,
+            profileImageShown,
+            profileImageUrl,
+            introduction,
+            contacts,
+            projects,
+            sections,
+            null
+        );
+    }
+
+    public Portfolio(
+        Long id,
+        Boolean profileImageShown,
+        String profileImageUrl,
+        String introduction,
+        Contacts contacts,
+        Projects projects,
+        Sections sections,
         User user
     ) {
         this.id = id;
         this.profileImageShown = profileImageShown;
         this.profileImageUrl = profileImageUrl;
         this.introduction = introduction;
-        this.contacts = new Contacts(contacts);
-        this.projects = new Projects(projects);
-        this.sections = new Sections(sections);
+        this.contacts = contacts;
+        this.projects = projects;
+        this.sections = sections;
         this.user = user;
     }
 
-    public boolean updateProfileImageShown(boolean profileImageShown) {
-        this.profileImageShown = profileImageShown;
-        return this.profileImageShown;
-    }
-
-    public String updateProfileImageUrl(String profileImageUrl) {
-        this.profileImageUrl = profileImageUrl;
-        return this.profileImageUrl;
-    }
-
-    public String updateIntroduction(String introduction) {
-        this.introduction = introduction;
-        return this.introduction;
-    }
-
-    public List<Contact> updateContacts(List<Contact> sources) {
-        return contacts.updateContacts(sources);
-    }
-
-    public List<Project> updateProjects(List<Project> sources) {
-        return projects.updateProjects(sources);
-    }
-
-    public List<Section> updateSections(List<Section> sources) {
-        return sections.updateSections(sources);
-    }
-
-    public void addContact(Contact contact) {
-        contact.linkPortfolio(this);
-        contacts.add(contact);
-    }
-
-    public void removeContact(Contact contact) {
-        contact.unlinkPortfolio(this);
-        contacts.remove(contact);
-    }
-
-    public void addProject(Project project) {
-        project.linkPortfolio(this);
-        projects.add(project);
-    }
-
-    public void removeProject(Project project) {
-        project.unlinkPortfolio(this);
-        projects.remove(project);
-    }
-
-    public void addSection(Section section) {
-        section.linkPortfolio(this);
-        sections.add(section);
-    }
-
-    public void removeSection(Section section) {
-        section.unlinkPortfolio(this);
-        sections.remove(section);
+    public void update(Portfolio portfolio) {
+        this.profileImageShown = portfolio.profileImageShown;
+        this.profileImageUrl = portfolio.profileImageUrl;
+        this.introduction = portfolio.introduction;
+        this.contacts.update(portfolio.contacts, this);
+        this.projects.update(portfolio.projects, this);
+        this.sections.update(portfolio.sections, this);
     }
 
     public Long getId() {
@@ -152,9 +125,5 @@ public class Portfolio {
 
     public Sections getSections() {
         return sections;
-    }
-
-    public User getUser() {
-        return user;
     }
 }

@@ -1,12 +1,9 @@
 package com.woowacourse.pickgit.portfolio.domain.project;
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-
+import com.woowacourse.pickgit.portfolio.domain.Portfolio;
+import com.woowacourse.pickgit.portfolio.domain.common.UpdateUtil;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.FetchType;
@@ -21,69 +18,31 @@ public class Projects {
         cascade = CascadeType.PERSIST,
         orphanRemoval = true
     )
-    private List<Project> projects;
+    private List<Project> value;
 
     protected Projects() {
         this(new ArrayList<>());
     }
 
-    public Projects(List<Project> projects) {
-        this.projects = projects;
+    public Projects(List<Project> value) {
+        this.value = value;
     }
 
-    public List<Project> updateProjects(List<Project> sources) {
-        updateExistingProjects(sources);
-        addNonExistingProjects(sources);
-        removeUselessProjects(sources);
+    public void update(Projects sources, Portfolio portfolio) {
+        sources.value.forEach(project -> project.appendTo(portfolio));
 
-        return projects;
-    }
-
-    private void updateExistingProjects(List<Project> sources) {
-        for (Project source : sources) {
-            updateExistingProject(source, getProjectsWithId());
-        }
-    }
-
-    private void updateExistingProject(Project source, Map<Long, Project> projectsWithId) {
-        if (projectsWithId.containsKey(source.getId())) {
-            Project project = projectsWithId.get(source.getId());
-
-            project.updateName(source.getName());
-            project.updateStartDate(source.getStartDate());
-            project.updateEndDate(source.getEndDate());
-            project.updateType(source.getType());
-            project.updateImageUrl(source.getImageUrl());
-            project.updateContent(source.getContent());
-            project.updateTags(source.getTags());
-        }
-    }
-
-    private Map<Long, Project> getProjectsWithId() {
-        return projects.stream()
-            .collect(toMap(Project::getId, Function.identity()));
-    }
-
-    private void addNonExistingProjects(List<Project> sources) {
-        List<Project> nonExistingProjects = sources.stream()
-            .filter(source -> !projects.contains(source))
-            .collect(toList());
-        projects.addAll(nonExistingProjects);
-    }
-
-    private void removeUselessProjects(List<Project> sources) {
-        projects.removeIf(project -> !sources.contains(project));
+        UpdateUtil.execute(this.value, sources.value);
     }
 
     public void add(Project project) {
-        projects.add(project);
+        value.add(project);
     }
 
     public void remove(Project project) {
-        projects.remove(project);
+        value.remove(project);
     }
 
-    public List<Project> getProjects() {
-        return projects;
+    public List<Project> getValue() {
+        return value;
     }
 }
