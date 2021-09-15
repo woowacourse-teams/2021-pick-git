@@ -4,10 +4,13 @@ import static java.util.stream.Collectors.toList;
 
 import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
+import com.woowacourse.pickgit.portfolio.application.PortfolioService;
+import com.woowacourse.pickgit.portfolio.application.dto.request.AuthUserForPortfolioRequestDto;
 import com.woowacourse.pickgit.portfolio.application.dto.request.ContactRequestDto;
 import com.woowacourse.pickgit.portfolio.application.dto.request.PortfolioRequestDto;
 import com.woowacourse.pickgit.portfolio.application.dto.request.ProjectRequestDto;
 import com.woowacourse.pickgit.portfolio.application.dto.request.SectionRequestDto;
+import com.woowacourse.pickgit.portfolio.application.dto.response.PortfolioResponseDto;
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.ContactRequest;
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.PortfolioRequest;
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.ProjectRequest;
@@ -26,15 +29,25 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin(value = "*")
 public class PortfolioController {
 
+    private final PortfolioService portfolioService;
+
+    public PortfolioController(
+        PortfolioService portfolioService
+    ) {
+        this.portfolioService = portfolioService;
+    }
+
     @PutMapping
-    public ResponseEntity<Void> update(
+    public ResponseEntity<PortfolioResponseDto> update(
         @Authenticated AppUser user,
         @Valid @RequestBody PortfolioRequest request
     ) {
+        PortfolioResponseDto responseDto = portfolioService.update(
+            AuthUserForPortfolioRequestDto.from(user),
+            createPortfolioRequestDto(request)
+        );
 
-
-        return ResponseEntity.ok().build();
-//        return ResponseEntity.ok(new PortfolioResponse());
+        return ResponseEntity.ok(responseDto);
     }
 
     private PortfolioRequestDto createPortfolioRequestDto(PortfolioRequest request) {

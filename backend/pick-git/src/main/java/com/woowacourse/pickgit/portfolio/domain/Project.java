@@ -35,12 +35,12 @@ public class Project {
 
     private String content;
 
+    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
+    private List<ProjectTag> tags;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "portfolio_id", nullable = false)
     private Portfolio portfolio;
-
-    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
-    private List<ProjectTag> tags;
 
     protected Project() {
     }
@@ -50,10 +50,39 @@ public class Project {
         String name,
         LocalDateTime startDate,
         LocalDateTime endDate,
+        String type,
+        String imageUrl,
+        String content,
+        List<ProjectTag> tags,
+        Portfolio portfolio
+    ) {
+        this(
+            id,
+            name,
+            startDate,
+            endDate,
+            ProjectType.of(type),
+            imageUrl,
+            content,
+            tags,
+            portfolio
+        );
+
+        for (ProjectTag tag : tags) {
+            tag.addProject(this);
+        }
+    }
+
+    private Project(
+        Long id,
+        String name,
+        LocalDateTime startDate,
+        LocalDateTime endDate,
         ProjectType type,
         String imageUrl,
         String content,
-        List<ProjectTag> tags
+        List<ProjectTag> tags,
+        Portfolio portfolio
     ) {
         this.id = id;
         this.name = name;
@@ -63,6 +92,7 @@ public class Project {
         this.imageUrl = imageUrl;
         this.content = content;
         this.tags = tags;
+        this.portfolio = portfolio;
     }
 
     public void updateName(String name) {
@@ -123,5 +153,16 @@ public class Project {
 
     public List<ProjectTag> getTags() {
         return tags;
+    }
+
+    public void linkPortfolio(Portfolio portfolio) {
+        if (portfolio != null) {
+            portfolio.removeProject(this);
+        }
+        this.portfolio = portfolio;
+    }
+
+    public void unlinkPortfolio(Portfolio portfolio) {
+        this.portfolio = null;
     }
 }

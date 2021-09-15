@@ -63,4 +63,15 @@ public class Contact {
     public Portfolio getPortfolio() {
         return portfolio;
     }
+
+    public void linkPortfolio(Portfolio portfolio) {
+        if (portfolio != null) {
+            portfolio.removeContact(this);
+        }
+        this.portfolio = portfolio;
+    }
+
+    public void unlinkPortfolio(Portfolio portfolio) {
+        this.portfolio = null;
+    }
 }

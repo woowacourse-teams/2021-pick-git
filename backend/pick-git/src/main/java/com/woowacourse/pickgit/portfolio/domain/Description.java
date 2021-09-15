@@ -33,6 +33,10 @@ public class Description {
         this.value = value;
     }
 
+    public void addItem(Item item) {
+        this.item = item;
+    }
+
     public Long getId() {
         return id;
     }

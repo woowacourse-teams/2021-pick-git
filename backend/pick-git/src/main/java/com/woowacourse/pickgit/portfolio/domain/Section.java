@@ -1,11 +1,11 @@
 package com.woowacourse.pickgit.portfolio.domain;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -38,11 +38,17 @@ public class Section {
     public Section(
         Long id,
         String name,
-        List<Item> items
+        List<Item> items,
+        Portfolio portfolio
     ) {
         this.id = id;
         this.name = name;
+        this.portfolio = portfolio;
         this.items = items;
+
+        for (Item item : items) {
+            item.addSection(this);
+        }
     }
 
     public void updateName(String name) {
@@ -96,5 +102,16 @@ public class Section {
 
     public List<Item> getItems() {
         return items;
+    }
+
+    public void linkPortfolio(Portfolio portfolio) {
+        if (portfolio != null) {
+            portfolio.removeSection(this);
+        }
+        this.portfolio = portfolio;
+    }
+
+    public void unlinkPortfolio(Portfolio portfolio) {
+        this.portfolio = null;
     }
 }

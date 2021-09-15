@@ -1,6 +1,9 @@
 package com.woowacourse.pickgit.portfolio.application.dto.request;
 
+import static java.util.stream.Collectors.toList;
+
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.ProjectRequest;
+import com.woowacourse.pickgit.portfolio.presentation.dto.request.TagRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
@@ -15,7 +18,7 @@ public class ProjectRequestDto {
     private String type;
     private String imageUrl;
     private String content;
-    private List<String> tags;
+    private List<TagRequestDto> tags;
 
     private ProjectRequestDto() {
     }
@@ -28,7 +31,7 @@ public class ProjectRequestDto {
         String type,
         String imageUrl,
         String content,
-        List<String> tags
+        List<TagRequestDto> tags
     ) {
         this.id = id;
         this.name = name;
@@ -49,8 +52,14 @@ public class ProjectRequestDto {
             .type(request.getType())
             .imageUrl(request.getImageUrl())
             .content(request.getContent())
-            .tags(request.getTags())
+            .tags(getTagRequestsDto(request.getTags()))
             .build();
+    }
+
+    private static List<TagRequestDto> getTagRequestsDto(List<TagRequest> requests) {
+        return requests.stream()
+            .map(TagRequestDto::of)
+            .collect(toList());
     }
 
     public Long getId() {
@@ -81,7 +90,7 @@ public class ProjectRequestDto {
         return content;
     }
 
-    public List<String> getTags() {
+    public List<TagRequestDto> getTags() {
         return tags;
     }
 }

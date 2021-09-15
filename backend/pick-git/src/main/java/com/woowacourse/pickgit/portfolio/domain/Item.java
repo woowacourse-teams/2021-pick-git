@@ -43,6 +43,10 @@ public class Item {
         this.category = category;
         this.descriptions = descriptions;
         this.section = section;
+
+        for (Description description : descriptions) {
+            description.addItem(this);
+        }
     }
 
     public void updateCategory(String category) {
@@ -86,6 +90,10 @@ public class Item {
 
     private void removeUselessDescriptions(List<Description> sources) {
         descriptions.removeIf(description -> !sources.contains(description));
+    }
+
+    public void addSection(Section section) {
+        this.section = section;
     }
 
     public Long getId() {

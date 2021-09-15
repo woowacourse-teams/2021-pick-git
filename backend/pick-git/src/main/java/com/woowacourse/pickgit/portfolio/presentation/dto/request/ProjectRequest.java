@@ -14,7 +14,7 @@ public class ProjectRequest {
     private String type;
     private String imageUrl;
     private String content;
-    private List<String> tags;
+    private List<TagRequest> tags;
 
     private ProjectRequest() {
     }
@@ -27,7 +27,7 @@ public class ProjectRequest {
         String type,
         String imageUrl,
         String content,
-        List<String> tags
+        List<TagRequest> tags
     ) {
         this.id = id;
         this.name = name;
@@ -67,7 +67,7 @@ public class ProjectRequest {
         return content;
     }
 
-    public List<String> getTags() {
+    public List<TagRequest> getTags() {
         return tags;
     }
 }

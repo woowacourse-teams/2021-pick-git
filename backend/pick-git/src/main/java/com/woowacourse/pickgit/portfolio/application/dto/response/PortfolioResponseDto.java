@@ -6,6 +6,7 @@ import lombok.Builder;
 @Builder
 public class PortfolioResponseDto {
 
+    private Long id;
     private boolean profileImageShown;
     private String profileImageUrl;
     private String introduction;
@@ -17,6 +18,7 @@ public class PortfolioResponseDto {
     }
 
     public PortfolioResponseDto(
+        Long id,
         boolean profileImageShown,
         String profileImageUrl,
         String introduction,
@@ -24,12 +26,34 @@ public class PortfolioResponseDto {
         List<ProjectResponseDto> projects,
         List<SectionResponseDto> sections
     ) {
+        this.id = id;
         this.profileImageShown = profileImageShown;
         this.profileImageUrl = profileImageUrl;
         this.introduction = introduction;
         this.contacts = contacts;
         this.projects = projects;
         this.sections = sections;
+    }
+
+    public static PortfolioResponseDto from(
+        Long id,
+        boolean profileImageShown,
+        String profileImageUrl,
+        String introduction,
+        List<ContactResponseDto> contacts,
+        List<ProjectResponseDto> projects,
+        List<SectionResponseDto> sections
+    ) {
+        return PortfolioResponseDto.builder()
+            .id(id)
+            .profileImageShown(profileImageShown)
+            .profileImageUrl(profileImageUrl)
+            .introduction(introduction)
+            .build();
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public boolean isProfileImageShown() {

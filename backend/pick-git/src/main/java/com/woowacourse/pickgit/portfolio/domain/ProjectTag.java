@@ -1,6 +1,5 @@
 package com.woowacourse.pickgit.portfolio.domain;
 
-import com.woowacourse.pickgit.portfolio.domain.Project;
 import com.woowacourse.pickgit.tag.domain.Tag;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -31,6 +30,14 @@ public class ProjectTag {
         this.id = id;
         this.project = project;
         this.tag = tag;
+    }
+
+    public void addProject(Project project) {
+        this.project = project;
+    }
+
+    public String getName() {
+        return tag.getName();
     }
 
     public Long getId() {

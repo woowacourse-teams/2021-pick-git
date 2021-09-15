@@ -82,22 +82,27 @@ public class Portfolio {
         this.sections = sections;
     }
 
-    public void updateProfileImageShown(boolean profileImageShown) {
+    public boolean updateProfileImageShown(boolean profileImageShown) {
         this.profileImageShown = profileImageShown;
+        return this.profileImageShown;
     }
 
-    public void updateProfileImageUrl(String profileImageUrl) {
+    public String updateProfileImageUrl(String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
+        return this.profileImageUrl;
     }
 
-    public void updateIntroduction(String introduction) {
+    public String updateIntroduction(String introduction) {
         this.introduction = introduction;
+        return this.introduction;
     }
 
-    public void updateContacts(List<Contact> sources) {
+    public List<Contact> updateContacts(List<Contact> sources) {
         updateExistingContacts(sources);
         addNonExistingContacts(sources);
         removeUselessContacts(sources);
+
+        return contacts;
     }
 
     private void updateExistingContacts(List<Contact> sources) {
@@ -131,10 +136,12 @@ public class Portfolio {
         contacts.removeIf(contact -> !sources.contains(contact));
     }
 
-    public void updateProjects(List<Project> sources) {
+    public List<Project> updateProjects(List<Project> sources) {
         updateExistingProjects(sources);
         addNonExistingProjects(sources);
         removeUselessProjects(sources);
+
+        return projects;
     }
 
     private void updateExistingProjects(List<Project> sources) {
@@ -173,10 +180,12 @@ public class Portfolio {
         projects.removeIf(project -> !sources.contains(project));
     }
 
-    public void updateSections(List<Section> sources) {
+    public List<Section> updateSections(List<Section> sources) {
         updateExistingSections(sources);
         addNonExistingSections(sources);
         removeUselessSections(sources);
+
+        return sections;
     }
 
     private void updateExistingSections(List<Section> sources) {
@@ -208,6 +217,36 @@ public class Portfolio {
 
     private void removeUselessSections(List<Section> sources) {
         sections.removeIf(section -> !sources.contains(section));
+    }
+
+    public void addContact(Contact contact) {
+        contact.linkPortfolio(this);
+        contacts.add(contact);
+    }
+
+    public void removeContact(Contact contact) {
+        contact.unlinkPortfolio(this);
+        contacts.remove(contact);
+    }
+
+    public void addProject(Project project) {
+        project.linkPortfolio(this);
+        projects.add(project);
+    }
+
+    public void removeProject(Project project) {
+        project.unlinkPortfolio(this);
+        projects.remove(project);
+    }
+
+    public void addSection(Section section) {
+        section.linkPortfolio(this);
+        sections.add(section);
+    }
+
+    public void removeSection(Section section) {
+        section.unlinkPortfolio(this);
+        sections.remove(section);
     }
 
     public Long getId() {

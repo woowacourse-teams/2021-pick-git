@@ -8,12 +8,16 @@ public class ItemRequest {
 
     private Long id;
     private String category;
-    private List<String> descriptions;
+    private List<DescriptionRequest> descriptions;
 
     private ItemRequest() {
     }
 
-    public ItemRequest(Long id, String category, List<String> descriptions) {
+    public ItemRequest(
+        Long id,
+        String category,
+        List<DescriptionRequest> descriptions
+    ) {
         this.id = id;
         this.category = category;
         this.descriptions = descriptions;
@@ -27,7 +31,7 @@ public class ItemRequest {
         return category;
     }
 
-    public List<String> getDescriptions() {
+    public List<DescriptionRequest> getDescriptions() {
         return descriptions;
     }
 }
