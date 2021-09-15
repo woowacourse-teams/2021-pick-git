@@ -1,6 +1,8 @@
 spring:
   profiles:
     include: security, db
+  flyway:
+    enabled: false
 
 github:
   contribution:

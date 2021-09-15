@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.user.domain;
 
+import com.woowacourse.pickgit.portfolio.domain.Portfolio;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.Posts;
 import com.woowacourse.pickgit.user.domain.follow.Follow;
@@ -10,11 +11,14 @@ import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import javax.persistence.CascadeType;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 @Entity
 public class User {
@@ -36,6 +40,9 @@ public class User {
 
     @Embedded
     private Posts posts;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    private List<Portfolio> portfolios;
 
     protected User() {
     }

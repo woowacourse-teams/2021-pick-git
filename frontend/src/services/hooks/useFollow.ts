@@ -51,7 +51,6 @@ const useFollow = (querySetter: (following: boolean) => void) => {
         : await mutateToFollow({ username, applyGithub });
 
       if (following === isFollowing) {
-        console.log("error??? ", following);
         pushSnackbarMessage(UNKNOWN_ERROR_MESSAGE);
         querySetter(isFollowing);
       }

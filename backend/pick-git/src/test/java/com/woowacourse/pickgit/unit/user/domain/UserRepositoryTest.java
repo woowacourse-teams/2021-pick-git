@@ -55,7 +55,7 @@ class UserRepositoryTest {
         // then
         assertThat(user)
             .usingRecursiveComparison()
-            .ignoringFields("id")
+            .ignoringFields("id", "portfolios")
             .isEqualTo(users.get(0));
     }
 

@@ -31,6 +31,7 @@ export const PAGE_URL = {
   FOLLOWERS_BASE: "/followers",
   FOLLOWINGS: (username: string) => `/followings?username=${username}`,
   FOLLOWERS: (username: string) => `/followers?username=${username}`,
+  PORTFOLIO: "/portfolio",
 };
 
 export const API_URL = {
