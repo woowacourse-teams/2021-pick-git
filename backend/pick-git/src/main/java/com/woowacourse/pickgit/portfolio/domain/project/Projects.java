@@ -34,6 +34,10 @@ public class Projects {
         UpdateUtil.execute(this.value, sources.value);
     }
 
+    public void appendTo(Portfolio portfolio) {
+        this.value.forEach(project -> project.appendTo(portfolio));
+    }
+
     public void add(Project project) {
         value.add(project);
     }

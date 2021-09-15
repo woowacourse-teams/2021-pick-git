@@ -28,6 +28,10 @@ public class Sections {
         this.values = values;
     }
 
+    public void appendTo(Portfolio portfolio) {
+        this.values.forEach(section -> section.appendTo(portfolio));
+    }
+
     public void update(Sections sources, Portfolio portfolio) {
         sources.values.forEach(source -> source.appendTo(portfolio));
 

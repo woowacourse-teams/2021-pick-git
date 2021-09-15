@@ -37,7 +37,6 @@ public class Section implements Updatable<Section> {
     @JoinColumn(name = "portfolio_id", nullable = false)
     private Portfolio portfolio;
 
-
     protected Section() {
     }
 
@@ -53,8 +52,10 @@ public class Section implements Updatable<Section> {
     ) {
         this.id = id;
         this.name = name;
-        this.portfolio = portfolio;
         this.items = items;
+        this.portfolio = portfolio;
+
+        this.items.forEach(item -> item.appendTo(this));
     }
 
     public void appendTo(Portfolio portfolio) {

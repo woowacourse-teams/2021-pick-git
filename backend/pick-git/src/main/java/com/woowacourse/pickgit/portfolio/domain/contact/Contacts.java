@@ -33,6 +33,10 @@ public class Contacts {
         this.contacts = contacts;
     }
 
+    public void appendTo(Portfolio portfolio) {
+        this.contacts.forEach(contact -> contact.appendTo(portfolio));
+    }
+
     public void update(Contacts source, Portfolio portfolio) {
         source.contacts.forEach(contact -> contact.appendTo(portfolio));
 

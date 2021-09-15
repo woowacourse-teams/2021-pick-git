@@ -56,6 +56,8 @@ public class Item implements Updatable<Item> {
         this.category = category;
         this.descriptions = descriptions;
         this.section = section;
+
+        this.descriptions.forEach(description -> description.appendTo(this));
     }
 
     public void appendTo(Section section) {

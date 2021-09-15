@@ -88,6 +88,10 @@ public class Portfolio {
         this.projects = projects;
         this.sections = sections;
         this.user = user;
+
+        this.contacts.appendTo(this);
+        this.projects.appendTo(this);
+        this.sections.appendTo(this);
     }
 
     public void update(Portfolio portfolio) {
