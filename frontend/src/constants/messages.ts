@@ -27,6 +27,9 @@ export const FAILURE_MESSAGE = {
   POST_FILE: "이미지를 추가해주세요.",
   COMMENT_CONTENT_MAX_LENGTH_EXCEEDED: `댓글은 ${LIMIT.COMMENT_LENGTH}자 이하로만 입력할 수 있습니다.`,
   COMMENT_SAVE_FAILED: "댓글을 저장하지 못했습니다",
+  SAME_CATEGORY_NAME_EXIST: "같은 이름의 소분류가 존재합니다",
+  SHOULD_HAVE_LEAST_ONE_CATEGORY: "하나 이상의 소분류는 존재해야 합니다",
+  SHOULD_HAVE_LEAST_ONE_DESCRIPTION: "하나 이상의 설명은 존재해야 합니다",
 };
 
 export const WARNING_MESSAGE = {
