@@ -28,6 +28,10 @@ public class Sections {
         this.values = values;
     }
 
+    public static Sections empty() {
+        return new Sections(new ArrayList<>());
+    }
+
     public void appendTo(Portfolio portfolio) {
         this.values.forEach(section -> section.appendTo(portfolio));
     }

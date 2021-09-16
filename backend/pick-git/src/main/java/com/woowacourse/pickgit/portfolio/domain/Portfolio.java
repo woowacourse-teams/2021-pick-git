@@ -1,13 +1,9 @@
 package com.woowacourse.pickgit.portfolio.domain;
 
-import com.woowacourse.pickgit.portfolio.domain.contact.Contact;
 import com.woowacourse.pickgit.portfolio.domain.contact.Contacts;
-import com.woowacourse.pickgit.portfolio.domain.project.Project;
 import com.woowacourse.pickgit.portfolio.domain.project.Projects;
-import com.woowacourse.pickgit.portfolio.domain.section.Section;
 import com.woowacourse.pickgit.portfolio.domain.section.Sections;
 import com.woowacourse.pickgit.user.domain.User;
-import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -94,6 +90,19 @@ public class Portfolio {
         this.sections.appendTo(this);
     }
 
+    public static Portfolio empty(User user) {
+        return new Portfolio(
+            null,
+            true,
+            user.getImage(),
+            user.getDescription(),
+            Contacts.empty(),
+            Projects.empty(),
+            Sections.empty(),
+            user
+        );
+    }
+
     public void update(Portfolio portfolio) {
         this.profileImageShown = portfolio.profileImageShown;
         this.profileImageUrl = portfolio.profileImageUrl;
@@ -101,6 +110,10 @@ public class Portfolio {
         this.contacts.update(portfolio.contacts, this);
         this.projects.update(portfolio.projects, this);
         this.sections.update(portfolio.sections, this);
+    }
+
+    public boolean isOwnedBy(User user) {
+        return this.user.equals(user);
     }
 
     public Long getId() {

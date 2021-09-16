@@ -1,14 +1,9 @@
 package com.woowacourse.pickgit.portfolio.domain.contact;
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-
 import com.woowacourse.pickgit.portfolio.domain.Portfolio;
 import com.woowacourse.pickgit.portfolio.domain.common.UpdateUtil;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.FetchType;
@@ -31,6 +26,10 @@ public class Contacts {
 
     public Contacts(List<Contact> contacts) {
         this.contacts = contacts;
+    }
+
+    public static Contacts empty() {
+        return new Contacts(new ArrayList<>());
     }
 
     public void appendTo(Portfolio portfolio) {

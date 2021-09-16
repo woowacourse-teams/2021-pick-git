@@ -28,6 +28,10 @@ public class Projects {
         this.value = value;
     }
 
+    public static Projects empty() {
+        return new Projects(new ArrayList<>());
+    }
+
     public void update(Projects sources, Portfolio portfolio) {
         sources.value.forEach(project -> project.appendTo(portfolio));
 
