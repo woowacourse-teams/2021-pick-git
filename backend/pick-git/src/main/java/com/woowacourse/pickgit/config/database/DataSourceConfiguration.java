@@ -23,7 +23,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Configuration
 @EnableAutoConfiguration(exclude = DataSourceAutoConfiguration.class)
 @EnableConfigurationProperties(MasterDataSourceProperties.class)
-@Profile("prod")
+@Profile({"prod", "staging"})
 public class DataSourceConfiguration {
 
     private final MasterDataSourceProperties dataSourceProperties;
