@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import Chip from "../../components/@shared/Chip/Chip";
@@ -31,7 +31,8 @@ const SearchPage = () => {
     isLoading: isUserSearchLoading,
     isFetchingNextPage: isUserSearchFetchingNextPage,
     handleIntersect: handleUserSearchIntersect,
-  } = useSearchUserData();
+    refetch: refetchUserData,
+  } = useSearchUserData(tabIndex === 0);
   const {
     infinitePostsData: postSearchResults,
     isError: isPostSearchError,
@@ -39,7 +40,21 @@ const SearchPage = () => {
     isFetchingNextPage: isPostSearchFetchingNextPage,
     handleIntersect: handlePostSearchIntersect,
     formattedKeyword: postSearchKeyword,
-  } = useSearchPostData("tags");
+    refetch: refetchPostData,
+  } = useSearchPostData("tags", null, tabIndex === 1);
+
+  useEffect(() => {
+    switch (tabIndex) {
+      case 0:
+        refetchUserData();
+        break;
+      case 1:
+        refetchPostData();
+        break;
+      default:
+        break;
+    }
+  }, [tabIndex]);
 
   const SearchUserResult = () => {
     if (isUserSearchLoading) {
