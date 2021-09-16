@@ -41,7 +41,7 @@ public class PortfolioService {
         }
 
         return portfolioDtoAssembler.toPortfolioResponseDto(
-            portfolio.orElseGet(() -> portfolioRepository.save(Portfolio.empty(getUser(userDto))))
+            portfolio.orElseGet(() -> portfolioRepository.save(Portfolio.empty(getUser(username))))
         );
     }
 
@@ -49,7 +49,7 @@ public class PortfolioService {
     public PortfolioResponseDto update(PortfolioRequestDto portfolioRequestDto, UserDto userDto) {
         Portfolio portfolio = portfolioRepository.findById(portfolioRequestDto.getId())
             .orElseThrow(NoSuchPortfolioException::new);
-        User user = getUser(userDto);
+        User user = getUser(userDto.getUsername());
 
         if (!portfolio.isOwnedBy(user)) {
             throw new UnauthorizedException();
@@ -60,8 +60,8 @@ public class PortfolioService {
         return portfolioDtoAssembler.toPortfolioResponseDto(portfolio);
     }
 
-    private User getUser(UserDto userDto) {
-        return userRepository.findByBasicProfile_Name(userDto.getUsername())
+    private User getUser(String username) {
+        return userRepository.findByBasicProfile_Name(username)
             .orElseThrow(UserNotFoundException::new);
     }
 }
