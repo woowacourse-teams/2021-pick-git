@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import Chip from "../../components/@shared/Chip/Chip";
@@ -21,6 +21,7 @@ const isSearchTypeValid = (type: string | null): type is keyof typeof searchType
   type !== null && type in searchTypeIndex;
 
 const SearchPage = () => {
+  console.log("render");
   const type = new URLSearchParams(location.search).get("type");
   const defaultTabIndex = isSearchTypeValid(type) ? searchTypeIndex[type] : 0;
   const [tabIndex, setTabIndex] = useState(defaultTabIndex);
@@ -31,7 +32,8 @@ const SearchPage = () => {
     isLoading: isUserSearchLoading,
     isFetchingNextPage: isUserSearchFetchingNextPage,
     handleIntersect: handleUserSearchIntersect,
-  } = useSearchUserData();
+    refetch: refetchUserData,
+  } = useSearchUserData(tabIndex === 0);
   const {
     infinitePostsData: postSearchResults,
     isError: isPostSearchError,
@@ -39,7 +41,21 @@ const SearchPage = () => {
     isFetchingNextPage: isPostSearchFetchingNextPage,
     handleIntersect: handlePostSearchIntersect,
     formattedKeyword: postSearchKeyword,
-  } = useSearchPostData("tags");
+    refetch: refetchPostData,
+  } = useSearchPostData("tags", null, tabIndex === 1);
+
+  useEffect(() => {
+    switch (tabIndex) {
+      case 0:
+        refetchUserData();
+        break;
+      case 1:
+        refetchPostData();
+        break;
+      default:
+        break;
+    }
+  }, [tabIndex]);
 
   const SearchUserResult = () => {
     if (isUserSearchLoading) {

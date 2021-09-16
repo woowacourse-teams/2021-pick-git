@@ -11,7 +11,7 @@ import { getAPIErrorMessage, handleHTTPError } from "../../utils/error";
 import { isHttpErrorStatus } from "../../utils/typeGuard";
 import { useSearchPostResultQuery } from "../queries/search";
 
-const useSearchPostData = (type: string | null, prevData?: InfiniteData<Post[]>) => {
+const useSearchPostData = (type: string | null, prevData?: InfiniteData<Post[]> | null, activated?: boolean) => {
   const [prevKeyword, setPrevKeyword] = useState<string | null>(null);
   const { keyword } = useContext(SearchContext);
   const { pushSnackbarMessage } = useContext(SnackBarContext);
@@ -29,8 +29,8 @@ const useSearchPostData = (type: string | null, prevData?: InfiniteData<Post[]>)
     fetchNextPage,
     isFetchingNextPage,
     refetch,
-  } = useSearchPostResultQuery(type, formattedKeyword, queryKey);
-
+  } = useSearchPostResultQuery(type, formattedKeyword, queryKey, activated);
+  console.log(isLoading);
   const handleIntersect = async () => {
     if (isAllResultFetched) return;
 
@@ -38,13 +38,14 @@ const useSearchPostData = (type: string | null, prevData?: InfiniteData<Post[]>)
   };
 
   const handleDataFetch = () => {
+    console.log(infinitePostsData);
     if (!infinitePostsData) {
       return;
     }
 
     const { pages } = infinitePostsData;
 
-    if (!pages) {
+    if (!pages[0]) {
       return;
     }
 
