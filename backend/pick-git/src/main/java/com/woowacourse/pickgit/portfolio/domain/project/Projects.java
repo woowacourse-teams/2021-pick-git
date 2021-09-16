@@ -18,39 +18,43 @@ public class Projects {
         cascade = CascadeType.PERSIST,
         orphanRemoval = true
     )
-    private List<Project> value;
+    private final List<Project> values;
 
     protected Projects() {
         this(new ArrayList<>());
     }
 
-    public Projects(List<Project> value) {
-        this.value = value;
+    public Projects(List<Project> values) {
+        this.values = values;
     }
 
     public static Projects empty() {
         return new Projects(new ArrayList<>());
     }
 
-    public void update(Projects sources, Portfolio portfolio) {
-        sources.value.forEach(project -> project.appendTo(portfolio));
-
-        UpdateUtil.execute(this.value, sources.value);
-    }
-
     public void appendTo(Portfolio portfolio) {
-        this.value.forEach(project -> project.appendTo(portfolio));
+        values.forEach(project -> project.appendTo(portfolio));
     }
 
     public void add(Project project) {
-        value.add(project);
+        values.add(project);
     }
 
     public void remove(Project project) {
-        value.remove(project);
+        values.remove(project);
     }
 
-    public List<Project> getValue() {
-        return value;
+    public void update(Projects sources, Portfolio portfolio) {
+        getValues(sources).forEach(project -> project.appendTo(portfolio));
+
+        UpdateUtil.execute(this.values, sources.values);
+    }
+
+    private List<Project> getValues(Projects sources) {
+        return sources.values;
+    }
+
+    public List<Project> getValues() {
+        return values;
     }
 }

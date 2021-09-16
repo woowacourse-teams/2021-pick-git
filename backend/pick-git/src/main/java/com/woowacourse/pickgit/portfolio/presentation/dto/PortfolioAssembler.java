@@ -16,7 +16,6 @@ import com.woowacourse.pickgit.portfolio.application.dto.response.PortfolioRespo
 import com.woowacourse.pickgit.portfolio.application.dto.response.ProjectResponseDto;
 import com.woowacourse.pickgit.portfolio.application.dto.response.SectionResponseDto;
 import com.woowacourse.pickgit.portfolio.application.dto.response.TagResponseDto;
-import com.woowacourse.pickgit.portfolio.domain.section.item.Description;
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.ContactRequest;
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.DescriptionRequest;
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.ItemRequest;
@@ -35,17 +34,20 @@ import java.util.List;
 
 public class PortfolioAssembler {
 
-    public static PortfolioRequestDto of(PortfolioRequest portfolioRequest) {
-        List<ContactRequestDto> contactRequestDtos = portfolioRequest.getContacts().stream()
-            .map(PortfolioAssembler::of)
+    private PortfolioAssembler() {
+    }
+
+    public static PortfolioRequestDto toPortfolioRequestDto(PortfolioRequest portfolioRequest) {
+        List<ContactRequestDto> contactRequestsDto = portfolioRequest.getContacts().stream()
+            .map(PortfolioAssembler::toContactRequestDto)
             .collect(toList());
 
-        List<ProjectRequestDto> projectRequestDtos = portfolioRequest.getProjects().stream()
-            .map(PortfolioAssembler::of)
+        List<ProjectRequestDto> projectRequestsDto = portfolioRequest.getProjects().stream()
+            .map(PortfolioAssembler::toProjectRequestDto)
             .collect(toList());
 
-        List<SectionRequestDto> sectionRequestDtos = portfolioRequest.getSections().stream()
-            .map(PortfolioAssembler::of)
+        List<SectionRequestDto> sectionRequestsDto = portfolioRequest.getSections().stream()
+            .map(PortfolioAssembler::toSectionRequestDto)
             .collect(toList());
 
         return new PortfolioRequestDto(
@@ -53,13 +55,13 @@ public class PortfolioAssembler {
             portfolioRequest.isProfileImageShown(),
             portfolioRequest.getProfileImageUrl(),
             portfolioRequest.getIntroduction(),
-            contactRequestDtos,
-            projectRequestDtos,
-            sectionRequestDtos
+            contactRequestsDto,
+            projectRequestsDto,
+            sectionRequestsDto
         );
     }
 
-    private static ContactRequestDto of(ContactRequest contactRequest) {
+    private static ContactRequestDto toContactRequestDto(ContactRequest contactRequest) {
         return new ContactRequestDto(
             contactRequest.getId(),
             contactRequest.getCategory(),
@@ -67,9 +69,9 @@ public class PortfolioAssembler {
         );
     }
 
-    private static ProjectRequestDto of(ProjectRequest projectRequest) {
-        List<TagRequestDto> tagRequestDtos = projectRequest.getTags().stream()
-            .map(PortfolioAssembler::of)
+    private static ProjectRequestDto toProjectRequestDto(ProjectRequest projectRequest) {
+        List<TagRequestDto> tagRequestsDto = projectRequest.getTags().stream()
+            .map(PortfolioAssembler::toTagRequestDto)
             .collect(toList());
 
         return new ProjectRequestDto(
@@ -80,59 +82,61 @@ public class PortfolioAssembler {
             projectRequest.getType(),
             projectRequest.getImageUrl(),
             projectRequest.getContent(),
-            tagRequestDtos
+            tagRequestsDto
         );
     }
 
-    private static TagRequestDto of(TagRequest tagRequest) {
+    private static TagRequestDto toTagRequestDto(TagRequest tagRequest) {
         return new TagRequestDto(
             tagRequest.getId(),
             tagRequest.getName()
         );
     }
 
-    private static SectionRequestDto of(SectionRequest sectionRequest) {
-        List<ItemRequestDto> itemRequestDtos = sectionRequest.getItems().stream()
-            .map(PortfolioAssembler::of)
+    private static SectionRequestDto toSectionRequestDto(SectionRequest sectionRequest) {
+        List<ItemRequestDto> itemRequestsDto = sectionRequest.getItems().stream()
+            .map(PortfolioAssembler::toItemRequestDto)
             .collect(toList());
 
         return new SectionRequestDto(
             sectionRequest.getId(),
             sectionRequest.getName(),
-            itemRequestDtos
+            itemRequestsDto
         );
     }
 
-    private static ItemRequestDto of(ItemRequest itemRequest) {
-        List<DescriptionRequestDto> descriptionRequestDtos = itemRequest.getDescriptions().stream()
-            .map(PortfolioAssembler::of)
+    private static ItemRequestDto toItemRequestDto(ItemRequest itemRequest) {
+        List<DescriptionRequestDto> descriptionRequestsDto = itemRequest.getDescriptions().stream()
+            .map(PortfolioAssembler::toDescriptionRequestDto)
             .collect(toList());
 
         return new ItemRequestDto(
             itemRequest.getId(),
             itemRequest.getCategory(),
-            descriptionRequestDtos
+            descriptionRequestsDto
         );
     }
 
-    private static DescriptionRequestDto of(DescriptionRequest descriptionRequest) {
+    private static DescriptionRequestDto toDescriptionRequestDto(
+        DescriptionRequest descriptionRequest
+    ) {
         return new DescriptionRequestDto(
             descriptionRequest.getId(),
             descriptionRequest.getValue()
         );
     }
 
-    public static PortfolioResponse of(PortfolioResponseDto responseDto) {
+    public static PortfolioResponse toPortfolioResponse(PortfolioResponseDto responseDto) {
         List<ContactResponse> contactResponses = responseDto.getContacts().stream()
-            .map(PortfolioAssembler::of)
+            .map(PortfolioAssembler::toContactResponse)
             .collect(toList());
 
         List<ProjectResponse> projectResponses = responseDto.getProjects().stream()
-            .map(PortfolioAssembler::of)
+            .map(PortfolioAssembler::toProjectResponse)
             .collect(toList());
 
         List<SectionResponse> sectionResponses = responseDto.getSections().stream()
-            .map(PortfolioAssembler::of)
+            .map(PortfolioAssembler::toSectionResponse)
             .collect(toList());
 
         return new PortfolioResponse(
@@ -146,7 +150,7 @@ public class PortfolioAssembler {
         );
     }
 
-    private static ContactResponse of(ContactResponseDto contactResponseDto) {
+    private static ContactResponse toContactResponse(ContactResponseDto contactResponseDto) {
         return new ContactResponse(
             contactResponseDto.getId(),
             contactResponseDto.getCategory(),
@@ -154,9 +158,9 @@ public class PortfolioAssembler {
         );
     }
 
-    private static ProjectResponse of(ProjectResponseDto projectResponseDto) {
+    private static ProjectResponse toProjectResponse(ProjectResponseDto projectResponseDto) {
         List<TagResponse> tagResponses = projectResponseDto.getTags().stream()
-            .map(PortfolioAssembler::of)
+            .map(PortfolioAssembler::toTagResponse)
             .collect(toList());
 
         return new ProjectResponse(
@@ -171,16 +175,16 @@ public class PortfolioAssembler {
         );
     }
 
-    private static TagResponse of(TagResponseDto tagResponseDto) {
+    private static TagResponse toTagResponse(TagResponseDto tagResponseDto) {
         return new TagResponse(
             tagResponseDto.getId(),
             tagResponseDto.getName()
         );
     }
 
-    private static SectionResponse of(SectionResponseDto sectionResponseDto) {
+    private static SectionResponse toSectionResponse(SectionResponseDto sectionResponseDto) {
         List<ItemResponse> itemResponses = sectionResponseDto.getItems().stream()
-            .map(PortfolioAssembler::of)
+            .map(PortfolioAssembler::toItemResponse)
             .collect(toList());
 
         return new SectionResponse(
@@ -190,9 +194,9 @@ public class PortfolioAssembler {
         );
     }
 
-    private static ItemResponse of(ItemResponseDto itemResponseDto) {
+    private static ItemResponse toItemResponse(ItemResponseDto itemResponseDto) {
         List<DescriptionResponse> descriptionResponses = itemResponseDto.getDescriptions().stream()
-            .map(PortfolioAssembler::of)
+            .map(PortfolioAssembler::toDescriptionResponse)
             .collect(toList());
 
         return new ItemResponse(
@@ -202,7 +206,9 @@ public class PortfolioAssembler {
         );
     }
 
-    private static DescriptionResponse of(DescriptionResponseDto descriptionResponseDto) {
+    private static DescriptionResponse toDescriptionResponse(
+        DescriptionResponseDto descriptionResponseDto
+    ) {
         return new DescriptionResponse(
             descriptionResponseDto.getId(),
             descriptionResponseDto.getValue()

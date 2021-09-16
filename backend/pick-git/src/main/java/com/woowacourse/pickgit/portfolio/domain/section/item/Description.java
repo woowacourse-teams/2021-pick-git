@@ -35,16 +35,16 @@ public class Description implements Updatable<Description> {
         this.item = item;
     }
 
+    public void appendTo(Item item) {
+        this.item = item;
+    }
+
     public Long getId() {
         return id;
     }
 
     public String getValue() {
         return value;
-    }
-
-    public void appendTo(Item item) {
-        this.item = item;
     }
 
     @Override

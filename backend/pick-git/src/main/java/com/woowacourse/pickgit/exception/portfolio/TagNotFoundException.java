@@ -7,7 +7,7 @@ public class TagNotFoundException extends ApplicationException {
 
     private static final String ERROR_CODE = "R0003";
     private static final HttpStatus HTTP_STATUS = HttpStatus.NOT_FOUND;
-    private static final String MESSAGE = "테그를 찾을 수 없습니다.";
+    private static final String MESSAGE = "태그를 찾을 수 없습니다.";
 
     public TagNotFoundException() {
         this(ERROR_CODE, HTTP_STATUS, MESSAGE);

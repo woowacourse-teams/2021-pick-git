@@ -18,14 +18,14 @@ public class Contacts {
         cascade = CascadeType.PERSIST,
         orphanRemoval = true
     )
-    private List<Contact> contacts;
+    private final List<Contact> values;
 
     protected Contacts() {
         this(new ArrayList<>());
     }
 
-    public Contacts(List<Contact> contacts) {
-        this.contacts = contacts;
+    public Contacts(List<Contact> values) {
+        this.values = values;
     }
 
     public static Contacts empty() {
@@ -33,16 +33,20 @@ public class Contacts {
     }
 
     public void appendTo(Portfolio portfolio) {
-        this.contacts.forEach(contact -> contact.appendTo(portfolio));
+        values.forEach(contact -> contact.appendTo(portfolio));
     }
 
-    public void update(Contacts source, Portfolio portfolio) {
-        source.contacts.forEach(contact -> contact.appendTo(portfolio));
+    public void update(Contacts sources, Portfolio portfolio) {
+        getValues(sources).forEach(contact -> contact.appendTo(portfolio));
 
-        UpdateUtil.execute(this.contacts, source.contacts);
+        UpdateUtil.execute(this.values, sources.values);
     }
 
-    public List<Contact> getContacts() {
-        return contacts;
+    private List<Contact> getValues(Contacts sources) {
+        return sources.values;
+    }
+
+    public List<Contact> getValues() {
+        return values;
     }
 }

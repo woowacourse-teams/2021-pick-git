@@ -19,7 +19,8 @@ import javax.persistence.OneToMany;
 @Entity
 public class Section implements Updatable<Section> {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
@@ -76,9 +77,13 @@ public class Section implements Updatable<Section> {
 
     @Override
     public void update(Section section) {
-        this.name = section.name;
+        getItems(section).forEach(item -> item.appendTo(this));
 
-        section.items.forEach(item -> item.appendTo(this));
+        this.name = section.name;
         UpdateUtil.execute(this.items, section.items);
+    }
+
+    private List<Item> getItems(Section section) {
+        return section.items;
     }
 }

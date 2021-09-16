@@ -33,33 +33,31 @@ public class PortfolioService {
         this.userRepository = userRepository;
     }
 
+    public PortfolioResponseDto findPortfolioByUsername(String username, UserDto userDto) {
+        Optional<Portfolio> portfolio = portfolioRepository.findPortfolioByUsername(username);
+
+        if (portfolio.isEmpty() && userDto.isGuest()) {
+            throw new NoSuchPortfolioException();
+        }
+
+        return portfolioDtoAssembler.toPortfolioResponseDto(
+            portfolio.orElseGet(() -> portfolioRepository.save(Portfolio.empty(getUser(userDto))))
+        );
+    }
+
     @Transactional
     public PortfolioResponseDto update(PortfolioRequestDto portfolioRequestDto, UserDto userDto) {
         Portfolio portfolio = portfolioRepository.findById(portfolioRequestDto.getId())
             .orElseThrow(NoSuchPortfolioException::new);
+        User user = getUser(userDto);
 
-        User user = userRepository.findByBasicProfile_Name(userDto.getUsername())
-            .orElseThrow(UserNotFoundException::new);
-
-        if(!portfolio.isOwnedBy(user)) {
+        if (!portfolio.isOwnedBy(user)) {
             throw new UnauthorizedException();
         }
 
-        portfolio.update(portfolioDtoAssembler.of(portfolioRequestDto));
+        portfolio.update(portfolioDtoAssembler.toPortfolio(portfolioRequestDto));
 
-        return portfolioDtoAssembler.of(portfolio);
-    }
-
-    public PortfolioResponseDto findPortfolioByUsername(String username, UserDto userDto) {
-        Optional<Portfolio> portfolio = portfolioRepository.findPortfolioByUsername(username);
-
-        if(portfolio.isEmpty() && userDto.isGuest()) {
-            throw new NoSuchPortfolioException();
-        }
-
-        return portfolioDtoAssembler.of(portfolio
-            .orElseGet(() -> portfolioRepository.save(Portfolio.empty(getUser(userDto))))
-        );
+        return portfolioDtoAssembler.toPortfolioResponseDto(portfolio);
     }
 
     private User getUser(UserDto userDto) {

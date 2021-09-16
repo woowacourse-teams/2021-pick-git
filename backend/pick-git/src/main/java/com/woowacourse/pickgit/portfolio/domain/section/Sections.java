@@ -18,7 +18,7 @@ public class Sections {
         cascade = CascadeType.PERSIST,
         orphanRemoval = true
     )
-    private List<Section> values;
+    private final List<Section> values;
 
     protected Sections() {
         this(new ArrayList<>());
@@ -36,18 +36,22 @@ public class Sections {
         this.values.forEach(section -> section.appendTo(portfolio));
     }
 
-    public void update(Sections sources, Portfolio portfolio) {
-        sources.values.forEach(source -> source.appendTo(portfolio));
-
-        UpdateUtil.execute(this.values, sources.values);
-    }
-
     public void add(Section section) {
         values.add(section);
     }
 
     public void remove(Section section) {
         values.remove(section);
+    }
+
+    public void update(Sections sources, Portfolio portfolio) {
+        getValues(sources).forEach(source -> source.appendTo(portfolio));
+
+        UpdateUtil.execute(this.values, sources.values);
+    }
+
+    private List<Section> getValues(Sections sources) {
+        return sources.values;
     }
 
     public List<Section> getValues() {

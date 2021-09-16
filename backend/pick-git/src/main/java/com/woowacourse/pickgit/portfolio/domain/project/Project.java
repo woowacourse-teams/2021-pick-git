@@ -145,7 +145,12 @@ public class Project implements Updatable<Project> {
         this.imageUrl = project.imageUrl;
         this.content = project.content;
 
-        project.tags.forEach(tag -> tag.appendTo(this));
+        getTags(project).forEach(tag -> tag.appendTo(this));
+
         UpdateUtil.execute(this.tags, project.tags);
+    }
+
+    private List<ProjectTag> getTags(Project project) {
+        return project.tags;
     }
 }

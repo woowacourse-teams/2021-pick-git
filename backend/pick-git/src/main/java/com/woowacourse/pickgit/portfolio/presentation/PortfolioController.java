@@ -33,6 +33,20 @@ public class PortfolioController {
         this.portfolioService = portfolioService;
     }
 
+    @ForLoginAndGuestUser
+    @GetMapping("/{username}")
+    public ResponseEntity<PortfolioResponse> findPortfolioByUsername(
+        @Authenticated AppUser user,
+        @PathVariable String username
+    ) {
+        PortfolioResponseDto portfolioByUsername = portfolioService.findPortfolioByUsername(
+            username,
+            UserDto.from(user)
+        );
+
+        return ResponseEntity.ok(PortfolioAssembler.toPortfolioResponse(portfolioByUsername));
+    }
+
     @ForOnlyLoginUser
     @PutMapping
     public ResponseEntity<PortfolioResponse> update(
@@ -40,22 +54,10 @@ public class PortfolioController {
         @Valid @RequestBody PortfolioRequest request
     ) {
         PortfolioResponseDto responseDto = portfolioService.update(
-            PortfolioAssembler.of(request),
+            PortfolioAssembler.toPortfolioRequestDto(request),
             UserDto.from(user)
         );
 
-        return ResponseEntity.ok(PortfolioAssembler.of(responseDto));
-    }
-
-    @ForLoginAndGuestUser
-    @GetMapping("/{username}")
-    public ResponseEntity<PortfolioResponse> findPortfolioByUsername(
-        @Authenticated AppUser user,
-        @PathVariable String username
-    ) {
-        PortfolioResponseDto portfolioByUsername = portfolioService
-            .findPortfolioByUsername(username, UserDto.from(user));
-
-        return ResponseEntity.ok(PortfolioAssembler.of(portfolioByUsername));
+        return ResponseEntity.ok(PortfolioAssembler.toPortfolioResponse(responseDto));
     }
 }
