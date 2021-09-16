@@ -1,13 +1,11 @@
 import { useContext } from "react";
 import { useQueryClient } from "react-query";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { ThemeContext } from "styled-components";
 import { ProfileData } from "../../../@types";
 import { WARNING_MESSAGE } from "../../../constants/messages";
 import { QUERY } from "../../../constants/queries";
 import { PAGE_URL } from "../../../constants/urls";
-import SnackBarContext from "../../../contexts/SnackbarContext";
-
 import UserContext from "../../../contexts/UserContext";
 import useMessageModal from "../../../services/hooks/@common/useMessageModal";
 import useModal from "../../../services/hooks/@common/useModal";
@@ -18,7 +16,14 @@ import ProfileModificationForm from "../../ProfileModificationForm/ProfileModifi
 import Avatar from "../Avatar/Avatar";
 import Button from "../Button/Button";
 import CountIndicator from "../CountIndicator/CountIndicator";
-import { AvatarWrapper, Container, Indicators, IndicatorsWrapper } from "./ProfileHeader.style";
+import {
+  AvatarWrapper,
+  ButtonsWrapper,
+  Container,
+  Indicators,
+  IndicatorsWrapper,
+  PortfolioButtonCSS,
+} from "./ProfileHeader.style";
 
 export interface Props {
   isMyProfile: boolean;
@@ -30,6 +35,7 @@ const ProfileHeader = ({ isMyProfile, profile, username }: Props) => {
   const theme = useContext(ThemeContext);
   const { isLoggedIn } = useContext(UserContext);
   const queryClient = useQueryClient();
+  const history = useHistory();
 
   const { isModalShown, showModal, hideModal } = useModal(false);
   const { modalMessage, isModalShown: isMessageModalShown, hideMessageModal, showConfirmModal } = useMessageModal();
@@ -65,6 +71,13 @@ const ProfileHeader = ({ isMyProfile, profile, username }: Props) => {
     if (profile && profile.following !== null) {
       showConfirmModal(profile.following ? WARNING_MESSAGE.GITHUB_UNFOLLOWING : WARNING_MESSAGE.GITHUB_FOLLOWING);
     }
+  };
+
+  const handleMoveToPortfolio = () => {
+    history.push({
+      pathname: PAGE_URL.PORTFOLIO,
+      search: `username=${username}`,
+    });
   };
 
   const ProfileButton = () => {
@@ -115,7 +128,12 @@ const ProfileHeader = ({ isMyProfile, profile, username }: Props) => {
             <CountIndicator name="팔로잉" count={profile?.followingCount ?? 0} />
           </Link>
         </Indicators>
-        <ProfileButton />
+        <ButtonsWrapper>
+          <ProfileButton />
+          <Button cssProp={PortfolioButtonCSS} onClick={handleMoveToPortfolio} kind="squaredBlock">
+            포트폴리오
+          </Button>
+        </ButtonsWrapper>
       </IndicatorsWrapper>
       {isModalShown && isLoggedIn && (
         <ModalPortal onClose={hideModal} isCloseButtonShown={true}>

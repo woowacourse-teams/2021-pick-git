@@ -1,5 +1,10 @@
-import styled from "styled-components";
-import { setDesktopMediaQuery, setLaptopMediaQuery, setMobileMediaQuery } from "../../@styled/mediaQueries";
+import styled, { css } from "styled-components";
+import {
+  setDesktopMediaQuery,
+  setLaptopAboveMediaQuery,
+  setLaptopMediaQuery,
+  setMobileMediaQuery,
+} from "../../@styled/mediaQueries";
 import Button from "../Button/Button";
 import { Spinner } from "../Loader/Loader.style";
 
@@ -52,6 +57,21 @@ export const Indicators = styled.div`
   display: flex;
   justify-content: space-between;
   margin-bottom: 0.8125rem;
+`;
+
+export const ButtonsWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+
+  ${setLaptopAboveMediaQuery`
+    margin-top: 1.4375rem;
+  `}
+`;
+
+export const PortfolioButtonCSS = css`
+  background-color: ${({ theme }) => theme.color.tagItemColor};
+  margin-left: 0.75rem;
 `;
 
 export const ButtonLoader = styled(Button)`
