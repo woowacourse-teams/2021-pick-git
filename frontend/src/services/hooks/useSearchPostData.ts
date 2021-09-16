@@ -42,8 +42,9 @@ const useSearchPostData = (type: string | null, prevData?: InfiniteData<Post[]> 
     }
 
     const { pages } = infinitePostsData;
+    const [firstPage] = pages;
 
-    if (!pages[0]) {
+    if (!firstPage) {
       return;
     }
 
