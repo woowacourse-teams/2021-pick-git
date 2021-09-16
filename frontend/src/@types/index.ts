@@ -157,7 +157,16 @@ export type PortfolioSection = {
 };
 
 export type Portfolio = {
-  introduction: string;
+  intro: PortfolioIntro;
+  projects: PortfolioProject[];
+  sections: PortfolioSection[];
+};
+
+export type PortfolioData = {
+  profileImageShown: Boolean;
+  profileImageUrl: String;
+  introduction: String;
+  contacts: PortfolioContact[];
   projects: PortfolioProject[];
   sections: PortfolioSection[];
 };

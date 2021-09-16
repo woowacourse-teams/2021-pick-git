@@ -24,10 +24,11 @@ import { FAILURE_MESSAGE } from "../../constants/messages";
 
 export interface Props {
   section: PortfolioSection;
+  isEditable: boolean;
   setSection: (section: PortfolioSection) => void;
 }
 
-const PortfolioSection = ({ section, setSection }: Props) => {
+const PortfolioSection = ({ section, isEditable, setSection }: Props) => {
   const {
     portfolioSectionItems,
     updateCategory,
@@ -59,7 +60,7 @@ const PortfolioSection = ({ section, setSection }: Props) => {
   };
 
   const handleDeleteSectionItem = (sectionItemIndex: number) => {
-    if (sectionItemIndex === 0) {
+    if (portfolioSectionItems.length === 1) {
       showAlertModal(FAILURE_MESSAGE.SHOULD_HAVE_LEAST_ONE_CATEGORY);
       return;
     }
@@ -67,8 +68,12 @@ const PortfolioSection = ({ section, setSection }: Props) => {
     deleteSectionItem(sectionItemIndex);
   };
 
-  const handleDeleteDescription = (sectionItemIndex: number, descriptionIndex: number) => {
-    if (descriptionIndex === 0) {
+  const handleDeleteDescription = (
+    sectionItem: PortfolioSectionItem,
+    sectionItemIndex: number,
+    descriptionIndex: number
+  ) => {
+    if (sectionItem.descriptions.length === 1) {
       showAlertModal(FAILURE_MESSAGE.SHOULD_HAVE_LEAST_ONE_DESCRIPTION);
       return;
     }
@@ -85,13 +90,16 @@ const PortfolioSection = ({ section, setSection }: Props) => {
             onChange={handleCategoryChange(item.category)}
             cssProp={CategoryTextareaCSS}
             placeholder={PLACE_HOLDER.CATEGORY}
+            disabled={!isEditable}
             autoGrow={true}
           />
-          <CategoryDeleteIconWrapper>
-            <SVGIcon icon="DeleteCircleIcon" onClick={() => handleDeleteSectionItem(sectionIndex)} />
-          </CategoryDeleteIconWrapper>
+          {isEditable && (
+            <CategoryDeleteIconWrapper>
+              <SVGIcon icon="DeleteCircleIcon" onClick={() => handleDeleteSectionItem(sectionIndex)} />
+            </CategoryDeleteIconWrapper>
+          )}
         </Category>
-        {sectionIndex === portfolioSectionItems.length - 1 && (
+        {sectionIndex === portfolioSectionItems.length - 1 && isEditable && (
           <CategoryAddIconWrapper>
             <SVGIcon icon="AddCircleLargeIcon" onClick={handleAddBlankSectionItem} />
           </CategoryAddIconWrapper>
@@ -105,17 +113,20 @@ const PortfolioSection = ({ section, setSection }: Props) => {
                 value={description}
                 onChange={handleDescriptionChange(item.category, descriptionIndex)}
                 cssProp={DescriptionItemTextareaCSS}
-                autoGrow={true}
+                disabled={!isEditable}
                 placeholder={PLACE_HOLDER.DESCRIPTION}
+                autoGrow={true}
               />
-              <DescriptionDeleteIconWrapper>
-                <SVGIcon
-                  icon="DeleteCircleIcon"
-                  onClick={() => handleDeleteDescription(sectionIndex, descriptionIndex)}
-                />
-              </DescriptionDeleteIconWrapper>
+              {isEditable && (
+                <DescriptionDeleteIconWrapper>
+                  <SVGIcon
+                    icon="DeleteCircleIcon"
+                    onClick={() => handleDeleteDescription(item, sectionIndex, descriptionIndex)}
+                  />
+                </DescriptionDeleteIconWrapper>
+              )}
             </Description>
-            {descriptionIndex === item.descriptions.length - 1 && (
+            {descriptionIndex === item.descriptions.length - 1 && isEditable && (
               <DescriptionAddIconWrapper>
                 <SVGIcon icon="AddCircleIcon" onClick={() => handleAddBlankDescription(sectionIndex)} />
               </DescriptionAddIconWrapper>

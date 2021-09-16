@@ -16,8 +16,6 @@ const useFeedMutation = (queryKey: QueryKey) => {
   const { mutateAsync: mutateDeletePostLike } = useDeletePostLikeMutation();
   const { mutateAsync: mutateAddPostLike } = useAddPostLikeMutation();
   const { mutateAsync: mutateDeletePost, isLoading: isDeletePostLoading } = useDeletePostMutation();
-  const { mutateAsync: mutateAddComment } = useAddPostCommentMutation();
-  const { mutateAsync: mutateDeleteComment } = useDeletePostCommentMutation();
   const queryClient = useQueryClient();
 
   const infinitePostsData = queryClient.getQueryData<InfiniteData<Post[]>>(queryKey) as InfiniteData<Post[]>;
@@ -75,20 +73,6 @@ const useFeedMutation = (queryKey: QueryKey) => {
     }
   };
 
-  const addPostComment = async (postId: Post["id"], commentValue: CommentData["content"]) => {
-    const newPostsPages = [...infinitePostsData.pages];
-    const targetPost = getTargetPost(postId, newPostsPages);
-
-    if (!targetPost) {
-      return;
-    }
-
-    const newComment = await mutateAddComment({ postId, commentContent: commentValue });
-    targetPost.comments.push(newComment);
-
-    setPostsPages(newPostsPages);
-  };
-
   const deletePost = async (postId: Post["id"]) => {
     await mutateDeletePost(postId);
 
@@ -125,7 +109,6 @@ const useFeedMutation = (queryKey: QueryKey) => {
   return {
     setPostsPages,
     addPostLike,
-    addPostComment,
     deletePost,
     deletePostLike,
     isDeletePostLoading,

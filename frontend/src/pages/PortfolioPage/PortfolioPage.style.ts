@@ -34,6 +34,7 @@ export const FullPage = styled.section<{ isVerticalCenter?: boolean }>`
 
 export const UserAvatarCSS = css`
   height: 6.5625rem;
+  margin-top: 3.125rem;
 `;
 
 export const UserNameCSS = css`
@@ -57,7 +58,7 @@ export const ToggleButtonCSS = css`
 
   ${setLaptopAboveMediaQuery`
     top: 6rem;
-    right: 10rem;  
+    right: 10rem;
   `}
 `;
 
@@ -180,13 +181,22 @@ export const SectionNameCSS = css`
   `}
 `;
 
-export const DeleteButtonCSS = css`
+export const CloseButtonWrapper = styled.div`
   position: absolute;
-  bottom: 0.5rem;
+  top: 1.5rem;
   left: 1rem;
+  display: flex;
+  justify-content: flex-end;
 
-  ${setLaptopAboveMediaQuery`
-    bottom: 0.5rem;
-    left: 5rem;
+  > button:active {
+    transform: scale(0.98);
+  }
+
+  ${setLaptopMediaQuery`
+    left: 4rem;
+  `}
+
+  ${setDesktopMediaQuery`
+    left: 6rem;
   `}
 `;
