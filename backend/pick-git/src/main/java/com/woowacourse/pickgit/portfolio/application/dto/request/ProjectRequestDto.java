@@ -43,25 +43,6 @@ public class ProjectRequestDto {
         this.tags = tags;
     }
 
-    public static ProjectRequestDto of(ProjectRequest request) {
-        return ProjectRequestDto.builder()
-            .id(request.getId())
-            .name(request.getName())
-            .startDate(request.getStartDate())
-            .endDate(request.getEndDate())
-            .type(request.getType())
-            .imageUrl(request.getImageUrl())
-            .content(request.getContent())
-            .tags(getTagRequestsDto(request.getTags()))
-            .build();
-    }
-
-    private static List<TagRequestDto> getTagRequestsDto(List<TagRequest> requests) {
-        return requests.stream()
-            .map(TagRequestDto::of)
-            .collect(toList());
-    }
-
     public Long getId() {
         return id;
     }

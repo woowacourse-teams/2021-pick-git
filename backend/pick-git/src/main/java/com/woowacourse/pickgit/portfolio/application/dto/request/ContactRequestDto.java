@@ -19,14 +19,6 @@ public class ContactRequestDto {
         this.value = value;
     }
 
-    public static ContactRequestDto of(ContactRequest request) {
-        return ContactRequestDto.builder()
-            .id(request.getId())
-            .category(request.getCategory())
-            .value(request.getValue())
-            .build();
-    }
-
     public Long getId() {
         return id;
     }

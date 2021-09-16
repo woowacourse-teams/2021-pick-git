@@ -27,20 +27,6 @@ public class SectionRequestDto {
         this.items = items;
     }
 
-    public static SectionRequestDto of(SectionRequest request) {
-        return SectionRequestDto.builder()
-            .id(request.getId())
-            .name(request.getName())
-            .items(createItemRequestsDto(request.getItems()))
-            .build();
-    }
-
-    private static List<ItemRequestDto> createItemRequestsDto(List<ItemRequest> itemRequests) {
-        return itemRequests.stream()
-            .map(ItemRequestDto::of)
-            .collect(toList());
-    }
-
     public Long getId() {
         return id;
     }
