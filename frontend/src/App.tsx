@@ -31,6 +31,7 @@ const AddPostPage = lazy(() => import("./pages/AddPostPage/AddPostPage"));
 const EditPostPage = lazy(() => import("./pages/EditPostPage/EditPostPage"));
 const CommentsPage = lazy(() => import("./pages/CommentsPage/CommentsPage"));
 const PostLikePeoplePage = lazy(() => import("./pages/PostLikePeoplePage/PostLikePeoplePage"));
+const PortfolioPage = lazy(() => import("./pages/PortfolioPage/PortfolioPage"));
 
 const App = () => {
   const { currentUsername, login, logout } = useContext(UserContext);
@@ -126,6 +127,9 @@ const App = () => {
           </Route>
           <Route path={PAGE_URL.POST_LIKE_PEOPLE}>
             <PostLikePeoplePage />
+          </Route>
+          <Route path={PAGE_URL.PORTFOLIO}>
+            <PortfolioPage />
           </Route>
           <Redirect to="/" />
         </Switch>
