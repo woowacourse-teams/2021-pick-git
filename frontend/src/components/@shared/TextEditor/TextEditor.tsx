@@ -7,6 +7,7 @@ export interface TextEditorProps extends React.HTMLAttributes<HTMLTextAreaElemen
   value: string;
   autoGrow: boolean;
   cssProp?: CSSProp;
+  disabled?: boolean;
 }
 
 const TextEditor = ({ value, cssProp, autoGrow, ...props }: TextEditorProps) => {

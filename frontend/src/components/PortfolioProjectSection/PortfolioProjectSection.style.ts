@@ -49,6 +49,8 @@ export const ProjectTypeCSS = css`
   `}
 `;
 
+export const ProjectType = styled.span(() => ProjectTypeCSS);
+
 export const ProjectDateCSS = css`
   width: 7rem;
   text-align: center;

@@ -14,7 +14,10 @@ export const HeaderContentWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   width: 100%;
-  padding: 0 3rem;
+
+  ${setLaptopAboveMediaQuery`
+    padding: 0 3rem;
+  `}
 `;
 
 export const HeaderButtonsWrapper = styled.div`
