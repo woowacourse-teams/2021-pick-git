@@ -3,27 +3,21 @@ package com.woowacourse.pickgit.portfolio.presentation.dto.response;
 import lombok.Builder;
 
 @Builder
-public class ContactResponse {
+public class DescriptionResponse {
 
     private Long id;
-    private String category;
     private String value;
 
-    private ContactResponse() {
+    private DescriptionResponse() {
     }
 
-    public ContactResponse(Long id, String category, String value) {
+    public DescriptionResponse(Long id, String value) {
         this.id = id;
-        this.category = category;
         this.value = value;
     }
 
     public Long getId() {
         return id;
-    }
-
-    public String getCategory() {
-        return category;
     }
 
     public String getValue() {

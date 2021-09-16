@@ -1,5 +1,7 @@
-package com.woowacourse.pickgit.portfolio.domain;
+package com.woowacourse.pickgit.portfolio.domain.section.item;
 
+import com.woowacourse.pickgit.portfolio.domain.common.Updatable;
+import javassist.runtime.Desc;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -9,7 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class Description {
+public class Description implements Updatable<Description> {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,9 +25,17 @@ public class Description {
     protected Description() {
     }
 
+    public Description(Long id, String value) {
+        this(id, value, null);
+    }
+
     public Description(Long id, String value, Item item) {
         this.id = id;
         this.value = value;
+        this.item = item;
+    }
+
+    public void appendTo(Item item) {
         this.item = item;
     }
 
@@ -37,7 +47,8 @@ public class Description {
         return value;
     }
 
-    public Item getItem() {
-        return item;
+    @Override
+    public void update(Description description) {
+        this.value = description.value;
     }
 }

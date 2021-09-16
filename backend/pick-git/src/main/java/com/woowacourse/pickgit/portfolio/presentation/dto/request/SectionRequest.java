@@ -1,22 +1,22 @@
-package com.woowacourse.pickgit.portfolio.presentation.dto.response;
+package com.woowacourse.pickgit.portfolio.presentation.dto.request;
 
 import java.util.List;
 import lombok.Builder;
 
 @Builder
-public class SectionResponse {
+public class SectionRequest {
 
     private Long id;
     private String name;
-    private List<ItemResponse> items;
+    private List<ItemRequest> items;
 
-    private SectionResponse() {
+    private SectionRequest() {
     }
 
-    public SectionResponse(
+    public SectionRequest(
         Long id,
         String name,
-        List<ItemResponse> items
+        List<ItemRequest> items
     ) {
         this.id = id;
         this.name = name;
@@ -31,7 +31,7 @@ public class SectionResponse {
         return name;
     }
 
-    public List<ItemResponse> getItems() {
+    public List<ItemRequest> getItems() {
         return items;
     }
 }

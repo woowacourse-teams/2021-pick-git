@@ -1,7 +1,11 @@
-package com.woowacourse.pickgit.portfolio.domain;
+package com.woowacourse.pickgit.portfolio.domain.project;
 
+import com.woowacourse.pickgit.portfolio.domain.Portfolio;
+import com.woowacourse.pickgit.portfolio.domain.common.Updatable;
+import com.woowacourse.pickgit.portfolio.domain.common.UpdateUtil;
 import java.time.LocalDateTime;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
@@ -12,9 +16,10 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Persistence;
 
 @Entity
-public class Project {
+public class Project implements Updatable<Project> {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -35,14 +40,42 @@ public class Project {
 
     private String content;
 
+    @OneToMany(
+        mappedBy = "project",
+        fetch = FetchType.LAZY,
+        cascade = CascadeType.PERSIST,
+        orphanRemoval = true
+    )
+    private List<ProjectTag> tags;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "portfolio_id", nullable = false)
     private Portfolio portfolio;
 
-    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
-    private List<ProjectTag> tags;
-
     protected Project() {
+    }
+
+    public Project(
+        Long id,
+        String name,
+        LocalDateTime startDate,
+        LocalDateTime endDate,
+        String type,
+        String imageUrl,
+        String content,
+        List<ProjectTag> tags
+    ) {
+        this(
+            id,
+            name,
+            startDate,
+            endDate,
+            ProjectType.of(type),
+            imageUrl,
+            content,
+            tags,
+            null
+        );
     }
 
     public Project(
@@ -53,7 +86,8 @@ public class Project {
         ProjectType type,
         String imageUrl,
         String content,
-        List<ProjectTag> tags
+        List<ProjectTag> tags,
+        Portfolio portfolio
     ) {
         this.id = id;
         this.name = name;
@@ -63,6 +97,11 @@ public class Project {
         this.imageUrl = imageUrl;
         this.content = content;
         this.tags = tags;
+        this.portfolio = portfolio;
+    }
+
+    public void appendTo(Portfolio portfolio) {
+        this.portfolio = portfolio;
     }
 
     public Long getId() {
@@ -95,5 +134,23 @@ public class Project {
 
     public List<ProjectTag> getTags() {
         return tags;
+    }
+
+    @Override
+    public void update(Project project) {
+        this.name = project.name;
+        this.startDate = project.startDate;
+        this.endDate = project.endDate;
+        this.type = project.type;
+        this.imageUrl = project.imageUrl;
+        this.content = project.content;
+
+        getTags(project).forEach(tag -> tag.appendTo(this));
+
+        UpdateUtil.execute(this.tags, project.tags);
+    }
+
+    private List<ProjectTag> getTags(Project project) {
+        return project.tags;
     }
 }

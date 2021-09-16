@@ -1,5 +1,8 @@
-package com.woowacourse.pickgit.portfolio.domain;
+package com.woowacourse.pickgit.portfolio.domain.contact;
 
+import com.woowacourse.pickgit.portfolio.domain.Portfolio;
+import com.woowacourse.pickgit.portfolio.domain.common.Updatable;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -10,7 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class Contact {
+public class Contact implements Updatable<Contact> {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,6 +31,10 @@ public class Contact {
     protected Contact() {
     }
 
+    public Contact(Long id, String category, String value) {
+        this(id, category, value, null);
+    }
+
     public Contact(
         Long id,
         String category,
@@ -37,6 +44,10 @@ public class Contact {
         this.id = id;
         this.category = category;
         this.value = value;
+        this.portfolio = portfolio;
+    }
+
+    public void appendTo(Portfolio portfolio) {
         this.portfolio = portfolio;
     }
 
@@ -54,5 +65,28 @@ public class Contact {
 
     public Portfolio getPortfolio() {
         return portfolio;
+    }
+
+    @Override
+    public void update(Contact contact) {
+        this.category = contact.category;
+        this.value = contact.value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Contact)) {
+            return false;
+        }
+        Contact contact = (Contact) o;
+        return Objects.equals(getId(), contact.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
     }
 }
