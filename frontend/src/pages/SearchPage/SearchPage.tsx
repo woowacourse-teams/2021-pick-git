@@ -21,7 +21,6 @@ const isSearchTypeValid = (type: string | null): type is keyof typeof searchType
   type !== null && type in searchTypeIndex;
 
 const SearchPage = () => {
-  console.log("render");
   const type = new URLSearchParams(location.search).get("type");
   const defaultTabIndex = isSearchTypeValid(type) ? searchTypeIndex[type] : 0;
   const [tabIndex, setTabIndex] = useState(defaultTabIndex);
