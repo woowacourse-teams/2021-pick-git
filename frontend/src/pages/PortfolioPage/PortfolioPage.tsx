@@ -55,7 +55,7 @@ const PortfolioPage = () => {
     mutateSetPortfolio,
   } = usePortfolio(username);
   const { data: profile, isLoading: isProfileLoading } = useProfile(isMyPortfolio, currentUsername);
-  const { infinitePostsData, handleIntersect } = useUserFeed(isMyPortfolio, currentUsername);
+  const { infinitePostsData, handleIntersect, isFetchingNextPage } = useUserFeed(isMyPortfolio, currentUsername);
 
   const {
     portfolioSections,
@@ -179,21 +179,27 @@ const PortfolioPage = () => {
     return <PageLoading />;
   }
 
-  if (!remotePortfolio && !isMyPortfolio) {
-    return <div>포트폴리오를 찾을 수 없습니다</div>;
-  }
+  // if (!remotePortfolio && !isMyPortfolio) {
+  //   return <div>포트폴리오를 찾을 수 없습니다</div>;
+  // }
 
-  let targetPortfolio: Portfolio;
+  // let targetPortfolio: Portfolio;
 
-  if (!remotePortfolio) {
-    targetPortfolio = {
-      intro: portfolioIntro,
-      projects: portfolioProjects,
-      sections: portfolioSections,
-    };
-  } else {
-    targetPortfolio = remotePortfolio;
-  }
+  // if (!remotePortfolio) {
+  //   targetPortfolio = {
+  //     intro: portfolioIntro,
+  //     projects: portfolioProjects,
+  //     sections: portfolioSections,
+  //   };
+  // } else {
+  //   targetPortfolio = remotePortfolio;
+  // }
+
+  const targetPortfolio = {
+    intro: portfolioIntro,
+    projects: portfolioProjects,
+    sections: portfolioSections,
+  };
 
   return (
     <>
@@ -259,8 +265,8 @@ const PortfolioPage = () => {
             </DetailInfo>
           </ContactWrapper>
         </FullPage>
-        {targetPortfolio.projects.map((portfolioProject) => (
-          <FullPage isVerticalCenter={true}>
+        {targetPortfolio.projects.map((portfolioProject, index) => (
+          <FullPage isVerticalCenter={true} key={index}>
             <PortfolioProjectSection
               isEditable={isMyPortfolio}
               project={portfolioProject}
@@ -279,8 +285,8 @@ const PortfolioPage = () => {
             )}
           </FullPage>
         ))}
-        {targetPortfolio.sections.map((portfolioSection) => (
-          <FullPage>
+        {targetPortfolio.sections.map((portfolioSection, index) => (
+          <FullPage key={index}>
             <PortfolioTextEditor
               cssProp={SectionNameCSS}
               value={portfolioSection.name}
@@ -305,7 +311,12 @@ const PortfolioPage = () => {
         ))}
         {isModalShown && isLoggedIn && (
           <ModalPortal onClose={hideModal} isCloseButtonShown={true}>
-            <PostSelector infinitePostsData={infinitePostsData} onPostSelect={handlePostSelect} />
+            <PostSelector
+              infinitePostsData={infinitePostsData}
+              isFetchingNextPage={isFetchingNextPage}
+              onPostSelect={handlePostSelect}
+              onIntersect={handleIntersect}
+            />
           </ModalPortal>
         )}
         {isMessageModalShown && isCancelButtonShown && (
