@@ -42,6 +42,11 @@ import Button from "../../components/@shared/Button/Button";
 import useMessageModal from "../../services/hooks/@common/useMessageModal";
 import MessageModalPortal from "../../components/@layout/MessageModalPortal/MessageModalPortal";
 import usePortfolio from "../../services/hooks/usePortfolio";
+import {
+  getPortfolioLocalUpdateTime,
+  getPortfolioServerUpdateTime,
+  setPortfolioServerUpdateTime,
+} from "../../storage/storage";
 
 const PortfolioPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -63,10 +68,16 @@ const PortfolioPage = () => {
     deletePortfolioSection,
     updatePortfolioSectionName,
     setPortfolioSection,
+    setPortfolioSections,
   } = usePortfolioSections();
 
-  const { portfolioProjects, addPortfolioProject, deletePortfolioProject, updatePortfolioProject } =
-    usePortfolioProjects();
+  const {
+    portfolioProjects,
+    addPortfolioProject,
+    deletePortfolioProject,
+    updatePortfolioProject,
+    setPortfolioProjects,
+  } = usePortfolioProjects();
 
   const { isModalShown, showModal, hideModal } = useModal(false);
   const { portfolioIntro, setPortfolioIntro, updateIntroName, updateIntroDescription, updateIsProfileShown } =
@@ -122,12 +133,13 @@ const PortfolioPage = () => {
     const [firstImageUrl] = post.imageUrls;
 
     addPortfolioProject({
+      id: null,
       content: post.content,
       imageUrl: firstImageUrl,
       name: "",
       startDate: "",
       endDate: "",
-      tags: post.tags,
+      tags: post.tags.map((tagName) => ({ id: null, name: tagName })),
       type: "team",
     });
 
@@ -157,8 +169,23 @@ const PortfolioPage = () => {
     hideMessageModal();
   };
 
-  const handleUploadPortfolio = async (portfolio: Portfolio) => {
-    await mutateSetPortfolio(portfolio);
+  const handleUploadPortfolio = async () => {
+    try {
+      const portfolio = {
+        id: remotePortfolio?.id ?? null,
+        profileImageShown: portfolioIntro.isProfileShown,
+        profileImageUrl: profile?.imageUrl ?? "",
+        introduction: portfolioIntro.description,
+        contacts: portfolioIntro.contacts,
+        projects: portfolioProjects,
+        sections: portfolioSections,
+      };
+
+      await mutateSetPortfolio(portfolio);
+      setPortfolioServerUpdateTime(new Date());
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {
@@ -170,6 +197,24 @@ const PortfolioPage = () => {
       });
     }
   }, [profile]);
+
+  useEffect(() => {
+    const localUpdateTime = getPortfolioLocalUpdateTime();
+    const serverUpdateTime = getPortfolioServerUpdateTime();
+
+    if (remotePortfolio && localUpdateTime < serverUpdateTime) {
+      const intro = {
+        name: username,
+        description: remotePortfolio.introduction,
+        isProfileShown: remotePortfolio.profileImageShown,
+        contacts: [...remotePortfolio.contacts],
+      };
+
+      setPortfolioIntro(intro);
+      setPortfolioProjects(remotePortfolio.projects);
+      setPortfolioSections(remotePortfolio.sections);
+    }
+  }, [remotePortfolio]);
 
   if (!isLoggedIn) {
     return <Redirect to={PAGE_URL.HOME} />;
@@ -183,18 +228,6 @@ const PortfolioPage = () => {
     return <div>포트폴리오를 찾을 수 없습니다</div>;
   }
 
-  let targetPortfolio: Portfolio;
-
-  if (!remotePortfolio) {
-    targetPortfolio = {
-      intro: portfolioIntro,
-      projects: portfolioProjects,
-      sections: portfolioSections,
-    };
-  } else {
-    targetPortfolio = remotePortfolio;
-  }
-
   return (
     <>
       <ScrollActiveHeader containerRef={containerRef}>
@@ -202,7 +235,7 @@ const PortfolioPage = () => {
           isButtonsShown={isMyPortfolio}
           onAddPortfolioSection={handleAddSection}
           onAddPortfolioProject={handleAddProject}
-          onUploadPortfolio={() => handleUploadPortfolio(targetPortfolio)}
+          onUploadPortfolio={handleUploadPortfolio}
         />
       </ScrollActiveHeader>
       <Container ref={containerRef}>
@@ -211,17 +244,17 @@ const PortfolioPage = () => {
             <ToggleButton
               toggleButtonText="프로필 사진 보이기"
               cssProp={ToggleButtonCSS}
-              isToggled={targetPortfolio.intro.isProfileShown}
-              onToggle={() => updateIsProfileShown(!targetPortfolio.intro.isProfileShown)}
+              isToggled={portfolioIntro.isProfileShown}
+              onToggle={() => updateIsProfileShown(!portfolioIntro.isProfileShown)}
             />
           )}
           <AvatarWrapper>
-            {targetPortfolio.intro.isProfileShown && (
+            {portfolioIntro.isProfileShown && (
               <Avatar diameter="6.5625rem" fontSize="1.5rem" imageUrl={profile?.imageUrl} cssProp={UserAvatarCSS} />
             )}
             <PortfolioTextEditor
               cssProp={UserNameCSS}
-              value={targetPortfolio.intro.name}
+              value={portfolioIntro.name}
               onChange={handleIntroNameUpdate}
               disabled={!isMyPortfolio}
               placeholder={PLACE_HOLDER.INTRO_NAME}
@@ -230,7 +263,7 @@ const PortfolioPage = () => {
           </AvatarWrapper>
           <PortfolioTextEditor
             cssProp={DescriptionCSS}
-            value={targetPortfolio.intro.description}
+            value={portfolioIntro.description}
             onChange={handleIntroDescriptionUpdate}
             disabled={!isMyPortfolio}
             placeholder={PLACE_HOLDER.INTRO_DESCRIPTION}
@@ -259,8 +292,9 @@ const PortfolioPage = () => {
             </DetailInfo>
           </ContactWrapper>
         </FullPage>
-        {targetPortfolio.projects.map((portfolioProject) => (
-          <FullPage isVerticalCenter={true}>
+        {/* TODO: remove index from key prop */}
+        {portfolioProjects.map((portfolioProject, i) => (
+          <FullPage isVerticalCenter={true} key={i}>
             <PortfolioProjectSection
               isEditable={isMyPortfolio}
               project={portfolioProject}
@@ -279,8 +313,9 @@ const PortfolioPage = () => {
             )}
           </FullPage>
         ))}
-        {targetPortfolio.sections.map((portfolioSection) => (
-          <FullPage>
+        {/* TODO: remove index from key prop */}
+        {portfolioSections.map((portfolioSection, i) => (
+          <FullPage key={i}>
             <PortfolioTextEditor
               cssProp={SectionNameCSS}
               value={portfolioSection.name}

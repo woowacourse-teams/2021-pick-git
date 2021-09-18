@@ -7,8 +7,14 @@ const usePortfolioSectionItem = (
   const addBlankSectionItem = () => {
     const newPortfolioSection = { ...portfolioSection };
     newPortfolioSection.items.push({
+      id: null,
       category: "",
-      descriptions: [""],
+      descriptions: [
+        {
+          id: null,
+          value: "",
+        },
+      ],
     });
 
     setPortfolioSection(newPortfolioSection);
@@ -16,7 +22,7 @@ const usePortfolioSectionItem = (
 
   const addBlankDescription = (sectionItemIndex: number) => {
     const newPortfolioSection = { ...portfolioSection };
-    newPortfolioSection.items[sectionItemIndex].descriptions.push("");
+    newPortfolioSection.items[sectionItemIndex].descriptions.push({ id: null, value: "" });
     setPortfolioSection(newPortfolioSection);
   };
 
@@ -47,7 +53,7 @@ const usePortfolioSectionItem = (
       return;
     }
 
-    targetSectionItem.descriptions[descriptionIndex] = newDescription;
+    targetSectionItem.descriptions[descriptionIndex].value = newDescription;
     setPortfolioSection(newPortfolioSection);
   };
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const useLocalStorage = <T>(key: string) => {
+const useLocalStorage = <T>(key: string, initialValue: T) => {
   const isItemExist = (item: string | null): item is string => {
     return item !== null;
   };
@@ -13,7 +13,7 @@ const useLocalStorage = <T>(key: string) => {
     return JSON.parse(item);
   };
 
-  const [itemState, setItemState] = useState<T | undefined>(getLocalStorageItem(key));
+  const [itemState, setItemState] = useState<T>(getLocalStorageItem(key) ?? initialValue);
 
   const setItem = (item: T) => {
     setItemState(item);

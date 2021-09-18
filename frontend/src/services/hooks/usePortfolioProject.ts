@@ -41,7 +41,7 @@ const usePortfolioProject = (
 
   const deleteTag = (targetTag: string) => {
     const newPortfolioProject = { ...portfolioProject };
-    const targetTagIndex = newPortfolioProject.tags.findIndex((tag) => tag === targetTag);
+    const targetTagIndex = newPortfolioProject.tags.findIndex((tag) => tag.name === targetTag);
     if (targetTagIndex === -1) {
       return;
     }
