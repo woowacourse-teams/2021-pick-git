@@ -81,8 +81,9 @@ const PortfolioSection = ({ section, isEditable, setSection }: Props) => {
     deleteDescription(sectionItemIndex, descriptionIndex);
   };
 
+  // TODO: remove index from key prop
   const categoryItems = portfolioSectionItems.map((item, sectionIndex) => (
-    <SectionContentWrapper>
+    <SectionContentWrapper key={sectionIndex}>
       <CategoriesWrapper>
         <Category>
           <PortfolioTextEditor
@@ -110,7 +111,7 @@ const PortfolioSection = ({ section, isEditable, setSection }: Props) => {
           <>
             <Description>
               <PortfolioTextEditor
-                value={description}
+                value={description.value}
                 onChange={handleDescriptionChange(item.category, descriptionIndex)}
                 cssProp={DescriptionItemTextareaCSS}
                 disabled={!isEditable}
