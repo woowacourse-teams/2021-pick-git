@@ -8,23 +8,25 @@ import com.woowacourse.pickgit.post.domain.util.PlatformRepositoryApiRequester;
 import com.woowacourse.pickgit.post.domain.util.PlatformRepositoryExtractor;
 import com.woowacourse.pickgit.post.domain.util.dto.RepositoryNameAndUrl;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 @Component
 public class GithubRepositoryExtractor implements PlatformRepositoryExtractor {
 
-    private static final String API_URL_FORMAT = "https://api.github.com/users/%s/repos?page=%d&per_page=%d";
-
     private final ObjectMapper objectMapper;
     private final PlatformRepositoryApiRequester platformRepositoryApiRequester;
+    private final String apiUrlFormatForRepository;
 
     public GithubRepositoryExtractor(
         ObjectMapper objectMapper,
-        PlatformRepositoryApiRequester platformRepositoryApiRequester
+        PlatformRepositoryApiRequester platformRepositoryApiRequester,
+        @Value("${github.repository.format-url}") String apiUrlFormatForRepository
     ) {
         this.objectMapper = objectMapper;
         this.platformRepositoryApiRequester = platformRepositoryApiRequester;
+        this.apiUrlFormatForRepository = apiUrlFormatForRepository;
     }
 
     @Override
@@ -37,7 +39,7 @@ public class GithubRepositoryExtractor implements PlatformRepositoryExtractor {
 
     private String generateApiUrl(String username, Pageable pageable) {
         return String
-            .format(API_URL_FORMAT, username, pageable.getPageNumber() + 1, pageable.getPageSize());
+            .format(apiUrlFormatForRepository, username, pageable.getPageNumber() + 1, pageable.getPageSize());
     }
 
     private List<RepositoryNameAndUrl> parseToRepositories(String response) {

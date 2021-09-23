@@ -9,24 +9,24 @@ import com.woowacourse.pickgit.post.domain.util.PlatformRepositorySearchExtracto
 import com.woowacourse.pickgit.post.domain.util.dto.RepositoryNameAndUrl;
 import com.woowacourse.pickgit.post.infrastructure.dto.RepositoryItemDto;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class GithubRepositorySearchExtractor implements PlatformRepositorySearchExtractor {
 
-    private static final String API_URL_FORMAT =
-        "https://api.github.com/search/repositories?"
-            + "q=user:%s %s in:name fork:true&page=%d&per_page=%d";
-
     private final ObjectMapper objectMapper;
     private final PlatformRepositoryApiRequester platformRepositoryApiRequester;
+    private final String apiUrlFormatForSearchRepository;
 
     public GithubRepositorySearchExtractor(
         ObjectMapper objectMapper,
-        PlatformRepositoryApiRequester platformRepositoryApiRequester
+        PlatformRepositoryApiRequester platformRepositoryApiRequester,
+        @Value("${github.repository.search.format-url}") String apiUrlFormatForSearchRepository
     ) {
         this.objectMapper = objectMapper;
         this.platformRepositoryApiRequester = platformRepositoryApiRequester;
+        this.apiUrlFormatForSearchRepository = apiUrlFormatForSearchRepository;
     }
 
     @Override
@@ -54,7 +54,7 @@ public class GithubRepositorySearchExtractor implements PlatformRepositorySearch
     ) {
 
         return String.format(
-            API_URL_FORMAT,
+            apiUrlFormatForSearchRepository,
             username,
             keyword,
             page,

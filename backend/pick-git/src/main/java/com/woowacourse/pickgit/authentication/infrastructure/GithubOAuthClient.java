@@ -34,13 +34,15 @@ public class GithubOAuthClient implements OAuthClient {
     @Value("${security.github.url.access-token}")
     private String accessTokenUrl;
 
+    @Value("${security.github.url.oauth-login-format")
+    private String oauthLoginUrlFormat;
+
+    @Value("${security.github.url.user-profile}")
+    private String githubProfileUrl;
+
     @Override
     public String getLoginUrl() {
-        return String.format("https://github.com/login/oauth/authorize"
-                + "?client_id=%s"
-                + "&redirect_uri=%s"
-                + "&scope=%s",
-            clientId, redirectUrl, scope);
+        return String.format(oauthLoginUrlFormat, clientId, redirectUrl, scope);
     }
 
     @Override
@@ -73,7 +75,7 @@ public class GithubOAuthClient implements OAuthClient {
 
         RestTemplate restTemplate = new RestTemplate();
         return restTemplate
-            .exchange("https://api.github.com/user", HttpMethod.GET, httpEntity, OAuthProfileResponse.class)
+            .exchange(githubProfileUrl, HttpMethod.GET, httpEntity, OAuthProfileResponse.class)
             .getBody();
     }
 }

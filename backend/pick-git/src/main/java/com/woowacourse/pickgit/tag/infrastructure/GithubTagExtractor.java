@@ -9,22 +9,26 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class GithubTagExtractor implements PlatformTagExtractor {
 
-    private static final String GITHUB_TAG_API_FORMAT
-        = "https://api.github.com/repos/%s/%s/languages";
     private static final String OTHER_TAG = "Other";
 
     private final PlatformTagApiRequester platformTagApiRequester;
     private final ObjectMapper objectMapper;
+    private final String apiUrlFormatForTag;
 
-    public GithubTagExtractor(PlatformTagApiRequester platformTagApiRequester,
-        ObjectMapper objectMapper) {
+    public GithubTagExtractor(
+        PlatformTagApiRequester platformTagApiRequester,
+        ObjectMapper objectMapper,
+        @Value("${github.tag.format-url}") String apiUrlFormatForTag
+    ) {
         this.platformTagApiRequester = platformTagApiRequester;
         this.objectMapper = objectMapper;
+        this.apiUrlFormatForTag = apiUrlFormatForTag;
     }
 
     public List<String> extractTags(String accessToken, String userName, String repositoryName) {
@@ -34,7 +38,7 @@ public class GithubTagExtractor implements PlatformTagExtractor {
     }
 
     private String generateApiUrl(String userName, String repositoryName) {
-        return String.format(GITHUB_TAG_API_FORMAT, userName, repositoryName);
+        return String.format(apiUrlFormatForTag, userName, repositoryName);
     }
 
     private List<String> parseResponseIntoLanguageTags(String response) {

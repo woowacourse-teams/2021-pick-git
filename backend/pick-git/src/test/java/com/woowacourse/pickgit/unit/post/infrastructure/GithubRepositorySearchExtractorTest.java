@@ -28,9 +28,10 @@ public class GithubRepositorySearchExtractorTest {
 
     @BeforeEach
     void setUp() {
-        this.platformRepositorySearchExtractor =
-            new GithubRepositorySearchExtractor(
-                objectMapper, new MockRepositoryApiRequester()
+        this.platformRepositorySearchExtractor = new GithubRepositorySearchExtractor(
+                objectMapper,
+                new MockRepositoryApiRequester(),
+            "https://api.github.com/search/repositories?q=user:%s %s in:name fork:true&page=%d&per_page=%d"
             );
     }
 
