@@ -113,7 +113,8 @@ jacocoTestReport {
                             '**/*S3*',
                             '**/*DataSource*',
                             '**/*Slave*',
-                            '**/portfolio*'
+                            '**/portfolio*',
+                            '**/*UpdateUtil*'
                     ])
         }))
     }
@@ -153,7 +154,8 @@ jacocoTestCoverageVerification {
                     '**.*Project*',
                     '**.*Section*',
                     '**.*Description*',
-                    '**.*Item*'
+                    '**.*Item*',
+                    '**.*UpdateUtil*'
             ]
         }
     }
