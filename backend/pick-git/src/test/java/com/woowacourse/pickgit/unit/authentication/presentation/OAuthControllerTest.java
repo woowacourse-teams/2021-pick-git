@@ -36,7 +36,7 @@ class OAuthControllerTest {
     @MockBean
     private OAuthService oAuthService;
 
-    @DisplayName("Github 로그인 요청을 하면 Github 인증 URL을 반환한다.")
+    @DisplayName("OAuth 로그인 - Github 로그인 요청을 하면 Github 인증 URL을 반환한다.")
     @Test
     void authorizationGithubUrl_InvalidAccount_GithubUrl() throws Exception {
         // given
@@ -58,7 +58,7 @@ class OAuthControllerTest {
         ));
     }
 
-    @DisplayName("Github 로그인 인증 후 토큰을 발행하여 반환한다.")
+    @DisplayName("OAuth 로그인 - Github 로그인 인증 후 토큰을 발행하여 반환한다.")
     @Test
     void afterAuthorizeGithubLogin_ValidAccount_JWTToken() throws Exception {
         // given
