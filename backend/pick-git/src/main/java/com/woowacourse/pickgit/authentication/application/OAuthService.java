@@ -69,9 +69,8 @@ public class OAuthService {
         GithubProfile latestGithubProfile = githubProfileResponse.toGithubProfile();
 
         userRepository.findByBasicProfile_Name(githubProfileResponse.getName())
-            .ifPresentOrElse(user -> {
-                user.changeGithubProfile(latestGithubProfile);
-            }, () -> {
+            .ifPresentOrElse(user -> user.changeGithubProfile(latestGithubProfile),
+                () -> {
                 BasicProfile basicProfile = githubProfileResponse.toBasicProfile();
                 User user = new User(basicProfile, latestGithubProfile);
                 userRepository.save(user);

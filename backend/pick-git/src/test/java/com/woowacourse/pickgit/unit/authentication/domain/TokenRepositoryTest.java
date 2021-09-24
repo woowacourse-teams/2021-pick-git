@@ -42,8 +42,8 @@ class TokenRepositoryTest {
         Optional<Token> findToken = tokenRepository.findById(savedToken.getId());
 
         // then
-        assertThat(findToken.isPresent()).isTrue();
-        assertThat(findToken.get()).isEqualTo(savedToken);
+        assertThat(findToken).isPresent();
+        assertThat(findToken).contains(savedToken);
     }
 
     @Test
@@ -57,7 +57,7 @@ class TokenRepositoryTest {
         tokenRepository.deleteById(savedToken.getId());
 
         // then
-        assertThat(tokenRepository.findById(savedToken.getId()).isPresent())
-            .isFalse();
+        assertThat(tokenRepository.findById(savedToken.getId()))
+            .isNotPresent();
     }
 }
