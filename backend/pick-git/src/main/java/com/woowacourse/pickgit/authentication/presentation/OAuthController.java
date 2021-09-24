@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 @CrossOrigin(value = "*")
 public class OAuthController {
+    private static final int COOKIE_MAX_AGE = 2628000;
 
     private final OAuthService oauthService;
 
@@ -67,7 +68,7 @@ public class OAuthController {
         refreshCookie.setPath("/");
         refreshCookie.setSecure(true);
         refreshCookie.setHttpOnly(true);
-        refreshCookie.setMaxAge(2628000);
+        refreshCookie.setMaxAge(COOKIE_MAX_AGE);
         return refreshCookie;
     }
 }

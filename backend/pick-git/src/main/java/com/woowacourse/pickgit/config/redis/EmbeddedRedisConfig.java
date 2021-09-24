@@ -14,6 +14,9 @@ import redis.embedded.RedisServer;
 @Profile("!prod")
 @Configuration
 public class EmbeddedRedisConfig {
+    private static final String BIN_SH = "/bin/sh";
+    private static final String BIN_SH_OPTION = "-c";
+    private static final String COMMAND = "netstat -nat | grep LISTEN|grep %d";
 
     @Value("${spring.redis.port}")
     private int redisPort;
@@ -51,8 +54,8 @@ public class EmbeddedRedisConfig {
     }
 
     private Process executeGrepProcessCommand(int port) throws IOException {
-        String command = String.format("netstat -nat | grep LISTEN|grep %d", port);
-        String[] shell = {"/bin/sh", "-c", command};
+        String command = String.format(COMMAND, port);
+        String[] shell = {BIN_SH, BIN_SH_OPTION, command};
         return Runtime.getRuntime().exec(shell);
     }
 
