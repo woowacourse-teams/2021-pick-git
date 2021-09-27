@@ -27,9 +27,7 @@ public class PortfolioController {
 
     private final PortfolioService portfolioService;
 
-    public PortfolioController(
-        PortfolioService portfolioService
-    ) {
+    public PortfolioController(PortfolioService portfolioService) {
         this.portfolioService = portfolioService;
     }
 
