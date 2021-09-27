@@ -30,15 +30,18 @@ import com.woowacourse.pickgit.portfolio.domain.section.item.Item;
 import com.woowacourse.pickgit.tag.domain.Tag;
 import com.woowacourse.pickgit.tag.domain.TagRepository;
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PortfolioDtoAssembler {
 
-    private final TagRepository tagRepository;
+    @PersistenceContext
+    private final EntityManager entityManager;
 
-    public PortfolioDtoAssembler(TagRepository tagRepository) {
-        this.tagRepository = tagRepository;
+    public PortfolioDtoAssembler(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 
     public Portfolio toPortfolio(PortfolioRequestDto portfolioRequestDto) {
@@ -95,8 +98,7 @@ public class PortfolioDtoAssembler {
     }
 
     private ProjectTag toTag(TagRequestDto tagRequestDto) {
-        Tag tag = tagRepository.findById(tagRequestDto.getId())
-            .orElseThrow(TagNotFoundException::new);
+        Tag tag = entityManager.getReference(Tag.class, tagRequestDto.getId());
 
         return new ProjectTag(
             tagRequestDto.getId(),
