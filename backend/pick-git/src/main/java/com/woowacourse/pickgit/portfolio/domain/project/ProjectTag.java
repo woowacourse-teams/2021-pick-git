@@ -59,6 +59,6 @@ public class ProjectTag implements Updatable<ProjectTag> {
 
     @Override
     public void update(ProjectTag projectTag) {
-        this.tag = projectTag.tag;
+        this.tag = projectTag.getTag();
     }
 }

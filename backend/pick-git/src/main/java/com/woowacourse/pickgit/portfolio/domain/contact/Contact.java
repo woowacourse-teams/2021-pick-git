@@ -69,8 +69,8 @@ public class Contact implements Updatable<Contact> {
 
     @Override
     public void update(Contact contact) {
-        this.category = contact.category;
-        this.value = contact.value;
+        this.category = contact.getCategory();
+        this.value = contact.getValue();
     }
 
     @Override

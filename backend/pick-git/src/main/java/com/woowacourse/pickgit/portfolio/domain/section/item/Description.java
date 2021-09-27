@@ -49,6 +49,6 @@ public class Description implements Updatable<Description> {
 
     @Override
     public void update(Description description) {
-        this.value = description.value;
+        this.value = description.getValue();
     }
 }

@@ -82,12 +82,8 @@ public class Item implements Updatable<Item> {
 
     @Override
     public void update(Item item) {
-        getDescriptions(item).forEach(description -> description.appendTo(this));
+        item.getDescriptions().forEach(description -> description.appendTo(this));
 
-        UpdateUtil.execute(item.descriptions, this.descriptions);
-    }
-
-    private List<Description> getDescriptions(Item item) {
-        return item.descriptions;
+        UpdateUtil.execute(item.getDescriptions(), this.getDescriptions());
     }
 }

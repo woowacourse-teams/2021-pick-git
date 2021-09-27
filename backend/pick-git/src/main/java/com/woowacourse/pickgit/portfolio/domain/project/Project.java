@@ -138,19 +138,15 @@ public class Project implements Updatable<Project> {
 
     @Override
     public void update(Project project) {
-        this.name = project.name;
-        this.startDate = project.startDate;
-        this.endDate = project.endDate;
-        this.type = project.type;
-        this.imageUrl = project.imageUrl;
-        this.content = project.content;
+        this.name = project.getName();
+        this.startDate = project.getStartDate();
+        this.endDate = project.getEndDate();
+        this.type = project.getType();
+        this.imageUrl = project.getImageUrl();
+        this.content = project.getContent();
 
-        getTags(project).forEach(tag -> tag.appendTo(this));
+        project.getTags().forEach(tag -> tag.appendTo(this));
 
-        UpdateUtil.execute(this.tags, project.tags);
-    }
-
-    private List<ProjectTag> getTags(Project project) {
-        return project.tags;
+        UpdateUtil.execute(this.getTags(), project.getTags());
     }
 }

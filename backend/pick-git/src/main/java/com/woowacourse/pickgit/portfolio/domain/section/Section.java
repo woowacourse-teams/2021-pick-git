@@ -77,13 +77,9 @@ public class Section implements Updatable<Section> {
 
     @Override
     public void update(Section section) {
-        getItems(section).forEach(item -> item.appendTo(this));
+        section.getItems().forEach(item -> item.appendTo(this));
 
         this.name = section.name;
-        UpdateUtil.execute(this.items, section.items);
-    }
-
-    private List<Item> getItems(Section section) {
-        return section.items;
+        UpdateUtil.execute(this.items, section.getItems());
     }
 }
