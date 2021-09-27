@@ -33,7 +33,7 @@ public class Projects {
     }
 
     public void appendTo(Portfolio portfolio) {
-        values.forEach(project -> project.appendTo(portfolio));
+        this.getValues().forEach(project -> project.appendTo(portfolio));
     }
 
     public void add(Project project) {
@@ -45,13 +45,9 @@ public class Projects {
     }
 
     public void update(Projects sources, Portfolio portfolio) {
-        getValues(sources).forEach(project -> project.appendTo(portfolio));
+        this.getValues().forEach(project -> project.appendTo(portfolio));
 
-        UpdateUtil.execute(this.values, sources.values);
-    }
-
-    private List<Project> getValues(Projects sources) {
-        return sources.values;
+        UpdateUtil.execute(this.getValues(), sources.getValues());
     }
 
     public List<Project> getValues() {
