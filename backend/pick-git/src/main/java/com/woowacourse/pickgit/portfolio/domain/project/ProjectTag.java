@@ -64,6 +64,16 @@ public class ProjectTag implements Updatable<ProjectTag> {
     }
 
     @Override
+    public boolean semanticallyEquals(Object o) {
+        return this.getTag().equals(o);
+    }
+
+    @Override
+    public int semanticallyHashcode() {
+        return this.getTag().hashCode();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;

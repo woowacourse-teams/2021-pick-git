@@ -85,6 +85,16 @@ public class Section implements Updatable<Section> {
     }
 
     @Override
+    public boolean semanticallyEquals(Object o) {
+        return equals(o);
+    }
+
+    @Override
+    public int semanticallyHashcode() {
+        return hashCode();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
