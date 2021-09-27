@@ -5,6 +5,7 @@ import com.woowacourse.pickgit.portfolio.domain.common.Updatable;
 import com.woowacourse.pickgit.portfolio.domain.common.UpdateUtil;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -148,5 +149,22 @@ public class Project implements Updatable<Project> {
         project.getTags().forEach(tag -> tag.appendTo(this));
 
         UpdateUtil.execute(this.getTags(), project.getTags());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Project)) {
+            return false;
+        }
+        Project project = (Project) o;
+        return Objects.equals(id, project.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

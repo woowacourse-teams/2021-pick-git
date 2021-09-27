@@ -4,6 +4,7 @@ import com.woowacourse.pickgit.portfolio.domain.contact.Contacts;
 import com.woowacourse.pickgit.portfolio.domain.project.Projects;
 import com.woowacourse.pickgit.portfolio.domain.section.Sections;
 import com.woowacourse.pickgit.user.domain.User;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -142,5 +143,22 @@ public class Portfolio {
 
     public Sections getSections() {
         return sections;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if ((o instanceof Portfolio)) {
+            return false;
+        }
+        Portfolio portfolio = (Portfolio) o;
+        return Objects.equals(id, portfolio.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

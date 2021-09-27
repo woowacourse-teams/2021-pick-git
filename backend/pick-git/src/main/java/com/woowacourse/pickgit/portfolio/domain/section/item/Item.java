@@ -8,6 +8,7 @@ import com.woowacourse.pickgit.portfolio.domain.common.UpdateUtil;
 import com.woowacourse.pickgit.portfolio.domain.section.Section;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -85,5 +86,22 @@ public class Item implements Updatable<Item> {
         item.getDescriptions().forEach(description -> description.appendTo(this));
 
         UpdateUtil.execute(item.getDescriptions(), this.getDescriptions());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Item)) {
+            return false;
+        }
+        Item item = (Item) o;
+        return Objects.equals(id, item.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

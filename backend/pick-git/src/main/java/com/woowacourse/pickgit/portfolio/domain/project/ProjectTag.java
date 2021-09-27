@@ -2,6 +2,7 @@ package com.woowacourse.pickgit.portfolio.domain.project;
 
 import com.woowacourse.pickgit.portfolio.domain.common.Updatable;
 import com.woowacourse.pickgit.tag.domain.Tag;
+import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -60,5 +61,22 @@ public class ProjectTag implements Updatable<ProjectTag> {
     @Override
     public void update(ProjectTag projectTag) {
         this.tag = projectTag.getTag();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ProjectTag)) {
+            return false;
+        }
+        ProjectTag that = (ProjectTag) o;
+        return Objects.equals(id, that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
