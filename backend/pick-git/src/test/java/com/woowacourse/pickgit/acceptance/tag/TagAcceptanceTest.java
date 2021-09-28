@@ -34,8 +34,11 @@ class TagAcceptanceTest extends AcceptanceTest {
         accessToken = tokenResponse.getToken();
     }
 
-    private ExtractableResponse<Response> requestTags(String accessToken, String url,
-        HttpStatus httpStatus) {
+    private ExtractableResponse<Response> requestTags(
+        String accessToken,
+        String url,
+        HttpStatus httpStatus
+    ) {
         return RestAssured.given().log().all()
             .auth().oauth2(accessToken)
             .when().get(url)
