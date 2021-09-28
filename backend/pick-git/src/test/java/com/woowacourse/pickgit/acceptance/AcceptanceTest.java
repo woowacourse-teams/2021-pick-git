@@ -27,13 +27,13 @@ public abstract class AcceptanceTest {
         setPort();
     }
 
+    private void setPort() {
+        RestAssured.port = port;
+    }
+
     @AfterEach
     void tearDown() {
         clearDataBase();
-    }
-
-    private void setPort() {
-        RestAssured.port = port;
     }
 
     private void clearDataBase() {

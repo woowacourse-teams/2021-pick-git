@@ -25,17 +25,17 @@ public class DatabaseCleaner implements InitializingBean {
     @Override
     public void afterPropertiesSet() {
         entityManager.unwrap(Session.class)
-                .doWork(this::extractTableNames);
+            .doWork(this::extractTableNames);
     }
 
     private void extractTableNames(Connection conn) throws SQLException {
         List<String> tableNames = new ArrayList<>();
 
         ResultSet tables = conn
-                .getMetaData()
-                .getTables(conn.getCatalog(), null, "%", new String[]{"TABLE"});
+            .getMetaData()
+            .getTables(conn.getCatalog(), null, "%", new String[]{"TABLE"});
 
-        while(tables.next()) {
+        while (tables.next()) {
             tableNames.add(tables.getString("table_name"));
         }
 
@@ -44,7 +44,7 @@ public class DatabaseCleaner implements InitializingBean {
 
     public void execute() {
         entityManager.unwrap(Session.class)
-                .doWork(this::cleanUpDatabase);
+            .doWork(this::cleanUpDatabase);
     }
 
     private void cleanUpDatabase(Connection conn) throws SQLException {
