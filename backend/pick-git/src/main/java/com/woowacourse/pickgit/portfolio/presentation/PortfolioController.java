@@ -33,16 +33,13 @@ public class PortfolioController {
 
     @ForLoginAndGuestUser
     @GetMapping("/{username}")
-    public ResponseEntity<PortfolioResponse> findPortfolioByUsername(
+    public ResponseEntity<PortfolioResponse> read(
         @Authenticated AppUser user,
         @PathVariable String username
     ) {
-        PortfolioResponseDto portfolioByUsername = portfolioService.findPortfolioByUsername(
-            username,
-            UserDto.from(user)
-        );
+        PortfolioResponseDto responseDto = portfolioService.read(username, UserDto.from(user));
 
-        return ResponseEntity.ok(PortfolioAssembler.toPortfolioResponse(portfolioByUsername));
+        return ResponseEntity.ok(PortfolioAssembler.toPortfolioResponse(responseDto));
     }
 
     @ForOnlyLoginUser

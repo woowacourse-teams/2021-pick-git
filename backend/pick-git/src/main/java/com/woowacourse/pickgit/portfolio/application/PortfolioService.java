@@ -33,10 +33,10 @@ public class PortfolioService {
         this.userRepository = userRepository;
     }
 
-    public PortfolioResponseDto findPortfolioByUsername(String username, UserDto userDto) {
+    public PortfolioResponseDto read(String username, UserDto userDto) {
         Optional<Portfolio> portfolio = portfolioRepository.findPortfolioByUsername(username);
 
-        if (portfolio.isEmpty() && userDto.isGuest()) {
+        if (userDto.isGuest() && portfolio.isEmpty()) {
             throw new NoSuchPortfolioException();
         }
 
