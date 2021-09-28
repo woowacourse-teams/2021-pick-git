@@ -312,9 +312,8 @@ class PostAcceptanceTest extends AcceptanceTest {
             .extract();
     }
 
-    private ExtractableResponse<Response> requestToWritePostApi(String token,
-        HttpStatus httpStatus) {
-        return given().log().all()
+    private void requestToWritePostApi(String token, HttpStatus httpStatus) {
+        given().log().all()
             .auth().oauth2(token)
             .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
             .formParams(request)
@@ -423,7 +422,7 @@ class PostAcceptanceTest extends AcceptanceTest {
             });
 
         // then
-        assertThat(unlikePostResponse.getLikesCount()).isEqualTo(0);
+        assertThat(unlikePostResponse.getLikesCount()).isZero();
         assertThat(unlikePostResponse.getLiked()).isFalse();
     }
 
