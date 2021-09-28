@@ -17,16 +17,16 @@ public class GithubRepositorySearchExtractor implements PlatformRepositorySearch
 
     private final ObjectMapper objectMapper;
     private final PlatformRepositoryApiRequester platformRepositoryApiRequester;
-    private final String apiUrlFormatForSearchRepository;
+    private final String apiBaseUrl;
 
     public GithubRepositorySearchExtractor(
         ObjectMapper objectMapper,
         PlatformRepositoryApiRequester platformRepositoryApiRequester,
-        @Value("${github.repository.search.format-url}") String apiUrlFormatForSearchRepository
+        @Value("${security.github.url.api}") String apiBaseUrl
     ) {
         this.objectMapper = objectMapper;
         this.platformRepositoryApiRequester = platformRepositoryApiRequester;
-        this.apiUrlFormatForSearchRepository = apiUrlFormatForSearchRepository;
+        this.apiBaseUrl = apiBaseUrl;
     }
 
     @Override
@@ -52,9 +52,10 @@ public class GithubRepositorySearchExtractor implements PlatformRepositorySearch
         int page,
         int limit
     ) {
-
+        String format = apiBaseUrl +
+            "/search/repositories?q=user:%s %s in:name fork:true&page=%d&per_page=%d";
         return String.format(
-            apiUrlFormatForSearchRepository,
+            format,
             username,
             keyword,
             page,

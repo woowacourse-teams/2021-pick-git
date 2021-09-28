@@ -15,19 +15,16 @@ public class GithubContributionExtractor implements PlatformContributionExtracto
 
     private final ObjectMapper objectMapper;
     private final PlatformContributionApiRequester platformContributionApiRequester;
-    private final String apiUrlFormatForStar;
-    private final String apiUrlFormatForCount;
+    private final String apiBaseUrl;
 
     public GithubContributionExtractor(
         ObjectMapper objectMapper,
         PlatformContributionApiRequester platformContributionApiRequester,
-        @Value("${github.contribution.star-url}") String apiUrlFormatForStar,
-        @Value("${github.contribution.count-url}") String apiUrlFormatForCount
+        @Value("${security.github.url.api}") String apiBaseUrl
     ) {
         this.objectMapper = objectMapper;
         this.platformContributionApiRequester = platformContributionApiRequester;
-        this.apiUrlFormatForStar = apiUrlFormatForStar;
-        this.apiUrlFormatForCount = apiUrlFormatForCount;
+        this.apiBaseUrl = apiBaseUrl;
     }
 
     @Override
@@ -39,7 +36,8 @@ public class GithubContributionExtractor implements PlatformContributionExtracto
     }
 
     private String generateUrl(String username) {
-        return String.format(apiUrlFormatForStar, username);
+        String url = apiBaseUrl + "/search/repositories?q=user:%s stars:>=1";
+        return String.format(url, username);
     }
 
     private ItemDto parseToStars(String response) {
@@ -59,7 +57,7 @@ public class GithubContributionExtractor implements PlatformContributionExtracto
     }
 
     private String generateUrl(String restUrl, String username) {
-        return apiUrlFormatForCount + String.format(restUrl, username);
+        return apiBaseUrl + String.format(restUrl, username);
     }
 
     private CountDto parseToCount(String response) {

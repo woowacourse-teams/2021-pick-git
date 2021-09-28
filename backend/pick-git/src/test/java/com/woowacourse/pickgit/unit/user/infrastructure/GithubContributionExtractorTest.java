@@ -35,8 +35,7 @@ class GithubContributionExtractorTest {
         platformContributionExtractor = new GithubContributionExtractor(
             objectMapper,
             new MockContributionApiRequester(),
-            apiUrlFormatForStar,
-            apiUrlFormatForCount
+            "https://api.github.com"
         );
     }
 
@@ -61,8 +60,7 @@ class GithubContributionExtractorTest {
         platformContributionExtractor = new GithubContributionExtractor(
             objectMapper,
             new MockContributionApiErrorRequester(),
-            apiUrlFormatForStar,
-            apiUrlFormatForCount
+            "https://api.github.com"
         );
 
         // when
@@ -81,8 +79,7 @@ class GithubContributionExtractorTest {
         platformContributionExtractor = new GithubContributionExtractor(
             objectMapper,
             new MockContributionApiErrorRequester(),
-            apiUrlFormatForStar,
-            apiUrlFormatForCount
+            "https://api.github.com"
         );
 
         // when
@@ -99,7 +96,7 @@ class GithubContributionExtractorTest {
     void extractCount_Commits_Success() {
         // when
         CountDto commits = platformContributionExtractor
-            .extractCount("/commits?q=committer:%s", ACCESS_TOKEN, USERNAME);
+            .extractCount("/search/commits?q=committer:%s", ACCESS_TOKEN, USERNAME);
 
         // then
         assertThat(commits.getCount()).isEqualTo(48);
@@ -112,14 +109,13 @@ class GithubContributionExtractorTest {
         platformContributionExtractor = new GithubContributionExtractor(
             objectMapper,
             new MockContributionApiErrorRequester(),
-            apiUrlFormatForStar,
-            apiUrlFormatForCount
+            "https://api.github.com"
         );
 
         // when
         assertThatThrownBy(() -> {
             platformContributionExtractor
-                .extractCount("/commits?q=committer:%s", INVALID_ACCESS_TOKEN, USERNAME);
+                .extractCount("/search/commits?q=committer:%s", INVALID_ACCESS_TOKEN, USERNAME);
         }).isInstanceOf(PlatformHttpErrorException.class)
             .hasFieldOrPropertyWithValue("errorCode", "V0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
@@ -133,14 +129,13 @@ class GithubContributionExtractorTest {
         platformContributionExtractor = new GithubContributionExtractor(
             objectMapper,
             new MockContributionApiErrorRequester(),
-            apiUrlFormatForStar,
-            apiUrlFormatForCount
+            "https://api.github.com"
         );
 
         // when
         assertThatThrownBy(() -> {
             platformContributionExtractor
-                .extractCount("/commits?q=committer:%s", ACCESS_TOKEN, USERNAME);
+                .extractCount("/search/commits?q=committer:%s", ACCESS_TOKEN, USERNAME);
         }).isInstanceOf(ContributionParseException.class)
             .hasFieldOrPropertyWithValue("errorCode", "V0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
@@ -152,7 +147,7 @@ class GithubContributionExtractorTest {
     void extractCount_PRs_Success() {
         // when
         CountDto prs = platformContributionExtractor
-            .extractCount("/issues?q=author:%s type:pr", ACCESS_TOKEN, USERNAME);
+            .extractCount("/search/issues?q=author:%s type:pr", ACCESS_TOKEN, USERNAME);
 
         // then
         assertThat(prs.getCount()).isEqualTo(48);
@@ -165,14 +160,13 @@ class GithubContributionExtractorTest {
         platformContributionExtractor = new GithubContributionExtractor(
             objectMapper,
             new MockContributionApiErrorRequester(),
-            apiUrlFormatForStar,
-            apiUrlFormatForCount
+            "https://api.github.com"
         );
 
         // when
         assertThatThrownBy(() -> {
             platformContributionExtractor
-                .extractCount("/issues?q=author:%s type:pr", INVALID_ACCESS_TOKEN, USERNAME);
+                .extractCount("/search/issues?q=author:%s type:pr", INVALID_ACCESS_TOKEN, USERNAME);
         }).isInstanceOf(PlatformHttpErrorException.class)
             .hasFieldOrPropertyWithValue("errorCode", "V0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
@@ -186,14 +180,13 @@ class GithubContributionExtractorTest {
         platformContributionExtractor = new GithubContributionExtractor(
             objectMapper,
             new MockContributionApiErrorRequester(),
-            apiUrlFormatForStar,
-            apiUrlFormatForCount
+            "https://api.github.com"
         );
 
         // when
         assertThatThrownBy(() -> {
             platformContributionExtractor
-                .extractCount("/issues?q=author:%s type:pr", ACCESS_TOKEN, USERNAME);
+                .extractCount("/search/issues?q=author:%s type:pr", ACCESS_TOKEN, USERNAME);
         }).isInstanceOf(ContributionParseException.class)
             .hasFieldOrPropertyWithValue("errorCode", "V0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
@@ -205,7 +198,7 @@ class GithubContributionExtractorTest {
     void extractCount_Issues_Success() {
         // when
         CountDto issues = platformContributionExtractor
-            .extractCount("/issues?q=author:%s type:issue", ACCESS_TOKEN, USERNAME);
+            .extractCount("/search/issues?q=author:%s type:issue", ACCESS_TOKEN, USERNAME);
 
         // then
         assertThat(issues.getCount()).isEqualTo(48);
@@ -218,14 +211,13 @@ class GithubContributionExtractorTest {
         platformContributionExtractor = new GithubContributionExtractor(
             objectMapper,
             new MockContributionApiErrorRequester(),
-            apiUrlFormatForStar,
-            apiUrlFormatForCount
+            "https://api.github.com"
         );
 
         // when
         assertThatThrownBy(() -> {
             platformContributionExtractor
-                .extractCount("/issues?q=author:%s type:issue", INVALID_ACCESS_TOKEN, USERNAME);
+                .extractCount("/search/issues?q=author:%s type:issue", INVALID_ACCESS_TOKEN, USERNAME);
         }).isInstanceOf(PlatformHttpErrorException.class)
             .hasFieldOrPropertyWithValue("errorCode", "V0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
@@ -239,14 +231,13 @@ class GithubContributionExtractorTest {
         platformContributionExtractor = new GithubContributionExtractor(
             objectMapper,
             new MockContributionApiErrorRequester(),
-            apiUrlFormatForStar,
-            apiUrlFormatForCount
+            "https://api.github.com"
         );
 
         // when
         assertThatThrownBy(() -> {
             platformContributionExtractor
-                .extractCount("/issues?q=author:%s type:issue", ACCESS_TOKEN, USERNAME);
+                .extractCount("/search/issues?q=author:%s type:issue", ACCESS_TOKEN, USERNAME);
         }).isInstanceOf(ContributionParseException.class)
             .hasFieldOrPropertyWithValue("errorCode", "V0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
@@ -258,7 +249,7 @@ class GithubContributionExtractorTest {
     void extractCount_Repos_Success() {
         // when
         CountDto repos = platformContributionExtractor
-            .extractCount("/repositories?q=user:%s is:public", ACCESS_TOKEN, USERNAME);
+            .extractCount("/search/repositories?q=user:%s is:public", ACCESS_TOKEN, USERNAME);
 
         // then
         assertThat(repos.getCount()).isEqualTo(48);
@@ -271,14 +262,13 @@ class GithubContributionExtractorTest {
         platformContributionExtractor = new GithubContributionExtractor(
             objectMapper,
             new MockContributionApiErrorRequester(),
-            apiUrlFormatForStar,
-            apiUrlFormatForCount
+            "https://api.github.com"
         );
 
         // when
         assertThatThrownBy(() -> {
             platformContributionExtractor
-                .extractCount("/repositories?q=user:%s is:public", INVALID_ACCESS_TOKEN, USERNAME);
+                .extractCount("/search/repositories?q=user:%s is:public", INVALID_ACCESS_TOKEN, USERNAME);
         }).isInstanceOf(PlatformHttpErrorException.class)
             .hasFieldOrPropertyWithValue("errorCode", "V0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
@@ -292,14 +282,13 @@ class GithubContributionExtractorTest {
         platformContributionExtractor = new GithubContributionExtractor(
             objectMapper,
             new MockContributionApiErrorRequester(),
-            apiUrlFormatForStar,
-            apiUrlFormatForCount
+            "https://api.github.com"
         );
 
         // when
         assertThatThrownBy(() -> {
             platformContributionExtractor
-                .extractCount("/repositories?q=user:%s is:public", ACCESS_TOKEN, USERNAME);
+                .extractCount("/search/repositories?q=user:%s is:public", ACCESS_TOKEN, USERNAME);
         }).isInstanceOf(ContributionParseException.class)
             .hasFieldOrPropertyWithValue("errorCode", "V0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)

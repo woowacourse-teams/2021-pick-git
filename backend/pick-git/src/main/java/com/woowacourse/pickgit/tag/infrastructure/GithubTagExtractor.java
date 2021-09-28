@@ -19,16 +19,16 @@ public class GithubTagExtractor implements PlatformTagExtractor {
 
     private final PlatformTagApiRequester platformTagApiRequester;
     private final ObjectMapper objectMapper;
-    private final String apiUrlFormatForTag;
+    private final String apiBaseUrl;
 
     public GithubTagExtractor(
         PlatformTagApiRequester platformTagApiRequester,
         ObjectMapper objectMapper,
-        @Value("${github.tag.format-url}") String apiUrlFormatForTag
+        @Value("${security.github.url.api}") String apiBaseUrl
     ) {
         this.platformTagApiRequester = platformTagApiRequester;
         this.objectMapper = objectMapper;
-        this.apiUrlFormatForTag = apiUrlFormatForTag;
+        this.apiBaseUrl = apiBaseUrl;
     }
 
     public List<String> extractTags(String accessToken, String userName, String repositoryName) {
@@ -38,7 +38,8 @@ public class GithubTagExtractor implements PlatformTagExtractor {
     }
 
     private String generateApiUrl(String userName, String repositoryName) {
-        return String.format(apiUrlFormatForTag, userName, repositoryName);
+        String url = apiBaseUrl + "/repos/%s/%s/languages";
+        return String.format(url, userName, repositoryName);
     }
 
     private List<String> parseResponseIntoLanguageTags(String response) {

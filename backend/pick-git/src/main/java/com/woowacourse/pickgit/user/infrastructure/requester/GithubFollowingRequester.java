@@ -15,12 +15,12 @@ import org.springframework.web.client.RestTemplate;
 @Profile("!test")
 public class GithubFollowingRequester implements PlatformFollowingRequester {
 
-    private final String apiUrlFormatForFollowing;
+    private final String apiBaseUrl;
 
     public GithubFollowingRequester(
-        @Value("${github.follow.format-url") String apiUrlFormatForFollowing
+        @Value("${security.github.url.api}") String apiBaseUrl
     ) {
-        this.apiUrlFormatForFollowing = apiUrlFormatForFollowing;
+        this.apiBaseUrl = apiBaseUrl;
     }
 
     @Override
@@ -34,7 +34,8 @@ public class GithubFollowingRequester implements PlatformFollowingRequester {
     }
 
     private void requestFollowingOrUnFollowing(HttpMethod method, String targetName, String accessToken) {
-        String url = String.format(apiUrlFormatForFollowing, targetName);
+        String format = apiBaseUrl + "/user/following/%s";
+        String url = String.format(format, targetName);
         try {
             HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.setBearerAuth(accessToken);

@@ -3,16 +3,3 @@ spring:
     include: security, db
   flyway:
     enabled: false
-
-github:
-  contribution:
-    star-url: https://api.github.com/search/repositories?q=user:%s stars:>=1
-    count-url: https://api.github.com/search/
-  tag:
-    format-url: https://api.github.com/repos/%s/%s/languages
-  repository:
-    format-url: https://api.github.com/users/%s/repos?page=%d&per_page=%d
-    search:
-      format-url: https://api.github.com/search/repositories?q=user:%s %s in:name fork:true&page=%d&per_page=%d
-  follow:
-    format-url: https://api.github.com/user/following/%s

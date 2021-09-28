@@ -17,16 +17,16 @@ public class GithubRepositoryExtractor implements PlatformRepositoryExtractor {
 
     private final ObjectMapper objectMapper;
     private final PlatformRepositoryApiRequester platformRepositoryApiRequester;
-    private final String apiUrlFormatForRepository;
+    private final String apiBaseUrl;
 
     public GithubRepositoryExtractor(
         ObjectMapper objectMapper,
         PlatformRepositoryApiRequester platformRepositoryApiRequester,
-        @Value("${github.repository.format-url}") String apiUrlFormatForRepository
+        @Value("${security.github.url.api}") String apiBaseUrl
     ) {
         this.objectMapper = objectMapper;
         this.platformRepositoryApiRequester = platformRepositoryApiRequester;
-        this.apiUrlFormatForRepository = apiUrlFormatForRepository;
+        this.apiBaseUrl = apiBaseUrl;
     }
 
     @Override
@@ -38,8 +38,8 @@ public class GithubRepositoryExtractor implements PlatformRepositoryExtractor {
     }
 
     private String generateApiUrl(String username, Pageable pageable) {
-        return String
-            .format(apiUrlFormatForRepository, username, pageable.getPageNumber() + 1, pageable.getPageSize());
+        String format = apiBaseUrl + "/users/%s/repos?page=%d&per_page=%d";
+        return String.format(format, username, pageable.getPageNumber() + 1, pageable.getPageSize());
     }
 
     private List<RepositoryNameAndUrl> parseToRepositories(String response) {

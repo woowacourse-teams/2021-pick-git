@@ -32,7 +32,7 @@ class GithubRepositoryExtractorTest {
         platformRepositoryExtractor = new GithubRepositoryExtractor(
             objectMapper,
             new MockRepositoryApiRequester(),
-            "https://api.github.com/users/%s/repos?page=%d&per_page=%d"
+            "https://api.github.com"
         );
     }
 
@@ -61,7 +61,7 @@ class GithubRepositoryExtractorTest {
         platformRepositoryExtractor = new GithubRepositoryExtractor(
             objectMapper,
             new MockEmptyRepositoryApiRequester(),
-            "https://api.github.com/users/%s/repos?page=%d&per_page=%d"
+            "https://api.github.com"
         );
 
         // when

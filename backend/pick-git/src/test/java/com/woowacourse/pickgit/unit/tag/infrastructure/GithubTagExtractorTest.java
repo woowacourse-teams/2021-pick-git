@@ -29,7 +29,7 @@ class GithubTagExtractorTest {
         platformTagExtractor = new GithubTagExtractor(
             platformTagApiRequester,
             objectMapper,
-            "https://api.github.com/repos/%s/%s/languages"
+            "https://api.github.com"
         );
     }
 

@@ -31,7 +31,7 @@ public class GithubRepositorySearchExtractorTest {
         this.platformRepositorySearchExtractor = new GithubRepositorySearchExtractor(
                 objectMapper,
                 new MockRepositoryApiRequester(),
-            "https://api.github.com/search/repositories?q=user:%s %s in:name fork:true&page=%d&per_page=%d"
+            "https://api.github.com"
             );
     }
 

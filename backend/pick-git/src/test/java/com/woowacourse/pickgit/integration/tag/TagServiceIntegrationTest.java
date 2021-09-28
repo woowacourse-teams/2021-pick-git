@@ -48,7 +48,7 @@ class TagServiceIntegrationTest {
             new GithubTagExtractor(
                 new MockTagApiRequester(),
                 objectMapper,
-                "https://api.github.com/repos/%s/%s/languages"
+                "https://api.github.com"
             );
         tagService = new TagService(platformTagExtractor, tagRepository);
     }
