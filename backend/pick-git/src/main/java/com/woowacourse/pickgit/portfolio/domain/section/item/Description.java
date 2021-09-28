@@ -2,7 +2,6 @@ package com.woowacourse.pickgit.portfolio.domain.section.item;
 
 import com.woowacourse.pickgit.portfolio.domain.common.Updatable;
 import java.util.Objects;
-import javassist.runtime.Desc;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;

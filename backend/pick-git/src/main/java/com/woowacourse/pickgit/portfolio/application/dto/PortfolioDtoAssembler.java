@@ -2,7 +2,6 @@ package com.woowacourse.pickgit.portfolio.application.dto;
 
 import static java.util.stream.Collectors.toList;
 
-import com.woowacourse.pickgit.exception.portfolio.TagNotFoundException;
 import com.woowacourse.pickgit.portfolio.application.dto.request.ContactRequestDto;
 import com.woowacourse.pickgit.portfolio.application.dto.request.DescriptionRequestDto;
 import com.woowacourse.pickgit.portfolio.application.dto.request.ItemRequestDto;
@@ -28,7 +27,6 @@ import com.woowacourse.pickgit.portfolio.domain.section.Sections;
 import com.woowacourse.pickgit.portfolio.domain.section.item.Description;
 import com.woowacourse.pickgit.portfolio.domain.section.item.Item;
 import com.woowacourse.pickgit.tag.domain.Tag;
-import com.woowacourse.pickgit.tag.domain.TagRepository;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;

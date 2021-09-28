@@ -8,8 +8,8 @@ import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.Controll
 import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.ForGuestScanner;
 import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.ForLoginUserScanner;
 import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.HttpMethodMapper;
-import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.data_structure.MergedInterceptorParameterByMethod;
 import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.data_structure.InterceptorParameter;
+import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.data_structure.MergedInterceptorParameterByMethod;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
