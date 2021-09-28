@@ -40,7 +40,6 @@ public class Contacts {
         sources.getValues().forEach(contact -> contact.appendTo(portfolio));
 
         UpdateUtil.execute(this.getValues(), sources.getValues());
-        UpdateUtil.execute(this.getValues(), sources.getValues());
     }
 
     public List<Contact> getValues() {

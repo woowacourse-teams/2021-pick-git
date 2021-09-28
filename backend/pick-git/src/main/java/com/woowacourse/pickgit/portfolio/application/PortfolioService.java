@@ -12,6 +12,8 @@ import com.woowacourse.pickgit.portfolio.domain.repository.PortfolioRepository;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import java.util.Optional;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,9 @@ public class PortfolioService {
     private final PortfolioRepository portfolioRepository;
     private final PortfolioDtoAssembler portfolioDtoAssembler;
     private final UserRepository userRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public PortfolioService(
         PortfolioRepository portfolioRepository,
@@ -56,6 +61,7 @@ public class PortfolioService {
         }
 
         portfolio.update(portfolioDtoAssembler.toPortfolio(portfolioRequestDto));
+        entityManager.detach(portfolio);
 
         return portfolioDtoAssembler.toPortfolioResponseDto(portfolio);
     }

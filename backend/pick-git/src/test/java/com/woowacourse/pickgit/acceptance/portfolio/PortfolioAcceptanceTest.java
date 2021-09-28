@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
@@ -12,12 +13,18 @@ import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
 import com.woowacourse.pickgit.common.factory.PortfolioFactory;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
+import com.woowacourse.pickgit.portfolio.presentation.dto.request.PortfolioRequest;
 import com.woowacourse.pickgit.portfolio.presentation.dto.response.PortfolioResponse;
+import com.woowacourse.pickgit.tag.domain.Tag;
+import com.woowacourse.pickgit.tag.domain.TagRepository;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,82 +37,299 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
     @MockBean
     private OAuthClient oAuthClient;
 
-    @DisplayName("사용자는 포트폴리오를 조회한다. - 내 것")
-    @Test
-    void read_LoginUserWithMine_Success() {
-        // given
-        String token = 로그인_되어있음(USERNAME).getToken();
+    @Autowired
+    private TagRepository tagRepository;
 
-        PortfolioResponse expected = PortfolioFactory.mockPortfolioResponse();
-
-        // when
-        PortfolioResponse response = authenticatedWithReadApi(token, USERNAME, OK)
-            .as(PortfolioResponse.class);
-
-        // then
-        assertThat(response)
-            .usingRecursiveComparison()
-            .isEqualTo(expected);
+    @BeforeEach
+    void setUp() {
+        tagRepository.save(new Tag("java"));
     }
 
-    @DisplayName("사용자는 포트폴리오를 조회한다. - 남 것")
-    @Test
-    void read_LoginUserWithYours_Success() {
-        // given
-        String token = 로그인_되어있음(USERNAME).getToken();
-        로그인_되어있음(ANOTHER_USERNAME);
+    @DisplayName("사용자는")
+    @Nested
+    class LoginUser {
 
-        PortfolioResponse expected = PortfolioFactory.mockPortfolioResponse();
+        @DisplayName("포트폴리오를 조회한다.")
+        @Nested
+        class read {
 
-        // when
-        PortfolioResponse response = authenticatedWithReadApi(token, ANOTHER_USERNAME, OK)
-            .as(PortfolioResponse.class);
+            @DisplayName("내 것 O")
+            @Test
+            void read_LoginUserWithMine_Success() {
+                // given
+                String token = 로그인_되어있음(USERNAME).getToken();
 
-        // then
-        assertThat(response)
-            .usingRecursiveComparison()
-            .isEqualTo(expected);
+                PortfolioResponse expected = PortfolioFactory.mockPortfolioResponse();
+
+                // when
+                PortfolioResponse response = authenticatedWithReadApi(token, USERNAME)
+                    .as(PortfolioResponse.class);
+
+                // then
+                assertThat(response)
+                    .usingRecursiveComparison()
+                    .isEqualTo(expected);
+            }
+
+            @DisplayName("남 것 O")
+            @Test
+            void read_LoginUserWithYours_Success() {
+                // given
+                String token = 로그인_되어있음(USERNAME).getToken();
+                로그인_되어있음(ANOTHER_USERNAME);
+
+                PortfolioResponse expected = PortfolioFactory.mockPortfolioResponse();
+
+                // when
+                PortfolioResponse response = authenticatedWithReadApi(token, ANOTHER_USERNAME)
+                    .as(PortfolioResponse.class);
+
+                // then
+                assertThat(response)
+                    .usingRecursiveComparison()
+                    .isEqualTo(expected);
+            }
+        }
+
+        @DisplayName("포트폴리오를 수정한다.")
+        @Nested
+        class update {
+
+            @DisplayName("내 것 O, 모든 내용, 연락처/프로젝트/섹션 1개")
+            @Test
+            void update_LoginUserWithMineWithNewAllAndSingleSize_Success() {
+                // given
+                String token = 로그인_되어있음(USERNAME).getToken();
+
+                authenticatedWithReadApi(token, USERNAME);
+
+                PortfolioRequest request = PortfolioFactory
+                    .mockPortfolioRequestWithNewAllAndSingleSize();
+                PortfolioResponse expected = PortfolioFactory
+                    .mockPortfolioResponseWithNewAllAndSingleSize();
+
+                // when
+                PortfolioResponse response = authenticatedWithUpdateApi(token, request, OK)
+                    .as(PortfolioResponse.class);
+
+                // then
+                assertThat(response)
+                    .usingRecursiveComparison()
+                    .isEqualTo(expected);
+            }
+
+            @DisplayName("내 것 O, 모든 내용, 연락처/프로젝트/섹션 2개 이상")
+            @Test
+            void update_LoginUserWithMineWithNewAllAndMultipleSize_Success() {
+                // given
+                String token = 로그인_되어있음(USERNAME).getToken();
+
+                authenticatedWithReadApi(token, USERNAME);
+
+                PortfolioRequest request = PortfolioFactory
+                    .mockPortfolioRequestWithNewAllAndMultipleSize();
+                PortfolioResponse expected = PortfolioFactory
+                    .mockPortfolioResponseWithNewAllAndMultipleSize();
+
+                // when
+                PortfolioResponse response = authenticatedWithUpdateApi(token, request, OK)
+                    .as(PortfolioResponse.class);
+
+                // then
+                assertThat(response)
+                    .usingRecursiveComparison()
+                    .isEqualTo(expected);
+            }
+
+            @DisplayName("내 것 O, 프로필 및 소개")
+            @Test
+            void update_LoginUserWithMineWithNewProfileAndIntroduction_Success() {
+                // given
+                String token = 로그인_되어있음(USERNAME).getToken();
+
+                authenticatedWithReadApi(token, USERNAME);
+
+                PortfolioRequest request = PortfolioFactory.mockPortfolioRequestWithNewContact();
+                PortfolioResponse expected = PortfolioFactory.mockPortfolioResponseWithNewContact();
+
+                // when
+                PortfolioResponse response = authenticatedWithUpdateApi(token, request, OK)
+                    .as(PortfolioResponse.class);
+
+                // then
+                assertThat(response)
+                    .usingRecursiveComparison()
+                    .isEqualTo(expected);
+            }
+
+            @DisplayName("내 것 O, 연락처")
+            @Test
+            void update_LoginUserWithMineWithNewContact_Success() {
+                // given
+                String token = 로그인_되어있음(USERNAME).getToken();
+
+                authenticatedWithReadApi(token, USERNAME);
+
+                PortfolioRequest request = PortfolioFactory.mockPortfolioRequestWithNewProject();
+                PortfolioResponse expected = PortfolioFactory.mockPortfolioResponseWithNewProject();
+
+                // when
+                PortfolioResponse response = authenticatedWithUpdateApi(token, request, OK)
+                    .as(PortfolioResponse.class);
+
+                // then
+                assertThat(response)
+                    .usingRecursiveComparison()
+                    .isEqualTo(expected);
+            }
+
+            @DisplayName("내 것 O, 프로젝트")
+            @Test
+            void update_LoginUserWithMineWithNewProject_Success() {
+                // given
+                String token = 로그인_되어있음(USERNAME).getToken();
+
+                authenticatedWithReadApi(token, USERNAME);
+
+                PortfolioRequest request = PortfolioFactory.mockPortfolioRequestWithNewSection();
+                PortfolioResponse expected = PortfolioFactory.mockPortfolioResponseWithNewSection();
+
+                // when
+                PortfolioResponse response = authenticatedWithUpdateApi(token, request, OK)
+                    .as(PortfolioResponse.class);
+
+                // then
+                assertThat(response)
+                    .usingRecursiveComparison()
+                    .isEqualTo(expected);
+            }
+
+            @DisplayName("내 것 O, 섹션")
+            @Test
+            void update_LoginUserWithMineWithNewSection_Success() {
+                // given
+                String token = 로그인_되어있음(USERNAME).getToken();
+
+                authenticatedWithReadApi(token, USERNAME);
+
+                PortfolioRequest request = PortfolioFactory
+                    .mockPortfolioRequestWithNewProfileAndIntroduction();
+                PortfolioResponse expected = PortfolioFactory
+                    .mockPortfolioResponseWithNewProfileAndIntroduction();
+
+                // when
+                PortfolioResponse response = authenticatedWithUpdateApi(token, request, OK)
+                    .as(PortfolioResponse.class);
+
+                // then
+                assertThat(response)
+                    .usingRecursiveComparison()
+                    .isEqualTo(expected);
+            }
+
+            @DisplayName("남 것 X")
+            @Test
+            void update_LoginUserWithYours_Fail() {
+                // given
+                String token = 로그인_되어있음(USERNAME).getToken();
+                String anotherToken = 로그인_되어있음(ANOTHER_USERNAME).getToken();
+
+                authenticatedWithReadApi(anotherToken, ANOTHER_USERNAME);
+
+                PortfolioRequest request = PortfolioFactory
+                    .mockPortfolioRequestWithNewAllAndSingleSize();
+
+                // when
+                ApiErrorResponse response = authenticatedWithUpdateApi(token, request, UNAUTHORIZED)
+                    .as(ApiErrorResponse.class);
+
+                // then
+                assertThat(response.getErrorCode()).isEqualTo("A0002");
+            }
+        }
     }
 
-    @DisplayName("게스트는 포트폴리오를 조회한다. - 포트폴리오 존재 O")
-    @Test
-    void read_GuestUser_Success() {
-        // given
-        String token = 로그인_되어있음(USERNAME).getToken();
-        authenticatedWithReadApi(token, USERNAME, OK);
+    @DisplayName("게스트는")
+    @Nested
+    class GuestUser {
 
-        PortfolioResponse expected = PortfolioFactory.mockPortfolioResponse();
+        @DisplayName("포트폴리오를 조회한다.")
+        @Nested
+        class read {
 
-        // when
-        PortfolioResponse response = unauthenticatedWithReadApi(OK)
-            .as(PortfolioResponse.class);
+            @DisplayName("남 것 O, 포트폴리오 존재 O")
+            @Test
+            void read_GuestUser_Success() {
+                // given
+                String token = 로그인_되어있음(USERNAME).getToken();
+                authenticatedWithReadApi(token, USERNAME);
 
-        // then
-        assertThat(response)
-            .usingRecursiveComparison()
-            .isEqualTo(expected);
+                PortfolioResponse expected = PortfolioFactory.mockPortfolioResponse();
+
+                // when
+                PortfolioResponse response = unauthenticatedWithReadApi(OK)
+                    .as(PortfolioResponse.class);
+
+                // then
+                assertThat(response)
+                    .usingRecursiveComparison()
+                    .isEqualTo(expected);
+            }
+
+            @DisplayName("남 것 O, 포트폴리오 존재 X")
+            @Test
+            void read_GuestUser_Fail() {
+                // when
+                ApiErrorResponse response = unauthenticatedWithReadApi(BAD_REQUEST)
+                    .as(ApiErrorResponse.class);
+
+                // then
+                assertThat(response.getErrorCode()).isEqualTo("R0001");
+            }
+        }
+
+        @DisplayName("포트폴리오를 수정한다.")
+        @Nested
+        class update {
+
+            @DisplayName("남 것 X")
+            @Test
+            void update_GuestUser_Fail() {
+                // given
+                PortfolioRequest request = PortfolioFactory
+                    .mockPortfolioRequestWithNewAllAndSingleSize();
+
+                // when
+                ApiErrorResponse response = unauthenticatedWithUpdateApi(request)
+                    .as(ApiErrorResponse.class);
+
+                // then
+                assertThat(response.getErrorCode()).isEqualTo("A0001");
+            }
+        }
     }
 
-    @DisplayName("게스트는 포트폴리오를 조회한다. - 포트폴리오 존재 X")
-    @Test
-    void read_GuestUser_Fail() {
-        // when
-        ApiErrorResponse response = unauthenticatedWithReadApi(BAD_REQUEST)
-            .as(ApiErrorResponse.class);
-
-        // then
-        assertThat(response.getErrorCode()).isEqualTo("R0001");
-    }
-
-    private ExtractableResponse<Response> authenticatedWithReadApi(
-        String token,
-        String username,
-        HttpStatus httpStatus
-    ) {
+    private ExtractableResponse<Response> authenticatedWithReadApi(String token, String username) {
         return given().log().all()
             .auth().oauth2(token)
             .when()
             .get("/api/portfolios/{username}", username)
+            .then().log().all()
+            .statusCode(OK.value())
+            .extract();
+    }
+
+    private ExtractableResponse<Response> authenticatedWithUpdateApi(
+        String token,
+        PortfolioRequest request,
+        HttpStatus httpStatus
+    ) {
+        return given().log().all()
+            .auth().oauth2(token)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(request)
+            .when()
+            .put("/api/portfolios")
             .then().log().all()
             .statusCode(httpStatus.value())
             .extract();
@@ -120,24 +344,15 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
             .extract();
     }
 
-    @DisplayName("사용자는 포트폴리오를 수정한다.")
-    @Test
-    void update_LoginUser_Success() {
-        // given
-
-        // when
-
-        // then
-    }
-
-    @DisplayName("게스트는 포트폴리오를 수정할 수 없다.")
-    @Test
-    void update_GuestUser_Fail() {
-        // given
-
-        // when
-
-        // then
+    private ExtractableResponse<Response> unauthenticatedWithUpdateApi(PortfolioRequest request) {
+        return given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(request)
+            .when()
+            .put("/api/portfolios")
+            .then().log().all()
+            .statusCode(UNAUTHORIZED.value())
+            .extract();
     }
 
     private OAuthTokenResponse 로그인_되어있음(String name) {
