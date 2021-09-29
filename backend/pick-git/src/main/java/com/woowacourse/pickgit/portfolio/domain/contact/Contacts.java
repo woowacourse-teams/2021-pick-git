@@ -37,7 +37,7 @@ public class Contacts {
     }
 
     public void update(Contacts sources, Portfolio portfolio) {
-        sources.getValues().forEach(contact -> contact.appendTo(portfolio));
+        sources.getValues().forEach(source -> source.appendTo(portfolio));
 
         UpdateUtil.execute(this.getValues(), sources.getValues());
     }

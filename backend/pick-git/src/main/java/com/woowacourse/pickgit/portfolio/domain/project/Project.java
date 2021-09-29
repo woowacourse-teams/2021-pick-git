@@ -98,6 +98,8 @@ public class Project implements Updatable<Project> {
         this.content = content;
         this.tags = tags;
         this.portfolio = portfolio;
+
+        this.tags.forEach(tag -> tag.appendTo(this));
     }
 
     public void appendTo(Portfolio portfolio) {
@@ -138,15 +140,14 @@ public class Project implements Updatable<Project> {
 
     @Override
     public void update(Project project) {
+        project.getTags().forEach(tag -> tag.appendTo(this));
+
         this.name = project.getName();
         this.startDate = project.getStartDate();
         this.endDate = project.getEndDate();
         this.type = project.getType();
         this.imageUrl = project.getImageUrl();
         this.content = project.getContent();
-
-        project.getTags().forEach(tag -> tag.appendTo(this));
-
         UpdateUtil.execute(this.getTags(), project.getTags());
     }
 

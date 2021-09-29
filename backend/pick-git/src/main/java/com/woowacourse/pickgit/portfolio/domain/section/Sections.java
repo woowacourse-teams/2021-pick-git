@@ -45,7 +45,7 @@ public class Sections {
     }
 
     public void update(Sections sources, Portfolio portfolio) {
-        this.getValues().forEach(source -> source.appendTo(portfolio));
+        sources.getValues().forEach(source -> source.appendTo(portfolio));
 
         UpdateUtil.execute(this.getValues(), sources.getValues());
     }

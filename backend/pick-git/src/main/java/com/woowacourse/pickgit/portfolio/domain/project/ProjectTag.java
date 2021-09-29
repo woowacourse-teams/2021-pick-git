@@ -28,8 +28,8 @@ public class ProjectTag implements Updatable<ProjectTag> {
     protected ProjectTag() {
     }
 
-    public ProjectTag(Long id, Tag tag) {
-        this(id, tag, null);
+    public ProjectTag(Tag tag) {
+        this(null, tag, null);
     }
 
     public ProjectTag(Long id, Tag tag, Project project) {
@@ -44,6 +44,10 @@ public class ProjectTag implements Updatable<ProjectTag> {
 
     public String getName() {
         return tag.getName();
+    }
+
+    public Long getTagId() {
+        return tag.getId();
     }
 
     public Long getId() {

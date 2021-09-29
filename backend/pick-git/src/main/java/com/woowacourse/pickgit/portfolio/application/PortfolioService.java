@@ -59,9 +59,9 @@ public class PortfolioService {
         if (!portfolio.isOwnedBy(user)) {
             throw new UnauthorizedException();
         }
-
         portfolio.update(portfolioDtoAssembler.toPortfolio(portfolioRequestDto));
-        entityManager.detach(portfolio);
+
+        entityManager.flush();
 
         return portfolioDtoAssembler.toPortfolioResponseDto(portfolio);
     }

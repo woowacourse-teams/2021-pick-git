@@ -98,10 +98,7 @@ public class PortfolioDtoAssembler {
     private ProjectTag toTag(TagRequestDto tagRequestDto) {
         Tag tag = entityManager.getReference(Tag.class, tagRequestDto.getId());
 
-        return new ProjectTag(
-            tagRequestDto.getId(),
-            tag
-        );
+        return new ProjectTag(tag);
     }
 
     private Sections toSections(List<SectionRequestDto> sectionRequestDtos) {
@@ -194,7 +191,7 @@ public class PortfolioDtoAssembler {
 
     private TagResponseDto toTagResponseDto(ProjectTag tag) {
         return new TagResponseDto(
-            tag.getId(),
+            tag.getTagId(),
             tag.getName()
         );
     }

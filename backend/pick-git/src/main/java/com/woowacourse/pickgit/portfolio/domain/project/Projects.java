@@ -45,7 +45,7 @@ public class Projects {
     }
 
     public void update(Projects sources, Portfolio portfolio) {
-        this.getValues().forEach(project -> project.appendTo(portfolio));
+        sources.getValues().forEach(source -> source.appendTo(portfolio));
 
         UpdateUtil.execute(this.getValues(), sources.getValues());
     }

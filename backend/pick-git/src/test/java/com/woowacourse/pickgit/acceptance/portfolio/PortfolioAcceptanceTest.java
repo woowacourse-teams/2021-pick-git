@@ -105,16 +105,18 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
 
                 PortfolioRequest request = PortfolioFactory
                     .mockPortfolioRequestWithNewAllAndSingleSize();
-                PortfolioResponse expected = PortfolioFactory
-                    .mockPortfolioResponseWithNewAllAndSingleSize();
 
                 // when
-                PortfolioResponse response = authenticatedWithUpdateApi(token, request, OK)
+                PortfolioResponse actual = authenticatedWithUpdateApi(token, request, OK)
                     .as(PortfolioResponse.class);
 
                 // then
-                assertThat(response)
+                PortfolioResponse expected = authenticatedWithReadApi(token, USERNAME)
+                    .as(PortfolioResponse.class);
+
+                assertThat(actual)
                     .usingRecursiveComparison()
+                    .ignoringFields("endDate", "startDate", "tags")
                     .isEqualTo(expected);
             }
 
@@ -128,16 +130,18 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
 
                 PortfolioRequest request = PortfolioFactory
                     .mockPortfolioRequestWithNewAllAndMultipleSize();
-                PortfolioResponse expected = PortfolioFactory
-                    .mockPortfolioResponseWithNewAllAndMultipleSize();
 
                 // when
-                PortfolioResponse response = authenticatedWithUpdateApi(token, request, OK)
+                PortfolioResponse actual = authenticatedWithUpdateApi(token, request, OK)
                     .as(PortfolioResponse.class);
 
                 // then
-                assertThat(response)
+                PortfolioResponse expected = authenticatedWithReadApi(token, USERNAME)
+                    .as(PortfolioResponse.class);
+
+                assertThat(actual)
                     .usingRecursiveComparison()
+                    .ignoringFields("endDate", "startDate")
                     .isEqualTo(expected);
             }
 
@@ -149,16 +153,20 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
 
                 authenticatedWithReadApi(token, USERNAME);
 
-                PortfolioRequest request = PortfolioFactory.mockPortfolioRequestWithNewContact();
-                PortfolioResponse expected = PortfolioFactory.mockPortfolioResponseWithNewContact();
+                PortfolioRequest request = PortfolioFactory
+                    .mockPortfolioRequestWithNewProfileAndIntroduction();
 
                 // when
-                PortfolioResponse response = authenticatedWithUpdateApi(token, request, OK)
+                PortfolioResponse actual = authenticatedWithUpdateApi(token, request, OK)
                     .as(PortfolioResponse.class);
 
                 // then
-                assertThat(response)
+                PortfolioResponse expected = authenticatedWithReadApi(token, USERNAME)
+                    .as(PortfolioResponse.class);
+
+                assertThat(actual)
                     .usingRecursiveComparison()
+                    .ignoringFields("endDate", "startDate")
                     .isEqualTo(expected);
             }
 
@@ -170,16 +178,19 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
 
                 authenticatedWithReadApi(token, USERNAME);
 
-                PortfolioRequest request = PortfolioFactory.mockPortfolioRequestWithNewProject();
-                PortfolioResponse expected = PortfolioFactory.mockPortfolioResponseWithNewProject();
+                PortfolioRequest request = PortfolioFactory.mockPortfolioRequestWithNewContact();
 
                 // when
-                PortfolioResponse response = authenticatedWithUpdateApi(token, request, OK)
+                PortfolioResponse actual = authenticatedWithUpdateApi(token, request, OK)
                     .as(PortfolioResponse.class);
 
                 // then
-                assertThat(response)
+                PortfolioResponse expected = authenticatedWithReadApi(token, USERNAME)
+                    .as(PortfolioResponse.class);
+
+                assertThat(actual)
                     .usingRecursiveComparison()
+                    .ignoringFields("endDate", "startDate")
                     .isEqualTo(expected);
             }
 
@@ -191,16 +202,19 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
 
                 authenticatedWithReadApi(token, USERNAME);
 
-                PortfolioRequest request = PortfolioFactory.mockPortfolioRequestWithNewSection();
-                PortfolioResponse expected = PortfolioFactory.mockPortfolioResponseWithNewSection();
+                PortfolioRequest request = PortfolioFactory.mockPortfolioRequestWithNewProject();
 
                 // when
-                PortfolioResponse response = authenticatedWithUpdateApi(token, request, OK)
+                PortfolioResponse actual = authenticatedWithUpdateApi(token, request, OK)
                     .as(PortfolioResponse.class);
 
                 // then
-                assertThat(response)
+                PortfolioResponse expected = authenticatedWithReadApi(token, USERNAME)
+                    .as(PortfolioResponse.class);
+
+                assertThat(actual)
                     .usingRecursiveComparison()
+                    .ignoringFields("endDate", "startDate")
                     .isEqualTo(expected);
             }
 
@@ -212,18 +226,19 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
 
                 authenticatedWithReadApi(token, USERNAME);
 
-                PortfolioRequest request = PortfolioFactory
-                    .mockPortfolioRequestWithNewProfileAndIntroduction();
-                PortfolioResponse expected = PortfolioFactory
-                    .mockPortfolioResponseWithNewProfileAndIntroduction();
+                PortfolioRequest request = PortfolioFactory.mockPortfolioRequestWithNewSection();
 
                 // when
-                PortfolioResponse response = authenticatedWithUpdateApi(token, request, OK)
+                PortfolioResponse actual = authenticatedWithUpdateApi(token, request, OK)
                     .as(PortfolioResponse.class);
 
                 // then
-                assertThat(response)
+                PortfolioResponse expected = authenticatedWithReadApi(token, USERNAME)
+                    .as(PortfolioResponse.class);
+
+                assertThat(actual)
                     .usingRecursiveComparison()
+                    .ignoringFields("endDate", "startDate")
                     .isEqualTo(expected);
             }
 
