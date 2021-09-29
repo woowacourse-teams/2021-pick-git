@@ -43,6 +43,7 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
     @BeforeEach
     void setUp() {
         tagRepository.save(new Tag("java"));
+        tagRepository.save(new Tag("spring"));
     }
 
     @DisplayName("사용자는")

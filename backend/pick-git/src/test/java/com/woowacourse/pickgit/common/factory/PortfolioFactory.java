@@ -127,14 +127,14 @@ public class PortfolioFactory {
             .type("team")
             .imageUrl("image")
             .content("pickgit")
-            .tags(List.of(mockTagRequest()))
+            .tags(List.of(mockTagRequest(1L, "java"), mockTagRequest(2L, "spring")))
             .build();
     }
 
-    private static TagRequest mockTagRequest() {
+    private static TagRequest mockTagRequest(Long id, String name) {
         return TagRequest.builder()
-            .id(1L)
-            .name("java")
+            .id(id)
+            .name(name)
             .build();
     }
 
