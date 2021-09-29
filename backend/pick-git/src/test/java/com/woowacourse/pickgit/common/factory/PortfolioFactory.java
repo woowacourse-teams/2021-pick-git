@@ -12,9 +12,10 @@ import java.util.List;
 
 public class PortfolioFactory {
 
-    public static PortfolioResponse mockPortfolioResponse() {
+    public static PortfolioResponse mockPortfolioResponse(String name) {
         return PortfolioResponse.builder()
             .id(1L)
+            .name(name)
             .profileImageShown(true)
             .profileImageUrl("image")
             .introduction("hi~")
@@ -26,9 +27,10 @@ public class PortfolioFactory {
             .build();
     }
 
-    public static PortfolioRequest mockPortfolioRequestWithNewAllAndSingleSize() {
+    public static PortfolioRequest mockPortfolioRequestWithNewAllAndSingleSize(String name) {
         return PortfolioRequest.builder()
             .id(1L)
+            .name(name)
             .profileImageShown(false)
             .profileImageUrl("image2")
             .introduction("hello~")

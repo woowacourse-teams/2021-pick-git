@@ -23,6 +23,8 @@ public class Portfolio {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String name;
+
     @Column(nullable = false)
     private Boolean profileImageShown;
 
@@ -53,6 +55,7 @@ public class Portfolio {
 
     public Portfolio(
         Long id,
+        String name,
         Boolean profileImageShown,
         String profileImageUrl,
         String introduction,
@@ -64,6 +67,7 @@ public class Portfolio {
     ) {
         this(
             id,
+            name,
             profileImageShown,
             profileImageUrl,
             introduction,
@@ -78,6 +82,7 @@ public class Portfolio {
 
     public Portfolio(
         Long id,
+        String name,
         Boolean profileImageShown,
         String profileImageUrl,
         String introduction,
@@ -89,6 +94,7 @@ public class Portfolio {
         User user
     ) {
         this.id = id;
+        this.name = name;
         this.profileImageShown = profileImageShown;
         this.profileImageUrl = profileImageUrl;
         this.introduction = introduction;
@@ -107,6 +113,7 @@ public class Portfolio {
     public static Portfolio empty(User user) {
         return new Portfolio(
             null,
+            user.getName(),
             true,
             user.getImage(),
             user.getDescription(),
@@ -120,6 +127,7 @@ public class Portfolio {
     }
 
     public void update(Portfolio portfolio) {
+        this.name = portfolio.getName();
         this.profileImageShown = portfolio.profileImageShown;
         this.profileImageUrl = portfolio.profileImageUrl;
         this.introduction = portfolio.introduction;
@@ -136,6 +144,10 @@ public class Portfolio {
 
     public Long getId() {
         return id;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public boolean isProfileImageShown() {

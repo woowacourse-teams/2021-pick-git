@@ -60,7 +60,8 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
                 // given
                 String token = 로그인_되어있음(USERNAME).getToken();
 
-                PortfolioResponse expected = PortfolioFactory.mockPortfolioResponse();
+                PortfolioResponse expected = PortfolioFactory
+                    .mockPortfolioResponse(USERNAME);
 
                 // when
                 PortfolioResponse response = authenticatedWithReadApi(token, USERNAME)
@@ -80,7 +81,8 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
                 String token = 로그인_되어있음(USERNAME).getToken();
                 로그인_되어있음(ANOTHER_USERNAME);
 
-                PortfolioResponse expected = PortfolioFactory.mockPortfolioResponse();
+                PortfolioResponse expected = PortfolioFactory
+                    .mockPortfolioResponse(ANOTHER_USERNAME);
 
                 // when
                 PortfolioResponse response = authenticatedWithReadApi(token, ANOTHER_USERNAME)
@@ -107,7 +109,7 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
                 authenticatedWithReadApi(token, USERNAME);
 
                 PortfolioRequest request = PortfolioFactory
-                    .mockPortfolioRequestWithNewAllAndSingleSize();
+                    .mockPortfolioRequestWithNewAllAndSingleSize(USERNAME);
 
                 // when
                 PortfolioResponse actual = authenticatedWithUpdateApi(token, request, OK)
@@ -249,7 +251,7 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
                 authenticatedWithReadApi(anotherToken, ANOTHER_USERNAME);
 
                 PortfolioRequest request = PortfolioFactory
-                    .mockPortfolioRequestWithNewAllAndSingleSize();
+                    .mockPortfolioRequestWithNewAllAndSingleSize(ANOTHER_USERNAME);
 
                 // when
                 ApiErrorResponse response = authenticatedWithUpdateApi(token, request, UNAUTHORIZED)
@@ -276,7 +278,8 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
                 String token = 로그인_되어있음(USERNAME).getToken();
                 authenticatedWithReadApi(token, USERNAME);
 
-                PortfolioResponse expected = PortfolioFactory.mockPortfolioResponse();
+                PortfolioResponse expected = PortfolioFactory
+                    .mockPortfolioResponse(USERNAME);
 
                 // when
                 PortfolioResponse response = unauthenticatedWithReadApi(OK)
@@ -310,7 +313,7 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
             void update_GuestUser_Fail() {
                 // given
                 PortfolioRequest request = PortfolioFactory
-                    .mockPortfolioRequestWithNewAllAndSingleSize();
+                    .mockPortfolioRequestWithNewAllAndSingleSize(ANOTHER_USERNAME);
 
                 // when
                 ApiErrorResponse response = unauthenticatedWithUpdateApi(request)

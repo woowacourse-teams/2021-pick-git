@@ -45,6 +45,7 @@ public class PortfolioDtoAssembler {
     public Portfolio toPortfolio(PortfolioRequestDto portfolioRequestDto) {
         return new Portfolio(
             portfolioRequestDto.getId(),
+            portfolioRequestDto.getName(),
             portfolioRequestDto.isProfileImageShown(),
             portfolioRequestDto.getProfileImageUrl(),
             portfolioRequestDto.getIntroduction(),
@@ -145,6 +146,7 @@ public class PortfolioDtoAssembler {
     public PortfolioResponseDto toPortfolioResponseDto(Portfolio portfolio) {
         return new PortfolioResponseDto(
             portfolio.getId(),
+            portfolio.getName(),
             portfolio.isProfileImageShown(),
             portfolio.getProfileImageUrl(),
             portfolio.getIntroduction(),
