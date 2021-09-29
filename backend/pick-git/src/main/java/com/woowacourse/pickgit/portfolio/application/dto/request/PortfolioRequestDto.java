@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.portfolio.application.dto.request;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
 
@@ -10,6 +11,8 @@ public class PortfolioRequestDto {
     private boolean profileImageShown;
     private String profileImageUrl;
     private String introduction;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private List<ContactRequestDto> contacts;
     private List<ProjectRequestDto> projects;
     private List<SectionRequestDto> sections;
@@ -22,6 +25,8 @@ public class PortfolioRequestDto {
         boolean profileImageShown,
         String profileImageUrl,
         String introduction,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt,
         List<ContactRequestDto> contacts,
         List<ProjectRequestDto> projects,
         List<SectionRequestDto> sections
@@ -30,6 +35,8 @@ public class PortfolioRequestDto {
         this.profileImageShown = profileImageShown;
         this.profileImageUrl = profileImageUrl;
         this.introduction = introduction;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
         this.contacts = contacts;
         this.projects = projects;
         this.sections = sections;
@@ -49,6 +56,14 @@ public class PortfolioRequestDto {
 
     public String getIntroduction() {
         return introduction;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 
     public List<ContactRequestDto> getContacts() {

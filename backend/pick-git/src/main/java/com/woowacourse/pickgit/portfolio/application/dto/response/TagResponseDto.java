@@ -28,7 +28,7 @@ public class TagResponseDto {
     public static TagResponseDto of(ProjectTag tag) {
         return TagResponseDto.builder()
             .id(tag.getId())
-            .name(tag.getName())
+            .name(tag.getTagName())
             .build();
     }
 

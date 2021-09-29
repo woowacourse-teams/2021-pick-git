@@ -42,12 +42,12 @@ public class ProjectTag implements Updatable<ProjectTag> {
         this.project = project;
     }
 
-    public String getName() {
-        return tag.getName();
-    }
-
     public Long getTagId() {
         return tag.getId();
+    }
+
+    public String getTagName() {
+        return tag.getName();
     }
 
     public Long getId() {

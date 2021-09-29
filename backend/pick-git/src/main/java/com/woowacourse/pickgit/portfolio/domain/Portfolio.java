@@ -4,6 +4,7 @@ import com.woowacourse.pickgit.portfolio.domain.contact.Contacts;
 import com.woowacourse.pickgit.portfolio.domain.project.Projects;
 import com.woowacourse.pickgit.portfolio.domain.section.Sections;
 import com.woowacourse.pickgit.user.domain.User;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -30,6 +31,10 @@ public class Portfolio {
 
     private String introduction;
 
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
+
     @Embedded
     private Contacts contacts;
 
@@ -51,6 +56,8 @@ public class Portfolio {
         Boolean profileImageShown,
         String profileImageUrl,
         String introduction,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt,
         Contacts contacts,
         Projects projects,
         Sections sections
@@ -60,6 +67,8 @@ public class Portfolio {
             profileImageShown,
             profileImageUrl,
             introduction,
+            createdAt,
+            updatedAt,
             contacts,
             projects,
             sections,
@@ -72,6 +81,8 @@ public class Portfolio {
         Boolean profileImageShown,
         String profileImageUrl,
         String introduction,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt,
         Contacts contacts,
         Projects projects,
         Sections sections,
@@ -81,6 +92,8 @@ public class Portfolio {
         this.profileImageShown = profileImageShown;
         this.profileImageUrl = profileImageUrl;
         this.introduction = introduction;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
         this.contacts = contacts;
         this.projects = projects;
         this.sections = sections;
@@ -97,6 +110,8 @@ public class Portfolio {
             true,
             user.getImage(),
             user.getDescription(),
+            LocalDateTime.now(),
+            LocalDateTime.now(),
             Contacts.empty(),
             Projects.empty(),
             Sections.empty(),
@@ -108,6 +123,8 @@ public class Portfolio {
         this.profileImageShown = portfolio.profileImageShown;
         this.profileImageUrl = portfolio.profileImageUrl;
         this.introduction = portfolio.introduction;
+        this.updatedAt = portfolio.updatedAt;
+        this.createdAt = portfolio.createdAt;
         this.contacts.update(portfolio.contacts, this);
         this.projects.update(portfolio.projects, this);
         this.sections.update(portfolio.sections, this);
@@ -127,6 +144,14 @@ public class Portfolio {
 
     public String getProfileImageUrl() {
         return profileImageUrl;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 
     public String getIntroduction() {
@@ -150,7 +175,7 @@ public class Portfolio {
         if (this == o) {
             return true;
         }
-        if ((o instanceof Portfolio)) {
+        if (!(o instanceof Portfolio)) {
             return false;
         }
         Portfolio portfolio = (Portfolio) o;

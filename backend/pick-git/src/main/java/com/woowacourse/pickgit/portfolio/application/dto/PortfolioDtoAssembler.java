@@ -48,6 +48,8 @@ public class PortfolioDtoAssembler {
             portfolioRequestDto.isProfileImageShown(),
             portfolioRequestDto.getProfileImageUrl(),
             portfolioRequestDto.getIntroduction(),
+            portfolioRequestDto.getCreatedAt(),
+            portfolioRequestDto.getUpdatedAt(),
             toContacts(portfolioRequestDto.getContacts()),
             toProjects(portfolioRequestDto.getProjects()),
             toSections(portfolioRequestDto.getSections())
@@ -146,6 +148,8 @@ public class PortfolioDtoAssembler {
             portfolio.isProfileImageShown(),
             portfolio.getProfileImageUrl(),
             portfolio.getIntroduction(),
+            portfolio.getCreatedAt(),
+            portfolio.getUpdatedAt(),
             toContactResponsesDto(portfolio.getContacts()),
             toProjectResponsesDto(portfolio.getProjects()),
             toSectionResponsesDto(portfolio.getSections())
@@ -192,7 +196,7 @@ public class PortfolioDtoAssembler {
     private TagResponseDto toTagResponseDto(ProjectTag tag) {
         return new TagResponseDto(
             tag.getTagId(),
-            tag.getName()
+            tag.getTagName()
         );
     }
 

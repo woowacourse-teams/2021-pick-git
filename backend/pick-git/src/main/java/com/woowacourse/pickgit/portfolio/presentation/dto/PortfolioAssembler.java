@@ -55,6 +55,8 @@ public class PortfolioAssembler {
             portfolioRequest.isProfileImageShown(),
             portfolioRequest.getProfileImageUrl(),
             portfolioRequest.getIntroduction(),
+            portfolioRequest.getCreatedAt(),
+            portfolioRequest.getUpdatedAt(),
             contactRequestsDto,
             projectRequestsDto,
             sectionRequestsDto
@@ -144,6 +146,8 @@ public class PortfolioAssembler {
             responseDto.isProfileImageShown(),
             responseDto.getProfileImageUrl(),
             responseDto.getIntroduction(),
+            responseDto.getCreatedAt(),
+            responseDto.getUpdatedAt(),
             contactResponses,
             projectResponses,
             sectionResponses

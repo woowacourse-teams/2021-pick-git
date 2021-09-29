@@ -68,6 +68,7 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
                 // then
                 assertThat(response)
                     .usingRecursiveComparison()
+                    .ignoringFields("createdAt", "updatedAt")
                     .isEqualTo(expected);
             }
 
@@ -87,6 +88,7 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
                 // then
                 assertThat(response)
                     .usingRecursiveComparison()
+                    .ignoringFields("createdAt", "updatedAt")
                     .isEqualTo(expected);
             }
         }
@@ -116,7 +118,6 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
 
                 assertThat(actual)
                     .usingRecursiveComparison()
-                    .ignoringFields("endDate", "startDate", "tags")
                     .isEqualTo(expected);
             }
 
@@ -141,7 +142,6 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
 
                 assertThat(actual)
                     .usingRecursiveComparison()
-                    .ignoringFields("endDate", "startDate")
                     .isEqualTo(expected);
             }
 
@@ -166,7 +166,6 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
 
                 assertThat(actual)
                     .usingRecursiveComparison()
-                    .ignoringFields("endDate", "startDate")
                     .isEqualTo(expected);
             }
 
@@ -190,7 +189,6 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
 
                 assertThat(actual)
                     .usingRecursiveComparison()
-                    .ignoringFields("endDate", "startDate")
                     .isEqualTo(expected);
             }
 
@@ -214,7 +212,6 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
 
                 assertThat(actual)
                     .usingRecursiveComparison()
-                    .ignoringFields("endDate", "startDate")
                     .isEqualTo(expected);
             }
 
@@ -238,7 +235,6 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
 
                 assertThat(actual)
                     .usingRecursiveComparison()
-                    .ignoringFields("endDate", "startDate")
                     .isEqualTo(expected);
             }
 
@@ -288,6 +284,7 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
                 // then
                 assertThat(response)
                     .usingRecursiveComparison()
+                    .ignoringFields("createdAt", "updatedAt")
                     .isEqualTo(expected);
             }
 
