@@ -54,13 +54,7 @@ public class GithubRepositorySearchExtractor implements PlatformRepositorySearch
     ) {
         String format = apiBaseUrl +
             "/search/repositories?q=user:%s %s in:name fork:true&page=%d&per_page=%d";
-        return String.format(
-            format,
-            username,
-            keyword,
-            page,
-            limit
-        );
+        return String.format(format, username, keyword, page, limit);
     }
 
     private RepositoryItemDto parseToRepositories(String response) {
