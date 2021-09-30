@@ -3,8 +3,3 @@ spring:
     include: security, db
   flyway:
     enabled: false
-
-github:
-  contribution:
-    star-url: https://api.github.com/search/repositories?q=user:%s stars:>=1
-    count-url: https://api.github.com/search/

@@ -41,28 +41,28 @@ public class GithubContributionCalculator implements PlatformContributionCalcula
 
     private int calculateCommits(String accessToken, String username) {
         CountDto count = platformContributionExtractor
-            .extractCount("/commits?q=committer:%s", accessToken, username);
+            .extractCount("/search/commits?q=committer:%s", accessToken, username);
 
         return count.getCount();
     }
 
     private int calculatePRs(String accessToken, String username) {
         CountDto count = platformContributionExtractor
-            .extractCount("/issues?q=author:%s type:pr", accessToken, username);
+            .extractCount("/search/issues?q=author:%s type:pr", accessToken, username);
 
         return count.getCount();
     }
 
     private int calculateIssues(String accessToken, String username) {
         CountDto count = platformContributionExtractor
-            .extractCount("/issues?q=author:%s type:issue", accessToken, username);
+            .extractCount("/search/issues?q=author:%s type:issue", accessToken, username);
 
         return count.getCount();
     }
 
     private int calculateRepos(String accessToken, String username) {
         CountDto count = platformContributionExtractor
-            .extractCount("/repositories?q=user:%s is:public", accessToken, username);
+            .extractCount("/search/repositories?q=user:%s is:public", accessToken, username);
 
         return count.getCount();
     }

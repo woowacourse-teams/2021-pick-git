@@ -2,6 +2,7 @@ package com.woowacourse.pickgit.user.infrastructure.requester;
 
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.user.domain.follow.PlatformFollowingRequester;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -13,7 +14,14 @@ import org.springframework.web.client.RestTemplate;
 @Component
 @Profile("!test")
 public class GithubFollowingRequester implements PlatformFollowingRequester {
-    private static final String URL_FORMAT = "https://api.github.com/user/following/%s";
+
+    private final String apiBaseUrl;
+
+    public GithubFollowingRequester(
+        @Value("${security.github.url.api}") String apiBaseUrl
+    ) {
+        this.apiBaseUrl = apiBaseUrl;
+    }
 
     @Override
     public void follow(String targetName, String accessToken) {
@@ -26,7 +34,8 @@ public class GithubFollowingRequester implements PlatformFollowingRequester {
     }
 
     private void requestFollowingOrUnFollowing(HttpMethod method, String targetName, String accessToken) {
-        String url = String.format(URL_FORMAT, targetName);
+        String format = apiBaseUrl + "/user/following/%s";
+        String url = String.format(format, targetName);
         try {
             HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.setBearerAuth(accessToken);
