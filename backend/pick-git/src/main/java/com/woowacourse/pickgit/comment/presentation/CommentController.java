@@ -15,6 +15,7 @@ import com.woowacourse.pickgit.config.auth_interceptor_register.ForLoginAndGuest
 import com.woowacourse.pickgit.config.auth_interceptor_register.ForOnlyLoginUser;
 import java.util.List;
 import javax.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,16 +27,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@RequiredArgsConstructor
+@CrossOrigin(value = "*")
 @RequestMapping("/api")
 @RestController
-@CrossOrigin(value = "*")
 public class CommentController {
 
     private final CommentService commentService;
-
-    public CommentController(CommentService commentService) {
-        this.commentService = commentService;
-    }
 
     @ForLoginAndGuestUser
     @GetMapping("/posts/{postId}/comments")
@@ -48,27 +46,32 @@ public class CommentController {
         QueryCommentRequestDto queryCommentRequestDto =
             createQueryCommentRequestDto(appUser, postId, page, limit);
 
-        List<CommentResponseDto> commentResponseDtos = commentService
-            .queryComments(queryCommentRequestDto);
+        List<CommentResponseDto> commentResponseDtos =
+            commentService.queryComments(queryCommentRequestDto);
 
         return ResponseEntity.ok(createCommentRequestDtos(commentResponseDtos));
     }
 
-    private List<CommentResponse> createCommentRequestDtos(
-        List<CommentResponseDto> commentResponseDtos) {
-        return commentResponseDtos.stream()
-            .map(this::createCommentResponse)
-            .collect(toList());
-    }
-
-    private QueryCommentRequestDto createQueryCommentRequestDto(AppUser appUser, Long postId,
-        int page, int limit) {
+    private QueryCommentRequestDto createQueryCommentRequestDto(
+        AppUser appUser,
+        Long postId,
+        int page,
+        int limit
+    ) {
         return QueryCommentRequestDto.builder()
             .postId(postId)
             .isGuest(appUser.isGuest())
             .page(page)
             .limit(limit)
             .build();
+    }
+
+    private List<CommentResponse> createCommentRequestDtos(
+        List<CommentResponseDto> commentResponseDtos
+    ) {
+        return commentResponseDtos.stream()
+            .map(this::createCommentResponse)
+            .collect(toList());
     }
 
     @ForOnlyLoginUser

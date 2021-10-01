@@ -16,29 +16,22 @@ import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import java.util.List;
-import javax.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
-@Transactional
 public class CommentService {
 
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
 
-    public CommentService(
-        CommentRepository commentRepository,
-        UserRepository userRepository,
-        PostRepository postRepository
-    ) {
-        this.commentRepository = commentRepository;
-        this.userRepository = userRepository;
-        this.postRepository = postRepository;
-    }
-
+    @Transactional
     public CommentResponseDto addComment(CommentRequestDto commentRequestDto) {
         String content = commentRequestDto.getContent();
         User user = findUserByName(commentRequestDto.getUserName());
@@ -54,7 +47,6 @@ public class CommentService {
         Long postId = queryCommentRequestDto.getPostId();
         int page = queryCommentRequestDto.getPage();
         int limit = queryCommentRequestDto.getLimit();
-
         Pageable pageable = PageRequest.of(page, limit);
 
         List<Comment> comments = commentRepository.findCommentsByPost_Id(postId, pageable);
@@ -74,6 +66,7 @@ public class CommentService {
             .build();
     }
 
+    @Transactional
     public void delete(CommentDeleteRequestDto commentDeleteRequestDto) {
         Post post = findPostById(commentDeleteRequestDto.getPostId());
         User user = findUserByName(commentDeleteRequestDto.getUsername());
