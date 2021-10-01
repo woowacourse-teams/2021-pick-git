@@ -54,7 +54,7 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
         @Nested
         class read {
 
-            @DisplayName("내 것 O")
+            @DisplayName("나의 포트폴리오 - 성공")
             @Test
             void read_LoginUserWithMine_Success() {
                 // given
@@ -74,7 +74,7 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
                     .isEqualTo(expected);
             }
 
-            @DisplayName("남 것 O")
+            @DisplayName("남의 포트폴리오 - 성공")
             @Test
             void read_LoginUserWithYours_Success() {
                 // given
@@ -100,7 +100,7 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
         @Nested
         class update {
 
-            @DisplayName("내 것 O, 모든 내용, 연락처/프로젝트/섹션 1개")
+            @DisplayName("나의 포트폴리오, 모든 내용, 연락처/프로젝트/섹션 1개 - 성공")
             @Test
             void update_LoginUserWithMineWithNewAllAndSingleSize_Success() {
                 // given
@@ -124,7 +124,7 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
                     .isEqualTo(expected);
             }
 
-            @DisplayName("내 것 O, 모든 내용, 연락처/프로젝트/섹션 2개 이상")
+            @DisplayName("나의 포트폴리오, 모든 내용, 연락처/프로젝트/섹션 2개 이상 - 성공")
             @Test
             void update_LoginUserWithMineWithNewAllAndMultipleSize_Success() {
                 // given
@@ -148,7 +148,7 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
                     .isEqualTo(expected);
             }
 
-            @DisplayName("내 것 O, 프로필 및 소개")
+            @DisplayName("나의 포트폴리오, 프로필 및 소개 - 성공")
             @Test
             void update_LoginUserWithMineWithNewProfileAndIntroduction_Success() {
                 // given
@@ -172,7 +172,7 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
                     .isEqualTo(expected);
             }
 
-            @DisplayName("내 것 O, 연락처")
+            @DisplayName("나의 포트폴리오, 연락처 - 성공")
             @Test
             void update_LoginUserWithMineWithNewContact_Success() {
                 // given
@@ -195,7 +195,7 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
                     .isEqualTo(expected);
             }
 
-            @DisplayName("내 것 O, 프로젝트")
+            @DisplayName("나의 포트폴리오, 프로젝트 - 성공")
             @Test
             void update_LoginUserWithMineWithNewProject_Success() {
                 // given
@@ -218,7 +218,7 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
                     .isEqualTo(expected);
             }
 
-            @DisplayName("내 것 O, 섹션")
+            @DisplayName("나의 포트폴리오, 섹션 - 성공")
             @Test
             void update_LoginUserWithMineWithNewSection_Success() {
                 // given
@@ -241,7 +241,7 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
                     .isEqualTo(expected);
             }
 
-            @DisplayName("남 것 X")
+            @DisplayName("남의 포트폴리오 - 실패")
             @Test
             void update_LoginUserWithYours_Fail() {
                 // given
@@ -271,9 +271,9 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
         @Nested
         class read {
 
-            @DisplayName("남 것 O, 포트폴리오 존재 O")
+            @DisplayName("남의 포트폴리오, 포트폴리오가 존재하는 경우 - 성공")
             @Test
-            void read_GuestUser_Success() {
+            void read_GuestUserWithExistingYours_Success() {
                 // given
                 String token = 로그인_되어있음(USERNAME).getToken();
                 authenticatedWithReadApi(token, USERNAME);
@@ -292,9 +292,9 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
                     .isEqualTo(expected);
             }
 
-            @DisplayName("남 것 O, 포트폴리오 존재 X")
+            @DisplayName("남의 포트폴리오, 포트폴리오가 존재하지 않는 경우 - 실패")
             @Test
-            void read_GuestUser_Fail() {
+            void read_GuestUserWithNonExistingYours_Fail() {
                 // when
                 ApiErrorResponse response = unauthenticatedWithReadApi(BAD_REQUEST)
                     .as(ApiErrorResponse.class);
@@ -308,9 +308,9 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
         @Nested
         class update {
 
-            @DisplayName("남 것 X")
+            @DisplayName("남의 포트폴리오 - 실패")
             @Test
-            void update_GuestUser_Fail() {
+            void update_GuestUserWithYours_Fail() {
                 // given
                 PortfolioRequest request = PortfolioFactory
                     .mockPortfolioRequestWithNewAllAndSingleSize(ANOTHER_USERNAME);
