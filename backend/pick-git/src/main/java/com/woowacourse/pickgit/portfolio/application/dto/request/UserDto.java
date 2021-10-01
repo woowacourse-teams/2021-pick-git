@@ -21,9 +21,9 @@ public class UserDto {
 
     public static UserDto from(AppUser user) {
         if (user.isGuest()) {
-            return new UserDto(null, null, false);
+            return new UserDto(null, null, true);
         }
-        return new UserDto(user.getUsername(), user.getAccessToken(), true);
+        return new UserDto(user.getUsername(), user.getAccessToken(), false);
     }
 
     public String getUsername() {

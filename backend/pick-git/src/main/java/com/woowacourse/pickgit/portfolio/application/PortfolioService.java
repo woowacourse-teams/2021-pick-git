@@ -12,6 +12,8 @@ import com.woowacourse.pickgit.portfolio.domain.repository.PortfolioRepository;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import java.util.Optional;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +25,9 @@ public class PortfolioService {
     private final PortfolioDtoAssembler portfolioDtoAssembler;
     private final UserRepository userRepository;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     public PortfolioService(
         PortfolioRepository portfolioRepository,
         PortfolioDtoAssembler portfolioDtoAssembler,
@@ -33,10 +38,10 @@ public class PortfolioService {
         this.userRepository = userRepository;
     }
 
-    public PortfolioResponseDto findPortfolioByUsername(String username, UserDto userDto) {
+    public PortfolioResponseDto read(String username, UserDto userDto) {
         Optional<Portfolio> portfolio = portfolioRepository.findPortfolioByUsername(username);
 
-        if (portfolio.isEmpty() && userDto.isGuest()) {
+        if (userDto.isGuest() && portfolio.isEmpty()) {
             throw new NoSuchPortfolioException();
         }
 
@@ -54,8 +59,9 @@ public class PortfolioService {
         if (!portfolio.isOwnedBy(user)) {
             throw new UnauthorizedException();
         }
-
         portfolio.update(portfolioDtoAssembler.toPortfolio(portfolioRequestDto));
+
+        entityManager.flush();
 
         return portfolioDtoAssembler.toPortfolioResponseDto(portfolio);
     }

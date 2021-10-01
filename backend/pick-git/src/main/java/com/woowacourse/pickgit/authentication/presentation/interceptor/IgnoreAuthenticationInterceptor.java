@@ -14,8 +14,7 @@ public class IgnoreAuthenticationInterceptor implements HandlerInterceptor {
 
     private OAuthService oAuthService;
 
-    public IgnoreAuthenticationInterceptor(
-        OAuthService oAuthService) {
+    public IgnoreAuthenticationInterceptor(OAuthService oAuthService) {
         this.oAuthService = oAuthService;
     }
 
@@ -23,7 +22,8 @@ public class IgnoreAuthenticationInterceptor implements HandlerInterceptor {
     public boolean preHandle(
         HttpServletRequest request,
         HttpServletResponse response,
-        Object handler) throws Exception {
+        Object handler
+    ) {
         if (isPreflightRequest(request)) {
             return true;
         }

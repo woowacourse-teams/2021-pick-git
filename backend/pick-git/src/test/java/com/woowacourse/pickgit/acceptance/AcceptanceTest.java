@@ -1,6 +1,5 @@
 package com.woowacourse.pickgit.acceptance;
 
-import com.woowacourse.pickgit.common.request_builder.PickGitRequest;
 import com.woowacourse.pickgit.config.DatabaseCleaner;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import io.restassured.RestAssured;
@@ -28,13 +27,13 @@ public abstract class AcceptanceTest {
         setPort();
     }
 
+    private void setPort() {
+        RestAssured.port = port;
+    }
+
     @AfterEach
     void tearDown() {
         clearDataBase();
-    }
-
-    private void setPort() {
-        RestAssured.port = port;
     }
 
     private void clearDataBase() {

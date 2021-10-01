@@ -1,9 +1,5 @@
 package com.woowacourse.pickgit.portfolio.application.dto.request;
 
-import static java.util.stream.Collectors.toList;
-
-import com.woowacourse.pickgit.portfolio.presentation.dto.request.ItemRequest;
-import com.woowacourse.pickgit.portfolio.presentation.dto.request.SectionRequest;
 import java.util.List;
 import lombok.Builder;
 

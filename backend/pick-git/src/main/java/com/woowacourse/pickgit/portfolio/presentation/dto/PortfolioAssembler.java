@@ -52,9 +52,12 @@ public class PortfolioAssembler {
 
         return new PortfolioRequestDto(
             portfolioRequest.getId(),
+            portfolioRequest.getName(),
             portfolioRequest.isProfileImageShown(),
             portfolioRequest.getProfileImageUrl(),
             portfolioRequest.getIntroduction(),
+            portfolioRequest.getCreatedAt(),
+            portfolioRequest.getUpdatedAt(),
             contactRequestsDto,
             projectRequestsDto,
             sectionRequestsDto
@@ -141,9 +144,12 @@ public class PortfolioAssembler {
 
         return new PortfolioResponse(
             responseDto.getId(),
+            responseDto.getName(),
             responseDto.isProfileImageShown(),
             responseDto.getProfileImageUrl(),
             responseDto.getIntroduction(),
+            responseDto.getCreatedAt(),
+            responseDto.getUpdatedAt(),
             contactResponses,
             projectResponses,
             sectionResponses

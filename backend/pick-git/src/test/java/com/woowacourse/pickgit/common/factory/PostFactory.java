@@ -9,7 +9,6 @@ import com.woowacourse.pickgit.user.domain.User;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import org.mockito.Mock;
 import org.springframework.web.multipart.MultipartFile;
 
 public class PostFactory {

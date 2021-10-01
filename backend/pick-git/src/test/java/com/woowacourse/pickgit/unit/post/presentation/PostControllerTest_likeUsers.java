@@ -31,7 +31,6 @@ import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.request.AuthUserForPostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeUsersResponseDto;
 import com.woowacourse.pickgit.post.presentation.PostController;
-import com.woowacourse.pickgit.post.presentation.PostFeedController;
 import com.woowacourse.pickgit.user.domain.User;
 import java.util.List;
 import org.apache.http.HttpHeaders;

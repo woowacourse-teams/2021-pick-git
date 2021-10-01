@@ -1,6 +1,5 @@
 package com.woowacourse.pickgit.portfolio.application.dto.request;
 
-import com.woowacourse.pickgit.portfolio.presentation.dto.request.ContactRequest;
 import lombok.Builder;
 
 @Builder
