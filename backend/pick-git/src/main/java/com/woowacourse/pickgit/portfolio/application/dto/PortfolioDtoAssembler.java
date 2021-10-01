@@ -83,7 +83,7 @@ public class PortfolioDtoAssembler {
 
     private Project toProject(ProjectRequestDto projectRequestDto) {
         List<ProjectTag> tags = projectRequestDto.getTags().stream()
-            .map(this::toTag)
+            .map(this::toProjectTag)
             .collect(toList());
 
         return new Project(
@@ -98,7 +98,7 @@ public class PortfolioDtoAssembler {
         );
     }
 
-    private ProjectTag toTag(TagRequestDto tagRequestDto) {
+    private ProjectTag toProjectTag(TagRequestDto tagRequestDto) {
         Tag tag = entityManager.getReference(Tag.class, tagRequestDto.getId());
 
         return new ProjectTag(tag);
