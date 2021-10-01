@@ -8,8 +8,8 @@ import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 
-@Component
 @Profile("!test")
+@Component
 public class GithubTagApiRequester implements PlatformTagApiRequester {
 
     @Override
