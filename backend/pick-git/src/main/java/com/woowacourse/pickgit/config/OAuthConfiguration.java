@@ -14,7 +14,6 @@ import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.Controll
 import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.ForGuestScanner;
 import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.ForLoginUserScanner;
 import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.package_scanner.PackageScanner;
-import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.package_scanner.SourceVisitor;
 import java.util.List;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

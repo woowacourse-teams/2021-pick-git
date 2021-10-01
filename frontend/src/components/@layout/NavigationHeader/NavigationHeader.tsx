@@ -43,9 +43,6 @@ const NavigationHeader = () => {
       <NavigationItem to={PAGE_URL.SEARCH}>
         <SearchIcon />
       </NavigationItem>
-      <NavigationItem to={PAGE_URL.PORTFOLIO}>
-        <SearchIcon />
-      </NavigationItem>
     </Navigation>
   );
 

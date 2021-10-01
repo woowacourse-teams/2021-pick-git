@@ -36,8 +36,7 @@ class GithubContributionCalculatorTest {
         platformContributionExtractor = new GithubContributionExtractor(
             objectMapper,
             new MockContributionApiRequester(),
-            apiUrlFormatForStar,
-            apiUrlFormatForCount
+            "https://api.github.com"
         );
         platformContributionCalculator = new GithubContributionCalculator(
             platformContributionExtractor
@@ -66,8 +65,7 @@ class GithubContributionCalculatorTest {
         platformContributionExtractor = new GithubContributionExtractor(
             objectMapper,
             new MockStarsContributionApiErrorRequester(),
-            apiUrlFormatForStar,
-            apiUrlFormatForCount
+            "https://api.github.com"
         );
         platformContributionCalculator = new GithubContributionCalculator(
             platformContributionExtractor
@@ -89,8 +87,7 @@ class GithubContributionCalculatorTest {
         platformContributionExtractor = new GithubContributionExtractor(
             objectMapper,
             new MockStarsContributionApiErrorRequester(),
-            apiUrlFormatForStar,
-            apiUrlFormatForCount
+            "https://api.github.com"
         );
         platformContributionCalculator = new GithubContributionCalculator(
             platformContributionExtractor
@@ -128,8 +125,7 @@ class GithubContributionCalculatorTest {
         platformContributionExtractor = new GithubContributionExtractor(
             objectMapper,
             new MockCountContributionApiErrorRequester(),
-            apiUrlFormatForStar,
-            apiUrlFormatForCount
+            "https://api.github.com"
         );
         platformContributionCalculator = new GithubContributionCalculator(
             platformContributionExtractor
@@ -151,8 +147,7 @@ class GithubContributionCalculatorTest {
         platformContributionExtractor = new GithubContributionExtractor(
             objectMapper,
             new MockCountContributionApiErrorRequester(),
-            apiUrlFormatForStar,
-            apiUrlFormatForCount
+            "https://api.github.com"
         );
         platformContributionCalculator = new GithubContributionCalculator(
             platformContributionExtractor

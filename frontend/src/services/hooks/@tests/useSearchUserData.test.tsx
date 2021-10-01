@@ -43,7 +43,7 @@ const wrapper = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const setupHook = () => renderHook(() => useSearchUserData(), { wrapper });
+const setupHook = () => renderHook(() => useSearchUserData(true), { wrapper });
 
 beforeAll(() => {
   searchUserDataServer.listen();

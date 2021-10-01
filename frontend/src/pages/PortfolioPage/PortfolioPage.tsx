@@ -14,14 +14,14 @@ import {
   DetailInfo,
   ContactWrapper,
   PaginatorWrapper,
+  CloseButtonWrapper,
   SectionNameCSS,
   ToggleButtonCSS,
   UserAvatarCSS,
   ContactIconCSS,
-  DeleteButtonCSS,
 } from "./PortfolioPage.style";
 import DotPaginator from "../../components/@shared/DotPaginator/DotPaginator";
-import { PortfolioProject, Post } from "../../@types";
+import { Portfolio, PortfolioProject, Post } from "../../@types";
 import ScrollActiveHeader from "../../components/@layout/ScrollActiveHeader/ScrollActiveHeader";
 import PortfolioHeader from "../../components/@layout/PortfolioHeader/PortfolioHeader";
 import { getScrollYPosition } from "../../utils/layout";
@@ -41,14 +41,22 @@ import usePortfolioIntro from "../../services/hooks/usePortfolioIntro";
 import Button from "../../components/@shared/Button/Button";
 import useMessageModal from "../../services/hooks/@common/useMessageModal";
 import MessageModalPortal from "../../components/@layout/MessageModalPortal/MessageModalPortal";
+import usePortfolio from "../../services/hooks/usePortfolio";
 
 const PortfolioPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [userName] = new URL(window.location.href).search;
+  const username = new URLSearchParams(location.search).get("username") ?? "";
   const { currentUsername, isLoggedIn } = useContext(UserContext);
-  const isMyProfile = userName === currentUsername;
-  const { data: profile, isLoading } = useProfile(isMyProfile, currentUsername);
-  const { infinitePostsData, handleIntersect } = useUserFeed(isMyProfile, currentUsername);
+  const isMyPortfolio = username === currentUsername;
+  const {
+    portfolio: remotePortfolio,
+    isError,
+    isLoading: isPortfolioLoading,
+    mutateSetPortfolio,
+  } = usePortfolio(username);
+  const { data: profile, isLoading: isProfileLoading } = useProfile(isMyPortfolio, currentUsername);
+  const { infinitePostsData, handleIntersect, isFetchingNextPage } = useUserFeed(isMyPortfolio, currentUsername);
+
   const {
     portfolioSections,
     addBlankPortfolioSection,
@@ -56,8 +64,10 @@ const PortfolioPage = () => {
     updatePortfolioSectionName,
     setPortfolioSection,
   } = usePortfolioSections();
+
   const { portfolioProjects, addPortfolioProject, deletePortfolioProject, updatePortfolioProject } =
     usePortfolioProjects();
+
   const { isModalShown, showModal, hideModal } = useModal(false);
   const { portfolioIntro, setPortfolioIntro, updateIntroName, updateIntroDescription, updateIsProfileShown } =
     usePortfolioIntro(profile?.name, profile?.description);
@@ -69,6 +79,7 @@ const PortfolioPage = () => {
     showConfirmModal,
     hideMessageModal,
   } = useMessageModal();
+
   const [deletingSectionType, setDeletingSectionType] = useState<"project" | "custom">();
   const [deletingSectionName, setDeletingSectionName] = useState("");
 
@@ -146,6 +157,10 @@ const PortfolioPage = () => {
     hideMessageModal();
   };
 
+  const handleUploadPortfolio = async (portfolio: Portfolio) => {
+    await mutateSetPortfolio(portfolio);
+  };
+
   useEffect(() => {
     if (profile && portfolioIntro.name === "" && portfolioIntro.description === "") {
       setPortfolioIntro({
@@ -160,101 +175,148 @@ const PortfolioPage = () => {
     return <Redirect to={PAGE_URL.HOME} />;
   }
 
-  if (isLoading) {
+  if (isProfileLoading) {
     return <PageLoading />;
   }
 
-  if (!profile) {
-    return <div>이용자 정보를 찾을 수 없습니다.</div>;
-  }
+  // if (!remotePortfolio && !isMyPortfolio) {
+  //   return <div>포트폴리오를 찾을 수 없습니다</div>;
+  // }
+
+  // let targetPortfolio: Portfolio;
+
+  // if (!remotePortfolio) {
+  //   targetPortfolio = {
+  //     intro: portfolioIntro,
+  //     projects: portfolioProjects,
+  //     sections: portfolioSections,
+  //   };
+  // } else {
+  //   targetPortfolio = remotePortfolio;
+  // }
+
+  const targetPortfolio = {
+    intro: portfolioIntro,
+    projects: portfolioProjects,
+    sections: portfolioSections,
+  };
 
   return (
     <>
       <ScrollActiveHeader containerRef={containerRef}>
-        <PortfolioHeader onAddPortfolioSection={handleAddSection} onAddPortfolioProject={handleAddProject} />
+        <PortfolioHeader
+          isButtonsShown={isMyPortfolio}
+          onAddPortfolioSection={handleAddSection}
+          onAddPortfolioProject={handleAddProject}
+          onUploadPortfolio={() => handleUploadPortfolio(targetPortfolio)}
+        />
       </ScrollActiveHeader>
       <Container ref={containerRef}>
         <FullPage isVerticalCenter={true}>
-          <ToggleButton
-            toggleButtonText="프로필 사진 보이기"
-            cssProp={ToggleButtonCSS}
-            isToggled={portfolioIntro.isProfileShown}
-            onToggle={() => updateIsProfileShown(!portfolioIntro.isProfileShown)}
-          />
+          {isMyPortfolio && (
+            <ToggleButton
+              toggleButtonText="프로필 사진 보이기"
+              cssProp={ToggleButtonCSS}
+              isToggled={targetPortfolio.intro.isProfileShown}
+              onToggle={() => updateIsProfileShown(!targetPortfolio.intro.isProfileShown)}
+            />
+          )}
           <AvatarWrapper>
-            {portfolioIntro.isProfileShown && (
-              <Avatar diameter="6.5625rem" fontSize="1.5rem" imageUrl={profile.imageUrl} cssProp={UserAvatarCSS} />
+            {targetPortfolio.intro.isProfileShown && (
+              <Avatar diameter="6.5625rem" fontSize="1.5rem" imageUrl={profile?.imageUrl} cssProp={UserAvatarCSS} />
             )}
             <PortfolioTextEditor
               cssProp={UserNameCSS}
-              value={portfolioIntro.name}
+              value={targetPortfolio.intro.name}
               onChange={handleIntroNameUpdate}
+              disabled={!isMyPortfolio}
+              placeholder={PLACE_HOLDER.INTRO_NAME}
               autoGrow
             />
           </AvatarWrapper>
           <PortfolioTextEditor
             cssProp={DescriptionCSS}
-            value={portfolioIntro.description}
+            value={targetPortfolio.intro.description}
             onChange={handleIntroDescriptionUpdate}
+            disabled={!isMyPortfolio}
+            placeholder={PLACE_HOLDER.INTRO_DESCRIPTION}
             autoGrow
           />
           <ContactWrapper>
             <DetailInfo>
               <SVGIcon cssProp={ContactIconCSS} icon="CompanyIcon" />
-              {profile.company ? profile.company : "-"}
+              {profile?.company ? profile?.company : "-"}
             </DetailInfo>
             <DetailInfo>
               <SVGIcon cssProp={ContactIconCSS} icon="LocationIcon" />
-              {profile.location ? profile.location : "-"}
+              {profile?.location ? profile?.location : "-"}
             </DetailInfo>
             <DetailInfo>
               <SVGIcon cssProp={ContactIconCSS} icon="GithubDarkIcon" />
-              <a href={profile.githubUrl ?? ""}>{profile.githubUrl ? profile.githubUrl : "-"}</a>
+              <a href={profile?.githubUrl ?? ""}>{profile?.githubUrl ? profile?.githubUrl : "-"}</a>
             </DetailInfo>
             <DetailInfo>
               <SVGIcon cssProp={ContactIconCSS} icon="WebsiteLinkIcon" />
-              <a href={profile.website ?? ""}>{profile.website ? profile.website : "-"}</a>
+              <a href={profile?.website ?? ""}>{profile?.website ? profile?.website : "-"}</a>
             </DetailInfo>
             <DetailInfo>
               <SVGIcon cssProp={ContactIconCSS} icon="TwitterIcon" />
-              {profile.twitter ? profile.twitter : "-"}
+              {profile?.twitter ? profile?.twitter : "-"}
             </DetailInfo>
           </ContactWrapper>
         </FullPage>
-        {portfolioProjects.map((portfolioProject) => (
-          <FullPage isVerticalCenter={true}>
-            <PortfolioProjectSection project={portfolioProject} setProject={handleSetProject(portfolioProject.name)} />
-            <Button
-              cssProp={DeleteButtonCSS}
-              kind="roundedInline"
-              onClick={() => handleDeleteProjectSection(portfolioProject.name)}
-            >
-              프로젝트 삭제
-            </Button>
+        {targetPortfolio.projects.map((portfolioProject, index) => (
+          <FullPage isVerticalCenter={true} key={index}>
+            <PortfolioProjectSection
+              isEditable={isMyPortfolio}
+              project={portfolioProject}
+              setProject={handleSetProject(portfolioProject.name)}
+            />
+            {isMyPortfolio && (
+              <CloseButtonWrapper>
+                <Button
+                  kind="roundedInline"
+                  padding="0.5rem"
+                  onClick={() => handleDeleteProjectSection(portfolioProject.name)}
+                >
+                  <SVGIcon icon="CancelNoCircleIcon" />
+                </Button>
+              </CloseButtonWrapper>
+            )}
           </FullPage>
         ))}
-        {portfolioSections.map((portfolioSection) => (
-          <FullPage>
+        {targetPortfolio.sections.map((portfolioSection, index) => (
+          <FullPage key={index}>
             <PortfolioTextEditor
               cssProp={SectionNameCSS}
               value={portfolioSection.name}
               onChange={handleSectionNameUpdate(portfolioSection.name)}
               autoGrow={true}
               placeholder={PLACE_HOLDER.SECTION_NAME}
+              disabled={!isMyPortfolio}
             />
-            <PortfolioSection section={portfolioSection} setSection={setPortfolioSection} />
-            <Button
-              cssProp={DeleteButtonCSS}
-              kind="roundedInline"
-              onClick={() => handleDeleteCustomSection(portfolioSection.name)}
-            >
-              섹션 삭제
-            </Button>
+            <PortfolioSection isEditable={isMyPortfolio} section={portfolioSection} setSection={setPortfolioSection} />
+            {isMyPortfolio && (
+              <CloseButtonWrapper>
+                <Button
+                  kind="roundedInline"
+                  padding="0.5rem"
+                  onClick={() => handleDeleteCustomSection(portfolioSection.name)}
+                >
+                  <SVGIcon icon="CancelNoCircleIcon" />
+                </Button>
+              </CloseButtonWrapper>
+            )}
           </FullPage>
         ))}
         {isModalShown && isLoggedIn && (
           <ModalPortal onClose={hideModal} isCloseButtonShown={true}>
-            <PostSelector infinitePostsData={infinitePostsData} onPostSelect={handlePostSelect} />
+            <PostSelector
+              infinitePostsData={infinitePostsData}
+              isFetchingNextPage={isFetchingNextPage}
+              onPostSelect={handlePostSelect}
+              onIntersect={handleIntersect}
+            />
           </ModalPortal>
         )}
         {isMessageModalShown && isCancelButtonShown && (

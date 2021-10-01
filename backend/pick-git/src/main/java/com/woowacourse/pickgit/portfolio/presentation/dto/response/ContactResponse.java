@@ -5,15 +5,21 @@ import lombok.Builder;
 @Builder
 public class ContactResponse {
 
+    private Long id;
     private String category;
     private String value;
 
     private ContactResponse() {
     }
 
-    public ContactResponse(String category, String value) {
+    public ContactResponse(Long id, String category, String value) {
+        this.id = id;
         this.category = category;
         this.value = value;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getCategory() {

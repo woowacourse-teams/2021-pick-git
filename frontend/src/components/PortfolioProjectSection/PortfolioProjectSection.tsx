@@ -4,6 +4,7 @@ import {
   ProjectPeriods,
   ProjectBody,
   ProjectInfo,
+  ProjectType,
   ProjectContentCSS,
   ProjectTypeCSS,
   ProjectDateCSS,
@@ -13,28 +14,23 @@ import {
   ProjectDateSeparator,
 } from "./PortfolioProjectSection.style";
 import Chip from "../@shared/Chip/Chip";
-import { PAGE_URL } from "../../constants/urls";
 import PortfolioTextEditor from "../PortfolioTextEditor/PortfolioTextEditor";
 import DropDown, { DropDownItem } from "../@shared/DropDown/DropDown";
 import DateInput from "../@shared/DateInput/DateInput";
 import usePortfolioProjectSection from "../../services/hooks/usePortfolioProject";
 import { PortfolioProject } from "../../@types";
+import { PLACE_HOLDER } from "../../constants/placeholder";
 
 export interface Props {
   project: PortfolioProject;
+  isEditable: boolean;
   setProject: (project: PortfolioProject) => void;
 }
 
-const PortfolioProjectSection = ({ project, setProject }: Props) => {
+const PortfolioProjectSection = ({ project, isEditable, setProject }: Props) => {
   const { deleteTag, updateContent, updateEndDate, updateName, updateStartDate, updateType } =
     usePortfolioProjectSection(project, setProject);
-
-  const tagList = project.tags.map((tag: string) => (
-    <Chip cssProp={TagItemCSS} onDelete={() => deleteTag(tag)}>
-      {tag}
-    </Chip>
-  ));
-
+  const projectType = project.type === "team" ? "팀 프로젝트" : "개인 프로젝트";
   const dropDownItems: DropDownItem[] = [
     {
       text: "팀 프로젝트",
@@ -45,6 +41,12 @@ const PortfolioProjectSection = ({ project, setProject }: Props) => {
       onClick: () => updateType("personal"),
     },
   ];
+
+  const tagList = project.tags.map((tag: string) => (
+    <Chip cssProp={TagItemCSS} onDelete={() => deleteTag(tag)}>
+      {tag}
+    </Chip>
+  ));
 
   const handleUpdateContent: React.ChangeEventHandler<HTMLTextAreaElement> = (event) => {
     updateContent(event.currentTarget.value);
@@ -65,14 +67,35 @@ const PortfolioProjectSection = ({ project, setProject }: Props) => {
   return (
     <Container>
       <ProjectPeriods>
-        <DateInput cssProp={ProjectDateCSS} value={project.startDate} onChange={handleUpdateStartDate} />
+        <DateInput
+          disabled={!isEditable}
+          cssProp={ProjectDateCSS}
+          value={project.startDate}
+          onChange={handleUpdateStartDate}
+        />
         <ProjectDateSeparator>~</ProjectDateSeparator>
-        <DateInput cssProp={ProjectDateCSS} value={project.endDate} onChange={handleUpdateEndDate} />
+        <DateInput
+          disabled={!isEditable}
+          cssProp={ProjectDateCSS}
+          value={project.endDate}
+          onChange={handleUpdateEndDate}
+        />
       </ProjectPeriods>
-      <DropDown items={dropDownItems} cssProp={ProjectTypeCSS}>
-        {project.type === "team" ? "팀 프로젝트" : "개인 프로젝트"}
-      </DropDown>
-      <PortfolioTextEditor cssProp={ProjectNameCSS} value={project.name} onChange={handleUpdateName} autoGrow />
+      {isEditable ? (
+        <DropDown items={dropDownItems} cssProp={ProjectTypeCSS}>
+          {projectType}
+        </DropDown>
+      ) : (
+        <ProjectType>{projectType}</ProjectType>
+      )}
+      <PortfolioTextEditor
+        disabled={!isEditable}
+        cssProp={ProjectNameCSS}
+        value={project.name}
+        onChange={handleUpdateName}
+        placeholder={PLACE_HOLDER.PROJECT_NAME}
+        autoGrow
+      />
       <ProjectBody>
         <ProjectImage src={project.imageUrl} />
         <ProjectInfo>
@@ -80,6 +103,8 @@ const PortfolioProjectSection = ({ project, setProject }: Props) => {
             cssProp={ProjectContentCSS}
             value={project.content}
             onChange={handleUpdateContent}
+            disabled={!isEditable}
+            placeholder={PLACE_HOLDER.PROJECT_DESCRIPTION}
             autoGrow
           />
           <TagListWrapper>{tagList}</TagListWrapper>
