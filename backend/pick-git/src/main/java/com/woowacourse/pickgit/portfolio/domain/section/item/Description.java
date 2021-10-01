@@ -1,7 +1,7 @@
 package com.woowacourse.pickgit.portfolio.domain.section.item;
 
 import com.woowacourse.pickgit.portfolio.domain.common.Updatable;
-import javassist.runtime.Desc;
+import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -49,6 +49,33 @@ public class Description implements Updatable<Description> {
 
     @Override
     public void update(Description description) {
-        this.value = description.value;
+        this.value = description.getValue();
+    }
+
+    @Override
+    public boolean semanticallyEquals(Object o) {
+        return equals(o);
+    }
+
+    @Override
+    public int semanticallyHashcode() {
+        return hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Description)) {
+            return false;
+        }
+        Description that = (Description) o;
+        return Objects.equals(id, that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

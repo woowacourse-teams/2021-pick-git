@@ -1,14 +1,10 @@
 package com.woowacourse.pickgit.portfolio.domain.section.item;
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-
 import com.woowacourse.pickgit.portfolio.domain.common.Updatable;
 import com.woowacourse.pickgit.portfolio.domain.common.UpdateUtil;
 import com.woowacourse.pickgit.portfolio.domain.section.Section;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
+import java.util.Objects;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -82,12 +78,35 @@ public class Item implements Updatable<Item> {
 
     @Override
     public void update(Item item) {
-        getDescriptions(item).forEach(description -> description.appendTo(this));
+        item.getDescriptions().forEach(description -> description.appendTo(this));
 
-        UpdateUtil.execute(item.descriptions, this.descriptions);
+        UpdateUtil.execute(item.getDescriptions(), this.getDescriptions());
     }
 
-    private List<Description> getDescriptions(Item item) {
-        return item.descriptions;
+    @Override
+    public boolean semanticallyEquals(Object o) {
+        return equals(o);
+    }
+
+    @Override
+    public int semanticallyHashcode() {
+        return hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Item)) {
+            return false;
+        }
+        Item item = (Item) o;
+        return Objects.equals(id, item.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

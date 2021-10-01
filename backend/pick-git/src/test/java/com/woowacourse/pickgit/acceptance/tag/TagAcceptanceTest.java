@@ -7,7 +7,6 @@ import com.woowacourse.pickgit.acceptance.AcceptanceTest;
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
-import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
 import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
@@ -17,16 +16,9 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import org.springframework.test.context.ActiveProfiles;
 
 class TagAcceptanceTest extends AcceptanceTest {
 
@@ -42,8 +34,11 @@ class TagAcceptanceTest extends AcceptanceTest {
         accessToken = tokenResponse.getToken();
     }
 
-    private ExtractableResponse<Response> requestTags(String accessToken, String url,
-        HttpStatus httpStatus) {
+    private ExtractableResponse<Response> requestTags(
+        String accessToken,
+        String url,
+        HttpStatus httpStatus
+    ) {
         return RestAssured.given().log().all()
             .auth().oauth2(accessToken)
             .when().get(url)

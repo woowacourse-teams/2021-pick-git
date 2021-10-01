@@ -18,15 +18,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class OAuthService {
 
-    private OAuthClient githubOAuthClient;
-    private JwtTokenProvider jwtTokenProvider;
-    private OAuthAccessTokenDao authAccessTokenDao;
-    private UserRepository userRepository;
+    private final OAuthClient githubOAuthClient;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final OAuthAccessTokenDao authAccessTokenDao;
+    private final UserRepository userRepository;
 
-    public OAuthService(OAuthClient githubOAuthClient,
+    public OAuthService(
+        OAuthClient githubOAuthClient,
         JwtTokenProvider jwtTokenProvider,
         OAuthAccessTokenDao authAccessTokenDao,
-        UserRepository userRepository) {
+        UserRepository userRepository
+    ) {
         this.githubOAuthClient = githubOAuthClient;
         this.jwtTokenProvider = jwtTokenProvider;
         this.authAccessTokenDao = authAccessTokenDao;
@@ -59,13 +61,12 @@ public class OAuthService {
         GithubProfile latestGithubProfile = githubProfileResponse.toGithubProfile();
 
         userRepository.findByBasicProfile_Name(githubProfileResponse.getName())
-            .ifPresentOrElse(user -> {
-                user.changeGithubProfile(latestGithubProfile);
-            }, () -> {
-                BasicProfile basicProfile = githubProfileResponse.toBasicProfile();
-                User user = new User(basicProfile, latestGithubProfile);
-                userRepository.save(user);
-            });
+            .ifPresentOrElse(user -> user.changeGithubProfile(latestGithubProfile),
+                () -> {
+                    BasicProfile basicProfile = githubProfileResponse.toBasicProfile();
+                    User user = new User(basicProfile, latestGithubProfile);
+                    userRepository.save(user);
+                });
     }
 
     private String createTokenAndSave(String githubAccessToken, String payload) {
@@ -83,6 +84,7 @@ public class OAuthService {
         String username = jwtTokenProvider.getPayloadByKey(authentication, "username");
         String accessToken = authAccessTokenDao.findByKeyToken(authentication)
             .orElseThrow(InvalidTokenException::new);
+
         return new LoginUser(username, accessToken);
     }
 
