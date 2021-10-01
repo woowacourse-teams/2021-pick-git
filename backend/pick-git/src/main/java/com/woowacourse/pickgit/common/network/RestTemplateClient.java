@@ -32,7 +32,7 @@ public class RestTemplateClient implements RestClient {
     private static RestTemplate createRestTemplate() {
         HttpComponentsClientHttpRequestFactory factory =
             new HttpComponentsClientHttpRequestFactory();
-        
+
         factory.setReadTimeout(READ_TIMEOUT);
         factory.setConnectionRequestTimeout(CONNECTION_REQUEST_TIMEOUT);
 
@@ -47,14 +47,20 @@ public class RestTemplateClient implements RestClient {
     }
 
     @Override
-    public <T> T getForObject(String url, Class<T> responseType, Object... uriVariables)
-        throws RestClientException {
+    public <T> T getForObject(
+        String url,
+        Class<T> responseType,
+        Object... uriVariables
+    ) throws RestClientException {
         return this.restTemplate.getForObject(url, responseType, uriVariables);
     }
 
     @Override
-    public <T> T getForObject(String url, Class<T> responseType, Map<String, ?> uriVariables)
-        throws RestClientException {
+    public <T> T getForObject(
+        String url,
+        Class<T> responseType,
+        Map<String, ?> uriVariables
+    ) throws RestClientException {
         return this.restTemplate.getForObject(url, responseType, uriVariables);
     }
 
@@ -64,32 +70,44 @@ public class RestTemplateClient implements RestClient {
     }
 
     @Override
-    public <T> ResponseEntity<T> getForEntity(String url, Class<T> responseType,
-        Object... uriVariables) throws RestClientException {
+    public <T> ResponseEntity<T> getForEntity(
+        String url,
+        Class<T> responseType,
+        Object... uriVariables
+    ) throws RestClientException {
         return this.restTemplate.getForEntity(url, responseType, uriVariables);
     }
 
     @Override
-    public <T> ResponseEntity<T> getForEntity(String url, Class<T> responseType,
-        Map<String, ?> uriVariables) throws RestClientException {
+    public <T> ResponseEntity<T> getForEntity(
+        String url,
+        Class<T> responseType,
+        Map<String, ?> uriVariables
+    ) throws RestClientException {
         return this.restTemplate.getForEntity(url, responseType, uriVariables);
     }
 
     @Override
-    public <T> ResponseEntity<T> getForEntity(URI url, Class<T> responseType)
-        throws RestClientException {
+    public <T> ResponseEntity<T> getForEntity(
+        URI url,
+        Class<T> responseType
+    ) throws RestClientException {
         return this.restTemplate.getForEntity(url, responseType);
     }
 
     @Override
-    public HttpHeaders headForHeaders(String url, Object... uriVariables)
-        throws RestClientException {
+    public HttpHeaders headForHeaders(
+        String url,
+        Object... uriVariables
+    ) throws RestClientException {
         return this.restTemplate.headForHeaders(url, uriVariables);
     }
 
     @Override
-    public HttpHeaders headForHeaders(String url, Map<String, ?> uriVariables)
-        throws RestClientException {
+    public HttpHeaders headForHeaders(
+        String url,
+        Map<String, ?> uriVariables
+    ) throws RestClientException {
         return this.restTemplate.headForHeaders(url, uriVariables);
     }
 
@@ -99,14 +117,20 @@ public class RestTemplateClient implements RestClient {
     }
 
     @Override
-    public URI postForLocation(String url, Object request, Object... uriVariables)
-        throws RestClientException {
+    public URI postForLocation(
+        String url,
+        Object request,
+        Object... uriVariables
+    ) throws RestClientException {
         return this.restTemplate.postForLocation(url, request, uriVariables);
     }
 
     @Override
-    public URI postForLocation(String url, Object request, Map<String, ?> uriVariables)
-        throws RestClientException {
+    public URI postForLocation(
+        String url,
+        Object request,
+        Map<String, ?> uriVariables
+    ) throws RestClientException {
         return this.restTemplate.postForLocation(url, request, uriVariables);
     }
 
@@ -116,38 +140,60 @@ public class RestTemplateClient implements RestClient {
     }
 
     @Override
-    public <T> T postForObject(String url, Object request, Class<T> responseType,
-        Object... uriVariables) throws RestClientException {
-        return this.restTemplate.postForObject(url, request,responseType, uriVariables);
+    public <T> T postForObject(
+        String url,
+        Object request,
+        Class<T> responseType,
+        Object... uriVariables
+    ) throws RestClientException {
+        return this.restTemplate.postForObject(url, request, responseType, uriVariables);
     }
 
     @Override
-    public <T> T postForObject(String url, Object request, Class<T> responseType,
-        Map<String, ?> uriVariables) throws RestClientException {
-        return this.restTemplate.postForObject(url, request,responseType, uriVariables);
+    public <T> T postForObject(
+        String url,
+        Object request,
+        Class<T> responseType,
+        Map<String, ?> uriVariables
+    ) throws RestClientException {
+        return this.restTemplate.postForObject(url, request, responseType, uriVariables);
     }
 
     @Override
-    public <T> T postForObject(URI url, Object request, Class<T> responseType)
-        throws RestClientException {
+    public <T> T postForObject(
+        URI url,
+        Object request,
+        Class<T> responseType
+    ) throws RestClientException {
         return this.restTemplate.postForObject(url, request, responseType);
     }
 
     @Override
-    public <T> ResponseEntity<T> postForEntity(String url, Object request, Class<T> responseType,
-        Object... uriVariables) throws RestClientException {
+    public <T> ResponseEntity<T> postForEntity(
+        String url,
+        Object request,
+        Class<T> responseType,
+        Object... uriVariables
+    ) throws RestClientException {
         return this.restTemplate.postForEntity(url, request, responseType, uriVariables);
     }
 
     @Override
-    public <T> ResponseEntity<T> postForEntity(String url, Object request, Class<T> responseType,
-        Map<String, ?> uriVariables) throws RestClientException {
+    public <T> ResponseEntity<T> postForEntity(
+        String url,
+        Object request,
+        Class<T> responseType,
+        Map<String, ?> uriVariables
+    ) throws RestClientException {
         return this.restTemplate.postForEntity(url, request, responseType, uriVariables);
     }
 
     @Override
-    public <T> ResponseEntity<T> postForEntity(URI url, Object request, Class<T> responseType)
-        throws RestClientException {
+    public <T> ResponseEntity<T> postForEntity(
+        URI url,
+        Object request,
+        Class<T> responseType
+    ) throws RestClientException {
         return this.restTemplate.postForEntity(url, request, responseType);
     }
 
@@ -157,8 +203,11 @@ public class RestTemplateClient implements RestClient {
     }
 
     @Override
-    public void put(String url, Object request, Map<String, ?> uriVariables)
-        throws RestClientException {
+    public void put(
+        String url,
+        Object request,
+        Map<String, ?> uriVariables
+    ) throws RestClientException {
         this.restTemplate.put(url, request);
     }
 
@@ -168,20 +217,31 @@ public class RestTemplateClient implements RestClient {
     }
 
     @Override
-    public <T> T patchForObject(String url, Object request, Class<T> responseType,
-        Object... uriVariables) throws RestClientException {
+    public <T> T patchForObject(
+        String url,
+        Object request,
+        Class<T> responseType,
+        Object... uriVariables
+    ) throws RestClientException {
         return this.restTemplate.patchForObject(url, request, responseType, uriVariables);
     }
 
     @Override
-    public <T> T patchForObject(String url, Object request, Class<T> responseType,
-        Map<String, ?> uriVariables) throws RestClientException {
+    public <T> T patchForObject(
+        String url,
+        Object request,
+        Class<T> responseType,
+        Map<String, ?> uriVariables
+    ) throws RestClientException {
         return this.restTemplate.patchForObject(url, request, responseType, uriVariables);
     }
 
     @Override
-    public <T> T patchForObject(URI url, Object request, Class<T> responseType)
-        throws RestClientException {
+    public <T> T patchForObject(
+        URI url,
+        Object request,
+        Class<T> responseType
+    ) throws RestClientException {
         return this.restTemplate.patchForObject(url, request, responseType);
     }
 
@@ -218,73 +278,116 @@ public class RestTemplateClient implements RestClient {
     }
 
     @Override
-    public <T> ResponseEntity<T> exchange(String url, HttpMethod method,
-        HttpEntity<?> requestEntity, Class<T> responseType, Object... uriVariables)
-        throws RestClientException {
+    public <T> ResponseEntity<T> exchange(
+        String url,
+        HttpMethod method,
+        HttpEntity<?> requestEntity,
+        Class<T> responseType,
+        Object... uriVariables
+    ) throws RestClientException {
         return this.restTemplate.exchange(url, method, requestEntity, responseType, uriVariables);
     }
 
     @Override
-    public <T> ResponseEntity<T> exchange(String url, HttpMethod method,
-        HttpEntity<?> requestEntity, Class<T> responseType, Map<String, ?> uriVariables)
-        throws RestClientException {
+    public <T> ResponseEntity<T> exchange(
+        String url,
+        HttpMethod method,
+        HttpEntity<?> requestEntity,
+        Class<T> responseType,
+        Map<String, ?> uriVariables
+    ) throws RestClientException {
         return this.restTemplate.exchange(url, method, requestEntity, responseType, uriVariables);
     }
 
     @Override
-    public <T> ResponseEntity<T> exchange(URI url, HttpMethod method, HttpEntity<?> requestEntity,
-        Class<T> responseType) throws RestClientException {
+    public <T> ResponseEntity<T> exchange(
+        URI url,
+        HttpMethod method,
+        HttpEntity<?> requestEntity,
+        Class<T> responseType
+    ) throws RestClientException {
         return this.restTemplate.exchange(url, method, requestEntity, responseType);
     }
 
     @Override
-    public <T> ResponseEntity<T> exchange(String url, HttpMethod method,
-        HttpEntity<?> requestEntity, ParameterizedTypeReference<T> responseType,
-        Object... uriVariables) throws RestClientException {
+    public <T> ResponseEntity<T> exchange(
+        String url,
+        HttpMethod method,
+        HttpEntity<?> requestEntity,
+        ParameterizedTypeReference<T> responseType,
+        Object... uriVariables
+    ) throws RestClientException {
         return this.restTemplate.exchange(url, method, requestEntity, responseType, uriVariables);
     }
 
     @Override
-    public <T> ResponseEntity<T> exchange(String url, HttpMethod method,
-        HttpEntity<?> requestEntity, ParameterizedTypeReference<T> responseType,
-        Map<String, ?> uriVariables) throws RestClientException {
+    public <T> ResponseEntity<T> exchange(
+        String url,
+        HttpMethod method,
+        HttpEntity<?> requestEntity,
+        ParameterizedTypeReference<T> responseType,
+        Map<String, ?> uriVariables
+    ) throws RestClientException {
         return this.restTemplate.exchange(url, method, requestEntity, responseType, uriVariables);
     }
 
     @Override
-    public <T> ResponseEntity<T> exchange(URI url, HttpMethod method, HttpEntity<?> requestEntity,
-        ParameterizedTypeReference<T> responseType) throws RestClientException {
+    public <T> ResponseEntity<T> exchange(
+        URI url,
+        HttpMethod method,
+        HttpEntity<?> requestEntity,
+        ParameterizedTypeReference<T> responseType
+    ) throws RestClientException {
         return this.restTemplate.exchange(url, method, requestEntity, responseType);
     }
 
     @Override
-    public <T> ResponseEntity<T> exchange(RequestEntity<?> requestEntity, Class<T> responseType)
-        throws RestClientException {
+    public <T> ResponseEntity<T> exchange(
+        RequestEntity<?> requestEntity,
+        Class<T> responseType
+    ) throws RestClientException {
         return this.restTemplate.exchange(requestEntity, responseType);
     }
 
     @Override
-    public <T> ResponseEntity<T> exchange(RequestEntity<?> requestEntity,
-        ParameterizedTypeReference<T> responseType) throws RestClientException {
+    public <T> ResponseEntity<T> exchange(
+        RequestEntity<?> requestEntity,
+        ParameterizedTypeReference<T> responseType
+    ) throws RestClientException {
         return this.restTemplate.exchange(requestEntity, responseType);
     }
 
     @Override
-    public <T> T execute(String url, HttpMethod method, RequestCallback requestCallback,
-        ResponseExtractor<T> responseExtractor, Object... uriVariables) throws RestClientException {
-        return this.restTemplate.execute(url, method, requestCallback, responseExtractor, uriVariables);
+    public <T> T execute(
+        String url,
+        HttpMethod method,
+        RequestCallback requestCallback,
+        ResponseExtractor<T> responseExtractor,
+        Object... uriVariables
+    ) throws RestClientException {
+        return this.restTemplate
+            .execute(url, method, requestCallback, responseExtractor, uriVariables);
     }
 
     @Override
-    public <T> T execute(String url, HttpMethod method, RequestCallback requestCallback,
-        ResponseExtractor<T> responseExtractor, Map<String, ?> uriVariables)
-        throws RestClientException {
-        return this.restTemplate.execute(url, method, requestCallback, responseExtractor, uriVariables);
+    public <T> T execute(
+        String url,
+        HttpMethod method,
+        RequestCallback requestCallback,
+        ResponseExtractor<T> responseExtractor,
+        Map<String, ?> uriVariables
+    ) throws RestClientException {
+        return this.restTemplate
+            .execute(url, method, requestCallback, responseExtractor, uriVariables);
     }
 
     @Override
-    public <T> T execute(URI url, HttpMethod method, RequestCallback requestCallback,
-        ResponseExtractor<T> responseExtractor) throws RestClientException {
+    public <T> T execute(
+        URI url,
+        HttpMethod method,
+        RequestCallback requestCallback,
+        ResponseExtractor<T> responseExtractor
+    ) throws RestClientException {
         return this.restTemplate.execute(url, method, requestCallback, responseExtractor);
     }
 }

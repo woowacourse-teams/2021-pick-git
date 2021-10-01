@@ -31,7 +31,9 @@ public class AutoAuthorizationInterceptorRegister {
         addPathPatterns(mergedInterceptorParameterByMethod);
     }
 
-    private void addPathPatterns(List<MergedInterceptorParameterByMethod> mergedInterceptorParameterByMethods) {
+    private void addPathPatterns(
+        List<MergedInterceptorParameterByMethod> mergedInterceptorParameterByMethods
+    ) {
         for (MergedInterceptorParameterByMethod registerCandidate : mergedInterceptorParameterByMethods) {
             StorageForRegisterType storageForRegisterType = storageForRegisterTypes.stream()
                 .filter(storage -> storage.isSatisfiedBy(registerCandidate.getRegisterType()))
