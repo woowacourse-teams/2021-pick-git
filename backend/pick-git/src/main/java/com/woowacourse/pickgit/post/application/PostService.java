@@ -31,14 +31,16 @@ import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import java.util.List;
 import java.util.function.Function;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
-@Transactional
 public class PostService {
 
     private final TagService tagService;
@@ -48,22 +50,7 @@ public class PostService {
     private final PlatformRepositoryExtractor platformRepositoryExtractor;
     private final PlatformRepositorySearchExtractor platformRepositorySearchExtractor;
 
-    public PostService(
-        TagService tagService,
-        UserRepository userRepository,
-        PostRepository postRepository,
-        PickGitStorage pickgitStorage,
-        PlatformRepositoryExtractor platformRepositoryExtractor,
-        PlatformRepositorySearchExtractor platformRepositorySearchExtractor
-    ) {
-        this.tagService = tagService;
-        this.userRepository = userRepository;
-        this.postRepository = postRepository;
-        this.pickgitStorage = pickgitStorage;
-        this.platformRepositoryExtractor = platformRepositoryExtractor;
-        this.platformRepositorySearchExtractor = platformRepositorySearchExtractor;
-    }
-
+    @Transactional
     public PostImageUrlResponseDto write(PostRequestDto postRequestDto) {
         Post post = createPost(postRequestDto);
         Post savedPost = postRepository.save(post);
@@ -104,7 +91,6 @@ public class PostService {
             .build();
     }
 
-    @Transactional(readOnly = true)
     public RepositoryResponsesDto userRepositories(RepositoryRequestDto repositoryRequestDto) {
         String token = repositoryRequestDto.getToken();
         String username = repositoryRequestDto.getUsername();
@@ -123,7 +109,6 @@ public class PostService {
         return new RepositoryResponsesDto(repositoryResponsesDto);
     }
 
-    @Transactional(readOnly = true)
     public RepositoryResponsesDto searchUserRepositories(
         SearchRepositoryRequestDto searchRepositoryRequestDto
     ) {
@@ -157,6 +142,7 @@ public class PostService {
             .build();
     }
 
+    @Transactional
     public LikeResponseDto like(AppUser user, Long postId) {
         User source = findUserByName(user.getUsername());
         Post target = findPostById(postId);
@@ -165,6 +151,7 @@ public class PostService {
         return new LikeResponseDto(target.getLikeCounts(), true);
     }
 
+    @Transactional
     public LikeResponseDto unlike(AppUser user, Long postId) {
         User source = findUserByName(user.getUsername());
         Post target = findPostById(postId);
@@ -173,6 +160,7 @@ public class PostService {
         return new LikeResponseDto(target.getLikeCounts(), false);
     }
 
+    @Transactional
     public PostUpdateResponseDto update(PostUpdateRequestDto updateRequestDto) {
         User user = findUserByName(updateRequestDto.getUsername());
         Post post = findPostById(updateRequestDto.getPostId());
@@ -192,6 +180,7 @@ public class PostService {
             .build();
     }
 
+    @Transactional
     public void delete(PostDeleteRequestDto deleteRequestDto) {
         User user = findUserByName(deleteRequestDto.getUsername());
         Post post = findPostById(deleteRequestDto.getPostId());
@@ -202,7 +191,6 @@ public class PostService {
         postRepository.delete(post);
     }
 
-    @Transactional(readOnly = true)
     public List<LikeUsersResponseDto> likeUsers(
         AuthUserForPostRequestDto authUserRequestDto,
         Long postId
@@ -211,44 +199,17 @@ public class PostService {
         List<User> likeUsers = post.getLikeUsers();
 
         if (authUserRequestDto.isGuest()) {
-            return createLikeUsersResponseDtoOfGuest(likeUsers);
+            return PostDtoAssembler.createLikeUsersResponseDtoOfGuest(likeUsers);
         }
 
         User loginUser = findUserByName(authUserRequestDto.getUsername());
 
-        return createLikeUsersResponseDtoOfLoginUser(loginUser, likeUsers);
+        return PostDtoAssembler.createLikeUsersResponseDtoOfLoginUser(loginUser, likeUsers);
     }
 
     private Post findPostWithLikeUsers(Long postId) {
         return postRepository.findPostWithLikeUsers(postId)
             .orElseThrow(PostNotFoundException::new);
-    }
-
-    private List<LikeUsersResponseDto> createLikeUsersResponseDtoOfGuest(
-        List<User> likeUsers
-    ) {
-        return likeUsers.stream()
-            .map(user ->
-                new LikeUsersResponseDto(
-                    user.getImage(),
-                    user.getName(),
-                    null
-                )
-            ).collect(toList());
-    }
-
-    private List<LikeUsersResponseDto> createLikeUsersResponseDtoOfLoginUser(
-        User loginUser,
-        List<User> likeUsers
-    ) {
-        return likeUsers.stream()
-            .map(user ->
-                new LikeUsersResponseDto(
-                    user.getImage(),
-                    user.getName(),
-                    loginUser.isFollowing(user)
-                )
-            ).collect(toList());
     }
 
     private Post findPostById(Long id) {

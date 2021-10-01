@@ -30,6 +30,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.function.Function;
 import javax.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -42,6 +43,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@RequiredArgsConstructor
 @CrossOrigin(value = "*")
 @RequestMapping("/api")
 @RestController
@@ -51,18 +53,15 @@ public class PostController {
 
     private final PostService postService;
 
-    public PostController(PostService postService) {
-        this.postService = postService;
-    }
-
     @ForOnlyLoginUser
     @PostMapping("/posts")
     public ResponseEntity<Void> write(@Authenticated AppUser user, PostRequest request) {
         PostImageUrlResponseDto postImageUrlResponseDto =
             postService.write(createPostRequestDto(user, request));
-
+        String url =
+            String.format("/api/posts/%s/%d", user.getUsername(), postImageUrlResponseDto.getId());
         return ResponseEntity
-            .created(redirectUrl(user, postImageUrlResponseDto))
+            .created(URI.create(url))
             .build();
     }
 
@@ -76,13 +75,6 @@ public class PostController {
             request.getContent()
         );
     }
-
-    private URI redirectUrl(AppUser user, PostImageUrlResponseDto responseDto) {
-        return URI
-            .create(String.format("/api/posts/%s/%d", user.getUsername(), responseDto.getId()));
-    }
-
-
 
     @ForOnlyLoginUser
     @GetMapping("/github/repositories")
@@ -120,9 +112,12 @@ public class PostController {
         @RequestParam int page,
         @RequestParam int limit
     ) {
-        SearchRepositoryRequestDto searchRepositoryRequestDto
-            = new SearchRepositoryRequestDto(
-                user.getAccessToken(), user.getUsername(), keyword, page, limit
+        SearchRepositoryRequestDto searchRepositoryRequestDto = new SearchRepositoryRequestDto(
+            user.getAccessToken(),
+            user.getUsername(),
+            keyword,
+            page,
+            limit
         );
 
         RepositoryResponsesDto repositoryResponsesDtos =
@@ -194,9 +189,9 @@ public class PostController {
     ) {
         PostUpdateResponseDto updateResponseDto = postService
             .update(createPostUpdateRequestDto(user, postId, updateRequest));
-
+        URI uri = URI.create(String.format(REDIRECT_URL, user.getUsername(), postId));
         return ResponseEntity
-            .created(redirectUrl(user.getUsername(), postId))
+            .created(uri)
             .body(createPostUpdateResponse(updateResponseDto));
     }
 
@@ -217,10 +212,6 @@ public class PostController {
             .tags(updateResponseDto.getTags())
             .content(updateResponseDto.getContent())
             .build();
-    }
-
-    private URI redirectUrl(String username, Long postId) {
-        return URI.create(String.format(REDIRECT_URL, username, postId));
     }
 
     @ForOnlyLoginUser
@@ -246,7 +237,8 @@ public class PostController {
         @Authenticated AppUser appUser,
         @PathVariable Long postId
     ) {
-        AuthUserForPostRequestDto authUserRequestDto = createAuthUserForPostRequestDto(appUser);
+        AuthUserForPostRequestDto authUserRequestDto =
+            new AuthUserForPostRequestDto(appUser);
 
         List<LikeUsersResponseDto> likeUsersResponseDtos = postService
             .likeUsers(authUserRequestDto, postId);
@@ -254,16 +246,9 @@ public class PostController {
         return ResponseEntity.ok(createLikeUsersResponse(likeUsersResponseDtos));
     }
 
-    private AuthUserForPostRequestDto createAuthUserForPostRequestDto(AppUser appUser) {
-         if (appUser.isGuest()) {
-             return new AuthUserForPostRequestDto(null, true);
-         }
-
-         return new AuthUserForPostRequestDto(appUser.getUsername(), false);
-    }
-
     private List<LikeUsersResponse> createLikeUsersResponse(
-        List<LikeUsersResponseDto> likeUsersResponseDtos) {
+        List<LikeUsersResponseDto> likeUsersResponseDtos
+    ) {
         return likeUsersResponseDtos.stream()
             .map(dto -> LikeUsersResponse.builder()
                 .username(dto.getUsername())

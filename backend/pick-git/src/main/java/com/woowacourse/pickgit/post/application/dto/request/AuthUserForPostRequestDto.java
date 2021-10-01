@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.post.application.dto.request;
 
+import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -11,6 +12,10 @@ public class AuthUserForPostRequestDto {
     private boolean isGuest;
 
     private AuthUserForPostRequestDto() {
+    }
+
+    public AuthUserForPostRequestDto(AppUser appUser) {
+        this(appUser.isGuest() ? null : appUser.getUsername(), appUser.isGuest());
     }
 
     public AuthUserForPostRequestDto(String username, boolean isGuest) {
