@@ -5,6 +5,7 @@ import com.woowacourse.pickgit.portfolio.domain.common.Updatable;
 import com.woowacourse.pickgit.portfolio.domain.common.UpdateUtil;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,7 +17,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.Persistence;
 
 @Entity
 public class Project implements Updatable<Project> {
@@ -98,6 +98,8 @@ public class Project implements Updatable<Project> {
         this.content = content;
         this.tags = tags;
         this.portfolio = portfolio;
+
+        this.tags.forEach(tag -> tag.appendTo(this));
     }
 
     public void appendTo(Portfolio portfolio) {
@@ -138,19 +140,41 @@ public class Project implements Updatable<Project> {
 
     @Override
     public void update(Project project) {
-        this.name = project.name;
-        this.startDate = project.startDate;
-        this.endDate = project.endDate;
-        this.type = project.type;
-        this.imageUrl = project.imageUrl;
-        this.content = project.content;
+        project.getTags().forEach(tag -> tag.appendTo(this));
 
-        getTags(project).forEach(tag -> tag.appendTo(this));
-
-        UpdateUtil.execute(this.tags, project.tags);
+        this.name = project.getName();
+        this.startDate = project.getStartDate();
+        this.endDate = project.getEndDate();
+        this.type = project.getType();
+        this.imageUrl = project.getImageUrl();
+        this.content = project.getContent();
+        UpdateUtil.execute(this.getTags(), project.getTags());
     }
 
-    private List<ProjectTag> getTags(Project project) {
-        return project.tags;
+    @Override
+    public boolean semanticallyEquals(Object o) {
+        return equals(o);
+    }
+
+    @Override
+    public int semanticallyHashcode() {
+        return hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Project)) {
+            return false;
+        }
+        Project project = (Project) o;
+        return Objects.equals(id, project.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

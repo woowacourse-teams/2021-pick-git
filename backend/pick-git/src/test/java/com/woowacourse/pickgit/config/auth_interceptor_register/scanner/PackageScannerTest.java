@@ -3,7 +3,6 @@ package com.woowacourse.pickgit.config.auth_interceptor_register.scanner;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.package_scanner.PackageScanner;
-import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.package_scanner.SourceVisitor;
 import java.net.URISyntaxException;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;

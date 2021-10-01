@@ -69,8 +69,18 @@ public class Contact implements Updatable<Contact> {
 
     @Override
     public void update(Contact contact) {
-        this.category = contact.category;
-        this.value = contact.value;
+        this.category = contact.getCategory();
+        this.value = contact.getValue();
+    }
+
+    @Override
+    public boolean semanticallyEquals(Object o) {
+        return equals(o);
+    }
+
+    @Override
+    public int semanticallyHashcode() {
+        return hashCode();
     }
 
     @Override

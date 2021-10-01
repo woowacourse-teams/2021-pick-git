@@ -33,17 +33,13 @@ public class Contacts {
     }
 
     public void appendTo(Portfolio portfolio) {
-        values.forEach(contact -> contact.appendTo(portfolio));
+        this.getValues().forEach(contact -> contact.appendTo(portfolio));
     }
 
     public void update(Contacts sources, Portfolio portfolio) {
-        getValues(sources).forEach(contact -> contact.appendTo(portfolio));
+        sources.getValues().forEach(source -> source.appendTo(portfolio));
 
-        UpdateUtil.execute(this.values, sources.values);
-    }
-
-    private List<Contact> getValues(Contacts sources) {
-        return sources.values;
+        UpdateUtil.execute(this.getValues(), sources.getValues());
     }
 
     public List<Contact> getValues() {

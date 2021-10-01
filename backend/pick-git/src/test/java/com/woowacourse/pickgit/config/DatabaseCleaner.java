@@ -1,18 +1,17 @@
 package com.woowacourse.pickgit.config;
 
-import org.hibernate.Session;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.stereotype.Component;
-import org.springframework.test.context.ActiveProfiles;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import org.hibernate.Session;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.stereotype.Component;
+import org.springframework.test.context.ActiveProfiles;
 
 @Component
 @ActiveProfiles("test")
@@ -26,17 +25,17 @@ public class DatabaseCleaner implements InitializingBean {
     @Override
     public void afterPropertiesSet() {
         entityManager.unwrap(Session.class)
-                .doWork(this::extractTableNames);
+            .doWork(this::extractTableNames);
     }
 
     private void extractTableNames(Connection conn) throws SQLException {
         List<String> tableNames = new ArrayList<>();
 
         ResultSet tables = conn
-                .getMetaData()
-                .getTables(conn.getCatalog(), null, "%", new String[]{"TABLE"});
+            .getMetaData()
+            .getTables(conn.getCatalog(), null, "%", new String[]{"TABLE"});
 
-        while(tables.next()) {
+        while (tables.next()) {
             tableNames.add(tables.getString("table_name"));
         }
 
@@ -45,7 +44,7 @@ public class DatabaseCleaner implements InitializingBean {
 
     public void execute() {
         entityManager.unwrap(Session.class)
-                .doWork(this::cleanUpDatabase);
+            .doWork(this::cleanUpDatabase);
     }
 
     private void cleanUpDatabase(Connection conn) throws SQLException {
