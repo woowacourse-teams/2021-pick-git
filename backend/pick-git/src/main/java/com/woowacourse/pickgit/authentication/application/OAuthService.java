@@ -12,27 +12,23 @@ import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
 import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
+import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class OAuthService {
 
-    private OAuthClient githubOAuthClient;
-    private JwtTokenProvider jwtTokenProvider;
-    private OAuthAccessTokenDao authAccessTokenDao;
-    private UserRepository userRepository;
+    private final OAuthClient githubOAuthClient;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final OAuthAccessTokenDao authAccessTokenDao;
+    private final UserRepository userRepository;
 
-    public OAuthService(OAuthClient githubOAuthClient,
-        JwtTokenProvider jwtTokenProvider,
-        OAuthAccessTokenDao authAccessTokenDao,
-        UserRepository userRepository) {
-        this.githubOAuthClient = githubOAuthClient;
-        this.jwtTokenProvider = jwtTokenProvider;
-        this.authAccessTokenDao = authAccessTokenDao;
-        this.userRepository = userRepository;
-    }
-
+    @Transactional(propagation = Propagation.NEVER)
     public String getGithubAuthorizationUrl() {
         return githubOAuthClient.getLoginUrl();
     }
@@ -41,31 +37,26 @@ public class OAuthService {
     public TokenDto createToken(String code) {
         String githubAccessToken = githubOAuthClient.getAccessToken(code);
 
-        OAuthProfileResponse githubProfileResponse = githubOAuthClient
-            .getGithubProfile(githubAccessToken);
+        OAuthProfileResponse githubProfileResponse =
+            githubOAuthClient.getGithubProfile(githubAccessToken);
 
         updateUserOrCreateUser(githubProfileResponse);
+        String token = createTokenAndSave(githubAccessToken, githubProfileResponse.getName());
 
-        return new TokenDto(
-            createTokenAndSave(
-                githubAccessToken,
-                githubProfileResponse.getName()
-            ),
-            githubProfileResponse.getName()
-        );
+        return new TokenDto(token, githubProfileResponse.getName());
     }
 
     private void updateUserOrCreateUser(OAuthProfileResponse githubProfileResponse) {
         GithubProfile latestGithubProfile = githubProfileResponse.toGithubProfile();
 
         userRepository.findByBasicProfile_Name(githubProfileResponse.getName())
-            .ifPresentOrElse(user -> {
-                user.changeGithubProfile(latestGithubProfile);
-            }, () -> {
-                BasicProfile basicProfile = githubProfileResponse.toBasicProfile();
-                User user = new User(basicProfile, latestGithubProfile);
-                userRepository.save(user);
-            });
+            .ifPresentOrElse(user -> user.changeGithubProfile(latestGithubProfile),
+                () -> {
+                    BasicProfile basicProfile = githubProfileResponse.toBasicProfile();
+                    User user = new User(basicProfile, latestGithubProfile);
+                    userRepository.save(user);
+                }
+            );
     }
 
     private String createTokenAndSave(String githubAccessToken, String payload) {
@@ -74,9 +65,8 @@ public class OAuthService {
         return token;
     }
 
-    @Transactional(readOnly = true)
     public AppUser findRequestUserByToken(String authentication) {
-        if (authentication == null) {
+        if (Objects.isNull(authentication)) {
             return new GuestUser();
         }
 
@@ -86,6 +76,7 @@ public class OAuthService {
         return new LoginUser(username, accessToken);
     }
 
+    @Transactional(propagation = Propagation.NEVER)
     public boolean validateToken(String authentication) {
         return jwtTokenProvider.validateToken(authentication);
     }

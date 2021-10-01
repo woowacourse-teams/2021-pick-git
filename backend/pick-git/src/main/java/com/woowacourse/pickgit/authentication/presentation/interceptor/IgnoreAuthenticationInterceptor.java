@@ -12,10 +12,9 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 public class IgnoreAuthenticationInterceptor implements HandlerInterceptor {
 
-    private OAuthService oAuthService;
+    private final OAuthService oAuthService;
 
-    public IgnoreAuthenticationInterceptor(
-        OAuthService oAuthService) {
+    public IgnoreAuthenticationInterceptor(OAuthService oAuthService) {
         this.oAuthService = oAuthService;
     }
 
@@ -23,7 +22,8 @@ public class IgnoreAuthenticationInterceptor implements HandlerInterceptor {
     public boolean preHandle(
         HttpServletRequest request,
         HttpServletResponse response,
-        Object handler) throws Exception {
+        Object handler
+    ) throws Exception {
         if (isPreflightRequest(request)) {
             return true;
         }
