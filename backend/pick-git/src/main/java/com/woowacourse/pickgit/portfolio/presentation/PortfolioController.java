@@ -27,28 +27,23 @@ public class PortfolioController {
 
     private final PortfolioService portfolioService;
 
-    public PortfolioController(
-        PortfolioService portfolioService
-    ) {
+    public PortfolioController(PortfolioService portfolioService) {
         this.portfolioService = portfolioService;
     }
 
     @ForLoginAndGuestUser
     @GetMapping("/{username}")
-    public ResponseEntity<PortfolioResponse> findPortfolioByUsername(
+    public ResponseEntity<PortfolioResponse> read(
         @Authenticated AppUser user,
         @PathVariable String username
     ) {
-        PortfolioResponseDto portfolioByUsername = portfolioService.findPortfolioByUsername(
-            username,
-            UserDto.from(user)
-        );
+        PortfolioResponseDto responseDto = portfolioService.read(username, UserDto.from(user));
 
-        return ResponseEntity.ok(PortfolioAssembler.toPortfolioResponse(portfolioByUsername));
+        return ResponseEntity.ok(PortfolioAssembler.toPortfolioResponse(responseDto));
     }
 
     @ForOnlyLoginUser
-    @PutMapping
+    @PutMapping("")
     public ResponseEntity<PortfolioResponse> update(
         @Authenticated AppUser user,
         @Valid @RequestBody PortfolioRequest request

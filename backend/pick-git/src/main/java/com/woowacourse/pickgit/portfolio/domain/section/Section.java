@@ -5,6 +5,7 @@ import com.woowacourse.pickgit.portfolio.domain.common.Updatable;
 import com.woowacourse.pickgit.portfolio.domain.common.UpdateUtil;
 import com.woowacourse.pickgit.portfolio.domain.section.item.Item;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -77,13 +78,36 @@ public class Section implements Updatable<Section> {
 
     @Override
     public void update(Section section) {
-        getItems(section).forEach(item -> item.appendTo(this));
+        section.getItems().forEach(item -> item.appendTo(this));
 
         this.name = section.name;
-        UpdateUtil.execute(this.items, section.items);
+        UpdateUtil.execute(this.items, section.getItems());
     }
 
-    private List<Item> getItems(Section section) {
-        return section.items;
+    @Override
+    public boolean semanticallyEquals(Object o) {
+        return equals(o);
+    }
+
+    @Override
+    public int semanticallyHashcode() {
+        return hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Section)) {
+            return false;
+        }
+        Section section = (Section) o;
+        return Objects.equals(id, section.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

@@ -2,7 +2,6 @@ package com.woowacourse.pickgit.portfolio.application.dto;
 
 import static java.util.stream.Collectors.toList;
 
-import com.woowacourse.pickgit.exception.portfolio.TagNotFoundException;
 import com.woowacourse.pickgit.portfolio.application.dto.request.ContactRequestDto;
 import com.woowacourse.pickgit.portfolio.application.dto.request.DescriptionRequestDto;
 import com.woowacourse.pickgit.portfolio.application.dto.request.ItemRequestDto;
@@ -28,25 +27,30 @@ import com.woowacourse.pickgit.portfolio.domain.section.Sections;
 import com.woowacourse.pickgit.portfolio.domain.section.item.Description;
 import com.woowacourse.pickgit.portfolio.domain.section.item.Item;
 import com.woowacourse.pickgit.tag.domain.Tag;
-import com.woowacourse.pickgit.tag.domain.TagRepository;
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PortfolioDtoAssembler {
 
-    private final TagRepository tagRepository;
+    @PersistenceContext
+    private final EntityManager entityManager;
 
-    public PortfolioDtoAssembler(TagRepository tagRepository) {
-        this.tagRepository = tagRepository;
+    public PortfolioDtoAssembler(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 
     public Portfolio toPortfolio(PortfolioRequestDto portfolioRequestDto) {
         return new Portfolio(
             portfolioRequestDto.getId(),
+            portfolioRequestDto.getName(),
             portfolioRequestDto.isProfileImageShown(),
             portfolioRequestDto.getProfileImageUrl(),
             portfolioRequestDto.getIntroduction(),
+            portfolioRequestDto.getCreatedAt(),
+            portfolioRequestDto.getUpdatedAt(),
             toContacts(portfolioRequestDto.getContacts()),
             toProjects(portfolioRequestDto.getProjects()),
             toSections(portfolioRequestDto.getSections())
@@ -79,7 +83,7 @@ public class PortfolioDtoAssembler {
 
     private Project toProject(ProjectRequestDto projectRequestDto) {
         List<ProjectTag> tags = projectRequestDto.getTags().stream()
-            .map(this::toTag)
+            .map(this::toProjectTag)
             .collect(toList());
 
         return new Project(
@@ -94,14 +98,10 @@ public class PortfolioDtoAssembler {
         );
     }
 
-    private ProjectTag toTag(TagRequestDto tagRequestDto) {
-        Tag tag = tagRepository.findById(tagRequestDto.getId())
-            .orElseThrow(TagNotFoundException::new);
+    private ProjectTag toProjectTag(TagRequestDto tagRequestDto) {
+        Tag tag = entityManager.getReference(Tag.class, tagRequestDto.getId());
 
-        return new ProjectTag(
-            tagRequestDto.getId(),
-            tag
-        );
+        return new ProjectTag(tag);
     }
 
     private Sections toSections(List<SectionRequestDto> sectionRequestDtos) {
@@ -146,9 +146,12 @@ public class PortfolioDtoAssembler {
     public PortfolioResponseDto toPortfolioResponseDto(Portfolio portfolio) {
         return new PortfolioResponseDto(
             portfolio.getId(),
+            portfolio.getName(),
             portfolio.isProfileImageShown(),
             portfolio.getProfileImageUrl(),
             portfolio.getIntroduction(),
+            portfolio.getCreatedAt(),
+            portfolio.getUpdatedAt(),
             toContactResponsesDto(portfolio.getContacts()),
             toProjectResponsesDto(portfolio.getProjects()),
             toSectionResponsesDto(portfolio.getSections())
@@ -194,8 +197,8 @@ public class PortfolioDtoAssembler {
 
     private TagResponseDto toTagResponseDto(ProjectTag tag) {
         return new TagResponseDto(
-            tag.getId(),
-            tag.getName()
+            tag.getTagId(),
+            tag.getTagName()
         );
     }
 
