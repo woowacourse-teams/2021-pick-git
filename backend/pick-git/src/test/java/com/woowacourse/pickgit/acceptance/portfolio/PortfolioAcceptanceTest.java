@@ -133,7 +133,7 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
                 authenticatedWithReadApi(token, USERNAME);
 
                 PortfolioRequest request = PortfolioFactory
-                    .mockPortfolioRequestWithNewAllAndMultipleSize();
+                    .mockPortfolioRequestWithNewAllAndMultipleSize(USERNAME);
 
                 // when
                 PortfolioResponse actual = authenticatedWithUpdateApi(token, request, OK)
@@ -157,7 +157,7 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
                 authenticatedWithReadApi(token, USERNAME);
 
                 PortfolioRequest request = PortfolioFactory
-                    .mockPortfolioRequestWithNewProfileAndIntroduction();
+                    .mockPortfolioRequestWithNewProfileAndIntroduction(USERNAME);
 
                 // when
                 PortfolioResponse actual = authenticatedWithUpdateApi(token, request, OK)
@@ -180,7 +180,8 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
 
                 authenticatedWithReadApi(token, USERNAME);
 
-                PortfolioRequest request = PortfolioFactory.mockPortfolioRequestWithNewContact();
+                PortfolioRequest request = PortfolioFactory
+                    .mockPortfolioRequestWithNewContact(USERNAME);
 
                 // when
                 PortfolioResponse actual = authenticatedWithUpdateApi(token, request, OK)
@@ -203,7 +204,8 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
 
                 authenticatedWithReadApi(token, USERNAME);
 
-                PortfolioRequest request = PortfolioFactory.mockPortfolioRequestWithNewProject();
+                PortfolioRequest request = PortfolioFactory
+                    .mockPortfolioRequestWithNewProject(USERNAME);
 
                 // when
                 PortfolioResponse actual = authenticatedWithUpdateApi(token, request, OK)
@@ -226,7 +228,8 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
 
                 authenticatedWithReadApi(token, USERNAME);
 
-                PortfolioRequest request = PortfolioFactory.mockPortfolioRequestWithNewSection();
+                PortfolioRequest request = PortfolioFactory
+                    .mockPortfolioRequestWithNewSection(USERNAME);
 
                 // when
                 PortfolioResponse actual = authenticatedWithUpdateApi(token, request, OK)
