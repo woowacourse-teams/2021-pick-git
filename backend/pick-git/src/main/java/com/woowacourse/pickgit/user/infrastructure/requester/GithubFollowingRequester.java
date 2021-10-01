@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-@Component
 @Profile("!test")
+@Component
 public class GithubFollowingRequester implements PlatformFollowingRequester {
 
     private final String apiBaseUrl;
@@ -33,10 +33,14 @@ public class GithubFollowingRequester implements PlatformFollowingRequester {
         requestFollowingOrUnFollowing(HttpMethod.DELETE, targetName, accessToken);
     }
 
-    private void requestFollowingOrUnFollowing(HttpMethod method, String targetName, String accessToken) {
-        String format = apiBaseUrl + "/user/following/%s";
-        String url = String.format(format, targetName);
+    private void requestFollowingOrUnFollowing(
+        HttpMethod method,
+        String targetName,
+        String accessToken
+    ) {
         try {
+            String format = apiBaseUrl + "/user/following/%s";
+            String url = String.format(format, targetName);
             HttpHeaders httpHeaders = new HttpHeaders();
             httpHeaders.setBearerAuth(accessToken);
             httpHeaders.set("Accept", "application/vnd.github.v3+json");
@@ -46,8 +50,7 @@ public class GithubFollowingRequester implements PlatformFollowingRequester {
                 .headers(httpHeaders)
                 .build();
 
-            new RestTemplate()
-                .exchange(requestEntity, Void.class);
+            new RestTemplate().exchange(requestEntity, Void.class);
         } catch (HttpClientErrorException e) {
             throw new PlatformHttpErrorException(e.getMessage());
         }

@@ -20,7 +20,6 @@ import com.woowacourse.pickgit.user.presentation.dto.request.ProfileDescriptionR
 import com.woowacourse.pickgit.user.presentation.dto.response.ContributionResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.FollowResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.ProfileDescriptionResponse;
-import com.woowacourse.pickgit.user.presentation.dto.response.ProfileEditResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.ProfileImageEditResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.UserProfileResponse;
 import io.restassured.RestAssured;
@@ -413,30 +412,6 @@ class UserAcceptanceTest extends AcceptanceTest {
         assertThat(response.getErrorCode()).isEqualTo("U0003");
     }
 
-    @DisplayName("로그인 사용자는 자신의 프로필(이미지, 한 줄 소개 포함)을 수정할 수 있다. - 삭제 예정")
-    @Test
-    void editUserProfile_LoginUserWithImageAndDescription_Success() {
-        // given
-        String description = "updated profile description";
-        File imageFile = FileFactory.getTestImage1File();
-
-        // when
-        ProfileEditResponse response = given().log().all()
-            .auth().oauth2(loginUserAccessToken)
-            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-            .formParams("description", description)
-            .multiPart("image", imageFile)
-            .when()
-            .post("/api/profiles/me")
-            .then().log().all()
-            .extract()
-            .as(ProfileEditResponse.class);
-
-        // then
-        assertThat(response.getImageUrl()).isNotBlank();
-        assertThat(response.getDescription()).isEqualTo(description);
-    }
-
     @DisplayName("로그인 사용자는 자신의 프로필 이미지를 수정할 수 있다.")
     @Test
     void editProfileImage_LoginUser_Success() throws IOException {
@@ -518,29 +493,6 @@ class UserAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.getErrorCode()).isEqualTo("A0001");
-    }
-
-    @DisplayName("게스트는 프로필을 수정할 수 없다.")
-    @Test
-    void editUserProfile_GuestUser_Fail() {
-        // given
-        String description = "updated profile description";
-
-        // when
-        ApiErrorResponse response = given().log().all()
-            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-            .formParams("description", description)
-            .multiPart("image", "")
-            .when()
-            .post("/api/profiles/me")
-            .then().log().all()
-            .extract()
-            .as(ApiErrorResponse.class);
-
-        // then
-        assertThat(response)
-            .extracting("errorCode")
-            .isEqualTo("A0001");
     }
 
     @DisplayName("로그인 - 저장된 유저중 유사한 이름을 가진 유저를 검색할 수 있다. 단, 자기 자신은 검색되지 않는다.(팔로잉 여부 true/false)")

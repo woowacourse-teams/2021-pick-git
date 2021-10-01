@@ -20,12 +20,10 @@ import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowSearchRequestDto;
-import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileImageEditRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.UserSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
-import com.woowacourse.pickgit.user.application.dto.response.ProfileEditResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.ProfileImageEditResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
@@ -444,55 +442,7 @@ class UserServiceIntegrationTest {
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
             .hasMessage("유효하지 않은 유저입니다.");
     }
-
-    @DisplayName("자신의 프로필(이미지, 한 줄 소개 포함)을 수정할 수 있다.")
-    @Test
-    void editUserProfile_WithImageAndDescription_Success() {
-        // given
-        String updatedDescription = "updated description";
-        User user = UserFactory.user("testUser");
-        AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
-
-        userRepository.save(user);
-
-        // when
-        ProfileEditRequestDto profileEditRequestDto = ProfileEditRequestDto
-            .builder()
-            .image(FileFactory.getTestImage1())
-            .decription(updatedDescription)
-            .build();
-        ProfileEditResponseDto responseDto =
-            userService.editProfile(authUserRequestDto, profileEditRequestDto);
-
-        // then
-        assertThat(responseDto.getImageUrl()).isNotBlank();
-        assertThat(responseDto.getDescription()).isEqualTo(updatedDescription);
-    }
-
-    @DisplayName("자신의 프로필(한 줄 소개만 포함)을 수정할 수 있다.")
-    @Test
-    void editUserProfile_WithDescription_Success() {
-        // given
-        String updatedDescription = "updated description";
-        User user = UserFactory.user("testUser");
-        AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
-
-        userRepository.save(user);
-
-        // when
-        ProfileEditRequestDto profileEditRequestDto = ProfileEditRequestDto
-            .builder()
-            .image(FileFactory.getEmptyTestFile())
-            .decription(updatedDescription)
-            .build();
-        ProfileEditResponseDto responseDto =
-            userService.editProfile(authUserRequestDto, profileEditRequestDto);
-
-        // then
-        assertThat(responseDto.getImageUrl()).isEqualTo(user.getImage());
-        assertThat(responseDto.getDescription()).isEqualTo(updatedDescription);
-    }
-
+    
     @DisplayName("자신의 프로필 이미지를 수정할 수 있다.")
     @Test
     void editProfileImage_LoginUser_Success() throws IOException {
