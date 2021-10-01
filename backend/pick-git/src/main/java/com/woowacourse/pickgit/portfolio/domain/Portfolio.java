@@ -134,8 +134,8 @@ public class Portfolio {
         this.profileImageShown = portfolio.profileImageShown;
         this.profileImageUrl = portfolio.profileImageUrl;
         this.introduction = portfolio.introduction;
-        this.updatedAt = portfolio.updatedAt;
         this.createdAt = portfolio.createdAt;
+        this.updatedAt = portfolio.updatedAt;
         this.contacts.update(portfolio.contacts, this);
         this.projects.update(portfolio.projects, this);
         this.sections.update(portfolio.sections, this);
