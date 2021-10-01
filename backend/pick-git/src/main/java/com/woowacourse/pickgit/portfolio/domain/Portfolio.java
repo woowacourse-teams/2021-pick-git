@@ -23,6 +23,7 @@ public class Portfolio {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
 
     @Column(nullable = false)
@@ -33,8 +34,10 @@ public class Portfolio {
 
     private String introduction;
 
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
 
     @Embedded
