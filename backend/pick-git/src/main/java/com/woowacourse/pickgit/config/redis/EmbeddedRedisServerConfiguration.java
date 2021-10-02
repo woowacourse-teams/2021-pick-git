@@ -39,10 +39,7 @@ public class EmbeddedRedisServerConfiguration {
     @PostConstruct
     public void redisServer() throws IOException {
         int redisPort = isRedisRunning() ? findAvailablePort() : port;
-        redisServer = RedisServer.builder()
-            .port(redisPort)
-            .setting("maxmemory 128M") //maxheap 128M
-            .build();
+        redisServer = new RedisServer(redisPort);
         redisServer.start();
     }
 
