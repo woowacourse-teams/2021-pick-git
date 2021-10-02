@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.acceptance.post;
+package com.woowacourse.pickgit.query.acceptance.post;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;

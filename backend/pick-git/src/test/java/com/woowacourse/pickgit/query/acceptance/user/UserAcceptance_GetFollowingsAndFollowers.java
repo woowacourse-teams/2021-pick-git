@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.acceptance.user;
+package com.woowacourse.pickgit.query.acceptance.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;

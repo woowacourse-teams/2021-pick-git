@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.integration.post;
+package com.woowacourse.pickgit.query.integrantion.post;
 
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;

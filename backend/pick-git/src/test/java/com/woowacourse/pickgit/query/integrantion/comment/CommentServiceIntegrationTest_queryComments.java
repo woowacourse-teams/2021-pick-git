@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.integration.comment;
+package com.woowacourse.pickgit.query.integrantion.comment;
 
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;

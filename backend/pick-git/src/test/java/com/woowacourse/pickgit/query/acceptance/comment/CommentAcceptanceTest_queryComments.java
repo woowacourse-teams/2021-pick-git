@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.acceptance.comment;
+package com.woowacourse.pickgit.query.acceptance.comment;
 
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
