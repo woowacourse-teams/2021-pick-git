@@ -55,7 +55,7 @@ export interface Post {
   authorName: string;
   profileImageUrl: string;
   likesCount: number;
-  tags: [];
+  tags: string[];
   createdAt: string;
   updatedAt: string;
   comments: CommentData[];
@@ -125,6 +125,7 @@ export type ClientErrorHandler = {
 };
 
 type PortfolioContact = {
+  id: number;
   category: string;
   value: string;
 };
@@ -132,40 +133,55 @@ type PortfolioContact = {
 export type PortfolioIntro = {
   name: string;
   description: string;
+  profileImageUrl: string;
   isProfileShown: boolean;
   contacts: PortfolioContact[];
 };
 
 export type PortfolioProject = {
+  id: number | null;
   name: string;
   startDate: string;
   endDate: string;
   type: "team" | "personal";
   imageUrl: string;
   content: string;
-  tags: string[];
+  tags: {
+    id: number | null;
+    name: string;
+  }[];
 };
 
 export type PortfolioSectionItem = {
+  id: number | null;
   category: string;
-  descriptions: string[];
+  descriptions: {
+    id: number | null;
+    value: string;
+  }[];
 };
 
 export type PortfolioSection = {
+  id: number | null;
   name: string;
   items: PortfolioSectionItem[];
 };
 
 export type Portfolio = {
+  id: number | null;
   intro: PortfolioIntro;
   projects: PortfolioProject[];
   sections: PortfolioSection[];
 };
 
 export type PortfolioData = {
-  profileImageShown: Boolean;
-  profileImageUrl: String;
-  introduction: String;
+  id: number | null;
+  name: string;
+  profileImageShown: boolean;
+  profileImageUrl: string;
+  introduction: string;
+  updatedAt?: string;
+  createdAt?: string;
   contacts: PortfolioContact[];
   projects: PortfolioProject[];
   sections: PortfolioSection[];

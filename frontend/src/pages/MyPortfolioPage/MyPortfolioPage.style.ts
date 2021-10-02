@@ -46,6 +46,22 @@ export const UserNameCSS = css`
   `}
 `;
 
+export const ToggleButtonCSS = css`
+  position: absolute;
+  top: 4rem;
+  right: 1.375rem;
+
+  ${setTabletMediaQuery`
+    top: 5rem;
+    right: 2rem;  
+  `}
+
+  ${setLaptopAboveMediaQuery`
+    top: 6rem;
+    right: 10rem;
+  `}
+`;
+
 export const AvatarWrapper = styled.div``;
 
 export const DescriptionCSS = css`
@@ -122,6 +138,16 @@ export const PaginatorWrapper = styled.div`
   bottom: 1.5625rem;
 `;
 
+export const CategoryAddIconWrapper = styled.div`
+  width: 100%;
+  padding-left: 2rem;
+
+  ${setLaptopAboveMediaQuery`
+    padding-left: 22rem;
+  
+  `}
+`;
+
 export const ContactIconCSS = css`
   margin-right: 0.75rem;
 `;
@@ -148,5 +174,25 @@ export const SectionNameCSS = css`
     min-height: 4.5rem;
     padding: 0 4rem;
     font-size: 2.2rem;
+  `}
+`;
+
+export const CloseButtonWrapper = styled.div`
+  position: absolute;
+  top: 1.5rem;
+  left: 1rem;
+  display: flex;
+  justify-content: flex-end;
+
+  > button:active {
+    transform: scale(0.98);
+  }
+
+  ${setLaptopMediaQuery`
+    left: 4rem;
+  `}
+
+  ${setDesktopMediaQuery`
+    left: 6rem;
   `}
 `;

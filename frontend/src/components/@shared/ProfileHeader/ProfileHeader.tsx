@@ -33,7 +33,7 @@ export interface Props {
 
 const ProfileHeader = ({ isMyProfile, profile, username }: Props) => {
   const theme = useContext(ThemeContext);
-  const { isLoggedIn } = useContext(UserContext);
+  const { isLoggedIn, currentUsername } = useContext(UserContext);
   const queryClient = useQueryClient();
   const history = useHistory();
 
@@ -74,6 +74,11 @@ const ProfileHeader = ({ isMyProfile, profile, username }: Props) => {
   };
 
   const handleMoveToPortfolio = () => {
+    if (currentUsername === username) {
+      history.push(PAGE_URL.MY_PORTFOLIO);
+      return;
+    }
+
     history.push({
       pathname: PAGE_URL.PORTFOLIO,
       search: `username=${username}`,

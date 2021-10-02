@@ -1,21 +1,32 @@
-import { PortfolioSection, PortfolioSectionItem } from "../../@types";
+import { PortfolioSection } from "../../@types";
 import { PORTFOLIO } from "../../constants/localStorageKey";
+import { setPortfolioLocalUpdateTime } from "../../storage/storage";
 import useLocalStorage from "./@common/useLocalStorage";
 
 const usePortfolioSections = () => {
-  const { itemState, setItem: setPortfolioSections } = useLocalStorage<PortfolioSection[]>(PORTFOLIO.SECTIONS);
-
-  const portfolioSections = itemState ?? [
+  const { itemState: portfolioSections, setItem } = useLocalStorage<PortfolioSection[]>(PORTFOLIO.SECTIONS, [
     {
+      id: null,
       name: "",
       items: [
         {
+          id: null,
           category: "",
-          descriptions: [""],
+          descriptions: [
+            {
+              id: null,
+              value: "",
+            },
+          ],
         },
       ],
     },
-  ];
+  ]);
+
+  const setPortfolioSections = (sections: PortfolioSection[]) => {
+    setPortfolioLocalUpdateTime(new Date());
+    setItem(sections);
+  };
 
   const addBlankPortfolioSection = () => {
     const newPortfolioSections = [...portfolioSections];
@@ -23,11 +34,18 @@ const usePortfolioSections = () => {
     setPortfolioSections([
       ...newPortfolioSections,
       {
+        id: null,
         name: "",
         items: [
           {
+            id: null,
             category: "",
-            descriptions: [""],
+            descriptions: [
+              {
+                id: null,
+                value: "",
+              },
+            ],
           },
         ],
       },
@@ -74,6 +92,7 @@ const usePortfolioSections = () => {
     portfolioSections,
     addBlankPortfolioSection,
     setPortfolioSection,
+    setPortfolioSections,
     updatePortfolioSectionName,
     deletePortfolioSection,
   };
