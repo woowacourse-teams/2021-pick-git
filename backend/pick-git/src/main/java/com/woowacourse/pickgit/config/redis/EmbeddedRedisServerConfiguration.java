@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.config.redis;
 
+import com.woowacourse.pickgit.exception.redis.EmbeddedRedisServerException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -75,15 +76,13 @@ public class EmbeddedRedisServerConfiguration {
         return Runtime.getRuntime().exec(shell);
     }
 
-    public int findAvailablePort() throws IOException {
-
+    private int findAvailablePort() throws IOException {
         for (int tempPort = 10000; tempPort <= 65535; tempPort++) {
             Process process = executeGrepProcessCommand(tempPort);
             if (!isRunning(process)) {
                 return tempPort;
             }
         }
-
-        throw new IllegalArgumentException("Not Found Available port: 10000 ~ 65535");
+        throw new EmbeddedRedisServerException();
     }
 }
