@@ -19,11 +19,12 @@ import redis.embedded.RedisServer;
 @Profile(value = {"test", "local"})
 @Configuration
 public class EmbeddedRedisServerConfiguration {
-
     private static final String LOCAL_HOST = "127.0.0.1";
     private static final String BIN_SH = "/bin/sh";
     private static final String BIN_SH_OPTION = "-c";
     private static final String COMMAND = "netstat -nat | grep LISTEN|grep %d";
+    private static final int START_PORT = 10000;
+    private static final int END_PORT = 65535;
 
     @Value("${security.redis.port}")
     private int port;
@@ -77,7 +78,7 @@ public class EmbeddedRedisServerConfiguration {
     }
 
     private int findAvailablePort() throws IOException {
-        for (int tempPort = 10000; tempPort <= 65535; tempPort++) {
+        for (int tempPort = START_PORT; tempPort <= END_PORT; tempPort++) {
             Process process = executeGrepProcessCommand(tempPort);
             if (!isRunning(process)) {
                 return tempPort;
