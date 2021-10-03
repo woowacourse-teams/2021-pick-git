@@ -2,6 +2,8 @@ package com.woowacourse.pickgit.common.mockapi;
 
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
+import com.woowacourse.pickgit.query.fixture.TUser;
+import java.util.concurrent.TimeUnit;
 
 public class MockGithubOAuthClient implements OAuthClient {
 
@@ -17,15 +19,6 @@ public class MockGithubOAuthClient implements OAuthClient {
 
     @Override
     public OAuthProfileResponse getGithubProfile(String githubAccessToken) {
-        return new OAuthProfileResponse(
-            githubAccessToken,
-            "https://github.com/testImage.jpg",
-            "testDescription",
-            "https://github.com/bperhaps",
-            "testCompany",
-            "testLocation",
-            "testWebsite",
-            "testTwitter"
-        );
+        return TUser.oAuthProfileResponse(githubAccessToken);
     }
 }

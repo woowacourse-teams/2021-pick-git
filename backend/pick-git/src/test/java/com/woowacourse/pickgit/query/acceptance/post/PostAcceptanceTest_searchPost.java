@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.query.acceptance.post;
 
+import static com.woowacourse.pickgit.query.fixture.TUser.NEOZAL;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,7 +45,7 @@ class PostAcceptanceTest_searchPost extends AcceptanceTest {
     private void createPost(String... tags) {
         int statusCode = PickGitRequest.post("/api/posts")
             .api_posts()
-            .withUser("testUser")
+            .withUser(NEOZAL)
             .initAllParams()
             .tags(tags)
             .extract().statusCode();
@@ -54,7 +55,7 @@ class PostAcceptanceTest_searchPost extends AcceptanceTest {
 
     private List<PostResponse> getAllPostsWithUser(int size) {
         return PickGitRequest.get("/api/posts?page={page}&limit={limit}", 0, size)
-            .withUser("testUser")
+            .withUser(NEOZAL)
             .extract()
             .as(new TypeRef<>() {
             });
@@ -75,7 +76,7 @@ class PostAcceptanceTest_searchPost extends AcceptanceTest {
         ExtractableResponse<Response> extract = PickGitRequest
             .get("/api/search/posts?type=tags&keyword={keyword}&page={page}&limit={limit}",
                 keyword, page, limit
-            ).withUser("testUser")
+            ).withUser(NEOZAL.은로그인을한다())
             .extract();
 
         assertThat(extract.statusCode()).isEqualTo(HttpStatus.OK.value());

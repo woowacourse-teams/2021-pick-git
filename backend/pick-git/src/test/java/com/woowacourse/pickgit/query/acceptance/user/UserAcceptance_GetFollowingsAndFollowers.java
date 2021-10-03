@@ -16,6 +16,7 @@ import com.woowacourse.pickgit.user.presentation.dto.response.UserSearchResponse
 import io.restassured.common.mapper.TypeRef;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +38,10 @@ class UserAcceptance_GetFollowingsAndFollowers extends AcceptanceTest {
     @Test
     void searchFollowings_Login_FollowingVarious() {
         // given
-        User target = UserFactory.user("target");
+        String loginUserName = UUID.randomUUID().toString();
+        User target = UserFactory.user(UUID.randomUUID().toString());
         List<User> usersInDb = new ArrayList<>(UserFactory.mockSearchUsers());
-        usersInDb.add(UserFactory.user("testUser"));
+        usersInDb.add(UserFactory.user(loginUserName));
         userRepository.save(target);
         userRepository.saveAll(usersInDb);
 
@@ -54,7 +56,7 @@ class UserAcceptance_GetFollowingsAndFollowers extends AcceptanceTest {
             userService.followUser(requestDto);
         }
         AuthUserForUserRequestDto testerAuthDto =
-            AuthUserForUserRequestDto.from(new LoginUser("testUser", "token"));
+            AuthUserForUserRequestDto.from(new LoginUser(loginUserName, "token"));
         for (int i = 0; i < 3; i++) {
             FollowRequestDto requestDto = FollowRequestDto.builder()
                 .authUserRequestDto(testerAuthDto)
@@ -66,8 +68,8 @@ class UserAcceptance_GetFollowingsAndFollowers extends AcceptanceTest {
 
         // when
         List<UserSearchResponse> response = PickGitRequest
-            .get(FOLLOWINGS_API_URL, "target", "0", "10")
-            .withUser("testUser")
+            .get(FOLLOWINGS_API_URL, target.getName(), "0", "10")
+            .withUser(loginUserName)
             .extract()
             .as(new TypeRef<>() {
             });
@@ -89,7 +91,7 @@ class UserAcceptance_GetFollowingsAndFollowers extends AcceptanceTest {
     @Test
     void searchFollowings_Guest_FollowingNull() {
         // given
-        User target = UserFactory.user("target");
+        User target = UserFactory.user(UUID.randomUUID().toString());
         List<User> usersInDb = UserFactory.mockSearchUsers();
         userRepository.save(target);
         userRepository.saveAll(usersInDb);
@@ -107,7 +109,7 @@ class UserAcceptance_GetFollowingsAndFollowers extends AcceptanceTest {
 
         // when
         List<UserSearchResponse> response = PickGitRequest
-            .get(FOLLOWINGS_API_URL, "target", "0",
+            .get(FOLLOWINGS_API_URL, target.getName(), "0",
                 "10")
             .withGuest()
             .extract()
@@ -130,9 +132,10 @@ class UserAcceptance_GetFollowingsAndFollowers extends AcceptanceTest {
     @Test
     void searchFollowers_Login_FollowingVarious() {
         // given
-        User target = UserFactory.user("target");
+        String loginUserName = UUID.randomUUID().toString();
+        User target = UserFactory.user(UUID.randomUUID().toString());
         List<User> usersInDb = new ArrayList<>(UserFactory.mockSearchUsers());
-        usersInDb.add(UserFactory.user("testUser"));
+        usersInDb.add(UserFactory.user(loginUserName));
         userRepository.save(target);
         userRepository.saveAll(usersInDb);
 
@@ -147,7 +150,7 @@ class UserAcceptance_GetFollowingsAndFollowers extends AcceptanceTest {
             userService.followUser(requestDto);
         }
         AuthUserForUserRequestDto testerAuthDto =
-            AuthUserForUserRequestDto.from(new LoginUser("testUser", "token"));
+            AuthUserForUserRequestDto.from(new LoginUser(loginUserName, "token"));
         for (int i = 0; i < 3; i++) {
             FollowRequestDto requestDto = FollowRequestDto.builder()
                 .authUserRequestDto(testerAuthDto)
@@ -159,8 +162,8 @@ class UserAcceptance_GetFollowingsAndFollowers extends AcceptanceTest {
 
         // when
         List<UserSearchResponse> response = PickGitRequest
-            .get(FOLLOWERS_API_URL, "target", "0", "10")
-            .withUser("testUser")
+            .get(FOLLOWERS_API_URL, target.getName(), "0", "10")
+            .withUser(loginUserName)
             .extract()
             .as(new TypeRef<>() {
             });
@@ -182,7 +185,7 @@ class UserAcceptance_GetFollowingsAndFollowers extends AcceptanceTest {
     @Test
     void searchFollowers_Guest_FollowingNull() {
         // given
-        User target = UserFactory.user("target");
+        User target = UserFactory.user(UUID.randomUUID().toString());
         List<User> usersInDb = UserFactory.mockSearchUsers();
         userRepository.save(target);
         userRepository.saveAll(usersInDb);
@@ -201,7 +204,7 @@ class UserAcceptance_GetFollowingsAndFollowers extends AcceptanceTest {
 
         // when
         List<UserSearchResponse> response = PickGitRequest
-            .get(FOLLOWERS_API_URL, "target", "0", "10")
+            .get(FOLLOWERS_API_URL, target.getName(), "0", "10")
             .withGuest()
             .extract()
             .as(new TypeRef<>() {

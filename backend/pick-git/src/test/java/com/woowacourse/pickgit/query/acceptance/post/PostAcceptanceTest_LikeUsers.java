@@ -1,17 +1,18 @@
 package com.woowacourse.pickgit.query.acceptance.post;
 
+import static com.woowacourse.pickgit.query.fixture.TUser.NEOZAL;
+import static com.woowacourse.pickgit.query.fixture.TUser.모든유저;
+import static com.woowacourse.pickgit.query.fixture.TUser.모든유저는로그인을한다;
+import static io.restassured.RestAssured.given;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;
-import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
-import com.woowacourse.pickgit.authentication.domain.OAuthClient;
-import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.post.presentation.dto.response.LikeUsersResponse;
+import com.woowacourse.pickgit.query.fixture.TUser;
 import com.woowacourse.pickgit.user.domain.User;
 import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
@@ -20,30 +21,29 @@ import io.restassured.response.Response;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 public class PostAcceptanceTest_LikeUsers extends AcceptanceTest {
 
-    @MockBean
-    private OAuthClient oAuthClient;
-
     @DisplayName("특정 게시물을 좋아요한 계정 리스트를 조회할 수 있다 - 로그인/성공")
     @Test
     void searchLikeUsers_LoginUser_Success() {
+        모든유저는로그인을한다();
+
         // given
         Long postId = 1L;
-        String authorToken = 로그인_되어있음("author").getToken();
-        List<User> likeUsers = UserFactory.mockLikeUsersIncludingAuthor();
+        String authorToken = NEOZAL.accessToken();
+        List<String> likeUsers = 모든유저().이유저는제외하고(NEOZAL).Accesstoken을가져온다();
 
         writePost(authorToken);
-        likePosts(postId, likeUsers);
-        followSomeUsers(authorToken, likeUsers);
+        likeUsers.forEach(token -> likePost(token, postId));
+        followSomeUsers(authorToken, 모든유저().이유저는제외하고(NEOZAL).가져온다());
 
-        List<LikeUsersResponse> expectedResponse = createLikeUserResponseForLoginUser(likeUsers);
+        List<LikeUsersResponse> expectedResponse = createLikeUserResponseForLoginUser(모든유저().이유저는제외하고(NEOZAL).가져온다());
 
         // when
         List<LikeUsersResponse> actualResponse =
@@ -66,25 +66,25 @@ public class PostAcceptanceTest_LikeUsers extends AcceptanceTest {
             .extract();
     }
 
-    private List<LikeUsersResponse> createLikeUserResponseForLoginUser(List<User> likeUsers) {
+    private List<LikeUsersResponse> createLikeUserResponseForLoginUser(List<TUser> likeUsers) {
         return likeUsers.stream()
             .map(user -> {
                     if (isFollowingUser(likeUsers, user)) {
-                        return new LikeUsersResponse(user.getImage(), user.getName(), true);
+                        return new LikeUsersResponse("https://github.com/testImage.jpg", user.name(), true);
                     }
 
-                    if (user.getName().equals("author")) {
-                        return new LikeUsersResponse(user.getImage(), user.getName(), null);
+                    if (user.name().equals("NEOZAL")) {
+                        return new LikeUsersResponse("https://github.com/testImage.jpg", user.name(), null);
                     }
 
-                    return new LikeUsersResponse(user.getImage(), user.getName(), false);
+                    return new LikeUsersResponse("https://github.com/testImage.jpg", user.name(), false);
                 }
             ).collect(toList());
     }
 
-    private boolean isFollowingUser(List<User> likeUsers, User user) {
-        return user.getName().equals(likeUsers.get(0).getName())
-            || user.getName().equals(likeUsers.get(1).getName());
+    private boolean isFollowingUser(List<TUser> likeUsers, TUser user) {
+        return user.name().equals(likeUsers.get(0).name())
+            || user.name().equals(likeUsers.get(1).name());
     }
 
     @DisplayName("특정 게시물을 좋아요한 계정 리스트를 조회할 수 있다 - 비 로그인/성공")
@@ -92,13 +92,13 @@ public class PostAcceptanceTest_LikeUsers extends AcceptanceTest {
     void searchLikeUsers_GuestUser_Success() {
         // given
         Long postId = 1L;
-        String authorToken = 로그인_되어있음("author").getToken();
-        List<User> likeUsers = UserFactory.mockLikeUsersIncludingAuthor();
+        String authorToken = NEOZAL.은로그인을한다();
+        List<String> likeUsers = 모든유저().이유저는제외하고(NEOZAL).Accesstoken을가져온다();
 
         writePost(authorToken);
-        likePosts(postId, likeUsers);
+        likeUsers.forEach(token -> likePost(token, postId));
 
-        List<LikeUsersResponse> expectedResponse = createLikeUserResponseForGuest(likeUsers);
+        List<LikeUsersResponse> expectedResponse = createLikeUserResponseForGuest(모든유저().이유저는제외하고(NEOZAL).가져온다());
 
         // when
         List<LikeUsersResponse> actualResponse =
@@ -111,10 +111,10 @@ public class PostAcceptanceTest_LikeUsers extends AcceptanceTest {
             .isEqualTo(expectedResponse);
     }
 
-    private List<LikeUsersResponse> createLikeUserResponseForGuest(List<User> likeUsers) {
+    private List<LikeUsersResponse> createLikeUserResponseForGuest(List<TUser> likeUsers) {
         return likeUsers.stream()
             .map(
-                user -> new LikeUsersResponse(user.getImage(), user.getName(), null)
+                user -> new LikeUsersResponse("https://github.com/testImage.jpg", user.name(), null)
             ).collect(toList());
     }
 
@@ -123,7 +123,7 @@ public class PostAcceptanceTest_LikeUsers extends AcceptanceTest {
     void searchLikeUsers_EmptyLikes_Success() {
         // given
         Long postId = 1L;
-        String authorToken = 로그인_되어있음("author").getToken();
+        String authorToken = NEOZAL.은로그인을한다();
 
         writePost(authorToken);
 
@@ -181,13 +181,13 @@ public class PostAcceptanceTest_LikeUsers extends AcceptanceTest {
             .statusCode(HttpStatus.OK.value());
     }
 
-    private void followSomeUsers(String authorToken, List<User> likeUsers) {
+    private void followSomeUsers(String authorToken, List<TUser> likeUsers) {
         for (int i = 0; i < 2; i++) {
             followUser(
                 authorToken,
                 likeUsers
                     .get(i)
-                    .getName()
+                    .name()
             );
         }
     }
@@ -205,7 +205,7 @@ public class PostAcceptanceTest_LikeUsers extends AcceptanceTest {
     @Test
     void searchLikeUsers_InvalidPostId_500Exception() {
         // given
-        Long postId = 1L;
+        Long postId = 999L;
 
         // when
         PostNotFoundException response =
@@ -225,40 +225,6 @@ public class PostAcceptanceTest_LikeUsers extends AcceptanceTest {
             .get("/api/posts/{postId}/likes", postId)
             .then().log().all()
             .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-            .extract();
-    }
-
-    private OAuthTokenResponse 로그인_되어있음(String name) {
-        OAuthTokenResponse response = 로그인_요청(name)
-            .as(OAuthTokenResponse.class);
-
-        assertThat(response.getToken()).isNotBlank();
-
-        return response;
-    }
-
-    private ExtractableResponse<Response> 로그인_요청(String name) {
-        // given
-        String oauthCode = "1234";
-        String accessToken = "oauth.access.token";
-
-        OAuthProfileResponse oAuthProfileResponse = new OAuthProfileResponse(
-            name, "http://img.com", "hi~", "github.com/",
-            null, null, null, null
-        );
-
-        given(oAuthClient.getAccessToken(oauthCode))
-            .willReturn(accessToken);
-        given(oAuthClient.getGithubProfile(accessToken))
-            .willReturn(oAuthProfileResponse);
-
-        // when
-        return RestAssured.given().log().all()
-            .accept(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .get("/api/afterlogin?code=" + oauthCode)
-            .then().log().all()
-            .statusCode(HttpStatus.OK.value())
             .extract();
     }
 }

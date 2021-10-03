@@ -1,39 +1,34 @@
 package com.woowacourse.pickgit.query.acceptance.portfolio;
 
+import static com.woowacourse.pickgit.query.fixture.TUser.KODA;
+import static com.woowacourse.pickgit.query.fixture.TUser.MARK;
+import static com.woowacourse.pickgit.query.fixture.TUser.NEOZAL;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.OK;
 
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;
-import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
-import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
 import com.woowacourse.pickgit.common.factory.PortfolioFactory;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
 import com.woowacourse.pickgit.portfolio.presentation.dto.response.PortfolioResponse;
 import com.woowacourse.pickgit.tag.domain.Tag;
 import com.woowacourse.pickgit.tag.domain.TagRepository;
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 public class PortfolioAcceptanceTest_Query extends AcceptanceTest {
 
     private static final String USERNAME = "dani";
     private static final String ANOTHER_USERNAME = "neozal";
-
-    @MockBean
-    private OAuthClient oAuthClient;
 
     @Autowired
     private TagRepository tagRepository;
@@ -57,13 +52,13 @@ public class PortfolioAcceptanceTest_Query extends AcceptanceTest {
             @Test
             void read_LoginUserWithMine_Success() {
                 // given
-                String token = 로그인_되어있음(USERNAME).getToken();
+                String token = NEOZAL.은로그인을한다();
 
                 PortfolioResponse expected = PortfolioFactory
-                    .mockPortfolioResponse(USERNAME);
+                    .mockPortfolioResponse(NEOZAL.name());
 
                 // when
-                PortfolioResponse response = authenticatedWithReadApi(token, USERNAME)
+                PortfolioResponse response = authenticatedWithReadApi(token, NEOZAL.name())
                     .as(PortfolioResponse.class);
 
                 // then
@@ -77,20 +72,23 @@ public class PortfolioAcceptanceTest_Query extends AcceptanceTest {
             @Test
             void read_LoginUserWithYours_Success() {
                 // given
-                String token = 로그인_되어있음(USERNAME).getToken();
-                로그인_되어있음(ANOTHER_USERNAME);
+                String token = NEOZAL.은로그인을한다();
+                String kodaAccessToken = KODA.은로그인을한다();
+
+                authenticatedWithReadApi(kodaAccessToken, NEOZAL.name())
+                    .as(PortfolioResponse.class);
 
                 PortfolioResponse expected = PortfolioFactory
-                    .mockPortfolioResponse(ANOTHER_USERNAME);
+                    .mockPortfolioResponse(KODA.name());
 
                 // when
-                PortfolioResponse response = authenticatedWithReadApi(token, ANOTHER_USERNAME)
+                PortfolioResponse response = authenticatedWithReadApi(token, KODA.name())
                     .as(PortfolioResponse.class);
 
                 // then
                 assertThat(response)
                     .usingRecursiveComparison()
-                    .ignoringFields("createdAt", "updatedAt")
+                    .ignoringFields("createdAt", "updatedAt", "id")
                     .isEqualTo(expected);
             }
         }
@@ -108,14 +106,14 @@ public class PortfolioAcceptanceTest_Query extends AcceptanceTest {
             @Test
             void read_GuestUserWithExistingYours_Success() {
                 // given
-                String token = 로그인_되어있음(USERNAME).getToken();
-                authenticatedWithReadApi(token, USERNAME);
+                String token = NEOZAL.은로그인을한다();
+                authenticatedWithReadApi(token, NEOZAL.name());
 
                 PortfolioResponse expected = PortfolioFactory
-                    .mockPortfolioResponse(USERNAME);
+                    .mockPortfolioResponse(NEOZAL.name());
 
                 // when
-                PortfolioResponse response = unauthenticatedWithReadApi(OK)
+                PortfolioResponse response = unauthenticatedWithReadApi(NEOZAL.name(), OK)
                     .as(PortfolioResponse.class);
 
                 // then
@@ -129,7 +127,7 @@ public class PortfolioAcceptanceTest_Query extends AcceptanceTest {
             @Test
             void read_GuestUserWithNonExistingYours_Fail() {
                 // when
-                ApiErrorResponse response = unauthenticatedWithReadApi(BAD_REQUEST)
+                ApiErrorResponse response = unauthenticatedWithReadApi(MARK.name(), BAD_REQUEST)
                     .as(ApiErrorResponse.class);
 
                 // then
@@ -148,46 +146,12 @@ public class PortfolioAcceptanceTest_Query extends AcceptanceTest {
             .extract();
     }
 
-    private ExtractableResponse<Response> unauthenticatedWithReadApi(HttpStatus httpStatus) {
+    private ExtractableResponse<Response> unauthenticatedWithReadApi(String name, HttpStatus httpStatus) {
         return given().log().all()
             .when()
-            .get("/api/portfolios/{username}", USERNAME)
+            .get("/api/portfolios/{username}", name)
             .then().log().all()
             .statusCode(httpStatus.value())
-            .extract();
-    }
-
-    private OAuthTokenResponse 로그인_되어있음(String name) {
-        OAuthTokenResponse response = 로그인_요청(name)
-            .as(OAuthTokenResponse.class);
-
-        assertThat(response.getToken()).isNotBlank();
-
-        return response;
-    }
-
-    private ExtractableResponse<Response> 로그인_요청(String name) {
-        // given
-        String oauthCode = "1234";
-        String accessToken = "oauth.access.token";
-
-        OAuthProfileResponse oAuthProfileResponse = new OAuthProfileResponse(
-            name, "image", "hi~", "github.com/",
-            null, null, null, null
-        );
-
-        BDDMockito.given(oAuthClient.getAccessToken(oauthCode))
-            .willReturn(accessToken);
-        BDDMockito.given(oAuthClient.getGithubProfile(accessToken))
-            .willReturn(oAuthProfileResponse);
-
-        // when
-        return RestAssured.given().log().all()
-            .accept(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .get("/api/afterlogin?code=" + oauthCode)
-            .then().log().all()
-            .statusCode(OK.value())
             .extract();
     }
 }

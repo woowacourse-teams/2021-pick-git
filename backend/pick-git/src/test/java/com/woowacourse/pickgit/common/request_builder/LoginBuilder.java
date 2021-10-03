@@ -4,6 +4,7 @@ import static io.restassured.RestAssured.given;
 
 import com.woowacourse.pickgit.authentication.application.dto.TokenDto;
 import com.woowacourse.pickgit.common.request_builder.parameters.Parameters;
+import com.woowacourse.pickgit.query.fixture.TUser;
 import io.restassured.specification.RequestSpecification;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -46,6 +47,10 @@ public class LoginBuilder<T extends Parameters> {
 
     public T withUser(String name) {
         return setOauth2ToSpec(requestLogin(name));
+    }
+
+    public T withUser(TUser user) {
+        return setOauth2ToSpec(user.은로그인을한다());
     }
 
     private T setOauth2ToSpec(String token) {

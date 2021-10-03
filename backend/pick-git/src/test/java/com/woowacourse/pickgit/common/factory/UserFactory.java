@@ -5,6 +5,7 @@ import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponse
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
 import java.util.List;
+import java.util.UUID;
 
 public class UserFactory {
 
@@ -133,11 +134,11 @@ public class UserFactory {
     }
 
     public static List<User> mockSearchUsers() {
-        User user1 = user("binghe");
-        User user2 = user("bing");
-        User user3 = user("jinbinghe");
-        User user4 = user("bbbbinghe");
-        User user5 = user("bingbing");
+        User user1 = user(UUID.randomUUID().toString());
+        User user2 = user(UUID.randomUUID().toString());
+        User user3 = user(UUID.randomUUID().toString());
+        User user4 = user(UUID.randomUUID().toString());
+        User user5 = user(UUID.randomUUID().toString());
 
         return List.of(
             user1, user2, user3, user4, user5
@@ -162,7 +163,7 @@ public class UserFactory {
         User user3 = user("user3");
         User user4 = user("user4");
         User user5 = user("user5");
-        User author = user("author");
+        User author = user("NEOZAL");
 
         return List.of(
             user1, user2, user3, user4, user5, author

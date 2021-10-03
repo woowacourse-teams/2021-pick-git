@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.query.acceptance.comment;
 
+import static com.woowacourse.pickgit.query.fixture.TUser.NEOZAL;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -8,6 +9,7 @@ import com.woowacourse.pickgit.comment.domain.CommentRepository;
 import com.woowacourse.pickgit.comment.presentation.dto.response.CommentResponse;
 import com.woowacourse.pickgit.common.request_builder.PickGitRequest;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
+import com.woowacourse.pickgit.query.fixture.TUser;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.ExtractableResponse;
@@ -36,13 +38,6 @@ public class CommentAcceptanceTest_queryComments extends AcceptanceTest {
     @Autowired
     private CommentRepository commentRepository;
 
-    @BeforeEach
-    void setUp() {
-        postRepository.deleteAll();
-        commentRepository.deleteAll();
-        userRepository.deleteAll();
-    }
-
     @DisplayName("사용자는 PostId로 댓글을 가져올 수 있다.")
     @ParameterizedTest
     @MethodSource("getParametersForQueryComments")
@@ -54,7 +49,7 @@ public class CommentAcceptanceTest_queryComments extends AcceptanceTest {
 
         List<CommentResponse> actual = PickGitRequest
             .get("/api/posts/{postId}/comments?page={page}&limit={limit}", postId, page, limit)
-            .withUser()
+            .withUser(NEOZAL)
             .extract()
             .as(new TypeRef<>() {
             });

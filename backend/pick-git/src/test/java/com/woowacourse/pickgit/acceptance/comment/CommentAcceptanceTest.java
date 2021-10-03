@@ -175,38 +175,4 @@ public class CommentAcceptanceTest extends AcceptanceTest {
             .statusCode(httpStatus.value())
             .extract();
     }
-
-    private OAuthTokenResponse 로그인_되어있음(String name) {
-        OAuthTokenResponse response = 로그인_요청(name)
-            .as(OAuthTokenResponse.class);
-
-        assertThat(response.getToken()).isNotBlank();
-
-        return response;
-    }
-
-    private ExtractableResponse<Response> 로그인_요청(String name) {
-        // given
-        String oauthCode = "1234";
-        String accessToken = "oauth.access.token";
-
-        OAuthProfileResponse oAuthProfileResponse = new OAuthProfileResponse(
-            name, "image", "hi~", "github.com/",
-            null, null, null, null
-        );
-
-        BDDMockito.given(oAuthClient.getAccessToken(oauthCode))
-            .willReturn(accessToken);
-        BDDMockito.given(oAuthClient.getGithubProfile(accessToken))
-            .willReturn(oAuthProfileResponse);
-
-        // when
-        return given().log().all()
-            .accept(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .get("/api/afterlogin?code=" + oauthCode)
-            .then().log().all()
-            .statusCode(HttpStatus.OK.value())
-            .extract();
-    }
 }
