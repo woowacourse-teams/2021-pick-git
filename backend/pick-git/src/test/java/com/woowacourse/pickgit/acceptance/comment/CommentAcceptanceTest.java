@@ -35,9 +35,6 @@ public class CommentAcceptanceTest extends AcceptanceTest {
     private String content;
     private Map<String, Object> request;
 
-    @MockBean
-    private OAuthClient oAuthClient;
-
     @BeforeEach
     void setUp() {
         githubRepoUrl = "https://github.com/woowacourse-teams/2021-pick-git";

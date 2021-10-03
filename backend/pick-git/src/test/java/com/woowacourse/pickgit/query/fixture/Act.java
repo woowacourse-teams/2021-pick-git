@@ -1,10 +1,18 @@
 package com.woowacourse.pickgit.query.fixture;
 
+import static io.restassured.RestAssured.given;
+
+import com.woowacourse.pickgit.post.presentation.dto.response.PostResponse;
 import io.restassured.RestAssured;
 import io.restassured.http.Method;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
+import java.io.File;
+import java.util.List;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
 public abstract class Act {
 
@@ -31,6 +39,43 @@ public abstract class Act {
             .when().request(method, url)
             .then().log().all()
             .statusCode(httpStatus.value())
+            .extract();
+    }
+
+    protected ExtractableResponse<Response> request(
+        String accessToken,
+        String url,
+        Method method,
+        TPost tPost
+    ) {
+        RequestSpecification spec = given().log().all()
+            .auth().oauth2(accessToken)
+            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+            .formParams(tPost.params());
+
+        for (File image : tPost.images()) {
+            spec = spec.multiPart("images", image);
+        }
+
+        return spec.when()
+            .request(method, url)
+            .then().log().all()
+            .extract();
+    }
+
+    protected ExtractableResponse<Response> request(
+        String accessToken,
+        String url,
+        Method method,
+        Map<String, Object> params
+    ) {
+        return given().log().all()
+            .auth().oauth2(accessToken)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(params)
+            .when()
+            .request(method, url)
+            .then().log().all()
             .extract();
     }
 }

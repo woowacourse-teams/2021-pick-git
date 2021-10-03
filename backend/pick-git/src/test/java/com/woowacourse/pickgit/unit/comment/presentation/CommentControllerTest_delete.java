@@ -26,6 +26,7 @@ import com.woowacourse.pickgit.comment.application.CommentService;
 import com.woowacourse.pickgit.comment.application.dto.request.CommentDeleteRequestDto;
 import com.woowacourse.pickgit.comment.presentation.CommentController;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
+import com.woowacourse.pickgit.unit.ControllerTest;
 import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,20 +39,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-@AutoConfigureRestDocs
-@Import(InfrastructureTestConfiguration.class)
-@WebMvcTest(CommentController.class)
-@ActiveProfiles("test")
-public class CommentControllerTest_delete {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private OAuthService oAuthService;
-
-    @MockBean
-    private CommentService commentService;
+public class CommentControllerTest_delete extends ControllerTest {
 
     @DisplayName("사용자는 댓글을 삭제한다.")
     @Test

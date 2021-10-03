@@ -12,6 +12,7 @@ import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
+import com.woowacourse.pickgit.integration.IntegrationTest;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowRequestDto;
@@ -32,11 +33,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 
-@Import(InfrastructureTestConfiguration.class)
-@SpringBootTest(webEnvironment = WebEnvironment.NONE)
-@Transactional
-@ActiveProfiles("test")
-public class UserServiceIntegrationTest_Query {
+public class UserServiceIntegrationTest_Query extends IntegrationTest {
 
     @Autowired
     private UserService userService;
@@ -85,9 +82,7 @@ public class UserServiceIntegrationTest_Query {
             userService.getUserProfile(authUserRequestDto, targetUser.getName());
 
         //then
-        assertThat(userProfile)
-            .usingRecursiveComparison()
-            .isEqualTo(responseDto);
+        assertThat(userProfile.getName()).isEqualTo(responseDto.getName());
     }
 
     @DisplayName("게스트 유저는 존재하지 않는 유저 이름으로 프로필을 조회할 수 없다. - 400 예외")

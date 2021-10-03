@@ -28,9 +28,6 @@ public class CommentAcceptanceTest_delete extends AcceptanceTest {
     private String content;
     private Map<String, Object> request;
 
-    @MockBean
-    private OAuthClient oAuthClient;
-
     @BeforeEach
     void setUp() {
 

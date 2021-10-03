@@ -9,7 +9,7 @@ public class MockGithubOAuthClient implements OAuthClient {
 
     @Override
     public String getLoginUrl() {
-        return null;
+        return "https://github.com/login/oauth/authorize?";
     }
 
     @Override

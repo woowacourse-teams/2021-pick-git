@@ -28,6 +28,7 @@ import com.woowacourse.pickgit.tag.application.ExtractionRequestDto;
 import com.woowacourse.pickgit.tag.application.TagService;
 import com.woowacourse.pickgit.tag.application.TagsDto;
 import com.woowacourse.pickgit.tag.presentation.TagController;
+import com.woowacourse.pickgit.unit.ControllerTest;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,21 +42,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-@AutoConfigureRestDocs
-@WebMvcTest(TagController.class)
-class TagControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @MockBean
-    private TagService tagService;
-
-    @MockBean
-    private OAuthService oAuthService;
+class TagControllerTest extends ControllerTest {
 
     private final String accessToken = "Bearer validtoken";
     private final String userName = "abc";

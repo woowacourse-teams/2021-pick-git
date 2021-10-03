@@ -41,9 +41,6 @@ import org.springframework.http.MediaType;
 
 class UserAcceptanceTest extends AcceptanceTest {
 
-    @MockBean
-    private OAuthClient oAuthClient;
-
     private String loginUserAccessToken;
 
     private User loginUser;
@@ -56,8 +53,8 @@ class UserAcceptanceTest extends AcceptanceTest {
         loginUser = UserFactory.user("testUser");
         targetUser = UserFactory.user("testUser2");
 
-        loginUserAccessToken = 로그인_되어있음(loginUser).getToken();
-        로그인_되어있음(targetUser);
+        loginUserAccessToken = 로그인_되어있음(loginUser.getName()).getToken();
+        로그인_되어있음(targetUser.getName());
     }
 
     @DisplayName("로그인되지 않은 사용자는 target 유저를 팔로우 할 수 없다.")
@@ -353,7 +350,7 @@ class UserAcceptanceTest extends AcceptanceTest {
             HttpStatus.OK
         );
         User unfollowedUser = UserFactory.user("testUser3");
-        로그인_되어있음(unfollowedUser);
+        로그인_되어있음(unfollowedUser.getName());
 
         // when
         String url = String.format("/api/search/users?keyword=%s&page=0&limit=5", "testUser");
@@ -472,42 +469,6 @@ class UserAcceptanceTest extends AcceptanceTest {
             .when().request(method, url)
             .then().log().all()
             .statusCode(httpStatus.value())
-            .extract();
-    }
-
-    private OAuthTokenResponse 로그인_되어있음(User user) {
-        // when
-        OAuthTokenResponse response = 로그인_요청(user).as(OAuthTokenResponse.class);
-
-        // then
-        assertThat(response.getToken()).isNotBlank();
-
-        return response;
-    }
-
-    private ExtractableResponse<Response> 로그인_요청(User user) {
-        // given
-        String oauthCode = "1234";
-        String accessToken = "oauth.access.token";
-
-        OAuthProfileResponse oAuthProfileResponse = new OAuthProfileResponse(
-            user.getName(), user.getImage(), user.getDescription(), user.getGithubUrl(),
-            user.getCompany(), user.getLocation(), user.getWebsite(), user.getTwitter()
-        );
-
-        given(oAuthClient.getAccessToken(oauthCode))
-            .willReturn(accessToken);
-        given(oAuthClient.getGithubProfile(accessToken))
-            .willReturn(oAuthProfileResponse);
-
-        // then
-        return RestAssured
-            .given().log().all()
-            .accept(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .get("/api/afterlogin?code=" + oauthCode)
-            .then().log().all()
-            .statusCode(HttpStatus.OK.value())
             .extract();
     }
 }

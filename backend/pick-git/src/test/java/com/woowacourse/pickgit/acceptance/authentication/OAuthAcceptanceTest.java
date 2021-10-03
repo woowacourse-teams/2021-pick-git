@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
+import com.woowacourse.pickgit.authentication.application.dto.TokenDto;
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.presentation.dto.OAuthLoginUrlResponse;
 import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
@@ -19,15 +20,9 @@ import org.springframework.http.MediaType;
 
 class OAuthAcceptanceTest extends AcceptanceTest {
 
-    @MockBean
-    private OAuthClient oAuthClient;
-
     @DisplayName("로그인 - Github OAuth 로그인 URL을 요청한다.")
     @Test
     void githubAuthorizationUrl_Github_ReturnLoginUrl() {
-        // mock
-        when(oAuthClient.getLoginUrl()).thenReturn("https://github.com/login/oauth/authorize?");
-
         // when
         OAuthLoginUrlResponse response = RestAssured
             .given().log().all()
@@ -55,7 +50,7 @@ class OAuthAcceptanceTest extends AcceptanceTest {
             .build();
 
         // then
-        OAuthTokenResponse tokenResponse = 로그인_되어있음(oAuthProfileResponse);
+        TokenDto tokenResponse = 로그인_되어있음(oAuthProfileResponse.getName());
         assertThat(tokenResponse.getToken()).isNotBlank();
         assertThat(tokenResponse.getUsername()).isEqualTo("pick-git-login");
     }
@@ -77,37 +72,11 @@ class OAuthAcceptanceTest extends AcceptanceTest {
             .build();
 
         //when
-        로그인_되어있음(previousOAuthProfileResponse);
+        로그인_되어있음(previousOAuthProfileResponse.getName());
 
         // then
-        OAuthTokenResponse tokenResponse = 로그인_되어있음(afterOAuthProfileResponse);
+        TokenDto tokenResponse = 로그인_되어있음(afterOAuthProfileResponse.getName());
         assertThat(tokenResponse.getToken()).isNotBlank();
         assertThat(tokenResponse.getUsername()).isEqualTo("pick-git-login");
-    }
-
-    private OAuthTokenResponse 로그인_되어있음(OAuthProfileResponse oAuthProfileResponse) {
-        OAuthTokenResponse response = 로그인_요청(oAuthProfileResponse).as(OAuthTokenResponse.class);
-        assertThat(response.getToken()).isNotBlank();
-        return response;
-    }
-
-    private ExtractableResponse<Response> 로그인_요청(OAuthProfileResponse oAuthProfileResponse) {
-        // given
-        String oauthCode = "1234";
-        String accessToken = "oauth.access.token";
-
-        // mock
-        when(oAuthClient.getAccessToken(oauthCode)).thenReturn(accessToken);
-        when(oAuthClient.getGithubProfile(accessToken)).thenReturn(oAuthProfileResponse);
-
-        // when
-        return RestAssured
-            .given().log().all()
-            .accept(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .get("/api/afterlogin?code=" + oauthCode)
-            .then().log().all()
-            .statusCode(HttpStatus.OK.value())
-            .extract();
     }
 }

@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;
 import com.woowacourse.pickgit.common.factory.PostFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
+import com.woowacourse.pickgit.integration.IntegrationTest;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.request.AuthUserForPostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeUsersResponseDto;
@@ -18,7 +19,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class PostFeedServiceIntegrationTest_Query extends AcceptanceTest {
+public class PostFeedServiceIntegrationTest_Query extends IntegrationTest {
 
     @Autowired
     private PostService postService;

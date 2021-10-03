@@ -34,9 +34,6 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
     private static final String USERNAME = "dani";
     private static final String ANOTHER_USERNAME = "neozal";
 
-    @MockBean
-    private OAuthClient oAuthClient;
-
     @Autowired
     private TagRepository tagRepository;
 

@@ -24,9 +24,6 @@ public class PostRepositorySearchAcceptanceTest extends AcceptanceTest {
 
     private static final String USERNAME = "jipark3";
 
-    @MockBean
-    private OAuthClient oAuthClient;
-
     @DisplayName("사용자는 Repository 목록을 키워드 검색으로 가져올 수 있다.")
     @Test
     void searchUserRepositories_LoginUser_Success() {

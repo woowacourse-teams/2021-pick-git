@@ -5,9 +5,12 @@ import static java.util.stream.Collectors.toList;
 
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
 import com.woowacourse.pickgit.authentication.application.dto.TokenDto;
-import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -22,10 +25,12 @@ public enum TUser {
     private String token;
     private final List<TUser> following;
     private final List<TUser> follower;
+    private final Map<TPost, ExtractableResponse<Response>> posts;
 
     TUser() {
         this.follower = new ArrayList<>();
         this.following = new ArrayList<>();
+        this.posts = new HashMap<>();
     }
 
     public String accessToken() {
@@ -53,6 +58,10 @@ public enum TUser {
         this.follower.add(tUser);
     }
 
+    void addPost(TPost tPost, ExtractableResponse<Response> response) {
+        this.posts.put(tPost, response);
+    }
+
     public String 은로그인을한다() {
         if (this.token == null) {
             this.token = requestLogin(name());
@@ -77,6 +86,10 @@ public enum TUser {
 
     List<TUser> getFollowing() {
         return following;
+    }
+
+    public Map<TPost, ExtractableResponse<Response>> getPosts() {
+        return posts;
     }
 
     private static String requestLogin(String code) {

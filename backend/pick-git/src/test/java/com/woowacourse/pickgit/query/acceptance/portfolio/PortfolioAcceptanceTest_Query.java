@@ -30,16 +30,6 @@ public class PortfolioAcceptanceTest_Query extends AcceptanceTest {
     private static final String USERNAME = "dani";
     private static final String ANOTHER_USERNAME = "neozal";
 
-    @Autowired
-    private TagRepository tagRepository;
-
-    @BeforeEach
-    void setUp() {
-        tagRepository.save(new Tag("java"));
-        tagRepository.save(new Tag("spring"));
-    }
-
-
     @DisplayName("사용자는")
     @Nested
     class LoginUser {
