@@ -7,7 +7,6 @@ import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileRespon
 import com.woowacourse.pickgit.authentication.application.dto.TokenDto;
 import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,18 +16,16 @@ public enum TUser {
     MARK,
     KEVIN,
     DANI,
-    KODA;
+    KODA,
+    GUEST;
 
     private String token;
-    private BasicProfile basicProfile;
+    private final List<TUser> following;
+    private final List<TUser> follower;
 
-    TUser() { }
-
-    public String 은로그인을한다() {
-        if(this.token == null) {
-            this.token = requestLogin(name());
-        }
-        return this.token;
+    TUser() {
+        this.follower = new ArrayList<>();
+        this.following = new ArrayList<>();
     }
 
     public String accessToken() {
@@ -48,12 +45,38 @@ public enum TUser {
         );
     }
 
-    public static void 모든유저는로그인을한다() {
-        List.of(values()).forEach(TUser::은로그인을한다);
+    void addFollowing(TUser tUser) {
+        this.following.add(tUser);
     }
 
-    public static Act 모든유저() {
-        return new Act(values());
+    void addFollower(TUser tUser) {
+        this.follower.add(tUser);
+    }
+
+    public String 은로그인을한다() {
+        if (this.token == null) {
+            this.token = requestLogin(name());
+        }
+        return this.token;
+    }
+
+    public LoginAndThenAct 은로그인을하고() {
+        return new LoginAndThenAct(this);
+    }
+
+    public UnLoginAndThenAct 는() {
+        return new UnLoginAndThenAct();
+    }
+
+    public static AllUserAct 모든유저() {
+        return new AllUserAct(List.of(values()).stream()
+            .filter(user -> GUEST != user)
+            .collect(toList())
+        );
+    }
+
+    List<TUser> getFollowing() {
+        return following;
     }
 
     private static String requestLogin(String code) {
@@ -66,34 +89,5 @@ public enum TUser {
             .extract()
             .as(TokenDto.class)
             .getToken();
-    }
-
-    public static class Act {
-
-        private final List<TUser> users;
-        private final List<TUser> except;
-
-        public Act(TUser... users) {
-            this.users = List.of(users);
-            this.except = new ArrayList<>();
-        }
-
-        public List<TUser> 가져온다() {
-            return users.stream()
-                .filter(user -> !except.contains(user))
-                .collect(toList());
-        }
-
-        public List<String> Accesstoken을가져온다() {
-            return users.stream()
-                .filter(user -> !except.contains(user))
-                .map(TUser::은로그인을한다)
-                .collect(toList());
-        }
-
-        public Act 이유저는제외하고(TUser... tUsers) {
-            except.addAll(List.of(tUsers));
-            return this;
-        }
     }
 }

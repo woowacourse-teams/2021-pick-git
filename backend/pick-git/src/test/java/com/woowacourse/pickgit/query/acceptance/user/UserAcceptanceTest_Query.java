@@ -1,7 +1,11 @@
 package com.woowacourse.pickgit.query.acceptance.user;
 
+import static com.woowacourse.pickgit.query.fixture.TUser.DANI;
+import static com.woowacourse.pickgit.query.fixture.TUser.KEVIN;
+import static com.woowacourse.pickgit.query.fixture.TUser.KODA;
 import static com.woowacourse.pickgit.query.fixture.TUser.MARK;
 import static com.woowacourse.pickgit.query.fixture.TUser.NEOZAL;
+import static com.woowacourse.pickgit.query.fixture.TUser.모든유저;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
@@ -25,7 +29,17 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-public class UqerAcceptanceTest_Query extends AcceptanceTest {
+public class UserAcceptanceTest_Query extends AcceptanceTest {
+
+    @BeforeEach
+    void setUp() {
+        모든유저().로그인을한다();
+
+        NEOZAL.은로그인을하고().팔로우를한다(KODA, DANI);
+        KODA.은로그인을하고().팔로우를한다(NEOZAL, MARK, DANI);
+        MARK.은로그인을하고().팔로우를한다(KODA, DANI);
+        DANI.은로그인을하고().팔로우를한다(KEVIN);
+    }
 
     @DisplayName("로그인된 사용자는 자신의 프로필을 조회할 수 있다.")
     @Test
@@ -79,43 +93,26 @@ public class UqerAcceptanceTest_Query extends AcceptanceTest {
     @DisplayName("로그인된 사용자는 팔로우한 유저의 프로필을 조회할 수 있다.")
     @Test
     void getUserProfile_LoginUserIsFollowing_Success() {
-        // given
-        String token = NEOZAL.은로그인을한다();
-        MARK.은로그인을한다();
-        UserProfileResponseDto responseDto =
-            UserFactory.mockLoginUserProfileIsFollowingResponseDto();
-
-        //팔로우하네
-        authenticatedRequest(
-            token,
-            String.format("/api/profiles/%s/followings?githubFollowing=false", MARK),
-            Method.POST,
-            HttpStatus.OK
-        );
-
         // when
         UserProfileResponse response =
             authenticatedRequest(
-                token,
-                String.format("/api/profiles/%s", MARK),
+                NEOZAL.은로그인을한다(),
+                String.format("/api/profiles/%s", KODA),
                 Method.GET,
                 HttpStatus.OK
             ).as(UserProfileResponse.class);
 
         // then
-        assertThat(response.getName()).isEqualTo(MARK.name());
+        assertThat(response.getName()).isEqualTo(KODA.name());
     }
 
     @DisplayName("로그인된 사용자는 팔로우하지 않은 유저의 프로필을 조회할 수 있다.")
     @Test
     void getUserProfile_LoginUserIsNotFollowing_Success() {
-        MARK.은로그인을한다();
-        String token = NEOZAL.은로그인을한다();
-
         // when
         UserProfileResponse response =
             authenticatedRequest(
-                token,
+                NEOZAL.은로그인을한다(),
                 String.format("/api/profiles/%s", MARK.name()),
                 Method.GET,
                 HttpStatus.OK

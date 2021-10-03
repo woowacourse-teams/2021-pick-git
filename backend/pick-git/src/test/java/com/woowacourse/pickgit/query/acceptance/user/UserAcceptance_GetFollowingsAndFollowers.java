@@ -1,5 +1,12 @@
 package com.woowacourse.pickgit.query.acceptance.user;
 
+import static com.woowacourse.pickgit.query.fixture.TUser.DANI;
+import static com.woowacourse.pickgit.query.fixture.TUser.GUEST;
+import static com.woowacourse.pickgit.query.fixture.TUser.KEVIN;
+import static com.woowacourse.pickgit.query.fixture.TUser.KODA;
+import static com.woowacourse.pickgit.query.fixture.TUser.MARK;
+import static com.woowacourse.pickgit.query.fixture.TUser.NEOZAL;
+import static com.woowacourse.pickgit.query.fixture.TUser.모든유저;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
@@ -17,6 +24,7 @@ import io.restassured.common.mapper.TypeRef;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,191 +42,76 @@ class UserAcceptance_GetFollowingsAndFollowers extends AcceptanceTest {
     @Autowired
     private UserService userService;
 
+    @BeforeEach
+    void setUp() {
+        모든유저().로그인을한다();
+
+        NEOZAL.은로그인을하고().팔로우를한다(KODA, DANI);
+        KODA.은로그인을하고().팔로우를한다(NEOZAL, MARK, DANI);
+        MARK.은로그인을하고().팔로우를한다(KODA, DANI);
+        DANI.은로그인을하고().팔로우를한다(KEVIN);
+    }
+
     @DisplayName("로그인 - 특정 유저의 팔로잉 목록을 조회한다. (팔로잉 여부 true/false, 본인은 null)")
     @Test
     void searchFollowings_Login_FollowingVarious() {
         // given
-        String loginUserName = UUID.randomUUID().toString();
-        User target = UserFactory.user(UUID.randomUUID().toString());
-        List<User> usersInDb = new ArrayList<>(UserFactory.mockSearchUsers());
-        usersInDb.add(UserFactory.user(loginUserName));
-        userRepository.save(target);
-        userRepository.saveAll(usersInDb);
-
-        AuthUserForUserRequestDto targetAuthDto =
-            AuthUserForUserRequestDto.from(new LoginUser(target.getName(), "token"));
-        for (User user : usersInDb) {
-            FollowRequestDto requestDto = FollowRequestDto.builder()
-                .authUserRequestDto(targetAuthDto)
-                .targetName(user.getName())
-                .githubFollowing(false)
-                .build();
-            userService.followUser(requestDto);
-        }
-        AuthUserForUserRequestDto testerAuthDto =
-            AuthUserForUserRequestDto.from(new LoginUser(loginUserName, "token"));
-        for (int i = 0; i < 3; i++) {
-            FollowRequestDto requestDto = FollowRequestDto.builder()
-                .authUserRequestDto(testerAuthDto)
-                .targetName(usersInDb.get(i).getName())
-                .githubFollowing(false)
-                .build();
-            userService.followUser(requestDto);
-        }
-
-        // when
-        List<UserSearchResponse> response = PickGitRequest
-            .get(FOLLOWINGS_API_URL, target.getName(), "0", "10")
-            .withUser(loginUserName)
-            .extract()
-            .as(new TypeRef<>() {
-            });
+        List<UserSearchResponse> 코다의팔로우 = NEOZAL.은로그인을하고().팔로우를확인한다(KODA);
 
         // then
-        assertThat(response)
+        assertThat(코다의팔로우)
             .extracting("username", "following")
             .containsExactly(
-                tuple(usersInDb.get(0).getName(), true),
-                tuple(usersInDb.get(1).getName(), true),
-                tuple(usersInDb.get(2).getName(), true),
-                tuple(usersInDb.get(3).getName(), false),
-                tuple(usersInDb.get(4).getName(), false),
-                tuple(usersInDb.get(5).getName(), null)
-            ).hasSize(6);
+                tuple(NEOZAL.name(), null),
+                tuple(MARK.name(), false),
+                tuple(DANI.name(), true)
+            ).hasSize(3);
     }
 
     @DisplayName("비로그인 - 특정 유저의 팔로잉 목록을 조회한다. (팔로잉 여부 모두 null)")
     @Test
     void searchFollowings_Guest_FollowingNull() {
-        // given
-        User target = UserFactory.user(UUID.randomUUID().toString());
-        List<User> usersInDb = UserFactory.mockSearchUsers();
-        userRepository.save(target);
-        userRepository.saveAll(usersInDb);
 
-        AuthUserForUserRequestDto targetAuthDto =
-            AuthUserForUserRequestDto.from(new LoginUser(target.getName(), "token"));
-        for (User user : usersInDb) {
-            FollowRequestDto requestDto = FollowRequestDto.builder()
-                .authUserRequestDto(targetAuthDto)
-                .targetName(user.getName())
-                .githubFollowing(false)
-                .build();
-            userService.followUser(requestDto);
-        }
-
-        // when
-        List<UserSearchResponse> response = PickGitRequest
-            .get(FOLLOWINGS_API_URL, target.getName(), "0",
-                "10")
-            .withGuest()
-            .extract()
-            .as(new TypeRef<>() {
-            });
-
+        List<UserSearchResponse> 코다의팔로우 = GUEST.는().팔로잉를확인한다(KODA);
         // then
-        assertThat(response)
+        assertThat(코다의팔로우)
             .extracting("username", "following")
             .containsExactly(
-                tuple(usersInDb.get(0).getName(), null),
-                tuple(usersInDb.get(1).getName(), null),
-                tuple(usersInDb.get(2).getName(), null),
-                tuple(usersInDb.get(3).getName(), null),
-                tuple(usersInDb.get(4).getName(), null)
-            ).hasSize(5);
+                tuple(NEOZAL.name(), null),
+                tuple(MARK.name(), null),
+                tuple(DANI.name(), null)
+            ).hasSize(3);
     }
 
     @DisplayName("로그인 - 특정 유저의 팔로워 목록을 조회한다. (팔로잉 여부 true/false, 본인은 null)")
     @Test
     void searchFollowers_Login_FollowingVarious() {
         // given
-        String loginUserName = UUID.randomUUID().toString();
-        User target = UserFactory.user(UUID.randomUUID().toString());
-        List<User> usersInDb = new ArrayList<>(UserFactory.mockSearchUsers());
-        usersInDb.add(UserFactory.user(loginUserName));
-        userRepository.save(target);
-        userRepository.saveAll(usersInDb);
-
-        for (User user : usersInDb) {
-            AuthUserForUserRequestDto mockUserAuthDto =
-                AuthUserForUserRequestDto.from(new LoginUser(user.getName(), "token"));
-            FollowRequestDto requestDto = FollowRequestDto.builder()
-                .authUserRequestDto(mockUserAuthDto)
-                .targetName(target.getName())
-                .githubFollowing(false)
-                .build();
-            userService.followUser(requestDto);
-        }
-        AuthUserForUserRequestDto testerAuthDto =
-            AuthUserForUserRequestDto.from(new LoginUser(loginUserName, "token"));
-        for (int i = 0; i < 3; i++) {
-            FollowRequestDto requestDto = FollowRequestDto.builder()
-                .authUserRequestDto(testerAuthDto)
-                .targetName(usersInDb.get(i).getName())
-                .githubFollowing(false)
-                .build();
-            userService.followUser(requestDto);
-        }
-
-        // when
-        List<UserSearchResponse> response = PickGitRequest
-            .get(FOLLOWERS_API_URL, target.getName(), "0", "10")
-            .withUser(loginUserName)
-            .extract()
-            .as(new TypeRef<>() {
-            });
+        List<UserSearchResponse> 다니의팔로워 = NEOZAL.은로그인을하고().팔로워를확인한다(DANI);
 
         // then
-        assertThat(response)
+        assertThat(다니의팔로워)
             .extracting("username", "following")
             .containsExactly(
-                tuple(usersInDb.get(0).getName(), true),
-                tuple(usersInDb.get(1).getName(), true),
-                tuple(usersInDb.get(2).getName(), true),
-                tuple(usersInDb.get(3).getName(), false),
-                tuple(usersInDb.get(4).getName(), false),
-                tuple(usersInDb.get(5).getName(), null)
-            ).hasSize(6);
+                tuple(NEOZAL.name(), null),
+                tuple(KODA.name(), true),
+                tuple(MARK.name(), false)
+            ).hasSize(3);
     }
 
     @DisplayName("비로그인 - 특정 유저의 팔로워 목록을 조회한다. (팔로잉 여부 모두 null)")
     @Test
     void searchFollowers_Guest_FollowingNull() {
         // given
-        User target = UserFactory.user(UUID.randomUUID().toString());
-        List<User> usersInDb = UserFactory.mockSearchUsers();
-        userRepository.save(target);
-        userRepository.saveAll(usersInDb);
-
-        for (User user : usersInDb) {
-            AuthUserForUserRequestDto mockUserAuthDto =
-                AuthUserForUserRequestDto.from(new LoginUser(user.getName(), "token"));
-
-            FollowRequestDto requestDto = FollowRequestDto.builder()
-                .authUserRequestDto(mockUserAuthDto)
-                .targetName(target.getName())
-                .githubFollowing(false)
-                .build();
-            userService.followUser(requestDto);
-        }
-
-        // when
-        List<UserSearchResponse> response = PickGitRequest
-            .get(FOLLOWERS_API_URL, target.getName(), "0", "10")
-            .withGuest()
-            .extract()
-            .as(new TypeRef<>() {
-            });
+        List<UserSearchResponse> 다니의팔로워 = GUEST.는().팔로워를확인한다(DANI);
 
         // then
-        assertThat(response)
+        assertThat(다니의팔로워)
             .extracting("username", "following")
             .containsExactly(
-                tuple(usersInDb.get(0).getName(), null),
-                tuple(usersInDb.get(1).getName(), null),
-                tuple(usersInDb.get(2).getName(), null),
-                tuple(usersInDb.get(3).getName(), null),
-                tuple(usersInDb.get(4).getName(), null)
-            ).hasSize(5);
+                tuple(NEOZAL.name(), null),
+                tuple(KODA.name(), null),
+                tuple(MARK.name(), null)
+            ).hasSize(3);
     }
 }

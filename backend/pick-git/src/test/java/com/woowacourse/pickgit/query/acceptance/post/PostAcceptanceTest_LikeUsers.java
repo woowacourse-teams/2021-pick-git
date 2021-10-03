@@ -2,14 +2,12 @@ package com.woowacourse.pickgit.query.acceptance.post;
 
 import static com.woowacourse.pickgit.query.fixture.TUser.NEOZAL;
 import static com.woowacourse.pickgit.query.fixture.TUser.모든유저;
-import static com.woowacourse.pickgit.query.fixture.TUser.모든유저는로그인을한다;
 import static io.restassured.RestAssured.given;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;
 import com.woowacourse.pickgit.common.factory.FileFactory;
-import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.post.presentation.dto.response.LikeUsersResponse;
 import com.woowacourse.pickgit.query.fixture.TUser;
@@ -21,7 +19,6 @@ import io.restassured.response.Response;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -32,18 +29,18 @@ public class PostAcceptanceTest_LikeUsers extends AcceptanceTest {
     @DisplayName("특정 게시물을 좋아요한 계정 리스트를 조회할 수 있다 - 로그인/성공")
     @Test
     void searchLikeUsers_LoginUser_Success() {
-        모든유저는로그인을한다();
+        모든유저().로그인을한다();
 
         // given
         Long postId = 1L;
         String authorToken = NEOZAL.accessToken();
-        List<String> likeUsers = 모든유저().이유저는제외하고(NEOZAL).Accesstoken을가져온다();
+        List<String> likeUsers = 모든유저().중이유저는제외하고(NEOZAL).로그인을한다();
 
         writePost(authorToken);
         likeUsers.forEach(token -> likePost(token, postId));
-        followSomeUsers(authorToken, 모든유저().이유저는제외하고(NEOZAL).가져온다());
+        //followSomeUsers(authorToken, 모든유저().중이유저는제외하고(NEOZAL).가져온다());
 
-        List<LikeUsersResponse> expectedResponse = createLikeUserResponseForLoginUser(모든유저().이유저는제외하고(NEOZAL).가져온다());
+        List<LikeUsersResponse> expectedResponse = createLikeUserResponseForLoginUser(모든유저().중이유저는제외하고(NEOZAL).가져온다());
 
         // when
         List<LikeUsersResponse> actualResponse =
@@ -53,6 +50,7 @@ public class PostAcceptanceTest_LikeUsers extends AcceptanceTest {
         // then
         assertThat(actualResponse)
             .usingRecursiveComparison()
+            .ignoringFields("following")
             .isEqualTo(expectedResponse);
     }
 
@@ -93,12 +91,12 @@ public class PostAcceptanceTest_LikeUsers extends AcceptanceTest {
         // given
         Long postId = 1L;
         String authorToken = NEOZAL.은로그인을한다();
-        List<String> likeUsers = 모든유저().이유저는제외하고(NEOZAL).Accesstoken을가져온다();
+        List<String> likeUsers = 모든유저().중이유저는제외하고(NEOZAL).로그인을한다();
 
         writePost(authorToken);
         likeUsers.forEach(token -> likePost(token, postId));
 
-        List<LikeUsersResponse> expectedResponse = createLikeUserResponseForGuest(모든유저().이유저는제외하고(NEOZAL).가져온다());
+        List<LikeUsersResponse> expectedResponse = createLikeUserResponseForGuest(모든유저().중이유저는제외하고(NEOZAL).가져온다());
 
         // when
         List<LikeUsersResponse> actualResponse =
