@@ -1,15 +1,16 @@
 package com.woowacourse.pickgit.config;
 
+import com.woowacourse.pickgit.config.db.DataSourceSelector;
+import com.woowacourse.pickgit.config.db.SchemaGenerator;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import org.hibernate.Session;
+import javax.sql.DataSource;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -17,15 +18,33 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 public class DatabaseCleaner implements InitializingBean {
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    @Autowired
+    private SchemaGenerator schemaGenerator;
+
+    @Autowired
+    private DataSourceSelector dataSourceSelector;
+
+    @Autowired
+    private DataSource dataSource;
 
     private List<String> tableNames;
 
     @Override
-    public void afterPropertiesSet() {
-        entityManager.unwrap(Session.class)
-            .doWork(this::extractTableNames);
+    public void afterPropertiesSet() throws SQLException {
+        String ddl = schemaGenerator.generate();
+
+        dataSourceSelector.toRead();
+        createTables(dataSource.getConnection(), ddl);
+
+        dataSourceSelector.toWrite();
+        createTables(dataSource.getConnection(), ddl);
+
+        extractTableNames(dataSource.getConnection());
+    }
+
+    private void createTables(Connection conn, String ddl) throws SQLException {
+        Statement statement = conn.createStatement();
+        statement.executeUpdate(ddl);
     }
 
     private void extractTableNames(Connection conn) throws SQLException {
@@ -43,8 +62,11 @@ public class DatabaseCleaner implements InitializingBean {
     }
 
     public void execute() {
-        entityManager.unwrap(Session.class)
-            .doWork(this::cleanUpDatabase);
+        try {
+            cleanUpDatabase(dataSource.getConnection());
+        } catch (SQLException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     private void cleanUpDatabase(Connection conn) throws SQLException {
@@ -52,17 +74,6 @@ public class DatabaseCleaner implements InitializingBean {
         statement.executeUpdate("SET REFERENTIAL_INTEGRITY FALSE");
 
         for (String tableName : tableNames) {
-//            if (tableName.equals("USER") ||
-//                tableName.equals("PORTFOLIO") ||
-//                tableName.equals("FOLLOW") ||
-//                tableName.equals("POST") ||
-//                tableName.equals("POST_TAG") ||
-//                tableName.equals("TAG") ||
-//                tableName.equals("LIKES") ||
-//                tableName.equals("COMMENT")
-//            ) {
-//                continue;
-//            }
 
             statement.executeUpdate("TRUNCATE TABLE " + tableName);
             statement.executeUpdate("ALTER TABLE " + tableName + " ALTER COLUMN id RESTART WITH 1");

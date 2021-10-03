@@ -9,20 +9,14 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.OK;
 
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;
-import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.common.factory.PortfolioFactory;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
 import com.woowacourse.pickgit.portfolio.presentation.dto.response.PortfolioResponse;
-import com.woowacourse.pickgit.tag.domain.Tag;
-import com.woowacourse.pickgit.tag.domain.TagRepository;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 
 public class PortfolioAcceptanceTest_Query extends AcceptanceTest {
