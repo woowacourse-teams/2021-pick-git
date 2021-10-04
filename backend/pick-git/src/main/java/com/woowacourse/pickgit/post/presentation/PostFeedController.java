@@ -14,6 +14,7 @@ import com.woowacourse.pickgit.post.presentation.dto.request.SearchPostsRequest;
 import com.woowacourse.pickgit.post.presentation.dto.response.PostResponse;
 import java.util.List;
 import java.util.function.Function;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,16 +23,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@RequiredArgsConstructor
 @CrossOrigin(value = "*")
 @RequestMapping("/api")
 @RestController
 public class PostFeedController {
 
     private final PostFeedService postFeedService;
-
-    public PostFeedController(PostFeedService postFeedService) {
-        this.postFeedService = postFeedService;
-    }
 
     @ForLoginAndGuestUser
     @GetMapping("/posts")

@@ -7,8 +7,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 
-@Component
 @Profile("!test")
+@Component
 public class GithubRepositoryApiRequester implements PlatformRepositoryApiRequester {
 
     private final RestClient restClient;
