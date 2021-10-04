@@ -4,7 +4,7 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.woowacourse.pickgit.authentication.application.dto.TokenDto;
-import com.woowacourse.pickgit.config.DatabaseCleaner;
+import com.woowacourse.pickgit.config.DatabaseConfigurator;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -21,28 +21,24 @@ import org.springframework.test.context.ActiveProfiles;
 
 @Import(InfrastructureTestConfiguration.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
+@ActiveProfiles({"test"})
 public abstract class AcceptanceTest {
 
     @LocalServerPort
     int port;
 
     @Autowired
-    private DatabaseCleaner databaseCleaner;
+    private DatabaseConfigurator databaseConfigurator;
 
     @BeforeEach
     void init() {
-        clearDataBase();
-        setPort();
-    }
-
-    private void setPort() {
         RestAssured.port = port;
     }
 
     @AfterEach
     void tearDown() {
         clearDataBase();
+        databaseConfigurator.toWrite();
     }
 
     protected final TokenDto 로그인_되어있음(String name) {
@@ -65,6 +61,10 @@ public abstract class AcceptanceTest {
     }
 
     private void clearDataBase() {
-        databaseCleaner.execute();
+        databaseConfigurator.clear();
+    }
+
+    protected void toRead() {
+        databaseConfigurator.toRead();
     }
 }

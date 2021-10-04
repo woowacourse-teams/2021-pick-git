@@ -1,13 +1,14 @@
 package com.woowacourse.pickgit.config.db;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
+@Profile("test")
 public class DataSourceSelector {
 
-    protected static final String WRITE = "write";
-    protected static final String READ = "read";
-    protected static final String TRANSACTIONAL = "transactional";
+    public static final String WRITE = "write";
+    public static final String READ = "read";
 
     private String selected = WRITE;
 
@@ -17,17 +18,6 @@ public class DataSourceSelector {
 
     public void toRead() {
         this.selected = READ;
-    }
-
-    public void toTransactional() {
-        this.selected = TRANSACTIONAL;
-    }
-
-    public void doInRead(Runnable runnable) {
-        String before = this.selected;
-        toRead();
-        runnable.run();
-        this.selected = before;
     }
 
     public String getSelected() {

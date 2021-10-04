@@ -36,14 +36,9 @@ class UserAcceptance_GetFollowingsAndFollowers extends AcceptanceTest {
     private static final String FOLLOWERS_API_URL =
         "/api/profiles/{username}/followers?page={page}&limit={limit}";
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private UserService userService;
-
     @BeforeEach
     void setUp() {
+        toRead();
         모든유저().로그인을한다();
 
         NEOZAL.은로그인을하고().팔로우를한다(KODA, DANI);

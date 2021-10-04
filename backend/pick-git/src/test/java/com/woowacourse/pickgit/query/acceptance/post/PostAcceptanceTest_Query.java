@@ -14,7 +14,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import io.restassured.common.mapper.TypeRef;
-import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,6 +24,7 @@ public class PostAcceptanceTest_Query extends AcceptanceTest {
 
     @BeforeEach
     void setUp() {
+        toRead();
         NEOZAL.은로그인을하고().포스트를등록한다(NEOZALPOST);
         MARK.은로그인을하고().포스트를등록한다(MARKPOST);
         KEVIN.은로그인을하고().포스트를등록한다(KEVINPOST);

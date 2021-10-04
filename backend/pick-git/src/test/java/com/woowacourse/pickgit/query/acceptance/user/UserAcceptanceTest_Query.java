@@ -33,6 +33,7 @@ public class UserAcceptanceTest_Query extends AcceptanceTest {
 
     @BeforeEach
     void setUp() {
+        toRead();
         모든유저().로그인을한다();
 
         NEOZAL.은로그인을하고().팔로우를한다(KODA, DANI);

@@ -25,6 +25,7 @@ public class PostAcceptanceTest_LikeUsers extends AcceptanceTest {
 
     @BeforeEach
     void setUp() {
+        toRead();
         NEOZAL.은로그인을하고().포스트를등록한다(NEOZALPOST);
         MARK.은로그인을하고().포스트를등록한다(MARKPOST);
         KEVIN.은로그인을하고().포스트를등록한다(KEVINPOST);

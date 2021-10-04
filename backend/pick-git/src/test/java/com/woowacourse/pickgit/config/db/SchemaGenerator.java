@@ -27,7 +27,15 @@ public class SchemaGenerator {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public String generate() {
+    public String create() {
+        return generate(Action.CREATE);
+    }
+
+    public String drop() {
+        return generate(Action.DROP);
+    }
+
+    private String generate(Action action) {
         StringWriter output = new StringWriter();
         BufferedWriter bufferedWriter = new BufferedWriter(output);
 
@@ -43,8 +51,9 @@ public class SchemaGenerator {
 
             SchemaExport schemaExport = new SchemaExport();
             schemaExport.setFormat(true);
+            schemaExport.setDelimiter(";");
             schemaExport
-                .perform(Action.CREATE, metadata, new ScriptTargetOutputToWriter(bufferedWriter));
+                .perform(action, metadata, new ScriptTargetOutputToWriter(bufferedWriter));
 
             return output.toString();
         } catch (IOException e) {

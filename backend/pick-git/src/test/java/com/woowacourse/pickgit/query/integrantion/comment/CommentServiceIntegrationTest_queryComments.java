@@ -10,6 +10,7 @@ import com.woowacourse.pickgit.comment.application.dto.response.CommentResponseD
 import com.woowacourse.pickgit.comment.domain.Comment;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
+import com.woowacourse.pickgit.integration.IntegrationTest;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.user.domain.User;
@@ -30,11 +31,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.DigestUtils;
 
-@Import(InfrastructureTestConfiguration.class)
-@Transactional
-@SpringBootTest(webEnvironment = WebEnvironment.NONE)
-@ActiveProfiles("test")
-public class CommentServiceIntegrationTest_queryComments {
+public class CommentServiceIntegrationTest_queryComments extends IntegrationTest {
 
     @Autowired
     private CommentService commentService;
