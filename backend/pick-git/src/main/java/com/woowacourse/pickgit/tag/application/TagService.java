@@ -9,23 +9,20 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
-@Transactional
 public class TagService {
 
     private final PlatformTagExtractor platformTagExtractor;
     private final TagRepository tagRepository;
 
-    public TagService(PlatformTagExtractor platformTagExtractor,
-        TagRepository tagRepository) {
-        this.platformTagExtractor = platformTagExtractor;
-        this.tagRepository = tagRepository;
-    }
-
-    @Transactional(readOnly = true)
+    @Transactional(propagation = Propagation.NEVER)
     public TagsDto extractTags(ExtractionRequestDto extractionRequestDto) {
         String accessToken = extractionRequestDto.getAccessToken();
         String userName = extractionRequestDto.getUserName();
@@ -38,11 +35,11 @@ public class TagService {
         return new TagsDto(tags);
     }
 
-    @Transactional(readOnly = true)
     public List<Tag> findOrCreateTags(TagsDto tagsDto) {
         if (Objects.isNull(tagsDto.getTagNames())) {
             return Collections.emptyList();
         }
+
         List<String> tagNames = tagsDto.getTagNames();
         List<Tag> tags = new ArrayList<>();
         for (String tagName : tagNames) {
