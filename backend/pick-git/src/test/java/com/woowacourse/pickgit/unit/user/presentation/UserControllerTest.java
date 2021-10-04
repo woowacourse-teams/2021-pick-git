@@ -22,12 +22,10 @@ import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestPartBody;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -43,11 +41,9 @@ import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowSearchRequestDto;
-import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileImageEditRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
-import com.woowacourse.pickgit.user.application.dto.response.ProfileEditResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.ProfileImageEditResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
@@ -67,7 +63,6 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -382,60 +377,6 @@ class UserControllerTest {
             ));
         }
 
-        @DisplayName("사용자는 자신의 프로필을 수정할 수 있다.")
-        @Test
-        void editUserProfile_LoginUserWithImageAndDescription_Success() throws Exception {
-            // given
-            AppUser loginUser = new LoginUser("testUser", "token");
-            String description = "updated description";
-            MockMultipartFile image = FileFactory.getTestImage1();
-            ProfileEditResponseDto responseDto = ProfileEditResponseDto.builder()
-                .imageUrl(image.getOriginalFilename())
-                .description(description)
-                .build();
-
-            // mock
-            given(oAuthService.validateToken("token"))
-                .willReturn(true);
-            given(oAuthService.findRequestUserByToken("token"))
-                .willReturn(loginUser);
-            given(userService
-                .editProfile(any(AuthUserForUserRequestDto.class), any(ProfileEditRequestDto.class)))
-                .willReturn(responseDto);
-
-            // when
-            ResultActions perform = mockMvc.perform(multipart("/api/profiles/me")
-                .file("images", "testImage1".getBytes())
-                .param("description", description)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer token")
-            );
-
-            // then
-            perform
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("imageUrl").value(image.getOriginalFilename()))
-                .andExpect(jsonPath("description").value(description));
-
-            verify(oAuthService, times(1)).validateToken("token");
-            verify(oAuthService, times(1)).findRequestUserByToken("token");
-            verify(userService, times(1))
-                .editProfile(any(AuthUserForUserRequestDto.class), any(ProfileEditRequestDto.class));
-
-            // restdocs
-            perform.andDo(document("profiles-edit",
-                getDocumentRequest(),
-                getDocumentResponse(),
-                requestHeaders(
-                    headerWithName(HttpHeaders.AUTHORIZATION).description("bearer token")
-                ),
-                requestPartBody("images"),
-                responseFields(
-                    fieldWithPath("imageUrl").type(STRING).description("변경된 프로필 이미지 url"),
-                    fieldWithPath("description").type(STRING).description("변경된 한 줄 소개")
-                ))
-            );
-        }
-
         @DisplayName("자신의 프로필 이미지를 수정할 수 있다.")
         @Test
         void editUserProfileImage_LoginUserWithImage_Success() throws Exception {
@@ -674,37 +615,6 @@ class UserControllerTest {
                 ),
                 responseFields(
                     fieldWithPath("errorCode").description("에러 코드")
-                )
-            ));
-        }
-
-        @DisplayName("게스트는 프로필을 수정할 수 없다.")
-        @Test
-        void editUserProfile_GuestUser_Fail() throws Exception {
-            // given
-            // mock
-            given(oAuthService.validateToken(any()))
-                .willReturn(false);
-
-            // when
-            ResultActions perform = mockMvc.perform(multipart("/api/profiles/me")
-                .file("images", "testImage1".getBytes())
-                .param("description", "updated description")
-            );
-
-            // then
-            perform
-                .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("errorCode").value("A0001"));
-
-            verify(oAuthService, times(1)).validateToken(any());
-
-            perform.andDo(document("profiles-edit-unLoggedIn",
-                getDocumentRequest(),
-                getDocumentResponse(),
-                requestPartBody("images"),
-                responseFields(
-                    fieldWithPath("errorCode").type(STRING).description("에러 코드")
                 )
             ));
         }

@@ -10,31 +10,27 @@ import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowSearchRequestDto;
-import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileImageEditRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
-import com.woowacourse.pickgit.user.application.dto.response.ProfileEditResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.ProfileImageEditResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
 import com.woowacourse.pickgit.user.presentation.dto.request.ProfileDescriptionRequest;
-import com.woowacourse.pickgit.user.presentation.dto.request.ProfileEditRequest;
 import com.woowacourse.pickgit.user.presentation.dto.response.ContributionResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.FollowResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.ProfileDescriptionResponse;
-import com.woowacourse.pickgit.user.presentation.dto.response.ProfileEditResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.ProfileImageEditResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.UserProfileResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.UserSearchResponse;
 import java.util.List;
 import javax.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -43,16 +39,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-@RequestMapping("/api/profiles")
+@RequiredArgsConstructor
 @CrossOrigin(value = "*")
+@RequestMapping("/api/profiles")
+@RestController
 public class UserController {
 
     private final UserService userService;
-
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
 
     @ForOnlyLoginUser
     @GetMapping("/me")
@@ -72,8 +65,8 @@ public class UserController {
         @PathVariable String username
     ) {
         AuthUserForUserRequestDto authUserRequestDto = AuthUserForUserRequestDto.from(appUser);
-        UserProfileResponseDto responseDto = userService
-            .getUserProfile(authUserRequestDto, username);
+        UserProfileResponseDto responseDto =
+            userService.getUserProfile(authUserRequestDto, username);
 
         return ResponseEntity.ok(createUserProfileResponse(responseDto));
     }
@@ -143,29 +136,6 @@ public class UserController {
     }
 
     @ForOnlyLoginUser
-    @PostMapping("/me")
-    public ResponseEntity<ProfileEditResponse> editProfile(
-        @Authenticated AppUser appUser,
-        @ModelAttribute ProfileEditRequest request
-    ) {
-        AuthUserForUserRequestDto authUserRequestDto = AuthUserForUserRequestDto.from(appUser);
-        ProfileEditRequestDto profileEditRequestDto = ProfileEditRequestDto
-            .builder()
-            .image(request.getImage())
-            .decription(request.getDescription())
-            .build();
-        ProfileEditResponseDto responseDto =
-            userService.editProfile(authUserRequestDto, profileEditRequestDto);
-
-        return ResponseEntity.ok(
-            new ProfileEditResponse(
-                responseDto.getImageUrl(),
-                responseDto.getDescription()
-            )
-        );
-    }
-
-    @ForOnlyLoginUser
     @PutMapping("/me/image")
     public ResponseEntity<ProfileImageEditResponse> editProfileImage(
         @Authenticated AppUser appUser,
@@ -201,8 +171,8 @@ public class UserController {
         @Authenticated AppUser user,
         @PathVariable String username
     ) {
-        ContributionResponseDto responseDto = userService
-            .calculateContributions(createContributionRequestDto(user, username));
+        ContributionResponseDto responseDto =
+            userService.calculateContributions(createContributionRequestDto(user, username));
 
         return ResponseEntity.ok(createContributionResponse(responseDto));
     }
