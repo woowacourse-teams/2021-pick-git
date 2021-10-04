@@ -13,12 +13,7 @@ public class TagNotFoundException extends ApplicationException {
         this(ERROR_CODE, HTTP_STATUS, MESSAGE);
     }
 
-    private TagNotFoundException(
-        String errorCode,
-        HttpStatus httpStatus,
-        String message
-    ) {
+    private TagNotFoundException(String errorCode, HttpStatus httpStatus, String message) {
         super(errorCode, httpStatus, message);
     }
-
 }
