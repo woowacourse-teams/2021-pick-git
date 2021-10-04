@@ -7,13 +7,13 @@ import com.woowacourse.pickgit.config.db.SchemaGenerator;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLSyntaxErrorException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.sql.DataSource;
-import org.h2.jdbc.JdbcSQLSyntaxErrorException;
 import org.hibernate.Session;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +60,7 @@ public class DatabaseConfigurator implements InitializingBean {
         entityManager.unwrap(Session.class).doWork(conn -> {
             try (Statement statement = conn.createStatement(); conn) {
                 statement.executeUpdate(schemaGenerator.create());
-            } catch (JdbcSQLSyntaxErrorException ignored) {}
+            } catch (SQLSyntaxErrorException ignored) {}
         });
 
         entityManager.unwrap(Session.class).doWork(this::extractTableNames);
