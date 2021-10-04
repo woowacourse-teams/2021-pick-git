@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.config.redis;
+package com.woowacourse.pickgit.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
@@ -6,7 +6,6 @@ import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import java.time.Duration;
 import java.util.ArrayList;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -17,16 +16,15 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-@EnableCaching
 @Configuration
-@Profile("!test")
-public class RedisCachingConfiguration {
+@Profile("test")
+public class TestRedisCachingConfiguration {
 
     private final RedisConnectionFactory redisConnectionFactory;
 
     private final ObjectMapper objectMapper;
 
-    public RedisCachingConfiguration(
+    public TestRedisCachingConfiguration(
         RedisConnectionFactory redisConnectionFactory,
         ObjectMapper objectMapper
     ) {
