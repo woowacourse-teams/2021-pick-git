@@ -14,15 +14,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtTokenProviderImpl implements JwtTokenProvider {
 
-    @Value("${security.jwt.secret-key}")
-    private String secretKey;
-    @Value("${security.jwt.expiration-time}")
-    private long expirationTimeInMilliSeconds;
+    private final String secretKey;
+    private final long expirationTimeInMilliSeconds;
 
-    public JwtTokenProviderImpl() {
-    }
-
-    public JwtTokenProviderImpl(String secretKey, long expirationTimeInMilliSeconds) {
+    public JwtTokenProviderImpl(
+        @Value("${security.jwt.secret-key}") String secretKey,
+        @Value("${security.jwt.expiration-time}") long expirationTimeInMilliSeconds
+    ) {
         this.secretKey = secretKey;
         this.expirationTimeInMilliSeconds = expirationTimeInMilliSeconds;
     }
@@ -44,7 +42,6 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
     public boolean validateToken(String token) {
         try {
             Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
-
             return !claims.getBody().getExpiration().before(new Date());
         } catch (JwtException | IllegalArgumentException e) {
             return false;
@@ -54,14 +51,13 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
     @Override
     public String getPayloadByKey(String token, String key) {
         try {
-            return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get(key, String.class);
+            return Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getBody()
+                .get(key, String.class);
         } catch (JwtException | IllegalArgumentException e) {
             throw new InvalidTokenException();
         }
-    }
-
-    @Override
-    public void changeExpirationTime(long expirationTimeInMilliSeconds) {
-        this.expirationTimeInMilliSeconds = expirationTimeInMilliSeconds;
     }
 }
