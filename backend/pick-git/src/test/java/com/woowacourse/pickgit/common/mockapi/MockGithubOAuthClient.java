@@ -14,7 +14,7 @@ public class MockGithubOAuthClient implements OAuthClient {
 
     @Override
     public String getAccessToken(String code) {
-        return code;
+        return "oauth.access.token";
     }
 
     @Override

@@ -28,7 +28,7 @@ class TagAcceptanceTest extends AcceptanceTest {
 
     @BeforeEach
     void setUp() {
-        TokenDto testUser = 로그인_되어있음("testUser");
+        TokenDto testUser = 로그인_되어있음("jipark3");
         accessToken = testUser.getToken();
     }
 
