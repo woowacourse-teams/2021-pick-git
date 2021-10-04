@@ -37,14 +37,14 @@
 
 ### Frontend
 
-![frontend_tech_stacks](https://user-images.githubusercontent.com/56240505/135824210-0bd826eb-2b7b-4181-996d-3045e3f82894.png)
+![frontend_tech_stacks](https://user-images.githubusercontent.com/50176238/135874567-f03612e6-9e2e-4553-9e91-c39b79935817.png)
 
 > <b>깃-들다</b>의 <b>프론트엔드</b>에 대해 더 자세하게 알고싶다면, [기술 블로그](https://2021-pick-git.github.io/) 또는 [GitHub WiKi - FE 중점 사항](https://github.com/woowacourse-teams/2021-pick-git/wiki/FE-%EC%A4%91%EC%A0%90-%EC%82%AC%ED%95%AD)을 참고해주세요.
 <br/>
 
 ### Backend
 
-![backend_tech_stacks](https://user-images.githubusercontent.com/56240505/135824199-09c039db-30aa-409f-bdfd-ed21cf08dda0.png)
+![backend_tech_stacks](https://user-images.githubusercontent.com/50176238/135874453-cfdc0bb2-98a0-4b07-b6f2-f2d7159f9211.png)
 
 > <b>깃-들다</b>의 <b>백엔드</b>에 대해 더 자세하게 알고싶다면, [기술 블로그](https://2021-pick-git.github.io/) 또는 [GitHub WiKi - BE 중점 사항](https://github.com/woowacourse-teams/2021-pick-git/wiki/BE-%EC%A4%91%EC%A0%90-%EC%82%AC%ED%95%AD)을 참고해주세요.
 <br/>
