@@ -18,13 +18,13 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 @Profile("test")
-public class TestRedisCachingConfiguration {
+public class RedisCachingTestConfiguration {
 
     private final RedisConnectionFactory redisConnectionFactory;
 
     private final ObjectMapper objectMapper;
 
-    public TestRedisCachingConfiguration(
+    public RedisCachingTestConfiguration(
         RedisConnectionFactory redisConnectionFactory,
         ObjectMapper objectMapper
     ) {

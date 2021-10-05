@@ -31,7 +31,7 @@ public class PostFeedService {
         key = "#homeFeedRequestDto.page",
         value = "homeFeed",
         condition = "#homeFeedRequestDto.guest == true",
-        unless="#result == null"
+        unless="#result == null || #result.empty"
     )
     public List<PostResponseDto> homeFeed(HomeFeedRequestDto homeFeedRequestDto) {
         Pageable pageable = getPagination(homeFeedRequestDto);
