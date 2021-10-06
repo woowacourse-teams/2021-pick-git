@@ -1,5 +1,8 @@
 package com.woowacourse.pickgit.config.count_data_source;
 
+import lombok.Getter;
+
+@Getter
 public class QueryCounter {
 
     private Count count;
@@ -12,7 +15,7 @@ public class QueryCounter {
 
     public void startCount() {
         this.countable = true;
-        this.count = new Count(0);
+        this.count = new Count(0L);
     }
 
     public void countOne() {
@@ -25,13 +28,5 @@ public class QueryCounter {
 
     public boolean isCountable() {
         return countable;
-    }
-
-    public void setCountable(boolean countable) {
-        this.countable = countable;
-    }
-
-    public Count getCount() {
-        return count;
     }
 }

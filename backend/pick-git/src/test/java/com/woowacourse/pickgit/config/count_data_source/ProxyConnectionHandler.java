@@ -33,18 +33,16 @@ public class ProxyConnectionHandler implements InvocationHandler {
 
         for (Object arg : args) {
             if (isQueryStatement(arg)) {
+                queryCounter.countOne();
                 break;
             }
         }
-        queryCounter.countOne();
         return result;
     }
 
     private boolean isQueryStatement(Object statement) {
         if (statement.getClass().isAssignableFrom(String.class)) {
             String queryStatement = (String) statement;
-//            return (queryStatement.startsWith("select") || queryStatement.startsWith("insert") ||
-//                queryStatement.startsWith("update") || queryStatement.startsWith("delete"));
             return queryStatement.startsWith("select");
         }
         return false;

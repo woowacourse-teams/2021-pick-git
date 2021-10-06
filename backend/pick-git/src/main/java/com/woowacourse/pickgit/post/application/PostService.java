@@ -32,6 +32,7 @@ import com.woowacourse.pickgit.user.domain.UserRepository;
 import java.util.List;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -50,6 +51,10 @@ public class PostService {
     private final PlatformRepositoryExtractor platformRepositoryExtractor;
     private final PlatformRepositorySearchExtractor platformRepositorySearchExtractor;
 
+    @CacheEvict(
+        value = "homeFeed",
+        allEntries = true
+    )
     @Transactional
     public PostImageUrlResponseDto write(PostRequestDto postRequestDto) {
         Post post = createPost(postRequestDto);

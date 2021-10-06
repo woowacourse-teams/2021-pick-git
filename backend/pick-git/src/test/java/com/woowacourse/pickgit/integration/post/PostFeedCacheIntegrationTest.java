@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.tuple;
 
 import com.woowacourse.pickgit.comment.application.CommentService;
 import com.woowacourse.pickgit.comment.application.dto.request.CommentRequestDto;
+import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.PostFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
@@ -14,6 +15,7 @@ import com.woowacourse.pickgit.post.application.PostFeedService;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.request.HomeFeedRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
@@ -36,6 +38,8 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @ActiveProfiles("test")
 public class PostFeedCacheIntegrationTest {
+    private static final String USERNAME = "binghe";
+    private static final String ACCESS_TOKEN = "oauth.access.token";
 
     @Autowired
     private PostService postService;
@@ -60,12 +64,7 @@ public class PostFeedCacheIntegrationTest {
     void readHomeFeed_Guest_LatestPosts() {
         // given
         createMockPosts();
-        HomeFeedRequestDto homeFeedRequestDto = HomeFeedRequestDto.builder()
-            .requestUserName(null)
-            .isGuest(true)
-            .page(1L)
-            .limit(2L)
-            .build();
+        HomeFeedRequestDto homeFeedRequestDto = createMockGuestHomeFeedRequest();
         entityManager.clear();
 
         // when
@@ -81,6 +80,38 @@ public class PostFeedCacheIntegrationTest {
                 tuple("dani", "java-racingcar", null),
                 tuple("ginger", "jwp-chess", null)
             );
+        assertThat(queryCounter.getCount().getValue()).isEqualTo(6L);
+    }
+
+    @DisplayName("캐싱 - 회원이 게시글 작성시 비로그인 홈피드 조회 캐싱이 삭제된다. (현재 페이지당 쿼리는 6번)")
+    @Test
+    void writePost_LoginUser_DeleteAllCache() {
+        // given
+        createMockPosts();
+        postFeedService.homeFeed(createMockGuestHomeFeedRequest());
+
+        // when
+        User user = UserFactory.user(USERNAME);
+        userRepository.save(user);
+
+        PostRequestDto postRequestDto = PostRequestDto.builder()
+            .token(ACCESS_TOKEN)
+            .username(USERNAME)
+            .images(List.of(
+                FileFactory.getTestImage1(),
+                FileFactory.getTestImage2()
+            ))
+            .githubRepoUrl("https://github.com/bperhaps")
+            .tags(List.of("java", "c++"))
+            .content("testContent")
+            .build();
+
+        postService.write(postRequestDto);
+        entityManager.clear();
+
+        // then
+        queryCounter.startCount();
+        postFeedService.homeFeed(createMockGuestHomeFeedRequest());
         assertThat(queryCounter.getCount().getValue()).isEqualTo(6L);
     }
 
@@ -103,5 +134,14 @@ public class PostFeedCacheIntegrationTest {
                     new CommentRequestDto(user.getName(), "test comment" + index, postId);
                 commentService.addComment(commentRequestDto);
             });
+    }
+
+    private HomeFeedRequestDto createMockGuestHomeFeedRequest() {
+        return HomeFeedRequestDto.builder()
+            .requestUserName(null)
+            .isGuest(true)
+            .page(1L)
+            .limit(2L)
+            .build();
     }
 }
