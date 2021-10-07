@@ -1,33 +1,31 @@
-import { useContext, useEffect } from "react";
+import axios from "axios";
+import { useEffect } from "react";
 
-import { Container, StepSlider, StepContainer, NextStepButtonWrapper } from "./AddPostPage.style";
-
-import PageLoadingWithCover from "../../components/@layout/PageLoadingWithCover/PageLoadingWithCover";
 import MessageModalPortal from "../../components/@layout/MessageModalPortal/MessageModalPortal";
+import PageLoadingWithCover from "../../components/@layout/PageLoadingWithCover/PageLoadingWithCover";
 import Button from "../../components/@shared/Button/Button";
-import RepositorySelector from "../../components/RepositorySelector/RepositorySelector";
 import PostContentUploader from "../../components/PostContentUploader/PostContentUploader";
+import RepositorySelector from "../../components/RepositorySelector/RepositorySelector";
 import TagInputForm from "../../components/TagInputForm/TagInputForm";
 
-import useSnackbar from "../../hooks/common/useSnackbar";
-import useMessageModal from "../../hooks/common/useMessageModal";
-import usePostUpload from "../../hooks/service/usePostUpload";
-import usePostAddStep from "../../hooks/service/usePostAddStep";
-import useGithubTags from "../../hooks/service/useGithubTags";
-
-import { PAGE_URL } from "../../constants/urls";
 import { FAILURE_MESSAGE, SUCCESS_MESSAGE, WARNING_MESSAGE } from "../../constants/messages";
 import { POST_ADD_STEPS } from "../../constants/steps";
+import { PAGE_URL } from "../../constants/urls";
 
+import useMessageModal from "../../hooks/common/useMessageModal";
+import useSnackbar from "../../hooks/common/useSnackbar";
+import useGithubTags from "../../hooks/service/useGithubTags";
+import usePostAddStep from "../../hooks/service/usePostAddStep";
+import usePostUpload from "../../hooks/service/usePostUpload";
+
+import { getAPIErrorMessage } from "../../utils/error";
 import {
   getPostAddValidationMessage,
   isContentEmpty,
-  isFilesEmpty,
-  isValidContentLength,
-  isGithubRepositoryEmpty,
-  isValidPostUploadData,
+  isFilesEmpty, isGithubRepositoryEmpty, isValidContentLength, isValidPostUploadData
 } from "../../utils/postUpload";
-import { getAPIErrorMessage } from "../../utils/error";
+
+import { Container, NextStepButtonWrapper, StepContainer, StepSlider } from "./AddPostPage.style";
 
 const AddPostPage = () => {
   const { pushSnackbarMessage } = useSnackbar();
@@ -54,6 +52,8 @@ const AddPostPage = () => {
     deactivateUploadingState,
   } = usePostUpload();
   const tagsQueryResult = useGithubTags(githubRepositoryName);
+  const isPosting = uploading && stepIndex === POST_ADD_STEPS.length - 1;
+  const isLastStepIndex = stepIndex < POST_ADD_STEPS.length - 1;
 
   const handlePostAddComplete = async () => {
     if (!isValidPostUploadData({ content, githubRepositoryName, tags, files })) {
@@ -70,6 +70,10 @@ const AddPostPage = () => {
       pushSnackbarMessage(SUCCESS_MESSAGE.POST_ADDED);
       completeStep();
     } catch (error) {
+      if (!axios.isAxiosError(error)) {
+        return;
+      }
+
       showAlertModal(getAPIErrorMessage(error.response?.data.errorCode));
       deactivateUploadingState();
     }
@@ -146,7 +150,7 @@ const AddPostPage = () => {
         ))}
       </StepSlider>
       <NextStepButtonWrapper>
-        {stepIndex < POST_ADD_STEPS.length - 1 ? (
+        {isLastStepIndex ? (
           <Button kind="roundedBlock" onClick={handleNextButtonClick}>
             다음
           </Button>
@@ -167,7 +171,7 @@ const AddPostPage = () => {
           />
         )}
       </NextStepButtonWrapper>
-      {uploading && stepIndex === POST_ADD_STEPS.length - 1 && <PageLoadingWithCover description="게시중" />}
+      {isPosting && <PageLoadingWithCover description="게시중" />}
     </Container>
   );
 };

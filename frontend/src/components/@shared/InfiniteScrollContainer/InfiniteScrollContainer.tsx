@@ -3,7 +3,7 @@ import useThrottle from "../../../hooks/common/useThrottle";
 import Loader from "../Loader/Loader";
 import { Container, LoaderWrapper, ContentWrapper } from "./InfiniteScrollContainer.style";
 
-export interface Props extends React.HTMLAttributes<HTMLSpanElement> {
+export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   isLoaderShown: boolean;
   onIntersect: () => void;
 }

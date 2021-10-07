@@ -1,28 +1,28 @@
-import { Dispatch, SetStateAction, useContext, useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useContext } from "react";
 import { useHistory } from "react-router-dom";
 import { ThemeContext } from "styled-components";
+
 import { RepositoryIcon, SearchIcon } from "../../assets/icons";
-import { FAILURE_MESSAGE, REDIRECT_MESSAGE } from "../../constants/messages";
-import { PAGE_URL } from "../../constants/urls";
-import useDebounce from "../../hooks/common/useDebounce";
-import useMessageModal from "../../hooks/common/useMessageModal";
-import { useGithubRepositoriesQuery } from "../../services/queries";
-import { getAPIErrorMessage } from "../../utils/error";
-import { getRepositoriesFromPages } from "../../utils/infiniteData";
 import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
 import PageLoading from "../@layout/PageLoading/PageLoading";
 import CircleIcon from "../@shared/CircleIcon/CircleIcon";
 import InfiniteScrollContainer from "../@shared/InfiniteScrollContainer/InfiniteScrollContainer";
 import Input from "../@shared/Input/Input";
+
+import { FAILURE_MESSAGE, REDIRECT_MESSAGE } from "../../constants/messages";
+import { PAGE_URL } from "../../constants/urls";
+
+import useMessageModal from "../../hooks/common/useMessageModal";
+import useSearchKeyword from "../../hooks/common/useSearchKeyword";
+
+import { useGithubRepositoriesQuery } from "../../services/queries";
+
+import { getAPIErrorMessage } from "../../utils/error";
+import { getRepositoriesFromPages } from "../../utils/infiniteData";
+
 import {
-  Container,
-  SearchInputWrapper,
-  RepositoryList,
-  RepositoryListItem,
-  RepositoryCircle,
-  RepositoryName,
-  SearchResultNotFound,
-  GoBackLink,
+  Container, GoBackLink, RepositoryCircle, RepositoryList,
+  RepositoryListItem, RepositoryName, SearchInputWrapper, SearchResultNotFound
 } from "./RepositorySelector.style";
 
 interface Props {
@@ -31,8 +31,8 @@ interface Props {
 }
 
 const RepositorySelector = ({ setGithubRepositoryName, goNextStep }: Props) => {
-  const [temporarySearchKeyword, setTemporarySearchKeyword] = useState("");
-  const [searchKeyword, setSearchKeyword] = useState("");
+  const {searchKeyword, setTemporarySearchKeyword} = useSearchKeyword();
+
   const {
     data: infiniteRepositoriesData,
     isLoading,
@@ -41,25 +41,12 @@ const RepositorySelector = ({ setGithubRepositoryName, goNextStep }: Props) => {
     fetchNextPage,
   } = useGithubRepositoriesQuery(searchKeyword);
   const { modalMessage, isModalShown, showAlertModal, hideMessageModal } = useMessageModal();
-
   const { color } = useContext(ThemeContext);
   const history = useHistory();
-
-  const changeSearchKeyword = useDebounce(() => {
-    setSearchKeyword(temporarySearchKeyword);
-  }, 150);
-
-  useEffect(() => {
-    changeSearchKeyword();
-  }, [temporarySearchKeyword]);
 
   const handleRepositorySelect = (repositoryName: string) => {
     setGithubRepositoryName(repositoryName);
     goNextStep();
-  };
-
-  const goBackToHome = () => {
-    history.goBack();
   };
 
   const handleErrorConfirm = () => {
@@ -134,7 +121,7 @@ const RepositorySelector = ({ setGithubRepositoryName, goNextStep }: Props) => {
         </SearchResultNotFound>
       )}
 
-      {isModalShown && <MessageModalPortal heading={modalMessage} onConfirm={goBackToHome} onClose={goBackToHome} />}
+      {isModalShown && <MessageModalPortal heading={modalMessage} onConfirm={history.goBack} onClose={history.goBack} />}
     </Container>
   );
 };
