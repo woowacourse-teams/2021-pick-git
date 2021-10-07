@@ -5,15 +5,15 @@ import SnackBarContext from "../../contexts/SnackbarContext";
 import UserContext from "../../contexts/UserContext";
 import PostItem from "../@shared/PostItem/PostItem";
 import { Container, PostItemWrapper } from "./Feed.style";
-import useFeedMutation from "../../services/hooks/useFeedMutation";
+import useFeedMutation from "../../hooks/useFeedMutation";
 import { SUCCESS_MESSAGE, WARNING_MESSAGE } from "../../constants/messages";
 import { getAPIErrorMessage } from "../../utils/error";
 import { useHistory } from "react-router-dom";
 import { PAGE_URL } from "../../constants/urls";
-import usePostEdit from "../../services/hooks/usePostEdit";
+import usePostEdit from "../../hooks/usePostEdit";
 import { InfiniteData, QueryKey } from "react-query";
 import { getItemsFromPages } from "../../utils/infiniteData";
-import useMessageModal from "../../services/hooks/@common/useMessageModal";
+import useMessageModal from "../../hooks/common/useMessageModal";
 import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
 import PageLoadingWithCover from "../@layout/PageLoadingWithCover/PageLoadingWithCover";
 

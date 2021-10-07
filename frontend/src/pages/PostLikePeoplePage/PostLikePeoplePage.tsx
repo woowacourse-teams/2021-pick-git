@@ -1,6 +1,6 @@
 import { Container, ContentWrapper } from "./PostLikePeoplePage.style";
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
-import usePostLikePeople from "../../services/hooks/usePostLikePeople";
+import usePostLikePeople from "../../hooks/usePostLikePeople";
 import { useLocation } from "react-router-dom";
 import { Post } from "../../@types";
 import UserList from "../../components/UserList/UserList";

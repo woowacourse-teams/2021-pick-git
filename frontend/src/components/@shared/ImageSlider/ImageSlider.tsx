@@ -2,7 +2,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { ThemeContext } from "styled-components";
 
 import { GoBackIcon, GoForwardIcon } from "../../../assets/icons/index";
-import useThrottle from "../../../services/hooks/@common/useThrottle";
+import useThrottle from "../../../hooks/common/useThrottle";
 import { Container, ImageList, ImageListSlider, ImageView, Indicator, SlideButton } from "./ImageSlider.style";
 
 export interface Props extends React.CSSProperties {

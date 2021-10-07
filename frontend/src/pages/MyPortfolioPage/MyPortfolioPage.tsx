@@ -4,7 +4,7 @@ import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import Avatar from "../../components/@shared/Avatar/Avatar";
 import { PAGE_URL } from "../../constants/urls";
 import UserContext from "../../contexts/UserContext";
-import useProfile from "../../services/hooks/useProfile";
+import useProfile from "../../hooks/useProfile";
 import {
   AvatarWrapper,
   Container,
@@ -27,21 +27,21 @@ import PortfolioHeader from "../../components/@layout/PortfolioHeader/PortfolioH
 import { getScrollYPosition } from "../../utils/layout";
 import PortfolioProjectSection from "../../components/PortfolioProjectSection/PortfolioProjectSection";
 import PortfolioSection from "../../components/PortfolioSection/PortfolioSection";
-import usePortfolioSections from "../../services/hooks/usePortfolioSection";
+import usePortfolioSections from "../../hooks/usePortfolioSection";
 import SVGIcon from "../../components/@shared/SVGIcon/SVGIcon";
 import PortfolioTextEditor from "../../components/PortfolioTextEditor/PortfolioTextEditor";
 import { PLACE_HOLDER } from "../../constants/placeholder";
-import useUserFeed from "../../services/hooks/useUserFeed";
-import usePortfolioProjects from "../../services/hooks/usePortfolioProjects";
-import useModal from "../../services/hooks/@common/useModal";
+import useUserFeed from "../../hooks/useUserFeed";
+import usePortfolioProjects from "../../hooks/usePortfolioProjects";
+import useModal from "../../hooks/common/useModal";
 import ModalPortal from "../../components/@layout/Modal/ModalPortal";
 import PostSelector from "../../components/PostSelector/PostSelector";
 import ToggleButton from "../../components/@shared/ToggleButton/ToggleButton";
-import usePortfolioIntro from "../../services/hooks/usePortfolioIntro";
+import usePortfolioIntro from "../../hooks/usePortfolioIntro";
 import Button from "../../components/@shared/Button/Button";
-import useMessageModal from "../../services/hooks/@common/useMessageModal";
+import useMessageModal from "../../hooks/common/useMessageModal";
 import MessageModalPortal from "../../components/@layout/MessageModalPortal/MessageModalPortal";
-import usePortfolio from "../../services/hooks/usePortfolio";
+import usePortfolio from "../../hooks/usePortfolio";
 import {
   getPortfolioLocalUpdateTime,
   getPortfolioLocalUpdateTimeString,

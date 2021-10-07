@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import Avatar from "../../components/@shared/Avatar/Avatar";
-import useProfile from "../../services/hooks/useProfile";
+import useProfile from "../../hooks/useProfile";
 import {
   AvatarWrapper,
   Container,
@@ -23,7 +23,7 @@ import PortfolioProjectSection from "../../components/PortfolioProjectSection/Po
 import PortfolioSection from "../../components/PortfolioSection/PortfolioSection";
 import SVGIcon from "../../components/@shared/SVGIcon/SVGIcon";
 import PortfolioTextEditor from "../../components/PortfolioTextEditor/PortfolioTextEditor";
-import usePortfolio from "../../services/hooks/usePortfolio";
+import usePortfolio from "../../hooks/usePortfolio";
 import PageError from "../../components/@shared/PageError/PageError";
 
 const PortfolioPage = () => {

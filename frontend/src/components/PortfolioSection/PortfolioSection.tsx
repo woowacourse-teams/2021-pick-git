@@ -1,7 +1,7 @@
 import { StringDecoder } from "string_decoder";
 import { PortfolioSection, PortfolioSectionItem } from "../../@types";
 import { PLACE_HOLDER } from "../../constants/placeholder";
-import usePortfolioSectionItem from "../../services/hooks/usePortfolioSectionItem";
+import usePortfolioSectionItem from "../../hooks/usePortfolioSectionItem";
 import PortfolioTextEditor from "../PortfolioTextEditor/PortfolioTextEditor";
 import SVGIcon from "../@shared/SVGIcon/SVGIcon";
 import {
@@ -19,7 +19,7 @@ import {
   DescriptionAddIconWrapper,
 } from "./PortfolioSection.style";
 import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
-import useMessageModal from "../../services/hooks/@common/useMessageModal";
+import useMessageModal from "../../hooks/common/useMessageModal";
 import { FAILURE_MESSAGE } from "../../constants/messages";
 
 export interface Props {

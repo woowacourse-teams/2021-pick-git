@@ -34,12 +34,12 @@ import { PAGE_URL } from "../../constants/urls";
 import UserContext from "../../contexts/UserContext";
 import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
 import { useHistory, useLocation } from "react-router-dom";
-import useComments from "../../services/hooks/useComments";
+import useComments from "../../hooks/service/useComments";
 import { getItemsFromPages } from "../../utils/infiniteData";
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import SnackBarContext from "../../contexts/SnackbarContext";
 import { FAILURE_MESSAGE, WARNING_MESSAGE } from "../../constants/messages";
-import useMessageModal from "../../services/hooks/@common/useMessageModal";
+import useMessageModal from "../../hooks/common/useMessageModal";
 import MessageModalPortal from "../../components/@layout/MessageModalPortal/MessageModalPortal";
 import { getTextElementsWithWithBr } from "../../utils/text";
 
