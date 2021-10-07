@@ -3,6 +3,7 @@ package com.woowacourse.pickgit.unit.user.presentation;
 import static com.woowacourse.pickgit.docs.ApiDocumentUtils.getDocumentRequest;
 import static com.woowacourse.pickgit.docs.ApiDocumentUtils.getDocumentResponse;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.InstanceOfAssertFactories.BYTE_ARRAY;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
@@ -16,10 +17,12 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.requestHe
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NULL;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
+import static org.springframework.restdocs.payload.JsonFieldType.VARIES;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
@@ -55,6 +58,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.List;
 import java.util.Optional;
+import javassist.bytecode.ByteArray;
 import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -385,7 +389,6 @@ class UserControllerTest extends ControllerTest {
                     .header(HttpHeaders.AUTHORIZATION, "Bearer token")
                     .content(new FileInputStream(file).readAllBytes())
             );
-
             // then
             perform
                 .andExpect(status().isOk())
@@ -432,7 +435,7 @@ class UserControllerTest extends ControllerTest {
                 .editProfileDescription(any(AuthUserForUserRequestDto.class), anyString());
 
             // restdocs
-            perform.andDo(document("edit-profile-description",
+            perform.andDo(document("profiles-edit-description",
                 getDocumentRequest(),
                 getDocumentResponse(),
                 requestHeaders(

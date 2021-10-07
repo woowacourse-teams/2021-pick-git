@@ -95,7 +95,7 @@ class PostFeedControllerTest_searchPosts extends ControllerTest {
                 .param("limit", "3"));
 
         perform.andExpect(status().isOk());
-        perform.andDo(document("api_search_posts_get_guest",
+        perform.andDo(document("search-tag-unLoggedIn",
             getDocumentRequest(),
             getDocumentResponse(),
             requestParameters(
@@ -144,7 +144,7 @@ class PostFeedControllerTest_searchPosts extends ControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, API_ACCESS_TOKEN));
 
         perform.andExpect(status().isOk());
-        perform.andDo(document("api_search_posts_get_login",
+        perform.andDo(document("search-tag-LoggedIn",
             getDocumentRequest(),
             getDocumentResponse(),
             requestHeaders(
