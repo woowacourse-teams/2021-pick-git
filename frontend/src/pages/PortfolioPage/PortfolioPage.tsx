@@ -1,24 +1,25 @@
 import { useRef } from "react";
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
+import PortfolioHeader from "../../components/@layout/PortfolioHeader/PortfolioHeader";
+import ScrollActiveHeader from "../../components/@layout/ScrollActiveHeader/ScrollActiveHeader";
 import Avatar from "../../components/@shared/Avatar/Avatar";
 import useProfile from "../../services/hooks/useProfile";
+import useUserFeed from "../../services/hooks/useUserFeed";
+import { getScrollYPosition } from "../../utils/layout";
 import {
   AvatarWrapper,
+  ContactIconCSS,
+  ContactWrapper,
   Container,
-  FullPage,
-  UserNameCSS,
   DescriptionCSS,
   DetailInfo,
-  ContactWrapper,
+  FullPage,
   PaginatorWrapper,
   SectionNameCSS,
   UserAvatarCSS,
-  ContactIconCSS,
+  UserNameCSS,
 } from "./PortfolioPage.style";
 import DotPaginator from "../../components/@shared/DotPaginator/DotPaginator";
-import ScrollActiveHeader from "../../components/@layout/ScrollActiveHeader/ScrollActiveHeader";
-import PortfolioHeader from "../../components/@layout/PortfolioHeader/PortfolioHeader";
-import { getScrollYPosition } from "../../utils/layout";
 import PortfolioProjectSection from "../../components/PortfolioProjectSection/PortfolioProjectSection";
 import PortfolioSection from "../../components/PortfolioSection/PortfolioSection";
 import SVGIcon from "../../components/@shared/SVGIcon/SVGIcon";
@@ -65,7 +66,14 @@ const PortfolioPage = () => {
   return (
     <>
       <ScrollActiveHeader containerRef={containerRef}>
-        <PortfolioHeader isButtonsShown={false} />
+        <PortfolioHeader
+          isButtonsShown={isMyPortfolio}
+          profile={profile ?? null}
+          portfolio={targetPortfolio}
+          onAddPortfolioSection={handleAddSection}
+          onAddPortfolioProject={handleAddProject}
+          onUploadPortfolio={() => handleUploadPortfolio(targetPortfolio)}
+        />
       </ScrollActiveHeader>
       <Container ref={containerRef}>
         <FullPage isVerticalCenter={true}>
