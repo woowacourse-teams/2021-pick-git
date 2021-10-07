@@ -1,15 +1,24 @@
-import { PortfolioIntro, PortfolioProject } from "../../@types";
+import { PortfolioIntro } from "../../@types";
 import { PORTFOLIO } from "../../constants/localStorageKey";
+import { setPortfolioLocalUpdateTime } from "../../storage/storage";
 import useLocalStorage from "./@common/useLocalStorage";
 
-const usePortfolioIntro = (name?: string, description?: string) => {
-  const { itemState, setItem: setPortfolioIntro } = useLocalStorage<PortfolioIntro>(PORTFOLIO.INTRO);
-
-  const portfolioIntro = itemState ?? {
-    name: "",
+const usePortfolioIntro = (name?: string, description?: string, profileImageUrl?: string) => {
+  const { itemState: portfolioIntro, setItem } = useLocalStorage<PortfolioIntro>(PORTFOLIO.INTRO, {
+    name: name ?? "",
     isProfileShown: true,
-    description: "",
+    profileImageUrl: profileImageUrl ?? "",
+    description: description ?? "",
     contacts: [],
+  });
+
+  const setPortfolioIntro = (intro: PortfolioIntro) => {
+    const newIntro = {
+      ...intro,
+      contacts: intro.contacts.map((contact) => ({ ...contact })),
+    };
+    setPortfolioLocalUpdateTime(new Date());
+    setItem(newIntro);
   };
 
   const updateIntroName = (newName: string) => {
