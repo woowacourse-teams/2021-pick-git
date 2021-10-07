@@ -1,4 +1,4 @@
-import { usePortfolioQuery, useSetPortfolioMutation } from "../services/queries/portfolio";
+import { usePortfolioQuery, useSetPortfolioMutation } from "../../services/queries/portfolio";
 
 const usePortfolio = (username: string) => {
   const { data, isError, isLoading, error } = usePortfolioQuery(username);

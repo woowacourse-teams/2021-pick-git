@@ -1,7 +1,7 @@
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import UserList from "../../components/UserList/UserList";
 import { QUERY } from "../../constants/queries";
-import useFollowerList from "../../hooks/useFollowerList";
+import useFollowerList from "../../hooks/service/useFollowerList";
 import { Container, ContentWrapper } from "./FollowerListPage.style";
 
 const FollowerList = () => {

@@ -1,15 +1,15 @@
 import axios from "axios";
 import { useContext, useEffect } from "react";
 import { useHistory } from "react-router-dom";
-import { HTTPErrorHandler } from "../@types";
-import { UNKNOWN_ERROR_MESSAGE } from "../constants/messages";
-import { PAGE_URL } from "../constants/urls";
+import { HTTPErrorHandler } from "../../@types";
+import { UNKNOWN_ERROR_MESSAGE } from "../../constants/messages";
+import { PAGE_URL } from "../../constants/urls";
 
-import SnackBarContext from "../contexts/SnackbarContext";
-import UserContext from "../contexts/UserContext";
-import { getAPIErrorMessage, handleHTTPError } from "../utils/error";
-import { isHttpErrorStatus } from "../utils/typeGuard";
-import { useProfileQuery } from "../services/queries";
+import SnackBarContext from "../../contexts/SnackbarContext";
+import UserContext from "../../contexts/UserContext";
+import { getAPIErrorMessage, handleHTTPError } from "../../utils/error";
+import { isHttpErrorStatus } from "../../utils/typeGuard";
+import { useProfileQuery } from "../../services/queries";
 
 const useProfile = (isMyProfile: boolean, username: string | null) => {
   const history = useHistory();

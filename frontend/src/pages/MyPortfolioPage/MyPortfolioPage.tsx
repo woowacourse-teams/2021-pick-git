@@ -1,52 +1,43 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { Redirect } from "react-router-dom";
+import { PortfolioData, PortfolioProject, Post } from "../../@types";
+import MessageModalPortal from "../../components/@layout/MessageModalPortal/MessageModalPortal";
+import ModalPortal from "../../components/@layout/Modal/ModalPortal";
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
-import Avatar from "../../components/@shared/Avatar/Avatar";
-import { PAGE_URL } from "../../constants/urls";
-import UserContext from "../../contexts/UserContext";
-import useProfile from "../../hooks/useProfile";
-import {
-  AvatarWrapper,
-  Container,
-  FullPage,
-  UserNameCSS,
-  DescriptionCSS,
-  DetailInfo,
-  ContactWrapper,
-  PaginatorWrapper,
-  CloseButtonWrapper,
-  SectionNameCSS,
-  ToggleButtonCSS,
-  UserAvatarCSS,
-  ContactIconCSS,
-} from "./MyPortfolioPage.style";
-import DotPaginator from "../../components/@shared/DotPaginator/DotPaginator";
-import { Portfolio, PortfolioData, PortfolioProject, Post } from "../../@types";
-import ScrollActiveHeader from "../../components/@layout/ScrollActiveHeader/ScrollActiveHeader";
 import PortfolioHeader from "../../components/@layout/PortfolioHeader/PortfolioHeader";
-import { getScrollYPosition } from "../../utils/layout";
+import ScrollActiveHeader from "../../components/@layout/ScrollActiveHeader/ScrollActiveHeader";
+import Avatar from "../../components/@shared/Avatar/Avatar";
+import Button from "../../components/@shared/Button/Button";
+import DotPaginator from "../../components/@shared/DotPaginator/DotPaginator";
+import SVGIcon from "../../components/@shared/SVGIcon/SVGIcon";
+import ToggleButton from "../../components/@shared/ToggleButton/ToggleButton";
 import PortfolioProjectSection from "../../components/PortfolioProjectSection/PortfolioProjectSection";
 import PortfolioSection from "../../components/PortfolioSection/PortfolioSection";
-import usePortfolioSections from "../../hooks/usePortfolioSection";
-import SVGIcon from "../../components/@shared/SVGIcon/SVGIcon";
 import PortfolioTextEditor from "../../components/PortfolioTextEditor/PortfolioTextEditor";
-import { PLACE_HOLDER } from "../../constants/placeholder";
-import useUserFeed from "../../hooks/useUserFeed";
-import usePortfolioProjects from "../../hooks/usePortfolioProjects";
-import useModal from "../../hooks/common/useModal";
-import ModalPortal from "../../components/@layout/Modal/ModalPortal";
 import PostSelector from "../../components/PostSelector/PostSelector";
-import ToggleButton from "../../components/@shared/ToggleButton/ToggleButton";
-import usePortfolioIntro from "../../hooks/usePortfolioIntro";
-import Button from "../../components/@shared/Button/Button";
+import { PLACE_HOLDER } from "../../constants/placeholder";
+import { PAGE_URL } from "../../constants/urls";
+import UserContext from "../../contexts/UserContext";
 import useMessageModal from "../../hooks/common/useMessageModal";
-import MessageModalPortal from "../../components/@layout/MessageModalPortal/MessageModalPortal";
-import usePortfolio from "../../hooks/usePortfolio";
+import useModal from "../../hooks/common/useModal";
+import usePortfolio from "../../hooks/service/usePortfolio";
+import usePortfolioIntro from "../../hooks/service/usePortfolioIntro";
+import usePortfolioProjects from "../../hooks/service/usePortfolioProjects";
+import usePortfolioSections from "../../hooks/service/usePortfolioSection";
+import useProfile from "../../hooks/service/useProfile";
+import useUserFeed from "../../hooks/service/useUserFeed";
 import {
   getPortfolioLocalUpdateTime,
   getPortfolioLocalUpdateTimeString,
-  setPortfolioLocalUpdateTime,
+  setPortfolioLocalUpdateTime
 } from "../../storage/storage";
+import { getScrollYPosition } from "../../utils/layout";
+import {
+  AvatarWrapper, CloseButtonWrapper, ContactIconCSS, ContactWrapper, Container, DescriptionCSS,
+  DetailInfo, FullPage, PaginatorWrapper, SectionNameCSS,
+  ToggleButtonCSS,
+  UserAvatarCSS, UserNameCSS
+} from "./MyPortfolioPage.style";
 
 const MyPortfolioPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);

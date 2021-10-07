@@ -1,4 +1,6 @@
 import { useContext, useEffect } from "react";
+import axios from "axios";
+
 import { Container, StepSlider, StepContainer, NextStepButtonWrapper } from "./EditPostPage.style";
 import { POST_EDIT_STEPS } from "../../constants/steps";
 import PostContentUploader from "../../components/PostContentUploader/PostContentUploader";
@@ -15,9 +17,9 @@ import {
   isValidPostEditData,
 } from "../../utils/postUpload";
 import { getAPIErrorMessage } from "../../utils/error";
-import usePostEdit from "../../hooks/usePostEdit";
+import usePostEdit from "../../hooks/service/usePostEdit";
 import { useLocation } from "react-router-dom";
-import usePostEditStep from "../../hooks/usePostEditStep";
+import usePostEditStep from "../../hooks/service/usePostEditStep";
 import UserContext from "../../contexts/UserContext";
 import SnackBarContext from "../../contexts/SnackbarContext";
 import PageLoadingWithCover from "../../components/@layout/PageLoadingWithCover/PageLoadingWithCover";
@@ -64,7 +66,9 @@ const EditPostPage = () => {
       pushSnackbarMessage(SUCCESS_MESSAGE.POST_MODIFIED);
       completeStep();
     } catch (error) {
-      showAlertModal(getAPIErrorMessage(error.response?.data.errorCode));
+      if (axios.isAxiosError(error)) {
+        showAlertModal(getAPIErrorMessage(error.response?.data.errorCode));
+      }
     }
   };
 

@@ -2,15 +2,15 @@ import { useContext, useState } from "react";
 import { useQueryClient } from "react-query";
 import axios from "axios";
 
-import { ProfileData } from "../@types";
-import { FAILURE_MESSAGE, SUCCESS_MESSAGE, UNKNOWN_ERROR_MESSAGE } from "../constants/messages";
-import { QUERY } from "../constants/queries";
-import SnackBarContext from "../contexts/SnackbarContext";
-import UserContext from "../contexts/UserContext";
-import { getAPIErrorMessage, getClientErrorMessage, handleClientError, handleHTTPError } from "../utils/error";
-import { isValidFileSize, isValidProfileDescription } from "../utils/profileModification";
-import { isClientErrorCode, isHttpErrorStatus } from "../utils/typeGuard";
-import { useProfileDescriptionMutation, useProfileImageMutation } from "../services/queries";
+import { ProfileData } from "../../@types";
+import { FAILURE_MESSAGE, SUCCESS_MESSAGE, UNKNOWN_ERROR_MESSAGE } from "../../constants/messages";
+import { QUERY } from "../../constants/queries";
+import SnackBarContext from "../../contexts/SnackbarContext";
+import UserContext from "../../contexts/UserContext";
+import { getAPIErrorMessage, getClientErrorMessage, handleClientError, handleHTTPError } from "../../utils/error";
+import { isValidFileSize, isValidProfileDescription } from "../../utils/profileModification";
+import { isClientErrorCode, isHttpErrorStatus } from "../../utils/typeGuard";
+import { useProfileDescriptionMutation, useProfileImageMutation } from "../../services/queries";
 
 const useProfileModificationForm = (
   username: string,

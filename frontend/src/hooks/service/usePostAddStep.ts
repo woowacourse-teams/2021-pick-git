@@ -1,8 +1,8 @@
 import { useContext } from "react";
 import { useHistory } from "react-router-dom";
-import { Step } from "../@types";
-import PostAddStepContext from "../contexts/PostAddStepContext";
-import useStep from "./common/useStep";
+import { Step } from "../../@types";
+import PostAddStepContext from "../../contexts/PostAddStepContext";
+import useStep from "../common/useStep";
 
 const usePostAddStep = (steps: Step[], stepCompleteLink?: string) => {
   const history = useHistory();

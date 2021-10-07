@@ -4,7 +4,7 @@ import { renderHook, act, WaitFor, RenderResult } from "@testing-library/react-h
 
 import { ProfileData } from "../../@types";
 import { QUERY } from "../../constants/queries";
-import useFollow from "../useFollow";
+import useFollow from "../service/useFollow";
 import UserContext from "../../contexts/UserContext";
 import SnackBarContext from "../../contexts/SnackbarContext";
 import { API_ERROR_MESSAGE, CLIENT_ERROR_MESSAGE } from "../../constants/messages";

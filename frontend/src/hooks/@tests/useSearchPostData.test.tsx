@@ -1,30 +1,20 @@
+import { act, renderHook } from "@testing-library/react-hooks";
 import React from "react";
-import { renderHook, act } from "@testing-library/react-hooks";
 import { QueryClientProvider } from "react-query";
-
-import UserContext from "../../contexts/UserContext";
-import SnackBarContext from "../../contexts/SnackbarContext";
 import SearchContext from "../../contexts/SearchContext";
+import SnackBarContext from "../../contexts/SnackbarContext";
+import UserContext from "../../contexts/UserContext";
+import {
+  EMPTY_RESULT_KEYWORD, searchPostDataServer,
+  SEARCH_POST_KEYWORD, SEARCH_RESULT_MAX_PAGE_LENGTH, SEARCH_RESULT_PAGES, SEARCH_TYPE
+} from "../@mocks/mockSearchPostData";
 import {
   createQueryClient,
   EMPTY_PAGE,
   keyword,
-  mockFn,
-  setLocalStorageInvalid,
-  setLocalStorageValid,
-  UNAUTHORIZED_TOKEN_ERROR,
-  USERNAME,
+  mockFn, USERNAME
 } from "../@mocks/shared";
-import useSearchPostData from "../useSearchPostData";
-import {
-  searchPostDataServer,
-  SEARCH_POST_KEYWORD,
-  SEARCH_TYPE,
-  SEARCH_RESULT_PAGES,
-  EMPTY_RESULT_KEYWORD,
-  SEARCH_RESULT_MAX_PAGE_LENGTH,
-} from "../@mocks/mockSearchPostData";
-import { API_ERROR_MESSAGE } from "../../constants/messages";
+import useSearchPostData from "../service/useSearchPostData";
 
 const queryClient = createQueryClient();
 

@@ -3,14 +3,14 @@ import { useContext, useEffect, useState } from "react";
 import { InfiniteData, useQueryClient } from "react-query";
 import { useHistory } from "react-router-dom";
 
-import { HTTPErrorHandler, Post } from "../@types";
-import { QUERY } from "../constants/queries";
-import { PAGE_URL } from "../constants/urls";
-import SnackBarContext from "../contexts/SnackbarContext";
-import UserContext from "../contexts/UserContext";
-import { handleHTTPError } from "../utils/error";
-import { isHttpErrorStatus } from "../utils/typeGuard";
-import { useUserPostsQuery } from "../services/queries";
+import { HTTPErrorHandler, Post } from "../../@types";
+import { QUERY } from "../../constants/queries";
+import { PAGE_URL } from "../../constants/urls";
+import SnackBarContext from "../../contexts/SnackbarContext";
+import UserContext from "../../contexts/UserContext";
+import { handleHTTPError } from "../../utils/error";
+import { isHttpErrorStatus } from "../../utils/typeGuard";
+import { useUserPostsQuery } from "../../services/queries";
 
 const useUserFeed = (isMyFeed: boolean, username: string | null, prevData?: InfiniteData<Post[]>) => {
   const [isAllPostsFetched, setIsAllPostsFetched] = useState(false);

@@ -1,7 +1,7 @@
 import { Container } from "./HomeFeedPage.style";
 import Feed from "../../components/Feed/Feed";
 import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
-import useHomeFeed from "../../hooks/useHomeFeed";
+import useHomeFeed from "../../hooks/service/useHomeFeed";
 import { QUERY } from "../../constants/queries";
 import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
 import useInfiniteImagePreloader from "../../hooks/common/useInfiniteImagePreloader";

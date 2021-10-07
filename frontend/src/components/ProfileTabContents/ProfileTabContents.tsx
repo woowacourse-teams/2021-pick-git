@@ -1,6 +1,6 @@
 import { PAGE_URL } from "../../constants/urls";
-import useGithubStatistics from "../../hooks/useGithubStatistics";
-import useUserFeed from "../../hooks/useUserFeed";
+import useGithubStatistics from "../../hooks/service/useGithubStatistics";
+import useUserFeed from "../../hooks/service/useUserFeed";
 import GithubStatistics from "../GithubStatistics/GithubStatistics";
 import GridFeed from "../@shared/GridFeed/GridFeed";
 

@@ -2,13 +2,13 @@ import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { InfiniteData, useQueryClient } from "react-query";
 
-import { Post } from "../@types";
-import { QUERY } from "../constants/queries";
-import UserContext from "../contexts/UserContext";
-import { removeDuplicatedData } from "../utils/data";
-import { handleHTTPError } from "../utils/error";
-import { isHttpErrorStatus } from "../utils/typeGuard";
-import { useHomeFeedPostsQuery } from "../services/queries";
+import { Post } from "../../@types";
+import { QUERY } from "../../constants/queries";
+import UserContext from "../../contexts/UserContext";
+import { removeDuplicatedData } from "../../utils/data";
+import { handleHTTPError } from "../../utils/error";
+import { isHttpErrorStatus } from "../../utils/typeGuard";
+import { useHomeFeedPostsQuery } from "../../services/queries";
 import useFeedMutation from "./useFeedMutation";
 
 const useHomeFeed = () => {

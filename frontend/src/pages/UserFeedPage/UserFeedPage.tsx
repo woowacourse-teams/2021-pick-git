@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 
 import Feed from "../../components/Feed/Feed";
 import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
-import useUserFeed from "../../hooks/useUserFeed";
+import useUserFeed from "../../hooks/service/useUserFeed";
 import { Container } from "./UserFeedPage.style";
 import { Post } from "../../@types";
 

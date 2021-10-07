@@ -9,7 +9,7 @@ import { PAGE_URL } from "../../../constants/urls";
 import UserContext from "../../../contexts/UserContext";
 import useMessageModal from "../../../hooks/common/useMessageModal";
 import useModal from "../../../hooks/common/useModal";
-import useFollow from "../../../hooks/useFollow";
+import useFollow from "../../../hooks/service/useFollow";
 import MessageModalPortal from "../../@layout/MessageModalPortal/MessageModalPortal";
 import ModalPortal from "../../@layout/Modal/ModalPortal";
 import ProfileModificationForm from "../../ProfileModificationForm/ProfileModificationForm";

@@ -1,7 +1,7 @@
-import { PortfolioIntro } from "../@types";
-import { PORTFOLIO } from "../constants/localStorageKey";
-import { setPortfolioLocalUpdateTime } from "../storage/storage";
-import useLocalStorage from "./common/useLocalStorage";
+import { PortfolioIntro } from "../../@types";
+import { PORTFOLIO } from "../../constants/localStorageKey";
+import { setPortfolioLocalUpdateTime } from "../../storage/storage";
+import useLocalStorage from "../common/useLocalStorage";
 
 const usePortfolioIntro = (name?: string, description?: string, profileImageUrl?: string) => {
   const { itemState: portfolioIntro, setItem } = useLocalStorage<PortfolioIntro>(PORTFOLIO.INTRO, {

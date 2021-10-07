@@ -6,7 +6,7 @@ import { WARNING_MESSAGE } from "../../constants/messages";
 import { PAGE_URL } from "../../constants/urls";
 import UserContext from "../../contexts/UserContext";
 import useMessageModal from "../../hooks/common/useMessageModal";
-import useFollow from "../../hooks/useFollow";
+import useFollow from "../../hooks/service/useFollow";
 import { isInfiniteData } from "../../utils/typeGuard";
 import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
 import Avatar from "../@shared/Avatar/Avatar";

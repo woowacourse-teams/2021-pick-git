@@ -7,7 +7,7 @@ import { ProfileData } from "../../@types";
 import { QUERY } from "../../constants/queries";
 import UserContext from "../../contexts/UserContext";
 import SnackBarContext from "../../contexts/SnackbarContext";
-import useProfileModificationForm from "../useProfileModificationForm";
+import useProfileModificationForm from "../service/useProfileModificationForm";
 import {
   IMAGE_FILE,
   IMAGE_FILE_URL,
