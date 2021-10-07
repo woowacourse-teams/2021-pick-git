@@ -1,10 +1,10 @@
 import { Container } from "./HomeFeedPage.style";
 import Feed from "../../components/Feed/Feed";
 import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
-import useHomeFeed from "../../services/hooks/useHomeFeed";
+import useHomeFeed from "../../hooks/useHomeFeed";
 import { QUERY } from "../../constants/queries";
 import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
-import useInfiniteImagePreloader from "../../services/hooks/@common/useInfiniteImagePreloader";
+import useInfiniteImagePreloader from "../../hooks/common/useInfiniteImagePreloader";
 
 const HomeFeedPage = () => {
   const { infinitePostsData, isLoading, isFetching, isError, handlePostsEndIntersect } = useHomeFeed();

@@ -6,7 +6,7 @@ import { ErrorResponse, Tags } from "../../@types";
 import { LIMIT } from "../../constants/limits";
 import { FAILURE_MESSAGE } from "../../constants/messages";
 import { PAGE_URL } from "../../constants/urls";
-import useMessageModal from "../../services/hooks/@common/useMessageModal";
+import useMessageModal from "../../hooks/common/useMessageModal";
 import { getAPIErrorMessage } from "../../utils/error";
 import { hasDuplicatedTag, isGithubRepositoryEmpty, isValidTagFormat, isValidTagLength } from "../../utils/postUpload";
 import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";

@@ -5,7 +5,7 @@ import PostContentUploader from "../../components/PostContentUploader/PostConten
 import TagInputForm from "../../components/TagInputForm/TagInputForm";
 import Button from "../../components/@shared/Button/Button";
 import { PAGE_URL } from "../../constants/urls";
-import useMessageModal from "../../services/hooks/@common/useMessageModal";
+import useMessageModal from "../../hooks/common/useMessageModal";
 import MessageModalPortal from "../../components/@layout/MessageModalPortal/MessageModalPortal";
 import { FAILURE_MESSAGE, SUCCESS_MESSAGE, WARNING_MESSAGE } from "../../constants/messages";
 import {
@@ -15,9 +15,9 @@ import {
   isValidPostEditData,
 } from "../../utils/postUpload";
 import { getAPIErrorMessage } from "../../utils/error";
-import usePostEdit from "../../services/hooks/usePostEdit";
+import usePostEdit from "../../hooks/usePostEdit";
 import { useLocation } from "react-router-dom";
-import usePostEditStep from "../../services/hooks/usePostEditStep";
+import usePostEditStep from "../../hooks/usePostEditStep";
 import UserContext from "../../contexts/UserContext";
 import SnackBarContext from "../../contexts/SnackbarContext";
 import PageLoadingWithCover from "../../components/@layout/PageLoadingWithCover/PageLoadingWithCover";

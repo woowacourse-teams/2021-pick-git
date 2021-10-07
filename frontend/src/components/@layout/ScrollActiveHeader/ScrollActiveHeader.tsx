@@ -1,5 +1,5 @@
 import { RefObject, useEffect, useState } from "react";
-import useDebounce from "../../../services/hooks/@common/useDebounce";
+import useDebounce from "../../../hooks/common/useDebounce";
 import { Container } from "./ScrollActiveHeader.style";
 
 export interface Props {

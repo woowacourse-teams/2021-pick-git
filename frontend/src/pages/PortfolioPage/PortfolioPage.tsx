@@ -3,8 +3,7 @@ import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import PortfolioHeader from "../../components/@layout/PortfolioHeader/PortfolioHeader";
 import ScrollActiveHeader from "../../components/@layout/ScrollActiveHeader/ScrollActiveHeader";
 import Avatar from "../../components/@shared/Avatar/Avatar";
-import useProfile from "../../services/hooks/useProfile";
-import { getScrollYPosition } from "../../utils/layout";
+import useProfile from "../../hooks/service/useProfile";
 import {
   AvatarWrapper,
   ContactIconCSS,
@@ -23,8 +22,9 @@ import PortfolioProjectSection from "../../components/PortfolioProjectSection/Po
 import PortfolioSection from "../../components/PortfolioSection/PortfolioSection";
 import SVGIcon from "../../components/@shared/SVGIcon/SVGIcon";
 import PortfolioTextEditor from "../../components/PortfolioTextEditor/PortfolioTextEditor";
-import usePortfolio from "../../services/hooks/usePortfolio";
+import usePortfolio from "../../hooks/service/usePortfolio";
 import PageError from "../../components/@shared/PageError/PageError";
+import { getScrollYPosition } from "../../utils/layout";
 
 const PortfolioPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
