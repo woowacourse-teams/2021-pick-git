@@ -4,6 +4,7 @@ import lombok.Builder;
 
 @Builder
 public class QueryCommentRequestDto {
+
     private Long postId;
     private boolean isGuest;
     private int page;

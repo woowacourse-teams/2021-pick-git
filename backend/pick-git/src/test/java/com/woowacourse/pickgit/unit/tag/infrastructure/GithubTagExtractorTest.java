@@ -26,7 +26,11 @@ class GithubTagExtractorTest {
     @BeforeEach
     void setUp() {
         PlatformTagApiRequester platformTagApiRequester = new MockTagApiRequester();
-        platformTagExtractor = new GithubTagExtractor(platformTagApiRequester, objectMapper);
+        platformTagExtractor = new GithubTagExtractor(
+            platformTagApiRequester,
+            objectMapper,
+            "https://api.github.com"
+        );
     }
 
     @DisplayName("명시된 User의 Repository에 기술된 Language Tags(Other 제외)를 추출한다.")

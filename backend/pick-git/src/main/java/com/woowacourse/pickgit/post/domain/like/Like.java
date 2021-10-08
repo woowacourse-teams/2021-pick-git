@@ -12,8 +12,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-@Entity
 @Table(name = "LIKES")
+@Entity
 public class Like {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

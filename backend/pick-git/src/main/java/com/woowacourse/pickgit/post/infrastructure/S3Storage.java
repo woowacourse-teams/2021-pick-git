@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -18,8 +19,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 
-@Repository
 @Profile("!test")
+@Repository
 public class S3Storage implements PickGitStorage {
 
     private static final String MULTIPART_KEY = "files";
@@ -41,6 +42,9 @@ public class S3Storage implements PickGitStorage {
             .postForEntity(s3ProxyUrl, createBody(files, userName), StorageDto.class)
             .getBody();
 
+        if (Objects.isNull(response)) {
+            throw new PlatformHttpErrorException();
+        }
         return response.getUrls();
     }
 

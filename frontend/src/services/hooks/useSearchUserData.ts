@@ -11,15 +11,17 @@ import { getAPIErrorMessage, handleHTTPError } from "../../utils/error";
 import { isHttpErrorStatus } from "../../utils/typeGuard";
 import { useSearchUserResultQuery } from "../queries/search";
 
-const useSearchUserData = () => {
+const useSearchUserData = (activated: boolean) => {
   const { keyword } = useContext(SearchContext);
   const { pushSnackbarMessage } = useContext(SnackBarContext);
   const { logout } = useContext(UserContext);
 
   const [results, setResults] = useState<UserItem[]>([]);
   const [isAllResultFetched, setIsAllResultFetched] = useState(false);
-  const { data, error, isError, isLoading, fetchNextPage, isFetchingNextPage, refetch } =
-    useSearchUserResultQuery(keyword);
+  const { data, error, isError, isLoading, fetchNextPage, isFetchingNextPage, refetch } = useSearchUserResultQuery(
+    keyword,
+    activated
+  );
 
   const handleIntersect = async () => {
     if (isAllResultFetched) return;

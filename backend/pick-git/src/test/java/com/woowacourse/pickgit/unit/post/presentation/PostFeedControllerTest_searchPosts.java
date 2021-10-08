@@ -45,7 +45,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 @AutoConfigureRestDocs
 @WebMvcTest(PostFeedController.class)
-public class PostFeedControllerTest_searchPosts {
+class PostFeedControllerTest_searchPosts {
 
     private static final String API_ACCESS_TOKEN = "oauth.access.token";
 

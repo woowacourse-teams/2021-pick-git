@@ -8,7 +8,6 @@ public class SearchRepositoryRequestDto {
     private int page;
     private int limit;
 
-
     private SearchRepositoryRequestDto() {
     }
 

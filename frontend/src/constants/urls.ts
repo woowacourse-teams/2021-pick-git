@@ -32,6 +32,7 @@ export const PAGE_URL = {
   FOLLOWINGS: (username: string) => `/followings?username=${username}`,
   FOLLOWERS: (username: string) => `/followers?username=${username}`,
   PORTFOLIO: "/portfolio",
+  MY_PORTFOLIO: "/my-portfolio",
 };
 
 export const API_URL = {
@@ -42,6 +43,8 @@ export const API_URL = {
   SELF_PROFILE_IMAGE: "/profiles/me/image",
   SELF_PROFILE_DESCRIPTION: "/profiles/me/description",
   ADD_POSTS: "/posts",
+  PORTFOLIO: "/portfolios",
+  USER_PORTFOLIO: (username: string) => `/portfolios/${username}`,
   GITHUB_REPOSITORIES: (keyword: string, page: number, limit: number) =>
     keyword === ""
       ? `/github/repositories?&page=${page}&limit=${limit}`

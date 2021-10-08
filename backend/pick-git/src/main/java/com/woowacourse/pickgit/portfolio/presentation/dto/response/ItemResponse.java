@@ -6,22 +6,32 @@ import lombok.Builder;
 @Builder
 public class ItemResponse {
 
+    private Long id;
     private String category;
-    private List<String> descriptions;
+    private List<DescriptionResponse> descriptions;
 
     private ItemResponse() {
     }
 
-    public ItemResponse(String category, List<String> descriptions) {
+    public ItemResponse(
+        Long id,
+        String category,
+        List<DescriptionResponse> descriptions
+    ) {
+        this.id = id;
         this.category = category;
         this.descriptions = descriptions;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getCategory() {
         return category;
     }
 
-    public List<String> getDescriptions() {
+    public List<DescriptionResponse> getDescriptions() {
         return descriptions;
     }
 }

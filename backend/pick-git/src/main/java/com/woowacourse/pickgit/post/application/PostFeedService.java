@@ -11,28 +11,20 @@ import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Service
 public class PostFeedService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final SearchTypes searchTypes;
-
-    public PostFeedService(
-        PostRepository postRepository,
-        UserRepository userRepository,
-        SearchTypes searchTypes
-    ) {
-        this.postRepository = postRepository;
-        this.userRepository = userRepository;
-        this.searchTypes = searchTypes;
-    }
 
     public List<PostResponseDto> homeFeed(HomeFeedRequestDto homeFeedRequestDto) {
         Pageable pageable = getPagination(homeFeedRequestDto);

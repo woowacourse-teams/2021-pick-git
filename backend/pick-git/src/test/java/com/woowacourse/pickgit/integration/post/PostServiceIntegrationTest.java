@@ -13,7 +13,6 @@ import com.woowacourse.pickgit.comment.application.dto.request.CommentRequestDto
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.PostFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
-import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.post.CannotAddTagException;
@@ -38,13 +37,7 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import org.springframework.test.context.ActiveProfiles;
 
 class PostServiceIntegrationTest extends AcceptanceTest {
 

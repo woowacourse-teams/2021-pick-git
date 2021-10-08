@@ -2,29 +2,35 @@ import { PortfolioSection } from "../../@types";
 
 const usePortfolioSectionItem = (
   portfolioSection: PortfolioSection,
-  setPortfolioSection: (portfolioSection: PortfolioSection) => void
+  setPortfolioSection?: (portfolioSection: PortfolioSection) => void
 ) => {
   const addBlankSectionItem = () => {
     const newPortfolioSection = { ...portfolioSection };
     newPortfolioSection.items.push({
+      id: null,
       category: "",
-      descriptions: [""],
+      descriptions: [
+        {
+          id: null,
+          value: "",
+        },
+      ],
     });
 
-    setPortfolioSection(newPortfolioSection);
+    setPortfolioSection && setPortfolioSection(newPortfolioSection);
   };
 
   const addBlankDescription = (sectionItemIndex: number) => {
     const newPortfolioSection = { ...portfolioSection };
-    newPortfolioSection.items[sectionItemIndex].descriptions.push("");
-    setPortfolioSection(newPortfolioSection);
+    newPortfolioSection.items[sectionItemIndex].descriptions.push({ id: null, value: "" });
+    setPortfolioSection && setPortfolioSection(newPortfolioSection);
   };
 
   const deleteSectionItem = (sectionItemIndex: number) => {
     const newPortfolioSection = { ...portfolioSection };
     newPortfolioSection.items.splice(sectionItemIndex, 1);
 
-    setPortfolioSection(newPortfolioSection);
+    setPortfolioSection && setPortfolioSection(newPortfolioSection);
   };
 
   const updateCategory = (prevCategory: string, currentCategory: string) => {
@@ -36,7 +42,7 @@ const usePortfolioSectionItem = (
     }
 
     targetSectionItem.category = currentCategory;
-    setPortfolioSection(newPortfolioSection);
+    setPortfolioSection && setPortfolioSection(newPortfolioSection);
   };
 
   const updateDescription = (category: string, descriptionIndex: number, newDescription: string) => {
@@ -47,14 +53,14 @@ const usePortfolioSectionItem = (
       return;
     }
 
-    targetSectionItem.descriptions[descriptionIndex] = newDescription;
-    setPortfolioSection(newPortfolioSection);
+    targetSectionItem.descriptions[descriptionIndex].value = newDescription;
+    setPortfolioSection && setPortfolioSection(newPortfolioSection);
   };
 
   const deleteDescription = (sectionItemIndex: number, descriptionIndex: number) => {
     const newPortfolioSection = { ...portfolioSection };
     newPortfolioSection.items[sectionItemIndex].descriptions.splice(descriptionIndex, 1);
-    setPortfolioSection(newPortfolioSection);
+    setPortfolioSection && setPortfolioSection(newPortfolioSection);
   };
 
   const isSameSectionNameExist = (sectionName?: string) => {

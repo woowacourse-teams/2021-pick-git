@@ -45,7 +45,11 @@ class TagServiceIntegrationTest {
     @BeforeEach
     void setUp() {
         PlatformTagExtractor platformTagExtractor =
-            new GithubTagExtractor(new MockTagApiRequester(), objectMapper);
+            new GithubTagExtractor(
+                new MockTagApiRequester(),
+                objectMapper,
+                "https://api.github.com"
+            );
         tagService = new TagService(platformTagExtractor, tagRepository);
     }
 

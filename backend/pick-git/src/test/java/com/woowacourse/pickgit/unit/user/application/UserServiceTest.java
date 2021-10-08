@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -25,12 +24,10 @@ import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowSearchRequestDto;
-import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileImageEditRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.UserSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
-import com.woowacourse.pickgit.user.application.dto.response.ProfileEditResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.ProfileImageEditResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
@@ -55,7 +52,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -891,67 +887,6 @@ class UserServiceTest {
             verify(userRepository, times(1))
                 .findByBasicProfile_Name("testUser");
         }
-    }
-
-
-    @DisplayName("자신의 프로필(이미지, 한 줄 소개 포함)을 수정할 수 있다.")
-    @Test
-    void editUserProfile_WithImageAndDescription_Success() {
-        // given
-        MultipartFile image = FileFactory.getTestImage1();
-        String updatedDescription = "updated description";
-        AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
-
-        // mock
-        given(userRepository.findByBasicProfile_Name("testUser"))
-            .willReturn(Optional.of(UserFactory.user(1L, "testUser")));
-        given(pickGitProfileStorage.store(any(File.class), anyString()))
-            .willReturn(Optional.ofNullable(image.getName()));
-
-        // when
-        ProfileEditRequestDto profileEditRequestDto = ProfileEditRequestDto
-            .builder()
-            .image(image)
-            .decription(updatedDescription)
-            .build();
-        ProfileEditResponseDto responseDto =
-            userService.editProfile(authUserRequestDto, profileEditRequestDto);
-
-        // then
-        assertThat(responseDto.getImageUrl()).isEqualTo(image.getName());
-        assertThat(responseDto.getDescription()).isEqualTo(updatedDescription);
-        verify(userRepository, times(1))
-            .findByBasicProfile_Name("testUser");
-        verify(pickGitProfileStorage, times(1))
-            .store(any(File.class), anyString());
-    }
-
-    @DisplayName("자신의 프로필(한 줄 소개만 포함)을 수정할 수 있다.")
-    @Test
-    void editUserProfile_WithDescription_Success() {
-        // given
-        User user = UserFactory.user(1L, "testUser");
-        String updatedDescription = "updated descrption";
-        AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
-
-        // mock
-        given(userRepository.findByBasicProfile_Name("testUser"))
-            .willReturn(Optional.of(user));
-
-        // when
-        ProfileEditRequestDto profileEditRequestDto = ProfileEditRequestDto
-            .builder()
-            .image(FileFactory.getEmptyTestFile())
-            .decription(updatedDescription)
-            .build();
-        ProfileEditResponseDto responseDto =
-            userService.editProfile(authUserRequestDto, profileEditRequestDto);
-
-        // then
-        assertThat(responseDto.getImageUrl()).isEqualTo(user.getImage());
-        assertThat(responseDto.getDescription()).isEqualTo(updatedDescription);
-        verify(userRepository, times(1))
-            .findByBasicProfile_Name(user.getName());
     }
 
     @DisplayName("로그인 - 저장된 유저중 유사한 이름을 가진 유저를 검색한다. (팔로잉한 여부 boolean)")

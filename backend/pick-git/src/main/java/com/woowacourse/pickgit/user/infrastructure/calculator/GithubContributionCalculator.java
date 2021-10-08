@@ -2,7 +2,6 @@ package com.woowacourse.pickgit.user.infrastructure.calculator;
 
 import com.woowacourse.pickgit.user.domain.Contribution;
 import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
-import com.woowacourse.pickgit.user.infrastructure.dto.CountDto;
 import com.woowacourse.pickgit.user.infrastructure.dto.ItemDto;
 import com.woowacourse.pickgit.user.infrastructure.dto.StarsDto;
 import com.woowacourse.pickgit.user.infrastructure.extractor.PlatformContributionExtractor;
@@ -21,13 +20,13 @@ public class GithubContributionCalculator implements PlatformContributionCalcula
 
     @Override
     public Contribution calculate(String accessToken, String username) {
-        return new Contribution(
-            calculateStars(accessToken, username),
-            calculateCommits(accessToken, username),
-            calculatePRs(accessToken, username),
-            calculateIssues(accessToken, username),
-            calculateRepos(accessToken, username)
-        );
+        return Contribution.builder()
+            .starsCount(calculateStars(accessToken, username))
+            .commitsCount(counts("/search/commits?q=committer:%s", accessToken, username))
+            .prsCount(counts("/search/issues?q=author:%s type:pr", accessToken, username))
+            .issuesCount(counts("/search/issues?q=author:%s type:issue", accessToken, username))
+            .reposCount(counts("/search/issues?q=author:%s type:issue", accessToken, username))
+            .build();
     }
 
     private int calculateStars(String accessToken, String username) {
@@ -39,31 +38,9 @@ public class GithubContributionCalculator implements PlatformContributionCalcula
             .sum();
     }
 
-    private int calculateCommits(String accessToken, String username) {
-        CountDto count = platformContributionExtractor
-            .extractCount("/commits?q=committer:%s", accessToken, username);
-
-        return count.getCount();
-    }
-
-    private int calculatePRs(String accessToken, String username) {
-        CountDto count = platformContributionExtractor
-            .extractCount("/issues?q=author:%s type:pr", accessToken, username);
-
-        return count.getCount();
-    }
-
-    private int calculateIssues(String accessToken, String username) {
-        CountDto count = platformContributionExtractor
-            .extractCount("/issues?q=author:%s type:issue", accessToken, username);
-
-        return count.getCount();
-    }
-
-    private int calculateRepos(String accessToken, String username) {
-        CountDto count = platformContributionExtractor
-            .extractCount("/repositories?q=user:%s is:public", accessToken, username);
-
-        return count.getCount();
+    private int counts(String url, String accessToken, String username) {
+        return platformContributionExtractor
+            .extractCount(url, accessToken, username)
+            .getCount();
     }
 }

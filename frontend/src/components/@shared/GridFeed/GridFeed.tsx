@@ -26,10 +26,7 @@ const GridFeed = ({ feedPagePath, infinitePostsData, isError, isFetchingNextPage
     if (posts.length > 0) {
       return (
         <Container>
-          <InfiniteScrollContainer
-            isLoaderShown={isFetchingNextPage ?? false}
-            onIntersect={handleIntersect ?? (() => {})}
-          >
+          <InfiniteScrollContainer isLoaderShown={isFetchingNextPage} onIntersect={handleIntersect}>
             <Grid>
               {posts?.map(({ id, imageUrls, authorName, content }) => (
                 <Link

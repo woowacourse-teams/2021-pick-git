@@ -103,7 +103,7 @@ class AuthenticationInterceptorIntegrationTest {
     @Test
     void preHandle_ExpiredToken_ThrowException() {
         // given
-        jwtTokenProvider.changeExpirationTime(0);
+        JwtTokenProvider jwtTokenProvider = new JwtTokenProviderImpl("pick-git", 1);
         String bearerToken = "Bearer " + jwtTokenProvider.createToken("pick-git");
 
         // mock

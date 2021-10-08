@@ -6,6 +6,7 @@ import lombok.Builder;
 @Builder
 public class SectionRequestDto {
 
+    private Long id;
     private String name;
     private List<ItemRequestDto> items;
 
@@ -13,11 +14,17 @@ public class SectionRequestDto {
     }
 
     public SectionRequestDto(
+        Long id,
         String name,
         List<ItemRequestDto> items
     ) {
+        this.id = id;
         this.name = name;
         this.items = items;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getName() {

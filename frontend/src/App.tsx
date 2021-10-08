@@ -11,6 +11,7 @@ import UserContext from "./contexts/UserContext";
 import SnackBarContext from "./contexts/SnackbarContext";
 import { PostEditStepContextProvider } from "./contexts/PostEditStepContext";
 import PageLoadingWithLogo from "./components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
+import MyPortfolioPage from "./pages/MyPortfolioPage/MyPortfolioPage";
 
 const NavigationHeader = lazy(() => import("./components/@layout/NavigationHeader/NavigationHeader"));
 const OneDepthStepHeader = lazy(() => import("./components/OneDepthStepHeader/OneDepthStepHeader"));
@@ -130,6 +131,9 @@ const App = () => {
           </Route>
           <Route path={PAGE_URL.PORTFOLIO}>
             <PortfolioPage />
+          </Route>
+          <Route path={PAGE_URL.MY_PORTFOLIO}>
+            <MyPortfolioPage />
           </Route>
           <Redirect to="/" />
         </Switch>

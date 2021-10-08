@@ -7,26 +7,29 @@ import lombok.Builder;
 @Builder
 public class ProjectRequestDto {
 
+    private Long id;
     private String name;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private String type;
     private String imageUrl;
     private String content;
-    private List<String> tags;
+    private List<TagRequestDto> tags;
 
     private ProjectRequestDto() {
     }
 
     public ProjectRequestDto(
+        Long id,
         String name,
         LocalDateTime startDate,
         LocalDateTime endDate,
         String type,
         String imageUrl,
         String content,
-        List<String> tags
+        List<TagRequestDto> tags
     ) {
+        this.id = id;
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -34,6 +37,10 @@ public class ProjectRequestDto {
         this.imageUrl = imageUrl;
         this.content = content;
         this.tags = tags;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getName() {
@@ -60,7 +67,7 @@ public class ProjectRequestDto {
         return content;
     }
 
-    public List<String> getTags() {
+    public List<TagRequestDto> getTags() {
         return tags;
     }
 }

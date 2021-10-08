@@ -14,6 +14,10 @@ public class AuthUserForPostRequestDto {
     private AuthUserForPostRequestDto() {
     }
 
+    public AuthUserForPostRequestDto(AppUser appUser) {
+        this(appUser.isGuest() ? null : appUser.getUsername(), appUser.isGuest());
+    }
+
     public AuthUserForPostRequestDto(String username, boolean isGuest) {
         this.username = username;
         this.isGuest = isGuest;

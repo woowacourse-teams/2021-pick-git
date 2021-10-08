@@ -7,6 +7,4 @@ public interface JwtTokenProvider {
     boolean validateToken(String token);
 
     String getPayloadByKey(String token, String key);
-
-    void changeExpirationTime(long expirationTimeInMilliSeconds);
 }

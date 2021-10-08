@@ -22,7 +22,6 @@ export interface Props {
 
 const ProfileModificationForm = ({ username, profileImageUrl, prevDescription, onTerminate }: Props) => {
   const theme = useContext(ThemeContext);
-  const { pushSnackbarMessage } = useContext(SnackBarContext);
   const { modalMessage, isModalShown, hideMessageModal, showAlertModal } = useMessageModal();
   const { values, handlers, isLoading } = useProfileModificationForm(
     username,

@@ -11,8 +11,8 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 public class ReplicationRoutingDataSource extends AbstractRoutingDataSource {
 
-    private static final Logger LOGGER = LoggerFactory
-        .getLogger(ReplicationRoutingDataSource.class);
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(ReplicationRoutingDataSource.class);
 
     private SlaveNames slaveNames;
 

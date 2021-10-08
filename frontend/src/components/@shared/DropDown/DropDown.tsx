@@ -12,7 +12,7 @@ import {
 
 export interface DropDownItem {
   text: string;
-  onClick: () => void;
+  onClick?: () => void;
 }
 
 export interface Props {
@@ -30,7 +30,7 @@ const DropDown = ({ cssProp, items, children }: Props) => {
 
   const handleDropDownListItemClick = (item: DropDownItem) => {
     setIsElementShown(false);
-    item.onClick();
+    item.onClick && item.onClick();
   };
 
   return (

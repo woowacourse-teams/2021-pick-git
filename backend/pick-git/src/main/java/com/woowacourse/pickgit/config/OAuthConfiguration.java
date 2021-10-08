@@ -14,7 +14,6 @@ import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.Controll
 import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.ForGuestScanner;
 import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.ForLoginUserScanner;
 import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.package_scanner.PackageScanner;
-import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.package_scanner.SourceVisitor;
 import java.util.List;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -25,50 +24,21 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class OAuthConfiguration implements WebMvcConfigurer {
 
+    private static final String PACKAGE = "com.woowacourse.pickgit";
+
     private final OAuthService oAuthService;
-    private String PACKAGE;
 
     public OAuthConfiguration(OAuthService oAuthService) {
         this.oAuthService = oAuthService;
     }
 
-    public AuthenticationInterceptor authenticationInterceptor() {
-        return new AuthenticationInterceptor(oAuthService);
-    }
-
-    public IgnoreAuthenticationInterceptor ignoreAuthenticationInterceptor() {
-        return new IgnoreAuthenticationInterceptor(oAuthService);
-    }
-
-    public AuthenticationPrincipalArgumentResolver authenticationPrincipalArgumentResolver() {
-        return new AuthenticationPrincipalArgumentResolver(oAuthService);
-    }
-
-    public List<StorageForRegisterType> getStorageForRegisterTypes() {
-        return List.of(
-            new AuthenticateStorageForRegisterType(),
-            new IgnoreAuthenticateStorageForRegisterType()
-        );
-    }
-
-    public List<String> parseClassesNames() {
-        PACKAGE = "com.woowacourse.pickgit";
-
-        PackageScanner packageScanner = new PackageScanner(PACKAGE);
-        return packageScanner.getAllClassNames();
-    }
-
-    public UriParser getUriParser() {
-        return new UriParser(
-            new ControllerScanner(parseClassesNames()),
-            new ForGuestScanner(),
-            new ForLoginUserScanner()
-        );
-    }
-
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(authenticationPrincipalArgumentResolver());
+    }
+
+    private AuthenticationPrincipalArgumentResolver authenticationPrincipalArgumentResolver() {
+        return new AuthenticationPrincipalArgumentResolver(oAuthService);
     }
 
     @Override
@@ -80,11 +50,11 @@ public class OAuthConfiguration implements WebMvcConfigurer {
 
         AutoAuthorizationInterceptorRegister autoAuthorizationInterceptorRegister =
             AutoAuthorizationInterceptorRegister.builder()
-            .storageForRegisterTypes(getStorageForRegisterTypes())
-            .authenticationInterceptor(authenticationInterceptor)
-            .ignoreAuthenticationInterceptor(ignoreAuthenticationInterceptor)
-            .uriParser(getUriParser())
-            .build();
+                .storageForRegisterTypes(getStorageForRegisterTypes())
+                .authenticationInterceptor(authenticationInterceptor)
+                .ignoreAuthenticationInterceptor(ignoreAuthenticationInterceptor)
+                .uriParser(getUriParser())
+                .build();
 
         autoAuthorizationInterceptorRegister.execute();
         ignoreAuthenticationInterceptor
@@ -95,5 +65,33 @@ public class OAuthConfiguration implements WebMvcConfigurer {
 
         registry.addInterceptor(ignoreAuthenticationInterceptor)
             .addPathPatterns("/**");
+    }
+
+    private AuthenticationInterceptor authenticationInterceptor() {
+        return new AuthenticationInterceptor(oAuthService);
+    }
+
+    private IgnoreAuthenticationInterceptor ignoreAuthenticationInterceptor() {
+        return new IgnoreAuthenticationInterceptor(oAuthService);
+    }
+
+    private List<StorageForRegisterType> getStorageForRegisterTypes() {
+        return List.of(
+            new AuthenticateStorageForRegisterType(),
+            new IgnoreAuthenticateStorageForRegisterType()
+        );
+    }
+
+    private UriParser getUriParser() {
+        return new UriParser(
+            new ControllerScanner(parseClassesNames()),
+            new ForGuestScanner(),
+            new ForLoginUserScanner()
+        );
+    }
+
+    private List<String> parseClassesNames() {
+        PackageScanner packageScanner = new PackageScanner(PACKAGE);
+        return packageScanner.getAllClassNames();
     }
 }

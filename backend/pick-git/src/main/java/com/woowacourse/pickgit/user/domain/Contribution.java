@@ -1,5 +1,8 @@
 package com.woowacourse.pickgit.user.domain;
 
+import lombok.Builder;
+
+@Builder
 public class Contribution {
 
     private int starsCount;
@@ -16,8 +19,8 @@ public class Contribution {
         int commitsCount,
         int prsCount,
         int issuesCount,
-        int reposCount)
-    {
+        int reposCount
+    ) {
         this.starsCount = starsCount;
         this.commitsCount = commitsCount;
         this.prsCount = prsCount;

@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -16,8 +17,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-@Component
 @Profile("!test")
+@Component
 public class S3PickGitProfileStorage implements PickGitProfileStorage {
 
     private static final String MULTIPART_KEY = "files";
@@ -35,11 +36,13 @@ public class S3PickGitProfileStorage implements PickGitProfileStorage {
 
     @Override
     public Optional<String> store(File file, String userName) {
-        List<String> imageUrls = restClient
+        StorageDto response = restClient
             .postForEntity(s3ProxyUrl, createBody(List.of(file), userName), StorageDto.class)
-            .getBody()
-            .getUrls();
-
+            .getBody();
+        if (Objects.isNull(response)) {
+            throw new PlatformHttpErrorException();
+        }
+        List<String> imageUrls = response.getUrls();
         return Optional.ofNullable(imageUrls.get(0));
     }
 
@@ -60,6 +63,7 @@ public class S3PickGitProfileStorage implements PickGitProfileStorage {
         return body;
     }
 
+    @Override
     public String storeByteFile(byte[] byteFile, String userName) {
         return saveImageAndGetUrl(byteFile, userName);
     }

@@ -7,10 +7,8 @@ import com.woowacourse.pickgit.acceptance.AcceptanceTest;
 import com.woowacourse.pickgit.comment.domain.CommentRepository;
 import com.woowacourse.pickgit.comment.presentation.dto.response.CommentResponse;
 import com.woowacourse.pickgit.common.request_builder.PickGitRequest;
-import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.user.domain.UserRepository;
-import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -25,11 +23,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.DigestUtils;
 
 public class CommentAcceptanceTest_queryComments extends AcceptanceTest {

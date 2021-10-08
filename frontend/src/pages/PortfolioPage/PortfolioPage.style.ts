@@ -34,6 +34,7 @@ export const FullPage = styled.section<{ isVerticalCenter?: boolean }>`
 
 export const UserAvatarCSS = css`
   height: 6.5625rem;
+  margin-top: 3.125rem;
 `;
 
 export const UserNameCSS = css`
@@ -42,22 +43,6 @@ export const UserNameCSS = css`
 
   ${setLaptopAboveMediaQuery`
     font-size: 1.5rem;
-  `}
-`;
-
-export const ToggleButtonCSS = css`
-  position: absolute;
-  top: 4rem;
-  right: 1.375rem;
-
-  ${setTabletMediaQuery`
-    top: 5rem;
-    right: 2rem;  
-  `}
-
-  ${setLaptopAboveMediaQuery`
-    top: 6rem;
-    right: 10rem;  
   `}
 `;
 
@@ -100,14 +85,10 @@ export const ContactWrapper = styled.div`
 
   ${setLaptopMediaQuery`
     padding: 0 12rem;
-    flex-direction: row;
-    width: initial;
   `}
 
   ${setDesktopMediaQuery`
     padding: 0 24rem;
-    flex-direction: row;
-    width: initial;
   `}
 `;
 
@@ -141,16 +122,6 @@ export const PaginatorWrapper = styled.div`
   bottom: 1.5625rem;
 `;
 
-export const CategoryAddIconWrapper = styled.div`
-  width: 100%;
-  padding-left: 2rem;
-
-  ${setLaptopAboveMediaQuery`
-    padding-left: 22rem;
-  
-  `}
-`;
-
 export const ContactIconCSS = css`
   margin-right: 0.75rem;
 `;
@@ -177,16 +148,5 @@ export const SectionNameCSS = css`
     min-height: 4.5rem;
     padding: 0 4rem;
     font-size: 2.2rem;
-  `}
-`;
-
-export const DeleteButtonCSS = css`
-  position: absolute;
-  bottom: 0.5rem;
-  left: 1rem;
-
-  ${setLaptopAboveMediaQuery`
-    bottom: 0.5rem;
-    left: 5rem;
   `}
 `;
