@@ -14,7 +14,7 @@ import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.authentication.infrastructure.JwtTokenProviderImpl;
-import com.woowacourse.pickgit.authentication.infrastructure.dao.CollectionOAuthAccessTokenDao;
+import com.woowacourse.pickgit.authentication.infrastructure.dao.RedisOAuthAccessTokenDao;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
@@ -25,12 +25,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 @Import(InfrastructureTestConfiguration.class)
-@DataJpaTest
+@Transactional
+@SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @ActiveProfiles("test")
 class OAuthServiceIntegrationTest {
 
@@ -42,6 +46,9 @@ class OAuthServiceIntegrationTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     private JwtTokenProvider jwtTokenProvider;
 
@@ -55,7 +62,7 @@ class OAuthServiceIntegrationTest {
             SECRET_KEY,
             EXPIRATION_TIME_IN_MILLISECONDS
         );
-        this.oAuthAccessTokenDao = new CollectionOAuthAccessTokenDao();
+        this.oAuthAccessTokenDao = new RedisOAuthAccessTokenDao(redisTemplate);
         this.oAuthService = new OAuthService(
             oAuthClient,
             jwtTokenProvider,
