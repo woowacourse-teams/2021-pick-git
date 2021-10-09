@@ -233,6 +233,13 @@ const MyPortfolioPage = () => {
       <ScrollActiveHeader containerRef={containerRef}>
         <PortfolioHeader
           isButtonsShown={true}
+          profile={profile ?? null}
+          portfolio={{
+            id: null,
+            intro: portfolioIntro,
+            projects: portfolioProjects,
+            sections: portfolioSections,
+          }}
           onAddPortfolioSection={handleAddSection}
           onAddPortfolioProject={handleAddProject}
           onUploadPortfolio={handleUploadPortfolio}
@@ -248,12 +255,7 @@ const MyPortfolioPage = () => {
           />
           <AvatarWrapper>
             {portfolioIntro.isProfileShown && (
-              <Avatar
-                diameter="6.5625rem"
-                fontSize="1.5rem"
-                imageUrl={portfolioIntro.profileImageUrl}
-                cssProp={UserAvatarCSS}
-              />
+              <Avatar diameter="6.5625rem" fontSize="1.5rem" imageUrl={profile?.imageUrl} cssProp={UserAvatarCSS} />
             )}
             <PortfolioTextEditor
               cssProp={UserNameCSS}

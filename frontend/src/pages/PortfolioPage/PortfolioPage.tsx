@@ -4,7 +4,6 @@ import PortfolioHeader from "../../components/@layout/PortfolioHeader/PortfolioH
 import ScrollActiveHeader from "../../components/@layout/ScrollActiveHeader/ScrollActiveHeader";
 import Avatar from "../../components/@shared/Avatar/Avatar";
 import useProfile from "../../services/hooks/useProfile";
-import useUserFeed from "../../services/hooks/useUserFeed";
 import { getScrollYPosition } from "../../utils/layout";
 import {
   AvatarWrapper,
@@ -66,14 +65,7 @@ const PortfolioPage = () => {
   return (
     <>
       <ScrollActiveHeader containerRef={containerRef}>
-        <PortfolioHeader
-          isButtonsShown={isMyPortfolio}
-          profile={profile ?? null}
-          portfolio={targetPortfolio}
-          onAddPortfolioSection={handleAddSection}
-          onAddPortfolioProject={handleAddProject}
-          onUploadPortfolio={() => handleUploadPortfolio(targetPortfolio)}
-        />
+        <PortfolioHeader isButtonsShown={false} />
       </ScrollActiveHeader>
       <Container ref={containerRef}>
         <FullPage isVerticalCenter={true}>

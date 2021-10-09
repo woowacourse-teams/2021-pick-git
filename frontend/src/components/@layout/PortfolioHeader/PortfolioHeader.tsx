@@ -1,4 +1,4 @@
-import { RefObject, useContext } from "react";
+import { useContext } from "react";
 import { useHistory } from "react-router";
 import { ThemeContext } from "styled-components";
 import { PDFDownloadLink } from "@react-pdf/renderer";
@@ -21,8 +21,8 @@ export interface Props {
   onAddPortfolioSection?: () => void;
   onAddPortfolioProject?: () => void;
   onUploadPortfolio?: () => void;
-  profile: ProfileData | null;
-  portfolio: Portfolio;
+  profile?: ProfileData | null;
+  portfolio?: Portfolio;
 }
 
 const PortfolioHeader = ({

@@ -4,8 +4,8 @@ import { Portfolio, ProfileData } from "../../@types";
 import styles from "./PortfolioDocument.style";
 
 interface PortfolioDocumentProps {
-  profile: ProfileData | null;
-  portfolio: Portfolio;
+  profile?: ProfileData | null;
+  portfolio?: Portfolio;
 }
 
 const PROJECT_TYPE = {
@@ -57,7 +57,7 @@ const PortfolioDocument = ({ profile, portfolio }: PortfolioDocumentProps) => {
       <Page style={styles.global.page}>
         <View style={styles.profile.profileContainer}>
           <View style={styles.profile.basic}>
-            {portfolio.intro.isProfileShown ? (
+            {portfolio?.intro.isProfileShown ? (
               <View style={styles.profile.imageWrapper}>
                 <Image style={styles.profile.image} src={profile?.imageUrl} />
               </View>
@@ -78,8 +78,8 @@ const PortfolioDocument = ({ profile, portfolio }: PortfolioDocumentProps) => {
           <Text style={styles.profile.description}>{portfolio?.intro?.description ?? ""}</Text>
         </View>
 
-        {portfolio.projects.length ? <Text style={styles.global.sectionTitle}>Project</Text> : <View />}
-        {portfolio.projects.map((project, i) => {
+        {portfolio?.projects.length ? <Text style={styles.global.sectionTitle}>Project</Text> : <View />}
+        {portfolio?.projects.map((project, i) => {
           return (
             <View key={project.name + i} style={{ marginBottom: 20 }} wrap={false}>
               <View style={styles.project.header}>
@@ -94,7 +94,7 @@ const PortfolioDocument = ({ profile, portfolio }: PortfolioDocumentProps) => {
                   <Text style={{ marginRight: 10 }}>{project.content}</Text>
                   <View style={styles.project.tagList} wrap={false}>
                     {project.tags.map((tag) => (
-                      <Tag key={tag} text={tag} />
+                      <Tag key={tag.id} text={tag.name} />
                     ))}
                   </View>
                 </View>
@@ -106,14 +106,14 @@ const PortfolioDocument = ({ profile, portfolio }: PortfolioDocumentProps) => {
           );
         })}
 
-        {portfolio.sections.length ? (
+        {portfolio?.sections.length ? (
           <Text style={styles.global.sectionTitle} wrap={false}>
             Details
           </Text>
         ) : (
           <View />
         )}
-        {portfolio.sections.map((section, i) => (
+        {portfolio?.sections.map((section, i) => (
           <View key={section.name + i}>
             <View style={styles.section.header} wrap={false}>
               <View style={styles.section.title}>
@@ -127,8 +127,8 @@ const PortfolioDocument = ({ profile, portfolio }: PortfolioDocumentProps) => {
                   <Text style={styles.section.category}>{item.category}</Text>
                   <View style={styles.section.descriptionList}>
                     {item.descriptions.map((description, i) => (
-                      <Text key={description + i} style={styles.section.description}>
-                        {description}
+                      <Text key={description.id ?? "" + i} style={styles.section.description}>
+                        {description.value}
                       </Text>
                     ))}
                   </View>
