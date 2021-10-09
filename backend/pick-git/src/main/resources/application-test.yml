@@ -16,5 +16,11 @@ spring:
     hibernate:
       ddl-auto: create-drop
 
+security:
+  redis:
+    host: localhost
+    password: test
+    port: 6379
+
 logging:
   config: classpath:log4j2/log4j2-test.xml
