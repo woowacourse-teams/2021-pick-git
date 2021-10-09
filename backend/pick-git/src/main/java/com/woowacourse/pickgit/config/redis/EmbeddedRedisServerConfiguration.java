@@ -22,7 +22,7 @@ public class EmbeddedRedisServerConfiguration {
     private static final String LOCAL_HOST = "127.0.0.1";
     private static final String BIN_SH = "/bin/sh";
     private static final String BIN_SH_OPTION = "-c";
-    private static final String COMMAND = "netstat -nat | grep LISTEN|grep %d";
+    private static final String COMMAND = "netstat -nat | grep LISTEN | grep %d";
     private static final int START_PORT = 10000;
     private static final int END_PORT = 65535;
 
