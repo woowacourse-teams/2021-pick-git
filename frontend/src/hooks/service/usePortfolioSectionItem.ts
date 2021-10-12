@@ -1,4 +1,4 @@
-import { PortfolioSection } from "../@types";
+import { PortfolioSection } from "../../@types";
 
 const usePortfolioSectionItem = (
   portfolioSection: PortfolioSection,

@@ -1,4 +1,4 @@
-import { PortfolioProject } from "../@types";
+import { PortfolioProject } from "../../@types";
 
 const usePortfolioProject = (
   portfolioProject: PortfolioProject,
