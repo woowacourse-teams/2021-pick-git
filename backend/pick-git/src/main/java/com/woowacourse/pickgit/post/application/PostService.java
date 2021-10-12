@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -147,6 +148,10 @@ public class PostService {
             .build();
     }
 
+    @CacheEvict(
+        value = "homeFeed",
+        allEntries = true
+    )
     @Transactional
     public LikeResponseDto like(AppUser user, Long postId) {
         User source = findUserByName(user.getUsername());
@@ -156,6 +161,10 @@ public class PostService {
         return new LikeResponseDto(target.getLikeCounts(), true);
     }
 
+    @CacheEvict(
+        value = "homeFeed",
+        allEntries = true
+    )
     @Transactional
     public LikeResponseDto unlike(AppUser user, Long postId) {
         User source = findUserByName(user.getUsername());
@@ -165,6 +174,10 @@ public class PostService {
         return new LikeResponseDto(target.getLikeCounts(), false);
     }
 
+    @CacheEvict(
+        value = "homeFeed",
+        allEntries = true
+    )
     @Transactional
     public PostUpdateResponseDto update(PostUpdateRequestDto updateRequestDto) {
         User user = findUserByName(updateRequestDto.getUsername());
@@ -185,6 +198,10 @@ public class PostService {
             .build();
     }
 
+    @CacheEvict(
+        value = "homeFeed",
+        allEntries = true
+    )
     @Transactional
     public void delete(PostDeleteRequestDto deleteRequestDto) {
         User user = findUserByName(deleteRequestDto.getUsername());
@@ -196,6 +213,10 @@ public class PostService {
         postRepository.delete(post);
     }
 
+    @CacheEvict(
+        value = "homeFeed",
+        allEntries = true
+    )
     public List<LikeUsersResponseDto> likeUsers(
         AuthUserForPostRequestDto authUserRequestDto,
         Long postId
