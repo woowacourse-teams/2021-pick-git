@@ -17,12 +17,20 @@ import com.woowacourse.pickgit.user.domain.follow.PlatformFollowingRequester;
 import com.woowacourse.pickgit.user.domain.profile.PickGitProfileStorage;
 import com.woowacourse.pickgit.user.infrastructure.requester.PlatformContributionApiRequester;
 import javax.sql.DataSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
 @TestConfiguration
 public class InfrastructureTestConfiguration {
+
+    @Value("${spring.datasource.url}")
+    private String url;
+
+    @Value("${spring.datasource.username}")
+    private String username;
 
     @Bean
     public PlatformRepositoryApiRequester platformRepositoryApiRequester() {
@@ -68,8 +76,8 @@ public class InfrastructureTestConfiguration {
     public DataSource dataSource() {
         DataSource dataSource = DataSourceBuilder.create()
             .driverClassName("org.h2.Driver")
-            .url("jdbc:h2:mem:~/test;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE")
-            .username("SA")
+            .url(url)
+            .username(username)
             .password("").build();
         return new CountDataSource(queryCounter(), dataSource);
     }
