@@ -204,11 +204,7 @@ const CommentsPage = () => {
   }
 
   if (isError || !comments) {
-<<<<<<< HEAD
     return <PageError errorMessage="댓글 정보를 불러오는데 실패했습니다" />;
-=======
-    return <div>에러!!</div>;
->>>>>>> b7fe88f (refactor: CommentsPage 리팩터링)
   }
 
   return (
