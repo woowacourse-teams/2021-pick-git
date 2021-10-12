@@ -1,12 +1,12 @@
 import axios, { AxiosError } from "axios";
 import { useContext } from "react";
 
-import { UNKNOWN_ERROR_MESSAGE } from "../constants/messages";
-import SnackBarContext from "../contexts/SnackbarContext";
-import UserContext from "../contexts/UserContext";
-import { getAPIErrorMessage, getClientErrorMessage, handleClientError, handleHTTPError } from "../utils/error";
-import { isHttpErrorStatus, isClientErrorCode } from "../utils/typeGuard";
-import { useFollowingMutation, useUnfollowingMutation } from "../services/queries";
+import { UNKNOWN_ERROR_MESSAGE } from "../../constants/messages";
+import SnackBarContext from "../../contexts/SnackbarContext";
+import UserContext from "../../contexts/UserContext";
+import { getAPIErrorMessage, getClientErrorMessage, handleClientError, handleHTTPError } from "../../utils/error";
+import { isHttpErrorStatus, isClientErrorCode } from "../../utils/typeGuard";
+import { useFollowingMutation, useUnfollowingMutation } from "../../services/queries";
 
 const useFollow = (querySetter: (following: boolean) => void) => {
   const { logout } = useContext(UserContext);

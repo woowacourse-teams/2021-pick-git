@@ -3,6 +3,7 @@ import { useHistory, useLocation } from "react-router-dom";
 
 import MessageModalPortal from "../../components/@layout/MessageModalPortal/MessageModalPortal";
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
+import PageError from "../../components/@shared/PageError/PageError";
 import Avatar from "../../components/@shared/Avatar/Avatar";
 import SVGIcon from "../../components/@shared/SVGIcon/SVGIcon";
 import Chip from "../../components/@shared/Chip/Chip";
@@ -186,7 +187,7 @@ const CommentsPage = () => {
   }
 
   if (isError || !comments) {
-    return <div>에러!!</div>;
+    return <PageError errorMessage="댓글 정보를 불러오는데 실패했습니다" />;
   }
 
   return (

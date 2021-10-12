@@ -1,18 +1,22 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import Button from "../../components/@shared/Button/Button";
 import CircleIcon from "../../components/@shared/CircleIcon/CircleIcon";
-import { GithubLargeIcon } from "../../assets/icons";
-import { requestGetGithubAuthLink } from "../../services/requests";
-import { PAGE_URL } from "../../constants/urls";
-import { ButtonLoader, ButtonSpinnerWrapper, Container, Heading, HomeLinkText, Inner } from "./LoginPage.style";
-import SnackBarContext from "../../contexts/SnackbarContext";
 import Loader from "../../components/@shared/Loader/Loader";
+import SVGIcon from "../../components/@shared/SVGIcon/SVGIcon";
+
+import { PAGE_URL } from "../../constants/urls";
+
+import useSnackbar from "../../hooks/common/useSnackbar";
+
+import { requestGetGithubAuthLink } from "../../services/requests";
+
+import { ButtonLoader, ButtonSpinnerWrapper, Container, Heading, HomeLinkText, Inner } from "./LoginPage.style";
 
 const LoginPage = () => {
   const [isRequesting, setIsRequesting] = useState(false);
-  const { pushSnackbarMessage } = useContext(SnackBarContext);
+  const { pushSnackbarMessage } = useSnackbar();
 
   const onRequestGithubLogin = async () => {
     try {
@@ -45,7 +49,7 @@ const LoginPage = () => {
       <Inner>
         <Heading>깃 - 들다</Heading>
         <CircleIcon diameter="10.5rem">
-          <GithubLargeIcon />
+          <SVGIcon icon="GithubLargeIcon" />
         </CircleIcon>
         <LoginButton />
         <Link to={PAGE_URL.HOME}>

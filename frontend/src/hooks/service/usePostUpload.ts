@@ -1,8 +1,8 @@
 import { useContext, useState } from "react";
-import PostAddDataContext from "../contexts/PostAddDataContext";
-import UserContext from "../contexts/UserContext";
-import { getAccessToken } from "../storage/storage";
-import { requestAddPost } from "../services/requests";
+import PostAddDataContext from "../../contexts/PostAddDataContext";
+import UserContext from "../../contexts/UserContext";
+import { getAccessToken } from "../../storage/storage";
+import { requestAddPost } from "../../services/requests";
 
 const usePostUpload = () => {
   const { content, files, tags, githubRepositoryName, setContent, setFiles, setGithubRepositoryName, setTags } =

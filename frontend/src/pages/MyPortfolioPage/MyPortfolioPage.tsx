@@ -1,85 +1,68 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Redirect } from "react-router-dom";
+
+import MessageModalPortal from "../../components/@layout/MessageModalPortal/MessageModalPortal";
+import ModalPortal from "../../components/@layout/Modal/ModalPortal";
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
-import Avatar from "../../components/@shared/Avatar/Avatar";
-import { PAGE_URL } from "../../constants/urls";
-import UserContext from "../../contexts/UserContext";
-import useProfile from "../../hooks/useProfile";
-import {
-  AvatarWrapper,
-  Container,
-  FullPage,
-  UserNameCSS,
-  DescriptionCSS,
-  DetailInfo,
-  ContactWrapper,
-  PaginatorWrapper,
-  CloseButtonWrapper,
-  SectionNameCSS,
-  ToggleButtonCSS,
-  UserAvatarCSS,
-  ContactIconCSS,
-} from "./MyPortfolioPage.style";
-import DotPaginator from "../../components/@shared/DotPaginator/DotPaginator";
-import { Portfolio, PortfolioData, PortfolioProject, Post } from "../../@types";
-import ScrollActiveHeader from "../../components/@layout/ScrollActiveHeader/ScrollActiveHeader";
 import PortfolioHeader from "../../components/@layout/PortfolioHeader/PortfolioHeader";
-import { getScrollYPosition } from "../../utils/layout";
+import ScrollActiveHeader from "../../components/@layout/ScrollActiveHeader/ScrollActiveHeader";
+import Avatar from "../../components/@shared/Avatar/Avatar";
+import Button from "../../components/@shared/Button/Button";
+import DotPaginator from "../../components/@shared/DotPaginator/DotPaginator";
+import SVGIcon from "../../components/@shared/SVGIcon/SVGIcon";
+import ToggleButton from "../../components/@shared/ToggleButton/ToggleButton";
+import PageError from "../../components/@shared/PageError/PageError";
 import PortfolioProjectSection from "../../components/PortfolioProjectSection/PortfolioProjectSection";
 import PortfolioSection from "../../components/PortfolioSection/PortfolioSection";
-import usePortfolioSections from "../../hooks/usePortfolioSection";
-import SVGIcon from "../../components/@shared/SVGIcon/SVGIcon";
 import PortfolioTextEditor from "../../components/PortfolioTextEditor/PortfolioTextEditor";
-import { PLACE_HOLDER } from "../../constants/placeholder";
-import useUserFeed from "../../hooks/useUserFeed";
-import usePortfolioProjects from "../../hooks/usePortfolioProjects";
-import useModal from "../../hooks/common/useModal";
-import ModalPortal from "../../components/@layout/Modal/ModalPortal";
 import PostSelector from "../../components/PostSelector/PostSelector";
-import ToggleButton from "../../components/@shared/ToggleButton/ToggleButton";
-import usePortfolioIntro from "../../hooks/usePortfolioIntro";
-import Button from "../../components/@shared/Button/Button";
+
+import { PLACE_HOLDER } from "../../constants/placeholder";
+import { PAGE_URL } from "../../constants/urls";
+
 import useMessageModal from "../../hooks/common/useMessageModal";
-import MessageModalPortal from "../../components/@layout/MessageModalPortal/MessageModalPortal";
-import usePortfolio from "../../hooks/usePortfolio";
+import useModal from "../../hooks/common/useModal";
+import useAuth from "../../hooks/common/useAuth";
+import useProfile from "../../hooks/service/useProfile";
+import usePortfolio from "../../hooks/service/usePortfolio";
+import usePortfolioIntro from "../../hooks/service/usePortfolioIntro";
+import usePortfolioProjects from "../../hooks/service/usePortfolioProjects";
+import usePortfolioSections from "../../hooks/service/usePortfolioSection";
+import useUserFeed from "../../hooks/service/useUserFeed";
+
 import {
   getPortfolioLocalUpdateTime,
   getPortfolioLocalUpdateTimeString,
   setPortfolioLocalUpdateTime,
 } from "../../storage/storage";
 
+import { getScrollYPosition } from "../../utils/layout";
+
+import {
+  AvatarWrapper,
+  CloseButtonWrapper,
+  ContactIconCSS,
+  ContactWrapper,
+  Container,
+  DescriptionCSS,
+  DetailInfo,
+  FullPage,
+  PaginatorWrapper,
+  SectionNameCSS,
+  ToggleButtonCSS,
+  UserAvatarCSS,
+  UserNameCSS,
+} from "./MyPortfolioPage.style";
+
+import type { PortfolioData, PortfolioProject, PortfolioSectionType, Post } from "../../@types";
+
 const MyPortfolioPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { currentUsername, isLoggedIn } = useContext(UserContext);
-  const {
-    portfolio: remotePortfolio,
-    isError,
-    isLoading: isPortfolioLoading,
-    mutateSetPortfolio,
-  } = usePortfolio(currentUsername);
-  const { data: profile, isLoading: isProfileLoading } = useProfile(true, currentUsername);
-  const { infinitePostsData, isFetchingNextPage, handleIntersect } = useUserFeed(true, currentUsername);
-  const {
-    portfolioSections,
-    addBlankPortfolioSection,
-    deletePortfolioSection,
-    updatePortfolioSectionName,
-    setPortfolioSection,
-    setPortfolioSections,
-  } = usePortfolioSections();
+  const [deletingSectionType, setDeletingSectionType] = useState<PortfolioSectionType>();
+  const [deletingSectionName, setDeletingSectionName] = useState("");
 
-  const {
-    portfolioProjects,
-    addPortfolioProject,
-    deletePortfolioProject,
-    updatePortfolioProject,
-    setPortfolioProjects,
-  } = usePortfolioProjects();
-
+  const { currentUsername, isLoggedIn } = useAuth();
   const { isModalShown, showModal, hideModal } = useModal(false);
-  const { portfolioIntro, setPortfolioIntro, updateIntroName, updateIntroDescription, updateIsProfileShown } =
-    usePortfolioIntro(profile?.name, profile?.description, profile?.imageUrl);
-  const paginationCount = portfolioProjects.length + portfolioSections.length + 1;
   const {
     modalMessage,
     isModalShown: isMessageModalShown,
@@ -88,8 +71,34 @@ const MyPortfolioPage = () => {
     hideMessageModal,
   } = useMessageModal();
 
-  const [deletingSectionType, setDeletingSectionType] = useState<"project" | "custom">();
-  const [deletingSectionName, setDeletingSectionName] = useState("");
+  const {
+    portfolio: remotePortfolio,
+    isError,
+    isLoading: isPortfolioLoading,
+    mutateSetPortfolio,
+  } = usePortfolio(currentUsername);
+  const { data: profile, isLoading: isProfileLoading } = useProfile(true, currentUsername);
+  const { infinitePostsData, isFetchingNextPage, handleIntersect } = useUserFeed(true, currentUsername);
+
+  const {
+    portfolioSections,
+    addBlankPortfolioSection,
+    deletePortfolioSection,
+    updatePortfolioSectionName,
+    setPortfolioSection,
+    setPortfolioSections,
+  } = usePortfolioSections();
+  const {
+    portfolioProjects,
+    addPortfolioProject,
+    deletePortfolioProject,
+    updatePortfolioProject,
+    setPortfolioProjects,
+  } = usePortfolioProjects();
+  const { portfolioIntro, setPortfolioIntro, updateIntroName, updateIntroDescription, updateIsProfileShown } =
+    usePortfolioIntro(profile?.name, profile?.description, profile?.imageUrl);
+
+  const paginationCount = portfolioProjects.length + portfolioSections.length + 1;
 
   const handleSetProject = (prevProjectName: string) => (newProject: PortfolioProject) => {
     updatePortfolioProject(prevProjectName, newProject);
@@ -222,6 +231,10 @@ const MyPortfolioPage = () => {
 
   if (!isLoggedIn) {
     return <Redirect to={PAGE_URL.HOME} />;
+  }
+
+  if (isError) {
+    return <PageError errorMessage="포트폴리오를 불러올 수 없습니다." />;
   }
 
   if (isProfileLoading || isPortfolioLoading) {

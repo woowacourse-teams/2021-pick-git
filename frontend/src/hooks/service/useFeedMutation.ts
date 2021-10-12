@@ -1,16 +1,10 @@
 import { useContext } from "react";
 import { InfiniteData, QueryKey, useQueryClient } from "react-query";
-import { CommentData, Post } from "../@types";
-import { UNKNOWN_ERROR_MESSAGE } from "../constants/messages";
-import SnackBarContext from "../contexts/SnackbarContext";
+import { Post } from "../../@types";
+import { UNKNOWN_ERROR_MESSAGE } from "../../constants/messages";
+import SnackBarContext from "../../contexts/SnackbarContext";
 
-import {
-  useAddPostLikeMutation,
-  useDeletePostLikeMutation,
-  useAddPostCommentMutation,
-  useDeletePostCommentMutation,
-  useDeletePostMutation,
-} from "../services/queries";
+import { useAddPostLikeMutation, useDeletePostLikeMutation, useDeletePostMutation } from "../../services/queries";
 
 const useFeedMutation = (queryKey: QueryKey) => {
   const { mutateAsync: mutateDeletePostLike } = useDeletePostLikeMutation();

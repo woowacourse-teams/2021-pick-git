@@ -1,8 +1,8 @@
 import { useContext, useState } from "react";
-import { PostEditData } from "../@types";
-import PostEditDataContext from "../contexts/PostEditDataContext";
-import { getAccessToken } from "../storage/storage";
-import { requestEditPost } from "../services/requests";
+import { PostEditData } from "../../@types";
+import PostEditDataContext from "../../contexts/PostEditDataContext";
+import { getAccessToken } from "../../storage/storage";
+import { requestEditPost } from "../../services/requests";
 
 const usePostEdit = () => {
   const { postId, content, tags, setPostId, setContent, setTags } = useContext(PostEditDataContext);

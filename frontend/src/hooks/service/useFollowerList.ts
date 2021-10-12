@@ -1,13 +1,13 @@
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
-import { HTTPErrorHandler, UserItem } from "../@types";
-import { UNKNOWN_ERROR_MESSAGE } from "../constants/messages";
-import SnackBarContext from "../contexts/SnackbarContext";
-import UserContext from "../contexts/UserContext";
-import { removeDuplicatedData } from "../utils/data";
-import { getAPIErrorMessage, handleHTTPError } from "../utils/error";
-import { isHttpErrorStatus } from "../utils/typeGuard";
-import { useFollowersQuery } from "../services/queries";
+import { HTTPErrorHandler, UserItem } from "../../@types";
+import { UNKNOWN_ERROR_MESSAGE } from "../../constants/messages";
+import SnackBarContext from "../../contexts/SnackbarContext";
+import UserContext from "../../contexts/UserContext";
+import { removeDuplicatedData } from "../../utils/data";
+import { getAPIErrorMessage, handleHTTPError } from "../../utils/error";
+import { isHttpErrorStatus } from "../../utils/typeGuard";
+import { useFollowersQuery } from "../../services/queries";
 
 const useFollowerList = (username: string | null) => {
   const [results, setResults] = useState<UserItem[]>([]);

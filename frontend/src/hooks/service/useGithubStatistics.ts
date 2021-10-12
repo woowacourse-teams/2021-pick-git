@@ -1,11 +1,11 @@
 import axios from "axios";
 import { useContext, useEffect } from "react";
-import { UNKNOWN_ERROR_MESSAGE } from "../constants/messages";
-import SnackBarContext from "../contexts/SnackbarContext";
-import UserContext from "../contexts/UserContext";
-import { getAPIErrorMessage, handleHTTPError } from "../utils/error";
-import { isHttpErrorStatus } from "../utils/typeGuard";
-import { useGithubStatsQuery } from "../services/queries";
+import { UNKNOWN_ERROR_MESSAGE } from "../../constants/messages";
+import SnackBarContext from "../../contexts/SnackbarContext";
+import UserContext from "../../contexts/UserContext";
+import { getAPIErrorMessage, handleHTTPError } from "../../utils/error";
+import { isHttpErrorStatus } from "../../utils/typeGuard";
+import { useGithubStatsQuery } from "../../services/queries";
 
 const useGithubStatistics = (username: string) => {
   const { data, error, isLoading, isError } = useGithubStatsQuery(username);
