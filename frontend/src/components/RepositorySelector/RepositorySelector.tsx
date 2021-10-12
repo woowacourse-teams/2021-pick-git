@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useContext, useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { ThemeContext } from "styled-components";
+import { ThemeContext, useTheme } from "styled-components";
 import { RepositoryIcon, SearchIcon } from "../../assets/icons";
 import { FAILURE_MESSAGE, REDIRECT_MESSAGE } from "../../constants/messages";
 import { PAGE_URL } from "../../constants/urls";
@@ -33,6 +33,10 @@ interface Props {
 const RepositorySelector = ({ setGithubRepositoryName, goNextStep }: Props) => {
   const [temporarySearchKeyword, setTemporarySearchKeyword] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
+  const history = useHistory();
+
+  const { color } = useTheme();
+
   const {
     data: infiniteRepositoriesData,
     isLoading,
@@ -42,16 +46,23 @@ const RepositorySelector = ({ setGithubRepositoryName, goNextStep }: Props) => {
   } = useGithubRepositoriesQuery(searchKeyword);
   const { modalMessage, isModalShown, showAlertModal, hideMessageModal } = useMessageModal();
 
-  const { color } = useContext(ThemeContext);
-  const history = useHistory();
+  const repositories = getRepositoriesFromPages(infiniteRepositoriesData?.pages);
+
+  const searchedRepositoryListItems =
+    repositories?.map((repository) => (
+      <RepositoryListItem key={repository.name} onClick={() => handleRepositorySelect(repository.name)}>
+        <RepositoryCircle>
+          <CircleIcon diameter="1.875rem" backgroundColor={color.tertiaryColor}>
+            <RepositoryIcon />
+          </CircleIcon>
+        </RepositoryCircle>
+        <RepositoryName>{repository.name}</RepositoryName>
+      </RepositoryListItem>
+    )) ?? [];
 
   const changeSearchKeyword = useDebounce(() => {
     setSearchKeyword(temporarySearchKeyword);
   }, 150);
-
-  useEffect(() => {
-    changeSearchKeyword();
-  }, [temporarySearchKeyword]);
 
   const handleRepositorySelect = (repositoryName: string) => {
     setGithubRepositoryName(repositoryName);
@@ -72,6 +83,10 @@ const RepositorySelector = ({ setGithubRepositoryName, goNextStep }: Props) => {
     setTemporarySearchKeyword(value);
   };
 
+  useEffect(() => {
+    changeSearchKeyword();
+  }, [temporarySearchKeyword]);
+
   if (error) {
     error.response && showAlertModal(getAPIErrorMessage(error.response?.data.errorCode));
 
@@ -89,28 +104,11 @@ const RepositorySelector = ({ setGithubRepositoryName, goNextStep }: Props) => {
     );
   }
 
-  if (!infiniteRepositoriesData) {
+  if (!repositories) {
     showAlertModal(FAILURE_MESSAGE.POST_REPOSITORY_NOT_LOADABLE);
 
     return <MessageModalPortal heading={modalMessage} onConfirm={handleErrorConfirm} onClose={hideMessageModal} />;
   }
-
-  const repositories = getRepositoriesFromPages(infiniteRepositoriesData.pages);
-
-  const searchedRepositoryListItems = isLoading ? (
-    <PageLoading />
-  ) : (
-    repositories.map((repository) => (
-      <RepositoryListItem key={repository.name} onClick={() => handleRepositorySelect(repository.name)}>
-        <RepositoryCircle>
-          <CircleIcon diameter="1.875rem" backgroundColor={color.tertiaryColor}>
-            <RepositoryIcon />
-          </CircleIcon>
-        </RepositoryCircle>
-        <RepositoryName>{repository.name}</RepositoryName>
-      </RepositoryListItem>
-    ))
-  );
 
   if (repositories?.length === 0 && searchKeyword === "") {
     showAlertModal(REDIRECT_MESSAGE.NO_REPOSITORY_EXIST);

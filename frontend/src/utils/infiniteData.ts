@@ -4,8 +4,8 @@ export const getPostsFromPages = (postsPages: Post[][]) => {
   return postsPages.reduce((acc, postPage) => acc.concat(postPage), []);
 };
 
-export const getRepositoriesFromPages = (postsPages: GithubRepository[][]) => {
-  return postsPages.reduce((acc, postPage) => acc.concat(postPage), []);
+export const getRepositoriesFromPages = (postsPages?: GithubRepository[][]) => {
+  return postsPages?.reduce((acc, postPage) => acc.concat(postPage), []) ?? null;
 };
 
 export const getCommentsFromPages = (postsPages: CommentData[][]) => {

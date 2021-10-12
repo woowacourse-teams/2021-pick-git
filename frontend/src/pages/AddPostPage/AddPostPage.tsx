@@ -1,5 +1,5 @@
-import { useContext, useEffect } from "react";
-
+import { useEffect } from "react";
+import axios from "axios";
 import { Container, StepSlider, StepContainer, NextStepButtonWrapper } from "./AddPostPage.style";
 
 import PageLoadingWithCover from "../../components/@layout/PageLoadingWithCover/PageLoadingWithCover";
@@ -11,9 +11,9 @@ import TagInputForm from "../../components/TagInputForm/TagInputForm";
 
 import useSnackbar from "../../hooks/common/useSnackbar";
 import useMessageModal from "../../hooks/common/useMessageModal";
-import usePostUpload from "../../hooks/usePostUpload";
-import usePostAddStep from "../../hooks/usePostAddStep";
-import useGithubTags from "../../hooks/useGithubTags";
+import usePostUpload from "../../hooks/service/usePostUpload";
+import usePostAddStep from "../../hooks/service/usePostAddStep";
+import useGithubTags from "../../hooks/service/useGithubTags";
 
 import { PAGE_URL } from "../../constants/urls";
 import { FAILURE_MESSAGE, SUCCESS_MESSAGE, WARNING_MESSAGE } from "../../constants/messages";
@@ -70,6 +70,10 @@ const AddPostPage = () => {
       pushSnackbarMessage(SUCCESS_MESSAGE.POST_ADDED);
       completeStep();
     } catch (error) {
+      if (!axios.isAxiosError(error)) {
+        throw error;
+      }
+
       showAlertModal(getAPIErrorMessage(error.response?.data.errorCode));
       deactivateUploadingState();
     }
