@@ -2,8 +2,12 @@ package com.woowacourse.pickgit.config.redis;
 
 import com.woowacourse.pickgit.exception.redis.EmbeddedRedisServerException;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.Objects;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
@@ -37,10 +41,33 @@ public class EmbeddedRedisServerConfiguration {
     }
 
     @PostConstruct
-    public void redisServer() throws IOException {
+    public void redisServer() throws IOException, URISyntaxException {
         int redisPort = isRedisRunning() ? findAvailablePort() : port;
-        redisServer = new RedisServer(redisPort);
+
+        if (isArmMac()) {
+            redisServer = new RedisServer(Objects.requireNonNull(getRedisFileForArcMac()), redisPort);
+        }
+        if (!isArmMac()) {
+            redisServer = new RedisServer(redisPort);
+        }
+
         redisServer.start();
+    }
+
+    private boolean isArmMac() {
+        return Objects.equals(System.getProperty("os.arch"), "aarch64") &&
+            Objects.equals(System.getProperty("os.name"), "Mac OS X");
+    }
+
+    private File getRedisFileForArcMac() throws URISyntaxException {
+        URL resource = getClass()
+            .getClassLoader()
+            .getResource("binary/redis/redis-server-6.2.5-mac-arm64");
+        File file = new File(resource.toURI());
+
+        file.setExecutable(true);
+
+        return file;
     }
 
     @PreDestroy
