@@ -14,7 +14,7 @@ import {
   USERNAME,
 } from "../@mocks/shared";
 import { API_ERROR_MESSAGE } from "../../constants/messages";
-import useFollowingList from "../useFollowingList";
+import useFollowingList from "../service/useFollowingList";
 import {
   followingListServer,
   USER_WITH_FOLLOWINGS,

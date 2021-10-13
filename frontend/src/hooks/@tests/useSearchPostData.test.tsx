@@ -15,7 +15,7 @@ import {
   UNAUTHORIZED_TOKEN_ERROR,
   USERNAME,
 } from "../@mocks/shared";
-import useSearchPostData from "../useSearchPostData";
+import useSearchPostData from "../service/useSearchPostData";
 import {
   searchPostDataServer,
   SEARCH_POST_KEYWORD,

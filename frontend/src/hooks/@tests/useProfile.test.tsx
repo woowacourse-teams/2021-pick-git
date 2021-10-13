@@ -13,7 +13,7 @@ import {
   UNAUTHORIZED_TOKEN_ERROR,
   USERNAME,
 } from "../@mocks/shared";
-import useProfile from "../useProfile";
+import useProfile from "../service/useProfile";
 import { API_ERROR_MESSAGE } from "../../constants/messages";
 import { PAGE_URL } from "../../constants/urls";
 import { QUERY } from "../../constants/queries";

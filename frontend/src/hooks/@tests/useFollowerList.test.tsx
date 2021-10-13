@@ -20,7 +20,7 @@ import {
   UNAUTHORIZED_TOKEN_ERROR,
   USERNAME,
 } from "../@mocks/shared";
-import useFollowerList from "../useFollowerList";
+import useFollowerList from "../service/useFollowerList";
 import { API_ERROR_MESSAGE } from "../../constants/messages";
 
 const queryClient = createQueryClient();

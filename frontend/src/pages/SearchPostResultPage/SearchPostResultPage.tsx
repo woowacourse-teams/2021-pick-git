@@ -3,7 +3,7 @@ import { InfiniteData } from "react-query";
 import { useLocation } from "react-router-dom";
 
 import { Post } from "../../@types";
-import useSearchPostData from "../../hooks/useSearchPostData";
+import useSearchPostData from "../../hooks/service/useSearchPostData";
 import { LayoutInPx } from "../../constants/layout";
 import { Container } from "./SearchPostResultPage.style";
 import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";

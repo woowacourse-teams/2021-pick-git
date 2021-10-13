@@ -5,7 +5,7 @@ import { CameraIcon } from "../../assets/icons";
 import { LIMIT } from "../../constants/limits";
 import SnackBarContext from "../../contexts/SnackbarContext";
 import useMessageModal from "../../hooks/common/useMessageModal";
-import useProfileModificationForm from "../../hooks/useProfileModificationForm";
+import useProfileModificationForm from "../../hooks/service/useProfileModificationForm";
 import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
 import PageLoadingWithCover from "../@layout/PageLoadingWithCover/PageLoadingWithCover";
 import Avatar from "../@shared/Avatar/Avatar";

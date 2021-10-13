@@ -15,7 +15,7 @@ import {
   UNAUTHORIZED_TOKEN_ERROR,
   USERNAME,
 } from "../@mocks/shared";
-import useGithubStatistics from "../useGithubStatistics";
+import useGithubStatistics from "../service/useGithubStatistics";
 
 const queryClient = createQueryClient();
 
