@@ -4,7 +4,7 @@ import { ThemeContext } from "styled-components";
 import { GithubStats } from "../../@types";
 import { BookIcon, ClockIcon, IssueIcon, PrIcon, StarIcon } from "../../assets/icons";
 import UserContext from "../../contexts/UserContext";
-import useGithubStatistics from "../../services/hooks/useGithubStatistics";
+import useGithubStatistics from "../../hooks/service/useGithubStatistics";
 import { getImagePreloadPromise } from "../../utils/preloaders";
 import PageLoading from "../@layout/PageLoading/PageLoading";
 import CircleIcon from "../@shared/CircleIcon/CircleIcon";

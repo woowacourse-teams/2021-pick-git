@@ -22,8 +22,8 @@ const PostSelector = ({ infinitePostsData, isFetchingNextPage, onPostSelect, onI
     <Container>
       <InfiniteScrollContainer isLoaderShown={isFetchingNextPage} onIntersect={onIntersect}>
         <Grid>
-          {posts.map((post) => (
-            <GridItem imageUrl={post.imageUrls[0]} onClick={() => onPostSelect(post)}></GridItem>
+          {posts?.map((post) => (
+            <GridItem key={post.id} imageUrl={post.imageUrls[0]} onClick={() => onPostSelect(post)}></GridItem>
           ))}
         </Grid>
       </InfiniteScrollContainer>

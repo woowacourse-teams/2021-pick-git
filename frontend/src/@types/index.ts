@@ -187,4 +187,6 @@ export type PortfolioData = {
   sections: PortfolioSection[];
 };
 
+export type PortfolioSectionType = "project" | "custom";
+
 export type PortfolioSectionList = string[];

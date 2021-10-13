@@ -17,7 +17,7 @@ import Chip from "../@shared/Chip/Chip";
 import PortfolioTextEditor from "../PortfolioTextEditor/PortfolioTextEditor";
 import DropDown, { DropDownItem } from "../@shared/DropDown/DropDown";
 import DateInput from "../@shared/DateInput/DateInput";
-import usePortfolioProjectSection from "../../services/hooks/usePortfolioProject";
+import usePortfolioProjectSection from "../../hooks/service/usePortfolioProject";
 import { PortfolioProject } from "../../@types";
 import { PLACE_HOLDER } from "../../constants/placeholder";
 

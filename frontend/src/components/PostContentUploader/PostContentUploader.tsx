@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useState } from "react";
 import { LIMIT } from "../../constants/limits";
 import { FAILURE_MESSAGE } from "../../constants/messages";
-import useMessageModal from "../../services/hooks/@common/useMessageModal";
+import useMessageModal from "../../hooks/common/useMessageModal";
 import { isValidFilesSize, isValidFilesSizeCount } from "../../utils/postUpload";
 import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
 import ImageSlider from "../@shared/ImageSlider/ImageSlider";
