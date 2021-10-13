@@ -1,5 +1,6 @@
-package com.woowacourse.pickgit.user.domain;
+package com.woowacourse.pickgit.user.domain.repository;
 
+import com.woowacourse.pickgit.user.domain.User;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Pageable;

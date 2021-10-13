@@ -44,7 +44,7 @@ class AuthenticationPrincipalArgumentResolverIntegrationTest {
         oAuthAccessTokenDao =
             new CollectionOAuthAccessTokenDao();
         oAuthService =
-            new OAuthService(null, jwtTokenProvider, oAuthAccessTokenDao, null);
+            new OAuthService(null, jwtTokenProvider, oAuthAccessTokenDao, null, null);
         authenticationPrincipalArgumentResolver =
             new AuthenticationPrincipalArgumentResolver(oAuthService);
     }

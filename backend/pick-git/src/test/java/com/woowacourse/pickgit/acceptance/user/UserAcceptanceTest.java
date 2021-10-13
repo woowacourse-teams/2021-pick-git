@@ -11,6 +11,7 @@ import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
+import com.woowacourse.pickgit.config.SearchEngineCleaner;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
@@ -35,6 +36,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -43,6 +45,9 @@ class UserAcceptanceTest extends AcceptanceTest {
 
     @MockBean
     private OAuthClient oAuthClient;
+
+    @Autowired
+    private SearchEngineCleaner searchEngineCleaner;
 
     private String loginUserAccessToken;
 
@@ -527,6 +532,7 @@ class UserAcceptanceTest extends AcceptanceTest {
                 tuple(targetUser.getName(), true),
                 tuple(unfollowedUser.getName(), false)
             );
+        searchEngineCleaner.clearUsers();
     }
 
     @DisplayName("비 로그인 - 저장된 유저중 유사한 이름을 가진 유저를 검색할 수 있다. (팔로잉 필드 null)")
@@ -550,6 +556,7 @@ class UserAcceptanceTest extends AcceptanceTest {
                 tuple(loginUser.getName(), null),
                 tuple(targetUser.getName(), null)
             );
+        searchEngineCleaner.clearUsers();
     }
 
     @DisplayName("사용자는 활동 통계를 조회할 수 있다.")

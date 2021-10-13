@@ -11,6 +11,7 @@ import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
+import com.woowacourse.pickgit.config.SearchEngineCleaner;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.user.DuplicateFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidFollowException;
@@ -28,7 +29,8 @@ import com.woowacourse.pickgit.user.application.dto.response.ProfileImageEditRes
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
-import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.domain.repository.UserRepository;
+import com.woowacourse.pickgit.user.domain.search.UserSearchEngine;
 import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
 import java.io.File;
 import java.io.FileInputStream;
@@ -55,6 +57,12 @@ class UserServiceIntegrationTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserSearchEngine userSearchEngine;
+
+    @Autowired
+    private SearchEngineCleaner searchEngineCleaner;
 
     @DisplayName("비로그인 유저는 내 프로필을 조회할 수 없다.")
     @Test
@@ -501,8 +509,8 @@ class UserServiceIntegrationTest {
         List<User> searchedUsers = usersInDb.subList(1, usersInDb.size());
         AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto(loginUser.getName());
 
-        userRepository.save(loginUser);
-        searchedUsers.forEach(user -> userRepository.save(user));
+        userSearchEngine.save(userRepository.save(loginUser));
+        userSearchEngine.saveAll(userRepository.saveAll(searchedUsers));
 
         FollowRequestDto requestDto = FollowRequestDto.builder()
             .authUserRequestDto(authUserRequestDto)
@@ -526,6 +534,7 @@ class UserServiceIntegrationTest {
                 tuple(searchedUsers.get(2).getName(), searchedUsers.get(2).getImage(), false),
                 tuple(searchedUsers.get(3).getName(), searchedUsers.get(3).getImage(), false)
             );
+        searchEngineCleaner.clearUsers();
     }
 
     @DisplayName("비 로그인 - 저장된 유저중 유사한 이름을 가진 유저를 검색한다. (팔로잉 필드 null)")
@@ -541,7 +550,7 @@ class UserServiceIntegrationTest {
             .build();
         AuthUserForUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
         List<User> userInDb = UserFactory.mockSearchUsers();
-        userRepository.saveAll(userInDb);
+        userSearchEngine.saveAll(userRepository.saveAll(userInDb));
 
         // when
         List<UserSearchResponseDto> searchResult =
@@ -555,6 +564,7 @@ class UserServiceIntegrationTest {
                 tuple(userInDb.get(1).getName(), userInDb.get(1).getImage(), null),
                 tuple(userInDb.get(2).getName(), userInDb.get(2).getImage(), null)
             );
+        searchEngineCleaner.clearUsers();
     }
 
     @DisplayName("로그인 - 특정 유저의 팔로잉 목록을 조회한다. (팔로잉 필드는 true/false, 본인은 null)")

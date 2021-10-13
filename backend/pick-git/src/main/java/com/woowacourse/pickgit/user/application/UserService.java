@@ -16,9 +16,10 @@ import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseD
 import com.woowacourse.pickgit.user.domain.Contribution;
 import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
 import com.woowacourse.pickgit.user.domain.User;
-import com.woowacourse.pickgit.user.domain.UserRepository;
 import com.woowacourse.pickgit.user.domain.follow.PlatformFollowingRequester;
 import com.woowacourse.pickgit.user.domain.profile.PickGitProfileStorage;
+import com.woowacourse.pickgit.user.domain.repository.UserRepository;
+import com.woowacourse.pickgit.user.domain.search.UserSearchEngine;
 import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final UserSearchEngine userSearchEngine;
     private final PickGitProfileStorage pickGitProfileStorage;
     private final PlatformContributionCalculator platformContributionCalculator;
     private final PlatformFollowingRequester platformFollowingRequester;
@@ -152,7 +154,7 @@ public class UserService {
             userSearchRequestDto.getPage(),
             userSearchRequestDto.getLimit()
         );
-        List<User> users = userRepository.searchByUsernameLike(
+        List<User> users = userSearchEngine.searchByUsernameLike(
             userSearchRequestDto.getKeyword(),
             pageable
         );

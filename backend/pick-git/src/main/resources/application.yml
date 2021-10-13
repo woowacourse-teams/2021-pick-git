@@ -3,3 +3,5 @@ spring:
     include: security, db
   flyway:
     enabled: false
+  main:
+    allow-bean-definition-overriding: true

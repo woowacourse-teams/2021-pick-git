@@ -19,7 +19,7 @@ import com.woowacourse.pickgit.post.domain.like.Like;
 import com.woowacourse.pickgit.post.domain.like.Likes;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.user.domain.User;
-import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.domain.repository.UserRepository;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;

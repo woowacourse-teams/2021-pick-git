@@ -8,7 +8,7 @@ import com.woowacourse.pickgit.comment.domain.CommentRepository;
 import com.woowacourse.pickgit.comment.presentation.dto.response.CommentResponse;
 import com.woowacourse.pickgit.common.request_builder.PickGitRequest;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
-import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.domain.repository.UserRepository;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;

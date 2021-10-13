@@ -19,7 +19,8 @@ import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.user.domain.User;
-import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.domain.repository.UserRepository;
+import com.woowacourse.pickgit.user.domain.search.UserSearchEngine;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -48,6 +49,9 @@ class OAuthServiceIntegrationTest {
     private UserRepository userRepository;
 
     @Autowired
+    private UserSearchEngine userSearchEngine;
+
+    @Autowired
     private StringRedisTemplate redisTemplate;
 
     private JwtTokenProvider jwtTokenProvider;
@@ -67,7 +71,8 @@ class OAuthServiceIntegrationTest {
             oAuthClient,
             jwtTokenProvider,
             oAuthAccessTokenDao,
-            userRepository
+            userRepository,
+            userSearchEngine
         );
     }
 
