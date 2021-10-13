@@ -14,11 +14,12 @@ public class MockGithubOAuthClient implements OAuthClient {
 
     @Override
     public String getAccessToken(String code) {
-        return "oauth.access.token";
+        return "oauth.access.token." + code;
     }
 
     @Override
     public OAuthProfileResponse getGithubProfile(String githubAccessToken) {
-        return TUser.oAuthProfileResponse(githubAccessToken);
+        String[] splitToken = githubAccessToken.split("\\.");
+        return TUser.oAuthProfileResponse(splitToken[3]);
     }
 }
