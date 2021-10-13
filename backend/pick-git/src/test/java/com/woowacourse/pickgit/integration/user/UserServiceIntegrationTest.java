@@ -497,6 +497,7 @@ class UserServiceIntegrationTest {
     @Test
     void searchUser_LoginUser_Success() {
         // given
+        searchEngineCleaner.clearUsers();
         String searchKeyword = "bing";
         UserSearchRequestDto userSearchRequestDto = UserSearchRequestDto
             .builder()
@@ -541,6 +542,7 @@ class UserServiceIntegrationTest {
     @Test
     void searchUser_GuestUser_Success() {
         // given
+        searchEngineCleaner.clearUsers();
         String searchKeyword = "bing";
         UserSearchRequestDto userSearchRequestDto = UserSearchRequestDto
             .builder()

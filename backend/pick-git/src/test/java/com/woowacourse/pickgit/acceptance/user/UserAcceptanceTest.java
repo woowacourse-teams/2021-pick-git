@@ -504,6 +504,7 @@ class UserAcceptanceTest extends AcceptanceTest {
     @Test
     void searchUser_LoginUser_Success() {
         // given
+        searchEngineCleaner.clearUsers();
         authenticatedRequest(
             loginUserAccessToken,
             String.format("/api/profiles/%s/followings?githubFollowing=false", targetUser.getName()),
@@ -539,6 +540,7 @@ class UserAcceptanceTest extends AcceptanceTest {
     @Test
     void searchUser_GuestUser_Success() {
         // when
+        searchEngineCleaner.clearUsers();
         String url = String.format("/api/search/users?keyword=%s&page=0&limit=5", "testUser");
         List<UserSearchResponseDto> response =
             unauthenticatedRequest(
