@@ -505,17 +505,22 @@ class UserAcceptanceTest extends AcceptanceTest {
     void searchUser_LoginUser_Success() {
         // given
         searchEngineCleaner.clearUsers();
+        loginUser = UserFactory.user("logan");
+        loginUserAccessToken = 로그인_되어있음(loginUser).getToken();
+        targetUser = UserFactory.user("logan2");
+        로그인_되어있음(targetUser);
+
         authenticatedRequest(
             loginUserAccessToken,
             String.format("/api/profiles/%s/followings?githubFollowing=false", targetUser.getName()),
             Method.POST,
             HttpStatus.OK
         );
-        User unfollowedUser = UserFactory.user("testUser3");
+        User unfollowedUser = UserFactory.user("logan3");
         로그인_되어있음(unfollowedUser);
 
         // when
-        String url = String.format("/api/search/users?keyword=%s&page=0&limit=5", "testUser");
+        String url = String.format("/api/search/users?keyword=%s&page=0&limit=5", "logan");
         List<UserSearchResponseDto> response =
             authenticatedRequest(
                 loginUserAccessToken,
@@ -541,7 +546,12 @@ class UserAcceptanceTest extends AcceptanceTest {
     void searchUser_GuestUser_Success() {
         // when
         searchEngineCleaner.clearUsers();
-        String url = String.format("/api/search/users?keyword=%s&page=0&limit=5", "testUser");
+        loginUser = UserFactory.user("logan");
+        targetUser = UserFactory.user("logan2");
+        loginUserAccessToken = 로그인_되어있음(loginUser).getToken();
+        로그인_되어있음(targetUser);
+
+        String url = String.format("/api/search/users?keyword=%s&page=0&limit=5", "logan");
         List<UserSearchResponseDto> response =
             unauthenticatedRequest(
                 url,
