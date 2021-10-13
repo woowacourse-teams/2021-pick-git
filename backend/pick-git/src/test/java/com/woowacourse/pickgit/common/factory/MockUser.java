@@ -21,7 +21,7 @@ public class MockUser {
 
         private Long id;
         private String name;
-        private String image = "http://img.com";
+        private String image = "https://github.com/testImage.jpg";
         private String description = "The Best";
         private String githubUrl = "https://github.com/yjksw";
         private String company = "woowacourse";

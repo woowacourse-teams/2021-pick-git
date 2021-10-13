@@ -56,6 +56,7 @@ import com.woowacourse.pickgit.post.presentation.PostController;
 import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
 import com.woowacourse.pickgit.post.presentation.dto.response.LikeResponse;
 import com.woowacourse.pickgit.post.presentation.dto.response.PostUpdateResponse;
+import com.woowacourse.pickgit.unit.ControllerTest;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -70,26 +71,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-@AutoConfigureRestDocs
-@Import(InfrastructureTestConfiguration.class)
-@WebMvcTest(PostController.class)
-@ActiveProfiles("test")
-class PostControllerTest {
+class PostControllerTest extends ControllerTest {
 
     private static final String ACCESS_TOKEN = "testToken";
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @MockBean
-    private PostService postService;
-
-    @MockBean
-    private OAuthService oAuthService;
-
 
     @DisplayName("게시물을 작성할 수 있다. - 사용자")
     @Test

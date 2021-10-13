@@ -13,6 +13,7 @@ import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.exception.comment.CannotDeleteCommentException;
 import com.woowacourse.pickgit.exception.comment.CommentNotFoundException;
+import com.woowacourse.pickgit.integration.IntegrationTest;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.user.domain.User;
@@ -27,11 +28,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-@Import(InfrastructureTestConfiguration.class)
-@Transactional
-@SpringBootTest(webEnvironment = WebEnvironment.NONE)
-@ActiveProfiles("test")
-public class CommentServiceIntegrationTest_delete {
+public class CommentServiceIntegrationTest_delete extends IntegrationTest {
 
     @Autowired
     private CommentService commentService;

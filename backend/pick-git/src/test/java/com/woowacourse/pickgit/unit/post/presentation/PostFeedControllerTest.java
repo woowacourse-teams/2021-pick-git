@@ -17,42 +17,23 @@ import static org.springframework.restdocs.request.RequestDocumentation.paramete
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.PostFactory;
-import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
-import com.woowacourse.pickgit.post.application.PostFeedService;
 import com.woowacourse.pickgit.post.application.dto.request.HomeFeedRequestDto;
 import com.woowacourse.pickgit.post.presentation.PostFeedController;
+import com.woowacourse.pickgit.unit.ControllerTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-@AutoConfigureRestDocs
-@Import(InfrastructureTestConfiguration.class)
-@WebMvcTest(PostFeedController.class)
-@ActiveProfiles("test")
-class PostFeedControllerTest {
+class PostFeedControllerTest extends ControllerTest {
 
     private static final String API_ACCESS_TOKEN = "oauth.access.token";
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private PostFeedService postfeedService;
-
-    @MockBean
-    private OAuthService oAuthService;
 
     @DisplayName("비로그인 유저는 홈피드를 조회할 수 있다.")
     @Test
@@ -60,7 +41,7 @@ class PostFeedControllerTest {
         // given
         given(oAuthService.findRequestUserByToken(any()))
             .willReturn(new GuestUser());
-        given(postfeedService.homeFeed(any(HomeFeedRequestDto.class)))
+        given(postFeedService.homeFeed(any(HomeFeedRequestDto.class)))
             .willReturn(PostFactory.mockPostResponseDtosForGuest());
 
         // when
@@ -114,7 +95,7 @@ class PostFeedControllerTest {
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(any()))
             .willReturn(loginUser);
-        given(postfeedService.homeFeed(any(HomeFeedRequestDto.class)))
+        given(postFeedService.homeFeed(any(HomeFeedRequestDto.class)))
             .willReturn(PostFactory.mockPostResponseDtosForLogin());
 
         // when

@@ -40,7 +40,7 @@ public class OAuthService {
         String githubAccessToken = githubOAuthClient.getAccessToken(code);
 
         OAuthProfileResponse githubProfileResponse =
-            githubOAuthClient.getGithubProfile(githubAccessToken);
+            githubOAuthClient.getGithubProfile(code);
 
         updateUserOrCreateUser(githubProfileResponse);
         String token = createTokenAndSave(githubAccessToken, githubProfileResponse.getName());

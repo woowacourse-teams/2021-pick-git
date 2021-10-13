@@ -8,6 +8,7 @@ import com.woowacourse.pickgit.common.mockapi.MockTagApiRequester;
 import com.woowacourse.pickgit.config.JpaTestConfiguration;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.post.TagFormatException;
+import com.woowacourse.pickgit.integration.IntegrationTest;
 import com.woowacourse.pickgit.tag.application.ExtractionRequestDto;
 import com.woowacourse.pickgit.tag.application.TagService;
 import com.woowacourse.pickgit.tag.application.TagsDto;
@@ -18,27 +19,26 @@ import com.woowacourse.pickgit.tag.infrastructure.GithubTagExtractor;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 
-@Import(JpaTestConfiguration.class)
-@DataJpaTest
-class TagServiceIntegrationTest {
+class TagServiceIntegrationTest extends IntegrationTest {
 
     private TagService tagService;
 
     @Autowired
     private TagRepository tagRepository;
 
-    @Autowired
-    private TestEntityManager entityManager;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     private final String accessToken = "oauth.access.token";
     private final String userName = "jipark3";

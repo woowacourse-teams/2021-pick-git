@@ -3,18 +3,12 @@ package com.woowacourse.pickgit.acceptance.user;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
-import static org.mockito.BDDMockito.given;
 
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;
-import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
-import com.woowacourse.pickgit.authentication.domain.OAuthClient;
-import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
-import com.woowacourse.pickgit.config.SearchEngineCleaner;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
-import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.presentation.dto.request.ProfileDescriptionRequest;
@@ -22,7 +16,6 @@ import com.woowacourse.pickgit.user.presentation.dto.response.ContributionRespon
 import com.woowacourse.pickgit.user.presentation.dto.response.FollowResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.ProfileDescriptionResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.ProfileImageEditResponse;
-import com.woowacourse.pickgit.user.presentation.dto.response.UserProfileResponse;
 import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
@@ -36,18 +29,10 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 class UserAcceptanceTest extends AcceptanceTest {
-
-    @MockBean
-    private OAuthClient oAuthClient;
-
-    @Autowired
-    private SearchEngineCleaner searchEngineCleaner;
 
     private String loginUserAccessToken;
 
@@ -61,161 +46,8 @@ class UserAcceptanceTest extends AcceptanceTest {
         loginUser = UserFactory.user("testUser");
         targetUser = UserFactory.user("testUser2");
 
-        loginUserAccessToken = 로그인_되어있음(loginUser).getToken();
-        로그인_되어있음(targetUser);
-    }
-
-    @DisplayName("로그인된 사용자는 자신의 프로필을 조회할 수 있다.")
-    @Test
-    void getAuthenticatedUserProfile_LoginUser_Success() {
-        // given
-        UserProfileResponseDto responseDto = UserFactory.mockLoginUserProfileResponseDto();
-
-        // when
-        UserProfileResponse response =
-            authenticatedRequest(
-                loginUserAccessToken,
-                "/api/profiles/me",
-                Method.GET,
-                HttpStatus.OK
-            ).as(UserProfileResponse.class);
-
-        // then
-        assertThat(response)
-            .usingRecursiveComparison()
-            .isEqualTo(responseDto);
-    }
-
-    @DisplayName("유효하지 않은 토큰을 지닌 사용자는 자신의 프로필을 조회할 수 없다. - 401 예외")
-    @Test
-    void getAuthenticatedUserProfile_LoginUserWithInvalidToken_401Exception() {
-        // when
-        ApiErrorResponse response =
-            authenticatedRequest(
-                "testToken",
-                "/api/profiles/me",
-                Method.GET,
-                HttpStatus.UNAUTHORIZED
-            ).as(ApiErrorResponse.class);
-
-        // then
-        assertThat(response.getErrorCode()).isEqualTo("A0001");
-    }
-
-    @DisplayName("토큰이 없는 사용자는 자신의 프로필을 조회할 수 없다. - 401 예외")
-    @Test
-    void getAuthenticatedUserProfile_LoginUserWithoutToken_401Exception() {
-        // when
-        ApiErrorResponse response =
-            unauthenticatedRequest(
-                "/api/profiles/me",
-                Method.GET,
-                HttpStatus.UNAUTHORIZED
-            ).as(ApiErrorResponse.class);
-
-        // then
-        assertThat(response.getErrorCode()).isEqualTo("A0001");
-    }
-
-    @DisplayName("로그인된 사용자는 팔로우한 유저의 프로필을 조회할 수 있다.")
-    @Test
-    void getUserProfile_LoginUserIsFollowing_Success() {
-        // given
-        UserProfileResponseDto responseDto =
-            UserFactory.mockLoginUserProfileIsFollowingResponseDto();
-
-        authenticatedRequest(
-            loginUserAccessToken,
-            String.format("/api/profiles/%s/followings?githubFollowing=false",
-                targetUser.getName()),
-            Method.POST,
-            HttpStatus.OK
-        );
-
-        // when
-        UserProfileResponse response =
-            authenticatedRequest(
-                loginUserAccessToken,
-                String.format("/api/profiles/%s", targetUser.getName()),
-                Method.GET,
-                HttpStatus.OK
-            ).as(UserProfileResponse.class);
-
-        // then
-        assertThat(response)
-            .usingRecursiveComparison()
-            .isEqualTo(responseDto);
-    }
-
-    @DisplayName("로그인된 사용자는 팔로우하지 않은 유저의 프로필을 조회할 수 있다.")
-    @Test
-    void getUserProfile_LoginUserIsNotFollowing_Success() {
-        // given
-        UserProfileResponseDto responseDto =
-            UserFactory.mockLoginUserProfileIsNotFollowingResponseDto();
-
-        // when
-        UserProfileResponse response =
-            authenticatedRequest(
-                loginUserAccessToken,
-                String.format("/api/profiles/%s", targetUser.getName()),
-                Method.GET,
-                HttpStatus.OK
-            ).as(UserProfileResponse.class);
-
-        // then
-        assertThat(response)
-            .usingRecursiveComparison()
-            .isEqualTo(responseDto);
-    }
-
-    @DisplayName("로그인된 사용자는 존재하지 않는 유저 이름으로 프로필을 조회할 수 없다. - 400 예외")
-    @Test
-    void getUserProfile_LoginUser_400Exception() {
-        // when
-        ApiErrorResponse response =
-            authenticatedRequest(
-                loginUserAccessToken,
-                String.format("/api/profiles/%s", "invalidName"),
-                Method.GET,
-                HttpStatus.BAD_REQUEST
-            ).as(ApiErrorResponse.class);
-
-        // then
-        assertThat(response.getErrorCode()).isEqualTo("U0001");
-    }
-
-    @DisplayName("게스트 유저는 다른 유저의 프로필을 조회할 수 있다.")
-    @Test
-    void getUserProfile_GuestUser_Success() {
-        //given
-        UserProfileResponseDto responseDto = UserFactory.mockGuestUserProfileResponseDto();
-
-        //when
-        UserProfileResponse response = unauthenticatedRequest(
-            String.format("/api/profiles/%s", loginUser.getName()),
-            Method.GET,
-            HttpStatus.OK
-        ).as(UserProfileResponse.class);
-
-        //then
-        assertThat(response)
-            .usingRecursiveComparison()
-            .isEqualTo(responseDto);
-    }
-
-    @DisplayName("게스트 유저는 존재하지 않는 유저 이름으로 프로필을 조회할 수 없다. - 400 예외")
-    @Test
-    void getUserProfile_GuestUser_400Exception() {
-        // when
-        ApiErrorResponse response = unauthenticatedRequest(
-            String.format("/api/profiles/%s", "invalidName"),
-            Method.GET,
-            HttpStatus.BAD_REQUEST
-        ).as(ApiErrorResponse.class);
-
-        // then
-        assertThat(response.getErrorCode()).isEqualTo("U0001");
+        loginUserAccessToken = 로그인_되어있음(loginUser.getName()).getToken();
+        로그인_되어있음(targetUser.getName());
     }
 
     @DisplayName("로그인되지 않은 사용자는 target 유저를 팔로우 할 수 없다.")
@@ -504,20 +336,14 @@ class UserAcceptanceTest extends AcceptanceTest {
     @Test
     void searchUser_LoginUser_Success() {
         // given
-        searchEngineCleaner.clearUsers();
-        loginUser = UserFactory.user("logan");
-        loginUserAccessToken = 로그인_되어있음(loginUser).getToken();
-        targetUser = UserFactory.user("logan2");
-        로그인_되어있음(targetUser);
-
         authenticatedRequest(
             loginUserAccessToken,
             String.format("/api/profiles/%s/followings?githubFollowing=false", targetUser.getName()),
             Method.POST,
             HttpStatus.OK
         );
-        User unfollowedUser = UserFactory.user("logan3");
-        로그인_되어있음(unfollowedUser);
+        User unfollowedUser = UserFactory.user("testUser3");
+        로그인_되어있음(unfollowedUser.getName());
 
         // when
         String url = String.format("/api/search/users?keyword=%s&page=0&limit=5", "logan");
@@ -538,19 +364,12 @@ class UserAcceptanceTest extends AcceptanceTest {
                 tuple(targetUser.getName(), true),
                 tuple(unfollowedUser.getName(), false)
             );
-        searchEngineCleaner.clearUsers();
     }
 
     @DisplayName("비 로그인 - 저장된 유저중 유사한 이름을 가진 유저를 검색할 수 있다. (팔로잉 필드 null)")
     @Test
     void searchUser_GuestUser_Success() {
         // when
-        searchEngineCleaner.clearUsers();
-        loginUser = UserFactory.user("logan");
-        targetUser = UserFactory.user("logan2");
-        loginUserAccessToken = 로그인_되어있음(loginUser).getToken();
-        로그인_되어있음(targetUser);
-
         String url = String.format("/api/search/users?keyword=%s&page=0&limit=5", "logan");
         List<UserSearchResponseDto> response =
             unauthenticatedRequest(
@@ -568,7 +387,6 @@ class UserAcceptanceTest extends AcceptanceTest {
                 tuple(loginUser.getName(), null),
                 tuple(targetUser.getName(), null)
             );
-        searchEngineCleaner.clearUsers();
     }
 
     @DisplayName("사용자는 활동 통계를 조회할 수 있다.")
@@ -644,42 +462,6 @@ class UserAcceptanceTest extends AcceptanceTest {
             .when().request(method, url)
             .then().log().all()
             .statusCode(httpStatus.value())
-            .extract();
-    }
-
-    private OAuthTokenResponse 로그인_되어있음(User user) {
-        // when
-        OAuthTokenResponse response = 로그인_요청(user).as(OAuthTokenResponse.class);
-
-        // then
-        assertThat(response.getToken()).isNotBlank();
-
-        return response;
-    }
-
-    private ExtractableResponse<Response> 로그인_요청(User user) {
-        // given
-        String oauthCode = "1234";
-        String accessToken = "oauth.access.token";
-
-        OAuthProfileResponse oAuthProfileResponse = new OAuthProfileResponse(
-            user.getName(), user.getImage(), user.getDescription(), user.getGithubUrl(),
-            user.getCompany(), user.getLocation(), user.getWebsite(), user.getTwitter()
-        );
-
-        given(oAuthClient.getAccessToken(oauthCode))
-            .willReturn(accessToken);
-        given(oAuthClient.getGithubProfile(accessToken))
-            .willReturn(oAuthProfileResponse);
-
-        // then
-        return RestAssured
-            .given().log().all()
-            .accept(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .get("/api/afterlogin?code=" + oauthCode)
-            .then().log().all()
-            .statusCode(HttpStatus.OK.value())
             .extract();
     }
 }
