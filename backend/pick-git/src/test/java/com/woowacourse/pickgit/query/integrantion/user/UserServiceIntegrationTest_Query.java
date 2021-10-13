@@ -9,7 +9,6 @@ import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.UserFactory;
-import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
 import com.woowacourse.pickgit.integration.IntegrationTest;
@@ -21,17 +20,13 @@ import com.woowacourse.pickgit.user.application.dto.request.UserSearchRequestDto
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
-import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.domain.repository.UserRepository;
+import com.woowacourse.pickgit.user.domain.search.UserSearchEngine;
 import java.util.List;
-import javax.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
 
 public class UserServiceIntegrationTest_Query extends IntegrationTest {
 
@@ -40,6 +35,9 @@ public class UserServiceIntegrationTest_Query extends IntegrationTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserSearchEngine userSearchEngine;
 
     @DisplayName("비로그인 유저는 내 프로필을 조회할 수 없다.")
     @Test
@@ -168,8 +166,8 @@ public class UserServiceIntegrationTest_Query extends IntegrationTest {
         List<User> searchedUsers = usersInDb.subList(1, usersInDb.size());
         AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto(loginUser.getName());
 
-        userRepository.save(loginUser);
-        searchedUsers.forEach(user -> userRepository.save(user));
+        userSearchEngine.save(userRepository.save(loginUser));
+        userSearchEngine.saveAll(userRepository.saveAll(searchedUsers));
 
         FollowRequestDto requestDto = FollowRequestDto.builder()
             .authUserRequestDto(authUserRequestDto)
@@ -208,7 +206,7 @@ public class UserServiceIntegrationTest_Query extends IntegrationTest {
             .build();
         AuthUserForUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
         List<User> userInDb = UserFactory.mockSearchUsers();
-        userRepository.saveAll(userInDb);
+        userSearchEngine.saveAll(userRepository.saveAll(userInDb));
 
         // when
         List<UserSearchResponseDto> searchResult =

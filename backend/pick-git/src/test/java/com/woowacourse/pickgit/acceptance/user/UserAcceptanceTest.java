@@ -346,7 +346,7 @@ class UserAcceptanceTest extends AcceptanceTest {
         로그인_되어있음(unfollowedUser.getName());
 
         // when
-        String url = String.format("/api/search/users?keyword=%s&page=0&limit=5", "logan");
+        String url = String.format("/api/search/users?keyword=%s&page=0&limit=5", "testUser");
         List<UserSearchResponseDto> response =
             authenticatedRequest(
                 loginUserAccessToken,
@@ -370,7 +370,7 @@ class UserAcceptanceTest extends AcceptanceTest {
     @Test
     void searchUser_GuestUser_Success() {
         // when
-        String url = String.format("/api/search/users?keyword=%s&page=0&limit=5", "logan");
+        String url = String.format("/api/search/users?keyword=%s&page=0&limit=5", "testUser");
         List<UserSearchResponseDto> response =
             unauthenticatedRequest(
                 url,
