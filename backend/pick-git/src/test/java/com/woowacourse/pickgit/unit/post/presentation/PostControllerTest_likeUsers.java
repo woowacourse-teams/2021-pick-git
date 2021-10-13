@@ -31,6 +31,7 @@ import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.request.AuthUserForPostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeUsersResponseDto;
 import com.woowacourse.pickgit.post.presentation.PostController;
+import com.woowacourse.pickgit.unit.ControllerTest;
 import com.woowacourse.pickgit.user.domain.User;
 import java.util.List;
 import org.apache.http.HttpHeaders;
@@ -46,23 +47,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-@AutoConfigureRestDocs
-@Import(InfrastructureTestConfiguration.class)
-@WebMvcTest(PostController.class)
-@ActiveProfiles("test")
-public class PostControllerTest_likeUsers {
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private PostService postService;
-
-    @MockBean
-    private OAuthService oAuthService;
+public class PostControllerTest_likeUsers extends ControllerTest {
 
     @DisplayName("게시물의 좋아요 리스트를 조회할 수 있다. - 로그인/성공")
     @Test

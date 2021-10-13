@@ -37,6 +37,7 @@ import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
+import com.woowacourse.pickgit.unit.ControllerTest;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowRequestDto;
@@ -68,22 +69,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-@AutoConfigureRestDocs
-@WebMvcTest(UserController.class)
-@ActiveProfiles("test")
-class UserControllerTest {
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private OAuthService oAuthService;
-
-    @MockBean
-    private UserService userService;
+class UserControllerTest extends ControllerTest {
 
     @DisplayName("로그인 되어있을 때")
     @Nested

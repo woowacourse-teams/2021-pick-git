@@ -34,6 +34,7 @@ import com.woowacourse.pickgit.comment.presentation.CommentController;
 import com.woowacourse.pickgit.comment.presentation.dto.request.ContentRequest;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.exception.post.CommentFormatException;
+import com.woowacourse.pickgit.unit.ControllerTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,23 +48,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-@AutoConfigureRestDocs
-@Import(InfrastructureTestConfiguration.class)
-@WebMvcTest(CommentController.class)
-@ActiveProfiles("test")
-public class CommentControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private OAuthService oAuthService;
-
-    @MockBean
-    private CommentService commentService;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+public class CommentControllerTest extends ControllerTest {
 
     @DisplayName("특정 Post에 Comment을 추가한다.")
     @Test

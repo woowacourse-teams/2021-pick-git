@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.integration.post;
+package com.woowacourse.pickgit.query.integrantion.post;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
@@ -8,6 +8,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.exception.post.IllegalSearchTypeException;
+import com.woowacourse.pickgit.integration.IntegrationTest;
 import com.woowacourse.pickgit.post.application.PostDtoAssembler;
 import com.woowacourse.pickgit.post.application.PostFeedService;
 import com.woowacourse.pickgit.post.application.dto.request.SearchPostsRequestDto;
@@ -29,8 +30,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-@Transactional
-public class PostFeedServiceIntegrationTest_search extends AcceptanceTest {
+public class PostFeedServiceIntegrationTest_search extends IntegrationTest {
 
     @Autowired
     private PostFeedService postFeedService;

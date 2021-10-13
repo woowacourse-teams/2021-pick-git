@@ -29,6 +29,7 @@ import com.woowacourse.pickgit.comment.application.dto.response.CommentResponseD
 import com.woowacourse.pickgit.comment.domain.Comment;
 import com.woowacourse.pickgit.comment.presentation.CommentController;
 import com.woowacourse.pickgit.common.factory.UserFactory;
+import com.woowacourse.pickgit.unit.ControllerTest;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,20 +41,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-@AutoConfigureRestDocs
-@WebMvcTest(CommentController.class)
-public class CommentControllerTest_queryComments {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private CommentService commentService;
-
-    @MockBean
-    private OAuthService oAuthService;
-
-    private ObjectMapper objectMapper = new ObjectMapper();
+public class CommentControllerTest_queryComments extends ControllerTest { ;
 
     @DisplayName("사용자는 특정 Post의 Comment를 요청할 수 있다.")
     @Test

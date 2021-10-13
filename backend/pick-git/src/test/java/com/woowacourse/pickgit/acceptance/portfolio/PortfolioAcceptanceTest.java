@@ -34,9 +34,6 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
     private static final String USERNAME = "dani";
     private static final String ANOTHER_USERNAME = "neozal";
 
-    @MockBean
-    private OAuthClient oAuthClient;
-
     @Autowired
     private TagRepository tagRepository;
 
@@ -49,52 +46,6 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
     @DisplayName("사용자는")
     @Nested
     class LoginUser {
-
-        @DisplayName("포트폴리오를 조회한다.")
-        @Nested
-        class read {
-
-            @DisplayName("나의 포트폴리오 - 성공")
-            @Test
-            void read_LoginUserWithMine_Success() {
-                // given
-                String token = 로그인_되어있음(USERNAME).getToken();
-
-                PortfolioResponse expected = PortfolioFactory
-                    .mockPortfolioResponse(USERNAME);
-
-                // when
-                PortfolioResponse response = authenticatedWithReadApi(token, USERNAME)
-                    .as(PortfolioResponse.class);
-
-                // then
-                assertThat(response)
-                    .usingRecursiveComparison()
-                    .ignoringFields("createdAt", "updatedAt")
-                    .isEqualTo(expected);
-            }
-
-            @DisplayName("남의 포트폴리오 - 성공")
-            @Test
-            void read_LoginUserWithYours_Success() {
-                // given
-                String token = 로그인_되어있음(USERNAME).getToken();
-                로그인_되어있음(ANOTHER_USERNAME);
-
-                PortfolioResponse expected = PortfolioFactory
-                    .mockPortfolioResponse(ANOTHER_USERNAME);
-
-                // when
-                PortfolioResponse response = authenticatedWithReadApi(token, ANOTHER_USERNAME)
-                    .as(PortfolioResponse.class);
-
-                // then
-                assertThat(response)
-                    .usingRecursiveComparison()
-                    .ignoringFields("createdAt", "updatedAt")
-                    .isEqualTo(expected);
-            }
-        }
 
         @DisplayName("포트폴리오를 수정한다.")
         @Nested
@@ -270,43 +221,6 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
     @Nested
     class GuestUser {
 
-        @DisplayName("포트폴리오를 조회한다.")
-        @Nested
-        class read {
-
-            @DisplayName("남의 포트폴리오, 포트폴리오가 존재하는 경우 - 성공")
-            @Test
-            void read_GuestUserWithExistingYours_Success() {
-                // given
-                String token = 로그인_되어있음(USERNAME).getToken();
-                authenticatedWithReadApi(token, USERNAME);
-
-                PortfolioResponse expected = PortfolioFactory
-                    .mockPortfolioResponse(USERNAME);
-
-                // when
-                PortfolioResponse response = unauthenticatedWithReadApi(OK)
-                    .as(PortfolioResponse.class);
-
-                // then
-                assertThat(response)
-                    .usingRecursiveComparison()
-                    .ignoringFields("createdAt", "updatedAt")
-                    .isEqualTo(expected);
-            }
-
-            @DisplayName("남의 포트폴리오, 포트폴리오가 존재하지 않는 경우 - 실패")
-            @Test
-            void read_GuestUserWithNonExistingYours_Fail() {
-                // when
-                ApiErrorResponse response = unauthenticatedWithReadApi(BAD_REQUEST)
-                    .as(ApiErrorResponse.class);
-
-                // then
-                assertThat(response.getErrorCode()).isEqualTo("R0001");
-            }
-        }
-
         @DisplayName("포트폴리오를 수정한다.")
         @Nested
         class update {
@@ -371,40 +285,6 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
             .put("/api/portfolios")
             .then().log().all()
             .statusCode(UNAUTHORIZED.value())
-            .extract();
-    }
-
-    private OAuthTokenResponse 로그인_되어있음(String name) {
-        OAuthTokenResponse response = 로그인_요청(name)
-            .as(OAuthTokenResponse.class);
-
-        assertThat(response.getToken()).isNotBlank();
-
-        return response;
-    }
-
-    private ExtractableResponse<Response> 로그인_요청(String name) {
-        // given
-        String oauthCode = "1234";
-        String accessToken = "oauth.access.token";
-
-        OAuthProfileResponse oAuthProfileResponse = new OAuthProfileResponse(
-            name, "image", "hi~", "github.com/",
-            null, null, null, null
-        );
-
-        given(oAuthClient.getAccessToken(oauthCode))
-            .willReturn(accessToken);
-        given(oAuthClient.getGithubProfile(accessToken))
-            .willReturn(oAuthProfileResponse);
-
-        // when
-        return RestAssured.given().log().all()
-            .accept(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .get("/api/afterlogin?code=" + oauthCode)
-            .then().log().all()
-            .statusCode(OK.value())
             .extract();
     }
 }

@@ -36,7 +36,7 @@ import org.springframework.test.context.ActiveProfiles;
 class OAuthServiceTest {
 
     private static final String GITHUB_CODE = "oauth authorization code";
-    private static final String OAUTH_ACCESS_TOKEN = "oauth access token";
+    private static final String OAUTH_ACCESS_TOKEN = "oauth.access.token";
     private static final String JWT_TOKEN = "jwt token";
 
     @Mock
@@ -88,9 +88,9 @@ class OAuthServiceTest {
         );
 
         // mock
-        given(oAuthClient.getAccessToken(GITHUB_CODE))
+        given(oAuthClient.getAccessToken(anyString()))
             .willReturn(OAUTH_ACCESS_TOKEN);
-        given(oAuthClient.getGithubProfile(OAUTH_ACCESS_TOKEN))
+        given(oAuthClient.getGithubProfile(anyString()))
             .willReturn(githubProfileResponse);
         given(userRepository.findByBasicProfile_Name(githubProfileResponse.getName()))
             .willReturn(Optional.empty());
@@ -142,9 +142,9 @@ class OAuthServiceTest {
         );
 
         // mock
-        given(oAuthClient.getAccessToken(GITHUB_CODE))
+        given(oAuthClient.getAccessToken(anyString()))
             .willReturn(OAUTH_ACCESS_TOKEN);
-        given(oAuthClient.getGithubProfile(OAUTH_ACCESS_TOKEN))
+        given(oAuthClient.getGithubProfile(anyString()))
             .willReturn(githubProfileResponse);
         given(userRepository.findByBasicProfile_Name(githubProfileResponse.getName()))
             .willReturn(Optional.of(user));

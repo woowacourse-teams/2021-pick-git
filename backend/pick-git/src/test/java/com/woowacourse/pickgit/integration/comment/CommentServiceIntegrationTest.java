@@ -11,6 +11,7 @@ import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.exception.post.CommentFormatException;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
+import com.woowacourse.pickgit.integration.IntegrationTest;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.user.domain.User;
@@ -27,11 +28,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-@Import(InfrastructureTestConfiguration.class)
-@Transactional
-@SpringBootTest(webEnvironment = WebEnvironment.NONE)
-@ActiveProfiles("test")
-public class CommentServiceIntegrationTest {
+public class CommentServiceIntegrationTest extends IntegrationTest {
 
     @Autowired
     private CommentService commentService;

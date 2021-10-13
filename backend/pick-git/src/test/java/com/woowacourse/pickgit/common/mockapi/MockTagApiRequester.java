@@ -13,6 +13,7 @@ public class MockTagApiRequester implements PlatformTagApiRequester {
     public String requestTags(String url, String accessToken) {
         String validUrl =
             "https://api.github.com/repos/" + USER_NAME + "/" + REPOSITORY_NAME + "/languages";
+
         if (!accessToken.equals(TESTER_ACCESS_TOKEN)) {
             throw new PlatformHttpErrorException();
         }
