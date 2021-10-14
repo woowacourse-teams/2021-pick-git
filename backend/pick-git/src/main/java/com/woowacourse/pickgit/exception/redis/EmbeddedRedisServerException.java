@@ -10,10 +10,10 @@ public class EmbeddedRedisServerException extends ApplicationException {
     private static final String MESSAGE = "Redis 내장 서버 연동 에러";
 
     public EmbeddedRedisServerException() {
-        super(ERROR_CODE, HTTP_STATUS, MESSAGE);
+        this(ERROR_CODE, HTTP_STATUS, MESSAGE);
     }
 
-    public EmbeddedRedisServerException(
+    private EmbeddedRedisServerException(
         String errorCode,
         HttpStatus httpStatus,
         String message
