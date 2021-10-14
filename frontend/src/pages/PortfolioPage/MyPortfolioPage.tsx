@@ -204,12 +204,18 @@ const MyPortfolioPage = () => {
     }
   };
 
+<<<<<<< HEAD
   const handleSlideDown = () => {
     hideBottomSlider();
   }
 
   const handleSetContacts = () => {
     showBottomSlider();
+=======
+  const handleWheelEvent: React.WheelEventHandler<HTMLElement> = (event) => {
+    event.preventDefault();
+    console.log("wheel");
+>>>>>>> 2673ed9 (fix: console 에 뜨는 동적 컴포넌트 key 관련 에러 제거)
   };
 
   useEffect(() => {
