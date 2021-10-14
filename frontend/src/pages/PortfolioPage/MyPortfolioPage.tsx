@@ -201,6 +201,11 @@ const MyPortfolioPage = () => {
     }
   };
 
+  const handleWheelEvent: React.WheelEventHandler<HTMLElement> = (event) => {
+    event.preventDefault();
+    console.log("wheel");
+  };
+
   useEffect(() => {
     if (!remotePortfolio || !remotePortfolio.updatedAt) {
       return;
@@ -271,7 +276,7 @@ const MyPortfolioPage = () => {
           onUploadPortfolio={handleUploadPortfolio}
         />
       </ScrollActiveHeader>
-      <Container ref={containerRef}>
+      <Container ref={containerRef} onWheel={handleWheelEvent}>
         <FullPage isVerticalCenter={true}>
           <ToggleButton
             toggleButtonText="프로필 사진 보이기"
