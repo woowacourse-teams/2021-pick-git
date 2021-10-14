@@ -93,8 +93,8 @@ const PortfolioDocument = ({ profile, portfolio }: PortfolioDocumentProps) => {
                 <View style={styles.project.content}>
                   <Text style={{ marginRight: 10 }}>{project.content}</Text>
                   <View style={styles.project.tagList} wrap={false}>
-                    {project.tags.map((tag) => (
-                      <Tag key={tag.id} text={tag.name} />
+                    {project.tags.map((tag, i) => (
+                      <Tag key={tag.id ?? "" + i} text={tag.name} />
                     ))}
                   </View>
                 </View>

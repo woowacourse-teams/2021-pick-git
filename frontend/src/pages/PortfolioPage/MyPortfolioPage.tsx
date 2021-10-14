@@ -203,6 +203,10 @@ const MyPortfolioPage = () => {
   useEffect(() => {
     const localUpdateTime = getPortfolioLocalUpdateTime();
 
+    console.log(portfolioIntro);
+    console.log(portfolioProjects);
+    console.log(portfolioSections);
+
     if (remotePortfolio && remotePortfolio.updatedAt && localUpdateTime < new Date(remotePortfolio.updatedAt)) {
       const intro = {
         name: currentUsername,
