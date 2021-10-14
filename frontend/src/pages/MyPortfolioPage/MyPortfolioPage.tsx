@@ -197,6 +197,11 @@ const MyPortfolioPage = () => {
     }
   };
 
+  const handleWheelEvent: React.WheelEventHandler<HTMLElement> = (event) => {
+    event.preventDefault();
+    console.log("wheel");
+  };
+
   useEffect(() => {
     const localUpdateTime = getPortfolioLocalUpdateTime();
 
@@ -258,7 +263,7 @@ const MyPortfolioPage = () => {
           onUploadPortfolio={handleUploadPortfolio}
         />
       </ScrollActiveHeader>
-      <Container ref={containerRef}>
+      <Container ref={containerRef} onWheel={handleWheelEvent}>
         <FullPage isVerticalCenter={true}>
           <ToggleButton
             toggleButtonText="프로필 사진 보이기"
@@ -308,8 +313,8 @@ const MyPortfolioPage = () => {
             </DetailInfo>
           </ContactWrapper>
         </FullPage>
-        {portfolioProjects.map((portfolioProject) => (
-          <FullPage isVerticalCenter={true} key={portfolioProject.id}>
+        {portfolioProjects.map((portfolioProject, index) => (
+          <FullPage isVerticalCenter={true} key={portfolioProject.id ?? index}>
             <PortfolioProjectSection
               isEditable={true}
               project={portfolioProject}
@@ -326,8 +331,8 @@ const MyPortfolioPage = () => {
             </CloseButtonWrapper>
           </FullPage>
         ))}
-        {portfolioSections.map((portfolioSection) => (
-          <FullPage key={portfolioSection.id}>
+        {portfolioSections.map((portfolioSection, index) => (
+          <FullPage key={portfolioSection.id ?? index}>
             <PortfolioTextEditor
               cssProp={SectionNameCSS}
               value={portfolioSection.name}

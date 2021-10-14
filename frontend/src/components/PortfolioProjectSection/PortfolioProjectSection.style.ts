@@ -54,6 +54,8 @@ export const ProjectType = styled.span(() => ProjectTypeCSS);
 export const ProjectDateCSS = css`
   width: 7rem;
   text-align: center;
+  background: none;
+  border: none;
 
   ${setLaptopMediaQuery`
     width: 10rem;

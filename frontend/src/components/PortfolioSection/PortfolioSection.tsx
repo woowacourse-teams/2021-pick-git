@@ -21,6 +21,7 @@ import {
 import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
 import useMessageModal from "../../hooks/common/useMessageModal";
 import { FAILURE_MESSAGE } from "../../constants/messages";
+import { Fragment } from "react";
 
 export interface Props {
   section: PortfolioSection;
@@ -108,7 +109,7 @@ const PortfolioSection = ({ section, isEditable, setSection }: Props) => {
       </CategoriesWrapper>
       <DescriptionsWrapper>
         {item.descriptions.map((description, descriptionIndex) => (
-          <>
+          <Fragment key={description.id ?? descriptionIndex}>
             <Description>
               <PortfolioTextEditor
                 value={description.value}
@@ -132,7 +133,7 @@ const PortfolioSection = ({ section, isEditable, setSection }: Props) => {
                 <SVGIcon icon="AddCircleIcon" onClick={() => handleAddBlankDescription(sectionIndex)} />
               </DescriptionAddIconWrapper>
             )}
-          </>
+          </Fragment>
         ))}
       </DescriptionsWrapper>
     </SectionContentWrapper>
