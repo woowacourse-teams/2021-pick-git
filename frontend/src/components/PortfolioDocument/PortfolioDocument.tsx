@@ -59,7 +59,7 @@ const PortfolioDocument = ({ profile, portfolio }: PortfolioDocumentProps) => {
           <View style={styles.profile.basic}>
             {portfolio?.intro.isProfileShown ? (
               <View style={styles.profile.imageWrapper}>
-                <Image style={styles.profile.image} src={profile?.imageUrl} />
+                <Image style={styles.profile.image} src={profile?.imageUrl ?? ""} />
               </View>
             ) : (
               <View style={{ width: 0, height: 0 }} />
@@ -99,7 +99,7 @@ const PortfolioDocument = ({ profile, portfolio }: PortfolioDocumentProps) => {
                   </View>
                 </View>
                 <View style={styles.project.thumbnailWrapper}>
-                  <Image style={styles.project.thumbnail} src={project.imageUrl} />
+                  <Image style={styles.project.thumbnail} src={project.imageUrl ?? ""} />
                 </View>
               </View>
             </View>
