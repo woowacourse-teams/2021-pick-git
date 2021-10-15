@@ -1,6 +1,9 @@
 package com.woowacourse.pickgit.portfolio.presentation.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import lombok.Builder;
 
@@ -8,12 +11,21 @@ import lombok.Builder;
 public class ProjectRequest {
 
     private Long id;
+
     private String name;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate startDate;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate endDate;
+
     private String type;
+
     private String imageUrl;
+
     private String content;
+
     private List<TagRequest> tags;
 
     private ProjectRequest() {
@@ -22,8 +34,8 @@ public class ProjectRequest {
     public ProjectRequest(
         Long id,
         String name,
-        LocalDateTime startDate,
-        LocalDateTime endDate,
+        LocalDate startDate,
+        LocalDate endDate,
         String type,
         String imageUrl,
         String content,
@@ -48,11 +60,11 @@ public class ProjectRequest {
     }
 
     public LocalDateTime getStartDate() {
-        return startDate;
+        return LocalDateTime.of(startDate, LocalTime.now());
     }
 
     public LocalDateTime getEndDate() {
-        return endDate;
+        return LocalDateTime.of(endDate, LocalTime.now());
     }
 
     public String getType() {

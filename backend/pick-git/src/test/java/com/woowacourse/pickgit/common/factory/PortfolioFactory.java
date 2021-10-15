@@ -10,6 +10,7 @@ import com.woowacourse.pickgit.portfolio.presentation.dto.request.ProjectRequest
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.SectionRequest;
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.TagRequest;
 import com.woowacourse.pickgit.portfolio.presentation.dto.response.PortfolioResponse;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -132,8 +133,8 @@ public class PortfolioFactory {
         return ProjectRequest.builder()
             .id(null)
             .name("pickgit")
-            .startDate(null)
-            .endDate(null)
+            .startDate(LocalDate.of(2021, 4, 18))
+            .endDate(LocalDate.of(2021, 10, 15))
             .type("team")
             .imageUrl("image")
             .content("pickgit")

@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.portfolio.presentation.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
@@ -8,14 +9,25 @@ import lombok.Builder;
 public class PortfolioRequest {
 
     private Long id;
+
     private String name;
+
     private boolean profileImageShown;
+
     private String profileImageUrl;
+
     private String introduction;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime updatedAt;
+
     private List<ContactRequest> contacts;
+
     private List<ProjectRequest> projects;
+
     private List<SectionRequest> sections;
 
     private PortfolioRequest() {
