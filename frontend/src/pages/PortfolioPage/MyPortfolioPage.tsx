@@ -204,18 +204,12 @@ const MyPortfolioPage = () => {
     }
   };
 
-<<<<<<< HEAD
   const handleSlideDown = () => {
     hideBottomSlider();
-  }
+  };
 
   const handleSetContacts = () => {
     showBottomSlider();
-=======
-  const handleWheelEvent: React.WheelEventHandler<HTMLElement> = (event) => {
-    event.preventDefault();
-    console.log("wheel");
->>>>>>> 2673ed9 (fix: console 에 뜨는 동적 컴포넌트 key 관련 에러 제거)
   };
 
   useEffect(() => {
@@ -270,7 +264,7 @@ const MyPortfolioPage = () => {
     setSlideEventHandler();
 
     return () => removeSlideEventHandler();
-  }, [])
+  }, []);
 
   if (!isLoggedIn) {
     return <Redirect to={PAGE_URL.HOME} />;
@@ -398,7 +392,9 @@ const MyPortfolioPage = () => {
         {isConfirmShown && (
           <ConfirmPortal heading={confirmMessage} onConfirm={handleDeleteSectionConfirm} onCancel={hideConfirm} />
         )}
-        <BottomSliderPortal onSlideDown={handleSlideDown} isSliderShown={isBottomSliderShown}>test</BottomSliderPortal>
+        <BottomSliderPortal onSlideDown={handleSlideDown} isSliderShown={isBottomSliderShown}>
+          test
+        </BottomSliderPortal>
       </Container>
       {/* <PaginatorWrapper>
         <DotPaginator activePageIndex={activePageIndex} paginationCount={paginationCount} onPaginate={paginate} />
