@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import useThrottle from "../../../services/hooks/@common/useThrottle";
+import useThrottle from "../../../hooks/common/useThrottle";
 import Loader from "../Loader/Loader";
 import { Container, LoaderWrapper, ContentWrapper } from "./InfiniteScrollContainer.style";
 

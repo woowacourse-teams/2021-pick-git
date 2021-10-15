@@ -1,5 +1,5 @@
 import { RefObject, useEffect, useState } from "react";
-import useDebounce from "../../../services/hooks/@common/useDebounce";
+import useDebounce from "../../../hooks/common/useDebounce";
 import { Container } from "./ScrollActiveHeader.style";
 
 export interface Props {
@@ -26,10 +26,6 @@ const ScrollActiveHeader = ({ containerRef, children }: Props) => {
 
     setLastScrollY(currentScrollY);
   }, 80);
-
-  const toggleHeader = useDebounce(() => {
-    setIsHeaderShown(!isHeaderShown);
-  }, 200);
 
   useEffect(() => {
     if (!containerRef.current) {

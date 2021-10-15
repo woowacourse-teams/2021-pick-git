@@ -1,14 +1,13 @@
 import { css } from "styled-components";
 import { setMobileMediaQuery, setTabletMediaQuery } from "./mediaQueries";
 
-export const customScrollbarCSS = css`
+export const customScrollbarCSS = (scrollbarColor: string) => css`
   color: transparent;
   text-shadow: 0 0 ${({ theme }) => theme.color.textColor};
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
   transition: color 0.8s;
 
   :hover {
-    color: ${({ theme }) => theme.color.tagItemColor};
+    color: ${scrollbarColor};
   }
 
   ::-webkit-scrollbar {

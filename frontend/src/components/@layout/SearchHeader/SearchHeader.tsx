@@ -5,7 +5,7 @@ import Input from "../../@shared/Input/Input";
 import { Container, HeaderContent, GoBackLink, SearchInputWrapper } from "./SearchHeader.style";
 import { GoBackIcon, SearchIcon } from "../../../assets/icons";
 import SearchContext from "../../../contexts/SearchContext";
-import useDebounce from "../../../services/hooks/@common/useDebounce";
+import useDebounce from "../../../hooks/common/useDebounce";
 
 const SearchHeader = () => {
   const defaultKeyword = new URLSearchParams(location.search).get("keyword");

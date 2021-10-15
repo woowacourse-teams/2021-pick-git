@@ -179,9 +179,11 @@ const PostItem = ({
         <TagListWrapper>{shouldHideContent || tagList}</TagListWrapper>
         <CommentsWrapper>
           {commentList.length > 10
-            ? commentList
-                .slice(0, 10)
-                .concat(<MoreCommentExistIndicator onClick={onMoreCommentClick}>...</MoreCommentExistIndicator>)
+            ? commentList.slice(0, 10).concat(
+                <MoreCommentExistIndicator key="more-contents-exist" onClick={onMoreCommentClick}>
+                  ...
+                </MoreCommentExistIndicator>
+              )
             : commentList}
         </CommentsWrapper>
       </PostBody>

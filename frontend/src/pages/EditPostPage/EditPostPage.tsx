@@ -1,31 +1,41 @@
-import { useContext, useEffect } from "react";
-import { Container, StepSlider, StepContainer, NextStepButtonWrapper } from "./EditPostPage.style";
-import { POST_EDIT_STEPS } from "../../constants/steps";
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+
+import MessageModalPortal from "../../components/@layout/MessageModalPortal/MessageModalPortal";
+import PageLoadingWithCover from "../../components/@layout/PageLoadingWithCover/PageLoadingWithCover";
+import Button from "../../components/@shared/Button/Button";
 import PostContentUploader from "../../components/PostContentUploader/PostContentUploader";
 import TagInputForm from "../../components/TagInputForm/TagInputForm";
-import Button from "../../components/@shared/Button/Button";
-import { PAGE_URL } from "../../constants/urls";
-import useMessageModal from "../../services/hooks/@common/useMessageModal";
-import MessageModalPortal from "../../components/@layout/MessageModalPortal/MessageModalPortal";
+
 import { FAILURE_MESSAGE, SUCCESS_MESSAGE, WARNING_MESSAGE } from "../../constants/messages";
+import { POST_EDIT_STEPS } from "../../constants/steps";
+import { PAGE_URL } from "../../constants/urls";
+
+import useMessageModal from "../../hooks/common/useMessageModal";
+import useSnackbar from "../../hooks/common/useSnackbar";
+import useAuth from "../../hooks/common/useAuth";
+import usePostEdit from "../../hooks/service/usePostEdit";
+import usePostEditStep from "../../hooks/service/usePostEditStep";
+
+import { getAPIErrorMessage } from "../../utils/error";
 import {
   getPostEditValidationMessage,
   isContentEmpty,
   isValidContentLength,
   isValidPostEditData,
 } from "../../utils/postUpload";
-import { getAPIErrorMessage } from "../../utils/error";
-import usePostEdit from "../../services/hooks/usePostEdit";
-import { useLocation } from "react-router-dom";
-import usePostEditStep from "../../services/hooks/usePostEditStep";
-import UserContext from "../../contexts/UserContext";
-import SnackBarContext from "../../contexts/SnackbarContext";
-import PageLoadingWithCover from "../../components/@layout/PageLoadingWithCover/PageLoadingWithCover";
+
+import { Container, NextStepButtonWrapper, StepContainer, StepSlider } from "./EditPostPage.style";
+import axios from "axios";
 
 const EditPostPage = () => {
   const { search } = useLocation();
-  const { currentUsername } = useContext(UserContext);
-  const { pushSnackbarMessage } = useContext(SnackBarContext);
+
+  const { currentUsername } = useAuth();
+  const { pushSnackbarMessage } = useSnackbar();
+  const { modalMessage, isModalShown, isCancelButtonShown, showAlertModal, showConfirmModal, hideMessageModal } =
+    useMessageModal();
+
   const { postId, content, tags, setTags, setContent, editPost, resetPostEditData, uploading } = usePostEdit();
   const { stepIndex, goNextStep, setStepMoveEventHandler, removeStepMoveEventHandler, completeStep } = usePostEditStep(
     POST_EDIT_STEPS,
@@ -34,23 +44,8 @@ const EditPostPage = () => {
       search: `?username=${currentUsername}`,
     }
   );
-  const { modalMessage, isModalShown, isCancelButtonShown, showAlertModal, showConfirmModal, hideMessageModal } =
-    useMessageModal();
 
-  const stepComponents = [
-    <PostContentUploader
-      key="post-content-uploader"
-      isImageUploaderShown={false}
-      content={content}
-      setContent={setContent}
-    />,
-    <TagInputForm key="tag-input-form" githubRepositoryName={search} tags={tags} setTags={setTags} />,
-  ];
-
-  useEffect(() => {
-    setStepMoveEventHandler();
-    return removeStepMoveEventHandler;
-  }, [stepIndex]);
+  const isLastStep = stepIndex >= POST_EDIT_STEPS.length - 1;
 
   const handlePostAddComplete = async () => {
     if (!isValidPostEditData({ postId, content, tags })) {
@@ -64,6 +59,10 @@ const EditPostPage = () => {
       pushSnackbarMessage(SUCCESS_MESSAGE.POST_MODIFIED);
       completeStep();
     } catch (error) {
+      if (!axios.isAxiosError(error)) {
+        throw error;
+      }
+
       showAlertModal(getAPIErrorMessage(error.response?.data.errorCode));
     }
   };
@@ -87,6 +86,21 @@ const EditPostPage = () => {
     goNextStep();
   };
 
+  useEffect(() => {
+    setStepMoveEventHandler();
+    return removeStepMoveEventHandler;
+  }, [stepIndex]);
+
+  const stepComponents = [
+    <PostContentUploader
+      key="post-content-uploader"
+      isImageUploaderShown={false}
+      content={content}
+      setContent={setContent}
+    />,
+    <TagInputForm key="tag-input-form" githubRepositoryName={search} tags={tags} setTags={setTags} />,
+  ];
+
   return (
     <Container>
       <StepSlider stepCount={POST_EDIT_STEPS.length} stepIndex={stepIndex}>
@@ -97,13 +111,13 @@ const EditPostPage = () => {
         ))}
       </StepSlider>
       <NextStepButtonWrapper>
-        {stepIndex < POST_EDIT_STEPS.length - 1 ? (
-          <Button kind="roundedBlock" onClick={handleNextButtonClick}>
-            다음
-          </Button>
-        ) : (
+        {isLastStep ? (
           <Button kind="roundedBlock" onClick={handlePostAddComplete}>
             작성 완료
+          </Button>
+        ) : (
+          <Button kind="roundedBlock" onClick={handleNextButtonClick}>
+            다음
           </Button>
         )}
         {isModalShown && (

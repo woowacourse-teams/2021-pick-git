@@ -1,5 +1,5 @@
 import { CompanyIcon, GithubDarkIcon, LocationIcon, WebsiteLinkIcon, TwitterIcon } from "../../assets/icons";
-import useProfile from "../../services/hooks/useProfile";
+import useProfile from "../../hooks/service/useProfile";
 import ProfileHeader from "../@shared/ProfileHeader/ProfileHeader";
 import { Container, Description, DetailInfo } from "./Profile.style";
 

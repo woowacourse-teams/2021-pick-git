@@ -5,15 +5,16 @@ import {
   setLaptopAboveMediaQuery,
   setTabletMediaQuery,
 } from "../../components/@styled/mediaQueries";
-import { customScrollbarCSS } from "../../components/@styled/scrollbar";
 
-export const Container = styled.main`
-  height: 100%;
-  scroll-snap-type: y mandatory;
-  overflow-x: hidden;
-  overflow-y: scroll;
-  ${customScrollbarCSS};
-`;
+export const Container = styled.main(
+  ({ theme }) => css`
+    height: 100%;
+    background-color: ${theme.color.white};
+    scroll-snap-type: y mandatory;
+    overflow-x: hidden;
+    overflow-y: scroll;
+  `
+);
 
 export const FullPage = styled.section<{ isVerticalCenter?: boolean }>`
   position: relative;
@@ -25,7 +26,7 @@ export const FullPage = styled.section<{ isVerticalCenter?: boolean }>`
   width: 100vw;
   height: 100vh;
   overflow-y: scroll;
-  padding: 2rem 0;
+  padding: 4.375rem 0;
 
   ::-webkit-scrollbar {
     display: none;
@@ -46,6 +47,22 @@ export const UserNameCSS = css`
   `}
 `;
 
+export const ToggleButtonCSS = css`
+  position: absolute;
+  top: 4rem;
+  right: 1.375rem;
+
+  ${setTabletMediaQuery`
+    top: 5rem;
+    right: 2rem;  
+  `}
+
+  ${setLaptopAboveMediaQuery`
+    top: 6rem;
+    right: 10rem;
+  `}
+`;
+
 export const AvatarWrapper = styled.div``;
 
 export const DescriptionCSS = css`
@@ -56,12 +73,13 @@ export const DescriptionCSS = css`
   width: 100%;
   text-align: left;
   font-size: 0.75rem;
-  margin: 1.25rem 0;
+  margin: 1rem 0;
   line-height: 1.2rem;
   padding: 0 3rem;
+  height: 100px;
 
   ${setLaptopMediaQuery`
-    margin: 2.5rem 0;
+    margin: 1.5rem 0;
     text-align: center;
     font-size: 0.8rem;
     border: none;
@@ -69,7 +87,7 @@ export const DescriptionCSS = css`
   `}
 
   ${setDesktopMediaQuery`
-    margin: 4rem 0;
+    margin: 2rem 0;
     text-align: center;
     font-size: 0.9rem;
     border: none;
@@ -99,7 +117,7 @@ export const DetailInfo = styled.div`
   color: ${({ theme }) => theme.color.textColor};
   line-height: 2.5;
   font-size: 0.875rem;
-  margin-top: 1.5rem;
+  margin-top: 0.7rem;
 
   ${setLaptopMediaQuery`
     font-size: 0.92rem;
@@ -117,9 +135,19 @@ export const DetailInfo = styled.div`
 `;
 
 export const PaginatorWrapper = styled.div`
-  position: absolute;
+  position: fixed;
   right: 1.125rem;
   bottom: 1.5625rem;
+`;
+
+export const CategoryAddIconWrapper = styled.div`
+  width: 100%;
+  padding-left: 2rem;
+
+  ${setLaptopAboveMediaQuery`
+    padding-left: 22rem;
+  
+  `}
 `;
 
 export const ContactIconCSS = css`
@@ -148,5 +176,25 @@ export const SectionNameCSS = css`
     min-height: 4.5rem;
     padding: 0 4rem;
     font-size: 2.2rem;
+  `}
+`;
+
+export const CloseButtonWrapper = styled.div`
+  position: absolute;
+  top: 4.375rem;
+  left: 1rem;
+  display: flex;
+  justify-content: flex-end;
+
+  > button:active {
+    transform: scale(0.98);
+  }
+
+  ${setLaptopMediaQuery`
+    left: 4rem;
+  `}
+
+  ${setDesktopMediaQuery`
+    left: 6rem;
   `}
 `;

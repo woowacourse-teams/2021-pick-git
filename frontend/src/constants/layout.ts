@@ -8,7 +8,7 @@ export const LAYOUT = {
 export const PAGE_WIDTH = {
   TABLET: "425px",
   LAPTOP: "640px",
-  DESKTOP: "860px",
+  DESKTOP: "720px",
 };
 
 export const LayoutInPx = {

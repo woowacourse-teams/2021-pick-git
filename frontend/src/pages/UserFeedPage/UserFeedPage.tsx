@@ -4,14 +4,14 @@ import { useLocation } from "react-router-dom";
 
 import Feed from "../../components/Feed/Feed";
 import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
-import useUserFeed from "../../services/hooks/useUserFeed";
+import useUserFeed from "../../hooks/service/useUserFeed";
 import { Container } from "./UserFeedPage.style";
 import { Post } from "../../@types";
 
 import UserContext from "../../contexts/UserContext";
 import { LayoutInPx } from "../../constants/layout";
 import { QUERY } from "../../constants/queries";
-import useInfiniteImagePreloader from "../../services/hooks/@common/useInfiniteImagePreloader";
+import useInfiniteImagePreloader from "../../hooks/common/useInfiniteImagePreloader";
 import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
 
 interface LocationState {

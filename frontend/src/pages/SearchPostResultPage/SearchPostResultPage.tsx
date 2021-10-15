@@ -3,12 +3,12 @@ import { InfiniteData } from "react-query";
 import { useLocation } from "react-router-dom";
 
 import { Post } from "../../@types";
-import useSearchPostData from "../../services/hooks/useSearchPostData";
+import useSearchPostData from "../../hooks/service/useSearchPostData";
 import { LayoutInPx } from "../../constants/layout";
 import { Container } from "./SearchPostResultPage.style";
 import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
 import Feed from "../../components/Feed/Feed";
-import useInfiniteImagePreloader from "../../services/hooks/@common/useInfiniteImagePreloader";
+import useInfiniteImagePreloader from "../../hooks/common/useInfiniteImagePreloader";
 import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
 
 interface LocationState {

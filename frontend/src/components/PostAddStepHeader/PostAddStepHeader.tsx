@@ -1,5 +1,5 @@
 import { POST_ADD_STEPS } from "../../constants/steps";
-import usePostAddStep from "../../services/hooks/usePostAddStep";
+import usePostAddStep from "../../hooks/service/usePostAddStep";
 import StepHeader from "../@layout/StepHeader/StepHeader";
 
 const PostAddStepHeader = () => {
