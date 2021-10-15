@@ -84,7 +84,7 @@ const PortfolioSection = ({ section, isEditable, setSection }: Props) => {
 
   // TODO: remove index from key prop
   const categoryItems = portfolioSectionItems.map((item, sectionIndex) => (
-    <SectionContentWrapper key={sectionIndex}>
+    <SectionContentWrapper key={item.id ?? "" + sectionIndex}>
       <CategoriesWrapper>
         <Category>
           <PortfolioTextEditor
@@ -109,7 +109,7 @@ const PortfolioSection = ({ section, isEditable, setSection }: Props) => {
       </CategoriesWrapper>
       <DescriptionsWrapper>
         {item.descriptions.map((description, descriptionIndex) => (
-          <Fragment key={description.id ?? descriptionIndex}>
+          <Fragment key={description.id ?? "" + descriptionIndex}>
             <Description>
               <PortfolioTextEditor
                 value={description.value}
