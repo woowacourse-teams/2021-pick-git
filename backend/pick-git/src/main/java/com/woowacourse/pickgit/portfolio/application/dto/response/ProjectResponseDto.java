@@ -3,6 +3,7 @@ package com.woowacourse.pickgit.portfolio.application.dto.response;
 import static java.util.stream.Collectors.toList;
 
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.TagRequest;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
@@ -58,12 +59,12 @@ public class ProjectResponseDto {
         return name;
     }
 
-    public LocalDateTime getStartDate() {
-        return startDate;
+    public LocalDate getStartDate() {
+        return LocalDate.of(startDate.getYear(), startDate.getMonth(), startDate.getDayOfMonth());
     }
 
-    public LocalDateTime getEndDate() {
-        return endDate;
+    public LocalDate getEndDate() {
+        return LocalDate.of(endDate.getYear(), endDate.getMonth(), endDate.getDayOfMonth());
     }
 
     public String getType() {
