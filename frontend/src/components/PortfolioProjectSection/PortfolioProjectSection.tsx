@@ -105,7 +105,7 @@ const PortfolioProjectSection = ({ project, isEditable, setProject }: Props) => 
             onChange={handleUpdateContent}
             disabled={!isEditable}
             placeholder={PLACE_HOLDER.PROJECT_DESCRIPTION}
-            autoGrow
+            autoGrow={false}
           />
           <TagListWrapper>{tagList}</TagListWrapper>
         </ProjectInfo>

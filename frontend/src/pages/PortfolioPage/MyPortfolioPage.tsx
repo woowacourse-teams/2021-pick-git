@@ -36,8 +36,6 @@ import {
   setPortfolioLocalUpdateTime,
 } from "../../storage/storage";
 
-import { getScrollYPosition } from "../../utils/layout";
-
 import {
   AvatarWrapper,
   CloseButtonWrapper,
@@ -52,9 +50,10 @@ import {
   ToggleButtonCSS,
   UserAvatarCSS,
   UserNameCSS,
-} from "./MyPortfolioPage.style";
+} from "./PortfolioPage.style";
 
 import type { PortfolioData, PortfolioProject, PortfolioSectionType, Post } from "../../@types";
+import useScrollPagination from "../../hooks/common/useScrollPagination";
 
 const MyPortfolioPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -64,11 +63,18 @@ const MyPortfolioPage = () => {
   const { currentUsername, isLoggedIn } = useAuth();
   const { isModalShown, showModal, hideModal } = useModal(false);
   const {
-    modalMessage,
-    isModalShown: isMessageModalShown,
+    modalMessage: alertModalMessage,
+    isModalShown: isAlertModalShown,
+    showAlertModal,
+    hideMessageModal: hideAlertModal,
+  } = useMessageModal();
+
+  const {
+    modalMessage: confirmModalMessage,
+    isModalShown: isConfirmModalShown,
     isCancelButtonShown,
     showConfirmModal,
-    hideMessageModal,
+    hideMessageModal: hideConfirmModal,
   } = useMessageModal();
 
   const {
@@ -99,6 +105,7 @@ const MyPortfolioPage = () => {
     usePortfolioIntro(profile?.name, profile?.description, profile?.imageUrl);
 
   const paginationCount = portfolioProjects.length + portfolioSections.length + 1;
+  const { activePageIndex, paginate } = useScrollPagination(containerRef, paginationCount);
 
   const handleSetProject = (prevProjectName: string) => (newProject: PortfolioProject) => {
     updatePortfolioProject(prevProjectName, newProject);
@@ -112,17 +119,6 @@ const MyPortfolioPage = () => {
     showModal();
   };
 
-  const handlePaginate = (index: number) => {
-    if (!containerRef.current) {
-      return;
-    }
-
-    containerRef.current.scrollTo({
-      behavior: "smooth",
-      top: getScrollYPosition(containerRef.current.children[index], containerRef.current),
-    });
-  };
-
   const handleSectionNameUpdate = (prevSectionName: string) => (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     updatePortfolioSectionName(prevSectionName, event.currentTarget.value);
   };
@@ -132,6 +128,11 @@ const MyPortfolioPage = () => {
   };
 
   const handleIntroDescriptionUpdate: React.ChangeEventHandler<HTMLTextAreaElement> = (event) => {
+    if (event.currentTarget.value.length > 200) {
+      showAlertModal("200자 이상의 자기소개를 작성하실 수 없습니다.");
+      return;
+    }
+
     updateIntroDescription(event.currentTarget.value);
   };
 
@@ -142,12 +143,14 @@ const MyPortfolioPage = () => {
       id: null,
       content: post.content,
       imageUrl: firstImageUrl,
-      name: "",
+      name: `프로젝트 ${portfolioProjects.length + 1}`,
       startDate: "",
       endDate: "",
       tags: post.tags.map((tagName) => ({ id: null, name: tagName })),
       type: "team",
     });
+
+    paginate(portfolioProjects.length + 1);
 
     hideModal();
   };
@@ -167,12 +170,12 @@ const MyPortfolioPage = () => {
   const handleDeleteSectionConfirm = () => {
     if (deletingSectionType === "project") {
       deletePortfolioProject(deletingSectionName);
-      hideMessageModal();
+      hideConfirmModal();
       return;
     }
 
     deletePortfolioSection(deletingSectionName);
-    hideMessageModal();
+    hideConfirmModal();
   };
 
   const handleUploadPortfolio = async () => {
@@ -195,11 +198,6 @@ const MyPortfolioPage = () => {
     } catch (error) {
       console.error(error);
     }
-  };
-
-  const handleWheelEvent: React.WheelEventHandler<HTMLElement> = (event) => {
-    event.preventDefault();
-    console.log("wheel");
   };
 
   useEffect(() => {
@@ -234,6 +232,10 @@ const MyPortfolioPage = () => {
     setPortfolioLocalUpdateTime(new Date());
   }, [portfolioIntro, portfolioProjects, portfolioSections]);
 
+  useEffect(() => {
+    paginate(paginationCount - 1);
+  }, [portfolioSections.length]);
+
   if (!isLoggedIn) {
     return <Redirect to={PAGE_URL.HOME} />;
   }
@@ -263,7 +265,7 @@ const MyPortfolioPage = () => {
           onUploadPortfolio={handleUploadPortfolio}
         />
       </ScrollActiveHeader>
-      <Container ref={containerRef} onWheel={handleWheelEvent}>
+      <Container ref={containerRef}>
         <FullPage isVerticalCenter={true}>
           <ToggleButton
             toggleButtonText="프로필 사진 보이기"
@@ -288,7 +290,7 @@ const MyPortfolioPage = () => {
             value={portfolioIntro.description}
             onChange={handleIntroDescriptionUpdate}
             placeholder={PLACE_HOLDER.INTRO_DESCRIPTION}
-            autoGrow
+            autoGrow={false}
           />
           <ContactWrapper>
             <DetailInfo>
@@ -362,17 +364,20 @@ const MyPortfolioPage = () => {
             />
           </ModalPortal>
         )}
-        {isMessageModalShown && isCancelButtonShown && (
+        {isConfirmModalShown && isCancelButtonShown && (
           <MessageModalPortal
-            heading={modalMessage}
+            heading={confirmModalMessage}
             onConfirm={handleDeleteSectionConfirm}
-            onClose={hideMessageModal}
-            onCancel={hideMessageModal}
+            onClose={hideConfirmModal}
+            onCancel={hideConfirmModal}
           />
+        )}
+        {isAlertModalShown && (
+          <MessageModalPortal heading={alertModalMessage} onConfirm={hideAlertModal} onClose={hideAlertModal} />
         )}
       </Container>
       <PaginatorWrapper>
-        <DotPaginator paginationCount={paginationCount} paginate={handlePaginate} />
+        <DotPaginator activePageIndex={activePageIndex} paginationCount={paginationCount} onPaginate={paginate} />
       </PaginatorWrapper>
     </>
   );

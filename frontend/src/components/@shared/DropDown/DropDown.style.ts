@@ -30,7 +30,7 @@ export const DropDownList = styled.ul<{ isShown: boolean }>(
     display: flex;
     flex-direction: column;
     width: 12.5rem;
-    transform: translateY(60%);
+    transform: translateY(40%);
     transition: opacity 0.5s;
     box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.2);
 

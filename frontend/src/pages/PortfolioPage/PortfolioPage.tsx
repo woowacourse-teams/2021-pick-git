@@ -10,11 +10,10 @@ import SVGIcon from "../../components/@shared/SVGIcon/SVGIcon";
 import PortfolioProjectSection from "../../components/PortfolioProjectSection/PortfolioProjectSection";
 import PortfolioSection from "../../components/PortfolioSection/PortfolioSection";
 import PortfolioTextEditor from "../../components/PortfolioTextEditor/PortfolioTextEditor";
+import useScrollPagination from "../../hooks/common/useScrollPagination";
 
 import usePortfolio from "../../hooks/service/usePortfolio";
 import useProfile from "../../hooks/service/useProfile";
-
-import { getScrollYPosition } from "../../utils/layout";
 
 import {
   AvatarWrapper,
@@ -38,16 +37,10 @@ const PortfolioPage = () => {
   const { data: profile, isLoading: isProfileLoading } = useProfile(false, username);
 
   const paginationCount = remotePortfolio ? remotePortfolio.projects.length + remotePortfolio.sections.length + 1 : 0;
+  const { activePageIndex, paginate } = useScrollPagination(containerRef, paginationCount);
 
   const handlePaginate = (index: number) => {
-    if (!containerRef.current) {
-      return;
-    }
-
-    containerRef.current.scrollTo({
-      behavior: "smooth",
-      top: getScrollYPosition(containerRef.current.children[index], containerRef.current),
-    });
+    paginate(index);
   };
 
   if (isProfileLoading || isPortfolioLoading) {
@@ -127,7 +120,7 @@ const PortfolioPage = () => {
         ))}
       </Container>
       <PaginatorWrapper>
-        <DotPaginator paginationCount={paginationCount} paginate={handlePaginate} />
+        <DotPaginator activePageIndex={activePageIndex} paginationCount={paginationCount} onPaginate={handlePaginate} />
       </PaginatorWrapper>
     </>
   );

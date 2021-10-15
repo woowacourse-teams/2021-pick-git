@@ -27,10 +27,6 @@ const ScrollActiveHeader = ({ containerRef, children }: Props) => {
     setLastScrollY(currentScrollY);
   }, 80);
 
-  const toggleHeader = useDebounce(() => {
-    setIsHeaderShown(!isHeaderShown);
-  }, 200);
-
   useEffect(() => {
     if (!containerRef.current) {
       return;

@@ -37,6 +37,7 @@ const usePortfolioProjects = () => {
     }
 
     newPortfolioProjects.splice(targetProjectIndex, 1);
+
     setPortfolioProjects(newPortfolioProjects);
   };
 

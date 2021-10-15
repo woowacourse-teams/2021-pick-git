@@ -11,7 +11,7 @@ import UserContext from "./contexts/UserContext";
 import SnackBarContext from "./contexts/SnackbarContext";
 import { PostEditStepContextProvider } from "./contexts/PostEditStepContext";
 import PageLoadingWithLogo from "./components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
-import MyPortfolioPage from "./pages/MyPortfolioPage/MyPortfolioPage";
+import MyPortfolioPage from "./pages/PortfolioPage/MyPortfolioPage";
 
 const NavigationHeader = lazy(() => import("./components/@layout/NavigationHeader/NavigationHeader"));
 const OneDepthStepHeader = lazy(() => import("./components/OneDepthStepHeader/OneDepthStepHeader"));
