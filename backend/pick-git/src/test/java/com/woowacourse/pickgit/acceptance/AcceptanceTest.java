@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.woowacourse.pickgit.authentication.application.dto.TokenDto;
 import com.woowacourse.pickgit.config.DatabaseConfigurator;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
+import com.woowacourse.pickgit.config.RedisCleaner;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -30,6 +31,9 @@ public abstract class AcceptanceTest {
     @Autowired
     private DatabaseConfigurator databaseConfigurator;
 
+    @Autowired
+    private RedisCleaner redisCleaner;
+
     @BeforeEach
     void init() {
         RestAssured.port = port;
@@ -37,6 +41,7 @@ public abstract class AcceptanceTest {
 
     @AfterEach
     void tearDown() {
+        redisCleaner.cleanUpRedis();
         clearDataBase();
         databaseConfigurator.toWrite();
     }
