@@ -1,8 +1,6 @@
 package com.woowacourse.pickgit.portfolio.presentation.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
 
@@ -10,21 +8,12 @@ import lombok.Builder;
 public class ProjectResponse {
 
     private Long id;
-
     private String name;
-
-    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
-
-    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
-
     private String type;
-
     private String imageUrl;
-
     private String content;
-
     private List<TagResponse> tags;
 
     private ProjectResponse() {
