@@ -8,11 +8,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class PostRequest {
 
     private List<MultipartFile> images;
-
     private String githubRepoUrl;
-
     private List<String> tags;
-
     private String content;
 
     private PostRequest() {

@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-@Component
 @Profile("!test")
+@Component
 public class GithubContributionApiRequester implements PlatformContributionApiRequester {
 
     @Override

@@ -37,10 +37,9 @@ public class GithubRepositorySearchExtractor implements PlatformRepositorySearch
         int page,
         int limit
     ) {
-        String response =
-            platformRepositoryApiRequester.request(
-                token,
-                generateApiUrl(username, keyword, page + 1, limit)
+        String response = platformRepositoryApiRequester.request(
+            token,
+            generateApiUrl(username, keyword, page + 1, limit)
         );
 
         return parseToRepositories(response).getItems();

@@ -1,11 +1,15 @@
 import { PortfolioProject } from "../../@types";
 import { PORTFOLIO } from "../../constants/localStorageKey";
+import { setPortfolioLocalUpdateTime } from "../../storage/storage";
 import useLocalStorage from "./@common/useLocalStorage";
 
 const usePortfolioProjects = () => {
-  const { itemState, setItem: setPortfolioProjects } = useLocalStorage<PortfolioProject[]>(PORTFOLIO.PROJECTS);
+  const { itemState: portfolioProjects, setItem } = useLocalStorage<PortfolioProject[]>(PORTFOLIO.PROJECTS, []);
 
-  const portfolioProjects = itemState ?? [];
+  const setPortfolioProjects = (projects: PortfolioProject[]) => {
+    setPortfolioLocalUpdateTime(new Date());
+    setItem(projects);
+  };
 
   const addPortfolioProject = (project: PortfolioProject) => {
     const newPortfolioProjects = [...portfolioProjects];
@@ -41,6 +45,7 @@ const usePortfolioProjects = () => {
     addPortfolioProject,
     deletePortfolioProject,
     updatePortfolioProject,
+    setPortfolioProjects,
   };
 };
 

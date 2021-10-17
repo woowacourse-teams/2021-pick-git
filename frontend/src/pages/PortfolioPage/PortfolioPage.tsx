@@ -1,9 +1,6 @@
-import { useContext, useEffect, useRef, useState } from "react";
-import { Redirect } from "react-router-dom";
+import { useRef } from "react";
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import Avatar from "../../components/@shared/Avatar/Avatar";
-import { PAGE_URL } from "../../constants/urls";
-import UserContext from "../../contexts/UserContext";
 import useProfile from "../../services/hooks/useProfile";
 import {
   AvatarWrapper,
@@ -14,86 +11,26 @@ import {
   DetailInfo,
   ContactWrapper,
   PaginatorWrapper,
-  CloseButtonWrapper,
   SectionNameCSS,
-  ToggleButtonCSS,
   UserAvatarCSS,
   ContactIconCSS,
 } from "./PortfolioPage.style";
 import DotPaginator from "../../components/@shared/DotPaginator/DotPaginator";
-import { Portfolio, PortfolioProject, Post } from "../../@types";
 import ScrollActiveHeader from "../../components/@layout/ScrollActiveHeader/ScrollActiveHeader";
 import PortfolioHeader from "../../components/@layout/PortfolioHeader/PortfolioHeader";
 import { getScrollYPosition } from "../../utils/layout";
 import PortfolioProjectSection from "../../components/PortfolioProjectSection/PortfolioProjectSection";
 import PortfolioSection from "../../components/PortfolioSection/PortfolioSection";
-import usePortfolioSections from "../../services/hooks/usePortfolioSection";
 import SVGIcon from "../../components/@shared/SVGIcon/SVGIcon";
 import PortfolioTextEditor from "../../components/PortfolioTextEditor/PortfolioTextEditor";
-import { PLACE_HOLDER } from "../../constants/placeholder";
-import useUserFeed from "../../services/hooks/useUserFeed";
-import usePortfolioProjects from "../../services/hooks/usePortfolioProjects";
-import useModal from "../../services/hooks/@common/useModal";
-import ModalPortal from "../../components/@layout/Modal/ModalPortal";
-import PostSelector from "../../components/PostSelector/PostSelector";
-import ToggleButton from "../../components/@shared/ToggleButton/ToggleButton";
-import usePortfolioIntro from "../../services/hooks/usePortfolioIntro";
-import Button from "../../components/@shared/Button/Button";
-import useMessageModal from "../../services/hooks/@common/useMessageModal";
-import MessageModalPortal from "../../components/@layout/MessageModalPortal/MessageModalPortal";
 import usePortfolio from "../../services/hooks/usePortfolio";
+import PageError from "../../components/@shared/PageError/PageError";
 
 const PortfolioPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const username = new URLSearchParams(location.search).get("username") ?? "";
-  const { currentUsername, isLoggedIn } = useContext(UserContext);
-  const isMyPortfolio = username === currentUsername;
-  const {
-    portfolio: remotePortfolio,
-    isError,
-    isLoading: isPortfolioLoading,
-    mutateSetPortfolio,
-  } = usePortfolio(username);
-  const { data: profile, isLoading: isProfileLoading } = useProfile(isMyPortfolio, currentUsername);
-  const { infinitePostsData, handleIntersect, isFetchingNextPage } = useUserFeed(isMyPortfolio, currentUsername);
-
-  const {
-    portfolioSections,
-    addBlankPortfolioSection,
-    deletePortfolioSection,
-    updatePortfolioSectionName,
-    setPortfolioSection,
-  } = usePortfolioSections();
-
-  const { portfolioProjects, addPortfolioProject, deletePortfolioProject, updatePortfolioProject } =
-    usePortfolioProjects();
-
-  const { isModalShown, showModal, hideModal } = useModal(false);
-  const { portfolioIntro, setPortfolioIntro, updateIntroName, updateIntroDescription, updateIsProfileShown } =
-    usePortfolioIntro(profile?.name, profile?.description);
-  const paginationCount = portfolioProjects.length + portfolioSections.length + 1;
-  const {
-    modalMessage,
-    isModalShown: isMessageModalShown,
-    isCancelButtonShown,
-    showConfirmModal,
-    hideMessageModal,
-  } = useMessageModal();
-
-  const [deletingSectionType, setDeletingSectionType] = useState<"project" | "custom">();
-  const [deletingSectionName, setDeletingSectionName] = useState("");
-
-  const handleSetProject = (prevProjectName: string) => (newProject: PortfolioProject) => {
-    updatePortfolioProject(prevProjectName, newProject);
-  };
-
-  const handleAddSection = () => {
-    addBlankPortfolioSection();
-  };
-
-  const handleAddProject = () => {
-    showModal();
-  };
+  const { portfolio: remotePortfolio, isError, isLoading: isPortfolioLoading, error } = usePortfolio(username);
+  const { data: profile, isLoading: isProfileLoading } = useProfile(false, username);
 
   const handlePaginate = (index: number) => {
     if (!containerRef.current) {
@@ -106,141 +43,48 @@ const PortfolioPage = () => {
     });
   };
 
-  const handleSectionNameUpdate = (prevSectionName: string) => (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    updatePortfolioSectionName(prevSectionName, event.currentTarget.value);
-  };
-
-  const handleIntroNameUpdate: React.ChangeEventHandler<HTMLTextAreaElement> = (event) => {
-    updateIntroName(event.currentTarget.value);
-  };
-
-  const handleIntroDescriptionUpdate: React.ChangeEventHandler<HTMLTextAreaElement> = (event) => {
-    updateIntroDescription(event.currentTarget.value);
-  };
-
-  const handlePostSelect = (post: Post) => {
-    const [firstImageUrl] = post.imageUrls;
-
-    addPortfolioProject({
-      content: post.content,
-      imageUrl: firstImageUrl,
-      name: "",
-      startDate: "",
-      endDate: "",
-      tags: post.tags,
-      type: "team",
-    });
-
-    hideModal();
-  };
-
-  const handleDeleteProjectSection = (sectionName: string) => {
-    showConfirmModal("정말 삭제하시겠습니까?");
-    setDeletingSectionType("project");
-    setDeletingSectionName(sectionName);
-  };
-
-  const handleDeleteCustomSection = (sectionName: string) => {
-    showConfirmModal("정말 삭제하시겠습니까?");
-    setDeletingSectionType("custom");
-    setDeletingSectionName(sectionName);
-  };
-
-  const handleDeleteSectionConfirm = () => {
-    if (deletingSectionType === "project") {
-      deletePortfolioProject(deletingSectionName);
-      hideMessageModal();
-      return;
-    }
-
-    deletePortfolioSection(deletingSectionName);
-    hideMessageModal();
-  };
-
-  const handleUploadPortfolio = async (portfolio: Portfolio) => {
-    await mutateSetPortfolio(portfolio);
-  };
-
-  useEffect(() => {
-    if (profile && portfolioIntro.name === "" && portfolioIntro.description === "") {
-      setPortfolioIntro({
-        ...portfolioIntro,
-        name: profile.name,
-        description: profile.description,
-      });
-    }
-  }, [profile]);
-
-  if (!isLoggedIn) {
-    return <Redirect to={PAGE_URL.HOME} />;
-  }
-
-  if (isProfileLoading) {
+  if (isProfileLoading || isPortfolioLoading) {
     return <PageLoading />;
   }
 
-  // if (!remotePortfolio && !isMyPortfolio) {
-  //   return <div>포트폴리오를 찾을 수 없습니다</div>;
-  // }
+  if (!remotePortfolio || isError) {
+    if (error?.response?.status === 400) {
+      return (
+        <>
+          <PortfolioHeader isButtonsShown={false} />
+          <PageError errorMessage="아직 포트폴리오가 만들어지지 않았습니다" />
+        </>
+      );
+    }
 
-  // let targetPortfolio: Portfolio;
+    return <div>포트폴리오 정보를 불러오는데 실패했습니다</div>;
+  }
 
-  // if (!remotePortfolio) {
-  //   targetPortfolio = {
-  //     intro: portfolioIntro,
-  //     projects: portfolioProjects,
-  //     sections: portfolioSections,
-  //   };
-  // } else {
-  //   targetPortfolio = remotePortfolio;
-  // }
-
-  const targetPortfolio = {
-    intro: portfolioIntro,
-    projects: portfolioProjects,
-    sections: portfolioSections,
-  };
+  const paginationCount = remotePortfolio.projects.length + remotePortfolio.sections.length + 1;
 
   return (
     <>
       <ScrollActiveHeader containerRef={containerRef}>
-        <PortfolioHeader
-          isButtonsShown={isMyPortfolio}
-          onAddPortfolioSection={handleAddSection}
-          onAddPortfolioProject={handleAddProject}
-          onUploadPortfolio={() => handleUploadPortfolio(targetPortfolio)}
-        />
+        <PortfolioHeader isButtonsShown={false} />
       </ScrollActiveHeader>
       <Container ref={containerRef}>
         <FullPage isVerticalCenter={true}>
-          {isMyPortfolio && (
-            <ToggleButton
-              toggleButtonText="프로필 사진 보이기"
-              cssProp={ToggleButtonCSS}
-              isToggled={targetPortfolio.intro.isProfileShown}
-              onToggle={() => updateIsProfileShown(!targetPortfolio.intro.isProfileShown)}
-            />
-          )}
           <AvatarWrapper>
-            {targetPortfolio.intro.isProfileShown && (
-              <Avatar diameter="6.5625rem" fontSize="1.5rem" imageUrl={profile?.imageUrl} cssProp={UserAvatarCSS} />
+            {remotePortfolio.profileImageShown && (
+              <Avatar
+                diameter="6.5625rem"
+                fontSize="1.5rem"
+                imageUrl={remotePortfolio.profileImageUrl}
+                cssProp={UserAvatarCSS}
+              />
             )}
-            <PortfolioTextEditor
-              cssProp={UserNameCSS}
-              value={targetPortfolio.intro.name}
-              onChange={handleIntroNameUpdate}
-              disabled={!isMyPortfolio}
-              placeholder={PLACE_HOLDER.INTRO_NAME}
-              autoGrow
-            />
+            <PortfolioTextEditor cssProp={UserNameCSS} value={remotePortfolio.name} disabled autoGrow={false} />
           </AvatarWrapper>
           <PortfolioTextEditor
             cssProp={DescriptionCSS}
-            value={targetPortfolio.intro.description}
-            onChange={handleIntroDescriptionUpdate}
-            disabled={!isMyPortfolio}
-            placeholder={PLACE_HOLDER.INTRO_DESCRIPTION}
-            autoGrow
+            value={remotePortfolio.introduction}
+            disabled
+            autoGrow={false}
           />
           <ContactWrapper>
             <DetailInfo>
@@ -265,68 +109,17 @@ const PortfolioPage = () => {
             </DetailInfo>
           </ContactWrapper>
         </FullPage>
-        {targetPortfolio.projects.map((portfolioProject, index) => (
-          <FullPage isVerticalCenter={true} key={index}>
-            <PortfolioProjectSection
-              isEditable={isMyPortfolio}
-              project={portfolioProject}
-              setProject={handleSetProject(portfolioProject.name)}
-            />
-            {isMyPortfolio && (
-              <CloseButtonWrapper>
-                <Button
-                  kind="roundedInline"
-                  padding="0.5rem"
-                  onClick={() => handleDeleteProjectSection(portfolioProject.name)}
-                >
-                  <SVGIcon icon="CancelNoCircleIcon" />
-                </Button>
-              </CloseButtonWrapper>
-            )}
+        {remotePortfolio.projects.map((portfolioProject) => (
+          <FullPage isVerticalCenter={true} key={portfolioProject.id}>
+            <PortfolioProjectSection isEditable={false} project={portfolioProject} />
           </FullPage>
         ))}
-        {targetPortfolio.sections.map((portfolioSection, index) => (
-          <FullPage key={index}>
-            <PortfolioTextEditor
-              cssProp={SectionNameCSS}
-              value={portfolioSection.name}
-              onChange={handleSectionNameUpdate(portfolioSection.name)}
-              autoGrow={true}
-              placeholder={PLACE_HOLDER.SECTION_NAME}
-              disabled={!isMyPortfolio}
-            />
-            <PortfolioSection isEditable={isMyPortfolio} section={portfolioSection} setSection={setPortfolioSection} />
-            {isMyPortfolio && (
-              <CloseButtonWrapper>
-                <Button
-                  kind="roundedInline"
-                  padding="0.5rem"
-                  onClick={() => handleDeleteCustomSection(portfolioSection.name)}
-                >
-                  <SVGIcon icon="CancelNoCircleIcon" />
-                </Button>
-              </CloseButtonWrapper>
-            )}
+        {remotePortfolio.sections.map((portfolioSection) => (
+          <FullPage key={portfolioSection.id}>
+            <PortfolioTextEditor cssProp={SectionNameCSS} value={portfolioSection.name} autoGrow={false} disabled />
+            <PortfolioSection isEditable={false} section={portfolioSection} />
           </FullPage>
         ))}
-        {isModalShown && isLoggedIn && (
-          <ModalPortal onClose={hideModal} isCloseButtonShown={true}>
-            <PostSelector
-              infinitePostsData={infinitePostsData}
-              isFetchingNextPage={isFetchingNextPage}
-              onPostSelect={handlePostSelect}
-              onIntersect={handleIntersect}
-            />
-          </ModalPortal>
-        )}
-        {isMessageModalShown && isCancelButtonShown && (
-          <MessageModalPortal
-            heading={modalMessage}
-            onConfirm={handleDeleteSectionConfirm}
-            onClose={hideMessageModal}
-            onCancel={hideMessageModal}
-          />
-        )}
       </Container>
       <PaginatorWrapper>
         <DotPaginator paginationCount={paginationCount} paginate={handlePaginate} />

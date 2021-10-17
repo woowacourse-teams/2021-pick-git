@@ -20,10 +20,10 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 
-@Configuration
+@Profile({"prod", "staging"})
 @EnableAutoConfiguration(exclude = DataSourceAutoConfiguration.class)
 @EnableConfigurationProperties(MasterDataSourceProperties.class)
-@Profile({"prod", "staging"})
+@Configuration
 public class DataSourceConfiguration {
 
     private final MasterDataSourceProperties dataSourceProperties;

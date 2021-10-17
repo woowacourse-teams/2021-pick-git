@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 
 import com.woowacourse.pickgit.comment.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.comment.domain.Comment;
+import com.woowacourse.pickgit.post.application.dto.response.LikeUsersResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.user.domain.User;
@@ -73,5 +74,32 @@ public class PostDtoAssembler {
         }
 
         return post.isLikedBy(requestUser);
+    }
+
+    public static List<LikeUsersResponseDto> createLikeUsersResponseDtoOfGuest(
+        List<User> likeUsers
+    ) {
+        return likeUsers.stream()
+            .map(user ->
+                new LikeUsersResponseDto(
+                    user.getImage(),
+                    user.getName(),
+                    null
+                )
+            ).collect(toList());
+    }
+
+    public static List<LikeUsersResponseDto> createLikeUsersResponseDtoOfLoginUser(
+        User loginUser,
+        List<User> likeUsers
+    ) {
+        return likeUsers.stream()
+            .map(user ->
+                new LikeUsersResponseDto(
+                    user.getImage(),
+                    user.getName(),
+                    loginUser.isFollowing(user)
+                )
+            ).collect(toList());
     }
 }

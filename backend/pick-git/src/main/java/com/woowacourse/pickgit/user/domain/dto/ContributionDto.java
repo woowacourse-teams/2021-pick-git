@@ -19,8 +19,8 @@ public class ContributionDto {
         int commitsCount,
         int prsCount,
         int issuesCount,
-        int reposCount)
-    {
+        int reposCount
+    ) {
         this.starsCount = starsCount;
         this.commitsCount = commitsCount;
         this.prsCount = prsCount;

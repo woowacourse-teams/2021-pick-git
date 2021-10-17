@@ -14,9 +14,9 @@ import {
 
 export interface Props {
   isButtonsShown?: boolean;
-  onAddPortfolioSection: () => void;
-  onAddPortfolioProject: () => void;
-  onUploadPortfolio: () => void;
+  onAddPortfolioSection?: () => void;
+  onAddPortfolioProject?: () => void;
+  onUploadPortfolio?: () => void;
 }
 
 const PortfolioHeader = ({
@@ -35,7 +35,7 @@ const PortfolioHeader = ({
   const dropdownListItems: DropDownItem[] = [
     { text: "프로젝트 추가", onClick: onAddPortfolioProject },
     { text: "섹션 추가", onClick: onAddPortfolioSection },
-    // { text: "포트폴리오 업로드", onClick: onUploadPortfolio },
+    { text: "포트폴리오 업로드", onClick: onUploadPortfolio },
   ];
 
   return (

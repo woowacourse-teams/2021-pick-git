@@ -13,11 +13,7 @@ public class NoSuchPortfolioException extends ApplicationException {
         this(ERROR_CODE, HTTP_STATUS, MESSAGE);
     }
 
-    private NoSuchPortfolioException(
-        String errorCode,
-        HttpStatus httpStatus,
-        String message
-    ) {
+    private NoSuchPortfolioException(String errorCode, HttpStatus httpStatus, String message) {
         super(errorCode, httpStatus, message);
     }
 }

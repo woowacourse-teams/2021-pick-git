@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.PageRequest;
 
 public interface SearchType {
+
     boolean isSatisfiedBy(String searchType);
     List<Post> search(String[] keywords, PageRequest pageRequest);
 }

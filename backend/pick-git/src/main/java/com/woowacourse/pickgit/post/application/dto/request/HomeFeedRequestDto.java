@@ -11,6 +11,9 @@ public class HomeFeedRequestDto {
     private Long page;
     private Long limit;
 
+    private HomeFeedRequestDto() {
+    }
+
     public HomeFeedRequestDto(AppUser appUser, Long page, Long limit) {
         if(appUser.isGuest()) {
             requestUserName = null;

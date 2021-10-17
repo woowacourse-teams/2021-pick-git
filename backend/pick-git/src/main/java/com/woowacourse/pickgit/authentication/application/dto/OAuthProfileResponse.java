@@ -30,11 +30,19 @@ public class OAuthProfileResponse {
     @JsonProperty("twitter_username")
     private String twitter;
 
-    public OAuthProfileResponse() {
+    private OAuthProfileResponse() {
     }
 
-    public OAuthProfileResponse(String name, String image, String description,
-        String githubUrl, String company, String location, String website, String twitter) {
+    public OAuthProfileResponse(
+        String name,
+        String image,
+        String description,
+        String githubUrl,
+        String company,
+        String location,
+        String website,
+        String twitter
+    ) {
         this.name = name;
         this.image = image;
         this.description = description;
@@ -46,21 +54,11 @@ public class OAuthProfileResponse {
     }
 
     public GithubProfile toGithubProfile() {
-        return new GithubProfile(
-            githubUrl,
-            company,
-            location,
-            website,
-            twitter
-        );
+        return new GithubProfile(githubUrl, company, location, website, twitter);
     }
 
     public BasicProfile toBasicProfile() {
-        return new BasicProfile(
-            name,
-            image,
-            description
-        );
+        return new BasicProfile(name, image, description);
     }
 
     public String getName() {

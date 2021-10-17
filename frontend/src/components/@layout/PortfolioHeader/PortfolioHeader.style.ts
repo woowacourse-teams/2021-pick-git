@@ -1,11 +1,13 @@
 import styled, { css } from "styled-components";
 import { Header } from "../../@styled/layout";
 import { setLaptopAboveMediaQuery } from "../../@styled/mediaQueries";
+import { Z_INDEX } from "../../../constants/layout";
 
 export const Container = styled(Header)`
   display: flex;
   align-items: center;
-  position: static;
+  position: relative;
+  z-index: ${Z_INDEX.LOW};
   padding: 1.1875rem 1.4375rem;
   width: 100%;
 `;

@@ -23,7 +23,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
         HttpServletRequest request,
         HttpServletResponse response,
         Object handler
-    ) {
+    ) throws Exception {
         if (isPreflightRequest(request)) {
             return true;
         }

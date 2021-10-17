@@ -14,29 +14,20 @@ import com.woowacourse.pickgit.user.domain.UserRepository;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Service
 public class PortfolioService {
 
+    @PersistenceContext
+    private final EntityManager entityManager;
     private final PortfolioRepository portfolioRepository;
     private final PortfolioDtoAssembler portfolioDtoAssembler;
     private final UserRepository userRepository;
-
-    @PersistenceContext
-    private EntityManager entityManager;
-
-    public PortfolioService(
-        PortfolioRepository portfolioRepository,
-        PortfolioDtoAssembler portfolioDtoAssembler,
-        UserRepository userRepository
-    ) {
-        this.portfolioRepository = portfolioRepository;
-        this.portfolioDtoAssembler = portfolioDtoAssembler;
-        this.userRepository = userRepository;
-    }
 
     public PortfolioResponseDto read(String username, UserDto userDto) {
         Optional<Portfolio> portfolio = portfolioRepository.findPortfolioByUsername(username);

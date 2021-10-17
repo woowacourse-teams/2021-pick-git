@@ -13,11 +13,7 @@ public class ProjectTypeNotFoundException extends ApplicationException {
         this(ERROR_CODE, HTTP_STATUS, MESSAGE);
     }
 
-    private ProjectTypeNotFoundException(
-        String errorCode,
-        HttpStatus httpStatus,
-        String message
-    ) {
+    private ProjectTypeNotFoundException(String errorCode, HttpStatus httpStatus, String message) {
         super(errorCode, httpStatus, message);
     }
 }
