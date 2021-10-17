@@ -45,6 +45,21 @@ public class PostFeedController {
         return ResponseEntity.ok(postResponses);
     }
 
+    @ForLoginAndGuestUser
+    @GetMapping("/test/posts")
+    public ResponseEntity<List<PostResponse>> testHomeFeed(
+        @Authenticated AppUser appUser,
+        @RequestParam Long postId,
+        @RequestParam Long limit
+    ) {
+        HomeFeedRequestDto homeFeedRequestDto = new HomeFeedRequestDto(appUser, postId, limit);
+        List<PostResponseDto> postResponseDtos = postFeedService.testHomeFeed(homeFeedRequestDto, postId);
+        List<PostResponse> postResponses = createPostResponses(postResponseDtos);
+
+        return ResponseEntity.ok(postResponses);
+    }
+
+
     @ForOnlyLoginUser
     @GetMapping("/posts/me")
     public ResponseEntity<List<PostResponse>> readMyFeed(

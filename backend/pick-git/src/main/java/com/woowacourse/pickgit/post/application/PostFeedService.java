@@ -36,6 +36,16 @@ public class PostFeedService {
         return PostDtoAssembler.assembleFrom(requestUser, result);
     }
 
+    public List<PostResponseDto> testHomeFeed(HomeFeedRequestDto homeFeedRequestDto, Long postId) {
+        Pageable pageable = PageRequest.ofSize(homeFeedRequestDto.getLimit().intValue());
+        if (homeFeedRequestDto.isGuest()) {
+            return PostDtoAssembler.assembleFrom(null,  postRepository.testHomeFeed(postId, pageable));
+        }
+        User requestUser = findUserByName(homeFeedRequestDto.getRequestUserName());
+        List<Post> result = postRepository.findAllAssociatedPostsByUser(requestUser, pageable);
+        return PostDtoAssembler.assembleFrom(requestUser, result);
+    }
+
     public List<PostResponseDto> myFeed(HomeFeedRequestDto homeFeedRequestDto) {
         if (homeFeedRequestDto.isGuest()) {
             throw new UnauthorizedException();
