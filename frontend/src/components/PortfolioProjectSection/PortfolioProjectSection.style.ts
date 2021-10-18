@@ -131,6 +131,7 @@ export const ProjectInfo = styled.div`
   height: 100%;
   order: 2;
   padding: 1rem 1.2rem;
+  overflow-y: scroll;
 
   ${setLaptopAboveMediaQuery`
     order: 1;
