@@ -3,12 +3,12 @@ import styled from "styled-components";
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: center;
   height: 100%;
   padding: 0 1.6875rem;
 `;
 
 export const Form = styled.form`
+  margin-top: 3rem;
   margin-bottom: 1.8125rem;
 `;
 

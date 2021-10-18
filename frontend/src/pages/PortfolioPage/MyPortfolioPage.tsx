@@ -79,8 +79,9 @@ const MyPortfolioPage = () => {
 
   const {
     portfolio: remotePortfolio,
-    isError,
     isLoading: isPortfolioLoading,
+    isError,
+    isFetching,
     mutateSetPortfolio,
   } = usePortfolio(currentUsername);
   const { data: profile, isLoading: isProfileLoading } = useProfile(true, currentUsername);
@@ -244,7 +245,7 @@ const MyPortfolioPage = () => {
     return <PageError errorMessage="포트폴리오를 불러올 수 없습니다." />;
   }
 
-  if (isProfileLoading || isPortfolioLoading) {
+  if (isProfileLoading || isPortfolioLoading || isFetching) {
     return <PageLoading />;
   }
 

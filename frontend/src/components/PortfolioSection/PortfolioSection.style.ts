@@ -1,6 +1,5 @@
 import styled, { css } from "styled-components";
-import { NoneStyledTextarea } from "../@styled/layout";
-import { setDesktopMediaQuery, setLaptopAboveMediaQuery, setLaptopMediaQuery } from "../@styled/mediaQueries";
+import { setLaptopAboveMediaQuery } from "../@styled/mediaQueries";
 
 export const Container = styled.div`
   position: relative;
@@ -22,13 +21,14 @@ export const CategoriesWrapper = styled.div`
   align-items: flex-end;
   width: 7.25rem;
   height: 100%;
-  padding: 2.5rem 1rem;
+  padding: 2.5rem 1rem 2.5rem 0rem;
   font-size: 0.875rem;
   border-right: 2px solid ${({ theme }) => theme.color.secondaryColor};
 
   ${setLaptopAboveMediaQuery`
     border-right-width: 3px;
     padding-right: 6.25rem;
+    padding: 2.5rem 1rem;
     font-size: 1.5rem;
     width: 31.25rem;
   `}

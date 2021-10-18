@@ -76,9 +76,11 @@ export const ProjectDateSeparator = styled.span`
 export const ProjectNameCSS = css`
   font-size: 1.5rem;
   padding: 0 1.2rem;
+  min-height: 2rem;
 
   ${setLaptopAboveMediaQuery`
     font-size: 2rem;
+    min-height: 2.5rem;
   `}
 
   ${setLaptopMediaQuery`
@@ -129,6 +131,7 @@ export const ProjectInfo = styled.div`
   height: 100%;
   order: 2;
   padding: 1rem 1.2rem;
+  overflow-y: scroll;
 
   ${setLaptopAboveMediaQuery`
     order: 1;
@@ -143,6 +146,7 @@ export const ProjectContentCSS = css`
   height: 100%;
   line-height: 1.5rem;
   margin-bottom: 1rem;
+  min-height: 12rem;
 
   color: ${({ theme }) => theme.color.textColor};
 

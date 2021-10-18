@@ -26,7 +26,7 @@ export const FullPage = styled.section<{ isVerticalCenter?: boolean }>`
   width: 100vw;
   height: 100vh;
   overflow-y: scroll;
-  padding: 4.375rem 0;
+  padding-top: 4.375rem;
 
   ::-webkit-scrollbar {
     display: none;

@@ -1,7 +1,7 @@
 import { usePortfolioQuery, useSetPortfolioMutation } from "../../services/queries/portfolio";
 
 const usePortfolio = (username: string) => {
-  const { data, isError, isLoading, error } = usePortfolioQuery(username);
+  const { data, isError, isLoading, error, isFetching } = usePortfolioQuery(username);
   const { mutateAsync: mutateSetPortfolio } = useSetPortfolioMutation(username);
 
   return {
@@ -9,6 +9,7 @@ const usePortfolio = (username: string) => {
     isError,
     isLoading,
     error,
+    isFetching,
     mutateSetPortfolio,
   };
 };

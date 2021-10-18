@@ -33,7 +33,13 @@ const PortfolioPage = () => {
   const username = new URLSearchParams(location.search).get("username") ?? "";
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const { portfolio: remotePortfolio, isError, isLoading: isPortfolioLoading, error } = usePortfolio(username);
+  const {
+    portfolio: remotePortfolio,
+    isLoading: isPortfolioLoading,
+    isError,
+    error,
+    isFetching,
+  } = usePortfolio(username);
   const { data: profile, isLoading: isProfileLoading } = useProfile(false, username);
 
   const paginationCount = remotePortfolio ? remotePortfolio.projects.length + remotePortfolio.sections.length + 1 : 0;
@@ -43,7 +49,7 @@ const PortfolioPage = () => {
     paginate(index);
   };
 
-  if (isProfileLoading || isPortfolioLoading) {
+  if (isProfileLoading || isPortfolioLoading || isFetching) {
     return <PageLoading />;
   }
 

@@ -10,7 +10,9 @@ export const usePortfolioQuery = (username: string) => {
     return await requestGetPortfolio(username);
   };
 
-  return useQuery<PortfolioData, AxiosError<ErrorResponse>>([QUERY.GET_PORTFOLIO], portfolioQueryFunction, {});
+  return useQuery<PortfolioData, AxiosError<ErrorResponse>>([QUERY.GET_PORTFOLIO], portfolioQueryFunction, {
+    refetchOnWindowFocus: false,
+  });
 };
 
 export const useSetPortfolioMutation = (username: string) => {

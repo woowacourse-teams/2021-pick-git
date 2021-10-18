@@ -5,6 +5,8 @@ import useDebounce from "./useDebounce";
 const useScrollPagination = (containerRef: RefObject<HTMLDivElement>, paginationCount: number) => {
   const [activePageIndex, setActivePageIndex] = useState(0);
 
+  console.log(activePageIndex);
+
   const paginate = (index: number) => {
     if (index < 0 || index >= paginationCount) {
       return;
@@ -15,11 +17,11 @@ const useScrollPagination = (containerRef: RefObject<HTMLDivElement>, pagination
 
   const increasePageIndex = useDebounce(() => {
     paginate(activePageIndex + 1);
-  }, 200);
+  }, 500);
 
   const decreasePageIndex = useDebounce(() => {
     paginate(activePageIndex - 1);
-  }, 200);
+  }, 500);
 
   useEffect(() => {
     if (!containerRef.current) {
@@ -39,6 +41,9 @@ const useScrollPagination = (containerRef: RefObject<HTMLDivElement>, pagination
 
     const preventWheelEvent = (event: WheelEvent) => {
       event.preventDefault();
+
+      console.log("event.deltaY", event.deltaY);
+
       if (event.deltaY > 0) {
         increasePageIndex();
       } else {
@@ -50,17 +55,14 @@ const useScrollPagination = (containerRef: RefObject<HTMLDivElement>, pagination
       passive: false,
     });
 
-    // const observer = new IntersectionObserver((entries) => {
-    //   entries.forEach((entry, index) => {
-    //     setActivePageIndex(index);
-    //   });
-    // });
+    return () => {
+      if (!containerRef.current) {
+        return;
+      }
 
-    // Array.from(containerRef.current.children).forEach((child) => {
-    //   observer.observe(child);
-    // });
-    return () => containerRef.current!.removeEventListener("wheel", preventWheelEvent);
-  }, [containerRef.current, activePageIndex]);
+      containerRef.current.removeEventListener("wheel", preventWheelEvent);
+    };
+  }, [activePageIndex]);
 
   return {
     activePageIndex,
