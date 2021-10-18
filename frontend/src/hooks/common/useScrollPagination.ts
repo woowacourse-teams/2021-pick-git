@@ -4,6 +4,8 @@ import { getScrollYPosition } from "../../utils/layout";
 const useScrollPagination = (containerRef: RefObject<HTMLDivElement>, paginationCount: number) => {
   const [activePageIndex, setActivePageIndex] = useState(0);
 
+  console.log(activePageIndex);
+
   const paginate = (index: number) => {
     if (index < 0 || index >= paginationCount) {
       return;
