@@ -23,7 +23,6 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public class RedisCachingConfiguration {
 
     private final RedisConnectionFactory redisConnectionFactory;
-
     private final ObjectMapper objectMapper;
 
     public RedisCachingConfiguration(
@@ -36,8 +35,8 @@ public class RedisCachingConfiguration {
 
     @Bean(name = "cacheManager")
     public CacheManager redisCacheManager() {
-        CollectionType listType =
-            objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, PostResponseDto.class);
+        CollectionType collectionType = objectMapper.getTypeFactory()
+            .constructCollectionType(ArrayList.class, PostResponseDto.class);
 
         RedisCacheConfiguration redisCachingConfiguration = RedisCacheConfiguration
             .defaultCacheConfig()
@@ -49,7 +48,7 @@ public class RedisCachingConfiguration {
             .serializeValuesWith(
                 RedisSerializationContext.SerializationPair.fromSerializer(
                     new Jackson2JsonRedisSerializer<>(
-                        listType
+                        collectionType
                     )
                 )
             )
@@ -58,6 +57,7 @@ public class RedisCachingConfiguration {
         return RedisCacheManager
             .RedisCacheManagerBuilder
             .fromConnectionFactory(redisConnectionFactory)
-            .cacheDefaults(redisCachingConfiguration).build();
+            .cacheDefaults(redisCachingConfiguration)
+            .build();
     }
 }

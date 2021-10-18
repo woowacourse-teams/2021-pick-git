@@ -12,7 +12,9 @@ public class ProxyConnectionHandler implements InvocationHandler {
     private final Connection connection;
 
     public ProxyConnectionHandler(
-        QueryCounter queryCounter, Connection connection) {
+        QueryCounter queryCounter,
+        Connection connection
+    ) {
         this.queryCounter = queryCounter;
         this.connection = connection;
     }
@@ -20,15 +22,17 @@ public class ProxyConnectionHandler implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (queryCounter.isCountable()) {
-            if (method.getName().equals("prepareStatement")) {
+            if ("prepareStatement".equals(method.getName())) {
                 return getPreparedStatement(method, args);
             }
         }
         return method.invoke(connection, args);
     }
 
-    private PreparedStatement getPreparedStatement(Method method, Object[] args)
-        throws IllegalAccessException, InvocationTargetException {
+    private PreparedStatement getPreparedStatement(
+        Method method,
+        Object[] args
+    ) throws IllegalAccessException, InvocationTargetException {
         final PreparedStatement result = (PreparedStatement) method.invoke(connection, args);
 
         for (Object arg : args) {

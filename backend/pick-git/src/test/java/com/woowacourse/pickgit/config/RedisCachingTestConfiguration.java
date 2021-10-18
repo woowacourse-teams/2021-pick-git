@@ -56,6 +56,7 @@ public class RedisCachingTestConfiguration {
         return RedisCacheManager
             .RedisCacheManagerBuilder
             .fromConnectionFactory(redisConnectionFactory)
-            .cacheDefaults(redisCachingConfiguration).build();
+            .cacheDefaults(redisCachingConfiguration)
+            .build();
     }
 }

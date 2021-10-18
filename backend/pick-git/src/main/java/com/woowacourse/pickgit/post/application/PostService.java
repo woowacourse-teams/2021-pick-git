@@ -213,10 +213,6 @@ public class PostService {
         postRepository.delete(post);
     }
 
-    @CacheEvict(
-        value = "homeFeed",
-        allEntries = true
-    )
     public List<LikeUsersResponseDto> likeUsers(
         AuthUserForPostRequestDto authUserRequestDto,
         Long postId

@@ -21,7 +21,6 @@ import com.woowacourse.pickgit.user.domain.UserRepository;
 import java.util.List;
 import java.util.stream.IntStream;
 import javax.persistence.EntityManager;
-import javax.sql.DataSource;
 import javax.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,6 +31,7 @@ import org.springframework.cache.annotation.EnableCaching;
 @Transactional
 @EnableCaching
 public class PostFeedCacheIntegrationTest extends AcceptanceTest {
+
     private static final String USERNAME = "binghe";
     private static final String ACCESS_TOKEN = "oauth.access.token";
 
