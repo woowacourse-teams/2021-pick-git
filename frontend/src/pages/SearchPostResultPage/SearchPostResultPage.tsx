@@ -2,14 +2,20 @@ import { useEffect, useState } from "react";
 import { InfiniteData } from "react-query";
 import { useLocation } from "react-router-dom";
 
-import { Post } from "../../@types";
-import useSearchPostData from "../../hooks/service/useSearchPostData";
-import { LayoutInPx } from "../../constants/layout";
-import { Container } from "./SearchPostResultPage.style";
+import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
+import PageError from "../../components/@shared/PageError/PageError";
 import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
 import Feed from "../../components/Feed/Feed";
+
+import { LayoutInPx } from "../../constants/layout";
+
 import useInfiniteImagePreloader from "../../hooks/common/useInfiniteImagePreloader";
-import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
+import useSearchKeyword from "../../hooks/common/useSearchKeyword";
+import useSearchPostData from "../../hooks/service/useSearchPostData";
+
+import { Container } from "./SearchPostResultPage.style";
+
+import type { Post } from "../../@types";
 
 interface LocationState {
   prevData?: InfiniteData<Post[]>;
@@ -17,8 +23,9 @@ interface LocationState {
 }
 
 const SearchPostResultPage = () => {
+  const { keyword } = useSearchKeyword();
   const [isMountedOnce, setIsMountedOnce] = useState(false);
-  const type = new URLSearchParams(location.search).get("type");
+  const type = new URLSearchParams(location.search).get("type") ?? "";
   const {
     state: { prevData, postId },
   } = useLocation<LocationState>();
@@ -30,7 +37,7 @@ const SearchPostResultPage = () => {
     isFetchingNextPage,
     handleIntersect: handlePostsEndIntersect,
     queryKey,
-  } = useSearchPostData(type, prevData);
+  } = useSearchPostData({ keyword, type, prevData, activated: true });
 
   const infiniteImageUrls =
     infinitePostsData?.pages.map(
@@ -61,7 +68,7 @@ const SearchPostResultPage = () => {
   }
 
   if (isError || !infinitePostsData) {
-    return <div>피드를 가져올 수 없습니다.</div>;
+    return <PageError errorMessage="피드를 가져올 수 없습니다." />;
   }
 
   return (

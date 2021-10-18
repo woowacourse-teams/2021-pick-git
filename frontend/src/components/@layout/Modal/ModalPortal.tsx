@@ -30,11 +30,11 @@ export const Modal = ({ onClose, isCloseButtonShown = false, children }: Props) 
 };
 
 const ModalPortal = ({ ...props }: Props) => {
-  const $MessageModal = document.getElementById("modal");
+  const $modal = document.getElementById("modal");
 
-  if (!$MessageModal) throw Error("cannot find modal wrapper");
+  if (!$modal) throw Error("cannot find modal wrapper");
 
-  return createPortal(<Modal {...props} />, $MessageModal);
+  return createPortal(<Modal {...props} />, $modal);
 };
 
 export default ModalPortal;

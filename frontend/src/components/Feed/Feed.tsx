@@ -13,9 +13,10 @@ import { PAGE_URL } from "../../constants/urls";
 import usePostEdit from "../../hooks/service/usePostEdit";
 import { InfiniteData, QueryKey } from "react-query";
 import { getItemsFromPages } from "../../utils/infiniteData";
-import useMessageModal from "../../hooks/common/useMessageModal";
-import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
+import ConfirmPortal from "../@layout/ConfirmPortal/ConfirmPortal";
 import PageLoadingWithCover from "../@layout/PageLoadingWithCover/PageLoadingWithCover";
+import useModal from "../../hooks/common/useModal";
+import axios from "axios";
 
 interface Props {
   infinitePostsData: InfiniteData<Post[] | null>;
@@ -29,7 +30,12 @@ const Feed = ({ infinitePostsData, queryKey, isFetching }: Props) => {
   const { addPostLike, deletePost, deletePostLike, isDeletePostLoading } = useFeedMutation(queryKey);
   const [posts, setPosts] = useState<Post[]>([]);
   const { setPostEditData } = usePostEdit();
-  const { modalMessage, isModalShown, isCancelButtonShown, showConfirmModal, hideMessageModal } = useMessageModal();
+  const {
+    isModalShown: isConfirmShown,
+    modalMessage: confirmMessage,
+    showModal: showConfirm,
+    hideModal: hideConfirm,
+  } = useModal();
   const { isLoggedIn, currentUsername } = useContext(UserContext);
   const history = useHistory();
 
@@ -40,7 +46,7 @@ const Feed = ({ infinitePostsData, queryKey, isFetching }: Props) => {
 
   const handlePostDeleteButtonClick = (postId: Post["id"]) => {
     setSelectedPostId(postId);
-    showConfirmModal(WARNING_MESSAGE.POST_DELETE);
+    showConfirm(WARNING_MESSAGE.POST_DELETE);
   };
 
   const handlePostDelete = async () => {
@@ -48,12 +54,16 @@ const Feed = ({ infinitePostsData, queryKey, isFetching }: Props) => {
       return;
     }
 
-    hideMessageModal();
+    hideConfirm();
 
     try {
       await deletePost(selectedPostId);
       pushSnackbarMessage(SUCCESS_MESSAGE.POST_DELETED);
     } catch (error) {
+      if (!axios.isAxiosError(error)) {
+        return;
+      }
+
       pushSnackbarMessage(getAPIErrorMessage(error.response?.data.errorCode));
     }
   };
@@ -145,14 +155,7 @@ const Feed = ({ infinitePostsData, queryKey, isFetching }: Props) => {
           {isDeletePostLoading && <PageLoadingWithCover description="삭제중" />}
         </PostItemWrapper>
       ))}
-      {isModalShown && isCancelButtonShown && (
-        <MessageModalPortal
-          heading={modalMessage}
-          onConfirm={handlePostDelete}
-          onClose={hideMessageModal}
-          onCancel={hideMessageModal}
-        />
-      )}
+      {isConfirmShown && <ConfirmPortal heading={confirmMessage} onConfirm={handlePostDelete} onCancel={hideConfirm} />}
     </Container>
   );
 };

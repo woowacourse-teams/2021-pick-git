@@ -5,11 +5,11 @@ import { RepositoryIcon, SearchIcon } from "../../assets/icons";
 import { FAILURE_MESSAGE, REDIRECT_MESSAGE } from "../../constants/messages";
 import { PAGE_URL } from "../../constants/urls";
 import useDebounce from "../../hooks/common/useDebounce";
-import useMessageModal from "../../hooks/common/useMessageModal";
+import useModal from "../../hooks/common/useModal";
 import { useGithubRepositoriesQuery } from "../../services/queries";
 import { getAPIErrorMessage } from "../../utils/error";
 import { getRepositoriesFromPages } from "../../utils/infiniteData";
-import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
+import AlertPortal from "../@layout/AlertPortal/AlertPortal";
 import PageLoading from "../@layout/PageLoading/PageLoading";
 import CircleIcon from "../@shared/CircleIcon/CircleIcon";
 import InfiniteScrollContainer from "../@shared/InfiniteScrollContainer/InfiniteScrollContainer";
@@ -44,7 +44,12 @@ const RepositorySelector = ({ setGithubRepositoryName, goNextStep }: Props) => {
     isFetching,
     fetchNextPage,
   } = useGithubRepositoriesQuery(searchKeyword);
-  const { modalMessage, isModalShown, showAlertModal, hideMessageModal } = useMessageModal();
+  const {
+    modalMessage: alertMessage,
+    isModalShown: isAlertShown,
+    showModal: showAlert,
+    hideModal: hideAlert,
+  } = useModal();
 
   const repositories = getRepositoriesFromPages(infiniteRepositoriesData?.pages);
 
@@ -88,9 +93,9 @@ const RepositorySelector = ({ setGithubRepositoryName, goNextStep }: Props) => {
   }, [temporarySearchKeyword]);
 
   if (error) {
-    error.response && showAlertModal(getAPIErrorMessage(error.response?.data.errorCode));
+    error.response && showAlert(getAPIErrorMessage(error.response?.data.errorCode));
 
-    return <MessageModalPortal heading={modalMessage} onConfirm={handleErrorConfirm} onClose={hideMessageModal} />;
+    return <AlertPortal heading={alertMessage} onOkay={handleErrorConfirm} />;
   }
 
   if (isLoading) {
@@ -105,13 +110,13 @@ const RepositorySelector = ({ setGithubRepositoryName, goNextStep }: Props) => {
   }
 
   if (!repositories) {
-    showAlertModal(FAILURE_MESSAGE.POST_REPOSITORY_NOT_LOADABLE);
+    showAlert(FAILURE_MESSAGE.POST_REPOSITORY_NOT_LOADABLE);
 
-    return <MessageModalPortal heading={modalMessage} onConfirm={handleErrorConfirm} onClose={hideMessageModal} />;
+    return <AlertPortal heading={alertMessage} onOkay={handleErrorConfirm} />;
   }
 
   if (repositories?.length === 0 && searchKeyword === "") {
-    showAlertModal(REDIRECT_MESSAGE.NO_REPOSITORY_EXIST);
+    showAlert(REDIRECT_MESSAGE.NO_REPOSITORY_EXIST);
   }
 
   return (
@@ -132,7 +137,7 @@ const RepositorySelector = ({ setGithubRepositoryName, goNextStep }: Props) => {
         </SearchResultNotFound>
       )}
 
-      {isModalShown && <MessageModalPortal heading={modalMessage} onConfirm={goBackToHome} onClose={goBackToHome} />}
+      {isAlertShown && <AlertPortal heading={alertMessage} onOkay={goBackToHome} />}
     </Container>
   );
 };

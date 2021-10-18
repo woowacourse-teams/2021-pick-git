@@ -1,10 +1,15 @@
-import { Container, ContentWrapper } from "./PostLikePeoplePage.style";
-import PageLoading from "../../components/@layout/PageLoading/PageLoading";
-import usePostLikePeople from "../../hooks/service/usePostLikePeople";
 import { useLocation } from "react-router-dom";
-import { Post } from "../../@types";
+
+import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import UserList from "../../components/UserList/UserList";
+
 import { QUERY } from "../../constants/queries";
+
+import usePostLikePeople from "../../hooks/service/usePostLikePeople";
+
+import { Container, ContentWrapper } from "./PostLikePeoplePage.style";
+
+import type { Post } from "../../@types";
 
 const PostLikePeoplePage = () => {
   const { state: postId } = useLocation<Post["id"]>();

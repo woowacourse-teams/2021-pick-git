@@ -1,4 +1,3 @@
-import { StringDecoder } from "string_decoder";
 import { PortfolioSection, PortfolioSectionItem } from "../../@types";
 import { PLACE_HOLDER } from "../../constants/placeholder";
 import usePortfolioSectionItem from "../../hooks/service/usePortfolioSectionItem";
@@ -18,10 +17,10 @@ import {
   DescriptionDeleteIconWrapper,
   DescriptionAddIconWrapper,
 } from "./PortfolioSection.style";
-import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
-import useMessageModal from "../../hooks/common/useMessageModal";
+import AlertPortal from "../@layout/AlertPortal/AlertPortal";
 import { FAILURE_MESSAGE } from "../../constants/messages";
 import { Fragment } from "react";
+import useModal from "../../hooks/common/useModal";
 
 export interface Props {
   section: PortfolioSection;
@@ -41,7 +40,12 @@ const PortfolioSection = ({ section, isEditable, setSection }: Props) => {
     isSameSectionNameExist,
   } = usePortfolioSectionItem(section, setSection);
 
-  const { modalMessage, isModalShown, showAlertModal, hideMessageModal } = useMessageModal();
+  const {
+    isModalShown: isAlertShown,
+    modalMessage: alertMessage,
+    showModal: showAlert,
+    hideModal: hideAlert,
+  } = useModal();
 
   const handleCategoryChange = (prevCategory: string) => (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     updateCategory(prevCategory, event.currentTarget.value);
@@ -62,7 +66,7 @@ const PortfolioSection = ({ section, isEditable, setSection }: Props) => {
 
   const handleDeleteSectionItem = (sectionItemIndex: number) => {
     if (portfolioSectionItems.length === 1) {
-      showAlertModal(FAILURE_MESSAGE.SHOULD_HAVE_LEAST_ONE_CATEGORY);
+      showAlert(FAILURE_MESSAGE.SHOULD_HAVE_LEAST_ONE_CATEGORY);
       return;
     }
 
@@ -75,7 +79,7 @@ const PortfolioSection = ({ section, isEditable, setSection }: Props) => {
     descriptionIndex: number
   ) => {
     if (sectionItem.descriptions.length === 1) {
-      showAlertModal(FAILURE_MESSAGE.SHOULD_HAVE_LEAST_ONE_DESCRIPTION);
+      showAlert(FAILURE_MESSAGE.SHOULD_HAVE_LEAST_ONE_DESCRIPTION);
       return;
     }
 
@@ -142,9 +146,7 @@ const PortfolioSection = ({ section, isEditable, setSection }: Props) => {
   return (
     <Container>
       {categoryItems}
-      {isModalShown && (
-        <MessageModalPortal heading={modalMessage} onConfirm={hideMessageModal} onClose={hideMessageModal} />
-      )}
+      {isAlertShown && <AlertPortal heading={alertMessage} onOkay={hideAlert} />}
     </Container>
   );
 };

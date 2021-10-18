@@ -1,18 +1,22 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { InfiniteData } from "react-query";
 import { useLocation } from "react-router-dom";
 
-import Feed from "../../components/Feed/Feed";
+import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
 import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
-import useUserFeed from "../../hooks/service/useUserFeed";
-import { Container } from "./UserFeedPage.style";
-import { Post } from "../../@types";
+import PageError from "../../components/@shared/PageError/PageError";
+import Feed from "../../components/Feed/Feed";
 
-import UserContext from "../../contexts/UserContext";
 import { LayoutInPx } from "../../constants/layout";
 import { QUERY } from "../../constants/queries";
+
 import useInfiniteImagePreloader from "../../hooks/common/useInfiniteImagePreloader";
-import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
+import useAuth from "../../hooks/common/useAuth";
+import useUserFeed from "../../hooks/service/useUserFeed";
+
+import { Container } from "./UserFeedPage.style";
+
+import type { Post } from "../../@types";
 
 interface LocationState {
   prevData?: InfiniteData<Post[]>;
@@ -21,7 +25,7 @@ interface LocationState {
 
 const UserFeedPage = () => {
   const [isMountedOnce, setIsMountedOnce] = useState(false);
-  const { currentUsername } = useContext(UserContext);
+  const { currentUsername } = useAuth();
   const username = new URLSearchParams(location.search).get("username");
   const isMyFeed = currentUsername === username;
 
@@ -29,6 +33,7 @@ const UserFeedPage = () => {
     state: { prevData, postId },
   } = useLocation<LocationState>();
 
+  // TODO : username 이 null 혹은 빈 문자열일 경우에 대한 예외처리
   const {
     infinitePostsData,
     isLoading,
@@ -65,7 +70,7 @@ const UserFeedPage = () => {
   }
 
   if (isError || !infinitePostsData) {
-    return <div>피드를 가져올 수 없습니다.</div>;
+    return <PageError errorMessage="피드를 가져올 수 없습니다." />;
   }
 
   return (

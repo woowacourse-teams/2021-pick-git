@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Redirect } from "react-router-dom";
 
-import MessageModalPortal from "../../components/@layout/MessageModalPortal/MessageModalPortal";
+import AlertPortal from "../../components/@layout/AlertPortal/AlertPortal";
+import ConfirmPortal from "../../components/@layout/ConfirmPortal/ConfirmPortal";
 import ModalPortal from "../../components/@layout/Modal/ModalPortal";
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import PortfolioHeader from "../../components/@layout/PortfolioHeader/PortfolioHeader";
@@ -20,7 +21,6 @@ import PostSelector from "../../components/PostSelector/PostSelector";
 import { PLACE_HOLDER } from "../../constants/placeholder";
 import { PAGE_URL } from "../../constants/urls";
 
-import useMessageModal from "../../hooks/common/useMessageModal";
 import useModal from "../../hooks/common/useModal";
 import useAuth from "../../hooks/common/useAuth";
 import useProfile from "../../hooks/service/useProfile";
@@ -61,21 +61,24 @@ const MyPortfolioPage = () => {
   const [deletingSectionName, setDeletingSectionName] = useState("");
 
   const { currentUsername, isLoggedIn } = useAuth();
-  const { isModalShown, showModal, hideModal } = useModal(false);
   const {
-    modalMessage: alertModalMessage,
-    isModalShown: isAlertModalShown,
-    showAlertModal,
-    hideMessageModal: hideAlertModal,
-  } = useMessageModal();
+    isModalShown: isProjectAddModalShown,
+    showModal: showProjectAddModal,
+    hideModal: hideProjectAddModal,
+  } = useModal(false);
+  const {
+    modalMessage: alertMessage,
+    isModalShown: isAlertShown,
+    showModal: showAlert,
+    hideModal: hideAlert,
+  } = useModal();
 
   const {
-    modalMessage: confirmModalMessage,
-    isModalShown: isConfirmModalShown,
-    isCancelButtonShown,
-    showConfirmModal,
-    hideMessageModal: hideConfirmModal,
-  } = useMessageModal();
+    modalMessage: confirmMessage,
+    isModalShown: isConfirmShown,
+    showModal: showConfirm,
+    hideModal: hideConfirm,
+  } = useModal();
 
   const {
     portfolio: remotePortfolio,
@@ -117,7 +120,7 @@ const MyPortfolioPage = () => {
   };
 
   const handleAddProject = () => {
-    showModal();
+    showProjectAddModal();
   };
 
   const handleSectionNameUpdate = (prevSectionName: string) => (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -130,7 +133,7 @@ const MyPortfolioPage = () => {
 
   const handleIntroDescriptionUpdate: React.ChangeEventHandler<HTMLTextAreaElement> = (event) => {
     if (event.currentTarget.value.length > 200) {
-      showAlertModal("200자 이상의 자기소개를 작성하실 수 없습니다.");
+      showAlert("200자 이상의 자기소개를 작성하실 수 없습니다.");
       return;
     }
 
@@ -153,17 +156,17 @@ const MyPortfolioPage = () => {
 
     paginate(portfolioProjects.length + 1);
 
-    hideModal();
+    hideProjectAddModal();
   };
 
   const handleDeleteProjectSection = (sectionName: string) => {
-    showConfirmModal("정말 삭제하시겠습니까?");
+    showConfirm("정말 삭제하시겠습니까?");
     setDeletingSectionType("project");
     setDeletingSectionName(sectionName);
   };
 
   const handleDeleteCustomSection = (sectionName: string) => {
-    showConfirmModal("정말 삭제하시겠습니까?");
+    showConfirm("정말 삭제하시겠습니까?");
     setDeletingSectionType("custom");
     setDeletingSectionName(sectionName);
   };
@@ -171,12 +174,12 @@ const MyPortfolioPage = () => {
   const handleDeleteSectionConfirm = () => {
     if (deletingSectionType === "project") {
       deletePortfolioProject(deletingSectionName);
-      hideConfirmModal();
+      hideConfirm();
       return;
     }
 
     deletePortfolioSection(deletingSectionName);
-    hideConfirmModal();
+    hideConfirm();
   };
 
   const handleUploadPortfolio = async () => {
@@ -355,8 +358,8 @@ const MyPortfolioPage = () => {
             </CloseButtonWrapper>
           </FullPage>
         ))}
-        {isModalShown && isLoggedIn && (
-          <ModalPortal onClose={hideModal} isCloseButtonShown={true}>
+        {isProjectAddModalShown && isLoggedIn && (
+          <ModalPortal onClose={hideProjectAddModal} isCloseButtonShown={true}>
             <PostSelector
               infinitePostsData={infinitePostsData}
               isFetchingNextPage={isFetchingNextPage}
@@ -365,16 +368,9 @@ const MyPortfolioPage = () => {
             />
           </ModalPortal>
         )}
-        {isConfirmModalShown && isCancelButtonShown && (
-          <MessageModalPortal
-            heading={confirmModalMessage}
-            onConfirm={handleDeleteSectionConfirm}
-            onClose={hideConfirmModal}
-            onCancel={hideConfirmModal}
-          />
-        )}
-        {isAlertModalShown && (
-          <MessageModalPortal heading={alertModalMessage} onConfirm={hideAlertModal} onClose={hideAlertModal} />
+        {isAlertShown && <AlertPortal heading={alertMessage} onOkay={hideAlert} />}
+        {isConfirmShown && (
+          <ConfirmPortal heading={confirmMessage} onConfirm={handleDeleteSectionConfirm} onCancel={hideConfirm} />
         )}
       </Container>
       <PaginatorWrapper>

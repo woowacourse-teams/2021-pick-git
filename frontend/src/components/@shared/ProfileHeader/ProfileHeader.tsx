@@ -7,10 +7,9 @@ import { WARNING_MESSAGE } from "../../../constants/messages";
 import { QUERY } from "../../../constants/queries";
 import { PAGE_URL } from "../../../constants/urls";
 import UserContext from "../../../contexts/UserContext";
-import useMessageModal from "../../../hooks/common/useMessageModal";
 import useModal from "../../../hooks/common/useModal";
 import useFollow from "../../../hooks/service/useFollow";
-import MessageModalPortal from "../../@layout/MessageModalPortal/MessageModalPortal";
+import ChoiceModalPortal from "../../@layout/ChoiceModalPortal/ChoiceModalPortal";
 import ModalPortal from "../../@layout/Modal/ModalPortal";
 import ProfileModificationForm from "../../ProfileModificationForm/ProfileModificationForm";
 import Avatar from "../Avatar/Avatar";
@@ -37,8 +36,17 @@ const ProfileHeader = ({ isMyProfile, profile, username }: Props) => {
   const queryClient = useQueryClient();
   const history = useHistory();
 
-  const { isModalShown, showModal, hideModal } = useModal(false);
-  const { modalMessage, isModalShown: isMessageModalShown, hideMessageModal, showConfirmModal } = useMessageModal();
+  const {
+    isModalShown: isProfileEditModalShown,
+    showModal: showProfileEditModal,
+    hideModal: hideProfileEditModal,
+  } = useModal(false);
+  const {
+    isModalShown: isChoiceModalShown,
+    modalMessage: choiceModalMessage,
+    showModal: showChoiceModal,
+    hideModal: hideChoiceModal,
+  } = useModal();
 
   const setProfileQueryData = (following: boolean) => {
     const currentProfileQueryKey = [QUERY.GET_PROFILE, { isMyProfile: false, username }];
@@ -63,13 +71,13 @@ const ProfileHeader = ({ isMyProfile, profile, username }: Props) => {
       return;
     }
 
-    hideMessageModal();
+    hideChoiceModal();
     toggleFollow(username, profile.following, applyGithub);
   };
 
   const handleFollowButtonClick = () => {
     if (profile && profile.following !== null) {
-      showConfirmModal(profile.following ? WARNING_MESSAGE.GITHUB_UNFOLLOWING : WARNING_MESSAGE.GITHUB_FOLLOWING);
+      showChoiceModal(profile.following ? WARNING_MESSAGE.GITHUB_UNFOLLOWING : WARNING_MESSAGE.GITHUB_FOLLOWING);
     }
   };
 
@@ -92,7 +100,7 @@ const ProfileHeader = ({ isMyProfile, profile, username }: Props) => {
 
     if (isMyProfile) {
       return (
-        <Button type="button" kind="squaredBlock" onClick={showModal}>
+        <Button type="button" kind="squaredBlock" onClick={() => showProfileEditModal()}>
           프로필 수정
         </Button>
       );
@@ -140,24 +148,24 @@ const ProfileHeader = ({ isMyProfile, profile, username }: Props) => {
           </Button>
         </ButtonsWrapper>
       </IndicatorsWrapper>
-      {isModalShown && isLoggedIn && (
-        <ModalPortal onClose={hideModal} isCloseButtonShown={true}>
+      {isProfileEditModalShown && isLoggedIn && (
+        <ModalPortal onClose={hideProfileEditModal} isCloseButtonShown={true}>
           <ProfileModificationForm
             username={username}
             profileImageUrl={profile?.imageUrl}
             prevDescription={profile?.description}
-            onTerminate={hideModal}
+            onTerminate={hideProfileEditModal}
           />
         </ModalPortal>
       )}
-      {isMessageModalShown && (
-        <MessageModalPortal
-          heading={modalMessage}
-          onConfirm={toggleFollowWithGithubFollowing(true)}
-          onCancel={toggleFollowWithGithubFollowing(false)}
-          onClose={hideMessageModal}
-          confirmText="예"
-          cancelText="아니오"
+      {isChoiceModalShown && (
+        <ChoiceModalPortal
+          heading={choiceModalMessage}
+          onPositiveChoose={toggleFollowWithGithubFollowing(true)}
+          onNagativeChoose={toggleFollowWithGithubFollowing(false)}
+          onClose={hideChoiceModal}
+          positiveChoiceText="예"
+          nagativeChoiceText="아니오"
         />
       )}
     </Container>
