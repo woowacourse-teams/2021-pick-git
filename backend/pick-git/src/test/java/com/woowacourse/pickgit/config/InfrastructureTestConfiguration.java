@@ -8,29 +8,17 @@ import com.woowacourse.pickgit.common.mockapi.MockPickGitStorage;
 import com.woowacourse.pickgit.common.mockapi.MockPlatformFollowingRequester;
 import com.woowacourse.pickgit.common.mockapi.MockRepositoryApiRequester;
 import com.woowacourse.pickgit.common.mockapi.MockTagApiRequester;
-import com.woowacourse.pickgit.config.count_data_source.CountDataSource;
-import com.woowacourse.pickgit.config.count_data_source.QueryCounter;
 import com.woowacourse.pickgit.post.domain.repository.PickGitStorage;
 import com.woowacourse.pickgit.post.domain.util.PlatformRepositoryApiRequester;
 import com.woowacourse.pickgit.tag.infrastructure.PlatformTagApiRequester;
 import com.woowacourse.pickgit.user.domain.follow.PlatformFollowingRequester;
 import com.woowacourse.pickgit.user.domain.profile.PickGitProfileStorage;
 import com.woowacourse.pickgit.user.infrastructure.requester.PlatformContributionApiRequester;
-import javax.sql.DataSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
 @TestConfiguration
 public class InfrastructureTestConfiguration {
-
-    @Value("${spring.datasource.url}")
-    private String url;
-
-    @Value("${spring.datasource.username}")
-    private String username;
 
     @Bean
     public PlatformRepositoryApiRequester platformRepositoryApiRequester() {
@@ -65,20 +53,5 @@ public class InfrastructureTestConfiguration {
     @Bean
     public OAuthClient githubOAuthClient() {
         return new MockGithubOAuthClient();
-    }
-
-    @Bean
-    public QueryCounter queryCounter() {
-        return new QueryCounter();
-    }
-
-    @Bean
-    public DataSource dataSource() {
-        DataSource dataSource = DataSourceBuilder.create()
-            .driverClassName("org.h2.Driver")
-            .url(url)
-            .username(username)
-            .password("").build();
-        return new CountDataSource(queryCounter(), dataSource);
     }
 }

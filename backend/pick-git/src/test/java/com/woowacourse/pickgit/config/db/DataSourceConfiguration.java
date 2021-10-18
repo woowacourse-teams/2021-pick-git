@@ -3,6 +3,8 @@ package com.woowacourse.pickgit.config.db;
 import static com.woowacourse.pickgit.config.db.DataSourceSelector.READ;
 import static com.woowacourse.pickgit.config.db.DataSourceSelector.WRITE;
 
+import com.woowacourse.pickgit.config.count_data_source.CountDataSource;
+import com.woowacourse.pickgit.config.count_data_source.QueryCounter;
 import java.util.HashMap;
 import java.util.Map;
 import javax.sql.DataSource;
@@ -46,9 +48,19 @@ public class DataSourceConfiguration {
     }
 
     @Bean
+    public QueryCounter queryCounter() {
+        return new QueryCounter();
+    }
+
+    @Bean
     @ConfigurationProperties(prefix = "spring.datasource-read")
-    public DataSource readDataSource() {
+    public DataSource readDataSourceOrigin() {
         return DataSourceBuilder.create().build();
+    }
+
+    @Bean
+    public DataSource readDataSource() {
+        return new CountDataSource(queryCounter(), readDataSourceOrigin());
     }
 
     @Bean

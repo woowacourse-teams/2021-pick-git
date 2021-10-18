@@ -4,40 +4,34 @@ import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
+import com.woowacourse.pickgit.acceptance.AcceptanceTest;
 import com.woowacourse.pickgit.comment.application.CommentService;
 import com.woowacourse.pickgit.comment.application.dto.request.CommentRequestDto;
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.PostFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
-import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.config.count_data_source.QueryCounter;
 import com.woowacourse.pickgit.post.application.PostFeedService;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.request.HomeFeedRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
-import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import java.util.List;
 import java.util.stream.IntStream;
 import javax.persistence.EntityManager;
+import javax.sql.DataSource;
 import javax.transaction.Transactional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
 
-@Import(InfrastructureTestConfiguration.class)
 @Transactional
 @EnableCaching
-@SpringBootTest(webEnvironment = WebEnvironment.NONE)
-@ActiveProfiles("test")
-public class PostFeedCacheIntegrationTest {
+public class PostFeedCacheIntegrationTest extends AcceptanceTest {
     private static final String USERNAME = "binghe";
     private static final String ACCESS_TOKEN = "oauth.access.token";
 
@@ -58,6 +52,11 @@ public class PostFeedCacheIntegrationTest {
 
     @Autowired
     private EntityManager entityManager;
+
+    @BeforeEach
+    void setUp() {
+        toRead();
+    }
 
     @DisplayName("캐싱 - 비로그인 홈피드 조회시 두 번째 조회부터는 캐시 저장소에서 가져온다. (현재 페이지당 쿼리는 6번)")
     @Test

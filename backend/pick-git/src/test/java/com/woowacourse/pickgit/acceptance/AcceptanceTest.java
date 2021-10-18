@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.woowacourse.pickgit.authentication.application.dto.TokenDto;
 import com.woowacourse.pickgit.config.DatabaseConfigurator;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
-import com.woowacourse.pickgit.config.RedisCleaner;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -23,16 +22,14 @@ import org.springframework.test.context.ActiveProfiles;
 @Import(InfrastructureTestConfiguration.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"test"})
-public abstract class AcceptanceTest {
+public abstract class
+AcceptanceTest {
 
     @LocalServerPort
     int port;
 
     @Autowired
     private DatabaseConfigurator databaseConfigurator;
-
-    @Autowired
-    private RedisCleaner redisCleaner;
 
     @BeforeEach
     void init() {
@@ -41,7 +38,6 @@ public abstract class AcceptanceTest {
 
     @AfterEach
     void tearDown() {
-        redisCleaner.cleanUpRedis();
         clearDataBase();
         databaseConfigurator.toWrite();
     }
