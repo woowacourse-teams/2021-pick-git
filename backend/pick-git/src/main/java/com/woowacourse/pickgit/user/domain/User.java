@@ -167,10 +167,6 @@ public class User {
         return githubProfile.getTwitter();
     }
 
-    public Followers getFollowers() {
-        return followers;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
