@@ -20,8 +20,13 @@ import {
   TagInputWrapper,
   TagList,
   TagListItem,
+<<<<<<< HEAD
   TextLengthIndicator,
   TagAddButton,
+=======
+  TagAddButtonCSS,
+  TextLengthIndicator,
+>>>>>>> 5f0c47b (feat: UI 개선)
 } from "./TagInputForm.style";
 
 interface Props {
@@ -53,28 +58,31 @@ const TagInputForm = ({ githubRepositoryName, tags, tagsQueryResult, setTags }: 
     }
   }, [githubRepositoryName]);
 
-  const handleTagSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
-    event.preventDefault();
-    const newTag = event.currentTarget["tag-input"].value;
+  const handleTagAdd = () => {
+    if (!formRef.current) {
+      return;
+    }
+
+    const newTag = formRef.current["tag-input"].value;
 
     if (newTag.length === 0) {
       return;
     }
 
     if (!isValidTagLength(newTag)) {
-      event.currentTarget["tag-input"].blur();
+      formRef.current["tag-input"].blur();
       showAlert(FAILURE_MESSAGE.POST_TAG_LENGTH_LIMIT_EXCEEDED);
       return;
     }
 
     if (!isValidTagFormat(newTag)) {
-      event.currentTarget["tag-input"].blur();
+      formRef.current["tag-input"].blur();
       showAlert(FAILURE_MESSAGE.POST_TAG_SPECIAL_SYMBOL_EXIST);
       return;
     }
 
     if (hasDuplicatedTag([...tags, newTag])) {
-      event.currentTarget["tag-input"].blur();
+      formRef.current["tag-input"].blur();
       showAlert(FAILURE_MESSAGE.POST_DUPLICATED_TAG_EXIST);
       return;
     }
@@ -129,9 +137,13 @@ const TagInputForm = ({ githubRepositoryName, tags, tagsQueryResult, setTags }: 
             name="tag-input"
             onChange={handleTagInputChange}
           />
+<<<<<<< HEAD
           <TagAddButton type="submit">
             <SVGIcon icon="AddBoxIcon" />
           </TagAddButton>
+=======
+          <SVGIcon icon="AddBoxIcon" cssProp={TagAddButtonCSS} onClick={handleTagAdd} />
+>>>>>>> 5f0c47b (feat: UI 개선)
         </TagInputWrapper>
         <TextLengthIndicator>{`${tagInputLength} / ${LIMIT.POST_TAG_LENGTH}`}</TextLengthIndicator>
       </Form>
