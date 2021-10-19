@@ -11,5 +11,5 @@ const Template: Story<Props> = (args) => <ChoiceModal {...args} />;
 export const Default = Template.bind({});
 Default.args = {
   heading: "제목",
-  onConfirm: () => {},
+  onClose: () => {},
 };

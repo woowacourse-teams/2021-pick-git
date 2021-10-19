@@ -41,9 +41,11 @@ export const UserAvatarCSS = css`
 export const UserNameCSS = css`
   height: 1.2rem;
   text-align: center;
+  min-height: 1.5rem;
 
   ${setLaptopAboveMediaQuery`
     font-size: 1.5rem;
+    min-height: 1.8rem;
   `}
 `;
 

@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { useHistory } from "react-router";
 import { ThemeContext } from "styled-components";
-import { PDFDownloadLink } from "@react-pdf/renderer";
+// import { PDFDownloadLink } from "@react-pdf/renderer";
 
 import Button from "../../@shared/Button/Button";
 import DropDown, { DropDownItem } from "../../@shared/DropDown/DropDown";
@@ -13,7 +13,7 @@ import {
   GoBackLinkButton,
   DropDownCSS,
 } from "./PortfolioHeader.style";
-import PortfolioDocument from "../../PortfolioDocument/PortfolioDocument";
+// import PortfolioDocument from "../../PortfolioDocument/PortfolioDocument";
 import { Portfolio, ProfileData } from "../../../@types";
 
 export interface Props {
@@ -27,8 +27,6 @@ export interface Props {
 
 const PortfolioHeader = ({
   isButtonsShown = true,
-  profile,
-  portfolio,
   onUploadPortfolio,
   onAddPortfolioSection,
   onAddPortfolioProject,

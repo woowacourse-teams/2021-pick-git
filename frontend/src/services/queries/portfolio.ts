@@ -3,10 +3,19 @@ import { useMutation, useQuery } from "react-query";
 import { ErrorResponse, PortfolioData } from "../../@types";
 import { QUERY } from "../../constants/queries";
 import { getAccessToken } from "../../storage/storage";
-import { requestGetPortfolio, requestSetPortfolio } from "../requests/portfolio";
+import { customError } from "../../utils/error";
+import { requestGetPortfolio, requestGetMyPortfolio, requestSetPortfolio } from "../requests/portfolio";
 
-export const usePortfolioQuery = (username: string) => {
+export const usePortfolioQuery = (username: string, isMyPortfolio: boolean) => {
   const portfolioQueryFunction = async () => {
+    const accessToken = getAccessToken();
+
+    if (isMyPortfolio) {
+      if (!accessToken) throw customError.noAccessToken;
+
+      return await requestGetMyPortfolio(username, accessToken);
+    }
+
     return await requestGetPortfolio(username);
   };
 
@@ -15,6 +24,6 @@ export const usePortfolioQuery = (username: string) => {
   });
 };
 
-export const useSetPortfolioMutation = (username: string) => {
-  return useMutation((portfolio: PortfolioData) => requestSetPortfolio(username, portfolio, getAccessToken()));
+export const useSetPortfolioMutation = () => {
+  return useMutation((portfolio: PortfolioData) => requestSetPortfolio(portfolio, getAccessToken()));
 };

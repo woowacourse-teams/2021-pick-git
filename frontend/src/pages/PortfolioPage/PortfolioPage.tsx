@@ -82,7 +82,7 @@ const PortfolioPage = () => {
                 cssProp={UserAvatarCSS}
               />
             )}
-            <PortfolioTextEditor cssProp={UserNameCSS} value={remotePortfolio.name} disabled autoGrow={false} />
+            <PortfolioTextEditor cssProp={UserNameCSS} value={remotePortfolio.name} disabled autoGrow />
           </AvatarWrapper>
           <PortfolioTextEditor
             cssProp={DescriptionCSS}

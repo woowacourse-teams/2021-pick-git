@@ -30,11 +30,7 @@ import usePortfolioProjects from "../../hooks/service/usePortfolioProjects";
 import usePortfolioSections from "../../hooks/service/usePortfolioSection";
 import useUserFeed from "../../hooks/service/useUserFeed";
 
-import {
-  getPortfolioLocalUpdateTime,
-  getPortfolioLocalUpdateTimeString,
-  setPortfolioLocalUpdateTime,
-} from "../../storage/storage";
+import { getPortfolioLocalUpdateTime, getPortfolioLocalUpdateTimeString } from "../../storage/storage";
 
 import {
   AvatarWrapper,
@@ -86,7 +82,7 @@ const MyPortfolioPage = () => {
     isError,
     isFetching,
     mutateSetPortfolio,
-  } = usePortfolio(currentUsername);
+  } = usePortfolio(currentUsername, true);
   const { data: profile, isLoading: isProfileLoading } = useProfile(true, currentUsername);
   const { infinitePostsData, isFetchingNextPage, handleIntersect } = useUserFeed(true, currentUsername);
 
@@ -185,6 +181,7 @@ const MyPortfolioPage = () => {
   const handleUploadPortfolio = async () => {
     try {
       const localUpdateTimeString = getPortfolioLocalUpdateTimeString();
+      
       const portfolio: PortfolioData = {
         id: remotePortfolio?.id ?? null,
         name: portfolioIntro.name,
@@ -205,9 +202,11 @@ const MyPortfolioPage = () => {
   };
 
   useEffect(() => {
-    const localUpdateTime = getPortfolioLocalUpdateTime();
+    if (!remotePortfolio || !remotePortfolio.updatedAt) {
+      return;
+    }
 
-    if (remotePortfolio && remotePortfolio.updatedAt && localUpdateTime < new Date(remotePortfolio.updatedAt)) {
+    const syncRemoteWithLocal = () => {
       const intro = {
         name: currentUsername,
         description: remotePortfolio.introduction,
@@ -216,25 +215,35 @@ const MyPortfolioPage = () => {
         contacts: [...remotePortfolio.contacts],
       };
 
-      setPortfolioIntro(intro);
-      setPortfolioProjects(remotePortfolio.projects);
-      setPortfolioSections(remotePortfolio.sections);
+      setPortfolioIntro(intro, false);
+      setPortfolioProjects(remotePortfolio.projects, false);
+      setPortfolioSections(remotePortfolio.sections, false);
+    };
+
+    const localUpdateTime = getPortfolioLocalUpdateTime();
+
+    if (!localUpdateTime) {
+      syncRemoteWithLocal();
+      return;
+    }
+
+    if (localUpdateTime < new Date(remotePortfolio.updatedAt)) {
+      syncRemoteWithLocal();
     }
   }, [remotePortfolio]);
 
   useEffect(() => {
     if (profile && portfolioIntro.name === "" && portfolioIntro.description === "") {
-      setPortfolioIntro({
-        ...portfolioIntro,
-        name: profile.name,
-        description: profile.description,
-      });
+      setPortfolioIntro(
+        {
+          ...portfolioIntro,
+          name: profile.name,
+          description: profile.description,
+        },
+        false
+      );
     }
   }, [profile]);
-
-  useEffect(() => {
-    setPortfolioLocalUpdateTime(new Date());
-  }, [portfolioIntro, portfolioProjects, portfolioSections]);
 
   useEffect(() => {
     paginate(paginationCount - 1);
@@ -257,13 +266,6 @@ const MyPortfolioPage = () => {
       <ScrollActiveHeader containerRef={containerRef}>
         <PortfolioHeader
           isButtonsShown={true}
-          profile={profile ?? null}
-          portfolio={{
-            id: null,
-            intro: portfolioIntro,
-            projects: portfolioProjects,
-            sections: portfolioSections,
-          }}
           onAddPortfolioSection={handleAddSection}
           onAddPortfolioProject={handleAddProject}
           onUploadPortfolio={handleUploadPortfolio}

@@ -23,8 +23,8 @@ const usePortfolioSections = () => {
     },
   ]);
 
-  const setPortfolioSections = (sections: PortfolioSection[]) => {
-    setPortfolioLocalUpdateTime(new Date());
+  const setPortfolioSections = (sections: PortfolioSection[], shouldRenewUpdateTime: boolean = true) => {
+    shouldRenewUpdateTime && setPortfolioLocalUpdateTime(new Date());
     setItem(sections);
   };
 
