@@ -1,0 +1,45 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+
+== Portfolio
+=== 나의 포트폴리오 조회 - 사용자 (로그인)
+==== Request
+include::{snippets}/portfolio-readMine-loggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/portfolio-readMine-loggedIn/http-response.adoc[]
+
+=== 남의 포트폴리오 조회 - 사용자 (로그인)
+==== Request
+include::{snippets}/portfolio-readYours-loggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/portfolio-readYours-loggedIn/http-response.adoc[]
+
+=== 나의 포트폴리오 수정 - 사용자 (로그인)
+==== Request
+include::{snippets}/portfolio-updateMine-loggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/portfolio-updateMine-loggedIn/http-response.adoc[]
+
+=== 남의 포트폴리오 수정 - 사용자 (로그인)
+==== Request
+include::{snippets}/portfolio-updateYours-loggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/portfolio-updateYours-loggedIn/http-response.adoc[]
+
+=== 남의 포트폴리오 조회 - 게스트 (비 로그인)
+==== Request
+include::{snippets}/portfolio-readYours-unLoggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/portfolio-readYours-unLoggedIn/http-response.adoc[]
+
+=== 남의 포트폴리오 수정 - 게스트 (비 로그인)
+==== Request
+include::{snippets}/portfolio-updateYours-unLoggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/portfolio-updateYours-unLoggedIn/http-response.adoc[]
