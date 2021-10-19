@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
+import { fadeIn } from "../@styled/keyframes";
+import { customScrollbarCSS } from "../@styled/scrollbar";
 
 export const Container = styled.div`
   display: flex;
@@ -12,26 +14,30 @@ export const SearchInputWrapper = styled.div`
   margin-bottom: 2.0625rem;
 `;
 
-export const RepositoryList = styled.ul`
-  height: auto;
-  overflow-y: auto;
-`;
+export const RepositoryList = styled.ul(
+  ({ theme }) => css`
+    height: auto;
+    overflow-y: auto;
 
-export const RepositoryListItem = styled.li`
-  padding: 0.5625rem 0.25rem;
-  display: flex;
-  align-items: center;
-  transition: background-color 0.5s;
-  cursor: pointer;
+    ${customScrollbarCSS(theme.color.textColor)}
+  `
+);
 
-  ${({ theme }) => `
-    border-bottom: 1px solid  ${theme.color.separatorColor};
-    
+export const RepositoryListItem = styled.li(
+  ({ theme }) => css`
+    padding: 0.5625rem 0.25rem;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.5s;
+    cursor: pointer;
+    border-bottom: 1px solid ${theme.color.separatorColor};
+    animation: ${fadeIn} 1s forwards;
+
     :hover {
       background-color: ${theme.color.secondaryColor};
     }
-  `};
-`;
+  `
+);
 
 export const RepositoryCircle = styled.a`
   margin-right: 1rem;

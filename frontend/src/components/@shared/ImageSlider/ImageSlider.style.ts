@@ -1,34 +1,40 @@
-import styled from "styled-components";
+import styled, { css, CSSProp } from "styled-components";
 
-export const Container = styled.div<React.CSSProperties>`
-  ${({ width }) => `
+export const Container = styled.div<React.CSSProperties & { cssProp?: CSSProp }>(
+  ({ cssProp }) => css`
+    overflow: hidden;
+    position: relative;
+    background-color: white;
+
+    ${cssProp};
+  `
+);
+
+export const ImageListSlider = styled.ul<React.CSSProperties>(
+  ({ theme, width }) => css`
     width: ${width};
-  `}
-  height: fit-content;
+    height: 100%;
+    background-color: ${theme.color.white};
 
-  overflow: hidden;
-  position: relative;
-`;
+    display: flex;
+    align-items: center;
+    transition: transform 0.5s ease-in-out;
+  `
+);
 
-export const ImageListSlider = styled.ul<React.CSSProperties>`
-  ${({ width }) => `
-    width: ${width};
-  `}
-  height: fit-content;
-  background-color: #000000;
-
-  display: flex;
-  align-items: center;
-  transition: transform 0.5s ease-in-out;
-`;
-
-export const ImageList = styled.li<React.CSSProperties>`
+export const ImageListItem = styled.li<React.CSSProperties>`
   width: 100%;
-
-  img {
-    width: 100%;
-  }
+  height: 100%;
 `;
+
+export const Image = styled.img<{ imageHeight?: string }>(
+  ({ imageHeight }) => css`
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    ${imageHeight && `height: ${imageHeight};`}
+  `
+);
 
 export const ImageView = styled.div<{ imageUrl: string }>`
   width: 100%;

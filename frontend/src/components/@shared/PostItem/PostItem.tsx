@@ -41,7 +41,6 @@ import { getTimeDiffFromCurrent } from "../../../utils/date";
 import EmptyPostImage from "../../../assets/images/empty-post-image.png";
 import ButtonDrawer from "../ButtonDrawer/ButtonDrawer";
 import { getTextElementsWithWithBr } from "../../../utils/text";
-import { Spinner } from "../Loader/Loader.style";
 
 export interface Props {
   currentUserName: string;
@@ -176,7 +175,7 @@ const PostItem = ({
             <MoreContentLinkButton onClick={handleMoreContentHide}>간략히</MoreContentLinkButton>
           )}
         </PostContent>
-        <TagListWrapper>{shouldHideContent || tagList}</TagListWrapper>
+        <TagListWrapper>{shouldHideContent ? tagList.slice(0, LIMIT.POST_TAG_HIDE_LENGTH) : tagList}</TagListWrapper>
         <CommentsWrapper>
           {commentList.length > 10
             ? commentList.slice(0, 10).concat(

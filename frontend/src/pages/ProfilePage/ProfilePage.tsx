@@ -33,19 +33,19 @@ const ProfilePage = ({ isMyProfile }: Props) => {
   if (!fixedUsername) return <Redirect to={PAGE_URL.HOME} />;
 
   return (
-    <Container>
-      <Suspense
-        fallback={
-          <LoadingWrapper>
-            <PageLoadingWithLogo />
-          </LoadingWrapper>
-        }
-      >
+    <Suspense
+      fallback={
+        <LoadingWrapper>
+          <PageLoadingWithLogo />
+        </LoadingWrapper>
+      }
+    >
+      <Container>
         <Profile isMyProfile={isMyProfile} username={fixedUsername} />
         <Tabs tabIndicatorKind="line" tabItems={tabItems} />
         <ProfileTabContents isMyProfile={isMyProfile} username={fixedUsername} tabIndex={tabIndex} />
-      </Suspense>
-    </Container>
+      </Container>
+    </Suspense>
   );
 };
 

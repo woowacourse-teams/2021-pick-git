@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 
 import ConfirmPortal from "../../components/@layout/ConfirmPortal/ConfirmPortal";
@@ -24,19 +24,23 @@ import { getTextElementsWithWithBr } from "../../utils/text";
 
 import {
   CloseLinkButton,
+  CloseLinkButtonWrapper,
+  CloseLinkText,
   CommentContentWrapper,
   CommentList,
   CommentListItem,
-  CommentLoadingWrapper,
   CommentText,
   CommentTextArea,
   CommentTextAreaWrapper,
   Container,
+  ContentWrapper,
   DeleteIconWrapper,
   GoBackLinkButton,
   HorizontalSlider,
   HorizontalSliderItemWrapper,
   HorizontalSliderWrapper,
+  LoaderCSS,
+  LoaderWrapper,
   PostContent,
   PostContentAuthorLink,
   SendIconWrapper,
@@ -48,6 +52,7 @@ import {
 
 import type { CommentData, Post, TabItem } from "../../@types";
 import useModal from "../../hooks/common/useModal";
+import Loader from "../../components/@shared/Loader/Loader";
 
 const CommentsPage = () => {
   const commentTextAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -128,10 +133,6 @@ const CommentsPage = () => {
     const newComment = commentTextAreaRef.current.value;
 
     commentTextAreaRef.current.value = "";
-    window.scroll({
-      top: window.outerHeight,
-      behavior: "smooth",
-    });
 
     try {
       await addPostComment(selectedPost.id, newComment);
@@ -139,6 +140,17 @@ const CommentsPage = () => {
       pushSnackbarMessage(FAILURE_MESSAGE.COMMENT_SAVE_FAILED);
     }
   };
+
+  useEffect(() => {
+    if (!containerRef.current) {
+      return;
+    }
+
+    containerRef.current.scroll({
+      top: window.outerHeight,
+      behavior: "smooth",
+    });
+  }, [comments]);
 
   const commentListItems =
     comments?.map((comment) => (
@@ -196,46 +208,51 @@ const CommentsPage = () => {
   }
 
   return (
-    <Container ref={containerRef}>
-      <SliderHeader>
-        <GoBackLinkButton>
-          <SVGIcon icon="GoBackIcon" onClick={handleGoBack} />
-        </GoBackLinkButton>
-        <CloseLinkButton isPostShown={isPostShown}>
-          <SVGIcon icon="GoDownIcon" onClick={handleTogglePost} />
-        </CloseLinkButton>
-      </SliderHeader>
-      {isPostShown && (
-        <HorizontalSliderWrapper>
-          <HorizontalSlider stepCount={COMMENT_SLIDE_STEPS.length} stepIndex={stepIndex}>
-            {horizontalSliderItems}
-          </HorizontalSlider>
-          <TabsWrapper>
-            <Tabs tabIndicatorKind="pill" tabItems={tabItems} />
-          </TabsWrapper>
-        </HorizontalSliderWrapper>
-      )}
-      {isAddCommentLoading || isDeleteCommentLoading ? (
-        <CommentLoadingWrapper>
-          <PageLoading />
-        </CommentLoadingWrapper>
-      ) : (
+    <ContentWrapper ref={containerRef}>
+      <Container>
+        <SliderHeader>
+          <GoBackLinkButton>
+            <SVGIcon icon="GoBackIcon" onClick={handleGoBack} />
+          </GoBackLinkButton>
+          <CloseLinkButtonWrapper onClick={handleTogglePost}>
+            <CloseLinkText>{isPostShown ? "숨기기" : "게시글 보기"}</CloseLinkText>
+            <CloseLinkButton isPostShown={isPostShown}>
+              <SVGIcon icon="GoDownIcon" />
+            </CloseLinkButton>
+          </CloseLinkButtonWrapper>
+        </SliderHeader>
+        {isPostShown && (
+          <HorizontalSliderWrapper>
+            <HorizontalSlider stepCount={COMMENT_SLIDE_STEPS.length} stepIndex={stepIndex}>
+              {horizontalSliderItems}
+            </HorizontalSlider>
+            <TabsWrapper>
+              <Tabs tabIndicatorKind="pill" tabItems={tabItems} />
+            </TabsWrapper>
+          </HorizontalSliderWrapper>
+        )}
+
         <InfiniteScrollContainer isLoaderShown={isFetching} onIntersect={getNextComments}>
           <CommentList>{commentListItems}</CommentList>
+          {(isAddCommentLoading || isDeleteCommentLoading) && (
+            <LoaderWrapper>
+              <Loader kind="dots" size="1rem" cssProp={LoaderCSS} />
+            </LoaderWrapper>
+          )}
         </InfiniteScrollContainer>
-      )}
-      {isLoggedIn && (
-        <CommentTextAreaWrapper>
-          <CommentTextArea placeholder="댓글 입력..." ref={commentTextAreaRef} />
-          <SendIconWrapper>
-            <SVGIcon icon="SendIcon" onClick={handleCommentSave} />
-          </SendIconWrapper>
-        </CommentTextAreaWrapper>
-      )}
-      {isConfirmShown && (
-        <ConfirmPortal heading={confirmMessage} onConfirm={handleCommentDelete} onCancel={hideConfirm} />
-      )}
-    </Container>
+        {isLoggedIn && (
+          <CommentTextAreaWrapper>
+            <CommentTextArea placeholder="댓글 입력..." ref={commentTextAreaRef} />
+            <SendIconWrapper>
+              <SVGIcon icon="SendIcon" onClick={handleCommentSave} />
+            </SendIconWrapper>
+          </CommentTextAreaWrapper>
+        )}
+        {isConfirmShown && (
+          <ConfirmPortal heading={confirmMessage} onConfirm={handleCommentDelete} onCancel={hideConfirm} />
+        )}
+      </Container>
+    </ContentWrapper>
   );
 };
 

@@ -1,16 +1,19 @@
-import styled from "styled-components";
+import styled, { css, CSSProp } from "styled-components";
 
-export const Container = styled.div`
-  display: flex;
-  justify-content: center;
-  width: 100%;
-`;
+export const Container = styled.div<{ cssProp?: CSSProp }>(
+  ({ cssProp }) => css`
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    ${cssProp}
+  `
+);
 
 export const Image = styled.img`
   width: 100%;
-  max-width: 420px;
   transition: opacity 0.5s, box-shadow 0.5s;
   cursor: pointer;
+  object-fit: cover;
 
   :hover {
     opacity: 0.85;
