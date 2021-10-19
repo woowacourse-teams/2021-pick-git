@@ -1,10 +1,20 @@
 import { useRef } from "react";
+
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import PortfolioHeader from "../../components/@layout/PortfolioHeader/PortfolioHeader";
 import ScrollActiveHeader from "../../components/@layout/ScrollActiveHeader/ScrollActiveHeader";
 import Avatar from "../../components/@shared/Avatar/Avatar";
-import useProfile from "../../services/hooks/useProfile";
-import { getScrollYPosition } from "../../utils/layout";
+import DotPaginator from "../../components/@shared/DotPaginator/DotPaginator";
+import PageError from "../../components/@shared/PageError/PageError";
+import SVGIcon from "../../components/@shared/SVGIcon/SVGIcon";
+import PortfolioProjectSection from "../../components/PortfolioProjectSection/PortfolioProjectSection";
+import PortfolioSection from "../../components/PortfolioSection/PortfolioSection";
+import PortfolioTextEditor from "../../components/PortfolioTextEditor/PortfolioTextEditor";
+import useScrollPagination from "../../hooks/common/useScrollPagination";
+
+import usePortfolio from "../../hooks/service/usePortfolio";
+import useProfile from "../../hooks/service/useProfile";
+
 import {
   AvatarWrapper,
   ContactIconCSS,
@@ -18,29 +28,19 @@ import {
   UserAvatarCSS,
   UserNameCSS,
 } from "./PortfolioPage.style";
-import DotPaginator from "../../components/@shared/DotPaginator/DotPaginator";
-import PortfolioProjectSection from "../../components/PortfolioProjectSection/PortfolioProjectSection";
-import PortfolioSection from "../../components/PortfolioSection/PortfolioSection";
-import SVGIcon from "../../components/@shared/SVGIcon/SVGIcon";
-import PortfolioTextEditor from "../../components/PortfolioTextEditor/PortfolioTextEditor";
-import usePortfolio from "../../services/hooks/usePortfolio";
-import PageError from "../../components/@shared/PageError/PageError";
 
 const PortfolioPage = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
   const username = new URLSearchParams(location.search).get("username") ?? "";
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const { portfolio: remotePortfolio, isError, isLoading: isPortfolioLoading, error } = usePortfolio(username);
   const { data: profile, isLoading: isProfileLoading } = useProfile(false, username);
 
-  const handlePaginate = (index: number) => {
-    if (!containerRef.current) {
-      return;
-    }
+  const paginationCount = remotePortfolio ? remotePortfolio.projects.length + remotePortfolio.sections.length + 1 : 0;
+  const { activePageIndex, paginate } = useScrollPagination(containerRef, paginationCount);
 
-    containerRef.current.scrollTo({
-      behavior: "smooth",
-      top: getScrollYPosition(containerRef.current.children[index], containerRef.current),
-    });
+  const handlePaginate = (index: number) => {
+    paginate(index);
   };
 
   if (isProfileLoading || isPortfolioLoading) {
@@ -57,10 +57,8 @@ const PortfolioPage = () => {
       );
     }
 
-    return <div>포트폴리오 정보를 불러오는데 실패했습니다</div>;
+    return <PageError errorMessage="포트폴리오 정보를 불러오는데 실패했습니다" />;
   }
-
-  const paginationCount = remotePortfolio.projects.length + remotePortfolio.sections.length + 1;
 
   return (
     <>
@@ -122,7 +120,7 @@ const PortfolioPage = () => {
         ))}
       </Container>
       <PaginatorWrapper>
-        <DotPaginator paginationCount={paginationCount} paginate={handlePaginate} />
+        <DotPaginator activePageIndex={activePageIndex} paginationCount={paginationCount} onPaginate={handlePaginate} />
       </PaginatorWrapper>
     </>
   );

@@ -58,13 +58,14 @@ const PortfolioHeader = ({
               작성란 추가
             </DropDown>
             <Button kind="roundedInline" backgroundColor={color.primaryColor} color={color.white}>
-              <PDFDownloadLink
+              PDF로 인쇄
+              {/* <PDFDownloadLink
                 document={<PortfolioDocument profile={profile} portfolio={portfolio} />}
                 fileName="포트폴리오.pdf"
                 style={{ color: "inherit", fontSize: "inherit" }}
               >
                 PDF로 인쇄
-              </PDFDownloadLink>
+              </PDFDownloadLink> */}
             </Button>
           </HeaderButtonsWrapper>
         )}

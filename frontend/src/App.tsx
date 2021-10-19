@@ -11,7 +11,7 @@ import UserContext from "./contexts/UserContext";
 import SnackBarContext from "./contexts/SnackbarContext";
 import { PostEditStepContextProvider } from "./contexts/PostEditStepContext";
 import PageLoadingWithLogo from "./components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
-import MyPortfolioPage from "./pages/MyPortfolioPage/MyPortfolioPage";
+import MyPortfolioPage from "./pages/PortfolioPage/MyPortfolioPage";
 
 const NavigationHeader = lazy(() => import("./components/@layout/NavigationHeader/NavigationHeader"));
 const OneDepthStepHeader = lazy(() => import("./components/OneDepthStepHeader/OneDepthStepHeader"));
@@ -20,7 +20,6 @@ const SearchHeader = lazy(() => import("./components/@layout/SearchHeader/Search
 
 const HomeFeedPage = lazy(() => import("./pages/HomeFeedPage/HomeFeedPage"));
 const UserFeedPage = lazy(() => import("./pages/UserFeedPage/UserFeedPage"));
-const TagFeedPage = lazy(() => import("./pages/TagFeedPage/TagFeedPage"));
 const SearchPage = lazy(() => import("./pages/SearchPage/SearchPage"));
 const SearchPostResultPage = lazy(() => import("./pages/SearchPostResultPage/SearchPostResultPage"));
 const LoginPage = lazy(() => import("./pages/LoginPage/LoginPage"));
@@ -85,9 +84,6 @@ const App = () => {
           </Route>
           <Route exact path={PAGE_URL.USER_FEED_BASE}>
             <UserFeedPage />
-          </Route>
-          <Route exact path={PAGE_URL.TAG_FEED_BASE}>
-            <TagFeedPage />
           </Route>
           <Route exact path={PAGE_URL.SEARCH}>
             <SearchPage />

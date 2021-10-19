@@ -12,7 +12,7 @@ public class MockContributionApiRequester implements PlatformContributionApiRequ
         if (!url.startsWith(validPrefix)) {
             throw new PlatformHttpErrorException();
         }
-        if (!"oauth.access.token".equals(accessToken)) {
+        if (!accessToken.contains("oauth.access.token")) {
             throw new PlatformHttpErrorException();
         }
 

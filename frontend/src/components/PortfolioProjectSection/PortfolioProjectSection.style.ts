@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import styled, { css } from "styled-components";
 import { setDesktopMediaQuery, setLaptopAboveMediaQuery, setLaptopMediaQuery } from "../@styled/mediaQueries";
 
@@ -54,6 +53,8 @@ export const ProjectType = styled.span(() => ProjectTypeCSS);
 export const ProjectDateCSS = css`
   width: 7rem;
   text-align: center;
+  background: none;
+  border: none;
 
   ${setLaptopMediaQuery`
     width: 10rem;
@@ -139,6 +140,11 @@ export const ProjectInfo = styled.div`
 export const ProjectContentCSS = css`
   font-size: 0.7rem;
   margin: 0 1.5rem 0 0;
+  height: 100%;
+  line-height: 1.5rem;
+  margin-bottom: 1rem;
+
+  color: ${({ theme }) => theme.color.textColor};
 
   ${setLaptopMediaQuery`
     font-size: 0.8rem;
@@ -149,9 +155,6 @@ export const ProjectContentCSS = css`
     font-size: 0.9rem;
     margin-right: 3rem;
   `}
-
-  line-height: 1.5rem;
-  margin-bottom: 1rem;
 `;
 
 export const TagListWrapper = styled.div`

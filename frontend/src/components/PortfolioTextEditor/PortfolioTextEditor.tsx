@@ -4,7 +4,7 @@ import { TextAreaCSS } from "./PortfolioTextEditor.style";
 
 export interface Props extends TextEditorProps {}
 
-const PortfolioTextEditor = ({ value, cssProp, placeholder, disabled, onChange }: Props) => {
+const PortfolioTextEditor = ({ value, cssProp, placeholder, disabled, autoGrow, onChange }: Props) => {
   return (
     <TextEditor
       value={value}
@@ -13,7 +13,7 @@ const PortfolioTextEditor = ({ value, cssProp, placeholder, disabled, onChange }
         ${cssProp}
         ${TextAreaCSS}
       `}
-      autoGrow={true}
+      autoGrow={autoGrow}
       placeholder={placeholder}
       disabled={disabled}
     />

@@ -39,7 +39,7 @@ public class MockRepositoryApiRequester implements PlatformRepositoryApiRequeste
     }
 
     private boolean isInvalidToken(String token) {
-        return !token.equals(ACCESS_TOKEN);
+        return !token.contains(ACCESS_TOKEN);
     }
 
     private boolean isInvalidUrl(

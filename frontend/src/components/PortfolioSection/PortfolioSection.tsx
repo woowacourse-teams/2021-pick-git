@@ -1,7 +1,7 @@
 import { StringDecoder } from "string_decoder";
 import { PortfolioSection, PortfolioSectionItem } from "../../@types";
 import { PLACE_HOLDER } from "../../constants/placeholder";
-import usePortfolioSectionItem from "../../services/hooks/usePortfolioSectionItem";
+import usePortfolioSectionItem from "../../hooks/service/usePortfolioSectionItem";
 import PortfolioTextEditor from "../PortfolioTextEditor/PortfolioTextEditor";
 import SVGIcon from "../@shared/SVGIcon/SVGIcon";
 import {
@@ -19,8 +19,9 @@ import {
   DescriptionAddIconWrapper,
 } from "./PortfolioSection.style";
 import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
-import useMessageModal from "../../services/hooks/@common/useMessageModal";
+import useMessageModal from "../../hooks/common/useMessageModal";
 import { FAILURE_MESSAGE } from "../../constants/messages";
+import { Fragment } from "react";
 
 export interface Props {
   section: PortfolioSection;
@@ -83,7 +84,7 @@ const PortfolioSection = ({ section, isEditable, setSection }: Props) => {
 
   // TODO: remove index from key prop
   const categoryItems = portfolioSectionItems.map((item, sectionIndex) => (
-    <SectionContentWrapper key={sectionIndex}>
+    <SectionContentWrapper key={item.id ?? "" + sectionIndex}>
       <CategoriesWrapper>
         <Category>
           <PortfolioTextEditor
@@ -108,7 +109,7 @@ const PortfolioSection = ({ section, isEditable, setSection }: Props) => {
       </CategoriesWrapper>
       <DescriptionsWrapper>
         {item.descriptions.map((description, descriptionIndex) => (
-          <>
+          <Fragment key={description.id ?? "" + descriptionIndex}>
             <Description>
               <PortfolioTextEditor
                 value={description.value}
@@ -132,7 +133,7 @@ const PortfolioSection = ({ section, isEditable, setSection }: Props) => {
                 <SVGIcon icon="AddCircleIcon" onClick={() => handleAddBlankDescription(sectionIndex)} />
               </DescriptionAddIconWrapper>
             )}
-          </>
+          </Fragment>
         ))}
       </DescriptionsWrapper>
     </SectionContentWrapper>

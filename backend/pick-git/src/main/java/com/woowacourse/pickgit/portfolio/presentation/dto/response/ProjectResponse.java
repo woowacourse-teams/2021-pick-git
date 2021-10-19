@@ -1,6 +1,6 @@
 package com.woowacourse.pickgit.portfolio.presentation.dto.response;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.Builder;
 
@@ -9,8 +9,8 @@ public class ProjectResponse {
 
     private Long id;
     private String name;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private String type;
     private String imageUrl;
     private String content;
@@ -22,8 +22,8 @@ public class ProjectResponse {
     public ProjectResponse(
         Long id,
         String name,
-        LocalDateTime startDate,
-        LocalDateTime endDate,
+        LocalDate startDate,
+        LocalDate endDate,
         String type,
         String imageUrl,
         String content,
@@ -47,11 +47,11 @@ public class ProjectResponse {
         return name;
     }
 
-    public LocalDateTime getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public LocalDateTime getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 

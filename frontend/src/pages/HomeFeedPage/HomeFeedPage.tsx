@@ -1,16 +1,21 @@
-import { Container } from "./HomeFeedPage.style";
-import Feed from "../../components/Feed/Feed";
-import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
-import useHomeFeed from "../../services/hooks/useHomeFeed";
-import { QUERY } from "../../constants/queries";
 import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
-import useInfiniteImagePreloader from "../../services/hooks/@common/useInfiniteImagePreloader";
+import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
+import PageError from "../../components/@shared/PageError/PageError";
+import Feed from "../../components/Feed/Feed";
+
+import { QUERY } from "../../constants/queries";
+
+import useInfiniteImagePreloader from "../../hooks/common/useInfiniteImagePreloader";
+import useHomeFeed from "../../hooks/service/useHomeFeed";
+
+import { Container } from "./HomeFeedPage.style";
 
 const HomeFeedPage = () => {
   const { infinitePostsData, isLoading, isFetching, isError, handlePostsEndIntersect } = useHomeFeed();
   const infiniteImageUrls =
-    infinitePostsData?.pages.map((posts) => posts.reduce<string[]>((acc, post) => [...acc, ...post.imageUrls], [])) ??
-    [];
+    infinitePostsData?.pages.map<string[]>((posts) =>
+      posts.reduce<string[]>((acc, post) => [...acc, ...post.imageUrls], [])
+    ) ?? [];
   const { isFirstImagesLoading, isImagesFetching, activateImageFetchingState } =
     useInfiniteImagePreloader(infiniteImageUrls);
 
@@ -24,7 +29,7 @@ const HomeFeedPage = () => {
   }
 
   if (isError || !infinitePostsData) {
-    return <div>에러!!</div>;
+    return <PageError errorMessage="게시물을 가져올 수 없습니다." />;
   }
 
   return (

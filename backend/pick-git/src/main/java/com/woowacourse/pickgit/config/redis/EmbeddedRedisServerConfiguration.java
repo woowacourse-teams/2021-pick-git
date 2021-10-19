@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import redis.embedded.RedisServer;
@@ -23,6 +24,7 @@ import redis.embedded.RedisServer;
 @Profile(value = {"test", "local"})
 @Configuration
 public class EmbeddedRedisServerConfiguration {
+
     private static final String LOCAL_HOST = "127.0.0.1";
     private static final String BIN_SH = "/bin/sh";
     private static final String BIN_SH_OPTION = "-c";
@@ -41,11 +43,13 @@ public class EmbeddedRedisServerConfiguration {
     }
 
     @PostConstruct
-    public void redisServer() throws IOException, URISyntaxException {
+    public void redisServer() throws IOException {
         int redisPort = isRedisRunning() ? findAvailablePort() : port;
         if (isArmMac()) {
-            redisServer = new RedisServer(getRedisFileForArcMac(), redisPort);
-        } else {
+            redisServer = new RedisServer(Objects.requireNonNull(getRedisFileForArcMac()),
+                redisPort);
+        }
+        if (!isArmMac()) {
             redisServer = new RedisServer(redisPort);
         }
         redisServer.start();
@@ -56,12 +60,12 @@ public class EmbeddedRedisServerConfiguration {
             Objects.equals(System.getProperty("os.name"), "Mac OS X");
     }
 
-    private File getRedisFileForArcMac() throws URISyntaxException {
-        URL resource = getClass().getClassLoader()
-            .getResource("binary/redis/redis-server-6.2.5-mac-arm64");
-        File file = new File(resource.toURI());
-        file.setExecutable(true);
-        return file;
+    private File getRedisFileForArcMac() {
+        try {
+            return new ClassPathResource("binary/redis/redis-server-6.2.5-mac-arm64").getFile();
+        } catch (Exception e) {
+            throw new EmbeddedRedisServerException();
+        }
     }
 
     @PreDestroy
@@ -79,7 +83,8 @@ public class EmbeddedRedisServerConfiguration {
         String line;
         StringBuilder pidInfo = new StringBuilder();
 
-        try (BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+        try (BufferedReader input = new BufferedReader(
+            new InputStreamReader(process.getInputStream()))) {
 
             while ((line = input.readLine()) != null) {
                 pidInfo.append(line);

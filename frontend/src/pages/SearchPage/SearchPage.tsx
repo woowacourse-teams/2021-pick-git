@@ -8,8 +8,8 @@ import UserList from "../../components/UserList/UserList";
 import { QUERY } from "../../constants/queries";
 import { PAGE_URL } from "../../constants/urls";
 import SearchContext from "../../contexts/SearchContext";
-import useSearchPostData from "../../services/hooks/useSearchPostData";
-import useSearchUserData from "../../services/hooks/useSearchUserData";
+import useSearchPostData from "../../hooks/service/useSearchPostData";
+import useSearchUserData from "../../hooks/service/useSearchUserData";
 import { Container, ContentWrapper, Empty, KeywordsWrapper } from "./SearchPage.style";
 
 const tabNames = ["계정", "태그"];
