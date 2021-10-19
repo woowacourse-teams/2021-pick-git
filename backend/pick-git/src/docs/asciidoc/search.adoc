@@ -19,3 +19,15 @@ include::{snippets}/search-user-LoggedIn/http-response.adoc[]
 include::{snippets}/search-user-unLoggedIn/http-request.adoc[]
 ==== Response
 include::{snippets}/search-user-unLoggedIn/http-response.adoc[]
+
+=== 태그 검색 - 로그인
+==== Request
+include::{snippets}/search-tag-LoggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/search-tag-LoggedIn/http-response.adoc[]
+
+=== 태그 검색 - 비 로그인
+==== Request
+include::{snippets}/search-tag-unLoggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/search-tag-unLoggedIn/http-response.adoc[]
