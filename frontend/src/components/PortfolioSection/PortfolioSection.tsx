@@ -37,7 +37,6 @@ const PortfolioSection = ({ section, isEditable, setSection }: Props) => {
     addBlankDescription,
     deleteDescription,
     deleteSectionItem,
-    isSameSectionNameExist,
   } = usePortfolioSectionItem(section, setSection);
 
   const {

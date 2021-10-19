@@ -1,4 +1,6 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
+import { setLaptopAboveMediaQuery } from "../@styled/mediaQueries";
+import { customScrollbarCSS } from "../@styled/scrollbar";
 
 export const Container = styled.div`
   display: flex;
@@ -10,16 +12,35 @@ export const Container = styled.div`
 export const Form = styled.form`
   margin-top: 3rem;
   margin-bottom: 1.8125rem;
+
+  ${setLaptopAboveMediaQuery`
+    margin-top: 6rem;
+  `}
 `;
 
-export const TagList = styled.ul`
-  display: flex;
-  flex-wrap: wrap;
-  margin: 0;
-`;
+export const TagList = styled.ul(
+  ({ theme }) => css`
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0;
+    overflow-y: scroll;
+
+    ${customScrollbarCSS(theme.color.tagItemColor)}
+  `
+);
 
 export const TagListItem = styled.li`
   margin: 0 0.625rem 0.5625rem 0;
+`;
+
+export const TagInputWrapper = styled.div`
+  position: relative;
+`;
+
+export const TagAddButtonCSS = css`
+  position: absolute;
+  top: 0.625rem;
+  right: 0.3125rem;
 `;
 
 export const TextLengthIndicator = styled.div<React.CSSProperties>`

@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { LAYOUT, PAGE_WIDTH, Z_INDEX } from "../../constants/layout";
+import { fadeIn } from "./keyframes";
 import { setDesktopMediaQuery, setLaptopMediaQuery, setTabletMediaQuery, setMobileMediaQuery } from "./mediaQueries";
 
 export const Header = styled.header`
@@ -20,6 +21,8 @@ export const Page = styled.main`
   width: 100%;
   height: 100%;
   padding-top: ${LAYOUT.HEADER_HEIGHT};
+
+  animation: ${fadeIn} 1s forwards;
 
   ${setTabletMediaQuery`
     padding-top: ${LAYOUT.PAGE_MARGIN_TOP};

@@ -1,5 +1,5 @@
 import { AxiosError } from "axios";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { UseQueryResult } from "react-query";
 import { useHistory } from "react-router-dom";
 import { ErrorResponse, Tags } from "../../@types";
@@ -13,7 +13,16 @@ import AlertPortal from "../@layout/AlertPortal/AlertPortal";
 import PageLoading from "../@layout/PageLoading/PageLoading";
 import Chip from "../@shared/Chip/Chip";
 import Input from "../@shared/Input/Input";
-import { Container, Form, TagList, TagListItem, TextLengthIndicator } from "./TagInputForm.style";
+import SVGIcon from "../@shared/SVGIcon/SVGIcon";
+import {
+  Container,
+  Form,
+  TagInputWrapper,
+  TagList,
+  TagListItem,
+  TagAddButtonCSS,
+  TextLengthIndicator,
+} from "./TagInputForm.style";
 
 interface Props {
   githubRepositoryName: string;
@@ -23,6 +32,7 @@ interface Props {
 }
 
 const TagInputForm = ({ githubRepositoryName, tags, tagsQueryResult, setTags }: Props) => {
+  const formRef = useRef<HTMLFormElement>(null);
   const [tagInputLength, setTagInputLength] = useState(0);
   const {
     modalMessage: alertMessage,
@@ -43,35 +53,44 @@ const TagInputForm = ({ githubRepositoryName, tags, tagsQueryResult, setTags }: 
     }
   }, [githubRepositoryName]);
 
-  const handleTagSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
-    event.preventDefault();
-    const newTag = event.currentTarget["tag-input"].value;
+  const handleTagAdd = () => {
+    if (!formRef.current) {
+      return;
+    }
+
+    const newTag = formRef.current["tag-input"].value;
 
     if (newTag.length === 0) {
       return;
     }
 
     if (!isValidTagLength(newTag)) {
-      event.currentTarget["tag-input"].blur();
+      formRef.current["tag-input"].blur();
       showAlert(FAILURE_MESSAGE.POST_TAG_LENGTH_LIMIT_EXCEEDED);
       return;
     }
 
     if (!isValidTagFormat(newTag)) {
-      event.currentTarget["tag-input"].blur();
+      formRef.current["tag-input"].blur();
       showAlert(FAILURE_MESSAGE.POST_TAG_SPECIAL_SYMBOL_EXIST);
       return;
     }
 
     if (hasDuplicatedTag([...tags, newTag])) {
-      event.currentTarget["tag-input"].blur();
+      formRef.current["tag-input"].blur();
       showAlert(FAILURE_MESSAGE.POST_DUPLICATED_TAG_EXIST);
       return;
     }
 
     setTags([...tags, newTag]);
     setTagInputLength(0);
-    event.currentTarget["tag-input"].value = "";
+
+    formRef.current["tag-input"].value = "";
+  };
+
+  const handleTagSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
+    event.preventDefault();
+    handleTagAdd();
   };
 
   const handleTagDelete = (targetTag: string) => {
@@ -109,14 +128,17 @@ const TagInputForm = ({ githubRepositoryName, tags, tagsQueryResult, setTags }: 
 
   return (
     <Container>
-      <Form onSubmit={handleTagSubmit}>
-        <Input
-          kind="borderBottom"
-          textAlign="center"
-          placeholder="태그 입력..."
-          name="tag-input"
-          onChange={handleTagInputChange}
-        />
+      <Form onSubmit={handleTagSubmit} ref={formRef}>
+        <TagInputWrapper>
+          <Input
+            kind="borderBottom"
+            textAlign="center"
+            placeholder="태그 입력..."
+            name="tag-input"
+            onChange={handleTagInputChange}
+          />
+          <SVGIcon icon="AddBoxIcon" cssProp={TagAddButtonCSS} onClick={handleTagAdd} />
+        </TagInputWrapper>
         <TextLengthIndicator>{`${tagInputLength} / ${LIMIT.POST_TAG_LENGTH}`}</TextLengthIndicator>
       </Form>
       <TagList>{tagListItems}</TagList>
