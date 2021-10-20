@@ -14,11 +14,17 @@ include::{snippets}/portfolio-readMine-loggedIn/http-request.adoc[]
 ==== Response
 include::{snippets}/portfolio-readMine-loggedIn/http-response.adoc[]
 
-=== 남의 포트폴리오 조회 - 사용자 (로그인)
+=== 남의 포트폴리오 조회, 존재하는 경우 - 사용자 (로그인)
 ==== Request
-include::{snippets}/portfolio-readYours-loggedIn/http-request.adoc[]
+include::{snippets}/portfolio-readYoursWithExisting-loggedIn/http-request.adoc[]
 ==== Response
-include::{snippets}/portfolio-readYours-loggedIn/http-response.adoc[]
+include::{snippets}/portfolio-readYoursWithExisting-loggedIn/http-response.adoc[]
+
+=== 남의 포트폴리오 조회, 존재하지 않는 경우 - 사용자 (로그인)
+==== Request
+include::{snippets}/portfolio-readYoursWithNotExisting-loggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/portfolio-readYoursWithNotExisting-loggedIn/http-response.adoc[]
 
 === 나의 포트폴리오 수정 - 사용자 (로그인)
 ==== Request
@@ -32,11 +38,17 @@ include::{snippets}/portfolio-updateYours-loggedIn/http-request.adoc[]
 ==== Response
 include::{snippets}/portfolio-updateYours-loggedIn/http-response.adoc[]
 
-=== 남의 포트폴리오 조회 - 게스트 (비 로그인)
+=== 남의 포트폴리오 조회, 존재하는 경우 - 게스트 (비 로그인)
 ==== Request
-include::{snippets}/portfolio-readYours-unLoggedIn/http-request.adoc[]
+include::{snippets}/portfolio-readYoursWithExisting-unLoggedIn/http-request.adoc[]
 ==== Response
-include::{snippets}/portfolio-readYours-unLoggedIn/http-response.adoc[]
+include::{snippets}/portfolio-readYoursWithExisting-unLoggedIn/http-response.adoc[]
+
+=== 남의 포트폴리오 조회, 존재하지 않는 경우 - 게스트 (비 로그인)
+==== Request
+include::{snippets}/portfolio-readYoursWithNotExisting-unLoggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/portfolio-readYoursWithNotExisting-unLoggedIn/http-response.adoc[]
 
 === 남의 포트폴리오 수정 - 게스트 (비 로그인)
 ==== Request
