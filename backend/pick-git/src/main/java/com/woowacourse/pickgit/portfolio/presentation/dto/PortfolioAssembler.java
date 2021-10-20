@@ -91,7 +91,6 @@ public class PortfolioAssembler {
 
     private static TagRequestDto toTagRequestDto(TagRequest tagRequest) {
         return new TagRequestDto(
-            tagRequest.getId(),
             tagRequest.getName()
         );
     }
@@ -183,7 +182,6 @@ public class PortfolioAssembler {
 
     private static TagResponse toTagResponse(TagResponseDto tagResponseDto) {
         return new TagResponse(
-            tagResponseDto.getId(),
             tagResponseDto.getName()
         );
     }
