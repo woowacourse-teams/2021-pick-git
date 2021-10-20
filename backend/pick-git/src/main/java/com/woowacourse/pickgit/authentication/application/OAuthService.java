@@ -65,8 +65,7 @@ public class OAuthService {
         return token;
     }
 
-    public AppUser
-    findRequestUserByToken(String authentication) {
+    public AppUser findRequestUserByToken(String authentication) {
         if (Objects.isNull(authentication)) {
             return new GuestUser();
         }
