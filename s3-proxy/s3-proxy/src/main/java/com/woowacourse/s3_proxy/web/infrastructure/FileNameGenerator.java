@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.tika.Tika;
 import org.apache.tika.mime.MimeType;
@@ -16,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Component
 public class FileNameGenerator {
+
     private static final Tika tika = new Tika();
 
     public String generate(MultipartFile multipartFile, String userName) {
@@ -27,7 +30,8 @@ public class FileNameGenerator {
             final String fileName = multipartFile.getOriginalFilename();
 
             MessageDigest messageDigest = MessageDigest.getInstance("MD5");
-            messageDigest.update((fileName+userName).getBytes(StandardCharsets.UTF_8));
+            messageDigest.update((fileName + userName + LocalDateTime.now())
+                .getBytes(StandardCharsets.UTF_8));
 
             return Hex.encodeHexString(messageDigest.digest());
         } catch (NoSuchAlgorithmException e) {
