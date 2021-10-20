@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.tika.Tika;
 import org.apache.tika.mime.MimeType;
