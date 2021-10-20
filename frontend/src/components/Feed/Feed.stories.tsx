@@ -11,14 +11,19 @@ export default {
 };
 
 const Template: Story = (args) => {
-  const { data: infinitePostsData, isLoading } = useHomeFeedPostsQuery();
+  const { data: infinitePostsData, isLoading } = useHomeFeedPostsQuery("all");
 
   if (isLoading || !infinitePostsData) {
     return <PageLoading />;
   }
 
   return (
-    <Feed {...args} infinitePostsData={infinitePostsData} queryKey={QUERY.GET_HOME_FEED_POSTS} isFetching={false} />
+    <Feed
+      {...args}
+      infinitePostsData={infinitePostsData}
+      queryKey={QUERY.GET_HOME_FEED_POSTS("all")}
+      isFetching={false}
+    />
   );
 };
 

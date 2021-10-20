@@ -1,8 +1,17 @@
+import { FeedFilterOption } from "../@types";
+
 export const QUERY = {
   GET_PROFILE: "GET_SELF_PROFILE",
   GET_PROFILE_FOLLOWING: "GET_PROFILE_FOLLOWING",
   GET_PROFILE_FOLLOWER: "GET_PROFILE_FOLLOWER",
-  GET_HOME_FEED_POSTS: "GET_HOME_FEED_POSTS",
+  GET_HOME_FEED_POSTS: (feedFilterOption: FeedFilterOption) => {
+    const table: { [K in FeedFilterOption]: string } = {
+      all: "GET_HOME_FEED_All_POSTS",
+      followings: "GET_HOME_FEED_FOLLOWING_POSTS",
+    };
+
+    return table[feedFilterOption];
+  },
   GET_USER_FEED_POSTS: "GET_USER_FEED_POSTS",
   GET_SEARCH_USER_RESULT: "GET_SEARCH_USER_RESULT",
   GET_SEARCH_POST_RESULT: "GET_SEARCH_POST_RESULT",
