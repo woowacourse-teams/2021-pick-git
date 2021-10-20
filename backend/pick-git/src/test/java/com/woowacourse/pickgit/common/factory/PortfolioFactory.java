@@ -144,7 +144,6 @@ public class PortfolioFactory {
 
     private static TagRequest mockTagRequest(Long id, String name) {
         return TagRequest.builder()
-            .id(id)
             .name(name)
             .build();
     }

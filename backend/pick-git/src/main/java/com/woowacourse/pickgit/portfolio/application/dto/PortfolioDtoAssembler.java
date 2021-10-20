@@ -27,19 +27,17 @@ import com.woowacourse.pickgit.portfolio.domain.section.Sections;
 import com.woowacourse.pickgit.portfolio.domain.section.item.Description;
 import com.woowacourse.pickgit.portfolio.domain.section.item.Item;
 import com.woowacourse.pickgit.tag.domain.Tag;
+import com.woowacourse.pickgit.tag.domain.TagRepository;
 import java.util.List;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PortfolioDtoAssembler {
 
-    @PersistenceContext
-    private final EntityManager entityManager;
+    private final TagRepository tagRepository;
 
-    public PortfolioDtoAssembler(EntityManager entityManager) {
-        this.entityManager = entityManager;
+    public PortfolioDtoAssembler(TagRepository tagRepository) {
+        this.tagRepository = tagRepository;
     }
 
     public Portfolio toPortfolio(PortfolioRequestDto portfolioRequestDto) {
@@ -82,9 +80,10 @@ public class PortfolioDtoAssembler {
     }
 
     private Project toProject(ProjectRequestDto projectRequestDto) {
-        List<ProjectTag> tags = projectRequestDto.getTags().stream()
-            .map(this::toProjectTag)
+        List<String> tagNames = projectRequestDto.getTags().stream()
+            .map(TagRequestDto::getName)
             .collect(toList());
+        List<ProjectTag> projectTags = toProjectTags(tagNames);
 
         return new Project(
             projectRequestDto.getId(),
@@ -94,14 +93,16 @@ public class PortfolioDtoAssembler {
             projectRequestDto.getType(),
             projectRequestDto.getImageUrl(),
             projectRequestDto.getContent(),
-            tags
+            projectTags
         );
     }
 
-    private ProjectTag toProjectTag(TagRequestDto tagRequestDto) {
-        Tag tag = entityManager.getReference(Tag.class, tagRequestDto.getId());
+    private List<ProjectTag> toProjectTags(List<String> tagNames) {
+        List<Tag> tags = tagRepository.findTagByNameIn(tagNames);
 
-        return new ProjectTag(tag);
+        return tags.stream()
+            .map(ProjectTag::new)
+            .collect(toList());
     }
 
     private Sections toSections(List<SectionRequestDto> sectionRequestDtos) {
@@ -197,7 +198,6 @@ public class PortfolioDtoAssembler {
 
     private TagResponseDto toTagResponseDto(ProjectTag tag) {
         return new TagResponseDto(
-            tag.getTagId(),
             tag.getTagName()
         );
     }

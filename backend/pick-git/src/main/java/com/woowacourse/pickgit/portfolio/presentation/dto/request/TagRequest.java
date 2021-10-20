@@ -5,19 +5,13 @@ import lombok.Builder;
 @Builder
 public class TagRequest {
 
-    private Long id;
     private String name;
 
     private TagRequest() {
     }
 
-    public TagRequest(Long id, String name) {
-        this.id = id;
+    public TagRequest(String name) {
         this.name = name;
-    }
-
-    public Long getId() {
-        return id;
     }
 
     public String getName() {
