@@ -29,8 +29,8 @@
 |<img src=https://user-images.githubusercontent.com/56240505/135817233-243ebc51-70c2-4613-b76e-7edc4aaf0667.gif>|<img src=https://user-images.githubusercontent.com/56240505/135817748-25771911-1f98-437f-a956-8b53f626d9e8.gif>|<img src=https://user-images.githubusercontent.com/56240505/135817760-ac932970-c5ab-4c95-81da-cc6533f19f17.gif>|
 
 <p align="center">
-    <b>깃-들다</b>는 Github 기반의 SNS로서 <b>개발자의 자기 PR과 소통을 위한 공간</b>입니다.<br>
-    <a href=https://sites.google.com/woowahan.com/wooteco-demo-3rd/%EA%B9%83-%EB%93%A4%EB%8B%A4?authuser=0>우아한테크코스 데모 데이 소개 사이트에서 동영상 등 더 많은 내용을 확인해보세요.</a>
+    <b>깃-들다</b>는 Github 기반의 SNS로서 <b>개발자의 자기 PR과 소통을 위한 공간</b>입니다.<br><br>
+    <a href=https://sites.google.com/woowahan.com/wooteco-demo-3rd/%EA%B9%83-%EB%93%A4%EB%8B%A4?authuser=0>우아한테크코스 데모데이 소개 사이트에서 동영상 등 더 많은 내용을 확인해보세요.</a>
 </p>
 <br/>
 
