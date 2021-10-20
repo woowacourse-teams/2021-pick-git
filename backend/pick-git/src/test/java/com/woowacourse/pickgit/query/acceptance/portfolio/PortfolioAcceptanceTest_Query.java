@@ -119,7 +119,12 @@ class PortfolioAcceptanceTest_Query extends AcceptanceTest {
         // then
         assertThat(response.getErrorCode()).isEqualTo("R0001");
     }
-
+    
+    private ExtractableResponse<Response> authenticatedWithReadApiWithStatus(String token, String username) {
+        return authenticatedWithReadApiWithoutStatus(token, username)
+            .statusCode(OK.value())
+            .extract();
+    }
 
     private ValidatableResponse authenticatedWithReadApiWithoutStatus(String token, String username) {
         return given().log().all()
@@ -127,12 +132,6 @@ class PortfolioAcceptanceTest_Query extends AcceptanceTest {
             .when()
             .get("/api/portfolios/{username}", username)
             .then().log().all();
-    }
-
-    private ExtractableResponse<Response> authenticatedWithReadApiWithStatus(String token, String username) {
-        return authenticatedWithReadApiWithoutStatus(token, username)
-            .statusCode(OK.value())
-            .extract();
     }
 
     private ExtractableResponse<Response> unauthenticatedWithReadApi(String name,
