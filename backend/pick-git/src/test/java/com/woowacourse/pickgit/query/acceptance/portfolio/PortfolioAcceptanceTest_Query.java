@@ -14,19 +14,20 @@ import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
 import com.woowacourse.pickgit.portfolio.presentation.dto.response.PortfolioResponse;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-public class PortfolioAcceptanceTest_Query extends AcceptanceTest {
+class PortfolioAcceptanceTest_Query extends AcceptanceTest {
 
     @BeforeEach
     void setUp() {
         toRead();
     }
 
-    @DisplayName("사용자는 포트폴리오를 조회한다 나의 포트폴리오 - 성공")
+    @DisplayName("사용자는 포트폴리오를 '최초' 조회한다 나의 포트폴리오 - 성공")
     @Test
     void read_LoginUserWithMine_Success() {
         // given
@@ -36,7 +37,7 @@ public class PortfolioAcceptanceTest_Query extends AcceptanceTest {
             .mockPortfolioResponse(NEOZAL.name());
 
         // when
-        PortfolioResponse response = authenticatedWithReadApi(token, NEOZAL.name())
+        PortfolioResponse response = authenticatedWithReadApiWithStatus(token, NEOZAL.name())
             .as(PortfolioResponse.class);
 
         // then
@@ -46,21 +47,21 @@ public class PortfolioAcceptanceTest_Query extends AcceptanceTest {
             .isEqualTo(expected);
     }
 
-    @DisplayName("사용자는 포트폴리오를 조회한다 남의 포트폴리오 - 성공")
+    @DisplayName("사용자는 포트폴리오를 조회한다 남의 포트폴리오, 포트폴리오가 존재하는 경우 - 성공")
     @Test
-    void read_LoginUserWithYours_Success() {
+    void read_LoginUserWithYours_IfExisting_Success() {
         // given
         String token = NEOZAL.은로그인을한다();
         String kodaAccessToken = KODA.은로그인을한다();
 
-        authenticatedWithReadApi(kodaAccessToken, NEOZAL.name())
+        authenticatedWithReadApiWithStatus(kodaAccessToken, KODA.name())
             .as(PortfolioResponse.class);
 
         PortfolioResponse expected = PortfolioFactory
             .mockPortfolioResponse(KODA.name());
 
         // when
-        PortfolioResponse response = authenticatedWithReadApi(token, KODA.name())
+        PortfolioResponse response = authenticatedWithReadApiWithStatus(token, KODA.name())
             .as(PortfolioResponse.class);
 
         // then
@@ -70,12 +71,29 @@ public class PortfolioAcceptanceTest_Query extends AcceptanceTest {
             .isEqualTo(expected);
     }
 
+    @DisplayName("사용자는 포트폴리오를 조회한다 남의 포트폴리오, 포트폴리오가 없는 경우 - 실패")
+    @Test
+    void read_LoginUserWithYours_IfNotExisting_Fail() {
+        // given
+        String token = NEOZAL.은로그인을한다();
+        KODA.은로그인을한다();
+
+        // when
+        ApiErrorResponse response = authenticatedWithReadApiWithoutStatus(token, KODA.name())
+            .statusCode(BAD_REQUEST.value())
+            .extract()
+            .as(ApiErrorResponse.class);
+
+        // then
+        assertThat(response.getErrorCode()).isEqualTo("R0001");
+    }
+
     @DisplayName("게스트는 포트폴리오를 조회한다 남의 포트폴리오, 포트폴리오가 존재하는 경우 - 성공")
     @Test
     void read_GuestUserWithExistingYours_Success() {
         // given
         String token = NEOZAL.은로그인을한다();
-        authenticatedWithReadApi(token, NEOZAL.name());
+        authenticatedWithReadApiWithStatus(token, NEOZAL.name());
 
         PortfolioResponse expected = PortfolioFactory
             .mockPortfolioResponse(NEOZAL.name());
@@ -103,12 +121,16 @@ public class PortfolioAcceptanceTest_Query extends AcceptanceTest {
     }
 
 
-    private ExtractableResponse<Response> authenticatedWithReadApi(String token, String username) {
+    private ValidatableResponse authenticatedWithReadApiWithoutStatus(String token, String username) {
         return given().log().all()
             .auth().oauth2(token)
             .when()
             .get("/api/portfolios/{username}", username)
-            .then().log().all()
+            .then().log().all();
+    }
+
+    private ExtractableResponse<Response> authenticatedWithReadApiWithStatus(String token, String username) {
+        return authenticatedWithReadApiWithoutStatus(token, username)
             .statusCode(OK.value())
             .extract();
     }
