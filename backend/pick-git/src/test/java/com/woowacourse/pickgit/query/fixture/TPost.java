@@ -26,6 +26,12 @@ public enum TPost {
         "kevin post",
         List.of("c++", "html"),
         List.of(FileFactory.getTestImage2File())
+    ),
+    UNKNOWN(
+        Long.MAX_VALUE,
+        "unkown post",
+        List.of(),
+        List.of()
     );
 
     private Long id;
@@ -37,6 +43,11 @@ public enum TPost {
     private final List<Pair> comment;
 
     TPost(String content, List<String> tags, List<File> images) {
+        this(null, content, tags, images);
+    }
+
+    TPost(Long id, String content, List<String> tags, List<File> images) {
+        this.id = id;
         this.content = content;
         this.likes = new ArrayList<>();
         this.tags = tags;
@@ -60,12 +71,28 @@ public enum TPost {
             .collect(toList());
     }
 
+    public static void clear() {
+        for (TPost value : values()) {
+            if(value.equals(UNKNOWN)) {
+                continue;
+            }
+
+            value.clearValues();
+        }
+    }
+
     public Long getId() {
         if(id == null) {
             throw new IllegalStateException("아직 Post 생성이 안됨");
         }
 
         return id;
+    }
+
+    private void clearValues() {
+        this.id = null;
+        this.likes.clear();
+        this.comment.clear();
     }
 
     protected void addLike(TUser tUser) {

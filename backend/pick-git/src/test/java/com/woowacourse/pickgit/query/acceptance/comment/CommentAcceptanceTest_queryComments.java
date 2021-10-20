@@ -3,6 +3,7 @@ package com.woowacourse.pickgit.query.acceptance.comment;
 import static com.woowacourse.pickgit.query.fixture.TPost.KEVINPOST;
 import static com.woowacourse.pickgit.query.fixture.TPost.MARKPOST;
 import static com.woowacourse.pickgit.query.fixture.TPost.NEOZALPOST;
+import static com.woowacourse.pickgit.query.fixture.TUser.GUEST;
 import static com.woowacourse.pickgit.query.fixture.TUser.KEVIN;
 import static com.woowacourse.pickgit.query.fixture.TUser.MARK;
 import static com.woowacourse.pickgit.query.fixture.TUser.NEOZAL;
@@ -20,7 +21,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class CommentAcceptanceTest_queryComments extends AcceptanceTest {
+class CommentAcceptanceTest_queryComments extends AcceptanceTest {
 
     @BeforeEach
     void setUp() {
@@ -33,18 +34,19 @@ public class CommentAcceptanceTest_queryComments extends AcceptanceTest {
     @DisplayName("사용자는 PostId로 댓글을 가져올 수 있다.")
     @ParameterizedTest
     @MethodSource("getParametersForQueryComments")
-    void queryComments_UserCanRequestCommentsOfSpecificPost_Success(int commentSize, int page, int limit, int expected) {
-        for(int i=0; i<commentSize; i++) {
+    void queryComments_UserCanRequestCommentsOfSpecificPost_Success(
+        int commentSize,
+        int page,
+        int limit,
+        int expected
+    ) {
+        for (int i = 0; i < commentSize; i++) {
             MARK.은로그인을하고().댓글을등록한다(NEOZALPOST, "comment" + i);
         }
 
-        List<CommentResponse> actual = PickGitRequest
-            .get("/api/posts/{postId}/comments?page={page}&limit={limit}", NEOZALPOST.getId(), page, limit)
-            .withUser(NEOZAL)
-            .extract()
+        List<CommentResponse> actual = NEOZAL.은로그인을하고().댓글을조회한다(NEOZALPOST, page, limit)
             .as(new TypeRef<>() {
             });
-
 
         assertThat(actual).hasSize(expected);
     }
@@ -52,18 +54,15 @@ public class CommentAcceptanceTest_queryComments extends AcceptanceTest {
     @DisplayName("게스트는 PostId로 댓글을 가져올 수 있다.")
     @ParameterizedTest
     @MethodSource("getParametersForQueryComments")
-    void queryComments_GuestCanRequestCommentsOfSpecificPost_Success(int commentSize, int page, int limit, int expected) {
-        for(int i=0; i<commentSize; i++) {
+    void queryComments_GuestCanRequestCommentsOfSpecificPost_Success(int commentSize, int page,
+                                                                     int limit, int expected) {
+        for (int i = 0; i < commentSize; i++) {
             MARK.은로그인을하고().댓글을등록한다(NEOZALPOST, "comment" + i);
         }
 
-        List<CommentResponse> actual = PickGitRequest
-            .get("/api/posts/{postId}/comments?page={page}&limit={limit}", NEOZALPOST.getId(), page, limit)
-            .withUser(NEOZAL)
-            .extract()
+        List<CommentResponse> actual = GUEST.는().댓글을조회한다(NEOZALPOST, page, limit)
             .as(new TypeRef<>() {
             });
-
 
         assertThat(actual).hasSize(expected);
     }

@@ -19,26 +19,22 @@ public abstract class Act {
     protected ExtractableResponse<Response> request(
         String accessToken,
         String url,
-        Method method,
-        HttpStatus httpStatus
+        Method method
     ) {
         return RestAssured.given().log().all()
             .auth().oauth2(accessToken)
             .when().request(method, url)
             .then().log().all()
-            .statusCode(httpStatus.value())
             .extract();
     }
 
     protected ExtractableResponse<Response> request(
         String url,
-        Method method,
-        HttpStatus httpStatus
+        Method method
     ) {
         return RestAssured.given().log().all()
             .when().request(method, url)
             .then().log().all()
-            .statusCode(httpStatus.value())
             .extract();
     }
 
@@ -71,6 +67,20 @@ public abstract class Act {
     ) {
         return given().log().all()
             .auth().oauth2(accessToken)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(params)
+            .when()
+            .request(method, url)
+            .then().log().all()
+            .extract();
+    }
+
+    protected ExtractableResponse<Response> request(
+        String url,
+        Method method,
+        Map<String, Object> params
+    ) {
+        return given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(params)
             .when()

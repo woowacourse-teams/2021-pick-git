@@ -26,11 +26,13 @@ public enum TUser {
     private final List<TUser> following;
     private final List<TUser> follower;
     private final Map<TPost, ExtractableResponse<Response>> posts;
+    protected final Map<String, Object> cache;
 
     TUser() {
         this.follower = new ArrayList<>();
         this.following = new ArrayList<>();
         this.posts = new HashMap<>();
+        this.cache = new HashMap<>();
     }
 
     public String accessToken() {
@@ -48,6 +50,20 @@ public enum TUser {
             "testWebsite",
             "testTwitter"
         );
+    }
+
+    public static void clear() {
+        for (TUser value : values()) {
+            value.clearValues();
+        }
+    }
+
+    private void clearValues() {
+        token = null;
+        following.clear();
+        follower.clear();
+        posts.clear();
+        cache.clear();
     }
 
     void addFollowing(TUser tUser) {
