@@ -264,7 +264,11 @@ const MyPortfolioPage = () => {
     setSlideEventHandler();
 
     return () => removeSlideEventHandler();
+<<<<<<< HEAD
   }, []);
+=======
+  }, [])
+>>>>>>> 9182b85 (feat: UI/UX 개선 작업)
 
   if (!isLoggedIn) {
     return <Redirect to={PAGE_URL.HOME} />;
@@ -392,9 +396,13 @@ const MyPortfolioPage = () => {
         {isConfirmShown && (
           <ConfirmPortal heading={confirmMessage} onConfirm={handleDeleteSectionConfirm} onCancel={hideConfirm} />
         )}
+<<<<<<< HEAD
         <BottomSliderPortal onSlideDown={handleSlideDown} isSliderShown={isBottomSliderShown}>
           test
         </BottomSliderPortal>
+=======
+        <BottomSliderPortal onSlideDown={handleSlideDown} isSliderShown={isBottomSliderShown}>test</BottomSliderPortal>
+>>>>>>> 9182b85 (feat: UI/UX 개선 작업)
       </Container>
       {/* <PaginatorWrapper>
         <DotPaginator activePageIndex={activePageIndex} paginationCount={paginationCount} onPaginate={paginate} />

@@ -7,7 +7,6 @@ import { Container, Image, ImageListItem, ImageListSlider, Indicator, SlideButto
 
 export interface Props extends React.CSSProperties {
   imageUrls: string[];
-  imageHeight?: string;
   slideButtonKind: "in-box" | "stick-out";
   cssProp?: CSSProp;
 }
