@@ -1,17 +1,17 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
-import MessageModalPortal from "../../components/@layout/MessageModalPortal/MessageModalPortal";
+import AlertPortal from "../../components/@layout/AlertPortal/AlertPortal";
+import ConfirmPortal from "../../components/@layout/ConfirmPortal/ConfirmPortal";
 import PageLoadingWithCover from "../../components/@layout/PageLoadingWithCover/PageLoadingWithCover";
 import Button from "../../components/@shared/Button/Button";
 import PostContentUploader from "../../components/PostContentUploader/PostContentUploader";
 import TagInputForm from "../../components/TagInputForm/TagInputForm";
-
 import { FAILURE_MESSAGE, SUCCESS_MESSAGE, WARNING_MESSAGE } from "../../constants/messages";
 import { POST_EDIT_STEPS } from "../../constants/steps";
 import { PAGE_URL } from "../../constants/urls";
 
-import useMessageModal from "../../hooks/common/useMessageModal";
+import useModal from "../../hooks/common/useModal";
 import useSnackbar from "../../hooks/common/useSnackbar";
 import useAuth from "../../hooks/common/useAuth";
 import usePostEdit from "../../hooks/service/usePostEdit";
@@ -33,8 +33,19 @@ const EditPostPage = () => {
 
   const { currentUsername } = useAuth();
   const { pushSnackbarMessage } = useSnackbar();
-  const { modalMessage, isModalShown, isCancelButtonShown, showAlertModal, showConfirmModal, hideMessageModal } =
-    useMessageModal();
+
+  const {
+    modalMessage: alertMessage,
+    isModalShown: isAlertShown,
+    showModal: showAlert,
+    hideModal: hideAlert,
+  } = useModal();
+  const {
+    modalMessage: confirmMessage,
+    isModalShown: isConfirmShown,
+    showModal: showConfirm,
+    hideModal: hideConfirm,
+  } = useModal();
 
   const { postId, content, tags, setTags, setContent, editPost, resetPostEditData, uploading } = usePostEdit();
   const { stepIndex, goNextStep, setStepMoveEventHandler, removeStepMoveEventHandler, completeStep } = usePostEditStep(
@@ -49,7 +60,7 @@ const EditPostPage = () => {
 
   const handlePostAddComplete = async () => {
     if (!isValidPostEditData({ postId, content, tags })) {
-      showAlertModal(getPostEditValidationMessage({ postId, content, tags }));
+      showAlert(getPostEditValidationMessage({ postId, content, tags }));
       return;
     }
 
@@ -63,26 +74,26 @@ const EditPostPage = () => {
         throw error;
       }
 
-      showAlertModal(getAPIErrorMessage(error.response?.data.errorCode));
+      showAlert(getAPIErrorMessage(error.response?.data.errorCode));
     }
   };
 
   const handleNextButtonClick = () => {
     if (stepIndex === 0 && !isValidContentLength(content)) {
-      showAlertModal(FAILURE_MESSAGE.POST_CONTENT_LENGTH_LIMIT_EXCEEDED);
+      showAlert(FAILURE_MESSAGE.POST_CONTENT_LENGTH_LIMIT_EXCEEDED);
       return;
     }
 
     if (stepIndex === 0 && isContentEmpty(content)) {
-      showConfirmModal(WARNING_MESSAGE.POST_CONTENT_EMPTY);
+      showConfirm(WARNING_MESSAGE.POST_CONTENT_EMPTY);
       return;
     }
 
     goNextStep();
   };
 
-  const handleConfirmModalConfirm = () => {
-    hideMessageModal();
+  const handleConfirm = () => {
+    hideConfirm();
     goNextStep();
   };
 
@@ -120,17 +131,8 @@ const EditPostPage = () => {
             다음
           </Button>
         )}
-        {isModalShown && (
-          <MessageModalPortal heading={modalMessage} onConfirm={hideMessageModal} onClose={hideMessageModal} />
-        )}
-        {isModalShown && isCancelButtonShown && (
-          <MessageModalPortal
-            heading={modalMessage}
-            onConfirm={handleConfirmModalConfirm}
-            onClose={hideMessageModal}
-            onCancel={hideMessageModal}
-          />
-        )}
+        {isAlertShown && <AlertPortal heading={alertMessage} onOkay={hideAlert} />}
+        {isConfirmShown && <ConfirmPortal heading={confirmMessage} onConfirm={handleConfirm} onCancel={hideConfirm} />}
       </NextStepButtonWrapper>
       {uploading && <PageLoadingWithCover description="수정중" />}
     </Container>

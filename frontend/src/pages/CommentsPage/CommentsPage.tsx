@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 
-import MessageModalPortal from "../../components/@layout/MessageModalPortal/MessageModalPortal";
+import ConfirmPortal from "../../components/@layout/ConfirmPortal/ConfirmPortal";
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import PageError from "../../components/@shared/PageError/PageError";
 import Avatar from "../../components/@shared/Avatar/Avatar";
@@ -15,7 +15,6 @@ import { FAILURE_MESSAGE, WARNING_MESSAGE } from "../../constants/messages";
 import { COMMENT_SLIDE_STEPS } from "../../constants/steps";
 import { PAGE_URL } from "../../constants/urls";
 
-import useMessageModal from "../../hooks/common/useMessageModal";
 import useSnackbar from "../../hooks/common/useSnackbar";
 import useAuth from "../../hooks/common/useAuth";
 import useComments from "../../hooks/service/useComments";
@@ -48,6 +47,7 @@ import {
 } from "./CommentsPage.style";
 
 import type { CommentData, Post, TabItem } from "../../@types";
+import useModal from "../../hooks/common/useModal";
 
 const CommentsPage = () => {
   const commentTextAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -60,7 +60,12 @@ const CommentsPage = () => {
 
   const { pushSnackbarMessage } = useSnackbar();
   const { currentUsername, isLoggedIn } = useAuth();
-  const { modalMessage, isModalShown, isCancelButtonShown, showConfirmModal, hideMessageModal } = useMessageModal();
+  const {
+    modalMessage: confirmMessage,
+    isModalShown: isConfirmShown,
+    showModal: showConfirm,
+    hideModal: hideConfirm,
+  } = useModal();
 
   const {
     infiniteCommentsData,
@@ -107,11 +112,11 @@ const CommentsPage = () => {
 
   const handleCommentDeleteClick = (commentId: CommentData["id"]) => {
     setSelectedCommentId(commentId);
-    showConfirmModal(WARNING_MESSAGE.COMMENT_DELETE);
+    showConfirm(WARNING_MESSAGE.COMMENT_DELETE);
   };
 
   const handleCommentDelete = async () => {
-    hideMessageModal();
+    hideConfirm();
     await deletePostComment(selectedPost.id, selectedCommentId);
   };
 
@@ -227,13 +232,8 @@ const CommentsPage = () => {
           </SendIconWrapper>
         </CommentTextAreaWrapper>
       )}
-      {isModalShown && isCancelButtonShown && (
-        <MessageModalPortal
-          heading={modalMessage}
-          onConfirm={handleCommentDelete}
-          onClose={hideMessageModal}
-          onCancel={hideMessageModal}
-        />
+      {isConfirmShown && (
+        <ConfirmPortal heading={confirmMessage} onConfirm={handleCommentDelete} onCancel={hideConfirm} />
       )}
     </Container>
   );

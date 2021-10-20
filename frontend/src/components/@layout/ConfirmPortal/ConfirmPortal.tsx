@@ -7,29 +7,21 @@ import {
   Text,
   CancelButton,
   ConfirmButton,
-} from "./MessageModalPortal.styles";
+} from "./ConfirmPortal.styles";
 import BackDrop from "../../@styled/BackDrop";
 
 export interface Props {
   heading: string;
-  onClose: () => void;
   onCancel?: () => void;
   onConfirm?: () => void;
   confirmText?: string;
   cancelText?: string;
 }
 
-export const MessageModal = ({
-  heading,
-  onClose,
-  onCancel,
-  onConfirm,
-  confirmText = "확인",
-  cancelText = "취소",
-}: Props) => {
+export const Confirm = ({ heading, onCancel, onConfirm, confirmText = "확인", cancelText = "취소" }: Props) => {
   return (
     <Container>
-      <BackDrop onMouseDown={onClose} />
+      <BackDrop onMouseDown={onCancel} />
       <ModalContent>
         <ModalBody>
           <Text>{heading}</Text>
@@ -43,11 +35,11 @@ export const MessageModal = ({
   );
 };
 
-const MessageModalPortal = ({ ...props }: Props) => {
-  const $MessageModal = document.getElementById("modal");
-  if (!$MessageModal) throw Error("cannot find modal wrapper");
+const ConfirmPortal = ({ ...props }: Props) => {
+  const $confirm = document.getElementById("modal");
+  if (!$confirm) throw Error("cannot find modal wrapper");
 
-  return createPortal(<MessageModal {...props} />, $MessageModal);
+  return createPortal(<Confirm {...props} />, $confirm);
 };
 
-export default MessageModalPortal;
+export default ConfirmPortal;

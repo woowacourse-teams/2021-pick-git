@@ -5,10 +5,10 @@ import { UserItem } from "../../@types";
 import { WARNING_MESSAGE } from "../../constants/messages";
 import { PAGE_URL } from "../../constants/urls";
 import UserContext from "../../contexts/UserContext";
-import useMessageModal from "../../hooks/common/useMessageModal";
+import useModal from "../../hooks/common/useModal";
 import useFollow from "../../hooks/service/useFollow";
 import { isInfiniteData } from "../../utils/typeGuard";
-import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
+import ChoiceModalPortal from "../@layout/ChoiceModalPortal/ChoiceModalPortal";
 import Avatar from "../@shared/Avatar/Avatar";
 import InfiniteScrollContainer from "../@shared/InfiniteScrollContainer/InfiniteScrollContainer";
 import { Button, Empty, NameTag, List } from "./UserList.style";
@@ -37,7 +37,12 @@ const UserList = ({ isFetchingNextPage, onIntersect, users, queryKey }: Props) =
   const [currentUserFollowing, setCurrentUserFollowing] = useState(false);
   const { isLoggedIn } = useContext(UserContext);
   const queryClient = useQueryClient();
-  const { modalMessage, isModalShown: isMessageModalShown, hideMessageModal, showConfirmModal } = useMessageModal();
+  const {
+    isModalShown: isChoiceModalShown,
+    modalMessage: choiceModalMessage,
+    showModal: showChoiceModal,
+    hideModal: hideChoiceModal,
+  } = useModal();
 
   const setInfiniteUserListQueryData = (currentQueryData: InfiniteData<UserItem[]>, following: boolean) => {
     const currentUserLocation = findCurrentUser(currentQueryData?.pages ?? [], currentUsername);
@@ -86,14 +91,14 @@ const UserList = ({ isFetchingNextPage, onIntersect, users, queryKey }: Props) =
   const { toggleFollow } = useFollow(setUserListQueryData);
 
   const toggleFollowWithGithubFollowing = (applyGithub: boolean) => () => {
-    hideMessageModal();
+    hideChoiceModal();
     toggleFollow(currentUsername, currentUserFollowing, applyGithub);
   };
 
   const handleFollowButtonClick = (username: string, following: boolean) => {
     setCurrentUsername(username);
     setCurrentUserFollowing(following);
-    showConfirmModal(following ? WARNING_MESSAGE.GITHUB_UNFOLLOWING : WARNING_MESSAGE.GITHUB_FOLLOWING);
+    showChoiceModal(following ? WARNING_MESSAGE.GITHUB_UNFOLLOWING : WARNING_MESSAGE.GITHUB_FOLLOWING);
   };
 
   const FollowButton = ({ username, following }: { username: string; following: boolean | null }) => {
@@ -131,14 +136,14 @@ const UserList = ({ isFetchingNextPage, onIntersect, users, queryKey }: Props) =
           ))}
         </ul>
       </InfiniteScrollContainer>
-      {isMessageModalShown && (
-        <MessageModalPortal
-          heading={modalMessage}
-          onConfirm={toggleFollowWithGithubFollowing(true)}
-          onCancel={toggleFollowWithGithubFollowing(false)}
-          onClose={hideMessageModal}
-          confirmText="예"
-          cancelText="아니오"
+      {isChoiceModalShown && (
+        <ChoiceModalPortal
+          heading={choiceModalMessage}
+          onPositiveChoose={toggleFollowWithGithubFollowing(true)}
+          onNagativeChoose={toggleFollowWithGithubFollowing(false)}
+          onClose={hideChoiceModal}
+          positiveChoiceText="예"
+          nagativeChoiceText="아니오"
         />
       )}
     </>

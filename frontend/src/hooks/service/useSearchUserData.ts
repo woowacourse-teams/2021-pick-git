@@ -3,7 +3,6 @@ import { useContext, useEffect, useState } from "react";
 
 import { HTTPErrorHandler, UserItem } from "../../@types";
 import { UNKNOWN_ERROR_MESSAGE } from "../../constants/messages";
-import SearchContext from "../../contexts/SearchContext";
 import SnackBarContext from "../../contexts/SnackbarContext";
 import UserContext from "../../contexts/UserContext";
 import { removeDuplicatedData } from "../../utils/data";
@@ -11,8 +10,12 @@ import { getAPIErrorMessage, handleHTTPError } from "../../utils/error";
 import { isHttpErrorStatus } from "../../utils/typeGuard";
 import { useSearchUserResultQuery } from "../../services/queries/search";
 
-const useSearchUserData = (activated: boolean) => {
-  const { keyword } = useContext(SearchContext);
+interface Params {
+  keyword: string;
+  activated: boolean;
+}
+
+const useSearchUserData = ({ keyword, activated }: Params) => {
   const { pushSnackbarMessage } = useContext(SnackBarContext);
   const { logout } = useContext(UserContext);
 

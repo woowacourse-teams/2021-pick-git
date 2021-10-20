@@ -42,8 +42,8 @@ const PortfolioProjectSection = ({ project, isEditable, setProject }: Props) => 
     },
   ];
 
-  const tagList = project.tags.map(({ name }, index) => (
-    <Chip key={index} cssProp={TagItemCSS} onDelete={() => deleteTag(name)}>
+  const tagList = project.tags.map(({ name, id }) => (
+    <Chip key={id} cssProp={TagItemCSS} onDelete={() => deleteTag(name)}>
       {name}
     </Chip>
   ));

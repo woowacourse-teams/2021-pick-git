@@ -1,15 +1,18 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import Chip from "../../components/@shared/Chip/Chip";
 import GridFeed from "../../components/@shared/GridFeed/GridFeed";
 import Tabs from "../../components/@shared/Tabs/Tabs";
 import UserList from "../../components/UserList/UserList";
+
 import { QUERY } from "../../constants/queries";
 import { PAGE_URL } from "../../constants/urls";
-import SearchContext from "../../contexts/SearchContext";
+
+import useSearchKeyword from "../../hooks/common/useSearchKeyword";
 import useSearchPostData from "../../hooks/service/useSearchPostData";
 import useSearchUserData from "../../hooks/service/useSearchUserData";
+
 import { Container, ContentWrapper, Empty, KeywordsWrapper } from "./SearchPage.style";
 
 const tabNames = ["계정", "태그"];
@@ -24,15 +27,15 @@ const SearchPage = () => {
   const type = new URLSearchParams(location.search).get("type");
   const defaultTabIndex = isSearchTypeValid(type) ? searchTypeIndex[type] : 0;
   const [tabIndex, setTabIndex] = useState(defaultTabIndex);
-  const { keyword } = useContext(SearchContext);
+
+  const { keyword, resetKeyword } = useSearchKeyword();
   const {
     results: userSearchResults,
     isError: isUserSearchError,
     isLoading: isUserSearchLoading,
     isFetchingNextPage: isUserSearchFetchingNextPage,
     handleIntersect: handleUserSearchIntersect,
-    refetch: refetchUserData,
-  } = useSearchUserData(tabIndex === 0);
+  } = useSearchUserData({ keyword, activated: tabIndex === 0 });
   const {
     infinitePostsData: postSearchResults,
     isError: isPostSearchError,
@@ -40,20 +43,10 @@ const SearchPage = () => {
     isFetchingNextPage: isPostSearchFetchingNextPage,
     handleIntersect: handlePostSearchIntersect,
     formattedKeyword: postSearchKeyword,
-    refetch: refetchPostData,
-  } = useSearchPostData("tags", null, tabIndex === 1);
+  } = useSearchPostData({ keyword, type: "tags", activated: tabIndex === 1 });
 
   useEffect(() => {
-    switch (tabIndex) {
-      case 0:
-        refetchUserData();
-        break;
-      case 1:
-        refetchPostData();
-        break;
-      default:
-        break;
-    }
+    resetKeyword();
   }, [tabIndex]);
 
   const SearchUserResult = () => {

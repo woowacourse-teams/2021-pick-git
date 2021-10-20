@@ -12,12 +12,12 @@ const usePortfolioIntro = (name?: string, description?: string, profileImageUrl?
     contacts: [],
   });
 
-  const setPortfolioIntro = (intro: PortfolioIntro) => {
+  const setPortfolioIntro = (intro: PortfolioIntro, shouldRenewUpdateTime: boolean = true) => {
     const newIntro = {
       ...intro,
       contacts: intro.contacts.map((contact) => ({ ...contact })),
     };
-    setPortfolioLocalUpdateTime(new Date());
+    shouldRenewUpdateTime && setPortfolioLocalUpdateTime(new Date());
     setItem(newIntro);
   };
 

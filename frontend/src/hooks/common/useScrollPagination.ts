@@ -1,6 +1,5 @@
 import { RefObject, useEffect, useState } from "react";
 import { getScrollYPosition } from "../../utils/layout";
-import useDebounce from "./useDebounce";
 
 const useScrollPagination = (containerRef: RefObject<HTMLDivElement>, paginationCount: number) => {
   const [activePageIndex, setActivePageIndex] = useState(0);
@@ -12,14 +11,6 @@ const useScrollPagination = (containerRef: RefObject<HTMLDivElement>, pagination
 
     setActivePageIndex(index);
   };
-
-  const increasePageIndex = useDebounce(() => {
-    paginate(activePageIndex + 1);
-  }, 200);
-
-  const decreasePageIndex = useDebounce(() => {
-    paginate(activePageIndex - 1);
-  }, 200);
 
   useEffect(() => {
     if (!containerRef.current) {
@@ -37,30 +28,26 @@ const useScrollPagination = (containerRef: RefObject<HTMLDivElement>, pagination
       return;
     }
 
-    const preventWheelEvent = (event: WheelEvent) => {
-      event.preventDefault();
-      if (event.deltaY > 0) {
-        increasePageIndex();
-      } else {
-        decreasePageIndex();
-      }
-    };
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry, index) => {
+          console.log("index", index);
+          console.log("entry", entry.intersectionRatio);
+          if (entry.intersectionRatio < 0.7) {
+            return;
+          }
 
-    containerRef.current.addEventListener("wheel", preventWheelEvent, {
-      passive: false,
+          paginate(index);
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    Array.from(containerRef.current.children).forEach((child) => {
+      console.log(child);
+      observer.observe(child);
     });
-
-    // const observer = new IntersectionObserver((entries) => {
-    //   entries.forEach((entry, index) => {
-    //     setActivePageIndex(index);
-    //   });
-    // });
-
-    // Array.from(containerRef.current.children).forEach((child) => {
-    //   observer.observe(child);
-    // });
-    return () => containerRef.current!.removeEventListener("wheel", preventWheelEvent);
-  }, [containerRef.current, activePageIndex]);
+  }, [containerRef.current]);
 
   return {
     activePageIndex,

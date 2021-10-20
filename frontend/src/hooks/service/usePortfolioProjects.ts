@@ -6,8 +6,8 @@ import useLocalStorage from "../common/useLocalStorage";
 const usePortfolioProjects = () => {
   const { itemState: portfolioProjects, setItem } = useLocalStorage<PortfolioProject[]>(PORTFOLIO.PROJECTS, []);
 
-  const setPortfolioProjects = (projects: PortfolioProject[]) => {
-    setPortfolioLocalUpdateTime(new Date());
+  const setPortfolioProjects = (projects: PortfolioProject[], shouldRenewUpdateTime: boolean = true) => {
+    shouldRenewUpdateTime && setPortfolioLocalUpdateTime(new Date());
     setItem(projects);
   };
 
