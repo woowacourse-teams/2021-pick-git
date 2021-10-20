@@ -16,8 +16,8 @@ public class UpdateUtil {
         List<UpdatableProxy<T>> originProxies = toProxy(origins);
         List<UpdatableProxy<T>> sourceProxies = toProxy(sources);
 
-        update(originProxies, sourceProxies);
         delete(originProxies, sourceProxies);
+        update(originProxies, sourceProxies);
         create(originProxies, sourceProxies);
 
         reset(origins, originProxies);
@@ -36,9 +36,12 @@ public class UpdateUtil {
         Map<UpdatableProxy<T>, UpdatableProxy<T>> originsWithProxy = originProxies.stream()
             .collect(toMap(Function.identity(), Function.identity()));
 
-        sourceProxies.stream()
+        List<UpdatableProxy<T>> updateableSources = sourceProxies.stream()
             .filter(originsWithProxy::containsKey)
-            .forEach(sourceProxy -> originsWithProxy.get(sourceProxy).update(sourceProxy));
+            .collect(toList());
+        updateableSources.forEach(sourceProxy -> originsWithProxy.get(sourceProxy).update(sourceProxy));
+
+        sourceProxies.removeAll(updateableSources);
     }
 
     private static <T extends Updatable<T>> void delete(
@@ -52,9 +55,7 @@ public class UpdateUtil {
         List<UpdatableProxy<T>> originProxies,
         List<UpdatableProxy<T>> sourceProxies
     ) {
-        sourceProxies.stream()
-            .filter(source -> !originProxies.contains(source))
-            .forEach(originProxies::add);
+       originProxies.addAll(sourceProxies);
     }
 
     private static <T extends Updatable<T>> void reset(
