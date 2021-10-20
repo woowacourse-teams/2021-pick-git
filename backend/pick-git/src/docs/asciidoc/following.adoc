@@ -7,7 +7,7 @@ endif::[]
 :toc: left
 :toclevels: 4
 
-== Authorization
+== Following
 === 팔로잉 요청 - 로그인
 ==== Request
 include::{snippets}/following-LoggedIn/http-request.adoc[]

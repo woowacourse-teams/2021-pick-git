@@ -5,6 +5,8 @@ import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.presentation.OAuthController;
 import com.woowacourse.pickgit.comment.application.CommentService;
 import com.woowacourse.pickgit.comment.presentation.CommentController;
+import com.woowacourse.pickgit.portfolio.application.PortfolioService;
+import com.woowacourse.pickgit.portfolio.presentation.PortfolioController;
 import com.woowacourse.pickgit.post.application.PostFeedService;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.presentation.PostController;
@@ -30,6 +32,7 @@ import org.springframework.test.web.servlet.MockMvc;
     PostController.class,
     CommentController.class,
     OAuthController.class,
+    PortfolioController.class
 })
 @ActiveProfiles("test")
 public abstract class ControllerTest {
@@ -51,6 +54,9 @@ public abstract class ControllerTest {
 
     @MockBean
     protected TagService tagService;
+
+    @MockBean
+    protected PortfolioService portfolioService;
 
     @Autowired
     protected MockMvc mockMvc;

@@ -14,5 +14,6 @@ include::post.adoc[]
 include::profile.adoc[]
 include::tag.adoc[]
 include::search.adoc[]
+include::portfolio.adoc[]
 
 PickGit API
