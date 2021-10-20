@@ -75,6 +75,8 @@ export interface PostEditData {
   content: string;
 }
 
+export type FeedFilterOption = "followings" | "all";
+
 export interface GithubStats {
   starsCount: number;
   commitsCount: number;
