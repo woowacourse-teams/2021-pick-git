@@ -21,7 +21,8 @@ import javax.persistence.UniqueConstraint;
 )
 public class ProjectTag implements Updatable<ProjectTag> {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -83,7 +84,7 @@ public class ProjectTag implements Updatable<ProjectTag> {
             return false;
         }
 
-        return this.getTag().equals(((ProjectTag) o ).getTag());
+        return this.getTag().equals(((ProjectTag) o).getTag());
     }
 
     @Override

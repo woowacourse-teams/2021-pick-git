@@ -29,6 +29,13 @@ public class UpdateUtil {
             .collect(toList());
     }
 
+    private static <T extends Updatable<T>> void delete(
+        List<UpdatableProxy<T>> originProxies,
+        List<UpdatableProxy<T>> sourceProxies
+    ) {
+        originProxies.removeIf(origin -> !sourceProxies.contains(origin));
+    }
+
     private static <T extends Updatable<T>> void update(
         List<UpdatableProxy<T>> originProxies,
         List<UpdatableProxy<T>> sourceProxies
@@ -36,19 +43,12 @@ public class UpdateUtil {
         Map<UpdatableProxy<T>, UpdatableProxy<T>> originsWithProxy = originProxies.stream()
             .collect(toMap(Function.identity(), Function.identity()));
 
-        List<UpdatableProxy<T>> updateableSources = sourceProxies.stream()
+        List<UpdatableProxy<T>> updatableSources = sourceProxies.stream()
             .filter(originsWithProxy::containsKey)
             .collect(toList());
-        updateableSources.forEach(sourceProxy -> originsWithProxy.get(sourceProxy).update(sourceProxy));
+        updatableSources.forEach(sourceProxy -> originsWithProxy.get(sourceProxy).update(sourceProxy));
 
-        sourceProxies.removeAll(updateableSources);
-    }
-
-    private static <T extends Updatable<T>> void delete(
-        List<UpdatableProxy<T>> originProxies,
-        List<UpdatableProxy<T>> sourceProxies
-    ) {
-        originProxies.removeIf(origin -> !sourceProxies.contains(origin));
+        sourceProxies.removeAll(updatableSources);
     }
 
     private static <T extends Updatable<T>> void create(
