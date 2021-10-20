@@ -14,7 +14,7 @@ export const ImageListSlider = styled.ul<React.CSSProperties>(
   ({ theme, width }) => css`
     width: ${width};
     height: 100%;
-    background-color: ${theme.color.white};
+    background-color: ${theme.color.lighterTextColor};
 
     display: flex;
     align-items: center;
@@ -25,6 +25,7 @@ export const ImageListSlider = styled.ul<React.CSSProperties>(
 export const ImageListItem = styled.li<React.CSSProperties>`
   width: 100%;
   height: 100%;
+  line-height: 0;
 `;
 
 export const Image = styled.img<{ imageHeight?: string }>(
@@ -32,6 +33,7 @@ export const Image = styled.img<{ imageHeight?: string }>(
     width: 100%;
     height: 100%;
     object-fit: contain;
+
     ${imageHeight && `height: ${imageHeight};`}
   `
 );
