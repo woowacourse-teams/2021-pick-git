@@ -22,18 +22,6 @@ public class FileNameGenerator {
         return md5(multipartFile, userName) + extension(multipartFile);
     }
 
-    private String extension(MultipartFile multipartFile) {
-        MimeTypes defaultMimeTypes = MimeTypes.getDefaultMimeTypes();
-        try {
-            MimeType mimeType = defaultMimeTypes.forName(
-                tika.detect(multipartFile.getBytes())
-            );
-            return mimeType.getExtension();
-        } catch (MimeTypeException | IOException e) {
-            throw new FileExtensionException("확장자 추출 실패");
-        }
-    }
-
     private String md5(MultipartFile multipartFile, String userName) {
         try {
             final String fileName = multipartFile.getOriginalFilename();
@@ -44,6 +32,18 @@ public class FileNameGenerator {
             return Hex.encodeHexString(messageDigest.digest());
         } catch (NoSuchAlgorithmException e) {
             throw new HashFailureException("파일 이름 해시화 실패");
+        }
+    }
+
+    private String extension(MultipartFile multipartFile) {
+        MimeTypes defaultMimeTypes = MimeTypes.getDefaultMimeTypes();
+        try {
+            MimeType mimeType = defaultMimeTypes.forName(
+                tika.detect(multipartFile.getBytes())
+            );
+            return mimeType.getExtension();
+        } catch (MimeTypeException | IOException e) {
+            throw new FileExtensionException("확장자 추출 실패");
         }
     }
 }
