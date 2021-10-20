@@ -1,10 +1,15 @@
 import styled, { css, CSSProp } from "styled-components";
+import { setLaptopAboveMediaQuery } from "../../@styled/mediaQueries";
 
 export const Container = styled.div<React.CSSProperties & { cssProp?: CSSProp }>(
   ({ cssProp }) => css`
-    overflow: hidden;
+    overflow-x: hidden;
     position: relative;
     background-color: white;
+
+    ::-webkit-scrollbar {
+      width: 0;
+    }
 
     ${cssProp};
   `
@@ -14,7 +19,7 @@ export const ImageListSlider = styled.ul<React.CSSProperties>(
   ({ theme, width }) => css`
     width: ${width};
     height: 100%;
-    background-color: ${theme.color.lighterTextColor};
+    background-color: ${theme.color.postBackgroundColor};
 
     display: flex;
     align-items: center;

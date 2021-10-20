@@ -1,9 +1,9 @@
 import styled, { css } from "styled-components";
 import { Page } from "../../components/@styled/layout";
-import { Z_INDEX } from "../../constants/layout";
 
 export const Container = styled(Page)<React.CSSProperties>`
   position: relative;
+  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;

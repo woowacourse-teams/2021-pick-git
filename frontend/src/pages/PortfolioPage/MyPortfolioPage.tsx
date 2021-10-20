@@ -4,6 +4,7 @@ import { Redirect } from "react-router-dom";
 import AlertPortal from "../../components/@layout/AlertPortal/AlertPortal";
 import ConfirmPortal from "../../components/@layout/ConfirmPortal/ConfirmPortal";
 import ModalPortal from "../../components/@layout/Modal/ModalPortal";
+import BottomSliderPortal from "../../components/@layout/BottomSliderPortal/BottomSliderPortal";
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import PortfolioHeader from "../../components/@layout/PortfolioHeader/PortfolioHeader";
 import ScrollActiveHeader from "../../components/@layout/ScrollActiveHeader/ScrollActiveHeader";
@@ -23,6 +24,7 @@ import { PAGE_URL } from "../../constants/urls";
 
 import useModal from "../../hooks/common/useModal";
 import useAuth from "../../hooks/common/useAuth";
+import useBottomSlider from "../../hooks/common/useBottomSlider";
 import useProfile from "../../hooks/service/useProfile";
 import usePortfolio from "../../hooks/service/usePortfolio";
 import usePortfolioIntro from "../../hooks/service/usePortfolioIntro";
@@ -68,13 +70,14 @@ const MyPortfolioPage = () => {
     showModal: showAlert,
     hideModal: hideAlert,
   } = useModal();
-
   const {
     modalMessage: confirmMessage,
     isModalShown: isConfirmShown,
     showModal: showConfirm,
     hideModal: hideConfirm,
   } = useModal();
+  const { isBottomSliderShown, showBottomSlider, setSlideEventHandler, removeSlideEventHandler, hideBottomSlider } =
+    useBottomSlider();
 
   const {
     portfolio: remotePortfolio,
@@ -93,16 +96,16 @@ const MyPortfolioPage = () => {
     updatePortfolioSectionName,
     setPortfolioSection,
     setPortfolioSections,
-  } = usePortfolioSections();
+  } = usePortfolioSections(currentUsername);
   const {
     portfolioProjects,
     addPortfolioProject,
     deletePortfolioProject,
     updatePortfolioProject,
     setPortfolioProjects,
-  } = usePortfolioProjects();
+  } = usePortfolioProjects(currentUsername);
   const { portfolioIntro, setPortfolioIntro, updateIntroName, updateIntroDescription, updateIsProfileShown } =
-    usePortfolioIntro(profile?.name, profile?.description, profile?.imageUrl);
+    usePortfolioIntro(currentUsername, profile?.name, profile?.description, profile?.imageUrl);
 
   const paginationCount = portfolioProjects.length + portfolioSections.length + 1;
   const { activePageIndex, paginate } = useScrollPagination(containerRef, paginationCount);
@@ -181,7 +184,7 @@ const MyPortfolioPage = () => {
   const handleUploadPortfolio = async () => {
     try {
       const localUpdateTimeString = getPortfolioLocalUpdateTimeString();
-      
+
       const portfolio: PortfolioData = {
         id: remotePortfolio?.id ?? null,
         name: portfolioIntro.name,
@@ -199,6 +202,14 @@ const MyPortfolioPage = () => {
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const handleSlideDown = () => {
+    hideBottomSlider();
+  }
+
+  const handleSetContacts = () => {
+    showBottomSlider();
   };
 
   useEffect(() => {
@@ -249,6 +260,12 @@ const MyPortfolioPage = () => {
     paginate(paginationCount - 1);
   }, [portfolioSections.length]);
 
+  useEffect(() => {
+    setSlideEventHandler();
+
+    return () => removeSlideEventHandler();
+  }, [])
+
   if (!isLoggedIn) {
     return <Redirect to={PAGE_URL.HOME} />;
   }
@@ -266,13 +283,14 @@ const MyPortfolioPage = () => {
       <ScrollActiveHeader containerRef={containerRef}>
         <PortfolioHeader
           isButtonsShown={true}
+          onSetPortfolioContacts={handleSetContacts}
           onAddPortfolioSection={handleAddSection}
           onAddPortfolioProject={handleAddProject}
           onUploadPortfolio={handleUploadPortfolio}
         />
       </ScrollActiveHeader>
       <Container ref={containerRef}>
-        <FullPage isVerticalCenter={true}>
+        <FullPage isVerticalCenter={true} data-index="0">
           <ToggleButton
             toggleButtonText="프로필 사진 보이기"
             cssProp={ToggleButtonCSS}
@@ -322,7 +340,7 @@ const MyPortfolioPage = () => {
           </ContactWrapper>
         </FullPage>
         {portfolioProjects.map((portfolioProject, index) => (
-          <FullPage isVerticalCenter={true} key={portfolioProject.id ?? index}>
+          <FullPage isVerticalCenter={true} key={portfolioProject.id ?? index} data-index={index + 1}>
             <PortfolioProjectSection
               isEditable={true}
               project={portfolioProject}
@@ -340,7 +358,7 @@ const MyPortfolioPage = () => {
           </FullPage>
         ))}
         {portfolioSections.map((portfolioSection, index) => (
-          <FullPage key={portfolioSection.id ?? index}>
+          <FullPage key={portfolioSection.id ?? index} data-index={portfolioProjects.length + 1}>
             <PortfolioTextEditor
               cssProp={SectionNameCSS}
               value={portfolioSection.name}
@@ -374,10 +392,11 @@ const MyPortfolioPage = () => {
         {isConfirmShown && (
           <ConfirmPortal heading={confirmMessage} onConfirm={handleDeleteSectionConfirm} onCancel={hideConfirm} />
         )}
+        <BottomSliderPortal onSlideDown={handleSlideDown} isSliderShown={isBottomSliderShown}>test</BottomSliderPortal>
       </Container>
-      <PaginatorWrapper>
+      {/* <PaginatorWrapper>
         <DotPaginator activePageIndex={activePageIndex} paginationCount={paginationCount} onPaginate={paginate} />
-      </PaginatorWrapper>
+      </PaginatorWrapper> */}
     </>
   );
 };

@@ -57,11 +57,6 @@ const PostContentUploader = ({ isImageUploaderShown, content, setFiles, setConte
     const newImageUrls = files.map((file) => URL.createObjectURL(file));
     setImageUrls(newImageUrls);
 
-    // files.forEach((file) => {
-    //   const imageUrl = URL.createObjectURL(file);
-    //   setImageUrls((state) => [...state, imageUrl]);
-    // });
-
     setFiles && setFiles(files);
   };
 

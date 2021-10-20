@@ -25,4 +25,5 @@ export const Z_INDEX = {
   LOWER: 150,
   ROOT: 0,
   UNDER_ROOT: -1,
+  BACKGROUND: -10,
 };

@@ -77,6 +77,10 @@ export const TextEditorWrapper = styled.div(
     padding-top: 1rem;
     background-color: ${theme.color.white};
 
+    textarea {
+      line-height: 1.5rem;
+    }
+
     ${setLaptopAboveMediaQuery`
       padding-top: 3rem;
     
@@ -87,5 +91,4 @@ export const TextEditorWrapper = styled.div(
 export const PostTextEditorCSS = css`
   width: 100%;
   height: 100%;
-  line-height: 1.8rem;
 `;

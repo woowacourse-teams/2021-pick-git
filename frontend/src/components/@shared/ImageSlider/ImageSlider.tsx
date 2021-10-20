@@ -7,14 +7,13 @@ import { Container, Image, ImageListItem, ImageListSlider, Indicator, SlideButto
 
 export interface Props extends React.CSSProperties {
   imageUrls: string[];
-  imageHeight?: string;
   slideButtonKind: "in-box" | "stick-out";
   cssProp?: CSSProp;
 }
 
 const SLIDE_THROTTLE_DELAY = 800;
 
-const ImageSlider = ({ imageUrls, imageHeight, cssProp }: Props) => {
+const ImageSlider = ({ imageUrls, cssProp }: Props) => {
   const [imageIndex, setImageIndex] = useState(0);
   const [isFirstImage, setIsFirstImage] = useState(true);
   const [isLastImage, setIsLastImage] = useState(false);
