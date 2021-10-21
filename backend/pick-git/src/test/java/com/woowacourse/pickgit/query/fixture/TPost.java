@@ -97,12 +97,6 @@ public enum TPost {
         return id;
     }
 
-    private void clearValues() {
-        this.id = null;
-        this.likes.clear();
-        this.comment.clear();
-    }
-
     protected void addLike(TUser tUser) {
         this.likes.add(tUser);
     }

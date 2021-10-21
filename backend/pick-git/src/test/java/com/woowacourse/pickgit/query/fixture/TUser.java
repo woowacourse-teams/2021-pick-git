@@ -75,12 +75,13 @@ public enum TUser {
     }
 
     public TokenDto 은로그인을한다() {
-        if (this.token != null && isRead) {
-            return this.token;
+        if(isRead) {
+            if (this.token != null) {
+                return this.token;
+            }
+            this.token = requestLogin(name());
         }
-
-        this.token = requestLogin(name());
-        return this.token;
+        return requestLogin(name());
     }
 
     public LoginAndThenAct 은로그인을하고() {

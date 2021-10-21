@@ -69,12 +69,11 @@ class UserAcceptanceTest_Query extends AcceptanceTest {
     @DisplayName("로그인된 사용자는 팔로우한 유저의 프로필을 조회할 수 있다.")
     @Test
     void getUserProfile_LoginUserIsFollowing_Success() {
-        MARK.은로그인을한다();
-        NEOZAL.은로그인을하고().팔로우를한다(MARK);
-        UserProfileResponse response = NEOZAL.은로그인을하고().프로필을_조회한다(MARK)
+        DANI.은로그인을한다();
+        UserProfileResponse response = NEOZAL.은로그인을하고().프로필을_조회한다(DANI)
             .as(UserProfileResponse.class);
 
-        assertThat(response.getName()).isEqualTo(MARK.name());
+        assertThat(response.getName()).isEqualTo(DANI.name());
     }
 
     @DisplayName("로그인된 사용자는 팔로우하지 않은 유저의 프로필을 조회할 수 있다.")

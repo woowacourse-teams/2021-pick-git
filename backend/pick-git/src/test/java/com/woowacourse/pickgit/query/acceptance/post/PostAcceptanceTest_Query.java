@@ -27,7 +27,6 @@ class PostAcceptanceTest_Query extends AcceptanceTest {
     void setUp() {
         toRead();
         모든유저().로그인을한다();
-
         NEOZAL.은로그인을하고().포스트를등록한다(NEOZALPOST);
         MARK.은로그인을하고().포스트를등록한다(MARKPOST);
         KEVIN.은로그인을하고().포스트를등록한다(KEVINPOST);

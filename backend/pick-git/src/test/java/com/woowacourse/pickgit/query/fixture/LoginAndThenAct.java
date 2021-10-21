@@ -95,7 +95,9 @@ public class LoginAndThenAct extends Act {
         );
 
         if (response.statusCode() == HttpStatus.CREATED.value()) {
-            this.tUser.addPost(tPost, response);
+            if(isRead) {
+                this.tUser.addPost(tPost, response);
+            }
             String location = response.headers().getValue(HttpHeaders.LOCATION);
             String[] split = location.split("/");
             tPost.setId(Long.parseLong(split[split.length - 1]));

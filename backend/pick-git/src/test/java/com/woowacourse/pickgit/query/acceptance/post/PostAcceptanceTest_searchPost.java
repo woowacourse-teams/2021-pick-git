@@ -83,7 +83,7 @@ class PostAcceptanceTest_searchPost extends AcceptanceTest {
     @DisplayName("존재하지 않는 type을 요청하면 예외가 발생한다.")
     @Test
     void userCanFindPostViaTags() {
-        ApiErrorResponse response = GUEST.은로그인을하고().포스트를검색한다(
+        ApiErrorResponse response = NEOZAL.은로그인을하고().포스트를검색한다(
             "invalid", "java", BAD_REQUEST)
             .as(ApiErrorResponse.class);
 
