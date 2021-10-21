@@ -1,0 +1,37 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+
+== Post Feed
+=== 홈 피드 조회 요청 - 로그인
+==== Request
+include::{snippets}/post-homefeed-LoggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/post-homefeed-LoggedIn/http-response.adoc[]
+
+=== 홈 피드 조회 요청 - 비 로그인
+==== Request
+include::{snippets}/post-homefeed-unLoggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/post-homefeed-unLoggedIn/http-response.adoc[]
+
+=== 본인 피드 조회 요청 - 로그인
+==== Request
+include::{snippets}/post-myfeed-LoggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/post-myfeed-LoggedIn/http-response.adoc[]
+
+=== 다른 사용자 피드 조회 요청 - 로그인
+include::{snippets}/post-userfeed-LoggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/post-userfeed-LoggedIn/http-response.adoc[]
+
+=== 다른 사용자 피드 조회 요청 - 비 로그인
+include::{snippets}/post-userfeed-unLoggedIn/http-request.adoc[]
+==== Response
+include::{snippets}/post-userfeed-unLoggedIn/http-response.adoc[]
