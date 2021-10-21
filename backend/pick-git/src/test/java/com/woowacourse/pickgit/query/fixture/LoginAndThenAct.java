@@ -82,12 +82,16 @@ public class LoginAndThenAct extends Act {
 
         String location = response.headers().getValue(HttpHeaders.LOCATION);
         String[] split = location.split("/");
-        tPost.setId(Long.parseLong(split[split.length-1]));
+        tPost.setId(Long.parseLong(split[split.length - 1]));
 
         return response;
     }
 
-    public ExtractableResponse<Response> 포스트를검색한다(String type, String keyword, HttpStatus status) {
+    public ExtractableResponse<Response> 포스트를검색한다(
+        String type,
+        String keyword,
+        HttpStatus status
+    ) {
         ExtractableResponse<Response> response = request(
             token,
             String.format(
@@ -100,7 +104,7 @@ public class LoginAndThenAct extends Act {
     }
 
     public void 포스트에좋아요를누른다(TPost tpost) {
-        if(tpost.getLikes().contains(tUser)) {
+        if (tpost.getLikes().contains(tUser)) {
             return;
         }
 
@@ -125,7 +129,7 @@ public class LoginAndThenAct extends Act {
     public ExtractableResponse<Response> 댓글을등록한다(TPost tPost, String comment) {
         String key = tPost.name() + comment;
 
-        if(tPost.getComment().contains(new Pair(tUser, comment))) {
+        if (tPost.getComment().contains(new Pair(tUser, comment))) {
             return (ExtractableResponse<Response>) tUser.cache.get(key);
         }
 
