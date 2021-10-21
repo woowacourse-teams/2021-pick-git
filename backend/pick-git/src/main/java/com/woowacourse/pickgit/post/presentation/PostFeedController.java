@@ -39,8 +39,8 @@ public class PostFeedController {
         @RequestParam Long limit
     ) {
         HomeFeedRequestDto homeFeedRequestDto = new HomeFeedRequestDto(appUser, page, limit);
-        List<PostResponseDto> postResponseDtos = postFeedService.homeFeed(homeFeedRequestDto);
-        List<PostResponse> postResponses = createPostResponses(postResponseDtos);
+        List<PostResponseDto> postResponsesDto = postFeedService.homeFeed(homeFeedRequestDto);
+        List<PostResponse> postResponses = createPostResponses(postResponsesDto);
 
         return ResponseEntity.ok(postResponses);
     }
@@ -53,8 +53,8 @@ public class PostFeedController {
         @RequestParam Long limit
     ) {
         HomeFeedRequestDto homeFeedRequestDto = new HomeFeedRequestDto(appUser, page, limit);
-        List<PostResponseDto> postResponseDtos = postFeedService.myFeed(homeFeedRequestDto);
-        List<PostResponse> postResponses = createPostResponses(postResponseDtos);
+        List<PostResponseDto> postResponsesDto = postFeedService.myFeed(homeFeedRequestDto);
+        List<PostResponse> postResponses = createPostResponses(postResponsesDto);
 
         return ResponseEntity.ok(postResponses);
     }
@@ -68,9 +68,9 @@ public class PostFeedController {
         @RequestParam Long limit
     ) {
         HomeFeedRequestDto homeFeedRequestDto = new HomeFeedRequestDto(appUser, page, limit);
-        List<PostResponseDto> postResponseDtos =
+        List<PostResponseDto> postResponsesDto =
             postFeedService.userFeed(homeFeedRequestDto, username);
-        List<PostResponse> postResponses = createPostResponses(postResponseDtos);
+        List<PostResponse> postResponses = createPostResponses(postResponsesDto);
 
         return ResponseEntity.ok(postResponses);
     }
@@ -89,8 +89,8 @@ public class PostFeedController {
         SearchPostsRequestDto searchPostsRequestDto =
             new SearchPostsRequestDto(type, keyword, page, limit, appUser);
 
-        List<PostResponseDto> postResponseDtos = postFeedService.search(searchPostsRequestDto);
-        List<PostResponse> postResponses = createPostResponses(postResponseDtos);
+        List<PostResponseDto> postResponsesDto = postFeedService.search(searchPostsRequestDto);
+        List<PostResponse> postResponses = createPostResponses(postResponsesDto);
 
         return ResponseEntity.ok(postResponses);
     }

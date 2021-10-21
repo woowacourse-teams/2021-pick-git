@@ -1,9 +1,10 @@
-package com.woowacourse.pickgit.post.application.search;
+package com.woowacourse.pickgit.unit.post.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.woowacourse.pickgit.exception.post.IllegalSearchTypeException;
+import com.woowacourse.pickgit.post.application.search.SearchTypes;
 import com.woowacourse.pickgit.post.application.search.type.SearchType;
 import com.woowacourse.pickgit.post.domain.Post;
 import java.util.List;
@@ -12,7 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 class SearchTypesTest {
 
@@ -63,7 +64,7 @@ class SearchTypesTest {
             }
 
             @Override
-            public List<Post> search(String[] keywords, PageRequest pageRequest) {
+            public List<Post> search(String[] keywords, Pageable pageRequest) {
                 return List.of(post);
             }
         };

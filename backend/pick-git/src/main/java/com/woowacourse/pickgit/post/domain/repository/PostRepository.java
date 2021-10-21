@@ -11,8 +11,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    @Query("select p from Post p left join fetch p.user order by p.createdAt desc")
-    List<Post> findAllPosts(Pageable pageable);
+    @Query("select p from Post p join fetch p.user where p.id >= :id order by p.createdAt desc")
+    List<Post> findAllPosts(@Param("id") Long id, Pageable pageable);
 
     @Query("select p from Post p where p.user = :user order by p.createdAt desc")
     List<Post> findAllPostsByUser(@Param("user") User user, Pageable pageable);

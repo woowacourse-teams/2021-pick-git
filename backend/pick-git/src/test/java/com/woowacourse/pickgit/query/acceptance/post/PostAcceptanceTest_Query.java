@@ -59,8 +59,6 @@ public class PostAcceptanceTest_Query extends AcceptanceTest {
     @DisplayName("비 로그인이어도 홈 피드 조회가 가능하다. - 게시물 좋아요 여부는 항상 null")
     @Test
     void read_GuestUser_Success() {
-        String token = NEOZAL.은로그인을한다();
-
         List<PostResponseDto> response = given().log().all()
             .when()
             .get("/api/posts?page=0&limit=3")
