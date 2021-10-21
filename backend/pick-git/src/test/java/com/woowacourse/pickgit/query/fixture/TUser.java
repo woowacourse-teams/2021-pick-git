@@ -25,7 +25,7 @@ public enum TUser {
     KODA,
     GUEST;
 
-    private String token;
+    private TokenDto token;
     private final List<TUser> following;
     private final List<TUser> follower;
     private final Map<TPost, ExtractableResponse<Response>> posts;
@@ -49,7 +49,7 @@ public enum TUser {
     }
 
     public String accessToken() {
-        return token;
+        return token.getToken();
     }
 
     public static OAuthProfileResponse oAuthProfileResponse(String name) {
@@ -91,10 +91,12 @@ public enum TUser {
         this.posts.put(tPost, response);
     }
 
-    public String 은로그인을한다() {
-        if (this.token == null) {
-            this.token = requestLogin(name());
+    public TokenDto 은로그인을한다() {
+        if (this.token != null && isRead) {
+            return this.token;
         }
+
+        this.token = requestLogin(name());
         return this.token;
     }
 
@@ -124,7 +126,7 @@ public enum TUser {
         return posts;
     }
 
-    private static String requestLogin(String code) {
+    private static TokenDto requestLogin(String code) {
         return given().log().all()
             .accept(MediaType.APPLICATION_JSON_VALUE)
             .when()
@@ -132,7 +134,6 @@ public enum TUser {
             .then().log().all()
             .statusCode(HttpStatus.OK.value())
             .extract()
-            .as(TokenDto.class)
-            .getToken();
+            .as(TokenDto.class);
     }
 }

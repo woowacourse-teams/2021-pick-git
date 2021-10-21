@@ -31,7 +31,7 @@ class PortfolioAcceptanceTest_Query extends AcceptanceTest {
     @Test
     void read_LoginUserWithMine_Success() {
         // given
-        String token = NEOZAL.은로그인을한다();
+        String token = NEOZAL.은로그인을한다().getToken();
 
         PortfolioResponse expected = PortfolioFactory
             .mockPortfolioResponse(NEOZAL.name());
@@ -51,8 +51,8 @@ class PortfolioAcceptanceTest_Query extends AcceptanceTest {
     @Test
     void read_LoginUserWithYours_IfExisting_Success() {
         // given
-        String token = NEOZAL.은로그인을한다();
-        String kodaAccessToken = KODA.은로그인을한다();
+        String token = NEOZAL.은로그인을한다().getToken();
+        String kodaAccessToken = KODA.은로그인을한다().getToken();
 
         authenticatedWithReadApiWithStatus(kodaAccessToken, KODA.name())
             .as(PortfolioResponse.class);
@@ -75,8 +75,8 @@ class PortfolioAcceptanceTest_Query extends AcceptanceTest {
     @Test
     void read_LoginUserWithYours_IfNotExisting_Fail() {
         // given
-        String token = NEOZAL.은로그인을한다();
-        KODA.은로그인을한다();
+        String token = NEOZAL.은로그인을한다().getToken();
+        KODA.은로그인을한다().getToken();
 
         // when
         ApiErrorResponse response = authenticatedWithReadApiWithoutStatus(token, KODA.name())
@@ -92,7 +92,7 @@ class PortfolioAcceptanceTest_Query extends AcceptanceTest {
     @Test
     void read_GuestUserWithExistingYours_Success() {
         // given
-        String token = NEOZAL.은로그인을한다();
+        String token = NEOZAL.은로그인을한다().getToken();
         authenticatedWithReadApiWithStatus(token, NEOZAL.name());
 
         PortfolioResponse expected = PortfolioFactory

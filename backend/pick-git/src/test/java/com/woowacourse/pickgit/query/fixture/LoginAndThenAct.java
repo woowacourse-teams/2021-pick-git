@@ -26,7 +26,7 @@ public class LoginAndThenAct extends Act {
     private final boolean isRead;
 
     public LoginAndThenAct(TUser tUser, boolean isRead) {
-        this.token = tUser.은로그인을한다();
+        this.token = tUser.은로그인을한다().getToken();
         this.tUser = tUser;
         this.isRead = isRead;
     }

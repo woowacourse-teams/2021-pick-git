@@ -46,7 +46,7 @@ public class UserAcceptanceTest_Query extends AcceptanceTest {
     @Test
     void getAuthenticatedUserProfile_LoginUser_Success() {
         // given
-        String token = NEOZAL.은로그인을한다();
+        String token = NEOZAL.은로그인을한다().getToken();
         // when
         UserProfileResponse response =
             authenticatedRequest(
@@ -97,7 +97,7 @@ public class UserAcceptanceTest_Query extends AcceptanceTest {
         // when
         UserProfileResponse response =
             authenticatedRequest(
-                NEOZAL.은로그인을한다(),
+                NEOZAL.은로그인을한다().getToken(),
                 String.format("/api/profiles/%s", KODA),
                 Method.GET,
                 HttpStatus.OK
@@ -113,7 +113,7 @@ public class UserAcceptanceTest_Query extends AcceptanceTest {
         // when
         UserProfileResponse response =
             authenticatedRequest(
-                NEOZAL.은로그인을한다(),
+                NEOZAL.은로그인을한다().getToken(),
                 String.format("/api/profiles/%s", MARK.name()),
                 Method.GET,
                 HttpStatus.OK
@@ -126,7 +126,7 @@ public class UserAcceptanceTest_Query extends AcceptanceTest {
     @DisplayName("로그인된 사용자는 존재하지 않는 유저 이름으로 프로필을 조회할 수 없다. - 400 예외")
     @Test
     void getUserProfile_LoginUser_400Exception() {
-        String token = NEOZAL.은로그인을한다();
+        String token = NEOZAL.은로그인을한다().getToken();
 
         // when
         ApiErrorResponse response =
@@ -145,7 +145,7 @@ public class UserAcceptanceTest_Query extends AcceptanceTest {
     @Test
     void getUserProfile_GuestUser_Success() {
         //given
-        MARK.은로그인을한다();
+        MARK.은로그인을한다().getToken();
 
         //when
         UserProfileResponse response = unauthenticatedRequest(

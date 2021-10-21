@@ -1,6 +1,7 @@
 package com.woowacourse.pickgit.query.fixture;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.InstanceOfAssertFactories.map;
 
 import com.woowacourse.pickgit.post.presentation.dto.response.LikeUsersResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.UserSearchResponse;
@@ -186,6 +187,13 @@ public class UnLoginAndThenAct extends Act {
     public ExtractableResponse<Response> 피드를_조회한다(TUser tUser) {
         return request(
             String.format("/api/posts/%s?page=0&limit=3", tUser.name()),
+            Method.GET
+        );
+    }
+
+    public ExtractableResponse<Response> OAuth_로그인_URL_요청을_한다() {
+        return request(
+            "/api/authorization/github",
             Method.GET
         );
     }
