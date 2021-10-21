@@ -1,19 +1,16 @@
 package com.woowacourse.pickgit.query.fixture;
 
-import static com.woowacourse.pickgit.config.db.DataSourceSelector.READ;
 import static io.restassured.RestAssured.given;
 import static java.util.stream.Collectors.toList;
 
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
 import com.woowacourse.pickgit.authentication.application.dto.TokenDto;
-import com.woowacourse.pickgit.config.DatabaseConfigurator;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -63,20 +60,6 @@ public enum TUser {
             "testWebsite",
             "testTwitter"
         );
-    }
-
-    public static void clear() {
-        for (TUser value : values()) {
-            value.clearValues();
-        }
-    }
-
-    private void clearValues() {
-        token = null;
-        following.clear();
-        follower.clear();
-        posts.clear();
-        cache.clear();
     }
 
     void addFollowing(TUser tUser) {

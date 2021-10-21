@@ -9,6 +9,7 @@ import static com.woowacourse.pickgit.query.fixture.TUser.KEVIN;
 import static com.woowacourse.pickgit.query.fixture.TUser.KODA;
 import static com.woowacourse.pickgit.query.fixture.TUser.MARK;
 import static com.woowacourse.pickgit.query.fixture.TUser.NEOZAL;
+import static com.woowacourse.pickgit.query.fixture.TUser.모든유저;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;
@@ -25,6 +26,8 @@ class PostAcceptanceTest_Query extends AcceptanceTest {
     @BeforeEach
     void setUp() {
         toRead();
+        모든유저().로그인을한다();
+
         NEOZAL.은로그인을하고().포스트를등록한다(NEOZALPOST);
         MARK.은로그인을하고().포스트를등록한다(MARKPOST);
         KEVIN.은로그인을하고().포스트를등록한다(KEVINPOST);

@@ -1,13 +1,11 @@
 package com.woowacourse.pickgit.acceptance;
 
-import static com.woowacourse.pickgit.config.db.DataSourceSelector.WRITE;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.woowacourse.pickgit.authentication.application.dto.TokenDto;
 import com.woowacourse.pickgit.config.DatabaseConfigurator;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
-import com.woowacourse.pickgit.query.fixture.FixtureConfigurator;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -39,10 +37,6 @@ public abstract class AcceptanceTest {
 
     @AfterEach
     void tearDown() {
-        if (databaseConfigurator.getSelectedDataSourceName().equals(WRITE)) {
-            FixtureConfigurator.clearFixtures();
-        }
-
         clearDataBase();
         databaseConfigurator.toWrite();
     }
