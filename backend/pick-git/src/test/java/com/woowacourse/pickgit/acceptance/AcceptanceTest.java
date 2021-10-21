@@ -9,8 +9,10 @@ import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -66,5 +68,16 @@ public abstract class AcceptanceTest {
 
     protected void toRead() {
         databaseConfigurator.toRead();
+    }
+
+    protected static Stream<Arguments> getPostSearchArguments() {
+        return Stream.of(
+            Arguments.of("java"),
+            Arguments.of("java post", 0, 5),
+            Arguments.of("", 0, 5),
+            Arguments.of("c++", 0, 5),
+            Arguments.of("html", 0, 5),
+            Arguments.of("java c++ spring", 0, 5)
+        );
     }
 }
