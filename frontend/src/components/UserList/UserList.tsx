@@ -11,7 +11,7 @@ import { isInfiniteData } from "../../utils/typeGuard";
 import ChoiceModalPortal from "../@layout/ChoiceModalPortal/ChoiceModalPortal";
 import Avatar from "../@shared/Avatar/Avatar";
 import InfiniteScrollContainer from "../@shared/InfiniteScrollContainer/InfiniteScrollContainer";
-import { Button, Empty, NameTag, List } from "./UserList.style";
+import { Button, Empty, NameTag, ListItem } from "./UserList.style";
 
 export interface Props {
   isFetchingNextPage: boolean;
@@ -126,13 +126,13 @@ const UserList = ({ isFetchingNextPage, onIntersect, users, queryKey }: Props) =
       <InfiniteScrollContainer isLoaderShown={isFetchingNextPage} onIntersect={onIntersect}>
         <ul>
           {users.map((user) => (
-            <List key={user.username}>
+            <ListItem key={user.username}>
               <NameTag to={PAGE_URL.USER_PROFILE(user.username)}>
                 <Avatar diameter="1.875rem" imageUrl={user.imageUrl} />
                 <span>{user.username}</span>
               </NameTag>
               <FollowButton username={user.username} following={user.following} />
-            </List>
+            </ListItem>
           ))}
         </ul>
       </InfiniteScrollContainer>

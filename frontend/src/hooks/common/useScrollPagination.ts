@@ -23,31 +23,27 @@ const useScrollPagination = (containerRef: RefObject<HTMLDivElement>, pagination
     });
   }, [activePageIndex]);
 
-  useEffect(() => {
-    if (!containerRef.current) {
-      return;
-    }
+  // useEffect(() => {
+  //   if (!containerRef.current) {
+  //     return;
+  //   }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry, index) => {
-          console.log("index", index);
-          console.log("entry", entry.intersectionRatio);
-          if (entry.intersectionRatio < 0.7) {
-            return;
-          }
+  //   const observer = new IntersectionObserver(
+  //     (entries) => {
+  //       entries.forEach((entry, index) => {
+  //         if (index === entries.length - 1) {
+  //           paginate(Number(entry.target.getAttribute("data-index")));
+  //         }
+  //       });
+  //     },
+  //     { threshold: 0.97 }
+  //   );
 
-          paginate(index);
-        });
-      },
-      { threshold: 0.5 }
-    );
-
-    Array.from(containerRef.current.children).forEach((child) => {
-      console.log(child);
-      observer.observe(child);
-    });
-  }, [containerRef.current]);
+  //   Array.from(containerRef.current.children).forEach((child) => {
+  //     console.log(child);
+  //     observer.observe(child);
+  //   });
+  // }, [containerRef.current]);
 
   return {
     activePageIndex,

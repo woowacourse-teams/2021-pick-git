@@ -1,18 +1,22 @@
-import styled from "styled-components";
+import styled, { css, CSSProp } from "styled-components";
 import { bounceAnimation, spinAnimation } from "../../@styled/keyframes";
 
-export const LoadingDots = styled.div<React.CSSProperties>``;
+export const LoadingDots = styled.div<{ cssProp?: CSSProp }>(
+  ({ cssProp }) => `
+    ${cssProp}
+  `
+);
 
-const LoadingDot = styled.div<{ size: string; loaderColor?: string }>`
-  ${({ theme, size, loaderColor }) => `
+const LoadingDot = styled.div<{ size: string; loaderColor?: string }>(
+  ({ theme, size, loaderColor }) => css`
     width: ${size};
-    height: ${size};  
-    background-color: ${loaderColor ?? theme.color.tagItemColor}
-  `};
-  border-radius: 50%;
-  display: inline-block;
-  animation: 1.5s ${bounceAnimation} infinite ease-in-out both;
-`;
+    height: ${size};
+    background-color: ${loaderColor ?? theme.color.tagItemColor};
+    border-radius: 50%;
+    display: inline-block;
+    animation: 1.5s ${bounceAnimation} infinite ease-in-out both;
+  `
+);
 
 export const FirstLoadingDot = styled(LoadingDot)`
   margin-right: 0.3rem;
@@ -27,15 +31,16 @@ export const ThirdLoadingDot = styled(LoadingDot)`
   animation-delay: 0.3s;
 `;
 
-export const Spinner = styled.div<{ size: string; loaderColor?: string }>`
-  ${({ theme, size, loaderColor }) => `
+export const Spinner = styled.div<{ size: string; loaderColor?: string; cssProp?: CSSProp }>(
+  ({ theme, size, loaderColor, cssProp }) => css`
     width: ${size};
-    height: ${size};  
+    height: ${size};
     border: 3px solid ${loaderColor ? "transparent" : theme.color.tagItemColor};
     border-top-color: ${loaderColor ?? theme.color.primaryColor};
-  `};
+    display: inline-block;
+    border-radius: 50%;
+    animation: 1s ${spinAnimation} infinite ease-in-out;
 
-  display: inline-block;
-  border-radius: 50%;
-  animation: 1s ${spinAnimation} infinite ease-in-out;
-`;
+    ${cssProp}
+  `
+);

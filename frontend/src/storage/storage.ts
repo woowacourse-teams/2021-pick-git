@@ -3,14 +3,13 @@ import { getDateString } from "../utils/date";
 const STORAGE_KEY = {
   ACCESS_TOKEN: "accessToken",
   USER_NAME: "username",
-  PORTFOLIO_LOCAL_UPDATE_TIME: "portfolioLocalUpdateTime",
-  PORTFOLIO_SERVER_UPDATE_TIME: "portfolioServerUpdateTime",
+  PORTFOLIO_LOCAL_UPDATE_TIME: (username: string) => `${username}-portfolioLocalUpdateTime`,
 };
 
 export const getAccessToken: () => string | null = () => localStorage.getItem(STORAGE_KEY.ACCESS_TOKEN);
 export const getUsername = () => localStorage.getItem(STORAGE_KEY.USER_NAME);
 export const getPortfolioLocalUpdateTime = () => {
-  const localUpdateTime = localStorage.getItem(STORAGE_KEY.PORTFOLIO_LOCAL_UPDATE_TIME);
+  const localUpdateTime = localStorage.getItem(STORAGE_KEY.PORTFOLIO_LOCAL_UPDATE_TIME(getUsername() ?? ""));
 
   if (!localUpdateTime) {
     return null;
@@ -20,7 +19,9 @@ export const getPortfolioLocalUpdateTime = () => {
 };
 
 export const getPortfolioLocalUpdateTimeString = () => {
-  const updateTime = new Date(localStorage.getItem(STORAGE_KEY.PORTFOLIO_LOCAL_UPDATE_TIME) ?? "0");
+  const updateTime = new Date(
+    localStorage.getItem(STORAGE_KEY.PORTFOLIO_LOCAL_UPDATE_TIME(getUsername() ?? "")) ?? "0"
+  );
   const ISOString = updateTime.toISOString();
   const closeIndex = ISOString.indexOf(".");
   return ISOString.substring(0, closeIndex);
@@ -31,5 +32,5 @@ export const setUsername = (username: string) => localStorage.setItem(STORAGE_KE
 export const setPortfolioLocalUpdateTime = (updateTime: Date) => {
   const dateTime = getDateString(updateTime);
 
-  return localStorage.setItem(STORAGE_KEY.PORTFOLIO_LOCAL_UPDATE_TIME, dateTime);
+  return localStorage.setItem(STORAGE_KEY.PORTFOLIO_LOCAL_UPDATE_TIME(getUsername() ?? ""), dateTime);
 };

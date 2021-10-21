@@ -99,7 +99,7 @@ export type Tags = string[];
 
 export type Step = {
   title: string;
-  path: string;
+  hash: string;
 };
 
 export type TabIndicatorKind = "line" | "pill";

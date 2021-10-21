@@ -5,6 +5,7 @@ import {
   setLaptopAboveMediaQuery,
   setTabletMediaQuery,
 } from "../../components/@styled/mediaQueries";
+import { customScrollbarCSS } from "../../components/@styled/scrollbar";
 
 export const Container = styled.main(
   ({ theme }) => css`
@@ -13,6 +14,7 @@ export const Container = styled.main(
     scroll-snap-type: y mandatory;
     overflow-x: hidden;
     overflow-y: scroll;
+    ${customScrollbarCSS(theme.color.tagItemColor)}
   `
 );
 

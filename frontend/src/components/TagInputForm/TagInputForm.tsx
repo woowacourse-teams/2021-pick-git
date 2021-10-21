@@ -1,5 +1,5 @@
 import { AxiosError } from "axios";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { UseQueryResult } from "react-query";
 import { useHistory } from "react-router-dom";
 import { ErrorResponse, Tags } from "../../@types";
@@ -13,7 +13,16 @@ import AlertPortal from "../@layout/AlertPortal/AlertPortal";
 import PageLoading from "../@layout/PageLoading/PageLoading";
 import Chip from "../@shared/Chip/Chip";
 import Input from "../@shared/Input/Input";
-import { Container, Form, TagList, TagListItem, TextLengthIndicator } from "./TagInputForm.style";
+import SVGIcon from "../@shared/SVGIcon/SVGIcon";
+import {
+  Container,
+  Form,
+  TagInputWrapper,
+  TagList,
+  TagListItem,
+  TextLengthIndicator,
+  TagAddButton,
+} from "./TagInputForm.style";
 
 interface Props {
   githubRepositoryName: string;
@@ -23,6 +32,7 @@ interface Props {
 }
 
 const TagInputForm = ({ githubRepositoryName, tags, tagsQueryResult, setTags }: Props) => {
+  const formRef = useRef<HTMLFormElement>(null);
   const [tagInputLength, setTagInputLength] = useState(0);
   const {
     modalMessage: alertMessage,
@@ -71,6 +81,7 @@ const TagInputForm = ({ githubRepositoryName, tags, tagsQueryResult, setTags }: 
 
     setTags([...tags, newTag]);
     setTagInputLength(0);
+
     event.currentTarget["tag-input"].value = "";
   };
 
@@ -109,14 +120,19 @@ const TagInputForm = ({ githubRepositoryName, tags, tagsQueryResult, setTags }: 
 
   return (
     <Container>
-      <Form onSubmit={handleTagSubmit}>
-        <Input
-          kind="borderBottom"
-          textAlign="center"
-          placeholder="태그 입력..."
-          name="tag-input"
-          onChange={handleTagInputChange}
-        />
+      <Form onSubmit={handleTagSubmit} ref={formRef}>
+        <TagInputWrapper>
+          <Input
+            kind="borderBottom"
+            textAlign="center"
+            placeholder="태그 입력..."
+            name="tag-input"
+            onChange={handleTagInputChange}
+          />
+          <TagAddButton type="submit">
+            <SVGIcon icon="AddBoxIcon" />
+          </TagAddButton>
+        </TagInputWrapper>
         <TextLengthIndicator>{`${tagInputLength} / ${LIMIT.POST_TAG_LENGTH}`}</TextLengthIndicator>
       </Form>
       <TagList>{tagListItems}</TagList>

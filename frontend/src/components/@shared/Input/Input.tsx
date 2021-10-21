@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { CSSProp } from "styled-components";
 import { Input as StyledInput, BottomBorderInputContainer, RoundedInputContainer, StyleProps } from "./Input.style";
 
 export interface Props extends React.HTMLAttributes<HTMLInputElement>, StyleProps {
@@ -6,6 +7,8 @@ export interface Props extends React.HTMLAttributes<HTMLInputElement>, StyleProp
   icon?: React.ReactNode;
   name?: string;
   value?: string;
+  wrapperCssProp?: CSSProp;
+  inputCssProp?: CSSProp;
 }
 
 const Input = ({
@@ -16,6 +19,8 @@ const Input = ({
   bottomBorderColor,
   name,
   value,
+  wrapperCssProp,
+  inputCssProp,
   ...props
 }: Props) => {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -29,8 +34,8 @@ const Input = ({
         textAlign={textAlign}
         autoComplete="off"
         value={value}
-        {...props}
         style={icon ? { marginLeft: "0.9375rem" } : {}}
+        {...props}
       />
     </>
   );
@@ -41,7 +46,11 @@ const Input = ({
 
   if (kind === "borderBottom") {
     return (
-      <BottomBorderInputContainer onClick={triggerInputFocus} bottomBorderColor={bottomBorderColor}>
+      <BottomBorderInputContainer
+        onClick={triggerInputFocus}
+        bottomBorderColor={bottomBorderColor}
+        cssProp={wrapperCssProp}
+      >
         {input}
       </BottomBorderInputContainer>
     );
@@ -49,14 +58,18 @@ const Input = ({
 
   if (kind === "rounded") {
     return (
-      <RoundedInputContainer onClick={triggerInputFocus} backgroundColor={backgroundColor}>
+      <RoundedInputContainer onClick={triggerInputFocus} backgroundColor={backgroundColor} cssProp={wrapperCssProp}>
         {input}
       </RoundedInputContainer>
     );
   }
 
   return (
-    <BottomBorderInputContainer onClick={triggerInputFocus} bottomBorderColor={bottomBorderColor}>
+    <BottomBorderInputContainer
+      onClick={triggerInputFocus}
+      bottomBorderColor={bottomBorderColor}
+      cssProp={wrapperCssProp}
+    >
       {input}
     </BottomBorderInputContainer>
   );

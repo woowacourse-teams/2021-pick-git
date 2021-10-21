@@ -29,6 +29,7 @@ import {
   isValidPostUploadData,
 } from "../../utils/postUpload";
 import { getAPIErrorMessage } from "../../utils/error";
+import { ScrollPageWrapper } from "../../components/@styled/layout";
 
 const AddPostPage = () => {
   const { pushSnackbarMessage } = useSnackbar();
@@ -153,29 +154,33 @@ const AddPostPage = () => {
   ];
 
   return (
-    <Container>
-      <StepSlider stepCount={POST_ADD_STEPS.length} stepIndex={stepIndex}>
-        {POST_ADD_STEPS.map((STEP, index) => (
-          <StepContainer key={STEP.title} stepCount={POST_ADD_STEPS.length} isShown={stepIndex === index}>
-            {stepComponents[index]}
-          </StepContainer>
-        ))}
-      </StepSlider>
-      <NextStepButtonWrapper>
-        {stepIndex < POST_ADD_STEPS.length - 1 ? (
-          <Button kind="roundedBlock" onClick={handleNextButtonClick}>
-            다음
-          </Button>
-        ) : (
-          <Button kind="roundedBlock" onClick={handlePostAddComplete}>
-            작성 완료
-          </Button>
-        )}
-        {isAlertShown && <AlertPortal heading={alertMessage} onOkay={hideAlert} />}
-        {isConfirmShown && <ConfirmPortal heading={confirmMessage} onConfirm={handleConfirm} onCancel={hideConfirm} />}
-      </NextStepButtonWrapper>
-      {uploading && stepIndex === POST_ADD_STEPS.length - 1 && <PageLoadingWithCover description="게시중" />}
-    </Container>
+    <ScrollPageWrapper>
+      <Container>
+        <StepSlider stepCount={POST_ADD_STEPS.length} stepIndex={stepIndex}>
+          {POST_ADD_STEPS.map((STEP, index) => (
+            <StepContainer key={STEP.title} stepCount={POST_ADD_STEPS.length} isShown={stepIndex === index}>
+              {stepComponents[index]}
+            </StepContainer>
+          ))}
+        </StepSlider>
+        <NextStepButtonWrapper>
+          {stepIndex < POST_ADD_STEPS.length - 1 ? (
+            <Button kind="roundedBlock" onClick={handleNextButtonClick}>
+              다음
+            </Button>
+          ) : (
+            <Button kind="roundedBlock" onClick={handlePostAddComplete}>
+              작성 완료
+            </Button>
+          )}
+          {isAlertShown && <AlertPortal heading={alertMessage} onOkay={hideAlert} />}
+          {isConfirmShown && (
+            <ConfirmPortal heading={confirmMessage} onConfirm={handleConfirm} onCancel={hideConfirm} />
+          )}
+        </NextStepButtonWrapper>
+        {uploading && stepIndex === POST_ADD_STEPS.length - 1 && <PageLoadingWithCover description="게시중" />}
+      </Container>
+    </ScrollPageWrapper>
   );
 };
 

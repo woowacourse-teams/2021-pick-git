@@ -1,31 +1,38 @@
-import styled from "styled-components";
+import styled, { css, CSSProp } from "styled-components";
 
 export interface StyleProps extends RoundedContainerProps, BottomBorderContainerProps, InputProps {}
 
 interface RoundedContainerProps {
   backgroundColor?: string;
+  cssProp?: CSSProp;
 }
 
 interface BottomBorderContainerProps {
   bottomBorderColor?: string;
+  cssProp?: CSSProp;
 }
 
 interface InputProps {
   textAlign?: "left" | "center";
+  cssProp?: CSSProp;
 }
 
-export const Input = styled.input<InputProps>`
-  display: block;
-  width: 100%;
-  border: none;
-  text-align: ${({ textAlign }) => (textAlign ? textAlign : "left")};
-  background: none;
-  font-size: 12px;
+export const Input = styled.input<InputProps>(
+  ({ textAlign, cssProp }) => css`
+    display: block;
+    width: 100%;
+    border: none;
+    text-align: ${textAlign ? textAlign : "left"};
+    background: none;
+    font-size: 12px;
 
-  :focus {
-    outline: none;
-  }
-`;
+    :focus {
+      outline: none;
+    }
+
+    ${cssProp}
+  `
+);
 
 export const RoundedInputContainer = styled.div<RoundedContainerProps>`
   display: flex;

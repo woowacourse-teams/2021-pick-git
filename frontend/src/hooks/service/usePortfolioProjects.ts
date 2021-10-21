@@ -3,8 +3,11 @@ import { PORTFOLIO } from "../../constants/localStorageKey";
 import { setPortfolioLocalUpdateTime } from "../../storage/storage";
 import useLocalStorage from "../common/useLocalStorage";
 
-const usePortfolioProjects = () => {
-  const { itemState: portfolioProjects, setItem } = useLocalStorage<PortfolioProject[]>(PORTFOLIO.PROJECTS, []);
+const usePortfolioProjects = (username: string) => {
+  const { itemState: portfolioProjects, setItem } = useLocalStorage<PortfolioProject[]>(
+    PORTFOLIO.PROJECTS(username),
+    []
+  );
 
   const setPortfolioProjects = (projects: PortfolioProject[], shouldRenewUpdateTime: boolean = true) => {
     shouldRenewUpdateTime && setPortfolioLocalUpdateTime(new Date());

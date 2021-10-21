@@ -4,15 +4,15 @@ import { customScrollbarCSS } from "../../@styled/scrollbar";
 
 export const TextArea = styled(NoneStyledTextarea)<{ cssProp?: CSSProp; autoGrow: boolean }>(
   ({ theme, cssProp, autoGrow }) => css`
-    ${cssProp}
     ${autoGrow
       ? `
       ::-webkit-scrollbar {
         width: 0px;
       }
-    `
+      `
       : customScrollbarCSS(theme.color.textColor)};
 
     color: ${theme.color.textColor};
+    ${cssProp}
   `
 );
