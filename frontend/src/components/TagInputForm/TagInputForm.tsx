@@ -20,13 +20,8 @@ import {
   TagInputWrapper,
   TagList,
   TagListItem,
-<<<<<<< HEAD
   TextLengthIndicator,
   TagAddButton,
-=======
-  TagAddButtonCSS,
-  TextLengthIndicator,
->>>>>>> 5f0c47b (feat: UI 개선)
 } from "./TagInputForm.style";
 
 interface Props {
@@ -137,13 +132,9 @@ const TagInputForm = ({ githubRepositoryName, tags, tagsQueryResult, setTags }: 
             name="tag-input"
             onChange={handleTagInputChange}
           />
-<<<<<<< HEAD
           <TagAddButton type="submit">
             <SVGIcon icon="AddBoxIcon" />
           </TagAddButton>
-=======
-          <SVGIcon icon="AddBoxIcon" cssProp={TagAddButtonCSS} onClick={handleTagAdd} />
->>>>>>> 5f0c47b (feat: UI 개선)
         </TagInputWrapper>
         <TextLengthIndicator>{`${tagInputLength} / ${LIMIT.POST_TAG_LENGTH}`}</TextLengthIndicator>
       </Form>
