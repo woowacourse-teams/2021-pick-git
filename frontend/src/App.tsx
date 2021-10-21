@@ -13,6 +13,7 @@ import { PostEditStepContextProvider } from "./contexts/PostEditStepContext";
 import PageLoadingWithLogo from "./components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
 import MyPortfolioPage from "./pages/PortfolioPage/MyPortfolioPage";
 import { UserFeedContextProvider } from "./contexts/UserFeedContext";
+import { SearchPostContextProvider } from "./contexts/SearchPostContext";
 
 const NavigationHeader = lazy(() => import("./components/@layout/NavigationHeader/NavigationHeader"));
 const OneDepthStepHeader = lazy(() => import("./components/OneDepthStepHeader/OneDepthStepHeader"));
@@ -83,12 +84,14 @@ const App = () => {
           <Route exact path={[PAGE_URL.HOME, PAGE_URL.HOME_FEED]}>
             <HomeFeedPage />
           </Route>
-          <Route exact path={PAGE_URL.SEARCH}>
-            <SearchPage />
-          </Route>
-          <Route exact path={PAGE_URL.SEARCH_RESULT_FEED_BASE}>
-            <SearchPostResultPage />
-          </Route>
+          <SearchPostContextProvider>
+            <Route exact path={PAGE_URL.SEARCH}>
+              <SearchPage />
+            </Route>
+            <Route exact path={PAGE_URL.SEARCH_RESULT_FEED_BASE}>
+              <SearchPostResultPage />
+            </Route>
+          </SearchPostContextProvider>
           <Route exact path={PAGE_URL.LOGIN}>
             <LoginPage />
           </Route>

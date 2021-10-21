@@ -1,29 +1,24 @@
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
-import { InfiniteData, useQueryClient } from "react-query";
-import { HTTPErrorHandler, Post } from "../../@types";
+import { HTTPErrorHandler } from "../../@types";
 import { UNKNOWN_ERROR_MESSAGE } from "../../constants/messages";
-import { QUERY } from "../../constants/queries";
 import SnackBarContext from "../../contexts/SnackbarContext";
 import UserContext from "../../contexts/UserContext";
 import { getAPIErrorMessage, handleHTTPError } from "../../utils/error";
 import { isHttpErrorStatus } from "../../utils/typeGuard";
-import { useSearchPostResultQuery } from "../../services/queries/search";
+import SearchPostContext from "../../contexts/SearchPostContext";
 
 interface Params {
   keyword: string;
   type: string;
-  prevData?: InfiniteData<Post[]>;
   activated: boolean;
 }
 
-const useSearchPostData = ({ keyword, type, prevData, activated }: Params) => {
+const useSearchPostData = ({ keyword, type, activated }: Params) => {
   const [prevKeyword, setPrevKeyword] = useState<string | null>(null);
   const { pushSnackbarMessage } = useContext(SnackBarContext);
   const { logout } = useContext(UserContext);
-  const queryClient = useQueryClient();
-  const formattedKeyword = keyword.trim().replace(/,/g, " ").replace(/\s+/g, " ");
-  const queryKey = [QUERY.GET_SEARCH_POST_RESULT, { type, formattedKeyword }];
+  const { queryResult, initSearchPost, initialized } = useContext(SearchPostContext);
 
   const [isAllResultFetched, setIsAllResultFetched] = useState(false);
   const {
@@ -34,7 +29,8 @@ const useSearchPostData = ({ keyword, type, prevData, activated }: Params) => {
     fetchNextPage,
     isFetchingNextPage,
     refetch,
-  } = useSearchPostResultQuery(type, formattedKeyword, queryKey, activated);
+  } = queryResult;
+
   const handleIntersect = async () => {
     if (isAllResultFetched) return;
 
@@ -42,7 +38,7 @@ const useSearchPostData = ({ keyword, type, prevData, activated }: Params) => {
   };
 
   const handleDataFetch = () => {
-    if (!infinitePostsData) {
+    if (!infinitePostsData || !initialized) {
       return;
     }
 
@@ -83,10 +79,9 @@ const useSearchPostData = ({ keyword, type, prevData, activated }: Params) => {
   };
 
   useEffect(() => {
-    if (prevData) {
-      queryClient.setQueryData([QUERY.GET_SEARCH_POST_RESULT, { type, keyword }], prevData);
-    }
-  }, []);
+    console.log("keyword", keyword);
+    initSearchPost(type, keyword, activated);
+  }, [type, keyword, activated]);
 
   useEffect(() => {
     if (prevKeyword !== keyword) {
@@ -110,8 +105,6 @@ const useSearchPostData = ({ keyword, type, prevData, activated }: Params) => {
     isFetchingNextPage,
     handleIntersect,
     refetch,
-    queryKey,
-    formattedKeyword,
   };
 };
 

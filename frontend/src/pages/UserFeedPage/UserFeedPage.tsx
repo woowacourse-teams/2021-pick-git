@@ -16,8 +16,6 @@ import useUserFeed from "../../hooks/service/useUserFeed";
 
 import { Container } from "./UserFeedPage.style";
 
-import type { Post } from "../../@types";
-
 interface LocationState {
   postId?: string;
 }

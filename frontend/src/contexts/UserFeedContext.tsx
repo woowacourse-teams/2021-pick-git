@@ -1,5 +1,5 @@
 import { AxiosError } from "axios";
-import { createContext, Dispatch, SetStateAction, useState } from "react";
+import { createContext, useState } from "react";
 import { UseInfiniteQueryResult } from "react-query";
 
 import type { ErrorResponse, Post } from "../@types";

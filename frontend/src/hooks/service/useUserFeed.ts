@@ -1,9 +1,7 @@
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { useContext, useEffect, useState } from "react";
-import { InfiniteData, UseInfiniteQueryResult, useQueryClient } from "react-query";
 import { useHistory } from "react-router-dom";
 
-import { QUERY } from "../../constants/queries";
 import { PAGE_URL } from "../../constants/urls";
 
 import SnackBarContext from "../../contexts/SnackbarContext";
@@ -12,9 +10,8 @@ import UserFeedContext from "../../contexts/UserFeedContext";
 
 import { handleHTTPError } from "../../utils/error";
 import { isHttpErrorStatus } from "../../utils/typeGuard";
-import { useUserPostsQuery } from "../../services/queries";
 
-import type { ErrorResponse, HTTPErrorHandler, Post } from "../../@types";
+import type { HTTPErrorHandler } from "../../@types";
 
 const useUserFeed = (isMyFeed: boolean, username: string | null) => {
   const [isAllPostsFetched, setIsAllPostsFetched] = useState(false);
