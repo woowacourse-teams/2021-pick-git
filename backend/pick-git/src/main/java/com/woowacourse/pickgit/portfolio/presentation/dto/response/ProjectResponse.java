@@ -14,7 +14,7 @@ public class ProjectResponse {
     private String type;
     private String imageUrl;
     private String content;
-    private List<TagResponse> tags;
+    private List<String> tags;
 
     private ProjectResponse() {
     }
@@ -27,7 +27,7 @@ public class ProjectResponse {
         String type,
         String imageUrl,
         String content,
-        List<TagResponse> tags
+        List<String> tags
     ) {
         this.id = id;
         this.name = name;
@@ -67,7 +67,7 @@ public class ProjectResponse {
         return content;
     }
 
-    public List<TagResponse> getTags() {
+    public List<String> getTags() {
         return tags;
     }
 }

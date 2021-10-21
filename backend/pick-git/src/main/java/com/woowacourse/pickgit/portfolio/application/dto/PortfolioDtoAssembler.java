@@ -15,7 +15,6 @@ import com.woowacourse.pickgit.portfolio.application.dto.response.ItemResponseDt
 import com.woowacourse.pickgit.portfolio.application.dto.response.PortfolioResponseDto;
 import com.woowacourse.pickgit.portfolio.application.dto.response.ProjectResponseDto;
 import com.woowacourse.pickgit.portfolio.application.dto.response.SectionResponseDto;
-import com.woowacourse.pickgit.portfolio.application.dto.response.TagResponseDto;
 import com.woowacourse.pickgit.portfolio.domain.Portfolio;
 import com.woowacourse.pickgit.portfolio.domain.contact.Contact;
 import com.woowacourse.pickgit.portfolio.domain.contact.Contacts;
@@ -180,8 +179,8 @@ public class PortfolioDtoAssembler {
     }
 
     private ProjectResponseDto toProjectResponseDto(Project project) {
-        List<TagResponseDto> tags = project.getTags().stream()
-            .map(this::toTagResponseDto)
+        List<String> tags = project.getTags().stream()
+            .map(ProjectTag::getTagName)
             .collect(toList());
 
         return new ProjectResponseDto(
@@ -193,12 +192,6 @@ public class PortfolioDtoAssembler {
             project.getImageUrl(),
             project.getContent(),
             tags
-        );
-    }
-
-    private TagResponseDto toTagResponseDto(ProjectTag tag) {
-        return new TagResponseDto(
-            tag.getTagName()
         );
     }
 

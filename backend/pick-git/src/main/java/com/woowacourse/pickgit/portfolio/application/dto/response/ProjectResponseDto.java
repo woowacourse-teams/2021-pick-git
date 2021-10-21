@@ -15,7 +15,7 @@ public class ProjectResponseDto {
     private String type;
     private String imageUrl;
     private String content;
-    private List<TagResponseDto> tags;
+    private List<String> tags;
 
     private ProjectResponseDto() {
     }
@@ -28,7 +28,7 @@ public class ProjectResponseDto {
         String type,
         String imageUrl,
         String content,
-        List<TagResponseDto> tags
+        List<String> tags
     ) {
         this(
             id,
@@ -50,7 +50,7 @@ public class ProjectResponseDto {
         String type,
         String imageUrl,
         String content,
-        List<TagResponseDto> tags
+        List<String> tags
     ) {
         this.id = id;
         this.name = name;
@@ -90,7 +90,7 @@ public class ProjectResponseDto {
         return content;
     }
 
-    public List<TagResponseDto> getTags() {
+    public List<String> getTags() {
         return tags;
     }
 }
