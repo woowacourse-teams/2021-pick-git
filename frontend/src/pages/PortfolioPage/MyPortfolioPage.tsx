@@ -206,7 +206,7 @@ const MyPortfolioPage = () => {
 
   const handleSlideDown = () => {
     hideBottomSlider();
-  }
+  };
 
   const handleSetContacts = () => {
     showBottomSlider();
@@ -264,7 +264,7 @@ const MyPortfolioPage = () => {
     setSlideEventHandler();
 
     return () => removeSlideEventHandler();
-  }, [])
+  }, []);
 
   if (!isLoggedIn) {
     return <Redirect to={PAGE_URL.HOME} />;
@@ -392,7 +392,9 @@ const MyPortfolioPage = () => {
         {isConfirmShown && (
           <ConfirmPortal heading={confirmMessage} onConfirm={handleDeleteSectionConfirm} onCancel={hideConfirm} />
         )}
-        <BottomSliderPortal onSlideDown={handleSlideDown} isSliderShown={isBottomSliderShown}>test</BottomSliderPortal>
+        <BottomSliderPortal onSlideDown={handleSlideDown} isSliderShown={isBottomSliderShown}>
+          test
+        </BottomSliderPortal>
       </Container>
       {/* <PaginatorWrapper>
         <DotPaginator activePageIndex={activePageIndex} paginationCount={paginationCount} onPaginate={paginate} />
