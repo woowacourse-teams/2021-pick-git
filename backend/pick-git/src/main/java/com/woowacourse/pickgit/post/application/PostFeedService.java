@@ -34,12 +34,16 @@ public class PostFeedService {
         unless = "#result == null || #result.empty"
     )
     public List<PostResponseDto> homeFeed(HomeFeedRequestDto homeFeedRequestDto) {
+        long id = homeFeedRequestDto.getPage() * homeFeedRequestDto.getLimit();
         Pageable pageable = getPagination(homeFeedRequestDto);
+
         if (homeFeedRequestDto.isGuest()) {
-            return PostDtoAssembler.assembleFrom(null,  postRepository.findAllPosts(pageable));
+            return PostDtoAssembler.assembleFrom(null,  postRepository.findAllPosts(id, pageable));
         }
+
         User requestUser = findUserByName(homeFeedRequestDto.getRequestUserName());
         List<Post> result = postRepository.findAllAssociatedPostsByUser(requestUser, pageable);
+
         return PostDtoAssembler.assembleFrom(requestUser, result);
     }
 
@@ -68,7 +72,7 @@ public class PostFeedService {
         return PostDtoAssembler.assembleFrom(requestUser, result);
     }
 
-    private PageRequest getPagination(HomeFeedRequestDto homeFeedRequestDto) {
+    private Pageable getPagination(HomeFeedRequestDto homeFeedRequestDto) {
         return PageRequest.of(
             homeFeedRequestDto.getPage().intValue(),
             homeFeedRequestDto.getLimit().intValue()
@@ -76,7 +80,7 @@ public class PostFeedService {
     }
 
     public List<PostResponseDto> search(SearchPostsRequestDto searchPostsRequestDto) {
-        PageRequest pageable = PageRequest.of(
+        Pageable pageable = PageRequest.of(
             searchPostsRequestDto.getPage(),
             searchPostsRequestDto.getLimit()
         );

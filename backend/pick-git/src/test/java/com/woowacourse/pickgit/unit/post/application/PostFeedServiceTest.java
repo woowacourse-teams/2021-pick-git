@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -59,7 +60,7 @@ class PostFeedServiceTest {
             .limit(3L)
             .build();
 
-        given(postRepository.findAllPosts(any(Pageable.class)))
+        given(postRepository.findAllPosts(anyLong(), any(Pageable.class)))
             .willReturn(posts);
 
         //when
@@ -74,7 +75,7 @@ class PostFeedServiceTest {
                 tuple(3L, null)
             );
 
-        verify(postRepository, times(1)).findAllPosts(any(Pageable.class));
+        verify(postRepository, times(1)).findAllPosts(anyLong(), any(Pageable.class));
     }
 
     @DisplayName("로그인 유저 - 팔로잉한 사람들의 최신 게시글 피드를 가져온다. (좋아요 여부 true/false)")
