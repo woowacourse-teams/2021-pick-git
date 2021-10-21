@@ -1,5 +1,6 @@
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import PageError from "../../components/@shared/PageError/PageError";
+import { ScrollPageWrapper } from "../../components/@styled/layout";
 import UserList from "../../components/UserList/UserList";
 
 import { QUERY } from "../../constants/queries";
@@ -21,16 +22,18 @@ const FollowerList = () => {
   }
 
   return (
-    <Container>
-      <ContentWrapper>
-        <UserList
-          users={results}
-          isFetchingNextPage={isFetchingNextPage}
-          onIntersect={handleIntersect}
-          queryKey={[QUERY.GET_PROFILE_FOLLOWER, { username }]}
-        />
-      </ContentWrapper>
-    </Container>
+    <ScrollPageWrapper>
+      <Container>
+        <ContentWrapper>
+          <UserList
+            users={results}
+            isFetchingNextPage={isFetchingNextPage}
+            onIntersect={handleIntersect}
+            queryKey={[QUERY.GET_PROFILE_FOLLOWER, { username }]}
+          />
+        </ContentWrapper>
+      </Container>
+    </ScrollPageWrapper>
   );
 };
 

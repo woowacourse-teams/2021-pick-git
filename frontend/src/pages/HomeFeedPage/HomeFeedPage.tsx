@@ -5,6 +5,7 @@ import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithLogo/Pa
 import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
 import PageError from "../../components/@shared/PageError/PageError";
 import Tabs from "../../components/@shared/Tabs/Tabs";
+import { ScrollPageWrapper } from "../../components/@styled/layout";
 import Feed from "../../components/Feed/Feed";
 
 import { QUERY } from "../../constants/queries";
@@ -60,20 +61,22 @@ const HomeFeedPage = () => {
   }
 
   return (
-    <Container>
-      {isLoggedIn && (
-        <PostTabWrapper>
-          <Tabs tabItems={tabList} tabIndicatorKind="line" cssProp={postTabCSS} />
-        </PostTabWrapper>
-      )}
-      <InfiniteScrollContainer isLoaderShown={isFetching || isImagesFetching} onIntersect={handleIntersect}>
-        <Feed
-          infinitePostsData={infinitePostsData}
-          queryKey={[QUERY.GET_HOME_FEED_POSTS(feedFilterOption)]}
-          isFetching={isFetching || isImagesFetching}
-        />
-      </InfiniteScrollContainer>
-    </Container>
+    <ScrollPageWrapper>
+      <Container>
+        {isLoggedIn && (
+          <PostTabWrapper>
+            <Tabs tabItems={tabList} tabIndicatorKind="line" cssProp={postTabCSS} />
+          </PostTabWrapper>
+        )}
+        <InfiniteScrollContainer isLoaderShown={isFetching || isImagesFetching} onIntersect={handleIntersect}>
+          <Feed
+            infinitePostsData={infinitePostsData}
+            queryKey={[QUERY.GET_HOME_FEED_POSTS(feedFilterOption)]}
+            isFetching={isFetching || isImagesFetching}
+          />
+        </InfiniteScrollContainer>
+      </Container>
+    </ScrollPageWrapper>
   );
 };
 

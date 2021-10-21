@@ -14,14 +14,6 @@ export const Container = styled.div<{ cssProp?: CSSProp }>(
   `
 );
 
-export const GoBackLinkButton = styled.a`
-  transition: opacity 0.5s;
-
-  :hover {
-    opacity: 0.5;
-  }
-`;
-
 export const CloseLinkButtonWrapper = styled.div`
   display: flex;
   cursor: pointer;
@@ -31,12 +23,5 @@ export const CloseLinkButtonWrapper = styled.div`
     opacity: 0.5;
   }
 `;
-
-export const CloseLinkText = styled.span(
-  ({ theme }) => css`
-    margin-right: 0.75rem;
-    color: ${theme.color.lighterTextColor};
-  `
-);
 
 export const CloseLinkButton = styled.a``;

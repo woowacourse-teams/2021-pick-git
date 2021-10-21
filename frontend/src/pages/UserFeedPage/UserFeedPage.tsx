@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { InfiniteData, useQueryClient } from "react-query";
 import { useLocation } from "react-router-dom";
 
 import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
 import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
+import { ScrollPageWrapper } from "../../components/@styled/layout";
 import PageError from "../../components/@shared/PageError/PageError";
 import Feed from "../../components/Feed/Feed";
 
@@ -81,6 +81,7 @@ const UserFeedPage = () => {
   }
 
   return (
+    <ScrollPageWrapper>
     <Container ref={containerRef}>
       <InfiniteScrollContainer isLoaderShown={isFetchingNextPage || isImagesFetching} onIntersect={handleIntersect}>
         <Feed
@@ -90,6 +91,7 @@ const UserFeedPage = () => {
         />
       </InfiniteScrollContainer>
     </Container>
+    </ScrollPageWrapper>
   );
 };
 

@@ -16,6 +16,7 @@ import ToggleButton from "../../components/@shared/ToggleButton/ToggleButton";
 import PageError from "../../components/@shared/PageError/PageError";
 import PortfolioProjectSection from "../../components/PortfolioProjectSection/PortfolioProjectSection";
 import PortfolioSection from "../../components/PortfolioSection/PortfolioSection";
+import PortfolioContactForm from "../../components/PortfolioContactForm/PortfolioContactForm";
 import PortfolioTextEditor from "../../components/PortfolioTextEditor/PortfolioTextEditor";
 import PostSelector from "../../components/PostSelector/PostSelector";
 
@@ -44,6 +45,7 @@ import {
   DetailInfo,
   FullPage,
   PaginatorWrapper,
+  PostSelectorModalCSS,
   SectionNameCSS,
   ToggleButtonCSS,
   UserAvatarCSS,
@@ -52,6 +54,8 @@ import {
 
 import type { PortfolioData, PortfolioProject, PortfolioSectionType, Post } from "../../@types";
 import useScrollPagination from "../../hooks/common/useScrollPagination";
+import usePortfolioContacts from "../../hooks/service/usePortfolioContacts";
+import { CONTACT_ICON } from "../../constants/portfolio";
 
 const MyPortfolioPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -104,11 +108,12 @@ const MyPortfolioPage = () => {
     updatePortfolioProject,
     setPortfolioProjects,
   } = usePortfolioProjects(currentUsername);
+  const { portfolioContacts, setPortfolioContact, setPortfolioContacts } = usePortfolioContacts(currentUsername);
   const { portfolioIntro, setPortfolioIntro, updateIntroName, updateIntroDescription, updateIsProfileShown } =
     usePortfolioIntro(currentUsername, profile?.name, profile?.description, profile?.imageUrl);
 
   const paginationCount = portfolioProjects.length + portfolioSections.length + 1;
-  const { activePageIndex, paginate } = useScrollPagination(containerRef, paginationCount);
+  const { paginate } = useScrollPagination(containerRef, paginationCount);
 
   const handleSetProject = (prevProjectName: string) => (newProject: PortfolioProject) => {
     updatePortfolioProject(prevProjectName, newProject);
@@ -149,7 +154,7 @@ const MyPortfolioPage = () => {
       name: `프로젝트 ${portfolioProjects.length + 1}`,
       startDate: "",
       endDate: "",
-      tags: post.tags.map((tagName) => ({ id: null, name: tagName })),
+      tags: post.tags,
       type: "team",
     });
 
@@ -191,7 +196,7 @@ const MyPortfolioPage = () => {
         profileImageShown: portfolioIntro.isProfileShown,
         profileImageUrl: profile?.imageUrl ?? "",
         introduction: portfolioIntro.description,
-        contacts: portfolioIntro.contacts,
+        contacts: portfolioContacts,
         createdAt: remotePortfolio?.createdAt,
         updatedAt: localUpdateTimeString,
         projects: portfolioProjects,
@@ -229,6 +234,7 @@ const MyPortfolioPage = () => {
       setPortfolioIntro(intro, false);
       setPortfolioProjects(remotePortfolio.projects, false);
       setPortfolioSections(remotePortfolio.sections, false);
+      setPortfolioContacts(remotePortfolio.contacts, false);
     };
 
     const localUpdateTime = getPortfolioLocalUpdateTime();
@@ -290,7 +296,7 @@ const MyPortfolioPage = () => {
         />
       </ScrollActiveHeader>
       <Container ref={containerRef}>
-        <FullPage isVerticalCenter={true} data-index="0">
+        <FullPage isVerticalCenter={true}>
           <ToggleButton
             toggleButtonText="프로필 사진 보이기"
             cssProp={ToggleButtonCSS}
@@ -314,33 +320,21 @@ const MyPortfolioPage = () => {
             value={portfolioIntro.description}
             onChange={handleIntroDescriptionUpdate}
             placeholder={PLACE_HOLDER.INTRO_DESCRIPTION}
-            autoGrow={false}
+            autoGrow
           />
           <ContactWrapper>
-            <DetailInfo>
-              <SVGIcon cssProp={ContactIconCSS} icon="CompanyIcon" />
-              {profile?.company ? profile?.company : "-"}
-            </DetailInfo>
-            <DetailInfo>
-              <SVGIcon cssProp={ContactIconCSS} icon="LocationIcon" />
-              {profile?.location ? profile?.location : "-"}
-            </DetailInfo>
-            <DetailInfo>
-              <SVGIcon cssProp={ContactIconCSS} icon="GithubDarkIcon" />
-              <a href={profile?.githubUrl ?? ""}>{profile?.githubUrl ? profile?.githubUrl : "-"}</a>
-            </DetailInfo>
-            <DetailInfo>
-              <SVGIcon cssProp={ContactIconCSS} icon="WebsiteLinkIcon" />
-              <a href={profile?.website ?? ""}>{profile?.website ? profile?.website : "-"}</a>
-            </DetailInfo>
-            <DetailInfo>
-              <SVGIcon cssProp={ContactIconCSS} icon="TwitterIcon" />
-              {profile?.twitter ? profile?.twitter : "-"}
-            </DetailInfo>
+            {portfolioContacts
+              .filter((portfolioContact) => portfolioContact.value !== "")
+              .map((portfolioContact) => (
+                <DetailInfo>
+                  <SVGIcon cssProp={ContactIconCSS} icon={CONTACT_ICON[portfolioContact.category]} />
+                  {portfolioContact.value}
+                </DetailInfo>
+              ))}
           </ContactWrapper>
         </FullPage>
         {portfolioProjects.map((portfolioProject, index) => (
-          <FullPage isVerticalCenter={true} key={portfolioProject.id ?? index} data-index={index + 1}>
+          <FullPage isVerticalCenter={true} key={portfolioProject.id ?? index}>
             <PortfolioProjectSection
               isEditable={true}
               project={portfolioProject}
@@ -358,7 +352,7 @@ const MyPortfolioPage = () => {
           </FullPage>
         ))}
         {portfolioSections.map((portfolioSection, index) => (
-          <FullPage key={portfolioSection.id ?? index} data-index={portfolioProjects.length + 1}>
+          <FullPage key={portfolioSection.id ?? index}>
             <PortfolioTextEditor
               cssProp={SectionNameCSS}
               value={portfolioSection.name}
@@ -393,7 +387,11 @@ const MyPortfolioPage = () => {
           <ConfirmPortal heading={confirmMessage} onConfirm={handleDeleteSectionConfirm} onCancel={hideConfirm} />
         )}
         <BottomSliderPortal onSlideDown={handleSlideDown} isSliderShown={isBottomSliderShown}>
-          test
+          <PortfolioContactForm
+            portfolioContacts={portfolioContacts}
+            setPortfolioContact={setPortfolioContact}
+            onEditComplete={handleSlideDown}
+          />
         </BottomSliderPortal>
       </Container>
       {/* <PaginatorWrapper>

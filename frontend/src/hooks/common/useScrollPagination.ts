@@ -40,7 +40,7 @@ const useScrollPagination = (containerRef: RefObject<HTMLDivElement>, pagination
   //   );
 
   //   Array.from(containerRef.current.children).forEach((child) => {
-  //     console.log(child);
+  //     (child);
   //     observer.observe(child);
   //   });
   // }, [containerRef.current]);

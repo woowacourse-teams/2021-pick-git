@@ -53,6 +53,7 @@ export const CategoryTextareaCSS = css`
   height: 1.5rem;
   text-align: right;
   transition: opacity 0.5s;
+  line-height: 2rem;
 
   :focus {
     opacity: 0.7;
@@ -92,6 +93,7 @@ export const DescriptionItemTextareaCSS = css`
   transition: opacity 0.5s;
   color: ${({ theme }) => theme.color.lighterTextColor};
   height: 1.5rem;
+  line-height: 1.5rem;
 
   :focus {
     opacity: 0.7;

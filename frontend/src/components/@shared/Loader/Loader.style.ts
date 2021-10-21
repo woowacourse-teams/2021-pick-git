@@ -1,8 +1,9 @@
 import styled, { css, CSSProp } from "styled-components";
 import { bounceAnimation, spinAnimation } from "../../@styled/keyframes";
 
-export const LoadingDots = styled.div<{ cssProp?: CSSProp }>(
-  ({ cssProp }) => `
+export const LoadingDots = styled.div<{ cssProp?: CSSProp; isShown: boolean }>(
+  ({ cssProp, isShown }) => `
+    ${isShown ? "display: block" : "display: none"}
     ${cssProp}
   `
 );
@@ -31,13 +32,13 @@ export const ThirdLoadingDot = styled(LoadingDot)`
   animation-delay: 0.3s;
 `;
 
-export const Spinner = styled.div<{ size: string; loaderColor?: string; cssProp?: CSSProp }>(
-  ({ theme, size, loaderColor, cssProp }) => css`
+export const Spinner = styled.div<{ size: string; isShown: boolean; loaderColor?: string; cssProp?: CSSProp }>(
+  ({ theme, size, isShown, loaderColor, cssProp }) => css`
+    ${isShown ? "display: inline-block;" : "display: none;"}
     width: ${size};
     height: ${size};
     border: 3px solid ${loaderColor ? "transparent" : theme.color.tagItemColor};
     border-top-color: ${loaderColor ?? theme.color.primaryColor};
-    display: inline-block;
     border-radius: 50%;
     animation: 1s ${spinAnimation} infinite ease-in-out;
 

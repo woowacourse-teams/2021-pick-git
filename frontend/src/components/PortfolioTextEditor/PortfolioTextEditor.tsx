@@ -10,8 +10,8 @@ const PortfolioTextEditor = ({ value, cssProp, placeholder, disabled, autoGrow, 
       value={value}
       onChange={onChange}
       cssProp={css`
-        ${cssProp}
         ${TextAreaCSS}
+        ${cssProp}
       `}
       autoGrow={autoGrow}
       placeholder={placeholder}

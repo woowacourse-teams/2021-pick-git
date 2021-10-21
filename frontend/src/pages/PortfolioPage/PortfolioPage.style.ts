@@ -1,4 +1,5 @@
 import styled, { css } from "styled-components";
+import { fadeIn } from "../../components/@styled/keyframes";
 import {
   setDesktopMediaQuery,
   setLaptopMediaQuery,
@@ -14,6 +15,9 @@ export const Container = styled.main(
     scroll-snap-type: y mandatory;
     overflow-x: hidden;
     overflow-y: scroll;
+
+    animation: ${fadeIn} 1s forwards;
+
     ${customScrollbarCSS(theme.color.tagItemColor)}
   `
 );
@@ -80,14 +84,13 @@ export const DescriptionCSS = css`
   margin: 1rem 0;
   line-height: 1.2rem;
   padding: 0 3rem;
-  height: 100px;
 
   ${setLaptopMediaQuery`
     margin: 1.5rem 0;
     text-align: center;
     font-size: 0.8rem;
     border: none;
-    padding: 0 12rem;
+    width: 70%;
   `}
 
   ${setDesktopMediaQuery`
@@ -95,7 +98,7 @@ export const DescriptionCSS = css`
     text-align: center;
     font-size: 0.9rem;
     border: none;
-    padding: 0 24rem;
+    width: 50%;
   `}
 `;
 
@@ -106,11 +109,11 @@ export const ContactWrapper = styled.div`
   width: 100%;
 
   ${setLaptopMediaQuery`
-    padding: 0 12rem;
+    width: 70%;
   `}
 
   ${setDesktopMediaQuery`
-    padding: 0 24rem;
+    width: 50%;
   `}
 `;
 
@@ -156,6 +159,8 @@ export const CategoryAddIconWrapper = styled.div`
 
 export const ContactIconCSS = css`
   margin-right: 0.75rem;
+  width: 20px;
+  height: 20px;
 `;
 
 export const SectionNameCSS = css`
@@ -202,3 +207,8 @@ export const CloseButtonWrapper = styled.div`
     left: 6rem;
   `}
 `;
+
+export const PostSelectorModalCSS = css`
+  width: 50rem;
+  height: 70rem;
+`
