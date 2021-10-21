@@ -10,10 +10,7 @@ import { PostAddDataContextProvider } from "./contexts/PostAddDataContext";
 import UserContext from "./contexts/UserContext";
 import SnackBarContext from "./contexts/SnackbarContext";
 import { PostEditStepContextProvider } from "./contexts/PostEditStepContext";
-import PageLoadingWithLogo from "./components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
 import MyPortfolioPage from "./pages/PortfolioPage/MyPortfolioPage";
-import { UserFeedContextProvider } from "./contexts/UserFeedContext";
-import { SearchPostContextProvider } from "./contexts/SearchPostContext";
 
 const NavigationHeader = lazy(() => import("./components/@layout/NavigationHeader/NavigationHeader"));
 const OneDepthStepHeader = lazy(() => import("./components/OneDepthStepHeader/OneDepthStepHeader"));
@@ -59,87 +56,81 @@ const App = () => {
 
   return (
     <BrowserRouter>
-      <Suspense fallback={<PageLoadingWithLogo />}>
-        <Switch>
-          <Route exact path={[PAGE_URL.HOME, PAGE_URL.PROFILE, PAGE_URL.MY_PROFILE, PAGE_URL.USER_FEED_BASE]}>
-            <NavigationHeader />
-          </Route>
-          <Route exact path={PAGE_URL.FOLLOWINGS_BASE}>
-            <OneDepthStepHeader title="팔로잉 목록" />
-          </Route>
-          <Route exact path={PAGE_URL.FOLLOWERS_BASE}>
-            <OneDepthStepHeader title="팔로우 목록" />
-          </Route>
-          <Route exact path={PAGE_URL.SEARCH_RESULT_FEED_BASE}>
-            <OneDepthStepHeader title="검색결과" />
-          </Route>
-          <Route path={PAGE_URL.ADD_POST}>
-            <PostAddStepHeader />
-          </Route>
-          <Route path={[PAGE_URL.SEARCH, PAGE_URL.POST_LIKE_PEOPLE]}>
-            <SearchHeader />
-          </Route>
-        </Switch>
-        <Switch>
-          <Route exact path={[PAGE_URL.HOME, PAGE_URL.HOME_FEED]}>
-            <HomeFeedPage />
-          </Route>
-          <SearchPostContextProvider>
-            <Route exact path={PAGE_URL.SEARCH}>
-              <SearchPage />
-            </Route>
-            <Route exact path={PAGE_URL.SEARCH_RESULT_FEED_BASE}>
-              <SearchPostResultPage />
-            </Route>
-          </SearchPostContextProvider>
-          <Route exact path={PAGE_URL.LOGIN}>
-            <LoginPage />
-          </Route>
-          <Route exact path={PAGE_URL.AUTH_PROCESSING}>
-            <AuthLoginProcessingPage />
-          </Route>
-          <UserFeedContextProvider>
-            <Route path={PAGE_URL.MY_PROFILE}>
-              <ProfilePage isMyProfile={true} />
-            </Route>
-            <Route path={PAGE_URL.PROFILE}>
-              <ProfilePage isMyProfile={false} />
-            </Route>
-            <Route exact path={PAGE_URL.USER_FEED_BASE}>
-              <UserFeedPage />
-            </Route>
-          </UserFeedContextProvider>
-          <Route path={PAGE_URL.FOLLOWINGS_BASE}>
-            <FollowingListPage />
-          </Route>
-          <Route path={PAGE_URL.FOLLOWERS_BASE}>
-            <FollowerListPage />
-          </Route>
-          <Route path={PAGE_URL.ADD_POST}>
-            <PostAddDataContextProvider>
-              <AddPostPage />
-            </PostAddDataContextProvider>
-          </Route>
-          <Route path={PAGE_URL.EDIT_POST}>
-            <PostEditStepContextProvider>
-              <EditPostPage />
-            </PostEditStepContextProvider>
-          </Route>
-          <Route path={PAGE_URL.POST_COMMENTS}>
-            <CommentsPage />
-          </Route>
-          <Route path={PAGE_URL.POST_LIKE_PEOPLE}>
-            <PostLikePeoplePage />
-          </Route>
-          <Route path={PAGE_URL.PORTFOLIO}>
-            <PortfolioPage />
-          </Route>
-          <Route path={PAGE_URL.MY_PORTFOLIO}>
-            <MyPortfolioPage />
-          </Route>
-          <Redirect to="/" />
-        </Switch>
-      </Suspense>
+      <Switch>
+        <Route exact path={[PAGE_URL.HOME, PAGE_URL.PROFILE, PAGE_URL.MY_PROFILE, PAGE_URL.USER_FEED_BASE]}>
+          <NavigationHeader />
+        </Route>
+        <Route exact path={PAGE_URL.FOLLOWINGS_BASE}>
+          <OneDepthStepHeader title="팔로잉 목록" />
+        </Route>
+        <Route exact path={PAGE_URL.FOLLOWERS_BASE}>
+          <OneDepthStepHeader title="팔로우 목록" />
+        </Route>
+        <Route exact path={PAGE_URL.SEARCH_RESULT_FEED_BASE}>
+          <OneDepthStepHeader title="검색결과" />
+        </Route>
+        <Route path={PAGE_URL.ADD_POST}>
+          <PostAddStepHeader />
+        </Route>
+        <Route path={[PAGE_URL.SEARCH, PAGE_URL.POST_LIKE_PEOPLE]}>
+          <SearchHeader />
+        </Route>
+      </Switch>
+      <Switch>
+        <Route exact path={[PAGE_URL.HOME, PAGE_URL.HOME_FEED]}>
+          <HomeFeedPage />
+        </Route>
+        <Route exact path={PAGE_URL.SEARCH}>
+          <SearchPage />
+        </Route>
+        <Route exact path={PAGE_URL.SEARCH_RESULT_FEED_BASE}>
+          <SearchPostResultPage />
+        </Route>
+        <Route exact path={PAGE_URL.LOGIN}>
+          <LoginPage />
+        </Route>
+        <Route exact path={PAGE_URL.AUTH_PROCESSING}>
+          <AuthLoginProcessingPage />
+        </Route>
+        <Route path={PAGE_URL.MY_PROFILE}>
+          <ProfilePage isMyProfile={true} />
+        </Route>
+        <Route path={PAGE_URL.PROFILE}>
+          <ProfilePage isMyProfile={false} />
+        </Route>
+        <Route exact path={PAGE_URL.USER_FEED_BASE}>
+          <UserFeedPage />
+        </Route>
+        <Route path={PAGE_URL.FOLLOWINGS_BASE}>
+          <FollowingListPage />
+        </Route>
+        <Route path={PAGE_URL.FOLLOWERS_BASE}>
+          <FollowerListPage />
+        </Route>
+        <Route path={PAGE_URL.ADD_POST}>
+          <PostAddDataContextProvider>
+            <AddPostPage />
+          </PostAddDataContextProvider>
+        </Route>
+        <Route path={PAGE_URL.EDIT_POST}>
+          <PostEditStepContextProvider>
+            <EditPostPage />
+          </PostEditStepContextProvider>
+        </Route>
+        <Route path={PAGE_URL.POST_COMMENTS}>
+          <CommentsPage />
+        </Route>
+        <Route path={PAGE_URL.POST_LIKE_PEOPLE}>
+          <PostLikePeoplePage />
+        </Route>
+        <Route path={PAGE_URL.PORTFOLIO}>
+          <PortfolioPage />
+        </Route>
+        <Route path={PAGE_URL.MY_PORTFOLIO}>
+          <MyPortfolioPage />
+        </Route>
+        <Redirect to="/" />
+      </Switch>
     </BrowserRouter>
   );
 };
