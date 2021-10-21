@@ -20,8 +20,8 @@ import {
   TagInputWrapper,
   TagList,
   TagListItem,
-  TagAddButtonCSS,
   TextLengthIndicator,
+  TagAddButton,
 } from "./TagInputForm.style";
 
 interface Props {
@@ -53,31 +53,28 @@ const TagInputForm = ({ githubRepositoryName, tags, tagsQueryResult, setTags }: 
     }
   }, [githubRepositoryName]);
 
-  const handleTagAdd = () => {
-    if (!formRef.current) {
-      return;
-    }
-
-    const newTag = formRef.current["tag-input"].value;
+  const handleTagSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
+    event.preventDefault();
+    const newTag = event.currentTarget["tag-input"].value;
 
     if (newTag.length === 0) {
       return;
     }
 
     if (!isValidTagLength(newTag)) {
-      formRef.current["tag-input"].blur();
+      event.currentTarget["tag-input"].blur();
       showAlert(FAILURE_MESSAGE.POST_TAG_LENGTH_LIMIT_EXCEEDED);
       return;
     }
 
     if (!isValidTagFormat(newTag)) {
-      formRef.current["tag-input"].blur();
+      event.currentTarget["tag-input"].blur();
       showAlert(FAILURE_MESSAGE.POST_TAG_SPECIAL_SYMBOL_EXIST);
       return;
     }
 
     if (hasDuplicatedTag([...tags, newTag])) {
-      formRef.current["tag-input"].blur();
+      event.currentTarget["tag-input"].blur();
       showAlert(FAILURE_MESSAGE.POST_DUPLICATED_TAG_EXIST);
       return;
     }
@@ -85,12 +82,7 @@ const TagInputForm = ({ githubRepositoryName, tags, tagsQueryResult, setTags }: 
     setTags([...tags, newTag]);
     setTagInputLength(0);
 
-    formRef.current["tag-input"].value = "";
-  };
-
-  const handleTagSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
-    event.preventDefault();
-    handleTagAdd();
+    event.currentTarget["tag-input"].value = "";
   };
 
   const handleTagDelete = (targetTag: string) => {
@@ -137,7 +129,9 @@ const TagInputForm = ({ githubRepositoryName, tags, tagsQueryResult, setTags }: 
             name="tag-input"
             onChange={handleTagInputChange}
           />
-          <SVGIcon icon="AddBoxIcon" cssProp={TagAddButtonCSS} onClick={handleTagAdd} />
+          <TagAddButton type="submit">
+            <SVGIcon icon="AddBoxIcon" />
+          </TagAddButton>
         </TagInputWrapper>
         <TextLengthIndicator>{`${tagInputLength} / ${LIMIT.POST_TAG_LENGTH}`}</TextLengthIndicator>
       </Form>
