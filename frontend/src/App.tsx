@@ -12,6 +12,8 @@ import SnackBarContext from "./contexts/SnackbarContext";
 import { PostEditStepContextProvider } from "./contexts/PostEditStepContext";
 import PageLoadingWithLogo from "./components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
 import MyPortfolioPage from "./pages/PortfolioPage/MyPortfolioPage";
+import { UserFeedContextProvider } from "./contexts/UserFeedContext";
+import { SearchPostContextProvider } from "./contexts/SearchPostContext";
 
 const NavigationHeader = lazy(() => import("./components/@layout/NavigationHeader/NavigationHeader"));
 const OneDepthStepHeader = lazy(() => import("./components/OneDepthStepHeader/OneDepthStepHeader"));
@@ -82,27 +84,31 @@ const App = () => {
           <Route exact path={[PAGE_URL.HOME, PAGE_URL.HOME_FEED]}>
             <HomeFeedPage />
           </Route>
-          <Route exact path={PAGE_URL.USER_FEED_BASE}>
-            <UserFeedPage />
-          </Route>
-          <Route exact path={PAGE_URL.SEARCH}>
-            <SearchPage />
-          </Route>
-          <Route exact path={PAGE_URL.SEARCH_RESULT_FEED_BASE}>
-            <SearchPostResultPage />
-          </Route>
+          <SearchPostContextProvider>
+            <Route exact path={PAGE_URL.SEARCH}>
+              <SearchPage />
+            </Route>
+            <Route exact path={PAGE_URL.SEARCH_RESULT_FEED_BASE}>
+              <SearchPostResultPage />
+            </Route>
+          </SearchPostContextProvider>
           <Route exact path={PAGE_URL.LOGIN}>
             <LoginPage />
           </Route>
           <Route exact path={PAGE_URL.AUTH_PROCESSING}>
             <AuthLoginProcessingPage />
           </Route>
-          <Route path={PAGE_URL.MY_PROFILE}>
-            <ProfilePage isMyProfile={true} />
-          </Route>
-          <Route path={PAGE_URL.PROFILE}>
-            <ProfilePage isMyProfile={false} />
-          </Route>
+          <UserFeedContextProvider>
+            <Route path={PAGE_URL.MY_PROFILE}>
+              <ProfilePage isMyProfile={true} />
+            </Route>
+            <Route path={PAGE_URL.PROFILE}>
+              <ProfilePage isMyProfile={false} />
+            </Route>
+            <Route exact path={PAGE_URL.USER_FEED_BASE}>
+              <UserFeedPage />
+            </Route>
+          </UserFeedContextProvider>
           <Route path={PAGE_URL.FOLLOWINGS_BASE}>
             <FollowingListPage />
           </Route>

@@ -33,7 +33,7 @@ const GridFeed = ({ feedPagePath, infinitePostsData, isError, isFetchingNextPage
                   to={{
                     pathname: feedPagePath?.split("?")[0] ?? "",
                     search: `?${feedPagePath?.split("?")[1]}`,
-                    state: { prevData: infinitePostsData, postId: id },
+                    state: { postId: id },
                   }}
                   key={id}
                 >

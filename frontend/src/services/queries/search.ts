@@ -1,6 +1,6 @@
 import { AxiosError } from "axios";
 
-import { QueryKey, useInfiniteQuery } from "react-query";
+import { useInfiniteQuery } from "react-query";
 import { ErrorResponse, Post, UserItem } from "../../@types";
 import { QUERY } from "../../constants/queries";
 import { getAccessToken } from "../../storage/storage";
@@ -17,20 +17,17 @@ export const useSearchUserResultQuery = (keyword: string, activated: boolean) =>
     }
   );
 
-export const useSearchPostResultQuery = (
-  type: string | null,
-  keyword: string,
-  queryKey: QueryKey,
-  activated?: boolean
-) =>
+export const useSearchPostResultQuery = (type: string, keyword: string, activated?: boolean) =>
   useInfiniteQuery<Post[] | null, AxiosError<ErrorResponse>>(
-    queryKey,
+    [QUERY.GET_SEARCH_POST_RESULT, { type, keyword }],
     async ({ pageParam = 0 }) =>
       activated ?? true
         ? await requestGetSearchPostResult(type, keyword, pageParam, getAccessToken())
         : Promise.resolve(null),
     {
       cacheTime: 0,
-      getNextPageParam: (_, pages) => pages.length,
+      getNextPageParam: (_, pages) => {
+        return pages.length;
+      },
     }
   );

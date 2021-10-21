@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 
-import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import Chip from "../../components/@shared/Chip/Chip";
 import GridFeed from "../../components/@shared/GridFeed/GridFeed";
 import Loader from "../../components/@shared/Loader/Loader";
@@ -31,6 +30,8 @@ const SearchPage = () => {
   const [tabIndex, setTabIndex] = useState(defaultTabIndex);
 
   const { keyword, resetKeyword } = useSearchKeyword();
+  const formattedKeyword = keyword.trim().replace(/,/g, " ").replace(/\s+/g, " ");
+
   const {
     results: userSearchResults,
     isError: isUserSearchError,
@@ -44,8 +45,7 @@ const SearchPage = () => {
     isLoading: isPostSearchLoading,
     isFetchingNextPage: isPostSearchFetchingNextPage,
     handleIntersect: handlePostSearchIntersect,
-    formattedKeyword: postSearchKeyword,
-  } = useSearchPostData({ keyword, type: "tags", activated: tabIndex === 1 });
+  } = useSearchPostData({ keyword: formattedKeyword, type: "tags", activated: tabIndex === 1 });
 
   useEffect(() => {
     resetKeyword();
@@ -88,7 +88,7 @@ const SearchPage = () => {
     ) : (
       <>
         <KeywordsWrapper>
-          {postSearchKeyword.split(" ").map((keyword, index) => keyword && <Chip key={index}>{keyword}</Chip>)}
+          {formattedKeyword.split(" ").map((keyword, index) => keyword && <Chip key={index}>{keyword}</Chip>)}
         </KeywordsWrapper>
         <GridFeed
           feedPagePath={PAGE_URL.SEARCH_RESULT_FEED("tags")}
