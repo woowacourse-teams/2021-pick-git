@@ -60,6 +60,25 @@ public abstract class Act {
     }
 
     protected ExtractableResponse<Response> request(
+        String url,
+        Method method,
+        TPost tPost
+    ) {
+        RequestSpecification spec = given().log().all()
+            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+            .formParams(tPost.params());
+
+        for (File image : tPost.images()) {
+            spec = spec.multiPart("images", image);
+        }
+
+        return spec.when()
+            .request(method, url)
+            .then().log().all()
+            .extract();
+    }
+
+    protected ExtractableResponse<Response> request(
         String accessToken,
         String url,
         Method method,

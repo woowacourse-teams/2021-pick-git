@@ -1,16 +1,19 @@
 package com.woowacourse.pickgit.query.fixture;
 
+import static com.woowacourse.pickgit.config.db.DataSourceSelector.READ;
 import static io.restassured.RestAssured.given;
 import static java.util.stream.Collectors.toList;
 
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
 import com.woowacourse.pickgit.authentication.application.dto.TokenDto;
+import com.woowacourse.pickgit.config.DatabaseConfigurator;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -28,11 +31,21 @@ public enum TUser {
     private final Map<TPost, ExtractableResponse<Response>> posts;
     protected final Map<String, Object> cache;
 
+    private static boolean isRead = false;
+
     TUser() {
         this.follower = new ArrayList<>();
         this.following = new ArrayList<>();
         this.posts = new HashMap<>();
         this.cache = new HashMap<>();
+    }
+
+    public static void toWrite() {
+        isRead = false;
+    }
+
+    public static void toRead() {
+        isRead = true;
     }
 
     public String accessToken() {
@@ -86,7 +99,10 @@ public enum TUser {
     }
 
     public LoginAndThenAct 은로그인을하고() {
-        return new LoginAndThenAct(this);
+        return new LoginAndThenAct(
+            this,
+            isRead
+        );
     }
 
     public UnLoginAndThenAct 는() {

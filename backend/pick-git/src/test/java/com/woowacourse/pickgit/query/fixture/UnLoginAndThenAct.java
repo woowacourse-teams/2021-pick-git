@@ -15,6 +15,8 @@ import org.springframework.http.HttpStatus;
 
 public class UnLoginAndThenAct extends Act {
 
+    private static final String INVALID_TOKEN = "invalid token";
+
     public List<UserSearchResponse> 팔로잉를확인한다(TUser tUser) {
         return request(
             String.format("/api/profiles/%s/followings?page=%s&limit=%s", tUser.name(), "0", "10"),
@@ -75,6 +77,7 @@ public class UnLoginAndThenAct extends Act {
     }
 
     public ExtractableResponse<Response> 댓글을삭제한다(TPost tPost, Long id) {
+
         return request(
             String.format("/api/posts/%d/comments/%d", tPost.getId(), id),
             Method.DELETE
@@ -84,6 +87,105 @@ public class UnLoginAndThenAct extends Act {
     public ExtractableResponse<Response> 댓글을조회한다(TPost tPost, int page, int limit) {
         return request(
             String.format("/api/posts/%d/comments?page=%d&limit=%d", tPost.getId(), page, limit),
+            Method.GET
+        );
+    }
+
+    public ExtractableResponse<Response> 유효하지_않은_토큰으로_포스트를등록한다(TPost tPost) {
+        ExtractableResponse<Response> response = request(
+            INVALID_TOKEN,
+            "/api/posts",
+            Method.POST,
+            tPost
+        );
+
+        return response;
+    }
+
+    public ExtractableResponse<Response> 포스트를등록한다(TPost tPost) {
+        ExtractableResponse<Response> response = request(
+            "/api/posts",
+            Method.POST,
+            tPost
+        );
+
+        return response;
+    }
+
+    public ExtractableResponse<Response> 비정상토큰으로_레포지토리목록을_가져온다() {
+        return request(
+            INVALID_TOKEN,
+            String.format("/api/github/repositories?page=%d&limit=%d", 0, 50L),
+            Method.GET
+        );
+    }
+
+    public ExtractableResponse<Response> 포스트에좋아요를누른다(TPost tpost) {
+        return request(
+            String.format("/api/posts/%d/likes", tpost.getId()),
+            Method.PUT
+        );
+    }
+
+    public ExtractableResponse<Response> 포스트에좋아요_취소를_한다(TPost tpost) {
+        return request(
+            String.format("/api/posts/%d/likes", tpost.getId()),
+            Method.DELETE
+        );
+    }
+
+    public ExtractableResponse<Response> 비정상토큰으로_게시물을_수정한다(TPost source, CPost target) {
+        return 비정상토큰으로_게시물을_수정한다(source, TPost.of(target));
+    }
+
+    public ExtractableResponse<Response> 비정상토큰으로_게시물을_수정한다(TPost source, TPost target) {
+        Map<String, Object> values = new HashMap<>();
+        values.put("tags", target.getTags());
+        values.put("content", target.getContent());
+
+        return request(
+            INVALID_TOKEN,
+            String.format("api/posts/%d", source.getId()),
+            Method.PUT,
+            values
+        );
+    }
+
+    public ExtractableResponse<Response> 비정상토큰으로_게시물을_삭제한다(TPost tPost) {
+        return request(
+            INVALID_TOKEN,
+            String.format("/api/posts/%d", tPost.getId()),
+            Method.DELETE
+        );
+    }
+
+    public ExtractableResponse<Response> 비정상토큰으로_레포지토리_목록을_키워드로_가져온다(String keyword) {
+        return request(
+            INVALID_TOKEN,
+            String.format(
+                "/api/github/search/repositories?keyword=%s&page=%d&limit=%d", keyword, 0, 50L
+            ),
+            Method.GET
+        );
+    }
+
+    public ExtractableResponse<Response> 홈피드를_조회한다() {
+        return request(
+            "/api/posts?page=0&limit=3",
+            Method.GET
+        );
+    }
+
+    public ExtractableResponse<Response> 내_피드를_조회한다() {
+        return request(
+            "/api/posts/me?page=0&limit=3",
+            Method.GET
+        );
+    }
+
+    public ExtractableResponse<Response> 피드를_조회한다(TUser tUser) {
+        return request(
+            String.format("/api/posts/%s?page=0&limit=3", tUser.name()),
             Method.GET
         );
     }

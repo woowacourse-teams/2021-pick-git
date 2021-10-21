@@ -81,13 +81,10 @@ public class GithubRepositorySearchExtractorTest {
     @DisplayName("유효하지 않은 유저 일 경우 예외가 발생한다. - 500 예외")
     @Test
     void extract_InvalidUser_500Exception() {
-        // given when
-        String invalidUser = "Invalid User";
-
         // then
         assertThatThrownBy(() ->
             platformRepositorySearchExtractor.extract(
-                ACCESS_TOKEN, invalidUser, KEYWORD, PAGE, LIMIT
+                ACCESS_TOKEN, "invalid", KEYWORD, PAGE, LIMIT
             )
         ).isInstanceOf(PlatformHttpErrorException.class)
             .hasFieldOrPropertyWithValue(

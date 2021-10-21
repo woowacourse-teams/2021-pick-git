@@ -21,7 +21,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-public class PostAcceptanceTest_LikeUsers extends AcceptanceTest {
+class PostAcceptanceTest_LikeUsers extends AcceptanceTest {
 
     @BeforeEach
     void setUp() {
@@ -41,7 +41,6 @@ public class PostAcceptanceTest_LikeUsers extends AcceptanceTest {
     void searchLikeUsers_LoginUser_Success() {
         List<LikeUsersResponse> ListUsersForMarkPost = NEOZAL.은로그인을하고().포스트에좋아요한사용자를조회한다(MARKPOST);
 
-        // then
         assertThat(ListUsersForMarkPost)
             .extracting("username")
             .containsExactly(MARK.name(), KODA.name());
@@ -52,33 +51,21 @@ public class PostAcceptanceTest_LikeUsers extends AcceptanceTest {
     void searchLikeUsers_GuestUser_Success() {
         List<LikeUsersResponse> ListUsersForMarkPost = GUEST.는().포스트에좋아요한사용자를조회한다(MARKPOST);
 
-        // then
         assertThat(ListUsersForMarkPost)
             .extracting("username")
             .containsExactly(MARK.name(), KODA.name());
     }
 
-    private List<LikeUsersResponse> createLikeUserResponseForGuest(List<TUser> likeUsers) {
-        return likeUsers.stream()
-            .map(
-                user -> new LikeUsersResponse("https://github.com/testImage.jpg", user.name(), null)
-            ).collect(toList());
-    }
-
     @DisplayName("좋아요가 없는 게시물을 조회하면 빈 배열을 반환한다. - 비 로그인/성공")
     @Test
     void searchLikeUsers_EmptyLikes_Success() {
-        // when
         List<LikeUsersResponse> ListUsersForNeozalPost = NEOZAL.은로그인을하고().포스트에좋아요한사용자를조회한다(NEOZALPOST);
-
-        // then
         assertThat(ListUsersForNeozalPost).isEmpty();
     }
 
     @DisplayName("존재하지 않은 포스트를 조회하면 500예외가 발생한다. - 비 로그인/실패")
     @Test
     void searchLikeUsers_InvalidPostId_500Exception() {
-        // given
         GUEST.는().포스트에좋아요한사용자를조회한다(99999L, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

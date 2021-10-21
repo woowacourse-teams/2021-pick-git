@@ -95,7 +95,7 @@ class GithubRepositoryExtractorTest {
 
         // then
         assertThatThrownBy(() -> {
-            platformRepositoryExtractor.extract(ACCESS_TOKEN, USERNAME + "hi", pageable);
+            platformRepositoryExtractor.extract(ACCESS_TOKEN, "invalid", pageable);
         }).isInstanceOf(PlatformHttpErrorException.class)
             .hasFieldOrPropertyWithValue("errorCode", "V0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)

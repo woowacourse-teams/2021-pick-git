@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.config.db;
 
+import com.woowacourse.pickgit.query.fixture.TUser;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -14,10 +15,12 @@ public class DataSourceSelector {
 
     public void toWrite() {
         this.selected = WRITE;
+        TUser.toWrite();
     }
 
     public void toRead() {
         this.selected = READ;
+        TUser.toRead();
     }
 
     public String getSelected() {
