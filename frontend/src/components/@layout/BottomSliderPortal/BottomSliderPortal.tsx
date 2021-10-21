@@ -10,8 +10,6 @@ export interface Props {
 }
 
 export const BottomSlider = ({ isSliderShown, children, onSlideDown }: Props) => {
-  const handleSlideDown = () => {};
-
   return (
     <Container isSliderShown={isSliderShown}>
       <SliderHeader onSlideDown={onSlideDown} />
