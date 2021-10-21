@@ -169,13 +169,14 @@ const PostItem = ({
                 .slice(0, LIMIT.POST_CONTENT_HIDE_LENGTH)
                 .concat(<span>...</span>)
             : getTextElementsWithWithBr(content)}
-          {shouldHideContent ? (
-            <MoreContentLinkButton onClick={handleMoreContentShow}>더보기</MoreContentLinkButton>
-          ) : (
-            <MoreContentLinkButton onClick={handleMoreContentHide}>간략히</MoreContentLinkButton>
-          )}
         </PostContent>
         <TagListWrapper>{shouldHideContent ? tagList.slice(0, LIMIT.POST_TAG_HIDE_LENGTH) : tagList}</TagListWrapper>
+        {shouldHideContent ? (
+          <MoreContentLinkButton onClick={handleMoreContentShow}>더보기</MoreContentLinkButton>
+        ) : (
+          <MoreContentLinkButton onClick={handleMoreContentHide}>간략히</MoreContentLinkButton>
+        )}
+
         <CommentsWrapper>
           {commentList.length > 10
             ? commentList.slice(0, 10).concat(
