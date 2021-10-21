@@ -14,6 +14,7 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 
 public class UnLoginAndThenAct extends Act {
+
     public List<UserSearchResponse> 팔로잉를확인한다(TUser tUser) {
         return request(
             String.format("/api/profiles/%s/followings?page=%s&limit=%s", tUser.name(), "0", "10"),
@@ -30,7 +31,11 @@ public class UnLoginAndThenAct extends Act {
         });
     }
 
-    public ExtractableResponse<Response> 포스트를검색한다(String type, String keyword, HttpStatus status) {
+    public ExtractableResponse<Response> 포스트를검색한다(
+        String type,
+        String keyword,
+        HttpStatus status
+    ) {
         ExtractableResponse<Response> response = request(
             String.format(
                 "/api/search/posts?type=%s&keyword=%s&page=%s&limit=%s", type, keyword, "0", "10"),
