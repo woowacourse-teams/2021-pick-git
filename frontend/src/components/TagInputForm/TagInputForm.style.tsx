@@ -37,7 +37,7 @@ export const TagInputWrapper = styled.div`
   position: relative;
 `;
 
-export const TagAddButtonCSS = css`
+export const TagAddButton = styled.button`
   position: absolute;
   top: 0.625rem;
   right: 0.3125rem;
