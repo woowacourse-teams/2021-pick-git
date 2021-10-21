@@ -13,6 +13,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.PageRequest;
 
 public class GithubRepositorySearchExtractorTest {
 
@@ -50,8 +51,7 @@ public class GithubRepositorySearchExtractorTest {
             ACCESS_TOKEN,
             USERNAME,
             KEYWORD,
-            PAGE,
-            LIMIT
+            PageRequest.of(PAGE, LIMIT)
         );
 
         // then
@@ -69,7 +69,7 @@ public class GithubRepositorySearchExtractorTest {
         // then
         assertThatThrownBy(() ->
             platformRepositorySearchExtractor.extract(
-                invalidToken, USERNAME, KEYWORD, PAGE, LIMIT
+                invalidToken, USERNAME, KEYWORD, PageRequest.of(PAGE, LIMIT)
             )
         ).isInstanceOf(PlatformHttpErrorException.class)
             .hasFieldOrPropertyWithValue(
@@ -84,7 +84,7 @@ public class GithubRepositorySearchExtractorTest {
         // then
         assertThatThrownBy(() ->
             platformRepositorySearchExtractor.extract(
-                ACCESS_TOKEN, "invalid", KEYWORD, PAGE, LIMIT
+                ACCESS_TOKEN, "invalid", KEYWORD, PageRequest.of(PAGE, LIMIT)
             )
         ).isInstanceOf(PlatformHttpErrorException.class)
             .hasFieldOrPropertyWithValue(

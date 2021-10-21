@@ -6,9 +6,7 @@ import com.woowacourse.pickgit.portfolio.domain.project.ProjectType;
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.ProjectRequest;
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.TagRequest;
 import com.woowacourse.pickgit.portfolio.presentation.dto.response.ProjectResponse;
-import com.woowacourse.pickgit.portfolio.presentation.dto.response.TagResponse;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 
 public class TProject {
@@ -48,7 +46,7 @@ public class TProject {
         private String type;
         private String imageUrl;
         private String content;
-        private List<TagRequest> tags;
+        private List<String> tags;
 
         public Modifier(ProjectResponse projectResponse) {
             this.projectResponse = projectResponse;
@@ -75,9 +73,7 @@ public class TProject {
         }
 
         public Modifier tags(String... tagNames) {
-            this.tags = Arrays.stream(tagNames)
-                .map(TagRequest::new)
-                .collect(toList());
+            this.tags = List.of(tagNames);
             return this;
         }
 
@@ -88,13 +84,12 @@ public class TProject {
                 .type(name == null ? projectResponse.getType() : type)
                 .imageUrl(imageUrl == null ? projectResponse.getImageUrl() : imageUrl)
                 .content(content == null ? projectResponse.getContent() : content)
-                .tags(tags == null ? toRequests(projectResponse.getTags()) : tags)
+                .tags(tags == null ? toRequests(projectResponse.getTags()) : toRequests(tags))
                 .build();
         }
 
-        private List<TagRequest> toRequests(List<TagResponse> tagResponses) {
-            return tagResponses.stream()
-                .map(TagResponse::getName)
+        private List<TagRequest> toRequests(List<String> tags) {
+            return tags.stream()
                 .map(TagRequest::new)
                 .collect(toList());
         }
