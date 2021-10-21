@@ -14,13 +14,20 @@
     "test-with-log": "yarn jest"
   },
   "dependencies": {
+    "@react-pdf/renderer": "^1.6.17",
+    "assert": "^2.0.0",
     "axios": "^0.21.1",
+    "browserify-zlib": "^0.2.0",
+    "buffer": "^6.0.3",
+    "process": "^0.11.10",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-query": "^3.18.1",
     "react-router-dom": "^5.2.0",
+    "stream-browserify": "^3.0.0",
     "styled-components": "^5.3.0",
-    "styled-normalize": "^8.0.7"
+    "styled-normalize": "^8.0.7",
+    "util": "^0.12.4"
   },
   "devDependencies": {
     "@babel/core": "^7.14.6",

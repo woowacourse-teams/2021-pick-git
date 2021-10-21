@@ -22,6 +22,11 @@ module.exports = {
 
   resolve: {
     extensions: [".js", ".jsx", ".ts", ".tsx"],
+    alias: {
+      process: "process/browser",
+      stream: "stream-browserify",
+      zlib: "browserify-zlib",
+    },
   },
 
   module: {
@@ -36,7 +41,7 @@ module.exports = {
         use: ["@svgr/webpack", "url-loader"],
       },
       {
-        test: /\.(png|jpg|jpeg|gif)$/i,
+        test: /\.(png|jpg|jpeg|gif|ttf)$/i,
         use: {
           loader: "url-loader",
           options: {
@@ -54,9 +59,13 @@ module.exports = {
     hot: true,
     proxy: {
       "/api": {
-        target: "http://localhost:8080",
+        target: "http://devapi.pick-git.com:8080",
         changeOrigin: true,
         secure: false,
+      },
+      "https://djgd6o993rakk.cloudfront.net/image": {
+        target: "https://djgd6o993rakk.cloudfront.net",
+        changeOrigin: true,
       },
     },
   },
@@ -65,6 +74,8 @@ module.exports = {
     new CleanWebpackPlugin(),
     new webpack.ProvidePlugin({
       React: "react",
+      process: "process/browser",
+      Buffer: ["buffer", "Buffer"],
     }),
     new webpack.DefinePlugin({
       "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),

@@ -15,7 +15,6 @@ import com.woowacourse.pickgit.portfolio.application.dto.response.ItemResponseDt
 import com.woowacourse.pickgit.portfolio.application.dto.response.PortfolioResponseDto;
 import com.woowacourse.pickgit.portfolio.application.dto.response.ProjectResponseDto;
 import com.woowacourse.pickgit.portfolio.application.dto.response.SectionResponseDto;
-import com.woowacourse.pickgit.portfolio.application.dto.response.TagResponseDto;
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.ContactRequest;
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.DescriptionRequest;
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.ItemRequest;
@@ -29,7 +28,6 @@ import com.woowacourse.pickgit.portfolio.presentation.dto.response.ItemResponse;
 import com.woowacourse.pickgit.portfolio.presentation.dto.response.PortfolioResponse;
 import com.woowacourse.pickgit.portfolio.presentation.dto.response.ProjectResponse;
 import com.woowacourse.pickgit.portfolio.presentation.dto.response.SectionResponse;
-import com.woowacourse.pickgit.portfolio.presentation.dto.response.TagResponse;
 import java.util.List;
 
 public class PortfolioAssembler {
@@ -91,7 +89,6 @@ public class PortfolioAssembler {
 
     private static TagRequestDto toTagRequestDto(TagRequest tagRequest) {
         return new TagRequestDto(
-            tagRequest.getId(),
             tagRequest.getName()
         );
     }
@@ -165,9 +162,7 @@ public class PortfolioAssembler {
     }
 
     private static ProjectResponse toProjectResponse(ProjectResponseDto projectResponseDto) {
-        List<TagResponse> tagResponses = projectResponseDto.getTags().stream()
-            .map(PortfolioAssembler::toTagResponse)
-            .collect(toList());
+        List<String> tagResponses = projectResponseDto.getTags();
 
         return new ProjectResponse(
             projectResponseDto.getId(),
@@ -178,13 +173,6 @@ public class PortfolioAssembler {
             projectResponseDto.getImageUrl(),
             projectResponseDto.getContent(),
             tagResponses
-        );
-    }
-
-    private static TagResponse toTagResponse(TagResponseDto tagResponseDto) {
-        return new TagResponse(
-            tagResponseDto.getId(),
-            tagResponseDto.getName()
         );
     }
 

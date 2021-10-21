@@ -50,7 +50,7 @@ public class UserFactory {
     public static UserProfileResponseDto mockLoginUserProfileResponseDto() {
         return UserProfileResponseDto.builder()
             .name("testUser")
-            .imageUrl("http://img.com")
+            .imageUrl("https://github.com/testImage.jpg")
             .description("The Best")
             .followerCount(0)
             .followingCount(0)
@@ -67,7 +67,7 @@ public class UserFactory {
     public static UserProfileResponseDto mockLoginUserProfileIsFollowingResponseDto() {
         return UserProfileResponseDto.builder()
             .name("testUser2")
-            .imageUrl("http://img.com")
+            .imageUrl("https://github.com/testImage.jpg")
             .description("The Best")
             .followerCount(1)
             .followingCount(0)
@@ -84,7 +84,7 @@ public class UserFactory {
     public static UserProfileResponseDto mockLoginUserProfileIsNotFollowingResponseDto() {
         return UserProfileResponseDto.builder()
             .name("testUser2")
-            .imageUrl("http://img.com")
+            .imageUrl("https://github.com/testImage.jpg")
             .description("The Best")
             .followerCount(0)
             .followingCount(0)
@@ -101,7 +101,7 @@ public class UserFactory {
     public static UserProfileResponseDto mockGuestUserProfileResponseDto() {
         return UserProfileResponseDto.builder()
             .name("testUser")
-            .imageUrl("http://img.com")
+            .imageUrl("https://github.com/testImage.jpg")
             .description("The Best")
             .followerCount(0)
             .followingCount(0)
@@ -170,11 +170,11 @@ public class UserFactory {
     }
 
     public static List<User> mockLikeUsers() {
-        User user1 = user("user1", "http://img.com");
-        User user2 = user("user2", "http://img.com");
-        User user3 = user("user3", "http://img.com");
-        User user4 = user("user4", "http://img.com");
-        User user5 = user("user5", "http://img.com");
+        User user1 = user("user1", "https://github.com/testImage.jpg");
+        User user2 = user("user2", "https://github.com/testImage.jpg");
+        User user3 = user("user3", "https://github.com/testImage.jpg");
+        User user4 = user("user4", "https://github.com/testImage.jpg");
+        User user5 = user("user5", "https://github.com/testImage.jpg");
 
         return List.of(
             user1, user2, user3, user4, user5
@@ -182,11 +182,11 @@ public class UserFactory {
     }
 
     public static List<User> mockLikeUsersWithId() {
-        User user1 = user(1L, "user1", "http://img.com");
-        User user2 = user(2L, "user2", "http://img.com");
-        User user3 = user(3L, "user3", "http://img.com");
-        User user4 = user(4L, "user4", "http://img.com");
-        User user5 = user(5L, "user5", "http://img.com");
+        User user1 = user(1L, "user1", "https://github.com/testImage.jpg");
+        User user2 = user(2L, "user2", "https://github.com/testImage.jpg");
+        User user3 = user(3L, "user3", "https://github.com/testImage.jpg");
+        User user4 = user(4L, "user4", "https://github.com/testImage.jpg");
+        User user5 = user(5L, "user5", "https://github.com/testImage.jpg");
 
         return List.of(
             user1, user2, user3, user4, user5

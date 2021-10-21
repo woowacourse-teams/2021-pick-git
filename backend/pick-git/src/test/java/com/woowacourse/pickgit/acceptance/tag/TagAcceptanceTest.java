@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
+import com.woowacourse.pickgit.authentication.application.dto.TokenDto;
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
@@ -22,16 +23,13 @@ import org.springframework.http.MediaType;
 
 class TagAcceptanceTest extends AcceptanceTest {
 
-    @MockBean
-    private OAuthClient oAuthClient;
-
     private String accessToken;
     private final String repositoryName = "doms-react";
 
     @BeforeEach
     void setUp() {
-        OAuthTokenResponse tokenResponse = 로그인_되어있음();
-        accessToken = tokenResponse.getToken();
+        TokenDto testUser = 로그인_되어있음("jipark3");
+        accessToken = testUser.getToken();
     }
 
     private ExtractableResponse<Response> requestTags(
@@ -111,39 +109,5 @@ class TagAcceptanceTest extends AcceptanceTest {
 
         // then
         assertThat(response.getErrorCode()).isEqualTo("A0001");
-    }
-
-    private OAuthTokenResponse 로그인_되어있음() {
-        OAuthTokenResponse response = 로그인_요청().as(OAuthTokenResponse.class);
-        assertThat(response.getToken()).isNotBlank();
-        return response;
-    }
-
-    private ExtractableResponse<Response> 로그인_요청() {
-        // given
-        String oauthCode = "1234";
-        String accessToken = "oauth.access.token";
-
-        OAuthProfileResponse oAuthProfileResponse = OAuthProfileResponse
-            .builder()
-            .name("jipark3")
-            .image("image")
-            .description("hi~")
-            .githubUrl("htts://www.github.com/")
-            .build();
-
-        // mock
-        when(oAuthClient.getAccessToken(oauthCode)).thenReturn(accessToken);
-        when(oAuthClient.getGithubProfile(accessToken)).thenReturn(oAuthProfileResponse);
-
-        // when
-        return RestAssured
-            .given().log().all()
-            .accept(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .get("/api/afterlogin?code=" + oauthCode)
-            .then().log().all()
-            .statusCode(HttpStatus.OK.value())
-            .extract();
     }
 }

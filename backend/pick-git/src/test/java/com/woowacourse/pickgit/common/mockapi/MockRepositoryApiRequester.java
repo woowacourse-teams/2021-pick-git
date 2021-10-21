@@ -19,13 +19,7 @@ public class MockRepositoryApiRequester implements PlatformRepositoryApiRequeste
         String userRepoApiUrl =
             String.format(API_USER_REPO_URL_FORMAT, USERNAME);
         String userRepoSearchApiUrl =
-            String.format(
-                API_SEARCH_USER_REPO_URL_FORMAT,
-                USERNAME,
-                KEYWORD,
-                1,
-                2
-            );
+            String.format(API_SEARCH_USER_REPO_URL_FORMAT, USERNAME, KEYWORD, 1, 2);
 
         if (isInvalidToken(token)) {
             throw new PlatformHttpErrorException("유효하지 않은 외부 플랫폼 토큰");
@@ -45,7 +39,7 @@ public class MockRepositoryApiRequester implements PlatformRepositoryApiRequeste
     }
 
     private boolean isInvalidToken(String token) {
-        return !token.equals(ACCESS_TOKEN);
+        return !token.contains(ACCESS_TOKEN);
     }
 
     private boolean isInvalidUrl(

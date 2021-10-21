@@ -1,7 +1,11 @@
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
+import PageError from "../../components/@shared/PageError/PageError";
 import UserList from "../../components/UserList/UserList";
+
 import { QUERY } from "../../constants/queries";
-import useFollowerList from "../../services/hooks/useFollowerList";
+
+import useFollowerList from "../../hooks/service/useFollowerList";
+
 import { Container, ContentWrapper } from "./FollowerListPage.style";
 
 const FollowerList = () => {
@@ -13,7 +17,7 @@ const FollowerList = () => {
   }
 
   if (isError) {
-    return <div>목록을 표시할 수 없습니다.</div>;
+    return <PageError errorMessage="목록을 표시할 수 없습니다." />;
   }
 
   return (

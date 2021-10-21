@@ -8,7 +8,7 @@ export const LAYOUT = {
 export const PAGE_WIDTH = {
   TABLET: "425px",
   LAPTOP: "640px",
-  DESKTOP: "860px",
+  DESKTOP: "720px",
 };
 
 export const LayoutInPx = {
@@ -25,4 +25,5 @@ export const Z_INDEX = {
   LOWER: 150,
   ROOT: 0,
   UNDER_ROOT: -1,
+  BACKGROUND: -10,
 };

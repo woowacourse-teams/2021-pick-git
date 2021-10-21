@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, Dispatch, SetStateAction, useState } from "react";
 
 interface Props {
   children: React.ReactNode;
@@ -6,11 +6,13 @@ interface Props {
 
 interface Value {
   keyword: string;
+  setKeyword: Dispatch<SetStateAction<string>>;
   onKeywordChange: (value: string) => void;
 }
 
 const SearchContext = createContext<Value>({
   keyword: "",
+  setKeyword: () => {},
   onKeywordChange: (value: string) => {},
 });
 
@@ -20,7 +22,7 @@ export const SearchContextProvider = ({ children }: Props) => {
   const handleKeywordChange = (value: string) => setKeyword(value);
 
   return (
-    <SearchContext.Provider value={{ keyword, onKeywordChange: handleKeywordChange }}>
+    <SearchContext.Provider value={{ keyword, setKeyword, onKeywordChange: handleKeywordChange }}>
       {children}
     </SearchContext.Provider>
   );

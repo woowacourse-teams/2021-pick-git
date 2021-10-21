@@ -11,7 +11,6 @@ import com.woowacourse.pickgit.portfolio.domain.Portfolio;
 import com.woowacourse.pickgit.portfolio.domain.repository.PortfolioRepository;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
-import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -30,15 +29,21 @@ public class PortfolioService {
     private final UserRepository userRepository;
 
     public PortfolioResponseDto read(String username, UserDto userDto) {
-        Optional<Portfolio> portfolio = portfolioRepository.findPortfolioByUsername(username);
+        Portfolio portfolio = portfolioRepository.findPortfolioByUsername(username)
+            .orElseGet(() -> generateEmptyPortfolio(username, userDto));
+        return portfolioDtoAssembler.toPortfolioResponseDto(portfolio);
+    }
 
-        if (userDto.isGuest() && portfolio.isEmpty()) {
+    private Portfolio generateEmptyPortfolio(String username, UserDto userDto) {
+        if (userDto.isGuest()) {
             throw new NoSuchPortfolioException();
         }
-
-        return portfolioDtoAssembler.toPortfolioResponseDto(
-            portfolio.orElseGet(() -> portfolioRepository.save(Portfolio.empty(getUser(username))))
-        );
+        User targetUser = getUser(username);
+        User requestUser = getUser(userDto.getUsername());
+        if (!targetUser.equals(requestUser)) {
+            throw new NoSuchPortfolioException();
+        }
+        return portfolioRepository.save(Portfolio.empty(targetUser));
     }
 
     @Transactional

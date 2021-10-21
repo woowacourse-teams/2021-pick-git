@@ -29,6 +29,7 @@ import com.woowacourse.pickgit.post.application.dto.request.SearchPostsRequestDt
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.presentation.PostFeedController;
 import com.woowacourse.pickgit.tag.domain.Tag;
+import com.woowacourse.pickgit.unit.ControllerTest;
 import com.woowacourse.pickgit.user.domain.User;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -43,20 +44,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-@AutoConfigureRestDocs
-@WebMvcTest(PostFeedController.class)
-class PostFeedControllerTest_searchPosts {
+class PostFeedControllerTest_searchPosts extends ControllerTest {
 
     private static final String API_ACCESS_TOKEN = "oauth.access.token";
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private PostFeedService postFeedService;
-
-    @MockBean
-    private OAuthService oAuthService;
 
     private User user;
     private Post post1;
@@ -105,7 +95,7 @@ class PostFeedControllerTest_searchPosts {
                 .param("limit", "3"));
 
         perform.andExpect(status().isOk());
-        perform.andDo(document("api_search_posts_get_guest",
+        perform.andDo(document("search-tag-unLoggedIn",
             getDocumentRequest(),
             getDocumentResponse(),
             requestParameters(
@@ -154,7 +144,7 @@ class PostFeedControllerTest_searchPosts {
                 .header(HttpHeaders.AUTHORIZATION, API_ACCESS_TOKEN));
 
         perform.andExpect(status().isOk());
-        perform.andDo(document("api_search_posts_get_login",
+        perform.andDo(document("search-tag-LoggedIn",
             getDocumentRequest(),
             getDocumentResponse(),
             requestHeaders(

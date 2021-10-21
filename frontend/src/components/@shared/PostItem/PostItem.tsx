@@ -41,7 +41,6 @@ import { getTimeDiffFromCurrent } from "../../../utils/date";
 import EmptyPostImage from "../../../assets/images/empty-post-image.png";
 import ButtonDrawer from "../ButtonDrawer/ButtonDrawer";
 import { getTextElementsWithWithBr } from "../../../utils/text";
-import { Spinner } from "../Loader/Loader.style";
 
 export interface Props {
   currentUserName: string;
@@ -170,18 +169,21 @@ const PostItem = ({
                 .slice(0, LIMIT.POST_CONTENT_HIDE_LENGTH)
                 .concat(<span>...</span>)
             : getTextElementsWithWithBr(content)}
-          {shouldHideContent ? (
-            <MoreContentLinkButton onClick={handleMoreContentShow}>더보기</MoreContentLinkButton>
-          ) : (
-            <MoreContentLinkButton onClick={handleMoreContentHide}>간략히</MoreContentLinkButton>
-          )}
         </PostContent>
-        <TagListWrapper>{shouldHideContent || tagList}</TagListWrapper>
+        <TagListWrapper>{shouldHideContent ? tagList.slice(0, LIMIT.POST_TAG_HIDE_LENGTH) : tagList}</TagListWrapper>
+        {shouldHideContent ? (
+          <MoreContentLinkButton onClick={handleMoreContentShow}>더보기</MoreContentLinkButton>
+        ) : (
+          <MoreContentLinkButton onClick={handleMoreContentHide}>간략히</MoreContentLinkButton>
+        )}
+
         <CommentsWrapper>
           {commentList.length > 10
-            ? commentList
-                .slice(0, 10)
-                .concat(<MoreCommentExistIndicator onClick={onMoreCommentClick}>...</MoreCommentExistIndicator>)
+            ? commentList.slice(0, 10).concat(
+                <MoreCommentExistIndicator key="more-contents-exist" onClick={onMoreCommentClick}>
+                  ...
+                </MoreCommentExistIndicator>
+              )
             : commentList}
         </CommentsWrapper>
       </PostBody>

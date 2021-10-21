@@ -1,38 +1,75 @@
-import { Container } from "./HomeFeedPage.style";
-import Feed from "../../components/Feed/Feed";
-import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
-import useHomeFeed from "../../services/hooks/useHomeFeed";
-import { QUERY } from "../../constants/queries";
+import { useEffect, useState } from "react";
+import { FeedFilterOption } from "../../@types";
+
 import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
-import useInfiniteImagePreloader from "../../services/hooks/@common/useInfiniteImagePreloader";
+import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
+import PageError from "../../components/@shared/PageError/PageError";
+import Tabs from "../../components/@shared/Tabs/Tabs";
+import Feed from "../../components/Feed/Feed";
+
+import { QUERY } from "../../constants/queries";
+import useAuth from "../../hooks/common/useAuth";
+
+import useInfiniteImagePreloader from "../../hooks/common/useInfiniteImagePreloader";
+import useHomeFeed from "../../hooks/service/useHomeFeed";
+
+import { Container, postTabCSS, PostTabWrapper } from "./HomeFeedPage.style";
 
 const HomeFeedPage = () => {
-  const { infinitePostsData, isLoading, isFetching, isError, handlePostsEndIntersect } = useHomeFeed();
+  const { isLoggedIn } = useAuth();
+  const [feedFilterOption, setFeedFilterOption] = useState<FeedFilterOption>(isLoggedIn ? "followings" : "all");
+  const feed = {
+    followings: useHomeFeed("followings"),
+    all: useHomeFeed("all"),
+  };
+
+  const { infinitePostsData, isLoading, isFetching, isError, handlePostsEndIntersect, refetch } =
+    feed[feedFilterOption];
+
   const infiniteImageUrls =
-    infinitePostsData?.pages.map((posts) => posts.reduce<string[]>((acc, post) => [...acc, ...post.imageUrls], [])) ??
-    [];
+    infinitePostsData?.pages.map<string[]>((posts) =>
+      posts.reduce<string[]>((acc, post) => [...acc, ...post.imageUrls], [])
+    ) ?? [];
   const { isFirstImagesLoading, isImagesFetching, activateImageFetchingState } =
     useInfiniteImagePreloader(infiniteImageUrls);
+
+  const tabList = [
+    { name: "Followings", onTabChange: () => setFeedFilterOption("followings") },
+    { name: "All", onTabChange: () => setFeedFilterOption("all") },
+  ];
 
   const handleIntersect = () => {
     handlePostsEndIntersect();
     activateImageFetchingState();
   };
 
+  useEffect(() => {
+    setFeedFilterOption(isLoggedIn ? "followings" : "all");
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    refetch();
+  }, [feedFilterOption, refetch]);
+
   if (isLoading || isFirstImagesLoading) {
     return <PageLoadingWithLogo />;
   }
 
   if (isError || !infinitePostsData) {
-    return <div>에러!!</div>;
+    return <PageError errorMessage="게시물을 가져올 수 없습니다." />;
   }
 
   return (
     <Container>
+      {isLoggedIn && (
+        <PostTabWrapper>
+          <Tabs tabItems={tabList} tabIndicatorKind="line" cssProp={postTabCSS} />
+        </PostTabWrapper>
+      )}
       <InfiniteScrollContainer isLoaderShown={isFetching || isImagesFetching} onIntersect={handleIntersect}>
         <Feed
           infinitePostsData={infinitePostsData}
-          queryKey={[QUERY.GET_HOME_FEED_POSTS]}
+          queryKey={[QUERY.GET_HOME_FEED_POSTS(feedFilterOption)]}
           isFetching={isFetching || isImagesFetching}
         />
       </InfiniteScrollContainer>

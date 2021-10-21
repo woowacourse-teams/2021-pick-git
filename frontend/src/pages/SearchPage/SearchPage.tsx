@@ -1,15 +1,20 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import Chip from "../../components/@shared/Chip/Chip";
 import GridFeed from "../../components/@shared/GridFeed/GridFeed";
+import Loader from "../../components/@shared/Loader/Loader";
 import Tabs from "../../components/@shared/Tabs/Tabs";
+import { ScrollPageWrapper } from "../../components/@styled/layout";
 import UserList from "../../components/UserList/UserList";
+
 import { QUERY } from "../../constants/queries";
 import { PAGE_URL } from "../../constants/urls";
-import SearchContext from "../../contexts/SearchContext";
-import useSearchPostData from "../../services/hooks/useSearchPostData";
-import useSearchUserData from "../../services/hooks/useSearchUserData";
+
+import useSearchKeyword from "../../hooks/common/useSearchKeyword";
+import useSearchPostData from "../../hooks/service/useSearchPostData";
+import useSearchUserData from "../../hooks/service/useSearchUserData";
+
 import { Container, ContentWrapper, Empty, KeywordsWrapper } from "./SearchPage.style";
 
 const tabNames = ["계정", "태그"];
@@ -24,15 +29,15 @@ const SearchPage = () => {
   const type = new URLSearchParams(location.search).get("type");
   const defaultTabIndex = isSearchTypeValid(type) ? searchTypeIndex[type] : 0;
   const [tabIndex, setTabIndex] = useState(defaultTabIndex);
-  const { keyword } = useContext(SearchContext);
+
+  const { keyword, resetKeyword } = useSearchKeyword();
   const {
     results: userSearchResults,
     isError: isUserSearchError,
     isLoading: isUserSearchLoading,
     isFetchingNextPage: isUserSearchFetchingNextPage,
     handleIntersect: handleUserSearchIntersect,
-    refetch: refetchUserData,
-  } = useSearchUserData(tabIndex === 0);
+  } = useSearchUserData({ keyword, activated: tabIndex === 0 });
   const {
     infinitePostsData: postSearchResults,
     isError: isPostSearchError,
@@ -40,29 +45,15 @@ const SearchPage = () => {
     isFetchingNextPage: isPostSearchFetchingNextPage,
     handleIntersect: handlePostSearchIntersect,
     formattedKeyword: postSearchKeyword,
-    refetch: refetchPostData,
-  } = useSearchPostData("tags", null, tabIndex === 1);
+  } = useSearchPostData({ keyword, type: "tags", activated: tabIndex === 1 });
 
   useEffect(() => {
-    switch (tabIndex) {
-      case 0:
-        refetchUserData();
-        break;
-      case 1:
-        refetchPostData();
-        break;
-      default:
-        break;
-    }
+    resetKeyword();
   }, [tabIndex]);
 
   const SearchUserResult = () => {
     if (isUserSearchLoading) {
-      return (
-        <Empty>
-          <PageLoading />
-        </Empty>
-      );
+      return <Loader kind="spinner" size="1rem" />;
     }
 
     if (isUserSearchError) {
@@ -84,29 +75,29 @@ const SearchPage = () => {
   };
 
   const SearchPostResult = () => {
-    return (
+    if (isPostSearchError) {
+      return <Empty>검색결과를 표시할 수 없습니다.</Empty>;
+    }
+
+    if (postSearchResults?.pages.length === 0) {
+      return <div>게시물이 없습니다.</div>;
+    }
+
+    return isPostSearchLoading ? (
+      <Loader kind="spinner" size="1rem" />
+    ) : (
       <>
         <KeywordsWrapper>
           {postSearchKeyword.split(" ").map((keyword, index) => keyword && <Chip key={index}>{keyword}</Chip>)}
         </KeywordsWrapper>
-        {isPostSearchLoading ? (
-          <Empty>
-            <PageLoading />
-          </Empty>
-        ) : isPostSearchError ? (
-          <Empty>검색결과를 표시할 수 없습니다.</Empty>
-        ) : postSearchResults?.pages.length === 0 ? (
-          <Empty>게시물이 없습니다.</Empty>
-        ) : (
-          <GridFeed
-            feedPagePath={PAGE_URL.SEARCH_RESULT_FEED("tags")}
-            infinitePostsData={postSearchResults}
-            isLoading={isPostSearchLoading}
-            isError={isPostSearchError}
-            isFetchingNextPage={isPostSearchFetchingNextPage}
-            handleIntersect={handlePostSearchIntersect}
-          />
-        )}
+        <GridFeed
+          feedPagePath={PAGE_URL.SEARCH_RESULT_FEED("tags")}
+          infinitePostsData={postSearchResults}
+          isLoading={isPostSearchLoading}
+          isError={isPostSearchError}
+          isFetchingNextPage={isPostSearchFetchingNextPage}
+          handleIntersect={handlePostSearchIntersect}
+        />
       </>
     );
   };
@@ -119,10 +110,12 @@ const SearchPage = () => {
   };
 
   return (
-    <Container>
-      <Tabs tabItems={tabItems} defaultTabIndex={defaultTabIndex} tabIndicatorKind="line" />
-      <Content tabIndex={tabIndex} />
-    </Container>
+    <ScrollPageWrapper>
+      <Container>
+        <Tabs tabItems={tabItems} defaultTabIndex={defaultTabIndex} tabIndicatorKind="line" />
+        <Content tabIndex={tabIndex} />
+      </Container>
+    </ScrollPageWrapper>
   );
 };
 

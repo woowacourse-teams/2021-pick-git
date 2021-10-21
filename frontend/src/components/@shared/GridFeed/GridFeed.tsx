@@ -23,7 +23,7 @@ const GridFeed = ({ feedPagePath, infinitePostsData, isError, isFetchingNextPage
   const posts = getItemsFromPages<Post>(infinitePostsData.pages);
 
   const Feed = () => {
-    if (posts.length > 0) {
+    if (posts?.length ?? 0 > 0) {
       return (
         <Container>
           <InfiniteScrollContainer isLoaderShown={isFetchingNextPage} onIntersect={handleIntersect}>

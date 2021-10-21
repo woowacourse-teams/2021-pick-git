@@ -41,9 +41,6 @@ import org.springframework.http.MediaType;
 
 class UserAcceptanceTest extends AcceptanceTest {
 
-    @MockBean
-    private OAuthClient oAuthClient;
-
     private String loginUserAccessToken;
 
     private User loginUser;
@@ -56,161 +53,8 @@ class UserAcceptanceTest extends AcceptanceTest {
         loginUser = UserFactory.user("testUser");
         targetUser = UserFactory.user("testUser2");
 
-        loginUserAccessToken = 로그인_되어있음(loginUser).getToken();
-        로그인_되어있음(targetUser);
-    }
-
-    @DisplayName("로그인된 사용자는 자신의 프로필을 조회할 수 있다.")
-    @Test
-    void getAuthenticatedUserProfile_LoginUser_Success() {
-        // given
-        UserProfileResponseDto responseDto = UserFactory.mockLoginUserProfileResponseDto();
-
-        // when
-        UserProfileResponse response =
-            authenticatedRequest(
-                loginUserAccessToken,
-                "/api/profiles/me",
-                Method.GET,
-                HttpStatus.OK
-            ).as(UserProfileResponse.class);
-
-        // then
-        assertThat(response)
-            .usingRecursiveComparison()
-            .isEqualTo(responseDto);
-    }
-
-    @DisplayName("유효하지 않은 토큰을 지닌 사용자는 자신의 프로필을 조회할 수 없다. - 401 예외")
-    @Test
-    void getAuthenticatedUserProfile_LoginUserWithInvalidToken_401Exception() {
-        // when
-        ApiErrorResponse response =
-            authenticatedRequest(
-                "testToken",
-                "/api/profiles/me",
-                Method.GET,
-                HttpStatus.UNAUTHORIZED
-            ).as(ApiErrorResponse.class);
-
-        // then
-        assertThat(response.getErrorCode()).isEqualTo("A0001");
-    }
-
-    @DisplayName("토큰이 없는 사용자는 자신의 프로필을 조회할 수 없다. - 401 예외")
-    @Test
-    void getAuthenticatedUserProfile_LoginUserWithoutToken_401Exception() {
-        // when
-        ApiErrorResponse response =
-            unauthenticatedRequest(
-                "/api/profiles/me",
-                Method.GET,
-                HttpStatus.UNAUTHORIZED
-            ).as(ApiErrorResponse.class);
-
-        // then
-        assertThat(response.getErrorCode()).isEqualTo("A0001");
-    }
-
-    @DisplayName("로그인된 사용자는 팔로우한 유저의 프로필을 조회할 수 있다.")
-    @Test
-    void getUserProfile_LoginUserIsFollowing_Success() {
-        // given
-        UserProfileResponseDto responseDto =
-            UserFactory.mockLoginUserProfileIsFollowingResponseDto();
-
-        authenticatedRequest(
-            loginUserAccessToken,
-            String.format("/api/profiles/%s/followings?githubFollowing=false",
-                targetUser.getName()),
-            Method.POST,
-            HttpStatus.OK
-        );
-
-        // when
-        UserProfileResponse response =
-            authenticatedRequest(
-                loginUserAccessToken,
-                String.format("/api/profiles/%s", targetUser.getName()),
-                Method.GET,
-                HttpStatus.OK
-            ).as(UserProfileResponse.class);
-
-        // then
-        assertThat(response)
-            .usingRecursiveComparison()
-            .isEqualTo(responseDto);
-    }
-
-    @DisplayName("로그인된 사용자는 팔로우하지 않은 유저의 프로필을 조회할 수 있다.")
-    @Test
-    void getUserProfile_LoginUserIsNotFollowing_Success() {
-        // given
-        UserProfileResponseDto responseDto =
-            UserFactory.mockLoginUserProfileIsNotFollowingResponseDto();
-
-        // when
-        UserProfileResponse response =
-            authenticatedRequest(
-                loginUserAccessToken,
-                String.format("/api/profiles/%s", targetUser.getName()),
-                Method.GET,
-                HttpStatus.OK
-            ).as(UserProfileResponse.class);
-
-        // then
-        assertThat(response)
-            .usingRecursiveComparison()
-            .isEqualTo(responseDto);
-    }
-
-    @DisplayName("로그인된 사용자는 존재하지 않는 유저 이름으로 프로필을 조회할 수 없다. - 400 예외")
-    @Test
-    void getUserProfile_LoginUser_400Exception() {
-        // when
-        ApiErrorResponse response =
-            authenticatedRequest(
-                loginUserAccessToken,
-                String.format("/api/profiles/%s", "invalidName"),
-                Method.GET,
-                HttpStatus.BAD_REQUEST
-            ).as(ApiErrorResponse.class);
-
-        // then
-        assertThat(response.getErrorCode()).isEqualTo("U0001");
-    }
-
-    @DisplayName("게스트 유저는 다른 유저의 프로필을 조회할 수 있다.")
-    @Test
-    void getUserProfile_GuestUser_Success() {
-        //given
-        UserProfileResponseDto responseDto = UserFactory.mockGuestUserProfileResponseDto();
-
-        //when
-        UserProfileResponse response = unauthenticatedRequest(
-            String.format("/api/profiles/%s", loginUser.getName()),
-            Method.GET,
-            HttpStatus.OK
-        ).as(UserProfileResponse.class);
-
-        //then
-        assertThat(response)
-            .usingRecursiveComparison()
-            .isEqualTo(responseDto);
-    }
-
-    @DisplayName("게스트 유저는 존재하지 않는 유저 이름으로 프로필을 조회할 수 없다. - 400 예외")
-    @Test
-    void getUserProfile_GuestUser_400Exception() {
-        // when
-        ApiErrorResponse response = unauthenticatedRequest(
-            String.format("/api/profiles/%s", "invalidName"),
-            Method.GET,
-            HttpStatus.BAD_REQUEST
-        ).as(ApiErrorResponse.class);
-
-        // then
-        assertThat(response.getErrorCode()).isEqualTo("U0001");
+        loginUserAccessToken = 로그인_되어있음(loginUser.getName()).getToken();
+        로그인_되어있음(targetUser.getName());
     }
 
     @DisplayName("로그인되지 않은 사용자는 target 유저를 팔로우 할 수 없다.")
@@ -506,7 +350,7 @@ class UserAcceptanceTest extends AcceptanceTest {
             HttpStatus.OK
         );
         User unfollowedUser = UserFactory.user("testUser3");
-        로그인_되어있음(unfollowedUser);
+        로그인_되어있음(unfollowedUser.getName());
 
         // when
         String url = String.format("/api/search/users?keyword=%s&page=0&limit=5", "testUser");
@@ -625,42 +469,6 @@ class UserAcceptanceTest extends AcceptanceTest {
             .when().request(method, url)
             .then().log().all()
             .statusCode(httpStatus.value())
-            .extract();
-    }
-
-    private OAuthTokenResponse 로그인_되어있음(User user) {
-        // when
-        OAuthTokenResponse response = 로그인_요청(user).as(OAuthTokenResponse.class);
-
-        // then
-        assertThat(response.getToken()).isNotBlank();
-
-        return response;
-    }
-
-    private ExtractableResponse<Response> 로그인_요청(User user) {
-        // given
-        String oauthCode = "1234";
-        String accessToken = "oauth.access.token";
-
-        OAuthProfileResponse oAuthProfileResponse = new OAuthProfileResponse(
-            user.getName(), user.getImage(), user.getDescription(), user.getGithubUrl(),
-            user.getCompany(), user.getLocation(), user.getWebsite(), user.getTwitter()
-        );
-
-        given(oAuthClient.getAccessToken(oauthCode))
-            .willReturn(accessToken);
-        given(oAuthClient.getGithubProfile(accessToken))
-            .willReturn(oAuthProfileResponse);
-
-        // then
-        return RestAssured
-            .given().log().all()
-            .accept(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .get("/api/afterlogin?code=" + oauthCode)
-            .then().log().all()
-            .statusCode(HttpStatus.OK.value())
             .extract();
     }
 }

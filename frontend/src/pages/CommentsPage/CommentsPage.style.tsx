@@ -1,15 +1,32 @@
 import { Link } from "react-router-dom";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
+import { fadeIn } from "../../components/@styled/keyframes";
 import { Page } from "../../components/@styled/layout";
-import { setDesktopMediaQuery, setLaptopMediaQuery, setTabletMediaQuery } from "../../components/@styled/mediaQueries";
+import {
+  setDesktopMediaQuery,
+  setLaptopAboveMediaQuery,
+  setLaptopMediaQuery,
+  setTabletMediaQuery,
+} from "../../components/@styled/mediaQueries";
+import { customScrollbarCSS } from "../../components/@styled/scrollbar";
 import { LAYOUT, PAGE_WIDTH, Z_INDEX } from "../../constants/layout";
 
-export const Container = styled(Page)`
-  padding-top: 0;
-  position: relative;
-  padding-bottom: ${LAYOUT.HEADER_HEIGHT};
-  background-color: ${({ theme }) => theme.color.white};
-`;
+export const ContentWrapper = styled.div(
+  ({ theme }) => css`
+    height: 100%;
+    overflow-y: scroll;
+    ${customScrollbarCSS(theme.color.textColor)}
+  `
+);
+
+export const Container = styled(Page)(
+  ({ theme }) => css`
+    padding-top: 0;
+    position: relative;
+    padding-bottom: ${LAYOUT.HEADER_HEIGHT};
+    background-color: ${theme.color.white};
+  `
+);
 
 export const SliderHeader = styled.div`
   display: flex;
@@ -73,13 +90,26 @@ export const GoBackLinkButton = styled.a`
   }
 `;
 
-export const CloseLinkButton = styled.a<{ isPostShown: boolean }>`
-  transition: transform 0.5s, opacity 0.5s;
-  transform: ${({ isPostShown }) => (isPostShown ? "" : "rotate(180deg)")};
+export const CloseLinkButtonWrapper = styled.div`
+  display: flex;
+  cursor: pointer;
+  transition: opacity 0.5s;
 
   :hover {
     opacity: 0.5;
   }
+`;
+
+export const CloseLinkText = styled.span(
+  ({ theme }) => css`
+    margin-right: 0.75rem;
+    color: ${theme.color.lighterTextColor};
+  `
+);
+
+export const CloseLinkButton = styled.a<{ isPostShown: boolean }>`
+  transition: transform 0.5s;
+  transform: ${({ isPostShown }) => (isPostShown ? "" : "rotate(180deg)")};
 `;
 
 export const TabsWrapper = styled.div`
@@ -98,6 +128,8 @@ export const CommentListItem = styled.li`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.4375rem;
+
+  animation: ${fadeIn} 1s forwards;
 `;
 
 export const CommentContentWrapper = styled.div`
@@ -111,7 +143,11 @@ export const CommentText = styled.span`
 `;
 
 export const DeleteIconWrapper = styled.a`
-  padding: 0.125rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 23px;
+  height: 23px;
   border-radius: 50%;
   background-color: ${({ theme }) => theme.color.lighterTextColor};
   transition: background-color 0.5s;
@@ -181,3 +217,10 @@ export const CommentTextArea = styled.textarea`
     outline: none;
   }
 `;
+
+export const LoaderWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+`;
+
+export const LoaderCSS = css``;

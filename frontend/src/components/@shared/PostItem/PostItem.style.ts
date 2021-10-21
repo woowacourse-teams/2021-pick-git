@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { fadeIn } from "../../@styled/keyframes";
 import { setDesktopMediaQuery, setMobileMediaQuery } from "../../@styled/mediaQueries";
 
 export const Container = styled.div`
   color: ${({ theme }) => theme.color.textColor};
+  animation: ${fadeIn} 1s forwards;
 `;
 
 export const PostHeader = styled.div`

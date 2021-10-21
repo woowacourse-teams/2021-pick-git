@@ -4,9 +4,6 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;
-import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
-import com.woowacourse.pickgit.authentication.domain.OAuthClient;
-import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
 import com.woowacourse.pickgit.comment.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.comment.presentation.dto.request.ContentRequest;
 import com.woowacourse.pickgit.common.factory.FileFactory;
@@ -22,8 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.BDDMockito;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -34,9 +29,6 @@ public class CommentAcceptanceTest extends AcceptanceTest {
     private String githubRepoUrl;
     private String content;
     private Map<String, Object> request;
-
-    @MockBean
-    private OAuthClient oAuthClient;
 
     @BeforeEach
     void setUp() {
@@ -173,40 +165,6 @@ public class CommentAcceptanceTest extends AcceptanceTest {
             .post("/api/posts/{postId}/comments", postId)
             .then().log().all()
             .statusCode(httpStatus.value())
-            .extract();
-    }
-
-    private OAuthTokenResponse 로그인_되어있음(String name) {
-        OAuthTokenResponse response = 로그인_요청(name)
-            .as(OAuthTokenResponse.class);
-
-        assertThat(response.getToken()).isNotBlank();
-
-        return response;
-    }
-
-    private ExtractableResponse<Response> 로그인_요청(String name) {
-        // given
-        String oauthCode = "1234";
-        String accessToken = "oauth.access.token";
-
-        OAuthProfileResponse oAuthProfileResponse = new OAuthProfileResponse(
-            name, "image", "hi~", "github.com/",
-            null, null, null, null
-        );
-
-        BDDMockito.given(oAuthClient.getAccessToken(oauthCode))
-            .willReturn(accessToken);
-        BDDMockito.given(oAuthClient.getGithubProfile(accessToken))
-            .willReturn(oAuthProfileResponse);
-
-        // when
-        return given().log().all()
-            .accept(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .get("/api/afterlogin?code=" + oauthCode)
-            .then().log().all()
-            .statusCode(HttpStatus.OK.value())
             .extract();
     }
 }

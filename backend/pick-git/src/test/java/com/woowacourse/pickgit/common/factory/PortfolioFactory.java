@@ -2,6 +2,7 @@ package com.woowacourse.pickgit.common.factory;
 
 import static java.time.Month.OCTOBER;
 
+import com.woowacourse.pickgit.portfolio.application.dto.response.PortfolioResponseDto;
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.ContactRequest;
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.DescriptionRequest;
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.ItemRequest;
@@ -10,6 +11,7 @@ import com.woowacourse.pickgit.portfolio.presentation.dto.request.ProjectRequest
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.SectionRequest;
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.TagRequest;
 import com.woowacourse.pickgit.portfolio.presentation.dto.response.PortfolioResponse;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -20,8 +22,23 @@ public class PortfolioFactory {
             .id(1L)
             .name(name)
             .profileImageShown(true)
-            .profileImageUrl("image")
-            .introduction("hi~")
+            .profileImageUrl("https://github.com/testImage.jpg")
+            .introduction("testDescription")
+            .createdAt(LocalDateTime.of(2021, OCTOBER, 1, 13, 10))
+            .updatedAt(LocalDateTime.of(2021, OCTOBER, 1, 13, 10))
+            .contacts(List.of())
+            .projects(List.of())
+            .sections(List.of())
+            .build();
+    }
+
+    public static PortfolioResponseDto mockPortfolioResponseDto(String name) {
+        return PortfolioResponseDto.builder()
+            .id(1L)
+            .name(name)
+            .profileImageShown(true)
+            .profileImageUrl("https://github.com/testImage.jpg")
+            .introduction("testDescription")
             .createdAt(LocalDateTime.of(2021, OCTOBER, 1, 13, 10))
             .updatedAt(LocalDateTime.of(2021, OCTOBER, 1, 13, 10))
             .contacts(List.of())
@@ -132,8 +149,8 @@ public class PortfolioFactory {
         return ProjectRequest.builder()
             .id(null)
             .name("pickgit")
-            .startDate(null)
-            .endDate(null)
+            .startDate(LocalDate.of(2021, 4, 18))
+            .endDate(LocalDate.of(2021, 10, 15))
             .type("team")
             .imageUrl("image")
             .content("pickgit")
@@ -143,7 +160,6 @@ public class PortfolioFactory {
 
     private static TagRequest mockTagRequest(Long id, String name) {
         return TagRequest.builder()
-            .id(id)
             .name(name)
             .build();
     }

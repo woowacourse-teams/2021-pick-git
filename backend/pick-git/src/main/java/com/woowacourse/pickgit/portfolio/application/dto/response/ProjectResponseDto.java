@@ -1,8 +1,6 @@
 package com.woowacourse.pickgit.portfolio.application.dto.response;
 
-import static java.util.stream.Collectors.toList;
-
-import com.woowacourse.pickgit.portfolio.presentation.dto.request.TagRequest;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
@@ -12,12 +10,12 @@ public class ProjectResponseDto {
 
     private Long id;
     private String name;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private String type;
     private String imageUrl;
     private String content;
-    private List<TagResponseDto> tags;
+    private List<String> tags;
 
     private ProjectResponseDto() {
     }
@@ -30,7 +28,29 @@ public class ProjectResponseDto {
         String type,
         String imageUrl,
         String content,
-        List<TagResponseDto> tags
+        List<String> tags
+    ) {
+        this(
+            id,
+            name,
+            LocalDate.of(startDate.getYear(), startDate.getMonth(), startDate.getDayOfMonth()),
+            LocalDate.of(endDate.getYear(), endDate.getMonth(), endDate.getDayOfMonth()),
+            type,
+            imageUrl,
+            content,
+            tags
+        );
+    }
+
+    private ProjectResponseDto(
+        Long id,
+        String name,
+        LocalDate startDate,
+        LocalDate endDate,
+        String type,
+        String imageUrl,
+        String content,
+        List<String> tags
     ) {
         this.id = id;
         this.name = name;
@@ -42,14 +62,6 @@ public class ProjectResponseDto {
         this.tags = tags;
     }
 
-    private static List<TagResponseDto> getTagResponsesDtoFromTagRequests(
-        List<TagRequest> requests
-    ) {
-        return requests.stream()
-            .map(TagResponseDto::of)
-            .collect(toList());
-    }
-
     public Long getId() {
         return id;
     }
@@ -58,11 +70,11 @@ public class ProjectResponseDto {
         return name;
     }
 
-    public LocalDateTime getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public LocalDateTime getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
@@ -78,7 +90,7 @@ public class ProjectResponseDto {
         return content;
     }
 
-    public List<TagResponseDto> getTags() {
+    public List<String> getTags() {
         return tags;
     }
 }

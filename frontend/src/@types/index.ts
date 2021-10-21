@@ -75,6 +75,8 @@ export interface PostEditData {
   content: string;
 }
 
+export type FeedFilterOption = "followings" | "all";
+
 export interface GithubStats {
   starsCount: number;
   commitsCount: number;
@@ -97,7 +99,7 @@ export type Tags = string[];
 
 export type Step = {
   title: string;
-  path: string;
+  hash: string;
 };
 
 export type TabIndicatorKind = "line" | "pill";
@@ -186,5 +188,7 @@ export type PortfolioData = {
   projects: PortfolioProject[];
   sections: PortfolioSection[];
 };
+
+export type PortfolioSectionType = "project" | "custom";
 
 export type PortfolioSectionList = string[];

@@ -2,20 +2,14 @@ import { useState } from "react";
 import { Container, DotPagination } from "./DotPaginator.style";
 
 export interface Props {
+  activePageIndex: number;
   paginationCount: number;
-  paginate: (index: number) => void;
+  onPaginate: (index: number) => void;
 }
 
-const DotPaginator = ({ paginationCount, paginate }: Props) => {
-  const [activePageIndex, setActivePageIndex] = useState(0);
-
-  const handlePaginate = (index: number) => {
-    setActivePageIndex(index);
-    paginate(index);
-  };
-
+const DotPaginator = ({ activePageIndex, paginationCount, onPaginate }: Props) => {
   const paginationItems = [...Array(paginationCount)].map((_, index) => (
-    <DotPagination key={index} isActive={activePageIndex === index} onClick={() => handlePaginate(index)} />
+    <DotPagination key={index} isActive={activePageIndex === index} onClick={() => onPaginate(index)} />
   ));
 
   return <Container>{paginationItems}</Container>;

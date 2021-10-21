@@ -1,7 +1,6 @@
-import { StringDecoder } from "string_decoder";
 import { PortfolioSection, PortfolioSectionItem } from "../../@types";
 import { PLACE_HOLDER } from "../../constants/placeholder";
-import usePortfolioSectionItem from "../../services/hooks/usePortfolioSectionItem";
+import usePortfolioSectionItem from "../../hooks/service/usePortfolioSectionItem";
 import PortfolioTextEditor from "../PortfolioTextEditor/PortfolioTextEditor";
 import SVGIcon from "../@shared/SVGIcon/SVGIcon";
 import {
@@ -18,9 +17,10 @@ import {
   DescriptionDeleteIconWrapper,
   DescriptionAddIconWrapper,
 } from "./PortfolioSection.style";
-import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
-import useMessageModal from "../../services/hooks/@common/useMessageModal";
+import AlertPortal from "../@layout/AlertPortal/AlertPortal";
 import { FAILURE_MESSAGE } from "../../constants/messages";
+import { Fragment } from "react";
+import useModal from "../../hooks/common/useModal";
 
 export interface Props {
   section: PortfolioSection;
@@ -37,10 +37,14 @@ const PortfolioSection = ({ section, isEditable, setSection }: Props) => {
     addBlankDescription,
     deleteDescription,
     deleteSectionItem,
-    isSameSectionNameExist,
   } = usePortfolioSectionItem(section, setSection);
 
-  const { modalMessage, isModalShown, showAlertModal, hideMessageModal } = useMessageModal();
+  const {
+    isModalShown: isAlertShown,
+    modalMessage: alertMessage,
+    showModal: showAlert,
+    hideModal: hideAlert,
+  } = useModal();
 
   const handleCategoryChange = (prevCategory: string) => (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     updateCategory(prevCategory, event.currentTarget.value);
@@ -61,7 +65,7 @@ const PortfolioSection = ({ section, isEditable, setSection }: Props) => {
 
   const handleDeleteSectionItem = (sectionItemIndex: number) => {
     if (portfolioSectionItems.length === 1) {
-      showAlertModal(FAILURE_MESSAGE.SHOULD_HAVE_LEAST_ONE_CATEGORY);
+      showAlert(FAILURE_MESSAGE.SHOULD_HAVE_LEAST_ONE_CATEGORY);
       return;
     }
 
@@ -74,7 +78,7 @@ const PortfolioSection = ({ section, isEditable, setSection }: Props) => {
     descriptionIndex: number
   ) => {
     if (sectionItem.descriptions.length === 1) {
-      showAlertModal(FAILURE_MESSAGE.SHOULD_HAVE_LEAST_ONE_DESCRIPTION);
+      showAlert(FAILURE_MESSAGE.SHOULD_HAVE_LEAST_ONE_DESCRIPTION);
       return;
     }
 
@@ -83,7 +87,7 @@ const PortfolioSection = ({ section, isEditable, setSection }: Props) => {
 
   // TODO: remove index from key prop
   const categoryItems = portfolioSectionItems.map((item, sectionIndex) => (
-    <SectionContentWrapper key={sectionIndex}>
+    <SectionContentWrapper key={item.id ?? "" + sectionIndex}>
       <CategoriesWrapper>
         <Category>
           <PortfolioTextEditor
@@ -108,7 +112,7 @@ const PortfolioSection = ({ section, isEditable, setSection }: Props) => {
       </CategoriesWrapper>
       <DescriptionsWrapper>
         {item.descriptions.map((description, descriptionIndex) => (
-          <>
+          <Fragment key={description.id ?? "" + descriptionIndex}>
             <Description>
               <PortfolioTextEditor
                 value={description.value}
@@ -132,7 +136,7 @@ const PortfolioSection = ({ section, isEditable, setSection }: Props) => {
                 <SVGIcon icon="AddCircleIcon" onClick={() => handleAddBlankDescription(sectionIndex)} />
               </DescriptionAddIconWrapper>
             )}
-          </>
+          </Fragment>
         ))}
       </DescriptionsWrapper>
     </SectionContentWrapper>
@@ -141,9 +145,7 @@ const PortfolioSection = ({ section, isEditable, setSection }: Props) => {
   return (
     <Container>
       {categoryItems}
-      {isModalShown && (
-        <MessageModalPortal heading={modalMessage} onConfirm={hideMessageModal} onClose={hideMessageModal} />
-      )}
+      {isAlertShown && <AlertPortal heading={alertMessage} onOkay={hideAlert} />}
     </Container>
   );
 };

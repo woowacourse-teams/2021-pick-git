@@ -3,3 +3,7 @@ spring:
     include: security
   flyway:
     enabled: false
+server:
+  compression:
+    enabled: true
+    mime-types: application/json

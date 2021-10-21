@@ -32,7 +32,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class PostServiceTest_likeUsers {
 
-    private static final String IMAGE_URL = "http://img.com";
+    private static final String IMAGE_URL = "https://github.com/testImage.jpg";
 
     @InjectMocks
     private PostService postService;

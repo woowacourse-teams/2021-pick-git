@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Import;
 
 @Import(JpaTestConfiguration.class)
 @DataJpaTest
-public class PostRepositoryTest_likeUsers {
+class PostRepositoryTest_likeUsers {
 
     @Autowired
     private PostRepository postRepository;

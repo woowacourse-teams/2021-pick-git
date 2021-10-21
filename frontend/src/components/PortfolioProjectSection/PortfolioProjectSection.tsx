@@ -17,7 +17,7 @@ import Chip from "../@shared/Chip/Chip";
 import PortfolioTextEditor from "../PortfolioTextEditor/PortfolioTextEditor";
 import DropDown, { DropDownItem } from "../@shared/DropDown/DropDown";
 import DateInput from "../@shared/DateInput/DateInput";
-import usePortfolioProjectSection from "../../services/hooks/usePortfolioProject";
+import usePortfolioProjectSection from "../../hooks/service/usePortfolioProject";
 import { PortfolioProject } from "../../@types";
 import { PLACE_HOLDER } from "../../constants/placeholder";
 
@@ -42,8 +42,8 @@ const PortfolioProjectSection = ({ project, isEditable, setProject }: Props) => 
     },
   ];
 
-  const tagList = project.tags.map(({ name }, index) => (
-    <Chip key={index} cssProp={TagItemCSS} onDelete={() => deleteTag(name)}>
+  const tagList = project.tags.map(({ name, id }) => (
+    <Chip key={id} cssProp={TagItemCSS} onDelete={() => deleteTag(name)}>
       {name}
     </Chip>
   ));
@@ -105,7 +105,7 @@ const PortfolioProjectSection = ({ project, isEditable, setProject }: Props) => 
             onChange={handleUpdateContent}
             disabled={!isEditable}
             placeholder={PLACE_HOLDER.PROJECT_DESCRIPTION}
-            autoGrow
+            autoGrow={false}
           />
           <TagListWrapper>{tagList}</TagListWrapper>
         </ProjectInfo>

@@ -20,9 +20,6 @@ const NavigationHeader = () => {
 
   const UnAuthenticatedNavigation = () => (
     <Navigation>
-      <NavigationItem to={PAGE_URL.HOME}>
-        <HomeIcon />
-      </NavigationItem>
       <NavigationItem to={PAGE_URL.SEARCH}>
         <SearchIcon />
       </NavigationItem>
@@ -31,9 +28,6 @@ const NavigationHeader = () => {
 
   const AuthenticatedNavigation = () => (
     <Navigation>
-      <NavigationItem to={PAGE_URL.HOME}>
-        <HomeIcon />
-      </NavigationItem>
       <NavigationItem to={PAGE_URL.MY_PROFILE}>
         <PersonIcon />
       </NavigationItem>
