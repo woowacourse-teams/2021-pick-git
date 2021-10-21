@@ -33,13 +33,11 @@ export const ImageListItem = styled.li<React.CSSProperties>`
   line-height: 0;
 `;
 
-export const Image = styled.img<{ imageHeight?: string }>(
-  ({ imageHeight }) => css`
+export const Image = styled.img(
+  () => css`
     width: 100%;
     height: 100%;
     object-fit: contain;
-
-    ${imageHeight && `height: ${imageHeight};`}
   `
 );
 
