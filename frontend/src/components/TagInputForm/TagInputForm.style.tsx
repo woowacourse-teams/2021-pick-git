@@ -1,4 +1,5 @@
 import styled, { css } from "styled-components";
+import { fadeIn } from "../@styled/keyframes";
 import { setLaptopAboveMediaQuery } from "../@styled/mediaQueries";
 import { customScrollbarCSS } from "../@styled/scrollbar";
 
@@ -31,6 +32,8 @@ export const TagList = styled.ul(
 
 export const TagListItem = styled.li`
   margin: 0 0.625rem 0.5625rem 0;
+
+  animation: ${fadeIn} 1s forwards;
 `;
 
 export const TagInputWrapper = styled.div`

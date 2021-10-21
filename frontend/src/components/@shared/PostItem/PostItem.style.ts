@@ -76,7 +76,9 @@ export const MoreContentLinkButton = styled.a`
   font-weight: bold;
   margin-left: 0.625rem;
   margin-right: 0.3125rem;
+  margin-bottom: 2rem;
   float: right;
+  text-align: right;
 `;
 
 export const PostContentAuthorLink = styled(Link)`
@@ -109,7 +111,6 @@ export const PostContent = styled.span`
 export const TagListWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
-  margin-bottom: 1rem;
 `;
 
 export const TagItemLinkButton = styled(Link)`

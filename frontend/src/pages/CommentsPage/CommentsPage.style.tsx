@@ -62,12 +62,20 @@ export const PostContentAuthorLink = styled(Link)`
   margin-right: 0.4375rem;
   font-size: 0.75rem;
   font-weight: bold;
+
+  ${setLaptopAboveMediaQuery`
+    font-size: 1rem;
+  `}
 `;
 
 export const PostContent = styled.p`
   font-size: 0.625rem;
   line-height: 1.5rem;
   padding: 0 1.125rem;
+
+  ${setLaptopAboveMediaQuery`
+    font-size: 0.9rem;
+  `}
 `;
 
 export const TagListWrapper = styled.div`

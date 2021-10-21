@@ -9,6 +9,7 @@ export interface Props extends React.HTMLAttributes<HTMLInputElement>, StyleProp
   value?: string;
   wrapperCssProp?: CSSProp;
   inputCssProp?: CSSProp;
+  type?: string;
 }
 
 const Input = ({
@@ -19,6 +20,7 @@ const Input = ({
   bottomBorderColor,
   name,
   value,
+  type,
   wrapperCssProp,
   inputCssProp,
   ...props
@@ -29,9 +31,9 @@ const Input = ({
       {icon}
       <StyledInput
         name={name}
-        type="text"
         ref={inputRef}
         textAlign={textAlign}
+        type={type}
         autoComplete="off"
         value={value}
         style={icon ? { marginLeft: "0.9375rem" } : {}}

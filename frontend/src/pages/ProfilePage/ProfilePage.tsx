@@ -13,6 +13,7 @@ import useAuth from "../../hooks/common/useAuth";
 import { Container, LoadingWrapper } from "./ProfilePage.style";
 
 import type { TabItem } from "../../@types";
+import { ScrollPageWrapper } from "../../components/@styled/layout";
 
 export interface Props {
   isMyProfile: boolean;
@@ -40,11 +41,13 @@ const ProfilePage = ({ isMyProfile }: Props) => {
         </LoadingWrapper>
       }
     >
-      <Container>
-        <Profile isMyProfile={isMyProfile} username={fixedUsername} />
-        <Tabs tabIndicatorKind="line" tabItems={tabItems} />
-        <ProfileTabContents isMyProfile={isMyProfile} username={fixedUsername} tabIndex={tabIndex} />
-      </Container>
+      <ScrollPageWrapper>
+        <Container>
+          <Profile isMyProfile={isMyProfile} username={fixedUsername} />
+          <Tabs tabIndicatorKind="line" tabItems={tabItems} />
+          <ProfileTabContents isMyProfile={isMyProfile} username={fixedUsername} tabIndex={tabIndex} />
+        </Container>
+      </ScrollPageWrapper>
     </Suspense>
   );
 };

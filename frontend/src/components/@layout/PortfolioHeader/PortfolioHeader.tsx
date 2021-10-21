@@ -44,7 +44,7 @@ const PortfolioHeader = ({
     { text: "연착처 업데이트", onClick: onSetPortfolioContacts },
     { text: "프로젝트 추가", onClick: onAddPortfolioProject },
     { text: "섹션 추가", onClick: onAddPortfolioSection },
-    { text: "포트폴리오 업로드", onClick: onUploadPortfolio },
+    { text: "전체 업로드", onClick: onUploadPortfolio },
   ];
 
   return (

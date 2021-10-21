@@ -1,7 +1,7 @@
 import styled, { css, CSSProp } from "styled-components";
 import * as icons from "../../../assets/icons";
 
-type IconType = keyof typeof icons;
+export type IconType = keyof typeof icons;
 
 export const iconTypes = Object.keys(icons) as IconType[];
 

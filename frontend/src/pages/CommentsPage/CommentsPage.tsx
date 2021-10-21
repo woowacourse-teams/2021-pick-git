@@ -84,7 +84,7 @@ const CommentsPage = () => {
     deletePostComment,
   } = useComments(selectedPost.id);
 
-  const comments = getItemsFromPages<CommentData>(infiniteCommentsData?.pages);
+  const comments = getItemsFromPages<CommentData>(infiniteCommentsData?.pages) ?? [];
 
   const tabItems: TabItem[] = [
     {
@@ -150,7 +150,7 @@ const CommentsPage = () => {
       top: window.outerHeight,
       behavior: "smooth",
     });
-  }, [comments]);
+  }, [comments.length]);
 
   const commentListItems =
     comments?.map((comment) => (
@@ -173,7 +173,7 @@ const CommentsPage = () => {
     )) ?? [];
 
   const tagListItems = selectedPost.tags.map((tag: string) => (
-    <TagItemLinkButton key={tag} to={PAGE_URL.TAG_FEED(tag)}>
+    <TagItemLinkButton key={tag} to={PAGE_URL.SEARCH_POST_BY_TAG(tag)}>
       <Chip>{tag}</Chip>
     </TagItemLinkButton>
   ));
