@@ -27,7 +27,6 @@ export const useSearchPostResultQuery = (type: string, keyword: string, activate
     {
       cacheTime: 0,
       getNextPageParam: (_, pages) => {
-        console.log("hey", pages);
         return pages.length;
       },
     }

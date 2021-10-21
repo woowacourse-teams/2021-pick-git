@@ -79,7 +79,6 @@ const useSearchPostData = ({ keyword, type, activated }: Params) => {
   };
 
   useEffect(() => {
-    console.log("keyword", keyword);
     initSearchPost(type, keyword, activated);
   }, [type, keyword, activated]);
 

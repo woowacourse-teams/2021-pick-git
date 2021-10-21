@@ -32,8 +32,6 @@ const SearchPage = () => {
   const { keyword, resetKeyword } = useSearchKeyword();
   const formattedKeyword = keyword.trim().replace(/,/g, " ").replace(/\s+/g, " ");
 
-  console.log(formattedKeyword);
-
   const {
     results: userSearchResults,
     isError: isUserSearchError,
