@@ -53,31 +53,28 @@ const TagInputForm = ({ githubRepositoryName, tags, tagsQueryResult, setTags }: 
     }
   }, [githubRepositoryName]);
 
-  const handleTagAdd = () => {
-    if (!formRef.current) {
-      return;
-    }
-
-    const newTag = formRef.current["tag-input"].value;
+  const handleTagSubmit: React.FormEventHandler<HTMLFormElement> = (event) => {
+    event.preventDefault();
+    const newTag = event.currentTarget["tag-input"].value;
 
     if (newTag.length === 0) {
       return;
     }
 
     if (!isValidTagLength(newTag)) {
-      formRef.current["tag-input"].blur();
+      event.currentTarget["tag-input"].blur();
       showAlert(FAILURE_MESSAGE.POST_TAG_LENGTH_LIMIT_EXCEEDED);
       return;
     }
 
     if (!isValidTagFormat(newTag)) {
-      formRef.current["tag-input"].blur();
+      event.currentTarget["tag-input"].blur();
       showAlert(FAILURE_MESSAGE.POST_TAG_SPECIAL_SYMBOL_EXIST);
       return;
     }
 
     if (hasDuplicatedTag([...tags, newTag])) {
-      formRef.current["tag-input"].blur();
+      event.currentTarget["tag-input"].blur();
       showAlert(FAILURE_MESSAGE.POST_DUPLICATED_TAG_EXIST);
       return;
     }
