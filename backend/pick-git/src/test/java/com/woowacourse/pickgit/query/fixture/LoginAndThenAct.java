@@ -327,4 +327,12 @@ public class LoginAndThenAct extends Act {
             Method.GET
         );
     }
+
+    public ExtractableResponse<Response> 레포지토리의_태그를_추출한다(TRepository tRepository) {
+        return request(
+            token,
+            String.format("/api/github/repositories/%s/tags/languages", tRepository),
+            Method.GET
+        );
+    }
 }
