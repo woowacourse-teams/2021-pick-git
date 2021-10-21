@@ -11,7 +11,7 @@ const SearchHeader = () => {
   const defaultKeyword = new URLSearchParams(location.search).get("keyword");
   const [localKeyword, setLocalKeyword] = useState(defaultKeyword ?? "");
   const history = useHistory();
-  const { onKeywordChange } = useContext(SearchContext);
+  const { keyword, onKeywordChange } = useContext(SearchContext);
 
   const handleGoBack = () => {
     history.goBack();
@@ -30,6 +30,10 @@ const SearchHeader = () => {
   useEffect(() => {
     applyKeywordToContext(localKeyword);
   }, [localKeyword]);
+
+  useEffect(() => {
+    setLocalKeyword(keyword);
+  }, [keyword]);
 
   return (
     <Container>
