@@ -14,7 +14,6 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -31,28 +30,33 @@ public class GithubContributionCalculator implements PlatformContributionCalcula
 
     @Override
     public Contribution calculate(String accessToken, String username) {
-
-        CountDownLatch latch = new CountDownLatch(CONTRIBUTION_COUNT);
-        Map<ContributionCategory, Integer> bucket = getContributionsViaPlatform(accessToken, username, latch);
-        return new Contribution(bucket);
-    }
-
-    private Map<ContributionCategory, Integer> getContributionsViaPlatform(String accessToken, String username, CountDownLatch latch) {
         try {
-            Map<ContributionCategory, Integer> bucket = new EnumMap<>(ContributionCategory.class);
-            platformContributionExtractor.extractStars(accessToken, username, bucket, latch);
-            platformContributionExtractor.extractCount(COMMIT, "/search/commits?q=committer:%s", accessToken, username, bucket, latch);
-            platformContributionExtractor.extractCount(PR, "/search/issues?q=author:%s type:pr", accessToken, username, bucket ,latch);
-            platformContributionExtractor.extractCount(ISSUE, "/search/issues?q=author:%s type:issue", accessToken, username, bucket, latch);
-            platformContributionExtractor.extractCount(REPO, "/search/issues?q=author:%s type:issue", accessToken, username, bucket, latch);
+            CountDownLatch latch = new CountDownLatch(CONTRIBUTION_COUNT);
+            Map<ContributionCategory, Integer> bucket =
+                getContributionsViaPlatform(accessToken, username, latch);
+            waitThreads(latch);
 
-            if(!latch.await(2, TimeUnit.SECONDS)) {
-                throw new PlatformHttpErrorException();
-            }
-            return bucket;
+            return new Contribution(bucket);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new PlatformInternalThreadException();
         }
+    }
+
+    private void waitThreads(CountDownLatch latch) throws InterruptedException {
+        if (!latch.await(2, TimeUnit.SECONDS)) {
+            throw new PlatformHttpErrorException();
+        }
+    }
+
+    private Map<ContributionCategory, Integer> getContributionsViaPlatform(String accessToken, String username, CountDownLatch latch) {
+        Map<ContributionCategory, Integer> bucket = new EnumMap<>(ContributionCategory.class);
+        platformContributionExtractor.extractStars(accessToken, username, bucket, latch);
+        platformContributionExtractor.extractCount(COMMIT, "/search/commits?q=committer:%s", accessToken, username, bucket, latch);
+        platformContributionExtractor.extractCount(PR, "/search/issues?q=author:%s type:pr", accessToken, username, bucket ,latch);
+        platformContributionExtractor.extractCount(ISSUE, "/search/issues?q=author:%s type:issue", accessToken, username, bucket, latch);
+        platformContributionExtractor.extractCount(REPO, "/search/issues?q=author:%s type:issue", accessToken, username, bucket, latch);
+
+        return bucket;
     }
 }
