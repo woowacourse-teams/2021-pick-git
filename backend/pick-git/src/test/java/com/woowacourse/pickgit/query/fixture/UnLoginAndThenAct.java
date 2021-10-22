@@ -3,6 +3,7 @@ package com.woowacourse.pickgit.query.fixture;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.woowacourse.pickgit.common.factory.FileFactory;
+import com.woowacourse.pickgit.portfolio.presentation.dto.request.PortfolioRequest;
 import com.woowacourse.pickgit.post.presentation.dto.response.LikeUsersResponse;
 import com.woowacourse.pickgit.user.presentation.dto.request.ProfileDescriptionRequest;
 import com.woowacourse.pickgit.user.presentation.dto.response.UserSearchResponse;
@@ -286,6 +287,21 @@ public class UnLoginAndThenAct extends Act {
             INVALID_TOKEN,
             String.format("/api/github/repositories/%s/tags/languages", tRepository),
             Method.GET
+        );
+    }
+
+    public ExtractableResponse<Response> 포트폴리오를_조회한다(TUser tUser) {
+        return request(
+            String.format("/api/portfolios/%s", tUser),
+            Method.GET
+        );
+    }
+
+    public ExtractableResponse<Response> 포트폴리오를_수정한다(TUser tUser, PortfolioRequest portfolioRequest) {
+        return request(
+            String.format("/api/portfolios", tUser),
+            Method.PUT,
+            portfolioRequest
         );
     }
 }

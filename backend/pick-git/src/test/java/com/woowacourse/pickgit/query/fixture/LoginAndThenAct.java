@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.woowacourse.pickgit.common.factory.FileFactory;
+import com.woowacourse.pickgit.portfolio.presentation.dto.request.PortfolioRequest;
 import com.woowacourse.pickgit.post.presentation.dto.response.LikeUsersResponse;
 import com.woowacourse.pickgit.query.fixture.TPost.Pair;
 import com.woowacourse.pickgit.user.presentation.dto.request.ProfileDescriptionRequest;
@@ -49,7 +50,7 @@ public class LoginAndThenAct extends Act {
             Method.POST
         );
 
-        if(isRead) {
+        if (isRead) {
             assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
             this.tUser.addFollowing(tUser);
             tUser.addFollower(this.tUser);
@@ -95,7 +96,7 @@ public class LoginAndThenAct extends Act {
         );
 
         if (response.statusCode() == HttpStatus.CREATED.value()) {
-            if(isRead) {
+            if (isRead) {
                 this.tUser.addPost(tPost, response);
             }
             String location = response.headers().getValue(HttpHeaders.LOCATION);
@@ -333,6 +334,34 @@ public class LoginAndThenAct extends Act {
             token,
             String.format("/api/github/repositories/%s/tags/languages", tRepository),
             Method.GET
+        );
+    }
+
+    public ExtractableResponse<Response> 포트폴리오를_조회한다(TUser tUser) {
+        String key = "portfolio" + tUser;
+        if (isRead && tUser.cache.containsKey(key)) {
+            return (ExtractableResponse<Response>) tUser.cache.get(key);
+        }
+
+        ExtractableResponse<Response> response = request(
+            token,
+            String.format("/api/portfolios/%s", tUser),
+            Method.GET
+        );
+
+        if(isRead) {
+            tUser.cache.put(key, response);
+        }
+
+        return response;
+    }
+
+    public ExtractableResponse<Response> 포트폴리오를_수정한다(PortfolioRequest portfolioRequest) {
+        return request(
+            token,
+            "/api/portfolios",
+            Method.PUT,
+            portfolioRequest
         );
     }
 }
