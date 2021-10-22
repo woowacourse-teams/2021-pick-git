@@ -18,12 +18,7 @@ const Template: Story = (args) => {
   }
 
   return (
-    <Feed
-      {...args}
-      infinitePostsData={infinitePostsData}
-      queryKey={QUERY.GET_HOME_FEED_POSTS("all")}
-      isFetching={false}
-    />
+    <Feed {...args} infinitePostsData={infinitePostsData} queryKey={QUERY.GET_HOME_FEED_POSTS} isFetching={false} />
   );
 };
 

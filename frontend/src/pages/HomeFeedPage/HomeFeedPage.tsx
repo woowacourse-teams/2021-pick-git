@@ -66,7 +66,7 @@ const HomeFeedPage = () => {
         <InfiniteScrollContainer isLoaderShown={isFetching || isImagesFetching} onIntersect={handleIntersect}>
           <Feed
             infinitePostsData={infinitePostsData}
-            queryKey={[QUERY.GET_HOME_FEED_POSTS(feedFilterOption)]}
+            queryKey={[QUERY.GET_HOME_FEED_POSTS]}
             isFetching={isFetching || isImagesFetching}
           />
         </InfiniteScrollContainer>
