@@ -91,9 +91,7 @@ class PostFeedServiceIntegrationTest extends IntegrationTest {
             .build();
 
         AuthUserForUserRequestDto authDto =
-            UserAssembler.authUserForUserRequestDto(
-                new LoginUser("kevin", "token")
-            );
+            UserAssembler.authUserForUserRequestDto(new LoginUser("kevin", "token"));
 
         User requester = userRepository.save(UserFactory.user("kevin"));
         List<User> mockUsers = userRepository.saveAll(UserFactory.mockSearchUsers());
