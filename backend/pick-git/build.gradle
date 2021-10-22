@@ -117,7 +117,8 @@ jacocoTestReport {
                             '**/content*',
                             '**/*S3*',
                             '**/*DataSource*',
-                            '**/*Slave*'
+                            '**/*Slave*',
+                            '**/GithubContributionExtractor'
                     ])
         }))
     }
@@ -151,7 +152,8 @@ jacocoTestCoverageVerification {
                     '**.*Content*',
                     '**.*Storage*',
                     '**.*DataSource*',
-                    '**.*Slave*'
+                    '**.*Slave*',
+                    '**.GithubContributionExtractor'
             ]
         }
     }
