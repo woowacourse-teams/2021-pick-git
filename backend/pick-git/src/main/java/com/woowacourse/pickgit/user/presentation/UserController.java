@@ -1,7 +1,5 @@
 package com.woowacourse.pickgit.user.presentation;
 
-import static java.util.stream.Collectors.toList;
-
 import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.config.auth_interceptor_register.ForLoginAndGuestUser;
@@ -16,6 +14,7 @@ import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.ProfileImageEditResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
+import com.woowacourse.pickgit.user.presentation.dto.UserAssembler;
 import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
 import com.woowacourse.pickgit.user.presentation.dto.request.ProfileDescriptionRequest;
 import com.woowacourse.pickgit.user.presentation.dto.response.ContributionResponse;
@@ -52,10 +51,12 @@ public class UserController {
     public ResponseEntity<UserProfileResponse> getAuthenticatedUserProfile(
         @Authenticated AppUser appUser
     ) {
-        AuthUserForUserRequestDto authUserRequestDto = AuthUserForUserRequestDto.from(appUser);
+        AuthUserForUserRequestDto authUserRequestDto =
+            UserAssembler.authUserForUserRequestDto(appUser);
+
         UserProfileResponseDto responseDto = userService.getMyUserProfile(authUserRequestDto);
 
-        return ResponseEntity.ok(createUserProfileResponse(responseDto));
+        return ResponseEntity.ok(UserAssembler.userProfileResponse(responseDto));
     }
 
     @ForLoginAndGuestUser
@@ -64,30 +65,13 @@ public class UserController {
         @Authenticated AppUser appUser,
         @PathVariable String username
     ) {
-        AuthUserForUserRequestDto authUserRequestDto = AuthUserForUserRequestDto.from(appUser);
+        AuthUserForUserRequestDto authUserRequestDto =
+            UserAssembler.authUserForUserRequestDto(appUser);
+
         UserProfileResponseDto responseDto =
             userService.getUserProfile(authUserRequestDto, username);
 
-        return ResponseEntity.ok(createUserProfileResponse(responseDto));
-    }
-
-    private UserProfileResponse createUserProfileResponse(
-        UserProfileResponseDto userProfileResponseDto
-    ) {
-        return UserProfileResponse.builder()
-            .name(userProfileResponseDto.getName())
-            .imageUrl(userProfileResponseDto.getImageUrl())
-            .description(userProfileResponseDto.getDescription())
-            .followerCount(userProfileResponseDto.getFollowerCount())
-            .followingCount(userProfileResponseDto.getFollowingCount())
-            .postCount(userProfileResponseDto.getPostCount())
-            .githubUrl(userProfileResponseDto.getGithubUrl())
-            .company(userProfileResponseDto.getCompany())
-            .location(userProfileResponseDto.getLocation())
-            .website(userProfileResponseDto.getWebsite())
-            .twitter(userProfileResponseDto.getTwitter())
-            .following(userProfileResponseDto.getFollowing())
-            .build();
+        return ResponseEntity.ok(UserAssembler.userProfileResponse(responseDto));
     }
 
     @ForOnlyLoginUser
@@ -97,16 +81,14 @@ public class UserController {
         @PathVariable String username,
         @RequestParam Boolean githubFollowing
     ) {
-        FollowRequestDto followRequestDto = FollowRequestDto.builder()
-            .authUserRequestDto(AuthUserForUserRequestDto.from(appUser))
-            .targetName(username)
-            .githubFollowing(githubFollowing)
-            .build();
+        FollowRequestDto followRequestDto =
+            UserAssembler.followRequestDto(appUser, username, githubFollowing);
 
-        FollowResponseDto followResponseDto =
-            userService.followUser(followRequestDto);
+        FollowResponseDto followResponseDto = userService.followUser(followRequestDto);
 
-        return ResponseEntity.ok(createFollowResponse(followResponseDto));
+        FollowResponse followResponse = UserAssembler.followResponse(followResponseDto);
+
+        return ResponseEntity.ok(followResponse);
     }
 
     @ForOnlyLoginUser
@@ -116,23 +98,13 @@ public class UserController {
         @PathVariable String username,
         @RequestParam Boolean githubUnfollowing
     ) {
-        FollowRequestDto unfollowRequestDto = FollowRequestDto.builder()
-            .authUserRequestDto(AuthUserForUserRequestDto.from(appUser))
-            .targetName(username)
-            .githubFollowing(githubUnfollowing)
-            .build();
+        FollowRequestDto unfollowRequestDto =
+            UserAssembler.followRequestDto(appUser, username, githubUnfollowing);
 
         FollowResponseDto followResponseDto =
             userService.unfollowUser(unfollowRequestDto);
 
-        return ResponseEntity.ok(createFollowResponse(followResponseDto));
-    }
-
-    private FollowResponse createFollowResponse(FollowResponseDto followResponseDto) {
-        return FollowResponse.builder()
-            .followerCount(followResponseDto.getFollowerCount())
-            .following(followResponseDto.isFollowing())
-            .build();
+        return ResponseEntity.ok(UserAssembler.followResponse(followResponseDto));
     }
 
     @ForOnlyLoginUser
@@ -141,13 +113,15 @@ public class UserController {
         @Authenticated AppUser appUser,
         @RequestBody byte[] image
     ) {
-        AuthUserForUserRequestDto authUserRequestDto = AuthUserForUserRequestDto.from(appUser);
-        ProfileImageEditRequestDto profileImageEditRequestDto = ProfileImageEditRequestDto
-            .builder()
-            .image(image)
-            .build();
+        AuthUserForUserRequestDto authUserRequestDto =
+            UserAssembler.authUserForUserRequestDto(appUser);
+
+        ProfileImageEditRequestDto profileImageEditRequestDto =
+            UserAssembler.profileImageEditRequestDto(image);
+
         ProfileImageEditResponseDto responseDto =
             userService.editProfileImage(authUserRequestDto, profileImageEditRequestDto);
+
         return ResponseEntity.ok(new ProfileImageEditResponse(responseDto.getImageUrl()));
     }
 
@@ -157,12 +131,13 @@ public class UserController {
         @Authenticated AppUser appUser,
         @Valid @RequestBody ProfileDescriptionRequest request
     ) {
-        AuthUserForUserRequestDto authUserRequestDto = AuthUserForUserRequestDto.from(appUser);
-        String editResult = userService.editProfileDescription(
-            authUserRequestDto,
-            request.getDescription()
-        );
-        return ResponseEntity.ok(new ProfileDescriptionResponse(editResult));
+        AuthUserForUserRequestDto authUserRequestDto =
+            UserAssembler.authUserForUserRequestDto(appUser);
+
+        String editResult =
+            userService.editProfileDescription(authUserRequestDto, request.getDescription());
+
+        return ResponseEntity.ok(UserAssembler.profileDescriptionResponse(editResult));
     }
 
     @ForOnlyLoginUser
@@ -171,26 +146,16 @@ public class UserController {
         @Authenticated AppUser user,
         @PathVariable String username
     ) {
-        ContributionResponseDto responseDto =
-            userService.calculateContributions(createContributionRequestDto(user, username));
-        return ResponseEntity.ok(createContributionResponse(responseDto));
-    }
+        ContributionRequestDto contributionRequestDto =
+            UserAssembler.contributionRequestDto(user, username);
 
-    private ContributionRequestDto createContributionRequestDto(AppUser user, String username) {
-        return ContributionRequestDto.builder()
-            .accessToken(user.getAccessToken())
-            .username(username)
-            .build();
-    }
+        ContributionResponseDto contributionResponseDto =
+            userService.calculateContributions(contributionRequestDto);
 
-    private ContributionResponse createContributionResponse(ContributionResponseDto responseDto) {
-        return ContributionResponse.builder()
-            .starsCount(responseDto.getStarsCount())
-            .commitsCount(responseDto.getCommitsCount())
-            .prsCount(responseDto.getPrsCount())
-            .issuesCount(responseDto.getIssuesCount())
-            .reposCount(responseDto.getReposCount())
-            .build();
+        ContributionResponse contributionResponse = UserAssembler
+            .contributionResponse(contributionResponseDto);
+
+        return ResponseEntity.ok(contributionResponse);
     }
 
     @ForLoginAndGuestUser
@@ -201,15 +166,19 @@ public class UserController {
         @RequestParam Long page,
         @RequestParam Long limit
     ) {
-        AuthUserForUserRequestDto authUserRequestDto = AuthUserForUserRequestDto.from(appUser);
-        FollowSearchRequestDto followSearchRequestDto = FollowSearchRequestDto.builder()
-            .username(username)
-            .page(page)
-            .limit(limit)
-            .build();
+        AuthUserForUserRequestDto authUserRequestDto =
+            UserAssembler.authUserForUserRequestDto(appUser);
+
+        FollowSearchRequestDto followSearchRequestDto =
+            UserAssembler.followSearchRequestDto(username, page, limit);
+
         List<UserSearchResponseDto> userSearchResponseDtos =
             userService.searchFollowings(authUserRequestDto, followSearchRequestDto);
-        return ResponseEntity.ok(createUserSearchResponses(userSearchResponseDtos));
+
+        List<UserSearchResponse> userSearchResponses = UserAssembler
+            .userSearchResponses(userSearchResponseDtos);
+
+        return ResponseEntity.ok(userSearchResponses);
     }
 
     @ForLoginAndGuestUser
@@ -220,32 +189,18 @@ public class UserController {
         @RequestParam Long page,
         @RequestParam Long limit
     ) {
-        AuthUserForUserRequestDto authUserRequestDto = AuthUserForUserRequestDto.from(appUser);
-        FollowSearchRequestDto followSearchRequestDto = FollowSearchRequestDto.builder()
-            .username(username)
-            .page(page)
-            .limit(limit)
-            .build();
+        AuthUserForUserRequestDto authUserRequestDto =
+            UserAssembler.authUserForUserRequestDto(appUser);
+
+        FollowSearchRequestDto followSearchRequestDto =
+            UserAssembler.followSearchRequestDto(username, page, limit);
+
         List<UserSearchResponseDto> userSearchResponseDtos =
             userService.searchFollowers(authUserRequestDto, followSearchRequestDto);
-        return ResponseEntity.ok(createUserSearchResponses(userSearchResponseDtos));
-    }
 
-    private List<UserSearchResponse> createUserSearchResponses(
-        List<UserSearchResponseDto> userSearchResponseDtos
-    ) {
-        return userSearchResponseDtos.stream()
-            .map(this::createUserSearchResponse)
-            .collect(toList());
-    }
+        List<UserSearchResponse> userSearchResponses =
+            UserAssembler.userSearchResponses(userSearchResponseDtos);
 
-    private UserSearchResponse createUserSearchResponse(
-        UserSearchResponseDto userSearchResponseDto
-    ) {
-        return UserSearchResponse.builder()
-            .imageUrl(userSearchResponseDto.getImageUrl())
-            .username(userSearchResponseDto.getUsername())
-            .following(userSearchResponseDto.getFollowing())
-            .build();
+        return ResponseEntity.ok(userSearchResponses);
     }
 }

@@ -1,6 +1,5 @@
 package com.woowacourse.pickgit.user.application.dto.request;
 
-import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -23,16 +22,5 @@ public class AuthUserForUserRequestDto {
         this.username = username;
         this.accessToken = accessToken;
         this.isGuest = isGuest;
-    }
-
-    public static AuthUserForUserRequestDto from(AppUser appUser) {
-        if (appUser.isGuest()) {
-            return new AuthUserForUserRequestDto(null, true);
-        }
-        return new AuthUserForUserRequestDto(
-            appUser.getUsername(),
-            appUser.getAccessToken(),
-            false
-        );
     }
 }
