@@ -2,8 +2,8 @@ import styled, { css } from "styled-components";
 import { setLaptopAboveMediaQuery } from "../@styled/mediaQueries";
 
 export const Container = styled.div`
-  width: 22.5rem;
-  height: 40rem;
+  width: 20rem;
+  height: 30rem;
   padding: 1rem 0;
   overflow-y: auto;
 
