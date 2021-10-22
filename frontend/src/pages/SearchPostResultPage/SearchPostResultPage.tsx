@@ -12,7 +12,6 @@ import { LayoutInPx } from "../../constants/layout";
 import { QUERY } from "../../constants/queries";
 
 import useInfiniteImagePreloader from "../../hooks/common/useInfiniteImagePreloader";
-import useSearchKeyword from "../../hooks/common/useSearchKeyword";
 import useSearchPostData from "../../hooks/service/useSearchPostData";
 
 import { Container } from "./SearchPostResultPage.style";
@@ -29,13 +28,13 @@ const SearchPostResultPage = () => {
   const [isMountedOnce, setIsMountedOnce] = useState(false);
   const [mountCounter, setMountCounter] = useState(0);
   const ScrollWrapperRef = useRef<HTMLDivElement>(null);
-  const { keyword } = useSearchKeyword();
-  const type = new URLSearchParams(location.search).get("type") ?? "tags";
   const {
     state: { postId },
   } = useLocation<LocationState>();
 
-  const formattedKeyword = keyword.trim().replace(/,/g, " ").replace(/\s+/g, " ");
+  const params = new URLSearchParams(location.search);
+  const type = params.get("type") ?? "tags";
+  const keyword = params.get("keyword") ?? "";
 
   const {
     infinitePostsData,
@@ -44,7 +43,7 @@ const SearchPostResultPage = () => {
     isFetchingNextPage,
     handleIntersect: handlePostsEndIntersect,
   } = useSearchPostData({
-    keyword: formattedKeyword,
+    keyword,
     type,
     activated: true,
   });
@@ -94,7 +93,7 @@ const SearchPostResultPage = () => {
         <InfiniteScrollContainer isLoaderShown={isFetchingNextPage || isImagesFetching} onIntersect={handleIntersect}>
           <Feed
             infinitePostsData={infinitePostsData}
-            queryKey={[QUERY.GET_SEARCH_POST_RESULT, { type, keyword: formattedKeyword }]}
+            queryKey={[QUERY.GET_SEARCH_POST_RESULT, { type, keyword }]}
             isFetching={isFetchingNextPage || isImagesFetching}
           />
         </InfiniteScrollContainer>

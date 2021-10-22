@@ -1,4 +1,4 @@
-import { useContext, useEffect, lazy, Suspense } from "react";
+import { useContext, useEffect, lazy } from "react";
 import { BrowserRouter, Route, Redirect, Switch } from "react-router-dom";
 
 import { PAGE_URL } from "./constants/urls";
