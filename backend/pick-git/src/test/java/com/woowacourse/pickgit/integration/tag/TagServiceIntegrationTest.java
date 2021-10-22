@@ -8,9 +8,9 @@ import com.woowacourse.pickgit.common.mockapi.MockTagApiRequester;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.post.TagFormatException;
 import com.woowacourse.pickgit.integration.IntegrationTest;
-import com.woowacourse.pickgit.tag.application.ExtractionRequestDto;
+import com.woowacourse.pickgit.tag.application.dto.ExtractionRequestDto;
 import com.woowacourse.pickgit.tag.application.TagService;
-import com.woowacourse.pickgit.tag.application.TagsDto;
+import com.woowacourse.pickgit.tag.application.dto.TagsDto;
 import com.woowacourse.pickgit.tag.domain.PlatformTagExtractor;
 import com.woowacourse.pickgit.tag.domain.Tag;
 import com.woowacourse.pickgit.tag.domain.TagRepository;
@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 class TagServiceIntegrationTest extends IntegrationTest {
 
