@@ -79,6 +79,7 @@ export const DescriptionCSS = css`
   `}
 
   width: 100%;
+  min-height: 5rem;
   text-align: left;
   font-size: 0.75rem;
   margin: 1rem 0;
