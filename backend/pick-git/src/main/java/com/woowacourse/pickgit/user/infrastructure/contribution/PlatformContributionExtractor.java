@@ -19,6 +19,6 @@ public interface PlatformContributionExtractor {
         String accessToken,
         String username,
         Map<ContributionCategory, Integer> bucket,
-        CountDownLatch countDownLatch
+        CountDownLatch latch
     );
 }
