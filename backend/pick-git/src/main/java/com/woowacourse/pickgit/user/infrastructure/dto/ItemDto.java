@@ -16,4 +16,10 @@ public class ItemDto {
     public List<StarsDto> getItems() {
         return items;
     }
+
+    public int sum() {
+        return items.stream()
+            .mapToInt(StarsDto::getStars)
+            .sum();
+    }
 }

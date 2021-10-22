@@ -13,11 +13,11 @@ import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.ProfileImageEditResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
-import com.woowacourse.pickgit.user.domain.Contribution;
-import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
+import com.woowacourse.pickgit.user.domain.contribution.PlatformContributionCalculator;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import com.woowacourse.pickgit.user.domain.follow.PlatformFollowingRequester;
+import com.woowacourse.pickgit.user.domain.contribution.Contribution;
 import com.woowacourse.pickgit.user.domain.profile.PickGitProfileStorage;
 import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
 import java.util.List;
@@ -131,7 +131,6 @@ public class UserService {
 
     public ContributionResponseDto calculateContributions(ContributionRequestDto requestDto) {
         User user = findUserByName(requestDto.getUsername());
-
         Contribution contribution =
             platformContributionCalculator.calculate(requestDto.getAccessToken(), user.getName());
 
