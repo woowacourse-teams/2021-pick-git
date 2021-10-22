@@ -30,6 +30,7 @@ import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponse
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.presentation.dto.UserAssembler;
 import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
 import java.io.File;
 import java.io.FileInputStream;
@@ -84,7 +85,7 @@ class UserServiceIntegrationTest extends IntegrationTest {
 
         // when, then
         assertThatCode(() -> userService.followUser(requestDto))
-            .isInstanceOf(UnauthorizedException.class);
+            .isInstanceOf(InvalidUserException.class);
     }
 
     @DisplayName("로그인 유저는 존재하지 않는 유저에 대해 팔로우할 수 없다. - 400 예")
@@ -196,7 +197,7 @@ class UserServiceIntegrationTest extends IntegrationTest {
 
         // when, then
         assertThatCode(() -> userService.unfollowUser(requestDto))
-            .isInstanceOf(UnauthorizedException.class);
+            .isInstanceOf(InvalidUserException.class);
     }
 
     @DisplayName("로그인 유저는 존재하지 않는 유저에 대해 언팔로우할 수 없다. - 400 예외")
@@ -371,10 +372,10 @@ class UserServiceIntegrationTest extends IntegrationTest {
 
     private AuthUserForUserRequestDto createLoginAuthUserRequestDto(String username) {
         AppUser appUser = new LoginUser(username, "Bearer testToken");
-        return AuthUserForUserRequestDto.from(appUser);
+        return UserAssembler.authUserForUserRequestDto(appUser);
     }
 
     private AuthUserForUserRequestDto createGuestAuthUserRequestDto() {
-        return AuthUserForUserRequestDto.from(new GuestUser());
+        return UserAssembler.authUserForUserRequestDto(new GuestUser());
     }
 }

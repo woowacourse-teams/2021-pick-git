@@ -22,6 +22,7 @@ import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponse
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.presentation.dto.UserAssembler;
 import java.util.List;
 import javax.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
@@ -49,7 +50,7 @@ public class UserServiceIntegrationTest_Query extends IntegrationTest {
 
         // when, then
         assertThatCode(() -> userService.getMyUserProfile(requestDto))
-            .isInstanceOf(UnauthorizedException.class);
+            .isInstanceOf(InvalidUserException.class);
     }
 
     @DisplayName("로그인된 사용자는 자신의 프로필을 조회할 수 있다.")
@@ -420,10 +421,10 @@ public class UserServiceIntegrationTest_Query extends IntegrationTest {
 
     private AuthUserForUserRequestDto createLoginAuthUserRequestDto(String username) {
         AppUser appUser = new LoginUser(username, "Bearer testToken");
-        return AuthUserForUserRequestDto.from(appUser);
+        return UserAssembler.authUserForUserRequestDto(appUser);
     }
 
     private AuthUserForUserRequestDto createGuestAuthUserRequestDto() {
-        return AuthUserForUserRequestDto.from(new GuestUser());
+        return UserAssembler.authUserForUserRequestDto(new GuestUser());
     }
 }

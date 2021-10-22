@@ -21,6 +21,7 @@ import com.woowacourse.pickgit.exception.user.InvalidFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
 import com.woowacourse.pickgit.exception.user.SameSourceTargetUserException;
 import com.woowacourse.pickgit.user.application.UserService;
+import com.woowacourse.pickgit.user.application.dto.UserDtoAssembler;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowSearchRequestDto;
@@ -38,6 +39,7 @@ import com.woowacourse.pickgit.user.domain.contribution.ContributionCategory;
 import com.woowacourse.pickgit.user.domain.contribution.PlatformContributionCalculator;
 import com.woowacourse.pickgit.user.domain.follow.PlatformFollowingRequester;
 import com.woowacourse.pickgit.user.domain.profile.PickGitProfileStorage;
+import com.woowacourse.pickgit.user.presentation.dto.UserAssembler;
 import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
 import java.io.File;
 import java.io.FileInputStream;
@@ -120,7 +122,7 @@ class UserServiceTest {
 
                 // when, then
                 assertThatCode(() -> userService.getMyUserProfile(requestDto))
-                    .isInstanceOf(UnauthorizedException.class);
+                    .isInstanceOf(InvalidUserException.class);
             }
         }
     }
@@ -313,7 +315,7 @@ class UserServiceTest {
 
                 // when, then
                 assertThatCode(() -> userService.followUser(requestDto))
-                    .isInstanceOf(UnauthorizedException.class);
+                    .isInstanceOf(InvalidUserException.class);
             }
         }
 
@@ -578,7 +580,7 @@ class UserServiceTest {
 
                 // when, then
                 assertThatCode(() -> userService.unfollowUser(requestDto))
-                    .isInstanceOf(UnauthorizedException.class);
+                    .isInstanceOf(InvalidUserException.class);
             }
         }
 
@@ -1334,10 +1336,10 @@ class UserServiceTest {
 
     private AuthUserForUserRequestDto createLoginAuthUserRequestDto(String username) {
         AppUser appUser = new LoginUser(username, "Bearer testToken");
-        return AuthUserForUserRequestDto.from(appUser);
+        return UserAssembler.authUserForUserRequestDto(appUser);
     }
 
     private AuthUserForUserRequestDto createGuestAuthUserRequestDto() {
-        return AuthUserForUserRequestDto.from(new GuestUser());
+        return UserAssembler.authUserForUserRequestDto(new GuestUser());
     }
 }

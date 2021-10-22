@@ -23,6 +23,7 @@ import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserReque
 import com.woowacourse.pickgit.user.application.dto.request.FollowRequestDto;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.presentation.dto.UserAssembler;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
@@ -89,7 +90,10 @@ class PostFeedServiceIntegrationTest extends IntegrationTest {
             .page(0L)
             .limit(10L)
             .build();
-        AuthUserForUserRequestDto authDto = AuthUserForUserRequestDto.from(new LoginUser("kevin", "token"));
+        AuthUserForUserRequestDto authDto =
+            UserAssembler.authUserForUserRequestDto(
+                new LoginUser("kevin", "token")
+            );
 
         User requester = userRepository.save(UserFactory.user("kevin"));
         List<User> mockUsers = userRepository.saveAll(UserFactory.mockSearchUsers());
