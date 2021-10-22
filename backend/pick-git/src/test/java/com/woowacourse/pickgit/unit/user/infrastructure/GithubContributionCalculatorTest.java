@@ -15,6 +15,7 @@ import com.woowacourse.pickgit.user.infrastructure.dto.StarsDto;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -74,7 +75,8 @@ class GithubContributionCalculatorTest {
         public void extractStars(
             String accessToken,
             String username,
-            Map<ContributionCategory, Integer> bucket
+            Map<ContributionCategory, Integer> bucket,
+            CountDownLatch countDownLatch
         ) {
             if (!ACCESS_TOKEN.equals(accessToken)) {
                 throw new PlatformHttpErrorException();
@@ -82,6 +84,7 @@ class GithubContributionCalculatorTest {
             List<StarsDto> starsDtos = List.of(new StarsDto(5), new StarsDto(6));
             ItemDto itemDto = new ItemDto(starsDtos);
             bucket.put(ContributionCategory.STAR, itemDto.sum());
+            countDownLatch.countDown();
         }
 
         @Override
@@ -90,13 +93,15 @@ class GithubContributionCalculatorTest {
             String restUrl,
             String accessToken,
             String username,
-            Map<ContributionCategory, Integer> bucket
+            Map<ContributionCategory, Integer> bucket,
+            CountDownLatch latch
         ) {
             if (!ACCESS_TOKEN.equals(accessToken)) {
                 throw new PlatformHttpErrorException();
             }
             CountDto countDto = new CountDto(48);
             bucket.put(category, countDto.getCount());
+            latch.countDown();
         }
     }
 }
