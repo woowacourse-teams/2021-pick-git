@@ -1,6 +1,5 @@
 package com.woowacourse.pickgit.user.application;
 
-import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
 import com.woowacourse.pickgit.user.application.dto.UserDtoAssembler;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserRequestDto;
@@ -38,7 +37,6 @@ public class UserService {
     private final PlatformFollowingRequester platformFollowingRequester;
 
     public UserProfileResponseDto getMyUserProfile(AuthUserForUserRequestDto requestDto) {
-        validateIsGuest(requestDto);
         User user = findUserByName(requestDto.getUsername());
         return UserDtoAssembler.generateUserProfileResponse(user, null);
     }
@@ -83,7 +81,6 @@ public class UserService {
     @Transactional
     public FollowResponseDto followUser(FollowRequestDto requestDto) {
         AuthUserForUserRequestDto authUserRequestDto = requestDto.getAuthUserRequestDto();
-        validateIsGuest(authUserRequestDto);
         User source = findUserByName(authUserRequestDto.getUsername());
         User target = findUserByName(requestDto.getTargetName());
 
@@ -104,7 +101,6 @@ public class UserService {
     @Transactional
     public FollowResponseDto unfollowUser(FollowRequestDto requestDto) {
         AuthUserForUserRequestDto authUserRequestDto = requestDto.getAuthUserRequestDto();
-        validateIsGuest(authUserRequestDto);
         User source = findUserByName(authUserRequestDto.getUsername());
         User target = findUserByName(requestDto.getTargetName());
 
@@ -205,12 +201,6 @@ public class UserService {
             loginUser,
             users
         );
-    }
-
-    private void validateIsGuest(AuthUserForUserRequestDto requestDto) {
-        if (requestDto.isGuest()) {
-            throw new UnauthorizedException();
-        }
     }
 
     private User findUserByName(String githubName) {
