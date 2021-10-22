@@ -7,6 +7,7 @@ import com.woowacourse.pickgit.user.domain.contribution.ContributionCategory;
 import com.woowacourse.pickgit.user.infrastructure.dto.CountDto;
 import com.woowacourse.pickgit.user.infrastructure.dto.ItemDto;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,13 +32,18 @@ public class GithubContributionExtractor implements PlatformContributionExtracto
 
     @Override
     public void extractStars(
-        String accessToken, String username,
-        Map<ContributionCategory, Integer> bucket
+        String accessToken,
+        String username,
+        Map<ContributionCategory, Integer> bucket,
+        CountDownLatch latch
     ) {
         String apiUrl = generateUrl(username);
         sendGitHubApi(accessToken, apiUrl)
             .bodyToMono(ItemDto.class)
-            .subscribe(result -> bucket.put(STAR, result.sum()));
+            .subscribe(result -> {
+                bucket.put(STAR, result.sum());
+                latch.countDown();
+            });
     }
 
     private String generateUrl(String username) {
@@ -51,12 +57,16 @@ public class GithubContributionExtractor implements PlatformContributionExtracto
         String restUrl,
         String accessToken,
         String username,
-        Map<ContributionCategory, Integer> bucket
+        Map<ContributionCategory, Integer> bucket,
+        CountDownLatch latch
     ) {
         String apiUrl = generateUrl(restUrl, username);
         sendGitHubApi(accessToken, apiUrl)
             .bodyToMono(CountDto.class)
-            .subscribe(result -> bucket.put(category, result.getCount()));
+            .subscribe(result -> {
+                bucket.put(category, result.getCount());
+                latch.countDown();
+            });
     }
 
     private String generateUrl(String restUrl, String username) {

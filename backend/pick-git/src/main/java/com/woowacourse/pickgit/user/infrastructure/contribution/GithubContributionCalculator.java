@@ -6,17 +6,20 @@ import static com.woowacourse.pickgit.user.domain.contribution.ContributionCateg
 import static com.woowacourse.pickgit.user.domain.contribution.ContributionCategory.REPO;
 
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
+import com.woowacourse.pickgit.exception.platform.PlatformInternalThreadException;
 import com.woowacourse.pickgit.user.domain.contribution.Contribution;
 import com.woowacourse.pickgit.user.domain.contribution.ContributionCategory;
 import com.woowacourse.pickgit.user.domain.contribution.PlatformContributionCalculator;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StopWatch;
 
 @Component
 public class GithubContributionCalculator implements PlatformContributionCalculator {
 
+    private static final int CONTRIBUTION_COUNT = 5;
     private final PlatformContributionExtractor platformContributionExtractor;
 
     public GithubContributionCalculator(
@@ -27,25 +30,33 @@ public class GithubContributionCalculator implements PlatformContributionCalcula
 
     @Override
     public Contribution calculate(String accessToken, String username) {
-        Map<ContributionCategory, Integer> bucket = new EnumMap<>(ContributionCategory.class);
-        platformContributionExtractor.extractStars(accessToken, username, bucket);
-        platformContributionExtractor.extractCount(COMMIT, "/search/commits?q=committer:%s", accessToken, username, bucket);
-        platformContributionExtractor.extractCount(PR, "/search/issues?q=author:%s type:pr", accessToken, username, bucket);
-        platformContributionExtractor.extractCount(ISSUE, "/search/issues?q=author:%s type:issue", accessToken, username, bucket);
-        platformContributionExtractor.extractCount(REPO, "/search/issues?q=author:%s type:issue", accessToken, username, bucket);
-        waitBusy(bucket);
-        return new Contribution(bucket);
+        try {
+            CountDownLatch latch = new CountDownLatch(CONTRIBUTION_COUNT);
+            Map<ContributionCategory, Integer> bucket =
+                getContributionsViaPlatform(accessToken, username, latch);
+            waitThreads(latch);
+
+            return new Contribution(bucket);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new PlatformInternalThreadException();
+        }
     }
 
-    private void waitBusy(Map<ContributionCategory, Integer> bucket) {
-        int categoryCounts = ContributionCategory.values().length;
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-        while (bucket.keySet().size() != categoryCounts) {
-            if (stopWatch.getTotalTimeSeconds() >= 2) {
-                throw new PlatformHttpErrorException();
-            }
+    private void waitThreads(CountDownLatch latch) throws InterruptedException {
+        if (!latch.await(2, TimeUnit.SECONDS)) {
+            throw new PlatformHttpErrorException();
         }
-        stopWatch.stop();
+    }
+
+    private Map<ContributionCategory, Integer> getContributionsViaPlatform(String accessToken, String username, CountDownLatch latch) {
+        Map<ContributionCategory, Integer> bucket = new EnumMap<>(ContributionCategory.class);
+        platformContributionExtractor.extractStars(accessToken, username, bucket, latch);
+        platformContributionExtractor.extractCount(COMMIT, "/search/commits?q=committer:%s", accessToken, username, bucket, latch);
+        platformContributionExtractor.extractCount(PR, "/search/issues?q=author:%s type:pr", accessToken, username, bucket ,latch);
+        platformContributionExtractor.extractCount(ISSUE, "/search/issues?q=author:%s type:issue", accessToken, username, bucket, latch);
+        platformContributionExtractor.extractCount(REPO, "/search/issues?q=author:%s type:issue", accessToken, username, bucket, latch);
+
+        return bucket;
     }
 }

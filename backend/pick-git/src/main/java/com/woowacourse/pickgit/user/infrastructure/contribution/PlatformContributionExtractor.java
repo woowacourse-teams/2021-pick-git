@@ -2,13 +2,15 @@ package com.woowacourse.pickgit.user.infrastructure.contribution;
 
 import com.woowacourse.pickgit.user.domain.contribution.ContributionCategory;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 public interface PlatformContributionExtractor {
 
     void extractStars(
         String accessToken,
         String username,
-        Map<ContributionCategory, Integer> bucket
+        Map<ContributionCategory, Integer> bucket,
+        CountDownLatch latch
     );
 
     void extractCount(
@@ -16,6 +18,7 @@ public interface PlatformContributionExtractor {
         String restUrl,
         String accessToken,
         String username,
-        Map<ContributionCategory, Integer> bucket
+        Map<ContributionCategory, Integer> bucket,
+        CountDownLatch latch
     );
 }
