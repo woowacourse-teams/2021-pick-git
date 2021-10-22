@@ -38,7 +38,7 @@ public class UserService {
 
     public UserProfileResponseDto getMyUserProfile(AuthUserForUserRequestDto requestDto) {
         User user = findUserByName(requestDto.getUsername());
-        return UserDtoAssembler.generateUserProfileResponse(user, null);
+        return UserDtoAssembler.userProfileResponseDto(user, null);
     }
 
     public UserProfileResponseDto getUserProfile(
@@ -47,10 +47,12 @@ public class UserService {
     ) {
         User target = findUserByName(targetName);
         if (requestDto.isGuest()) {
-            return UserDtoAssembler.generateUserProfileResponse(target, null);
+            return UserDtoAssembler.userProfileResponseDto(target, null);
         }
+
         User source = findUserByName(requestDto.getUsername());
-        return UserDtoAssembler.generateUserProfileResponse(target, source.isFollowing(target));
+
+        return UserDtoAssembler.userProfileResponseDto(target, source.isFollowing(target));
     }
 
     @Transactional
@@ -64,7 +66,9 @@ public class UserService {
             profileImageEditRequestDto.getImage(),
             user.getName()
         );
+
         user.updateProfileImage(userImageUrl);
+
         return new ProfileImageEditResponseDto(userImageUrl);
     }
 
@@ -75,6 +79,7 @@ public class UserService {
     ) {
         User user = findUserByName(authUserRequestDto.getUsername());
         user.updateDescription(description);
+
         return description;
     }
 
@@ -86,7 +91,8 @@ public class UserService {
 
         source.follow(target);
         followInPlatform(requestDto);
-        return generateFollowResponse(target, true);
+
+        return UserDtoAssembler.followResponseDto(target, true);
     }
 
     private void followInPlatform(FollowRequestDto requestDto) {
@@ -106,7 +112,7 @@ public class UserService {
 
         source.unfollow(target);
         unfollowInPlatform(requestDto);
-        return generateFollowResponse(target, false);
+        return UserDtoAssembler.followResponseDto(target, false);
     }
 
     private void unfollowInPlatform(FollowRequestDto requestDto) {
@@ -118,25 +124,12 @@ public class UserService {
         }
     }
 
-    private FollowResponseDto generateFollowResponse(User target, boolean isFollowing) {
-        return FollowResponseDto.builder()
-            .followerCount(target.getFollowerCount())
-            .isFollowing(isFollowing)
-            .build();
-    }
-
     public ContributionResponseDto calculateContributions(ContributionRequestDto requestDto) {
         User user = findUserByName(requestDto.getUsername());
         Contribution contribution =
             platformContributionCalculator.calculate(requestDto.getAccessToken(), user.getName());
 
-        return ContributionResponseDto.builder()
-            .starsCount(contribution.getStarsCount())
-            .commitsCount(contribution.getCommitsCount())
-            .prsCount(contribution.getPrsCount())
-            .issuesCount(contribution.getIssuesCount())
-            .reposCount(contribution.getReposCount())
-            .build();
+        return UserDtoAssembler.contributionResponseDto(contribution);
     }
 
     public List<UserSearchResponseDto> searchUser(
@@ -147,17 +140,18 @@ public class UserService {
             userSearchRequestDto.getPage(),
             userSearchRequestDto.getLimit()
         );
+
         List<User> users = userRepository.searchByUsernameLike(
             userSearchRequestDto.getKeyword(),
             pageable
         );
 
         if (authUserRequestDto.isGuest()) {
-            return UserDtoAssembler.convertToUserSearchResponseDtoWithoutFollowing(users);
+            return UserDtoAssembler.userSearchResponseDto(users);
         }
 
         User loginUser = findUserByName(authUserRequestDto.getUsername());
-        return UserDtoAssembler.convertToUserSearchResponseDtoWithFollowing(loginUser, users);
+        return UserDtoAssembler.UserSearchResponseDto(loginUser, users);
     }
 
     public List<UserSearchResponseDto> searchFollowings(
@@ -165,6 +159,7 @@ public class UserService {
         FollowSearchRequestDto followSearchRequestDto
     ) {
         User target = findUserByName(followSearchRequestDto.getUsername());
+
         Pageable pageable = PageRequest.of(
             Math.toIntExact(followSearchRequestDto.getPage()),
             Math.toIntExact(followSearchRequestDto.getLimit())
@@ -193,14 +188,11 @@ public class UserService {
         List<User> users
     ) {
         if (authUserRequestDto.isGuest()) {
-            return UserDtoAssembler.convertToUserSearchResponseDtoWithoutFollowing(users);
+            return UserDtoAssembler.userSearchResponseDto(users);
         }
 
         User loginUser = findUserByName(authUserRequestDto.getUsername());
-        return UserDtoAssembler.convertToUserSearchResponseDtoWithFollowingAndIncludingMe(
-            loginUser,
-            users
-        );
+        return UserDtoAssembler.userSearchResponseDto(loginUser, users);
     }
 
     private User findUserByName(String githubName) {

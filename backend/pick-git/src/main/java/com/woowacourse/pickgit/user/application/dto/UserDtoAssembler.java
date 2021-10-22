@@ -2,8 +2,12 @@ package com.woowacourse.pickgit.user.application.dto;
 
 import static java.util.stream.Collectors.toList;
 
+import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserRequestDto;
+import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
+import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
+import com.woowacourse.pickgit.user.domain.Contribution;
 import com.woowacourse.pickgit.user.domain.User;
 import java.util.List;
 import java.util.function.Predicate;
@@ -13,7 +17,7 @@ public class UserDtoAssembler {
     private UserDtoAssembler() {
     }
 
-    public static UserProfileResponseDto generateUserProfileResponse(User user, Boolean following) {
+    public static UserProfileResponseDto userProfileResponseDto(User user, Boolean following) {
         return UserProfileResponseDto.builder()
             .name(user.getName())
             .imageUrl(user.getImage())
@@ -30,7 +34,7 @@ public class UserDtoAssembler {
             .build();
     }
 
-    public static List<UserSearchResponseDto> convertToUserSearchResponseDtoWithFollowingAndIncludingMe(
+    public static List<UserSearchResponseDto> userSearchResponseDto(
         User loginUser,
         List<User> followings
     ) {
@@ -50,7 +54,7 @@ public class UserDtoAssembler {
         );
     }
 
-    public static List<UserSearchResponseDto> convertToUserSearchResponseDtoWithoutFollowing(
+    public static List<UserSearchResponseDto> userSearchResponseDto(
         List<User> users
     ) {
         return users.stream()
@@ -58,7 +62,7 @@ public class UserDtoAssembler {
             .collect(toList());
     }
 
-    public static List<UserSearchResponseDto> convertToUserSearchResponseDtoWithFollowing(
+    public static List<UserSearchResponseDto> UserSearchResponseDto(
         User loginUser,
         List<User> users
     ) {
@@ -75,4 +79,22 @@ public class UserDtoAssembler {
     private static Predicate<User> isLoginUser(User loginUser) {
         return user -> !user.equals(loginUser);
     }
+
+    public static FollowResponseDto followResponseDto(User target, boolean isFollowing) {
+        return FollowResponseDto.builder()
+            .followerCount(target.getFollowerCount())
+            .isFollowing(isFollowing)
+            .build();
+    }
+
+    public static ContributionResponseDto contributionResponseDto(Contribution contribution) {
+        return ContributionResponseDto.builder()
+            .starsCount(contribution.getStarsCount())
+            .commitsCount(contribution.getCommitsCount())
+            .prsCount(contribution.getPrsCount())
+            .issuesCount(contribution.getIssuesCount())
+            .reposCount(contribution.getReposCount())
+            .build();
+    }
+
 }
