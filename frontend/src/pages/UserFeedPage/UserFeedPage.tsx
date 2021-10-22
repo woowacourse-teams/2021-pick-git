@@ -23,7 +23,7 @@ interface LocationState {
 const UserFeedPage = () => {
   const [isMountedOnce, setIsMountedOnce] = useState(false);
   const [mountCounter, setMountCounter] = useState(0);
-  const containerRef = useRef<any>();
+  const scrollWrapperRef = useRef<HTMLDivElement>(null);
   const { currentUsername } = useAuth();
   const username = new URLSearchParams(location.search).get("username");
   const isMyFeed = currentUsername === username;
@@ -60,7 +60,7 @@ const UserFeedPage = () => {
 
     if (!isMountedOnce) {
       setMountCounter((prev) => prev + 1);
-      setIsMountedOnce(containerRef.current !== undefined);
+      setIsMountedOnce(scrollWrapperRef.current !== null);
 
       return;
     }
@@ -68,7 +68,7 @@ const UserFeedPage = () => {
     const $targetPost = document.querySelector(`#post${postId}`);
 
     if ($targetPost && $targetPost instanceof HTMLElement) {
-      window.scrollTo(0, $targetPost.offsetTop - LayoutInPx.HEADER_HEIGHT);
+      scrollWrapperRef.current?.scrollTo(0, $targetPost.offsetTop - LayoutInPx.HEADER_HEIGHT);
     }
   }, [postId, isMountedOnce, mountCounter]);
 
@@ -81,8 +81,8 @@ const UserFeedPage = () => {
   }
 
   return (
-    <ScrollPageWrapper>
-      <Container ref={containerRef}>
+    <ScrollPageWrapper ref={scrollWrapperRef}>
+      <Container>
         <InfiniteScrollContainer isLoaderShown={isFetchingNextPage || isImagesFetching} onIntersect={handleIntersect}>
           <Feed
             infinitePostsData={infinitePostsData}
