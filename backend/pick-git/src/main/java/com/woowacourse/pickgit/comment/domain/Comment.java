@@ -45,13 +45,7 @@ public class Comment {
         this.post = post;
     }
 
-    public void validateDeletion(Post post, User user) {
-        if (post.isNotWrittenBy(user) && isNotCommentedBy(user)) {
-            throw new CannotDeleteCommentException();
-        }
-    }
-
-    private boolean isNotCommentedBy(User user) {
+    public boolean isNotCommentedBy(User user) {
         return !this.user.equals(user);
     }
 

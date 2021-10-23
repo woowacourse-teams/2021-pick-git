@@ -2,12 +2,15 @@ package com.woowacourse.pickgit.comment.application;
 
 import static java.util.stream.Collectors.toList;
 
+import com.woowacourse.pickgit.comment.application.dto.CommentDtoAssembler;
 import com.woowacourse.pickgit.comment.application.dto.request.CommentDeleteRequestDto;
 import com.woowacourse.pickgit.comment.application.dto.request.CommentRequestDto;
 import com.woowacourse.pickgit.comment.application.dto.request.QueryCommentRequestDto;
 import com.woowacourse.pickgit.comment.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.comment.domain.Comment;
 import com.woowacourse.pickgit.comment.domain.CommentRepository;
+import com.woowacourse.pickgit.comment.presentation.dto.CommentAssembler;
+import com.woowacourse.pickgit.exception.comment.CannotDeleteCommentException;
 import com.woowacourse.pickgit.exception.comment.CommentNotFoundException;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
@@ -32,10 +35,7 @@ public class CommentService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
 
-    @CacheEvict(
-        value = "homeFeed",
-        allEntries = true
-    )
+    @CacheEvict(value = "homeFeed", allEntries = true)
     @Transactional
     public CommentResponseDto addComment(CommentRequestDto commentRequestDto) {
         String content = commentRequestDto.getContent();
@@ -45,7 +45,7 @@ public class CommentService {
         Comment comment = new Comment(content, user, post);
         Comment savedComment = commentRepository.save(comment);
 
-        return createCommentResponseDto(savedComment);
+        return CommentDtoAssembler.commentResponseDto(savedComment);
     }
 
     public List<CommentResponseDto> queryComments(QueryCommentRequestDto queryCommentRequestDto) {
@@ -56,32 +56,19 @@ public class CommentService {
 
         List<Comment> comments = commentRepository.findCommentsByPost_Id(postId, pageable);
 
-        return comments.stream()
-            .map(this::createCommentResponseDto)
-            .collect(toList());
+        return CommentDtoAssembler.commentResponseDtos(comments);
     }
 
-    private CommentResponseDto createCommentResponseDto(Comment comment) {
-        return CommentResponseDto.builder()
-            .id(comment.getId())
-            .profileImageUrl(comment.getProfileImageUrl())
-            .authorName(comment.getAuthorName())
-            .content(comment.getContent())
-            .liked(false)
-            .build();
-    }
-
-    @CacheEvict(
-        value = "homeFeed",
-        allEntries = true
-    )
+    @CacheEvict(value = "homeFeed", allEntries = true)
     @Transactional
     public void delete(CommentDeleteRequestDto commentDeleteRequestDto) {
         Post post = findPostById(commentDeleteRequestDto.getPostId());
         User user = findUserByName(commentDeleteRequestDto.getUsername());
         Comment comment = findCommentById(commentDeleteRequestDto.getCommentId());
 
-        comment.validateDeletion(post, user);
+        if (post.isNotWrittenBy(user) && comment.isNotCommentedBy(user)) {
+            throw new CannotDeleteCommentException();
+        }
 
         commentRepository.delete(comment);
     }
