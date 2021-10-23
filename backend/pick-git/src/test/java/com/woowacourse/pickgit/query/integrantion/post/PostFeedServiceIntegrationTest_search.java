@@ -5,11 +5,10 @@ import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.woowacourse.pickgit.acceptance.AcceptanceTest;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.exception.post.IllegalSearchTypeException;
 import com.woowacourse.pickgit.integration.IntegrationTest;
-import com.woowacourse.pickgit.post.application.PostDtoAssembler;
+import com.woowacourse.pickgit.post.application.dto.PostDtoAssembler;
 import com.woowacourse.pickgit.post.application.PostFeedService;
 import com.woowacourse.pickgit.post.application.dto.request.SearchPostsRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
@@ -28,7 +27,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 
 public class PostFeedServiceIntegrationTest_search extends IntegrationTest {
 
@@ -99,7 +97,7 @@ public class PostFeedServiceIntegrationTest_search extends IntegrationTest {
         // then
         List<Post> allPosts = postRepository.findAll();
         List<PostResponseDto> allPostResponseDtos = PostDtoAssembler
-            .assembleFrom(user, allPosts);
+            .postResponseDtos(user, allPosts);
         List<PostResponseDto> expected = findPostResponseByTags(allPostResponseDtos, keyword);
 
         assertThat(actual)
@@ -122,7 +120,7 @@ public class PostFeedServiceIntegrationTest_search extends IntegrationTest {
         // then
         List<Post> allPosts = postRepository.findAll();
         List<PostResponseDto> allPostResponseDtos = PostDtoAssembler
-            .assembleFrom(null, allPosts);
+            .postResponseDtos(null, allPosts);
         List<PostResponseDto> expected = findPostResponseByTags(allPostResponseDtos, keyword);
 
         assertThat(actual)

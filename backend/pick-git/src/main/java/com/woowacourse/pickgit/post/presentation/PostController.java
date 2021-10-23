@@ -11,6 +11,7 @@ import com.woowacourse.pickgit.post.application.dto.request.SearchRepositoryRequ
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeUsersResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponsesDto;
 import com.woowacourse.pickgit.post.presentation.dto.PostAssembler;
 import com.woowacourse.pickgit.post.presentation.dto.request.PostRequest;
@@ -64,11 +65,11 @@ public class PostController {
         RepositoryRequestDto repositoryRequestDto =
             PostAssembler.repositoryRequestDto(user, page, limit);
 
-        RepositoryResponsesDto repositoryResponsesDto = postService
+        List<RepositoryResponseDto> repositoryResponseDtos = postService
             .userRepositories(repositoryRequestDto);
 
         List<RepositoryResponse> repositoryResponses =
-            PostAssembler.repositoryResponses(repositoryResponsesDto.getRepositoryResponsesDto());
+            PostAssembler.repositoryResponses(repositoryResponseDtos);
 
         return ResponseEntity.ok(repositoryResponses);
     }
@@ -84,11 +85,11 @@ public class PostController {
         SearchRepositoryRequestDto searchRepositoryRequestDto =
             PostAssembler.searchRepositoryRequestDto(user, keyword, page, limit);
 
-        RepositoryResponsesDto repositoryResponsesDtos =
-            postService.searchUserRepositories(searchRepositoryRequestDto);
+        List<RepositoryResponseDto> repositoryResponseDtos = postService
+            .searchUserRepositories(searchRepositoryRequestDto);
 
         List<RepositoryResponse> repositoryResponses =
-            PostAssembler.repositoryResponses(repositoryResponsesDtos.getRepositoryResponsesDto());
+            PostAssembler.repositoryResponses(repositoryResponseDtos);
 
         return ResponseEntity.ok(repositoryResponses);
     }

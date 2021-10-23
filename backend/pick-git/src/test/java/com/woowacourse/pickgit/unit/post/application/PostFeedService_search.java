@@ -9,7 +9,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.woowacourse.pickgit.common.factory.UserFactory;
-import com.woowacourse.pickgit.post.application.PostDtoAssembler;
+import com.woowacourse.pickgit.post.application.dto.PostDtoAssembler;
 import com.woowacourse.pickgit.post.application.PostFeedService;
 import com.woowacourse.pickgit.post.application.dto.request.SearchPostsRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
@@ -71,7 +71,7 @@ public class PostFeedService_search {
 
         assertThat(actual)
             .usingRecursiveComparison()
-            .isEqualTo(PostDtoAssembler.assembleFrom(requestUser, List.of(post)));
+            .isEqualTo(PostDtoAssembler.postResponseDtos(requestUser, List.of(post)));
 
         verify(searchTypes, times(1))
             .findByTypeName(type);
@@ -104,7 +104,7 @@ public class PostFeedService_search {
         // then
         assertThat(actual)
             .usingRecursiveComparison()
-            .isEqualTo(PostDtoAssembler.assembleFrom(null, List.of(post)));
+            .isEqualTo(PostDtoAssembler.postResponseDtos(null, List.of(post)));
 
         verify(searchTypes, times(1))
             .findByTypeName(type);

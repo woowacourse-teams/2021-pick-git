@@ -127,7 +127,7 @@ public class PostFeedCacheIntegrationTest extends AcceptanceTest {
                 PostRequestDto newPost = postRequestDtos.get(index);
 
                 userRepository.save(user);
-                Long postId = postService.write(newPost).getId();
+                Long postId = postService.write(newPost);
 
                 CommentRequestDto commentRequestDto =
                     new CommentRequestDto(user.getName(), "test comment" + index, postId);

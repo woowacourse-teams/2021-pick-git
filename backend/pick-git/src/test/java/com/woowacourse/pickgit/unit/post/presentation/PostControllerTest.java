@@ -86,7 +86,7 @@ class PostControllerTest extends ControllerTest {
         given(oAuthService.findRequestUserByToken(any()))
             .willReturn(loginUser);
         given(postService.write(any(PostRequestDto.class)))
-            .willReturn(new PostImageUrlResponseDto(1L));
+            .willReturn(1L);
 
         // when
         ResultActions perform = mockMvc.perform(multipart("/api/posts")
@@ -152,20 +152,20 @@ class PostControllerTest extends ControllerTest {
     @Test
     void userRepositories_LoginUser_Success() throws Exception {
         // given
-        RepositoryResponsesDto responseDto = new RepositoryResponsesDto(List.of(
+        List<RepositoryResponseDto> repositoryResponseDtos = List.of(
             new RepositoryResponseDto("https://github.com/jipark3/pick", "pick"),
             new RepositoryResponseDto("https://github.com/jipark3/git", "git")
-        ));
+        );
 
         given(oAuthService.validateToken(any()))
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(any()))
             .willReturn(new LoginUser("testUser", ACCESS_TOKEN));
         given(postService.userRepositories(any(RepositoryRequestDto.class)))
-            .willReturn(responseDto);
+            .willReturn(repositoryResponseDtos);
 
         String repositories = objectMapper
-            .writeValueAsString(responseDto.getRepositoryResponsesDto());
+            .writeValueAsString(repositoryResponseDtos);
 
         // when
         ResultActions perform = mockMvc.perform(get("/api/github/repositories")
@@ -206,14 +206,14 @@ class PostControllerTest extends ControllerTest {
         given(oAuthService.findRequestUserByToken(any()))
             .willReturn(loginUser);
 
-        RepositoryResponsesDto responseDto = new RepositoryResponsesDto(List.of(
+        List<RepositoryResponseDto> repositoryResponseDtos = List.of(
             new RepositoryResponseDto("pick", "https://github.com/jipark3/pick"),
             new RepositoryResponseDto("pick-git", "https://github.com/jipark3/pick-git")
-        ));
-        String repositories = objectMapper.writeValueAsString(responseDto.getRepositoryResponsesDto());
+        );
+        String repositories = objectMapper.writeValueAsString(repositoryResponseDtos);
 
         given(postService.searchUserRepositories(any(SearchRepositoryRequestDto.class)))
-            .willReturn(responseDto);
+            .willReturn(repositoryResponseDtos);
 
         // then
         ResultActions perform = mockMvc

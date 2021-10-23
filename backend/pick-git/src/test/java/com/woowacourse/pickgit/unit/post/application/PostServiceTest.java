@@ -111,11 +111,10 @@ class PostServiceTest {
             .willReturn(extractTagsFrom(requestDto));
 
         // when
-        PostImageUrlResponseDto responseDto = postService.write(requestDto);
+        Long postId = postService.write(requestDto);
 
         // then
-        assertThat(responseDto.getId()).isNotNull();
-        assertThat(responseDto.getImageUrls()).containsAll(extractImageUrlsFrom(requestDto));
+        assertThat(postId).isNotNull();
 
         verify(userRepository, times(1))
             .findByBasicProfile_Name(requestDto.getUsername());
@@ -205,14 +204,12 @@ class PostServiceTest {
             .willReturn(repositories);
 
         // when
-        RepositoryResponsesDto repositoryResponsesDto = postService.userRepositories(requestDto);
-
-        List<RepositoryResponseDto> responsesDto =
-            repositoryResponsesDto.getRepositoryResponsesDto();
+        List<RepositoryResponseDto> repositoryResponseDtos = postService
+            .userRepositories(requestDto);
 
         // then
-        assertThat(responsesDto).hasSize(2);
-        assertThat(responsesDto)
+        assertThat(repositoryResponseDtos).hasSize(2);
+        assertThat(repositoryResponseDtos)
             .usingRecursiveComparison()
             .isEqualTo(repositories);
 
@@ -237,14 +234,12 @@ class PostServiceTest {
             .willReturn(repositories);
 
         // when
-        RepositoryResponsesDto repositoryResponsesDto = postService.userRepositories(requestDto);
-
-        List<RepositoryResponseDto> responsesDto = repositoryResponsesDto
-            .getRepositoryResponsesDto();
+        List<RepositoryResponseDto> repositoryResponseDtos = postService
+            .userRepositories(requestDto);
 
         // then
-        assertThat(responsesDto).hasSize(0);
-        assertThat(responsesDto)
+        assertThat(repositoryResponseDtos).isEmpty();
+        assertThat(repositoryResponseDtos)
             .usingRecursiveComparison()
             .isEqualTo(repositories);
 
@@ -344,14 +339,11 @@ class PostServiceTest {
         ).willReturn(repositories);
 
         // when
-
-        RepositoryResponsesDto repositoryResponsesDto =
-            postService.searchUserRepositories(searchRepositoryRequestDto);
-        List<RepositoryResponseDto> responseDtos =
-            repositoryResponsesDto.getRepositoryResponsesDto();
+        List<RepositoryResponseDto> repositoryResponseDtos = postService
+            .searchUserRepositories(searchRepositoryRequestDto);
 
         // then
-        assertThat(responseDtos)
+        assertThat(repositoryResponseDtos)
             .usingRecursiveComparison()
             .isEqualTo(repositories);
         verify(platformRepositorySearchExtractor, times(1))

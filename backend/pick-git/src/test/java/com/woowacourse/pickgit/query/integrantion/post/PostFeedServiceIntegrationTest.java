@@ -138,7 +138,7 @@ class PostFeedServiceIntegrationTest extends IntegrationTest {
                 PostRequestDto newPost = postRequestDtos.get(index);
 
                 userRepository.save(user);
-                Long postId = postService.write(newPost).getId();
+                Long postId = postService.write(newPost);
 
                 CommentRequestDto commentRequestDto =
                     new CommentRequestDto(user.getName(), "test comment" + index, postId);
@@ -162,7 +162,7 @@ class PostFeedServiceIntegrationTest extends IntegrationTest {
             .limit((long) postRequestDtos.size())
             .build();
 
-        List<PostResponseDto> postResponseDtos = postFeedService.myFeed(homeFeedRequestDto);
+        List<PostResponseDto> postResponseDtos = postFeedService.userFeed(homeFeedRequestDto, "kevin");
         List<String> repoNames = postResponseDtos.stream()
             .map(PostResponseDto::getGithubRepoUrl)
             .collect(toList());

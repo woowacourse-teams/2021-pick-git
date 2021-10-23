@@ -30,6 +30,7 @@ import com.woowacourse.pickgit.post.application.dto.request.SearchRepositoryRequ
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponsesDto;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
@@ -85,10 +86,10 @@ class PostServiceIntegrationTest extends IntegrationTest {
             .build();
 
         // when
-        PostImageUrlResponseDto responseDto = postService.write(postRequestDto);
+        Long postId = postService.write(postRequestDto);
 
         // then
-        assertThat(responseDto.getId()).isNotNull();
+        assertThat(postId).isNotNull();
     }
 
     @DisplayName("사용자는 게시글 등록시 중복된 태그를 작성할 수 없다.")
@@ -124,10 +125,11 @@ class PostServiceIntegrationTest extends IntegrationTest {
         RepositoryRequestDto requestDto = createRepositoryRequestDto(ACCESS_TOKEN, USERNAME);
 
         // when
-        RepositoryResponsesDto responseDto = postService.userRepositories(requestDto);
+        List<RepositoryResponseDto> repositoryResponseDtos = postService
+            .userRepositories(requestDto);
 
         // then
-        assertThat(responseDto.getRepositoryResponsesDto()).hasSize(2);
+        assertThat(repositoryResponseDtos).hasSize(2);
     }
 
     @DisplayName("토큰이 유효하지 않은 경우 예외가 발생한다. - 500 예외")
@@ -177,12 +179,11 @@ class PostServiceIntegrationTest extends IntegrationTest {
             );
 
         // when
-        RepositoryResponsesDto repositoryResponsesDto = postService
+        List<RepositoryResponseDto> repositoryResponseDtos = postService
             .searchUserRepositories(requestDto);
 
         // then
-        assertThat(repositoryResponsesDto.getRepositoryResponsesDto())
-            .hasSize(2);
+        assertThat(repositoryResponseDtos).hasSize(2);
     }
 
     @DisplayName("레포지토리 검색 시 토큰이 유효하지 않은 경우 예외가 발생한다. - 500 예외")
@@ -212,10 +213,10 @@ class PostServiceIntegrationTest extends IntegrationTest {
 
         AppUser appUser = new LoginUser(loginUser.getName(), "token");
 
-        PostImageUrlResponseDto writtenPost = postService.write(postRequestDtos);
+        Long postId = postService.write(postRequestDtos);
 
         // when
-        LikeResponseDto likeResponseDto = postService.like(appUser, writtenPost.getId());
+        LikeResponseDto likeResponseDto = postService.like(appUser, postId);
 
         // then
         assertThat(likeResponseDto.getLikesCount()).isEqualTo(1);
@@ -231,11 +232,11 @@ class PostServiceIntegrationTest extends IntegrationTest {
 
         AppUser appUser = new LoginUser(loginUser.getName(), "token");
 
-        PostImageUrlResponseDto writtenPost = postService.write(postRequestDtos);
-        postService.like(appUser, writtenPost.getId());
+        Long postId = postService.write(postRequestDtos);
+        postService.like(appUser, postId);
 
         // when
-        LikeResponseDto likeResponseDto = postService.unlike(appUser, writtenPost.getId());
+        LikeResponseDto likeResponseDto = postService.unlike(appUser, postId);
 
         // then
         assertThat(likeResponseDto.getLikesCount()).isEqualTo(0);
@@ -251,11 +252,11 @@ class PostServiceIntegrationTest extends IntegrationTest {
 
         AppUser appUser = new LoginUser(loginUser.getName(), "token");
 
-        PostImageUrlResponseDto writtenPost = postService.write(postRequestDtos);
-        postService.like(appUser, writtenPost.getId());
+        Long postId = postService.write(postRequestDtos);
+        postService.like(appUser, postId);
 
         // when then
-        assertThatThrownBy(() -> postService.like(appUser, writtenPost.getId()))
+        assertThatThrownBy(() -> postService.like(appUser, postId))
             .isInstanceOf(DuplicatedLikeException.class)
             .hasFieldOrPropertyWithValue("errorCode", "P0003")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
@@ -271,10 +272,10 @@ class PostServiceIntegrationTest extends IntegrationTest {
 
         AppUser appUser = new GuestUser();
 
-        PostImageUrlResponseDto writtenPost = postService.write(postRequestDtos);
+        Long postId = postService.write(postRequestDtos);
 
         // when then
-        assertThatThrownBy(() -> postService.like(appUser, writtenPost.getId()))
+        assertThatThrownBy(() -> postService.like(appUser, postId))
             .isInstanceOf(UnauthorizedException.class)
             .hasFieldOrPropertyWithValue("errorCode", "A0002")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)
@@ -290,10 +291,10 @@ class PostServiceIntegrationTest extends IntegrationTest {
 
         AppUser appUser = new LoginUser(loginUser.getName(), "token");
 
-        PostImageUrlResponseDto writtenPost = postService.write(postRequestDtos);
+        Long postId = postService.write(postRequestDtos);
 
         // when then
-        assertThatThrownBy(() -> postService.unlike(appUser, writtenPost.getId()))
+        assertThatThrownBy(() -> postService.unlike(appUser, postId))
             .isInstanceOf(CannotUnlikeException.class)
             .hasFieldOrPropertyWithValue("errorCode", "P0004")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
@@ -311,11 +312,11 @@ class PostServiceIntegrationTest extends IntegrationTest {
         AppUser loginUser = new LoginUser(likeUser.getName(), "token");
         AppUser guestUser = new GuestUser();
 
-        PostImageUrlResponseDto writtenPost = postService.write(postRequestDtos);
-        postService.like(loginUser, writtenPost.getId());
+        Long postId = postService.write(postRequestDtos);
+        postService.like(loginUser, postId);
 
         // when then
-        assertThatThrownBy(() -> postService.unlike(guestUser, writtenPost.getId()))
+        assertThatThrownBy(() -> postService.unlike(guestUser, postId))
             .isInstanceOf(UnauthorizedException.class)
             .hasFieldOrPropertyWithValue("errorCode", "A0002")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)

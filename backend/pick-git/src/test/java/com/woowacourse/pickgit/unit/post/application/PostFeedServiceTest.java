@@ -149,7 +149,7 @@ class PostFeedServiceTest {
             .willReturn(posts);
 
         //when
-        List<PostResponseDto> postResponseDtos = postFeedService.myFeed(homeFeedRequestDto);
+        List<PostResponseDto> postResponseDtos = postFeedService.userFeed(homeFeedRequestDto, "testUser");
 
         //then
         List<Long> expected = posts.stream()
@@ -175,30 +175,13 @@ class PostFeedServiceTest {
             .build();
 
         //when
-        assertThatCode(() -> postFeedService.myFeed(homeFeedRequestDto))
+        assertThatCode(() -> postFeedService.userFeed(homeFeedRequestDto, "testUser"))
             .isInstanceOf(UserNotFoundException.class)
             .extracting("errorCode")
             .isEqualTo("U0001");
 
         verify(userRepository, times(1))
             .findByBasicProfile_Name(anyString());
-    }
-
-    @DisplayName("게스트 유저는 나의 홈 피드를 가져오지 못한다.")
-    @Test
-    void readMyFeed_guestUser_ExceptionOccur() {
-        //given
-        HomeFeedRequestDto homeFeedRequestDto = HomeFeedRequestDto.builder()
-            .isGuest(true)
-            .page(1L)
-            .limit(3L)
-            .build();
-
-        //when
-        assertThatCode(() -> postFeedService.myFeed(homeFeedRequestDto))
-            .isInstanceOf(UnauthorizedException.class)
-            .extracting("errorCode")
-            .isEqualTo("A0002");
     }
 
     @DisplayName("다른 유저의 홈 피드를 가져온다")

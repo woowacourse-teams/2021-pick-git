@@ -113,12 +113,6 @@ public class Post {
         return likes.contains(like);
     }
 
-    public void validateDeletion(User user) {
-        if (this.isNotWrittenBy(user)) {
-            throw new PostNotBelongToUserException();
-        }
-    }
-
     public boolean isNotWrittenBy(User user) {
         return !this.user.equals(user);
     }

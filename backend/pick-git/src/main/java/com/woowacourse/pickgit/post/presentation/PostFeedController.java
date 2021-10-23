@@ -53,7 +53,10 @@ public class PostFeedController {
         @RequestParam Long limit
     ) {
         HomeFeedRequestDto homeFeedRequestDto = new HomeFeedRequestDto(appUser, page, limit);
-        List<PostResponseDto> postResponseDtos = postFeedService.myFeed(homeFeedRequestDto);
+
+        List<PostResponseDto> postResponseDtos =
+            postFeedService.userFeed(homeFeedRequestDto, appUser.getUsername());
+
         List<PostResponse> postResponses = createPostResponses(postResponseDtos);
 
         return ResponseEntity.ok(postResponses);

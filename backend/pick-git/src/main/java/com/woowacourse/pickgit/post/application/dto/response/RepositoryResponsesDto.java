@@ -6,6 +6,7 @@ import lombok.Builder;
 @Builder
 public class RepositoryResponsesDto {
 
+
     private List<RepositoryResponseDto> repositoryResponsesDto;
 
     private RepositoryResponsesDto() {

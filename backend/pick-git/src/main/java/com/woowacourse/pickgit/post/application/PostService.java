@@ -6,6 +6,7 @@ import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.exception.post.PostNotBelongToUserException;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
+import com.woowacourse.pickgit.post.application.dto.PostDtoAssembler;
 import com.woowacourse.pickgit.post.application.dto.request.AuthUserForPostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostDeleteRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
@@ -14,7 +15,6 @@ import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto
 import com.woowacourse.pickgit.post.application.dto.request.SearchRepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeUsersResponseDto;
-import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponsesDto;
@@ -24,6 +24,7 @@ import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.post.domain.util.PlatformRepositoryExtractor;
 import com.woowacourse.pickgit.post.domain.util.PlatformRepositorySearchExtractor;
 import com.woowacourse.pickgit.post.domain.util.dto.RepositoryNameAndUrl;
+import com.woowacourse.pickgit.post.presentation.dto.PostAssembler;
 import com.woowacourse.pickgit.tag.application.TagService;
 import com.woowacourse.pickgit.tag.application.dto.TagsDto;
 import com.woowacourse.pickgit.tag.domain.Tag;
@@ -61,36 +62,21 @@ public class PostService {
     }
 
     private Post createPost(PostRequestDto postRequestDto) {
-        String content = postRequestDto.getContent();
-        List<MultipartFile> files = postRequestDto.getImages();
-        String userName = postRequestDto.getUsername();
-        String githubRepoUrl = postRequestDto.getGithubRepoUrl();
         List<Tag> tags = tagService.findOrCreateTags(new TagsDto(postRequestDto.getTags()));
 
-        User user = findUserByName(userName);
-        List<String> imageUrls = pickgitStorage.storeMultipartFile(files, userName);
+        User user = findUserByName(postRequestDto.getUsername());
+        List<String> imageUrls = pickgitStorage.storeMultipartFile(
+            postRequestDto.getImages(),
+            postRequestDto.getUsername()
+        );
 
-        Post post = createPost(content, githubRepoUrl, user, imageUrls);
+        Post post = PostDtoAssembler.post(user, postRequestDto, imageUrls);
         post.addTags(tags);
 
         return post;
     }
 
-    private Post createPost(
-        String content,
-        String githubRepoUrl,
-        User user,
-        List<String> imageUrls
-    ) {
-        return Post.builder()
-            .content(content)
-            .images(imageUrls)
-            .githubRepoUrl(githubRepoUrl)
-            .author(user)
-            .build();
-    }
-
-    public RepositoryResponsesDto userRepositories(RepositoryRequestDto repositoryRequestDto) {
+    public List<RepositoryResponseDto> userRepositories(RepositoryRequestDto repositoryRequestDto) {
         String token = repositoryRequestDto.getToken();
         String username = repositoryRequestDto.getUsername();
 
@@ -99,16 +85,13 @@ public class PostService {
             Math.toIntExact(repositoryRequestDto.getLimit())
         );
 
-        List<RepositoryNameAndUrl> repositoryNameAndUrls = platformRepositoryExtractor
-            .extract(token, username, pageable);
+        List<RepositoryNameAndUrl> repositoryNameAndUrls =
+            platformRepositoryExtractor.extract(token, username, pageable);
 
-        List<RepositoryResponseDto> repositoryResponsesDto =
-            createRepositoryResponsesDto(repositoryNameAndUrls);
-
-        return new RepositoryResponsesDto(repositoryResponsesDto);
+        return PostDtoAssembler.repositoryResponsesDtos(repositoryNameAndUrls);
     }
 
-    public RepositoryResponsesDto searchUserRepositories(
+    public List<RepositoryResponseDto> searchUserRepositories(
         SearchRepositoryRequestDto searchRepositoryRequestDto
     ) {
         String token = searchRepositoryRequestDto.getToken();
@@ -120,25 +103,7 @@ public class PostService {
         List<RepositoryNameAndUrl> repositoryNameAndUrls =
             platformRepositorySearchExtractor.extract(token, username, keyword, page, limit);
 
-        List<RepositoryResponseDto> repositoryResponseDtos =
-            createRepositoryResponsesDto(repositoryNameAndUrls);
-
-        return new RepositoryResponsesDto(repositoryResponseDtos);
-    }
-
-    private List<RepositoryResponseDto> createRepositoryResponsesDto(
-        List<RepositoryNameAndUrl> repositoryNameAndUrls
-    ) {
-        return repositoryNameAndUrls.stream()
-            .map(toRepositoryResponseDto())
-            .collect(toList());
-    }
-
-    private Function<RepositoryNameAndUrl, RepositoryResponseDto> toRepositoryResponseDto() {
-        return repositoryNameAndUrl -> RepositoryResponseDto.builder()
-            .name(repositoryNameAndUrl.getName())
-            .url(repositoryNameAndUrl.getUrl())
-            .build();
+        return PostDtoAssembler.repositoryResponsesDtos(repositoryNameAndUrls);
     }
 
     @CacheEvict(value = "homeFeed", allEntries = true)
@@ -176,10 +141,7 @@ public class PostService {
         post.updateContent(updateRequestDto.getContent());
         post.updateTags(tags);
 
-        return PostUpdateResponseDto.builder()
-            .content(post.getContent())
-            .tags(post.getTagNames())
-            .build();
+        return PostDtoAssembler.postUpdateRequestDto(post);
     }
 
     @CacheEvict(value = "homeFeed", allEntries = true)
@@ -187,8 +149,6 @@ public class PostService {
     public void delete(PostDeleteRequestDto deleteRequestDto) {
         User user = findUserByName(deleteRequestDto.getUsername());
         Post post = findPostById(deleteRequestDto.getPostId());
-
-        post.validateDeletion(user);
 
         user.delete(post);
         postRepository.delete(post);
