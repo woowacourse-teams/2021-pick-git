@@ -1,11 +1,8 @@
 package com.woowacourse.pickgit.comment.presentation;
 
-import static java.util.stream.Collectors.toList;
-
 import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.comment.application.CommentService;
-import com.woowacourse.pickgit.comment.application.dto.request.CommentDeleteRequestDto;
 import com.woowacourse.pickgit.comment.application.dto.request.CommentRequestDto;
 import com.woowacourse.pickgit.comment.application.dto.request.QueryCommentRequestDto;
 import com.woowacourse.pickgit.comment.application.dto.response.CommentResponseDto;

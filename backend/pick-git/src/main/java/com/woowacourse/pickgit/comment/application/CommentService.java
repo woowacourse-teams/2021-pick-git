@@ -1,7 +1,5 @@
 package com.woowacourse.pickgit.comment.application;
 
-import static java.util.stream.Collectors.toList;
-
 import com.woowacourse.pickgit.comment.application.dto.CommentDtoAssembler;
 import com.woowacourse.pickgit.comment.application.dto.request.CommentDeleteRequestDto;
 import com.woowacourse.pickgit.comment.application.dto.request.CommentRequestDto;
@@ -9,7 +7,6 @@ import com.woowacourse.pickgit.comment.application.dto.request.QueryCommentReque
 import com.woowacourse.pickgit.comment.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.comment.domain.Comment;
 import com.woowacourse.pickgit.comment.domain.CommentRepository;
-import com.woowacourse.pickgit.comment.presentation.dto.CommentAssembler;
 import com.woowacourse.pickgit.exception.comment.CannotDeleteCommentException;
 import com.woowacourse.pickgit.exception.comment.CommentNotFoundException;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
