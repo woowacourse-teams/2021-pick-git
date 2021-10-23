@@ -7,7 +7,10 @@ import com.woowacourse.pickgit.tag.application.dto.TagsDto;
 import com.woowacourse.pickgit.tag.domain.PlatformTagExtractor;
 import com.woowacourse.pickgit.tag.domain.Tag;
 import com.woowacourse.pickgit.tag.domain.TagRepository;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -44,7 +47,8 @@ public class TagService {
     }
 
     private Tag getTagOrCreateTagIfNotExist(String tagName) {
-        return tagRepository.findByName(tagName)
-            .orElseGet(() -> tagRepository.save(new Tag(tagName)));
+        Tag tag = new Tag(tagName);
+        return tagRepository.findByName(tag.getName())
+            .orElseGet(() -> tagRepository.save(tag));
     }
 }
