@@ -41,7 +41,7 @@ public class PortfolioController {
     }
 
     @ForOnlyLoginUser
-    @PutMapping("")
+    @PutMapping
     public ResponseEntity<PortfolioResponse> update(
         @Authenticated AppUser user,
         @Valid @RequestBody PortfolioRequest request
