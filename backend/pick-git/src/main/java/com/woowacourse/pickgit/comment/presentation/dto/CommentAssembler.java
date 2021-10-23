@@ -10,6 +10,7 @@ import com.woowacourse.pickgit.comment.application.dto.response.CommentResponseD
 import com.woowacourse.pickgit.comment.presentation.dto.request.ContentRequest;
 import com.woowacourse.pickgit.comment.presentation.dto.response.CommentResponse;
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 
 public class CommentAssembler {
 
@@ -58,14 +59,12 @@ public class CommentAssembler {
     public static QueryCommentRequestDto queryCommentRequestDto(
         AppUser appUser,
         Long postId,
-        int page,
-        int limit
+        Pageable pageable
     ) {
         return QueryCommentRequestDto.builder()
             .postId(postId)
             .isGuest(appUser.isGuest())
-            .page(page)
-            .limit(limit)
+            .pageable(pageable)
             .build();
     }
 }

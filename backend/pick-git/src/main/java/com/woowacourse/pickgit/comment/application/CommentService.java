@@ -18,7 +18,6 @@ import com.woowacourse.pickgit.user.domain.UserRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,9 +46,7 @@ public class CommentService {
 
     public List<CommentResponseDto> queryComments(QueryCommentRequestDto queryCommentRequestDto) {
         Long postId = queryCommentRequestDto.getPostId();
-        int page = queryCommentRequestDto.getPage();
-        int limit = queryCommentRequestDto.getLimit();
-        Pageable pageable = PageRequest.of(page, limit);
+        Pageable pageable = queryCommentRequestDto.getPageable();
 
         List<Comment> comments = commentRepository.findCommentsByPost_Id(postId, pageable);
 
