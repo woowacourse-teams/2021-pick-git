@@ -64,19 +64,19 @@ const SearchPage = () => {
 
     return (
       <>
-      <Loader kind="spinner" size="1rem" isShown={isUserSearchLoading} />
-      <UserList
-        users={userSearchResults}
-        isFetchingNextPage={isUserSearchFetchingNextPage}
-        onIntersect={handleUserSearchIntersect}
-        queryKey={[QUERY.GET_SEARCH_USER_RESULT, { keyword }]}
-      />
+        <Loader kind="spinner" size="1rem" isShown={isUserSearchLoading} />
+        <UserList
+          users={userSearchResults}
+          isFetchingNextPage={isUserSearchFetchingNextPage}
+          onIntersect={handleUserSearchIntersect}
+          queryKey={[QUERY.GET_SEARCH_USER_RESULT, { keyword }]}
+        />
       </>
     );
   };
 
   // TODO: 조건부 렌더링 없애기
-  const SearchPostResult = () => {    
+  const SearchPostResult = () => {
     if (isPostSearchError || !postSearchResults) {
       return <NotFound type="post" message="검색결과를 표시할 수 없습니다." cssProp={NotFoundCSS} />;
     }
@@ -87,14 +87,14 @@ const SearchPage = () => {
       return <NotFound type="post" message="일치하는 게시물이 없습니다." cssProp={NotFoundCSS} />;
     }
 
-    return  (
+    return (
       <>
         <Loader kind="spinner" size="1rem" isShown={isPostSearchLoading} />
         <KeywordsWrapper>
           {formattedKeyword.split(" ").map((keyword, index) => keyword && <Chip key={index}>{keyword}</Chip>)}
         </KeywordsWrapper>
         <GridFeed
-          feedPagePath={PAGE_URL.SEARCH_RESULT_FEED("tags")}
+          feedPagePath={PAGE_URL.SEARCH_RESULT_FEED("tags", formattedKeyword)}
           infinitePostsData={postSearchResults}
           isLoading={isPostSearchLoading}
           isError={isPostSearchError}
@@ -102,7 +102,7 @@ const SearchPage = () => {
           handleIntersect={handlePostSearchIntersect}
         />
       </>
-    )
+    );
   };
 
   const tabItems = tabNames.map((name, index) => ({ name, onTabChange: () => setTabIndex(index) }));
@@ -120,6 +120,6 @@ const SearchPage = () => {
       </Container>
     </ScrollPageWrapper>
   );
-};;
+};
 
 export default SearchPage;
