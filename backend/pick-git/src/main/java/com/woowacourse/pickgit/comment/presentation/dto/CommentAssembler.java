@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.toList;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.comment.application.dto.request.CommentDeleteRequestDto;
 import com.woowacourse.pickgit.comment.application.dto.request.CommentRequestDto;
+import com.woowacourse.pickgit.comment.application.dto.request.QueryCommentRequestDto;
 import com.woowacourse.pickgit.comment.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.comment.presentation.dto.request.ContentRequest;
 import com.woowacourse.pickgit.comment.presentation.dto.response.CommentResponse;
@@ -51,6 +52,20 @@ public class CommentAssembler {
             .username(user.getUsername())
             .postId(postId)
             .commentId(commentId)
+            .build();
+    }
+
+    public static QueryCommentRequestDto queryCommentRequestDto(
+        AppUser appUser,
+        Long postId,
+        int page,
+        int limit
+    ) {
+        return QueryCommentRequestDto.builder()
+            .postId(postId)
+            .isGuest(appUser.isGuest())
+            .page(page)
+            .limit(limit)
             .build();
     }
 }

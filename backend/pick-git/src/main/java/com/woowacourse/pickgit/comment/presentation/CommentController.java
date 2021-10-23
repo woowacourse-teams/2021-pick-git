@@ -42,26 +42,12 @@ public class CommentController {
         @RequestParam int limit
     ) {
         QueryCommentRequestDto queryCommentRequestDto =
-            createQueryCommentRequestDto(appUser, postId, page, limit);
+            CommentAssembler.queryCommentRequestDto(appUser, postId, page, limit);
 
         List<CommentResponseDto> commentResponseDtos =
             commentService.queryComments(queryCommentRequestDto);
 
         return ResponseEntity.ok(CommentAssembler.commentRequests(commentResponseDtos));
-    }
-
-    private QueryCommentRequestDto createQueryCommentRequestDto(
-        AppUser appUser,
-        Long postId,
-        int page,
-        int limit
-    ) {
-        return QueryCommentRequestDto.builder()
-            .postId(postId)
-            .isGuest(appUser.isGuest())
-            .page(page)
-            .limit(limit)
-            .build();
     }
 
     @ForOnlyLoginUser
