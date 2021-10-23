@@ -46,7 +46,7 @@ const useHomeFeed = (feedFilterOption: FeedFilterOption) => {
         handleHTTPError(status, {
           unauthorized: () => {
             logout();
-            queryClient.refetchQueries(QUERY.GET_HOME_FEED_POSTS("all"), { active: true });
+            queryClient.refetchQueries(QUERY.GET_HOME_FEED_POSTS, { active: true });
           },
         });
       }

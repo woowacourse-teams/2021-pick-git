@@ -19,13 +19,8 @@ import { Container, postTabCSS, PostTabWrapper } from "./HomeFeedPage.style";
 const HomeFeedPage = () => {
   const { isLoggedIn } = useAuth();
   const [feedFilterOption, setFeedFilterOption] = useState<FeedFilterOption>(isLoggedIn ? "followings" : "all");
-  const feed = {
-    followings: useHomeFeed("followings"),
-    all: useHomeFeed("all"),
-  };
-
   const { infinitePostsData, isLoading, isFetching, isError, handlePostsEndIntersect, refetch } =
-    feed[feedFilterOption];
+    useHomeFeed(feedFilterOption);
 
   const infiniteImageUrls =
     infinitePostsData?.pages.map<string[]>((posts) =>
@@ -71,7 +66,7 @@ const HomeFeedPage = () => {
         <InfiniteScrollContainer isLoaderShown={isFetching || isImagesFetching} onIntersect={handleIntersect}>
           <Feed
             infinitePostsData={infinitePostsData}
-            queryKey={[QUERY.GET_HOME_FEED_POSTS(feedFilterOption)]}
+            queryKey={[QUERY.GET_HOME_FEED_POSTS]}
             isFetching={isFetching || isImagesFetching}
           />
         </InfiniteScrollContainer>

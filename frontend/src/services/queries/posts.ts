@@ -39,7 +39,7 @@ const userPostsQueryFunction: QueryFunction<Post[]> = async ({ queryKey, pagePar
 
 export const useHomeFeedPostsQuery = (feedFilterOption: FeedFilterOption) => {
   return useInfiniteQuery<Post[], AxiosError<ErrorResponse>>(
-    [QUERY.GET_HOME_FEED_POSTS(feedFilterOption)],
+    [QUERY.GET_HOME_FEED_POSTS],
     async ({ pageParam = 0 }) => {
       return await requestGetHomeFeedPosts(pageParam, feedFilterOption === "all" ? null : getAccessToken());
     },
