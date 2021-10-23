@@ -3,6 +3,7 @@ package com.woowacourse.pickgit.common.pagenation;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -30,8 +31,7 @@ public class PaginationArgumentResolver implements HandlerMethodArgumentResolver
 
         return PageRequest.of(
             parsePage(page, pageableCustom),
-            parseLimit(limit, pageableCustom),
-            pageableCustom.direction()
+            parseLimit(limit, pageableCustom)
         );
     }
 

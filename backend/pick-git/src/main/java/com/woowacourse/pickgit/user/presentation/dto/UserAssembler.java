@@ -19,6 +19,7 @@ import com.woowacourse.pickgit.user.presentation.dto.response.ProfileDescription
 import com.woowacourse.pickgit.user.presentation.dto.response.UserProfileResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.UserSearchResponse;
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 
 public class UserAssembler {
 
@@ -131,18 +132,6 @@ public class UserAssembler {
             .prsCount(responseDto.getPrsCount())
             .issuesCount(responseDto.getIssuesCount())
             .reposCount(responseDto.getReposCount())
-            .build();
-    }
-
-    public static FollowSearchRequestDto followSearchRequestDto(
-        String username,
-        Long page,
-        Long limit
-    ) {
-        return FollowSearchRequestDto.builder()
-            .username(username)
-            .page(page)
-            .limit(limit)
             .build();
     }
 

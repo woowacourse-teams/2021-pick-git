@@ -13,9 +13,4 @@ public @interface PageableCustom {
     int size() default 10;
 
     int page() default 0;
-
-    String[] sort() default {};
-
-    Direction direction() default Direction.ASC;
-
 }

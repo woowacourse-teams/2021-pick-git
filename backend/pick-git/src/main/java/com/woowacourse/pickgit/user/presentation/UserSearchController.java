@@ -2,6 +2,7 @@ package com.woowacourse.pickgit.user.presentation;
 
 import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
+import com.woowacourse.pickgit.common.pagenation.PageableCustom;
 import com.woowacourse.pickgit.config.auth_interceptor_register.ForLoginAndGuestUser;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserRequestDto;
@@ -11,6 +12,8 @@ import com.woowacourse.pickgit.user.presentation.dto.UserAssembler;
 import com.woowacourse.pickgit.user.presentation.dto.response.UserSearchResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,17 +34,13 @@ public class UserSearchController {
     public ResponseEntity<List<UserSearchResponse>> searchUser(
         @Authenticated AppUser appUser,
         @RequestParam String keyword,
-        @RequestParam Long page,
-        @RequestParam Long limit
+        @PageableCustom Pageable pageable
     ) {
         AuthUserForUserRequestDto authUserRequestDto =
             UserAssembler.authUserForUserRequestDto(appUser);
 
-        UserSearchRequestDto userSearchRequestDto =
-            UserAssembler.userSearchRequestDto(keyword, page, limit);
-
         List<UserSearchResponseDto> userSearchResponseDtos = userService
-            .searchUser(authUserRequestDto, userSearchRequestDto);
+            .searchUser(authUserRequestDto, keyword, pageable);
 
         List<UserSearchResponse> userSearchResponses = UserAssembler
             .userSearchResponses(userSearchResponseDtos);
