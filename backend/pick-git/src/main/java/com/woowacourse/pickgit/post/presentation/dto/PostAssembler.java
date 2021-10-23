@@ -10,12 +10,14 @@ import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto
 import com.woowacourse.pickgit.post.application.dto.request.SearchRepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeUsersResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.presentation.dto.request.PostRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
 import com.woowacourse.pickgit.post.presentation.dto.response.LikeResponse;
 import com.woowacourse.pickgit.post.presentation.dto.response.LikeUsersResponse;
+import com.woowacourse.pickgit.post.presentation.dto.response.PostResponse;
 import com.woowacourse.pickgit.post.presentation.dto.response.PostUpdateResponse;
 import com.woowacourse.pickgit.post.presentation.dto.response.RepositoryResponse;
 import java.util.List;
@@ -117,6 +119,29 @@ public class PostAssembler {
             .username(dto.getUsername())
             .imageUrl(dto.getImageUrl())
             .following(dto.getFollowing())
+            .build();
+    }
+
+    public static List<PostResponse> postResponses(List<PostResponseDto> postResponseDtos) {
+        return postResponseDtos.stream()
+            .map(postResponseDtoPostResponse())
+            .collect(toList());
+    }
+
+    private static Function<PostResponseDto, PostResponse> postResponseDtoPostResponse() {
+        return postResponseDto -> PostResponse.builder()
+            .id(postResponseDto.getId())
+            .imageUrls(postResponseDto.getImageUrls())
+            .githubRepoUrl(postResponseDto.getGithubRepoUrl())
+            .content(postResponseDto.getContent())
+            .authorName(postResponseDto.getAuthorName())
+            .profileImageUrl(postResponseDto.getProfileImageUrl())
+            .likesCount(postResponseDto.getLikesCount())
+            .tags(postResponseDto.getTags())
+            .createdAt(postResponseDto.getCreatedAt())
+            .updatedAt(postResponseDto.getUpdatedAt())
+            .comments(postResponseDto.getComments())
+            .liked(postResponseDto.getLiked())
             .build();
     }
 }
