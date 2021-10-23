@@ -1,5 +1,8 @@
 package com.woowacourse.pickgit.post.presentation.dto.response;
 
+import lombok.Builder;
+
+@Builder
 public class LikeResponse {
 
     private int likesCount;

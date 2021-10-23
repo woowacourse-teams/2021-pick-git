@@ -44,6 +44,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class PostService {
 
+    private static final String REDIRECT_URL = "/api/posts/%s/%d";
+
     private final TagService tagService;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
@@ -53,14 +55,9 @@ public class PostService {
 
     @CacheEvict(value = "homeFeed", allEntries = true)
     @Transactional
-    public PostImageUrlResponseDto write(PostRequestDto postRequestDto) {
-        Post post = createPost(postRequestDto);
-        Post savedPost = postRepository.save(post);
-
-        return PostImageUrlResponseDto.builder()
-            .id(savedPost.getId())
-            .imageUrls(savedPost.getImageUrls())
-            .build();
+    public Long write(PostRequestDto postRequestDto) {
+        Post savedPost = postRepository.save(createPost(postRequestDto));
+        return savedPost.getId();
     }
 
     private Post createPost(PostRequestDto postRequestDto) {
