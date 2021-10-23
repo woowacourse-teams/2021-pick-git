@@ -22,6 +22,7 @@ import com.woowacourse.pickgit.post.presentation.dto.response.PostUpdateResponse
 import com.woowacourse.pickgit.post.presentation.dto.response.RepositoryResponse;
 import java.util.List;
 import java.util.function.Function;
+import org.springframework.data.domain.Pageable;
 
 public class PostAssembler {
 
@@ -36,12 +37,11 @@ public class PostAssembler {
             .build();
     }
 
-    public static RepositoryRequestDto repositoryRequestDto(AppUser user, Long page, Long limit) {
+    public static RepositoryRequestDto repositoryRequestDto(AppUser user, Pageable pageable) {
         return RepositoryRequestDto.builder()
             .token(user.getAccessToken())
             .username(user.getUsername())
-            .page(page)
-            .limit(limit)
+            .pageable(pageable)
             .build();
     }
 
@@ -63,15 +63,13 @@ public class PostAssembler {
     public static SearchRepositoryRequestDto searchRepositoryRequestDto(
         AppUser user,
         String keyword,
-        int page,
-        int limit
+        Pageable pageable
     ) {
         return SearchRepositoryRequestDto.builder()
             .token(user.getAccessToken())
             .username(user.getUsername())
             .keyword(keyword)
-            .page(page)
-            .limit(limit)
+            .pageable(pageable)
             .build();
     }
 
