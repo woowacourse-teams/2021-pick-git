@@ -5,6 +5,7 @@ import com.woowacourse.pickgit.authentication.presentation.AuthenticationPrincip
 import com.woowacourse.pickgit.authentication.presentation.interceptor.AuthenticationInterceptor;
 import com.woowacourse.pickgit.authentication.presentation.interceptor.IgnoreAuthenticationInterceptor;
 import com.woowacourse.pickgit.authentication.presentation.interceptor.PathMatchInterceptor;
+import com.woowacourse.pickgit.common.pagenation.PaginationArgumentResolver;
 import com.woowacourse.pickgit.config.auth_interceptor_register.AutoAuthorizationInterceptorRegister;
 import com.woowacourse.pickgit.config.auth_interceptor_register.UriParser;
 import com.woowacourse.pickgit.config.auth_interceptor_register.register_type.AuthenticateStorageForRegisterType;
@@ -35,10 +36,15 @@ public class OAuthConfiguration implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(authenticationPrincipalArgumentResolver());
+        resolvers.add(paginationArgumentResolver());
     }
 
     private AuthenticationPrincipalArgumentResolver authenticationPrincipalArgumentResolver() {
         return new AuthenticationPrincipalArgumentResolver(oAuthService);
+    }
+
+    private PaginationArgumentResolver paginationArgumentResolver() {
+        return new PaginationArgumentResolver();
     }
 
     @Override
