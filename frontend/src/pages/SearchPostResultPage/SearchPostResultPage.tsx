@@ -28,7 +28,7 @@ interface LocationState {
 const SearchPostResultPage = () => {
   const [isMountedOnce, setIsMountedOnce] = useState(false);
   const [mountCounter, setMountCounter] = useState(0);
-  const containerRef = useRef<any>();
+  const ScrollWrapperRef = useRef<HTMLDivElement>(null);
   const { keyword } = useSearchKeyword();
   const type = new URLSearchParams(location.search).get("type") ?? "tags";
   const {
@@ -68,7 +68,7 @@ const SearchPostResultPage = () => {
 
     if (!isMountedOnce) {
       setMountCounter((prev) => prev + 1);
-      setIsMountedOnce(containerRef.current !== undefined);
+      setIsMountedOnce(ScrollWrapperRef.current !== null);
 
       return;
     }
@@ -76,7 +76,7 @@ const SearchPostResultPage = () => {
     const $targetPost = document.querySelector(`#post${postId}`);
 
     if ($targetPost && $targetPost instanceof HTMLElement) {
-      window.scrollTo(0, $targetPost.offsetTop - LayoutInPx.HEADER_HEIGHT);
+      ScrollWrapperRef.current?.scrollTo(0, $targetPost.offsetTop - LayoutInPx.HEADER_HEIGHT);
     }
   }, [postId, mountCounter, isMountedOnce]);
 
@@ -89,8 +89,8 @@ const SearchPostResultPage = () => {
   }
 
   return (
-    <ScrollPageWrapper>
-      <Container ref={containerRef}>
+    <ScrollPageWrapper ref={ScrollWrapperRef}>
+      <Container>
         <InfiniteScrollContainer isLoaderShown={isFetchingNextPage || isImagesFetching} onIntersect={handleIntersect}>
           <Feed
             infinitePostsData={infinitePostsData}
