@@ -38,14 +38,15 @@ interface Stats {
 export interface Props {
   username: string | null;
   githubStatisticQueryResult: ReturnType<typeof useGithubStatistics>;
+  isFocused: boolean;
 }
 
-const GithubStatistics = ({ username, githubStatisticQueryResult }: Props) => {
+const GithubStatistics = ({ username, githubStatisticQueryResult, isFocused }: Props) => {
   const [isContributionGraphLoading, setIsContributionGraphLoading] = useState(true);
   const { color } = useContext(ThemeContext);
   const { isLoggedIn } = useContext(UserContext);
   const { data, isError } = githubStatisticQueryResult;
-  const contributionGraphUrl = `https://ghchart.rshah.org/${color.primaryColor.slice(1)}/${username}`;
+  const contributionGraphUrl = isFocused ? `https://ghchart.rshah.org/${color.primaryColor.slice(1)}/${username}` : "";
 
   const GithubStats = () => {
     const Content = () => {

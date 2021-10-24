@@ -32,7 +32,7 @@ const wrapper = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const setupHook = (username: string) => renderHook(() => useGithubStatistics(username), { wrapper });
+const setupHook = (username: string) => renderHook(() => useGithubStatistics(username, true), { wrapper });
 
 beforeAll(() => {
   githubStatisticsServer.listen();

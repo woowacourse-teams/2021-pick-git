@@ -7,8 +7,8 @@ import { getAPIErrorMessage, handleHTTPError } from "../../utils/error";
 import { isHttpErrorStatus } from "../../utils/typeGuard";
 import { useGithubStatsQuery } from "../../services/queries";
 
-const useGithubStatistics = (username: string) => {
-  const { data, error, isLoading, isError } = useGithubStatsQuery(username);
+const useGithubStatistics = (username: string, activated: boolean) => {
+  const { data, error, isLoading, isError } = useGithubStatsQuery(username, activated);
   const { logout } = useContext(UserContext);
   const { pushSnackbarMessage } = useContext(SnackBarContext);
 

@@ -11,12 +11,18 @@ export interface Props {
 }
 
 const ProfileTabContents = ({ isMyProfile, username, tabIndex }: Props) => {
+  const isGithubStatsFocused = tabIndex === 1;
   const userFeedProps = useUserFeed(isMyProfile, username);
-  const githubStatisticQueryResult = useGithubStatistics(username);
+  const githubStatisticQueryResult = useGithubStatistics(username, isGithubStatsFocused);
 
   const tabContents = [
     <GridFeed key="profile-feed" feedPagePath={PAGE_URL.USER_FEED(username)} {...userFeedProps} />,
-    <GithubStatistics key="github-stats" username={username} githubStatisticQueryResult={githubStatisticQueryResult} />,
+    <GithubStatistics
+      key="github-stats"
+      username={username}
+      githubStatisticQueryResult={githubStatisticQueryResult}
+      isFocused={isGithubStatsFocused}
+    />,
   ];
 
   return tabContents[tabIndex];
