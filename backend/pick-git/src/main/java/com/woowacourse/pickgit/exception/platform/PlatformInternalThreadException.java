@@ -11,7 +11,7 @@ public class PlatformInternalThreadException extends PlatformException{
         this(MESSAGE);
     }
 
-    public PlatformInternalThreadException(String message) {
+    private PlatformInternalThreadException(String message) {
         super(CODE, HttpStatus.INTERNAL_SERVER_ERROR, message);
     }
 }

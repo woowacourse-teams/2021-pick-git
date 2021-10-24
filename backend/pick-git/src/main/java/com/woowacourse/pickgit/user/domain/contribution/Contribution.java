@@ -4,33 +4,33 @@ import java.util.Map;
 
 public class Contribution {
 
-    private final Map<ContributionCategory, Integer> contribution;
+    private final Map<ContributionCategory, Integer> contributions;
 
-    public Contribution(Map<ContributionCategory, Integer> contribution) {
-        this.contribution = contribution;
+    public Contribution(Map<ContributionCategory, Integer> contributions) {
+        this.contributions = contributions;
     }
 
     public void put(ContributionCategory key, Integer value) {
-        contribution.put(key, value);
+        contributions.put(key, value);
     }
 
     public int getStarsCount() {
-        return contribution.get(ContributionCategory.STAR);
+        return contributions.get(ContributionCategory.STAR);
     }
 
     public int getCommitsCount() {
-        return contribution.get(ContributionCategory.COMMIT);
+        return contributions.get(ContributionCategory.COMMIT);
     }
 
     public int getPrsCount() {
-        return contribution.get(ContributionCategory.PR);
+        return contributions.get(ContributionCategory.PR);
     }
 
     public int getIssuesCount() {
-        return contribution.get(ContributionCategory.ISSUE);
+        return contributions.get(ContributionCategory.ISSUE);
     }
 
     public int getReposCount() {
-        return contribution.get(ContributionCategory.REPO);
+        return contributions.get(ContributionCategory.REPO);
     }
 }

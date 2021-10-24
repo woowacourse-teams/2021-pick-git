@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 public class GithubContributionCalculator implements PlatformContributionCalculator {
 
     private static final int CONTRIBUTION_COUNT = 5;
+
     private final PlatformContributionExtractor platformContributionExtractor;
 
     public GithubContributionCalculator(
@@ -43,12 +44,6 @@ public class GithubContributionCalculator implements PlatformContributionCalcula
         }
     }
 
-    private void waitThreads(CountDownLatch latch) throws InterruptedException {
-        if (!latch.await(2, TimeUnit.SECONDS)) {
-            throw new PlatformHttpErrorException();
-        }
-    }
-
     private Map<ContributionCategory, Integer> getContributionsViaPlatform(String accessToken, String username, CountDownLatch latch) {
         Map<ContributionCategory, Integer> bucket = new EnumMap<>(ContributionCategory.class);
         platformContributionExtractor.extractStars(accessToken, username, bucket, latch);
@@ -58,5 +53,11 @@ public class GithubContributionCalculator implements PlatformContributionCalcula
         platformContributionExtractor.extractCount(REPO, "/search/issues?q=author:%s type:issue", accessToken, username, bucket, latch);
 
         return bucket;
+    }
+
+    private void waitThreads(CountDownLatch latch) throws InterruptedException {
+        if (!latch.await(2, TimeUnit.SECONDS)) {
+            throw new PlatformHttpErrorException();
+        }
     }
 }
