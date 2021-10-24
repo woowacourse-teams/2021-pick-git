@@ -138,9 +138,9 @@ public class UriParser {
                 completeUrl,
                 httpMethod,
                 registerType
-            )).collect(toList());
+            ))
+            .collect(toList());
     }
-
 
     private List<String> parseUrlsFromMethod(Method method) {
         return HttpMethodMapper.extractMappingValues(method);
