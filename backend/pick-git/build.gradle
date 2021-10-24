@@ -120,7 +120,7 @@ jacocoTestReport {
                             '**/*DataSource*',
                             '**/*Slave*',
                             '**/GithubContributionExtractor',
-                            '**.*Configuration*'
+                            '**/*Configuration*'
                     ])
         }))
     }
