@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 27.953 33.72">
+  <g id="location-line" transform="translate(1 1)">
+    <path id="Path" d="M28.953,13.976c0,10.093-12.977,18.744-12.977,18.744S3,24.069,3,13.976a12.977,12.977,0,0,1,25.953,0Z" transform="translate(-3 -1)" fill="#fff" stroke="#5a5a5a" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+    <circle id="Path-2" data-name="Path" cx="4.5" cy="4.5" r="4.5" transform="translate(8.365 8.385)" fill="#fff" stroke="#5a5a5a" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+  </g>
+</svg>

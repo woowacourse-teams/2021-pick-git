@@ -17,6 +17,7 @@ import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,10 @@ public class CommentService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
 
+    @CacheEvict(
+        value = "homeFeed",
+        allEntries = true
+    )
     @Transactional
     public CommentResponseDto addComment(CommentRequestDto commentRequestDto) {
         String content = commentRequestDto.getContent();
@@ -66,6 +71,10 @@ public class CommentService {
             .build();
     }
 
+    @CacheEvict(
+        value = "homeFeed",
+        allEntries = true
+    )
     @Transactional
     public void delete(CommentDeleteRequestDto commentDeleteRequestDto) {
         Post post = findPostById(commentDeleteRequestDto.getPostId());

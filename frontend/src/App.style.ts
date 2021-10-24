@@ -1,5 +1,6 @@
 import { createGlobalStyle } from "styled-components";
 import normalize from "styled-normalize";
+import backgroundImagePNG from "./assets/images/app-background.png";
 
 export const theme = {
   color: {
@@ -10,6 +11,7 @@ export const theme = {
     tertiaryColor: "#6d6d6d",
     textColor: "#3d3d3d",
     lighterTextColor: "#959595",
+    postBackgroundColor: "#f2f2f2",
     borderColor: "#cfcfcf",
     darkBorderColor: "#9f9f9f",
     tagItemColor: "#ffc1c1",
@@ -32,7 +34,10 @@ export const GlobalStyle = createGlobalStyle`
   }
 
   body {
-    /* background-color: #fef9f8; */
+    background-image: url(${backgroundImagePNG});
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
   }
    
   svg {

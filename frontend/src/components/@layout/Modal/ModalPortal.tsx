@@ -1,4 +1,5 @@
 import { createPortal } from "react-dom";
+import { CSSProp } from "styled-components";
 import { CancelNoCircleIcon } from "../../../assets/icons";
 import Button from "../../@shared/Button/Button";
 import BackDrop from "../../@styled/BackDrop";
@@ -6,14 +7,15 @@ import BackDrop from "../../@styled/BackDrop";
 import { CloseButtonWrapper, Container, ModalContent } from "./ModalPortal.style";
 
 export interface Props {
-  onClose: () => void;
   isCloseButtonShown?: boolean;
   children: React.ReactNode;
+  cssProp?: CSSProp;
+  onClose: () => void;
 }
 
-export const Modal = ({ onClose, isCloseButtonShown = false, children }: Props) => {
+export const Modal = ({ isCloseButtonShown = false, children, cssProp, onClose }: Props) => {
   return (
-    <Container>
+    <Container cssProp={cssProp}>
       <BackDrop onClick={onClose} />
       <ModalContent>
         {isCloseButtonShown && (

@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 
-import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import Chip from "../../components/@shared/Chip/Chip";
 import GridFeed from "../../components/@shared/GridFeed/GridFeed";
+import Loader from "../../components/@shared/Loader/Loader";
 import Tabs from "../../components/@shared/Tabs/Tabs";
+import NotFound from "../../components/@shared/NotFound/NotFound";
+import { ScrollPageWrapper } from "../../components/@styled/layout";
 import UserList from "../../components/UserList/UserList";
 
 import { QUERY } from "../../constants/queries";
@@ -13,7 +15,8 @@ import useSearchKeyword from "../../hooks/common/useSearchKeyword";
 import useSearchPostData from "../../hooks/service/useSearchPostData";
 import useSearchUserData from "../../hooks/service/useSearchUserData";
 
-import { Container, ContentWrapper, Empty, KeywordsWrapper } from "./SearchPage.style";
+import { Container, ContentWrapper, Empty, KeywordsWrapper, NotFoundCSS } from "./SearchPage.style";
+import { getItemsFromPages } from "../../utils/infiniteData";
 
 const tabNames = ["계정", "태그"];
 const searchTypeIndex = {
@@ -29,6 +32,8 @@ const SearchPage = () => {
   const [tabIndex, setTabIndex] = useState(defaultTabIndex);
 
   const { keyword, resetKeyword } = useSearchKeyword();
+  const formattedKeyword = keyword.trim().replace(/,/g, " ").replace(/\s+/g, " ");
+
   const {
     results: userSearchResults,
     isError: isUserSearchError,
@@ -42,64 +47,60 @@ const SearchPage = () => {
     isLoading: isPostSearchLoading,
     isFetchingNextPage: isPostSearchFetchingNextPage,
     handleIntersect: handlePostSearchIntersect,
-    formattedKeyword: postSearchKeyword,
-  } = useSearchPostData({ keyword, type: "tags", activated: tabIndex === 1 });
+  } = useSearchPostData({ keyword: formattedKeyword, type: "tags", activated: tabIndex === 1 });
 
   useEffect(() => {
     resetKeyword();
   }, [tabIndex]);
 
   const SearchUserResult = () => {
-    if (isUserSearchLoading) {
-      return (
-        <Empty>
-          <PageLoading />
-        </Empty>
-      );
-    }
-
     if (isUserSearchError) {
-      return <Empty>검색결과를 표시할 수 없습니다.</Empty>;
+      return <NotFound type="user" message="검색결과를 표시할 수 없습니다." cssProp={NotFoundCSS} />;
     }
 
     if (userSearchResults.length === 0) {
-      return <Empty>일치하는 계정이 없습니다.</Empty>;
+      return <NotFound type="user" message="일치하는 계정이 없습니다." cssProp={NotFoundCSS} />;
     }
 
     return (
-      <UserList
-        users={userSearchResults}
-        isFetchingNextPage={isUserSearchFetchingNextPage}
-        onIntersect={handleUserSearchIntersect}
-        queryKey={[QUERY.GET_SEARCH_USER_RESULT, { keyword }]}
-      />
+      <>
+        <Loader kind="spinner" size="1rem" isShown={isUserSearchLoading} />
+        <UserList
+          users={userSearchResults}
+          isFetchingNextPage={isUserSearchFetchingNextPage}
+          onIntersect={handleUserSearchIntersect}
+          queryKey={[QUERY.GET_SEARCH_USER_RESULT, { keyword }]}
+        />
+      </>
     );
   };
 
+  // TODO: 조건부 렌더링 없애기
   const SearchPostResult = () => {
+    if (isPostSearchError || !postSearchResults) {
+      return <NotFound type="post" message="검색결과를 표시할 수 없습니다." cssProp={NotFoundCSS} />;
+    }
+
+    const posts = getItemsFromPages(postSearchResults.pages);
+
+    if (posts && posts.length === 0) {
+      return <NotFound type="post" message="일치하는 게시물이 없습니다." cssProp={NotFoundCSS} />;
+    }
+
     return (
       <>
+        <Loader kind="spinner" size="1rem" isShown={isPostSearchLoading} />
         <KeywordsWrapper>
-          {postSearchKeyword.split(" ").map((keyword, index) => keyword && <Chip key={index}>{keyword}</Chip>)}
+          {formattedKeyword.split(" ").map((keyword, index) => keyword && <Chip key={index}>{keyword}</Chip>)}
         </KeywordsWrapper>
-        {isPostSearchLoading ? (
-          <Empty>
-            <PageLoading />
-          </Empty>
-        ) : isPostSearchError ? (
-          <Empty>검색결과를 표시할 수 없습니다.</Empty>
-        ) : postSearchResults?.pages.length === 0 ? (
-          <Empty>게시물이 없습니다.</Empty>
-        ) : (
-          <GridFeed
-            feedPagePath={PAGE_URL.SEARCH_RESULT_FEED("tags")}
-            infinitePostsData={postSearchResults}
-            isLoading={isPostSearchLoading}
-            isError={isPostSearchError}
-            isFetchingNextPage={isPostSearchFetchingNextPage}
-            handleIntersect={handlePostSearchIntersect}
-          />
-        )}
+        <GridFeed
+          feedPagePath={PAGE_URL.SEARCH_RESULT_FEED("tags", formattedKeyword)}
+          infinitePostsData={postSearchResults}
+          isLoading={isPostSearchLoading}
+          isError={isPostSearchError}
+          isFetchingNextPage={isPostSearchFetchingNextPage}
+          handleIntersect={handlePostSearchIntersect}
+        />
       </>
     );
   };
@@ -112,10 +113,12 @@ const SearchPage = () => {
   };
 
   return (
-    <Container>
-      <Tabs tabItems={tabItems} defaultTabIndex={defaultTabIndex} tabIndicatorKind="line" />
-      <Content tabIndex={tabIndex} />
-    </Container>
+    <ScrollPageWrapper>
+      <Container>
+        <Tabs tabItems={tabItems} defaultTabIndex={defaultTabIndex} tabIndicatorKind="line" />
+        <Content tabIndex={tabIndex} />
+      </Container>
+    </ScrollPageWrapper>
   );
 };
 

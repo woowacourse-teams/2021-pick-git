@@ -1,6 +1,6 @@
 spring:
   profiles:
-    include: security, db
+    include: security
   flyway:
     enabled: false
 server:

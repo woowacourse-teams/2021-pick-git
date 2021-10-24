@@ -1,3 +1,4 @@
+import { IconType } from "../components/@shared/SVGIcon/SVGIcon";
 import { clientErrorCodeName, httpErrorStatus, httpErrorStatusName } from "../constants/error";
 import { API_ERROR_MESSAGE, CLIENT_ERROR_MESSAGE } from "../constants/messages";
 
@@ -99,7 +100,7 @@ export type Tags = string[];
 
 export type Step = {
   title: string;
-  path: string;
+  hash: string;
 };
 
 export type TabIndicatorKind = "line" | "pill";
@@ -126,11 +127,21 @@ export type ClientErrorHandler = {
   [V in ClientErrorCodeName]?: () => void;
 };
 
-type PortfolioContact = {
-  id: number;
+export type PortfolioContact = {
+  id: number | null;
   category: string;
   value: string;
 };
+
+export type PortfolioIcon =
+  | "GithubLineIcon"
+  | "EmailIcon"
+  | "BlogIcon"
+  | "WebsiteIcon"
+  | "PhoneIcon"
+  | "LocationLineIcon"
+  | "CompanyLineIcon"
+  | "LinkIcon";
 
 export type PortfolioIntro = {
   name: string;
@@ -148,10 +159,7 @@ export type PortfolioProject = {
   type: "team" | "personal";
   imageUrl: string;
   content: string;
-  tags: {
-    id: number | null;
-    name: string;
-  }[];
+  tags: string[];
 };
 
 export type PortfolioSectionItem = {

@@ -13,6 +13,7 @@ import useAuth from "../../hooks/common/useAuth";
 import { Container, LoadingWrapper } from "./ProfilePage.style";
 
 import type { TabItem } from "../../@types";
+import { ScrollPageWrapper } from "../../components/@styled/layout";
 
 export interface Props {
   isMyProfile: boolean;
@@ -33,19 +34,21 @@ const ProfilePage = ({ isMyProfile }: Props) => {
   if (!fixedUsername) return <Redirect to={PAGE_URL.HOME} />;
 
   return (
-    <Container>
-      <Suspense
-        fallback={
-          <LoadingWrapper>
-            <PageLoadingWithLogo />
-          </LoadingWrapper>
-        }
-      >
-        <Profile isMyProfile={isMyProfile} username={fixedUsername} />
-        <Tabs tabIndicatorKind="line" tabItems={tabItems} />
-        <ProfileTabContents isMyProfile={isMyProfile} username={fixedUsername} tabIndex={tabIndex} />
-      </Suspense>
-    </Container>
+    <Suspense
+      fallback={
+        <LoadingWrapper>
+          <PageLoadingWithLogo />
+        </LoadingWrapper>
+      }
+    >
+      <ScrollPageWrapper>
+        <Container>
+          <Profile isMyProfile={isMyProfile} username={fixedUsername} />
+          <Tabs tabIndicatorKind="line" tabItems={tabItems} />
+          <ProfileTabContents isMyProfile={isMyProfile} username={fixedUsername} tabIndex={tabIndex} />
+        </Container>
+      </ScrollPageWrapper>
+    </Suspense>
   );
 };
 

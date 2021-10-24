@@ -10,6 +10,7 @@ import usePostLikePeople from "../../hooks/service/usePostLikePeople";
 import { Container, ContentWrapper } from "./PostLikePeoplePage.style";
 
 import type { Post } from "../../@types";
+import { ScrollPageWrapper } from "../../components/@styled/layout";
 
 const PostLikePeoplePage = () => {
   const { state: postId } = useLocation<Post["id"]>();
@@ -28,17 +29,19 @@ const PostLikePeoplePage = () => {
   }
 
   return (
-    <Container>
-      <ContentWrapper>
-        <UserList
-          key="post-like-user"
-          users={postLikePeople}
-          isFetchingNextPage={false}
-          onIntersect={() => {}}
-          queryKey={[QUERY.GET_POST_LIKE_PEOPLE, postId]}
-        />
-      </ContentWrapper>
-    </Container>
+    <ScrollPageWrapper>
+      <Container>
+        <ContentWrapper>
+          <UserList
+            key="post-like-user"
+            users={postLikePeople}
+            isFetchingNextPage={false}
+            onIntersect={() => {}}
+            queryKey={[QUERY.GET_POST_LIKE_PEOPLE, postId]}
+          />
+        </ContentWrapper>
+      </Container>
+    </ScrollPageWrapper>
   );
 };
 

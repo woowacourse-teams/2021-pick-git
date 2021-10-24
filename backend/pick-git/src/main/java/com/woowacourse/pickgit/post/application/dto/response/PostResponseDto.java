@@ -1,5 +1,9 @@
 package com.woowacourse.pickgit.post.application.dto.response;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.woowacourse.pickgit.comment.application.dto.response.CommentResponseDto;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,7 +20,11 @@ public class PostResponseDto {
     private String profileImageUrl;
     private Integer likesCount;
     private List<String> tags;
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime createdAt;
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime updatedAt;
     private List<CommentResponseDto> comments;
     private Boolean liked;

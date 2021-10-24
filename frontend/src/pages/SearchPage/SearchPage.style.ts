@@ -1,20 +1,29 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { Page } from "../../components/@styled/layout";
 
-export const Container = styled(Page)<React.CSSProperties>`
-  background-color: ${({ theme }) => theme.color.white};
-  height: 100vh;
+export const Container = styled(Page)<React.CSSProperties>(
+  ({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    color: ${theme.color.textColor};
+  `
+);
+
+export const ContentWrapper = styled.div`
+  flex-grow: 1;
+  padding: 1.4375rem;
+`;
+
+export const NotFoundCSS = css`
+  margin-top: 3rem;
 `;
 
 export const Empty = styled.div`
-  height: 80vh;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-`;
-
-export const ContentWrapper = styled.div`
-  padding: 1.4375rem;
+  text-align: center;
 `;
 
 export const KeywordsWrapper = styled.div`

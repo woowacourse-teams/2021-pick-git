@@ -27,6 +27,7 @@ import {
 
 import { Container, NextStepButtonWrapper, StepContainer, StepSlider } from "./EditPostPage.style";
 import axios from "axios";
+import { ScrollPageWrapper } from "../../components/@styled/layout";
 
 const EditPostPage = () => {
   const { search } = useLocation();
@@ -113,29 +114,33 @@ const EditPostPage = () => {
   ];
 
   return (
-    <Container>
-      <StepSlider stepCount={POST_EDIT_STEPS.length} stepIndex={stepIndex}>
-        {POST_EDIT_STEPS.map((STEP, index) => (
-          <StepContainer key={STEP.title} stepCount={POST_EDIT_STEPS.length} isShown={stepIndex === index}>
-            {stepComponents[index]}
-          </StepContainer>
-        ))}
-      </StepSlider>
-      <NextStepButtonWrapper>
-        {isLastStep ? (
-          <Button kind="roundedBlock" onClick={handlePostAddComplete}>
-            작성 완료
-          </Button>
-        ) : (
-          <Button kind="roundedBlock" onClick={handleNextButtonClick}>
-            다음
-          </Button>
-        )}
-        {isAlertShown && <AlertPortal heading={alertMessage} onOkay={hideAlert} />}
-        {isConfirmShown && <ConfirmPortal heading={confirmMessage} onConfirm={handleConfirm} onCancel={hideConfirm} />}
-      </NextStepButtonWrapper>
-      {uploading && <PageLoadingWithCover description="수정중" />}
-    </Container>
+    <ScrollPageWrapper>
+      <Container>
+        <StepSlider stepCount={POST_EDIT_STEPS.length} stepIndex={stepIndex}>
+          {POST_EDIT_STEPS.map((STEP, index) => (
+            <StepContainer key={STEP.title} stepCount={POST_EDIT_STEPS.length} isShown={stepIndex === index}>
+              {stepComponents[index]}
+            </StepContainer>
+          ))}
+        </StepSlider>
+        <NextStepButtonWrapper>
+          {isLastStep ? (
+            <Button kind="roundedBlock" onClick={handlePostAddComplete}>
+              작성 완료
+            </Button>
+          ) : (
+            <Button kind="roundedBlock" onClick={handleNextButtonClick}>
+              다음
+            </Button>
+          )}
+          {isAlertShown && <AlertPortal heading={alertMessage} onOkay={hideAlert} />}
+          {isConfirmShown && (
+            <ConfirmPortal heading={confirmMessage} onConfirm={handleConfirm} onCancel={hideConfirm} />
+          )}
+        </NextStepButtonWrapper>
+        {uploading && <PageLoadingWithCover description="수정중" />}
+      </Container>
+    </ScrollPageWrapper>
   );
 };
 

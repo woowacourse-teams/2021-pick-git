@@ -145,7 +145,7 @@ export const ProjectContentCSS = css`
   height: 100%;
   line-height: 1.5rem;
   margin-bottom: 1rem;
-  min-height: 12rem;
+  min-height: 10rem;
 
   color: ${({ theme }) => theme.color.textColor};
 

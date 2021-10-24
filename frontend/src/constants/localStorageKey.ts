@@ -1,5 +1,6 @@
 export const PORTFOLIO = {
-  INTRO: "portfolioIntro",
-  PROJECTS: "portfolioProjects",
-  SECTIONS: "portfolioSections",
+  INTRO: (username: string) => `${username}-portfolioIntro`,
+  PROJECTS: (username: string) => `${username}-portfolioProjects`,
+  SECTIONS: (username: string) => `${username}-portfolioSections`,
+  CONTACTS: (username: string) => `${username}-portfolioContacts`,
 };

@@ -61,9 +61,7 @@ const ProfileModificationForm = ({ username, profileImageUrl, prevDescription, o
           autoGrow={false}
         />
       </TextEditorWrapper>
-      <Button kind="roundedBlock" padding="0.875rem">
-        수정 완료
-      </Button>
+      <Button kind="roundedBlock">수정 완료</Button>
       {isAlertShown && <AlertPortal heading={alertMessage} onOkay={hideAlert} />}
       {isLoading && <PageLoadingWithCover description="수정중" />}
     </Container>

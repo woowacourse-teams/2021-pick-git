@@ -22,7 +22,7 @@ import redis.embedded.RedisServer;
 @Slf4j
 @Profile(value = {"test", "local"})
 @Configuration
-public class EmbeddedRedisServerConfiguration {
+public class EmbeddedRedisConfiguration {
 
     private static final String LOCAL_HOST = "127.0.0.1";
     private static final String BIN_SH = "/bin/sh";

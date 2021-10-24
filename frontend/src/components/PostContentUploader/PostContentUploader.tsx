@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useRef, useState } from "react";
 import { LIMIT } from "../../constants/limits";
 import { FAILURE_MESSAGE } from "../../constants/messages";
 import useModal from "../../hooks/common/useModal";
@@ -7,7 +7,16 @@ import AlertPortal from "../@layout/AlertPortal/AlertPortal";
 import ImageSlider from "../@shared/ImageSlider/ImageSlider";
 import ImageUploader from "../@shared/ImageUploader/ImageUploader";
 import PostTextEditor from "../PostTextEditor/PostTextEditor";
-import { Container, ImageUploaderWrapper, PostTextEditorCSS, TextEditorWrapper } from "./PostContentUploader.style";
+import {
+  Container,
+  ImageSliderCSS,
+  ImageSliderWrapper,
+  ImageUploaderCSS,
+  ImageUploaderWrapper,
+  PostTextEditorCSS,
+  ReUploadButton,
+  TextEditorWrapper,
+} from "./PostContentUploader.style";
 
 interface Props {
   isImageUploaderShown: boolean;
@@ -18,6 +27,7 @@ interface Props {
 
 // TODO : key 를 넣지 않는 방법 생각해보기
 const PostContentUploader = ({ isImageUploaderShown, content, setFiles, setContent }: Props) => {
+  const uploaderRef = useRef<HTMLImageElement>(null);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const {
     isModalShown: isAlertShown,
@@ -44,24 +54,29 @@ const PostContentUploader = ({ isImageUploaderShown, content, setFiles, setConte
       return;
     }
 
-    files.forEach((file) => {
-      const imageUrl = URL.createObjectURL(file);
-      setImageUrls((state) => [...state, imageUrl]);
-    });
+    const newImageUrls = files.map((file) => URL.createObjectURL(file));
+    setImageUrls(newImageUrls);
 
     setFiles && setFiles(files);
   };
 
+  const handleReUploadButtonClick = () => {
+    if (!uploaderRef.current) {
+      return;
+    }
+
+    uploaderRef.current.click();
+  };
+
   return (
     <Container>
-      {isImageUploaderShown && imageUrls.length > 0 && (
-        <ImageSlider imageUrls={imageUrls} slideButtonKind="stick-out" />
-      )}
-      {isImageUploaderShown && imageUrls.length === 0 && (
-        <ImageUploaderWrapper>
-          <ImageUploader onFileListSave={handleFileListSave} />
-        </ImageUploaderWrapper>
-      )}
+      <ImageSliderWrapper isShown={isImageUploaderShown && imageUrls.length > 0}>
+        <ImageSlider cssProp={ImageSliderCSS} imageUrls={imageUrls} slideButtonKind="stick-out" />
+        <ReUploadButton onClick={handleReUploadButtonClick}>다시 올리기</ReUploadButton>
+      </ImageSliderWrapper>
+      <ImageUploaderWrapper isShown={isImageUploaderShown && imageUrls.length === 0}>
+        <ImageUploader cssProp={ImageUploaderCSS} onFileListSave={handleFileListSave} imageUploaderRef={uploaderRef} />
+      </ImageUploaderWrapper>
       <TextEditorWrapper>
         <PostTextEditor
           onChange={handlePostContentChange}

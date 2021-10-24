@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from "react";
 import { useHistory } from "react-router-dom";
 import { Step } from "../../@types";
-import { getLastPath } from "../../utils/history";
+import { getLastHash } from "../../utils/history";
 
 interface Parameters {
   steps: Step[];
@@ -14,7 +14,7 @@ const useStep = ({ steps, stepIndex, setStepIndex }: Parameters) => {
 
   const setStepMoveEventHandler = () => {
     window.onpopstate = () => {
-      if (getLastPath(history.location.pathname) === steps[stepIndex + 1]?.path) {
+      if (getLastHash(history.location.pathname) === steps[stepIndex + 1]?.hash) {
         setStepIndex(stepIndex + 1);
         return;
       }
@@ -37,7 +37,9 @@ const useStep = ({ steps, stepIndex, setStepIndex }: Parameters) => {
 
   const goNextStep = () => {
     setStepIndex(stepIndex + 1);
-    history.push(steps[stepIndex + 1].path);
+    history.push({
+      hash: steps[stepIndex + 1].hash,
+    });
   };
 
   return {

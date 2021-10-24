@@ -7,6 +7,7 @@ export const Container = styled(Page)<React.CSSProperties>`
   flex-direction: column;
   justify-content: space-between;
   overflow-x: hidden;
+  height: 100%;
   background-color: ${({ theme }) => theme.color.white};
 `;
 

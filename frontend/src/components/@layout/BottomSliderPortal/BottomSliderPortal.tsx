@@ -1,14 +1,21 @@
 import { createPortal } from "react-dom";
+import SliderHeader from "../../@shared/SliderHeader/SliderHeader";
 
 import { Container } from "./BottomSliderPortal.styles";
 
 export interface Props {
   children: React.ReactNode;
   isSliderShown: boolean;
+  onSlideDown: () => void;
 }
 
-export const BottomSlider = ({ isSliderShown, children }: Props) => {
-  return <Container isSliderShown={isSliderShown}>{children}</Container>;
+export const BottomSlider = ({ isSliderShown, children, onSlideDown }: Props) => {
+  return (
+    <Container isSliderShown={isSliderShown}>
+      <SliderHeader onSlideDown={onSlideDown} />
+      {children}
+    </Container>
+  );
 };
 
 const BottomSliderPortal = ({ ...props }: Props) => {

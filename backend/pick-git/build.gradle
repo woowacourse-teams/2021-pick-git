@@ -30,6 +30,7 @@ dependencies {
     implementation 'net.rakugakibox.spring.boot:logback-access-spring-boot-starter:2.7.1'
     implementation 'org.reflections:reflections:0.9.10'
     implementation 'org.flywaydb:flyway-core:6.4.2'
+    implementation 'org.springframework.boot:spring-boot-starter-cache:2.5.4'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis:2.5.4'
     implementation ('it.ozimov:embedded-redis:0.7.3') {
         exclude group: 'org.slf4j', module: 'slf4j-simple'
@@ -118,7 +119,8 @@ jacocoTestReport {
                             '**/*S3*',
                             '**/*DataSource*',
                             '**/*Slave*',
-                            '**/GithubContributionExtractor'
+                            '**/GithubContributionExtractor',
+                            '**.*Configuration*'
                     ])
         }))
     }
@@ -153,7 +155,8 @@ jacocoTestCoverageVerification {
                     '**.*Storage*',
                     '**.*DataSource*',
                     '**.*Slave*',
-                    '**.GithubContributionExtractor'
+                    '**.GithubContributionExtractor',
+                    '**.*Configuration*'
             ]
         }
     }
