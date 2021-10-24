@@ -15,7 +15,7 @@ import useSearchKeyword from "../../hooks/common/useSearchKeyword";
 import useSearchPostData from "../../hooks/service/useSearchPostData";
 import useSearchUserData from "../../hooks/service/useSearchUserData";
 
-import { Container, ContentWrapper, Empty, KeywordsWrapper, NotFoundCSS } from "./SearchPage.style";
+import { Container, ContentWrapper, KeywordsWrapper, NotFoundCSS } from "./SearchPage.style";
 import { getItemsFromPages } from "../../utils/infiniteData";
 
 const tabNames = ["계정", "태그"];
@@ -28,10 +28,12 @@ const isSearchTypeValid = (type: string | null): type is keyof typeof searchType
 
 const SearchPage = () => {
   const type = new URLSearchParams(location.search).get("type");
+  const defaultKeyword = new URLSearchParams(location.search).get("keyword");
   const defaultTabIndex = isSearchTypeValid(type) ? searchTypeIndex[type] : 0;
   const [tabIndex, setTabIndex] = useState(defaultTabIndex);
+  const [isFirstMount, setIsFirstMount] = useState(true);
 
-  const { keyword, resetKeyword } = useSearchKeyword();
+  const { keyword, resetKeyword, changeKeyword } = useSearchKeyword();
   const formattedKeyword = keyword.trim().replace(/,/g, " ").replace(/\s+/g, " ");
 
   const {
@@ -50,6 +52,18 @@ const SearchPage = () => {
   } = useSearchPostData({ keyword: formattedKeyword, type: "tags", activated: tabIndex === 1 });
 
   useEffect(() => {
+    if (defaultKeyword) {
+      changeKeyword(defaultKeyword);
+    }
+  }, [defaultKeyword]);
+
+  useEffect(() => {
+    if (isFirstMount) {
+      setIsFirstMount(false);
+
+      return;
+    }
+
     resetKeyword();
   }, [tabIndex]);
 
