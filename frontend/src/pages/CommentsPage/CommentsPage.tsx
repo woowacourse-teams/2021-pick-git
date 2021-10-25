@@ -130,6 +130,10 @@ const CommentsPage = () => {
       return;
     }
 
+    if (commentTextAreaRef.current.value === "") {
+      return;
+    }
+
     const newComment = commentTextAreaRef.current.value;
 
     commentTextAreaRef.current.value = "";
@@ -140,6 +144,20 @@ const CommentsPage = () => {
       pushSnackbarMessage(FAILURE_MESSAGE.COMMENT_SAVE_FAILED);
     }
   };
+
+  const handleCommentTextInput: React.KeyboardEventHandler<HTMLTextAreaElement> = (event) => {    
+    if (event.ctrlKey && event.code === "Enter") {
+      event.preventDefault();
+      event.currentTarget.value += '\n';
+      return;
+    }
+
+    if (event.code === "Enter") {
+      event.preventDefault();
+      handleCommentSave();
+      return;
+    }
+  }
 
   useEffect(() => {
     if (!containerRef.current) {
@@ -161,7 +179,9 @@ const CommentsPage = () => {
             <PostContentAuthorLink to={PAGE_URL.USER_PROFILE(comment.authorName)}>
               {comment.authorName}
             </PostContentAuthorLink>
-            {comment.content}
+            <span>
+              {comment.content}
+            </span>
           </CommentText>
         </CommentContentWrapper>
         {(currentUsername === comment.authorName || selectedPost.authorName === currentUsername) && (
@@ -242,7 +262,7 @@ const CommentsPage = () => {
         </InfiniteScrollContainer>
         {isLoggedIn && (
           <CommentTextAreaWrapper>
-            <CommentTextArea placeholder="댓글 입력..." ref={commentTextAreaRef} />
+            <CommentTextArea placeholder="댓글 입력..." ref={commentTextAreaRef} onKeyPress={handleCommentTextInput} />
             <SendIconWrapper>
               <SVGIcon icon="SendIcon" onClick={handleCommentSave} />
             </SendIconWrapper>

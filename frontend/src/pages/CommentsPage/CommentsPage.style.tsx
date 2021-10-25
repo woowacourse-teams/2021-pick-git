@@ -60,6 +60,7 @@ export const HorizontalSliderItemWrapper = styled.div<{ stepCount: number }>`
 
 export const PostContentAuthorLink = styled(Link)`
   margin-right: 0.4375rem;
+  height: 2.5rem;
   font-size: 0.75rem;
   font-weight: bold;
 
@@ -142,10 +143,13 @@ export const CommentListItem = styled.li`
 
 export const CommentContentWrapper = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-start;
 `;
 
 export const CommentText = styled.span`
+  padding-top: 1.25rem;
+  display: flex;
+  white-space: pre;
   margin-left: 0.5rem;
   font-size: 0.75rem;
 `;
