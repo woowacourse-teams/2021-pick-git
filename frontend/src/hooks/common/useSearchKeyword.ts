@@ -9,7 +9,9 @@ const useSearchKeyword = () => {
     setKeyword("");
   };
 
-  const changeKeyword = (newKeyword: string) => setKeyword(newKeyword);
+  const changeKeyword = (newKeyword: string) => {
+    setKeyword(newKeyword);
+  };
 
   return { keyword, resetKeyword, changeKeyword };
 };
