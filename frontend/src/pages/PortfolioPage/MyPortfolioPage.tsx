@@ -56,6 +56,7 @@ import type { PortfolioData, PortfolioProject, PortfolioSectionType, Post } from
 import useScrollPagination from "../../hooks/common/useScrollPagination";
 import usePortfolioContacts from "../../hooks/service/usePortfolioContacts";
 import { CONTACT_ICON } from "../../constants/portfolio";
+import useSnackbar from "../../hooks/common/useSnackbar";
 
 const MyPortfolioPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -82,6 +83,7 @@ const MyPortfolioPage = () => {
   } = useModal();
   const { isBottomSliderShown, showBottomSlider, setSlideEventHandler, removeSlideEventHandler, hideBottomSlider } =
     useBottomSlider();
+  const { pushSnackbarMessage } = useSnackbar();
 
   const {
     portfolio: remotePortfolio,
@@ -204,8 +206,11 @@ const MyPortfolioPage = () => {
       };
 
       await mutateSetPortfolio(portfolio);
+
+      pushSnackbarMessage("포트폴리오 업로드 성공");
     } catch (error) {
       console.error(error);
+      showAlert("포트폴리오를 서버에 저장하는데 실패했습니다.");
     }
   };
 
@@ -244,7 +249,7 @@ const MyPortfolioPage = () => {
       return;
     }
 
-    if (localUpdateTime < new Date(remotePortfolio.updatedAt)) {
+    if (localUpdateTime <= new Date(remotePortfolio.updatedAt)) {
       syncRemoteWithLocal();
     }
   }, [remotePortfolio]);
@@ -296,7 +301,7 @@ const MyPortfolioPage = () => {
         />
       </ScrollActiveHeader>
       <Container ref={containerRef}>
-        <FullPage isVerticalCenter={true}>
+        <FullPage isVerticalCenter={false}>
           <ToggleButton
             toggleButtonText="프로필 사진 보이기"
             cssProp={ToggleButtonCSS}

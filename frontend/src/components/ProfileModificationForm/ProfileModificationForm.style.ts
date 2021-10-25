@@ -8,7 +8,7 @@ interface AvatarWrapperProps extends React.CSSProperties {
 export const Container = styled.form`
   position: relative;
   width: 20.5rem;
-  height: 39rem;
+  height: 32rem;
   padding: 2rem 1rem;
 
   display: flex;
