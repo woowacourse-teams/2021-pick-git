@@ -9,13 +9,13 @@ import com.woowacourse.pickgit.comment.application.dto.response.CommentResponseD
 import com.woowacourse.pickgit.comment.presentation.dto.CommentAssembler;
 import com.woowacourse.pickgit.comment.presentation.dto.request.ContentRequest;
 import com.woowacourse.pickgit.comment.presentation.dto.response.CommentResponse;
-import com.woowacourse.pickgit.common.pagenation.PageableCustom;
 import com.woowacourse.pickgit.config.auth_interceptor_register.ForLoginAndGuestUser;
 import com.woowacourse.pickgit.config.auth_interceptor_register.ForOnlyLoginUser;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -39,7 +39,7 @@ public class CommentController {
     public ResponseEntity<List<CommentResponse>> comment(
         @Authenticated AppUser appUser,
         @PathVariable Long postId,
-        @PageableCustom Pageable pageable
+        @PageableDefault Pageable pageable
     ) {
         QueryCommentRequestDto queryCommentRequestDto =
             CommentAssembler.queryCommentRequestDto(appUser, postId, pageable);

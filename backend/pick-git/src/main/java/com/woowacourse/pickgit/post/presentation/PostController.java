@@ -2,7 +2,6 @@ package com.woowacourse.pickgit.post.presentation;
 
 import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
-import com.woowacourse.pickgit.common.pagenation.PageableCustom;
 import com.woowacourse.pickgit.config.auth_interceptor_register.ForLoginAndGuestUser;
 import com.woowacourse.pickgit.config.auth_interceptor_register.ForOnlyLoginUser;
 import com.woowacourse.pickgit.post.application.PostService;
@@ -25,6 +24,7 @@ import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -60,7 +60,7 @@ public class PostController {
     @GetMapping("/github/repositories")
     public ResponseEntity<List<RepositoryResponse>> userRepositories(
         @Authenticated AppUser user,
-        @PageableCustom Pageable pageable
+        @PageableDefault Pageable pageable
     ) {
         RepositoryRequestDto repositoryRequestDto =
             PostAssembler.repositoryRequestDto(user, pageable);
@@ -79,7 +79,7 @@ public class PostController {
     public ResponseEntity<List<RepositoryResponse>> userSearchedRepositories(
         @Authenticated AppUser user,
         @RequestParam String keyword,
-        @PageableCustom Pageable pageable
+        @PageableDefault Pageable pageable
     ) {
         SearchRepositoryRequestDto searchRepositoryRequestDto =
             PostAssembler.searchRepositoryRequestDto(user, keyword, pageable);

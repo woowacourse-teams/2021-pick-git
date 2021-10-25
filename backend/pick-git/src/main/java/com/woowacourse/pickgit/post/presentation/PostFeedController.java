@@ -2,7 +2,6 @@ package com.woowacourse.pickgit.post.presentation;
 
 import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
-import com.woowacourse.pickgit.common.pagenation.PageableCustom;
 import com.woowacourse.pickgit.config.auth_interceptor_register.ForLoginAndGuestUser;
 import com.woowacourse.pickgit.config.auth_interceptor_register.ForOnlyLoginUser;
 import com.woowacourse.pickgit.post.application.PostFeedService;
@@ -15,12 +14,12 @@ import com.woowacourse.pickgit.post.presentation.dto.response.PostResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -35,7 +34,7 @@ public class PostFeedController {
     @GetMapping("/posts")
     public ResponseEntity<List<PostResponse>> readHomeFeed(
         @Authenticated AppUser appUser,
-        @PageableCustom Pageable pageable
+        @PageableDefault Pageable pageable
     ) {
         HomeFeedRequestDto homeFeedRequestDto = new HomeFeedRequestDto(appUser, pageable);
         List<PostResponseDto> postResponseDtos = postFeedService.homeFeed(homeFeedRequestDto);
@@ -48,7 +47,7 @@ public class PostFeedController {
     @GetMapping("/posts/me")
     public ResponseEntity<List<PostResponse>> readMyFeed(
         @Authenticated AppUser appUser,
-        @PageableCustom Pageable pageable
+        @PageableDefault Pageable pageable
     ) {
         HomeFeedRequestDto homeFeedRequestDto = new HomeFeedRequestDto(appUser, pageable);
         List<PostResponseDto> postResponseDtos =
@@ -63,7 +62,7 @@ public class PostFeedController {
     public ResponseEntity<List<PostResponse>> readUserFeed(
         @Authenticated AppUser appUser,
         @PathVariable String username,
-        @PageableCustom Pageable pageable
+        @PageableDefault Pageable pageable
     ) {
         HomeFeedRequestDto homeFeedRequestDto = new HomeFeedRequestDto(appUser, pageable);
         List<PostResponseDto> postResponseDtos =

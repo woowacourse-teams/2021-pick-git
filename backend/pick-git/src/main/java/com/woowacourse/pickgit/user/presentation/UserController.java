@@ -2,13 +2,11 @@ package com.woowacourse.pickgit.user.presentation;
 
 import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
-import com.woowacourse.pickgit.common.pagenation.PageableCustom;
 import com.woowacourse.pickgit.config.auth_interceptor_register.ForLoginAndGuestUser;
 import com.woowacourse.pickgit.config.auth_interceptor_register.ForOnlyLoginUser;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowRequestDto;
-import com.woowacourse.pickgit.user.application.dto.request.FollowSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileImageEditRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
@@ -28,6 +26,7 @@ import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -165,7 +164,7 @@ public class UserController {
     public ResponseEntity<List<UserSearchResponse>> searchFollowings(
         @Authenticated AppUser appUser,
         @PathVariable String username,
-        @PageableCustom Pageable pageable
+        @PageableDefault Pageable pageable
     ) {
         AuthUserForUserRequestDto authUserRequestDto =
             UserAssembler.authUserForUserRequestDto(appUser);
@@ -184,7 +183,7 @@ public class UserController {
     public ResponseEntity<List<UserSearchResponse>> searchFollowers(
         @Authenticated AppUser appUser,
         @PathVariable String username,
-        @PageableCustom Pageable pageable
+        @PageableDefault Pageable pageable
     ) {
         AuthUserForUserRequestDto authUserRequestDto =
             UserAssembler.authUserForUserRequestDto(appUser);
