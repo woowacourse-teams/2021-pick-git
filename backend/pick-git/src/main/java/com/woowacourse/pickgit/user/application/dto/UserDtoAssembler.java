@@ -2,13 +2,12 @@ package com.woowacourse.pickgit.user.application.dto;
 
 import static java.util.stream.Collectors.toList;
 
-import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
-import com.woowacourse.pickgit.user.domain.Contribution;
 import com.woowacourse.pickgit.user.domain.User;
+import com.woowacourse.pickgit.user.domain.contribution.Contribution;
 import java.util.List;
 import java.util.function.Predicate;
 
