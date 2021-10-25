@@ -173,7 +173,6 @@ public class UserController {
     ) {
         ContributionResponseDto responseDto =
             userService.calculateContributions(createContributionRequestDto(user, username));
-
         return ResponseEntity.ok(createContributionResponse(responseDto));
     }
 

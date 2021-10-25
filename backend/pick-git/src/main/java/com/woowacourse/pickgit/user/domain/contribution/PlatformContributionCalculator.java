@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.user.domain;
+package com.woowacourse.pickgit.user.domain.contribution;
 
 public interface PlatformContributionCalculator {
 

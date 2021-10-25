@@ -31,17 +31,20 @@ import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.ProfileImageEditResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
-import com.woowacourse.pickgit.user.domain.Contribution;
-import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.domain.contribution.Contribution;
+import com.woowacourse.pickgit.user.domain.contribution.ContributionCategory;
+import com.woowacourse.pickgit.user.domain.contribution.PlatformContributionCalculator;
 import com.woowacourse.pickgit.user.domain.follow.PlatformFollowingRequester;
 import com.woowacourse.pickgit.user.domain.profile.PickGitProfileStorage;
 import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -983,7 +986,12 @@ class UserServiceTest {
                 User user = UserFactory.user();
                 ContributionRequestDto requestDto = UserFactory.mockContributionRequestDto();
 
-                Contribution contribution = new Contribution(11, 48, 48, 48, 48);
+                Map<ContributionCategory, Integer> contributionMap = new EnumMap<>(ContributionCategory.class);
+                contributionMap.put(ContributionCategory.STAR, 11);
+                for (int i = 1; i < ContributionCategory.values().length; i++) {
+                    contributionMap.put(ContributionCategory.values()[i], 48);
+                }
+                Contribution contribution = new Contribution(contributionMap);
 
                 given(userRepository.findByBasicProfile_Name("testUser"))
                     .willReturn(Optional.of(user));
