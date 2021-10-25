@@ -41,6 +41,7 @@ import {
   HorizontalSliderWrapper,
   LoaderCSS,
   LoaderWrapper,
+  NotFoundCSS,
   PostContent,
   PostContentAuthorLink,
   SendIconWrapper,
@@ -53,6 +54,7 @@ import {
 import type { CommentData, Post, TabItem } from "../../@types";
 import useModal from "../../hooks/common/useModal";
 import Loader from "../../components/@shared/Loader/Loader";
+import NotFound from "../../components/@shared/NotFound/NotFound";
 
 const CommentsPage = () => {
   const commentTextAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -170,8 +172,8 @@ const CommentsPage = () => {
     });
   }, [comments.length]);
 
-  const commentListItems =
-    comments?.map((comment) => (
+  const commentListItems = comments.length === 0 ? 
+    <NotFound type="comment" message="작성된 댓글이 없습니다" cssProp={NotFoundCSS} /> : comments.map((comment) => (
       <CommentListItem key={comment.id}>
         <CommentContentWrapper>
           <Avatar diameter="2.5rem" imageUrl={comment.profileImageUrl} />
@@ -190,7 +192,7 @@ const CommentsPage = () => {
           </DeleteIconWrapper>
         )}
       </CommentListItem>
-    )) ?? [];
+    ));
 
   const tagListItems = selectedPost.tags.map((tag: string) => (
     <TagItemLinkButton key={tag} to={PAGE_URL.SEARCH_POST_BY_TAG(tag)}>

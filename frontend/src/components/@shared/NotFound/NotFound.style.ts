@@ -26,6 +26,7 @@ export const Text = styled.h3(
     font-size: 1.2rem;
     text-align: center;
     color: ${theme.color.textColor};
+    word-break: keep-all;
 
     ${setLaptopAboveMediaQuery`
       font-size: 2rem;

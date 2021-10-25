@@ -126,6 +126,11 @@ export const TabsWrapper = styled.div`
   padding: 1.125rem;
 `;
 
+export const NotFoundCSS = css`
+  width: 70%;
+  margin: 2rem auto 0;
+`
+
 export const CommentList = styled.ul`
   padding-top: 1.125rem;
   border-top: 1px solid ${({ theme }) => theme.color.secondaryColor};
