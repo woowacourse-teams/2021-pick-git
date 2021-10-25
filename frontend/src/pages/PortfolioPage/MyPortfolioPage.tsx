@@ -249,7 +249,7 @@ const MyPortfolioPage = () => {
       return;
     }
 
-    if (localUpdateTime < new Date(remotePortfolio.updatedAt)) {
+    if (localUpdateTime <= new Date(remotePortfolio.updatedAt)) {
       syncRemoteWithLocal();
     }
   }, [remotePortfolio]);
@@ -301,7 +301,7 @@ const MyPortfolioPage = () => {
         />
       </ScrollActiveHeader>
       <Container ref={containerRef}>
-        <FullPage isVerticalCenter={true}>
+        <FullPage isVerticalCenter={false}>
           <ToggleButton
             toggleButtonText="프로필 사진 보이기"
             cssProp={ToggleButtonCSS}

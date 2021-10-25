@@ -71,11 +71,22 @@ export const ToggleButtonCSS = css`
   `}
 `;
 
-export const AvatarWrapper = styled.div``;
+export const AvatarWrapper = styled.div(({theme}) => css`
+  background-color: ${theme.color.white};
+
+  ${setTabletMediaQuery`
+    margin-top: 3rem;
+  `}
+
+  ${setLaptopAboveMediaQuery`
+    margin-top: 5rem;
+  `}
+`);
 
 export const DescriptionCSS = css`
   ${({ theme }) => `
     color: ${theme.color.textColor};
+    background-color: ${theme.color.white};
   `}
 
   width: 100%;
@@ -103,11 +114,14 @@ export const DescriptionCSS = css`
   `}
 `;
 
-export const ContactWrapper = styled.div`
+export const ContactWrapper = styled.div(({theme}) => css`
   display: flex;
   flex-direction: column;
   padding: 0 3rem;
   width: 100%;
+  overflow-y: scroll;
+
+  ${customScrollbarCSS(theme.color.textColor)}
 
   ${setLaptopMediaQuery`
     width: 70%;
@@ -116,7 +130,7 @@ export const ContactWrapper = styled.div`
   ${setDesktopMediaQuery`
     width: 50%;
   `}
-`;
+`);
 
 export const DetailInfo = styled.div`
   display: flex;
