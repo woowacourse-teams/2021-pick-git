@@ -2,12 +2,17 @@ package com.woowacourse.pickgit.query.fixture;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.woowacourse.pickgit.common.factory.FileFactory;
+import com.woowacourse.pickgit.portfolio.presentation.dto.request.PortfolioRequest;
 import com.woowacourse.pickgit.post.presentation.dto.response.LikeUsersResponse;
+import com.woowacourse.pickgit.user.presentation.dto.request.ProfileDescriptionRequest;
 import com.woowacourse.pickgit.user.presentation.dto.response.UserSearchResponse;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.Method;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -187,6 +192,116 @@ public class UnLoginAndThenAct extends Act {
         return request(
             String.format("/api/posts/%s?page=0&limit=3", tUser.name()),
             Method.GET
+        );
+    }
+
+    public ExtractableResponse<Response> OAuth_로그인_URL_요청을_한다() {
+        return request(
+            "/api/authorization/github",
+            Method.GET
+        );
+    }
+
+    public void 팔로우를한다(TUser... tUsers) {
+        List.of(tUsers).forEach(this::팔로우를한다);
+    }
+
+    public ExtractableResponse<Response> 팔로우를한다(TUser tUser) {
+        return request(
+            String.format("/api/profiles/%s/followings?githubFollowing=false", tUser),
+            Method.POST
+        );
+    }
+
+    public ExtractableResponse<Response> 언팔로우를한다(TUser tUser) {
+        return request(
+            String.format("/api/profiles/%s/followings?githubUnfollowing=false", tUser),
+            Method.DELETE
+        );
+    }
+
+    public ExtractableResponse<Response> 프로필_이미지를_수정한다() throws IOException {
+        return request(
+            "/api/profiles/me/image",
+            Method.PUT,
+            new FileInputStream(FileFactory.getTestImage1File()).readAllBytes()
+        );
+    }
+
+    public ExtractableResponse<Response> 프로필_한줄소개를_수정한다(String description) {
+        return request(
+            "/api/profiles/me/description",
+            Method.PUT,
+            new ProfileDescriptionRequest(description)
+        );
+    }
+
+    public ExtractableResponse<Response> 유저를_검색한다(String keyword) {
+        return request(
+            String.format("/api/search/users?keyword=%s&page=0&limit=5", keyword),
+            Method.GET
+        );
+    }
+
+    public ExtractableResponse<Response> 비정상토큰으로_활통통계를_조회한다(TUser tUser) {
+        return request(
+            INVALID_TOKEN,
+            String.format("/api/profiles/%s/contributions", tUser),
+            Method.GET
+        );
+    }
+
+    public ExtractableResponse<Response> 비정상토큰으로_자신의_프로필을_조회한다() {
+        return request(
+            INVALID_TOKEN,
+            "/api/profiles/me",
+            Method.GET
+        );
+    }
+
+    public ExtractableResponse<Response> 자신의_프로필을_조회한다() {
+        return request(
+            INVALID_TOKEN,
+            "/api/profiles/me",
+            Method.GET
+        );
+    }
+
+    public ExtractableResponse<Response> 프로필을_조회한다(TUser tUser) {
+        return request(
+            String.format("/api/profiles/%s", tUser),
+            Method.GET
+        );
+    }
+
+    public ExtractableResponse<Response> 비정상토큰으로_레포지토리의_태그를_추출한다(TRepository tRepository) {
+        return request(
+            INVALID_TOKEN,
+            String.format("/api/github/repositories/%s/tags/languages", tRepository),
+            Method.GET
+        );
+    }
+
+    public ExtractableResponse<Response> 레포지토리의_태그를_추출한다(TRepository tRepository) {
+        return request(
+            INVALID_TOKEN,
+            String.format("/api/github/repositories/%s/tags/languages", tRepository),
+            Method.GET
+        );
+    }
+
+    public ExtractableResponse<Response> 포트폴리오를_조회한다(TUser tUser) {
+        return request(
+            String.format("/api/portfolios/%s", tUser),
+            Method.GET
+        );
+    }
+
+    public ExtractableResponse<Response> 포트폴리오를_수정한다(TUser tUser, PortfolioRequest portfolioRequest) {
+        return request(
+            String.format("/api/portfolios", tUser),
+            Method.PUT,
+            portfolioRequest
         );
     }
 }

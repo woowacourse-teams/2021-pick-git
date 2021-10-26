@@ -82,7 +82,7 @@ public abstract class Act {
         String accessToken,
         String url,
         Method method,
-        Map<String, Object> params
+        Object params
     ) {
         return given().log().all()
             .auth().oauth2(accessToken)
@@ -97,7 +97,7 @@ public abstract class Act {
     protected ExtractableResponse<Response> request(
         String url,
         Method method,
-        Map<String, Object> params
+        Object params
     ) {
         return given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)

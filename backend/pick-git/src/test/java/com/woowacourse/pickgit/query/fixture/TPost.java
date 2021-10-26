@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.springframework.web.multipart.MultipartFile;
 
 public enum TPost {
     NEOZALPOST(
@@ -89,28 +90,12 @@ public enum TPost {
             .collect(toList());
     }
 
-    public static void clear() {
-        for (TPost value : values()) {
-            if (value.equals(UNKNOWN)) {
-                continue;
-            }
-
-            value.clearValues();
-        }
-    }
-
     public Long getId() {
         if (id == null) {
             throw new IllegalStateException("아직 Post 생성이 안됨");
         }
 
         return id;
-    }
-
-    private void clearValues() {
-        this.id = null;
-        this.likes.clear();
-        this.comment.clear();
     }
 
     protected void addLike(TUser tUser) {
@@ -141,6 +126,10 @@ public enum TPost {
         return content;
     }
 
+    public String getGithubRepoUrl() {
+        return githubRepoUrl;
+    }
+
     protected void setId(Long id) {
         this.id = id;
     }
@@ -157,6 +146,12 @@ public enum TPost {
 
     protected List<File> images() {
         return images;
+    }
+
+    protected List<MultipartFile> getMultipartImages() {
+        return images.stream()
+            .map(FileFactory::fileToMultipart)
+            .collect(toList());
     }
 
     protected static final class Pair {
