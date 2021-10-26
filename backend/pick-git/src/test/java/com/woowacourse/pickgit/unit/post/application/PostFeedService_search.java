@@ -29,6 +29,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
@@ -67,7 +68,7 @@ public class PostFeedService_search {
         SearchPostsRequestDto searchPostsRequestDto =
             createSearchPostsRequestDto(type, requestUser.getName(), false);
         List<PostResponseDto> actual =
-            postFeedService.search(searchPostsRequestDto);
+            postFeedService.search(searchPostsRequestDto, PageRequest.of(0, 5));
 
         assertThat(actual)
             .usingRecursiveComparison()
@@ -99,7 +100,7 @@ public class PostFeedService_search {
         SearchPostsRequestDto searchPostsRequestDto =
             createSearchPostsRequestDto(type, null, true);
         List<PostResponseDto> actual =
-            postFeedService.search(searchPostsRequestDto);
+            postFeedService.search(searchPostsRequestDto, PageRequest.of(0, 5));
 
         // then
         assertThat(actual)
@@ -131,8 +132,6 @@ public class PostFeedService_search {
         return SearchPostsRequestDto.builder()
             .type(type)
             .keyword("keyword")
-            .page(0)
-            .limit(3)
             .userName(userName)
             .isGuest(isGuest)
             .build();

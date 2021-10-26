@@ -33,6 +33,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -76,7 +77,7 @@ class PostFeedControllerTest_searchPosts extends ControllerTest {
     void search() throws Exception {
         given(oAuthService.findRequestUserByToken(any()))
             .willReturn(new GuestUser());
-        given(postFeedService.search(any(SearchPostsRequestDto.class)))
+        given(postFeedService.search(any(SearchPostsRequestDto.class), any(Pageable.class)))
             .willReturn(PostDtoAssembler.postResponseDtos(null,  List.of(post1, post2)));
 
         ResultActions perform = mockMvc.perform(
@@ -124,7 +125,7 @@ class PostFeedControllerTest_searchPosts extends ControllerTest {
     void search2() throws Exception {
         given(oAuthService.findRequestUserByToken(any()))
             .willReturn(new GuestUser());
-        given(postFeedService.search(any(SearchPostsRequestDto.class)))
+        given(postFeedService.search(any(SearchPostsRequestDto.class), any(Pageable.class)))
             .willReturn(PostDtoAssembler.postResponseDtos(user, List.of(post1, post2)));
 
         ResultActions perform = mockMvc.perform(

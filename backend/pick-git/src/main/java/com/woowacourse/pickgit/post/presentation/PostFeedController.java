@@ -13,6 +13,7 @@ import com.woowacourse.pickgit.post.presentation.dto.request.SearchPostsRequest;
 import com.woowacourse.pickgit.post.presentation.dto.response.PostResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -76,17 +77,16 @@ public class PostFeedController {
     @GetMapping("/search/posts")
     public ResponseEntity<List<PostResponse>> searchPosts(
         @Authenticated AppUser appUser,
+        @PageableDefault Pageable pageable,
         SearchPostsRequest searchPostsByTagRequest
     ) {
         String type = searchPostsByTagRequest.getType();
         String keyword = searchPostsByTagRequest.getKeyword();
-        int page = searchPostsByTagRequest.getPage();
-        int limit = searchPostsByTagRequest.getLimit();
 
         SearchPostsRequestDto searchPostsRequestDto =
-            new SearchPostsRequestDto(type, keyword, page, limit, appUser);
+            new SearchPostsRequestDto(type, keyword, appUser);
 
-        List<PostResponseDto> postResponseDtos = postFeedService.search(searchPostsRequestDto);
+        List<PostResponseDto> postResponseDtos = postFeedService.search(searchPostsRequestDto, pageable);
         List<PostResponse> postResponses = PostAssembler.postResponses((postResponseDtos));
 
         return ResponseEntity.ok(postResponses);
