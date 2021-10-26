@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.springframework.web.multipart.MultipartFile;
 
 public enum TPost {
     NEOZALPOST(
@@ -125,6 +126,10 @@ public enum TPost {
         return content;
     }
 
+    public String getGithubRepoUrl() {
+        return githubRepoUrl;
+    }
+
     protected void setId(Long id) {
         this.id = id;
     }
@@ -141,6 +146,12 @@ public enum TPost {
 
     protected List<File> images() {
         return images;
+    }
+
+    protected List<MultipartFile> getMultipartImages() {
+        return images.stream()
+            .map(FileFactory::fileToMultipart)
+            .collect(toList());
     }
 
     protected static final class Pair {

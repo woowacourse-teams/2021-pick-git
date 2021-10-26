@@ -1,14 +1,23 @@
 package com.woowacourse.pickgit.acceptance;
 
+import static com.woowacourse.pickgit.query.fixture.TPost.KEVINPOST;
+import static com.woowacourse.pickgit.query.fixture.TPost.NEOZALPOST;
+import static com.woowacourse.pickgit.query.fixture.TUser.NEOZAL;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.woowacourse.pickgit.authentication.application.dto.TokenDto;
 import com.woowacourse.pickgit.config.DatabaseConfigurator;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
+import com.woowacourse.pickgit.portfolio.domain.Portfolio;
+import com.woowacourse.pickgit.query.fixture.TContact;
+import com.woowacourse.pickgit.query.fixture.TPortfolio;
+import com.woowacourse.pickgit.query.fixture.TProject;
+import com.woowacourse.pickgit.query.fixture.TSection;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -78,6 +87,31 @@ public abstract class AcceptanceTest {
             Arguments.of("c++", 0, 5),
             Arguments.of("html", 0, 5),
             Arguments.of("java c++ spring", 0, 5)
+        );
+    }
+
+    protected static Stream<Arguments> getParametersForPortfolioUpdate() {
+        return Stream.of(
+            Arguments.of(
+                List.of(TContact.createRandom()),
+                List.of(TProject.of(NEOZALPOST)),
+                List.of(TSection.createRandom())
+            ),
+            Arguments.of(
+                List.of(TContact.createRandom(), TContact.createRandom()),
+                List.of(TProject.of(NEOZALPOST)),
+                List.of(TSection.createRandom())
+            ),
+            Arguments.of(
+                List.of(TContact.createRandom(), TContact.createRandom(), TContact.createRandom()),
+                List.of(TProject.of(NEOZALPOST)),
+                List.of(TSection.createRandom(), TSection.createRandom())
+            ),
+            Arguments.of(
+                List.of(TContact.createRandom(), TContact.createRandom(), TContact.createRandom()),
+                List.of(TProject.of(NEOZALPOST), TProject.of(NEOZALPOST), TProject.of(KEVINPOST)),
+                List.of(TSection.createRandom())
+            )
         );
     }
 }
