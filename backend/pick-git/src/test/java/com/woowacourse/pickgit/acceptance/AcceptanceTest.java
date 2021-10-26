@@ -95,6 +95,16 @@ public abstract class AcceptanceTest {
         );
     }
 
+    protected static Stream<Arguments> getPortfolioUpdateInvalidDateProjectsArguments() {
+        return Stream.of(
+            Arguments.of(
+                List.of(TContact.createRandom()),
+                List.of(TProject.invalidDateOf(NEOZALPOST)),
+                List.of(TSection.createRandom())
+            )
+        );
+    }
+
     protected static Stream<Arguments> getPortfolioUpdateDuplicateSectionsArguments() {
         return Stream.of(
             Arguments.of(

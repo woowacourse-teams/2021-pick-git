@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.query.fixture;
 
+import static java.time.Month.OCTOBER;
 import static java.util.stream.Collectors.toList;
 
 import com.woowacourse.pickgit.portfolio.domain.project.ProjectType;
@@ -27,6 +28,23 @@ public class TProject {
             tPost.name(),
             LocalDate.now(),
             LocalDate.now(),
+            ProjectType.PERSONAL.getValue(),
+            "test image url",
+            tPost.getContent(),
+            tags
+        );
+    }
+
+    public static ProjectRequest invalidDateOf(TPost tPost) {
+        List<TagRequest> tags = tPost.getTags().stream()
+            .map(TagRequest::new)
+            .collect(toList());
+
+        return new ProjectRequest(
+            null,
+            tPost.name(),
+            LocalDate.of(2021, OCTOBER, 26),
+            LocalDate.of(2021, OCTOBER, 23),
             ProjectType.PERSONAL.getValue(),
             "test image url",
             tPost.getContent(),
