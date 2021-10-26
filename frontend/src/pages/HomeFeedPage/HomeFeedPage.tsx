@@ -3,6 +3,7 @@ import { FeedFilterOption } from "../../@types";
 
 import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
 import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
+import NotFound from "../../components/@shared/NotFound/NotFound";
 import PageError from "../../components/@shared/PageError/PageError";
 import Tabs from "../../components/@shared/Tabs/Tabs";
 import { ScrollPageWrapper } from "../../components/@styled/layout";
@@ -13,8 +14,9 @@ import useAuth from "../../hooks/common/useAuth";
 
 import useInfiniteImagePreloader from "../../hooks/common/useInfiniteImagePreloader";
 import useHomeFeed from "../../hooks/service/useHomeFeed";
+import { getItemsFromPages } from "../../utils/infiniteData";
 
-import { Container, postTabCSS, PostTabWrapper } from "./HomeFeedPage.style";
+import { Container, NotFoundCSS, postTabCSS, PostTabWrapper } from "./HomeFeedPage.style";
 
 const HomeFeedPage = () => {
   const { isLoggedIn } = useAuth();
@@ -55,6 +57,8 @@ const HomeFeedPage = () => {
     return <PageError errorMessage="게시물을 가져올 수 없습니다." />;
   }
 
+  const isPostsEmpty = getItemsFromPages(infinitePostsData.pages)?.length === 0;
+
   return (
     <ScrollPageWrapper>
       <Container>
@@ -63,13 +67,17 @@ const HomeFeedPage = () => {
             <Tabs tabItems={tabList} tabIndicatorKind="line" cssProp={postTabCSS} />
           </PostTabWrapper>
         )}
-        <InfiniteScrollContainer isLoaderShown={isFetching || isImagesFetching} onIntersect={handleIntersect}>
-          <Feed
-            infinitePostsData={infinitePostsData}
-            queryKey={[QUERY.GET_HOME_FEED_POSTS]}
-            isFetching={isFetching || isImagesFetching}
-          />
-        </InfiniteScrollContainer>
+        {isPostsEmpty ? (
+          <NotFound type="post" message="게시글을 올리거나 다른 사람을 팔로우 해보세요" cssProp={NotFoundCSS} />
+        ) : (
+          <InfiniteScrollContainer isLoaderShown={isFetching || isImagesFetching} onIntersect={handleIntersect}>
+            <Feed
+              infinitePostsData={infinitePostsData}
+              queryKey={[QUERY.GET_HOME_FEED_POSTS]}
+              isFetching={isFetching || isImagesFetching}
+            />
+          </InfiniteScrollContainer>
+        )}
       </Container>
     </ScrollPageWrapper>
   );
