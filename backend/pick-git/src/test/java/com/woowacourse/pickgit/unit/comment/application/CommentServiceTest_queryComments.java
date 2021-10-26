@@ -25,6 +25,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.DigestUtils;
 
@@ -71,7 +72,7 @@ public class CommentServiceTest_queryComments {
             .willReturn(comments);
 
         QueryCommentRequestDto queryCommentRequestDto =
-            createQueryCommentRequestDto(postId, limit, page);
+            createQueryCommentRequestDto(postId, PageRequest.of(page, limit));
 
         // when
         List<CommentResponseDto> commentResponsesDto = commentService
@@ -85,12 +86,11 @@ public class CommentServiceTest_queryComments {
             .isEqualTo(expected);
     }
 
-    private QueryCommentRequestDto createQueryCommentRequestDto(Long postId, int limit, int page) {
+    private QueryCommentRequestDto createQueryCommentRequestDto(Long postId, Pageable pageable) {
         return QueryCommentRequestDto.builder()
             .postId(postId)
             .isGuest(false)
-            .page(page)
-            .limit(limit)
+            .pageable(pageable)
             .build();
     }
 

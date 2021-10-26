@@ -63,7 +63,7 @@ class SearchTypesTest {
             }
 
             @Override
-            public List<Post> search(String[] keywords, PageRequest pageRequest) {
+            public List<Post> search(String keywords, PageRequest pageRequest) {
                 return List.of(post);
             }
         };

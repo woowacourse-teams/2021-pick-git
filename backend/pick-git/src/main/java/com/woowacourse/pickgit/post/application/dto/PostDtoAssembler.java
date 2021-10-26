@@ -1,12 +1,17 @@
-package com.woowacourse.pickgit.post.application;
+package com.woowacourse.pickgit.post.application.dto;
 
 import static java.util.stream.Collectors.toList;
 
 import com.woowacourse.pickgit.comment.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.comment.domain.Comment;
+import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeUsersResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
+import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.domain.Post;
+import com.woowacourse.pickgit.post.domain.util.dto.RepositoryNameAndUrl;
 import com.woowacourse.pickgit.user.domain.User;
 import java.util.List;
 import java.util.Objects;
@@ -17,7 +22,7 @@ public class PostDtoAssembler {
     private PostDtoAssembler() {
     }
 
-    public static List<PostResponseDto> assembleFrom(
+    public static List<PostResponseDto> postResponseDtos(
         User requestUser,
         List<Post> posts
     ) {
@@ -101,5 +106,36 @@ public class PostDtoAssembler {
                     loginUser.isFollowing(user)
                 )
             ).collect(toList());
+    }
+
+    public static Post post(User user, PostRequestDto postRequestDto, List<String> imageUrls) {
+        return Post.builder()
+            .content(postRequestDto.getContent())
+            .images(imageUrls)
+            .githubRepoUrl(postRequestDto.getGithubRepoUrl())
+            .author(user)
+            .build();
+    }
+
+    public static List<RepositoryResponseDto> repositoryResponsesDtos(
+        List<RepositoryNameAndUrl> repositoryNameAndUrls
+    ) {
+        return repositoryNameAndUrls.stream()
+            .map(toRepositoryResponseDto())
+            .collect(toList());
+    }
+
+    private static Function<RepositoryNameAndUrl, RepositoryResponseDto> toRepositoryResponseDto() {
+        return repositoryNameAndUrl -> RepositoryResponseDto.builder()
+            .name(repositoryNameAndUrl.getName())
+            .url(repositoryNameAndUrl.getUrl())
+            .build();
+    }
+
+    public static PostUpdateResponseDto postUpdateRequestDto(Post post) {
+        return PostUpdateResponseDto.builder()
+            .content(post.getContent())
+            .tags(post.getTagNames())
+            .build();
     }
 }

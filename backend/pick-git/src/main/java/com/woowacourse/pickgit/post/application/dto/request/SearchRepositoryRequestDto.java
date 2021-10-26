@@ -1,12 +1,15 @@
 package com.woowacourse.pickgit.post.application.dto.request;
 
+import lombok.Builder;
+import org.springframework.data.domain.Pageable;
+
+@Builder
 public class SearchRepositoryRequestDto {
 
     private String token;
     private String username;
     private String keyword;
-    private int page;
-    private int limit;
+    private Pageable pageable;
 
     private SearchRepositoryRequestDto() {
     }
@@ -15,14 +18,12 @@ public class SearchRepositoryRequestDto {
         String token,
         String username,
         String keyword,
-        int page,
-        int limit
+        Pageable pageable
     ) {
         this.token = token;
         this.username = username;
         this.keyword = keyword;
-        this.page = page;
-        this.limit = limit;
+        this.pageable = pageable;
     }
 
     public String getToken() {
@@ -37,11 +38,7 @@ public class SearchRepositoryRequestDto {
         return keyword;
     }
 
-    public int getPage() {
-        return page;
-    }
-
-    public int getLimit() {
-        return limit;
+    public Pageable getPageable() {
+        return pageable;
     }
 }

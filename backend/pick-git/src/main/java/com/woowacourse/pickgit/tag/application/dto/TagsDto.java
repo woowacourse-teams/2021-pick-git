@@ -1,6 +1,8 @@
-package com.woowacourse.pickgit.tag.application;
+package com.woowacourse.pickgit.tag.application.dto;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class TagsDto {
 
@@ -14,6 +16,7 @@ public class TagsDto {
     }
 
     public List<String> getTagNames() {
-        return tagNames;
+        return Optional.ofNullable(tagNames)
+            .orElseGet(Collections::emptyList);
     }
 }

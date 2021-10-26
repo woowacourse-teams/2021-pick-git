@@ -23,6 +23,7 @@ import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserReque
 import com.woowacourse.pickgit.user.application.dto.request.FollowRequestDto;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.presentation.dto.UserAssembler;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
@@ -33,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 
 class PostFeedServiceIntegrationTest extends IntegrationTest {
@@ -63,8 +65,7 @@ class PostFeedServiceIntegrationTest extends IntegrationTest {
         HomeFeedRequestDto homeFeedRequestDto = HomeFeedRequestDto.builder()
             .requestUserName(null)
             .isGuest(true)
-            .page(1L)
-            .limit(2L)
+            .pageable(PageRequest.of(1, 2))
             .build();
 
         // when
@@ -86,10 +87,13 @@ class PostFeedServiceIntegrationTest extends IntegrationTest {
         HomeFeedRequestDto homeFeedRequestDto = HomeFeedRequestDto.builder()
             .requestUserName("kevin")
             .isGuest(false)
-            .page(0L)
-            .limit(10L)
+            .pageable(PageRequest.of(0, 10))
             .build();
-        AuthUserForUserRequestDto authDto = AuthUserForUserRequestDto.from(new LoginUser("kevin", "token"));
+
+        AuthUserForUserRequestDto authDto =
+            UserAssembler.authUserForUserRequestDto(
+                new LoginUser("kevin", "token")
+            );
 
         User requester = userRepository.save(UserFactory.user("kevin"));
         List<User> mockUsers = userRepository.saveAll(UserFactory.mockSearchUsers());
@@ -107,18 +111,17 @@ class PostFeedServiceIntegrationTest extends IntegrationTest {
         // when
         List<PostResponseDto> postResponseDtos = postFeedService.homeFeed(homeFeedRequestDto);
 
-        assertThat(true).isTrue();
         // then
-//        assertThat(postResponseDtos)
-//            .extracting("authorName", "githubRepoUrl", "liked")
-//            .containsExactly(
-//                tuple("bingbing", "url4", true),
-//                tuple("bbbbinghe", "url3", false),
-//                tuple("jinbinghe", "url2", true),
-//                tuple("bing", "url1", false),
-//                tuple("binghe", "url0", true),
-//                tuple("kevin", "mock-url", false)
-//            );
+        assertThat(postResponseDtos)
+            .extracting("authorName", "githubRepoUrl", "liked")
+            .containsExactly(
+                tuple("bingbing", "url4", true),
+                tuple("bbbbinghe", "url3", false),
+                tuple("jinbinghe", "url2", true),
+                tuple("bing", "url1", false),
+                tuple("binghe", "url0", true),
+                tuple("kevin", "mock-url", false)
+            );
     }
 
     private void createMockPosts() {
@@ -134,7 +137,7 @@ class PostFeedServiceIntegrationTest extends IntegrationTest {
                 PostRequestDto newPost = postRequestDtos.get(index);
 
                 userRepository.save(user);
-                Long postId = postService.write(newPost).getId();
+                Long postId = postService.write(newPost);
 
                 CommentRequestDto commentRequestDto =
                     new CommentRequestDto(user.getName(), "test comment" + index, postId);
@@ -154,11 +157,10 @@ class PostFeedServiceIntegrationTest extends IntegrationTest {
         HomeFeedRequestDto homeFeedRequestDto = HomeFeedRequestDto.builder()
             .requestUserName(savedUser.getName())
             .isGuest(false)
-            .page(0L)
-            .limit((long) postRequestDtos.size())
+            .pageable(PageRequest.of(0, postRequestDtos.size()))
             .build();
 
-        List<PostResponseDto> postResponseDtos = postFeedService.myFeed(homeFeedRequestDto);
+        List<PostResponseDto> postResponseDtos = postFeedService.userFeed(homeFeedRequestDto, "kevin");
         List<String> repoNames = postResponseDtos.stream()
             .map(PostResponseDto::getGithubRepoUrl)
             .collect(toList());
@@ -182,8 +184,7 @@ class PostFeedServiceIntegrationTest extends IntegrationTest {
         HomeFeedRequestDto homeFeedRequestDto = HomeFeedRequestDto.builder()
             .requestUserName(neozal.getName())
             .isGuest(false)
-            .page(0L)
-            .limit((long) postRequestDtos.size())
+            .pageable(PageRequest.of(0, postRequestDtos.size()))
             .build();
 
         //when
@@ -210,8 +211,7 @@ class PostFeedServiceIntegrationTest extends IntegrationTest {
 
         HomeFeedRequestDto homeFeedRequestDto = HomeFeedRequestDto.builder()
             .isGuest(true)
-            .page(0L)
-            .limit((long) postRequestDtos.size())
+            .pageable(PageRequest.of(0, postRequestDtos.size()))
             .build();
 
         //when

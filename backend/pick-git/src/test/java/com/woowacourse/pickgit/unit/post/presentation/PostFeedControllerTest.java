@@ -48,7 +48,7 @@ class PostFeedControllerTest extends ControllerTest {
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(any()))
             .willReturn(loginUser);
-        given(postFeedService.myFeed(any(HomeFeedRequestDto.class)))
+        given(postFeedService.userFeed(any(HomeFeedRequestDto.class), anyString()))
             .willReturn(PostFactory.mockPostResponseDtosForLogin());
 
         // when

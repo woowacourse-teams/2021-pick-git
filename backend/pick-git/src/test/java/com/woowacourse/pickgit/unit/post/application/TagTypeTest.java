@@ -47,7 +47,7 @@ class TagTypeTest {
             .willReturn(List.of(post));
 
         PageRequest pageRequest = PageRequest.of(0, 1);
-        List<Post> actual = tagType.search(new String[]{"keyword"}, pageRequest);
+        List<Post> actual = tagType.search("keyword", pageRequest);
 
         assertThat(actual.size()).isEqualTo(1);
     }

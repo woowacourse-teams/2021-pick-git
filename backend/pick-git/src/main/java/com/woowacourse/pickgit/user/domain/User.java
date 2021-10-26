@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.user.domain;
 
+import com.woowacourse.pickgit.exception.post.PostNotBelongToUserException;
 import com.woowacourse.pickgit.portfolio.domain.Portfolio;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.Posts;
@@ -23,7 +24,8 @@ import javax.persistence.OneToMany;
 @Entity
 public class User {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Embedded
@@ -111,8 +113,11 @@ public class User {
     }
 
     public void delete(Post post) {
-        List<Post> posts = this.posts.getPosts();
-        posts.remove(post);
+        if (post.isNotWrittenBy(this)) {
+            throw new PostNotBelongToUserException();
+        }
+
+        this.posts.getPosts().remove(post);
     }
 
     public Long getId() {

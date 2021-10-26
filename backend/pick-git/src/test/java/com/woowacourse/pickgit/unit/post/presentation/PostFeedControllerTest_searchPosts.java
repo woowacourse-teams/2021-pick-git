@@ -19,15 +19,12 @@ import static org.springframework.restdocs.request.RequestDocumentation.paramete
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.comment.domain.Comment;
 import com.woowacourse.pickgit.common.factory.UserFactory;
-import com.woowacourse.pickgit.post.application.PostDtoAssembler;
-import com.woowacourse.pickgit.post.application.PostFeedService;
+import com.woowacourse.pickgit.post.application.dto.PostDtoAssembler;
 import com.woowacourse.pickgit.post.application.dto.request.SearchPostsRequestDto;
 import com.woowacourse.pickgit.post.domain.Post;
-import com.woowacourse.pickgit.post.presentation.PostFeedController;
 import com.woowacourse.pickgit.tag.domain.Tag;
 import com.woowacourse.pickgit.unit.ControllerTest;
 import com.woowacourse.pickgit.user.domain.User;
@@ -36,12 +33,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 class PostFeedControllerTest_searchPosts extends ControllerTest {
@@ -85,7 +77,7 @@ class PostFeedControllerTest_searchPosts extends ControllerTest {
         given(oAuthService.findRequestUserByToken(any()))
             .willReturn(new GuestUser());
         given(postFeedService.search(any(SearchPostsRequestDto.class)))
-            .willReturn(PostDtoAssembler.assembleFrom(null,  List.of(post1, post2)));
+            .willReturn(PostDtoAssembler.postResponseDtos(null,  List.of(post1, post2)));
 
         ResultActions perform = mockMvc.perform(
             get("/api/search/posts")
@@ -133,7 +125,7 @@ class PostFeedControllerTest_searchPosts extends ControllerTest {
         given(oAuthService.findRequestUserByToken(any()))
             .willReturn(new GuestUser());
         given(postFeedService.search(any(SearchPostsRequestDto.class)))
-            .willReturn(PostDtoAssembler.assembleFrom(user, List.of(post1, post2)));
+            .willReturn(PostDtoAssembler.postResponseDtos(user, List.of(post1, post2)));
 
         ResultActions perform = mockMvc.perform(
             get("/api/search/posts")

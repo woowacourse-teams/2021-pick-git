@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.tag.application;
+package com.woowacourse.pickgit.tag.application.dto;
 
 import lombok.Builder;
 

@@ -23,7 +23,7 @@ public class TagType implements SearchType {
     }
 
     @Override
-    public List<Post> search(String[] keywords, PageRequest pageRequest) {
-        return postRepository.findAllPostsByTagNames(List.of(keywords), pageRequest);
+    public List<Post> search(String keywords, PageRequest pageRequest) {
+        return postRepository.findAllPostsByTagNames(List.of(keywords.split(" ")), pageRequest);
     }
 }

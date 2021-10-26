@@ -3,6 +3,7 @@ package com.woowacourse.pickgit.query.integrantion.user;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.setAllowExtractingPrivateFields;
 import static org.assertj.core.groups.Tuple.tuple;
 
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
@@ -22,6 +23,7 @@ import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponse
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.presentation.dto.UserAssembler;
 import java.util.List;
 import javax.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
@@ -30,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -49,7 +52,7 @@ public class UserServiceIntegrationTest_Query extends IntegrationTest {
 
         // when, then
         assertThatCode(() -> userService.getMyUserProfile(requestDto))
-            .isInstanceOf(UnauthorizedException.class);
+            .isInstanceOf(InvalidUserException.class);
     }
 
     @DisplayName("로그인된 사용자는 자신의 프로필을 조회할 수 있다.")
@@ -157,16 +160,11 @@ public class UserServiceIntegrationTest_Query extends IntegrationTest {
     void searchUser_LoginUser_Success() {
         // given
         String searchKeyword = "bing";
-        UserSearchRequestDto userSearchRequestDto = UserSearchRequestDto
-            .builder()
-            .keyword(searchKeyword)
-            .page(0L)
-            .limit(5L)
-            .build();
         List<User> usersInDb = UserFactory.mockSearchUsers();
         User loginUser = usersInDb.get(0);
         List<User> searchedUsers = usersInDb.subList(1, usersInDb.size());
-        AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto(loginUser.getName());
+        AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto(
+            loginUser.getName());
 
         userRepository.save(loginUser);
         searchedUsers.forEach(user -> userRepository.save(user));
@@ -181,7 +179,7 @@ public class UserServiceIntegrationTest_Query extends IntegrationTest {
         userService.followUser(requestDto);
 
         List<UserSearchResponseDto> searchResult =
-            userService.searchUser(authUserRequestDto, userSearchRequestDto);
+            userService.searchUser(authUserRequestDto, searchKeyword, PageRequest.of(0, 10));
 
         // then
         assertThat(searchResult).hasSize(4);
@@ -200,19 +198,13 @@ public class UserServiceIntegrationTest_Query extends IntegrationTest {
     void searchUser_GuestUser_Success() {
         // given
         String searchKeyword = "bing";
-        UserSearchRequestDto userSearchRequestDto = UserSearchRequestDto
-            .builder()
-            .keyword(searchKeyword)
-            .page(0L)
-            .limit(3L)
-            .build();
         AuthUserForUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
         List<User> userInDb = UserFactory.mockSearchUsers();
         userRepository.saveAll(userInDb);
 
         // when
         List<UserSearchResponseDto> searchResult =
-            userService.searchUser(authUserRequestDto, userSearchRequestDto);
+            userService.searchUser(authUserRequestDto, searchKeyword, PageRequest.of(0, 3));
 
         // then
         assertThat(searchResult)
@@ -229,12 +221,6 @@ public class UserServiceIntegrationTest_Query extends IntegrationTest {
     void searchFollowings_LoginUser_Success() {
         // given
         AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("bingbing");
-        FollowSearchRequestDto followSearchRequestDto =
-            FollowSearchRequestDto.builder()
-                .username("target")
-                .page(0L)
-                .limit(10L)
-                .build();
         List<User> usersInDb = UserFactory.mockSearchUsers();
         User targetUser = UserFactory.user("target");
 
@@ -262,7 +248,7 @@ public class UserServiceIntegrationTest_Query extends IntegrationTest {
 
         // when
         List<UserSearchResponseDto> response =
-            userService.searchFollowings(authUserRequestDto, followSearchRequestDto);
+            userService.searchFollowings(authUserRequestDto, "target", PageRequest.of(0, 10));
 
         // then
         assertThat(response)
@@ -281,12 +267,6 @@ public class UserServiceIntegrationTest_Query extends IntegrationTest {
     void searchFollowings_GuestUser_Success() {
         // given
         AuthUserForUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
-        FollowSearchRequestDto followSearchRequestDto =
-            FollowSearchRequestDto.builder()
-                .username("target")
-                .page(0L)
-                .limit(10L)
-                .build();
         List<User> usersInDb = UserFactory.mockSearchUsers();
         User targetUser = UserFactory.user("target");
 
@@ -306,7 +286,7 @@ public class UserServiceIntegrationTest_Query extends IntegrationTest {
 
         // when
         List<UserSearchResponseDto> response =
-            userService.searchFollowings(authUserRequestDto, followSearchRequestDto);
+            userService.searchFollowings(authUserRequestDto, "target", PageRequest.of(0, 10));
 
         // then
         assertThat(response)
@@ -325,12 +305,6 @@ public class UserServiceIntegrationTest_Query extends IntegrationTest {
     void searchFollowers_LoginUser_Success() {
         // given
         AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("bingbing");
-        FollowSearchRequestDto followSearchRequestDto =
-            FollowSearchRequestDto.builder()
-                .username("target")
-                .page(0L)
-                .limit(10L)
-                .build();
         List<User> usersInDb = UserFactory.mockSearchUsers();
         User targetUser = UserFactory.user("target");
 
@@ -360,7 +334,7 @@ public class UserServiceIntegrationTest_Query extends IntegrationTest {
 
         // when
         List<UserSearchResponseDto> response =
-            userService.searchFollowers(authUserRequestDto, followSearchRequestDto);
+            userService.searchFollowers(authUserRequestDto, "target", PageRequest.of(0, 10));
 
         // then
         assertThat(response)
@@ -379,12 +353,6 @@ public class UserServiceIntegrationTest_Query extends IntegrationTest {
     void searchFollowers_GuestUser_Success() {
         // given
         AuthUserForUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
-        FollowSearchRequestDto followSearchRequestDto =
-            FollowSearchRequestDto.builder()
-                .username("target")
-                .page(0L)
-                .limit(10L)
-                .build();
         List<User> usersInDb = UserFactory.mockSearchUsers();
         User targetUser = UserFactory.user("target");
 
@@ -392,7 +360,8 @@ public class UserServiceIntegrationTest_Query extends IntegrationTest {
         userRepository.save(targetUser);
 
         usersInDb.forEach(mockUser -> {
-            AuthUserForUserRequestDto mockUserAuthDto = createLoginAuthUserRequestDto(mockUser.getName());
+            AuthUserForUserRequestDto mockUserAuthDto = createLoginAuthUserRequestDto(
+                mockUser.getName());
 
             FollowRequestDto requestDto = FollowRequestDto.builder()
                 .authUserRequestDto(mockUserAuthDto)
@@ -404,7 +373,7 @@ public class UserServiceIntegrationTest_Query extends IntegrationTest {
 
         // when
         List<UserSearchResponseDto> response =
-            userService.searchFollowers(authUserRequestDto, followSearchRequestDto);
+            userService.searchFollowers(authUserRequestDto, "target", PageRequest.of(0, 10));
 
         // then
         assertThat(response)
@@ -420,10 +389,10 @@ public class UserServiceIntegrationTest_Query extends IntegrationTest {
 
     private AuthUserForUserRequestDto createLoginAuthUserRequestDto(String username) {
         AppUser appUser = new LoginUser(username, "Bearer testToken");
-        return AuthUserForUserRequestDto.from(appUser);
+        return UserAssembler.authUserForUserRequestDto(appUser);
     }
 
     private AuthUserForUserRequestDto createGuestAuthUserRequestDto() {
-        return AuthUserForUserRequestDto.from(new GuestUser());
+        return UserAssembler.authUserForUserRequestDto(new GuestUser());
     }
 }
