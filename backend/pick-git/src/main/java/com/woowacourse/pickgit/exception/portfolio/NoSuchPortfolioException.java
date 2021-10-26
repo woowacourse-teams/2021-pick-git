@@ -1,6 +1,5 @@
 package com.woowacourse.pickgit.exception.portfolio;
 
-import com.woowacourse.pickgit.exception.ApplicationException;
 import org.springframework.http.HttpStatus;
 
 public class NoSuchPortfolioException extends PortfolioException {

@@ -19,7 +19,6 @@ import com.woowacourse.pickgit.user.presentation.dto.response.ProfileDescription
 import com.woowacourse.pickgit.user.presentation.dto.response.UserProfileResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.UserSearchResponse;
 import java.util.List;
-import org.springframework.data.domain.Pageable;
 
 public class UserAssembler {
 

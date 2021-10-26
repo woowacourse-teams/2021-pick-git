@@ -10,8 +10,8 @@ import static org.mockito.Mockito.verify;
 
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.post.TagFormatException;
-import com.woowacourse.pickgit.tag.application.dto.ExtractionRequestDto;
 import com.woowacourse.pickgit.tag.application.TagService;
+import com.woowacourse.pickgit.tag.application.dto.ExtractionRequestDto;
 import com.woowacourse.pickgit.tag.application.dto.TagsDto;
 import com.woowacourse.pickgit.tag.domain.PlatformTagExtractor;
 import com.woowacourse.pickgit.tag.domain.Tag;

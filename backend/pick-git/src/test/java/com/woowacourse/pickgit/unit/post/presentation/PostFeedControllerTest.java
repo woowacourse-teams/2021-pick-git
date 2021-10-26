@@ -24,14 +24,10 @@ import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.PostFactory;
 import com.woowacourse.pickgit.post.application.dto.request.HomeFeedRequestDto;
-import com.woowacourse.pickgit.post.presentation.PostFeedController;
 import com.woowacourse.pickgit.unit.ControllerTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.ResultActions;
 
 class PostFeedControllerTest extends ControllerTest {

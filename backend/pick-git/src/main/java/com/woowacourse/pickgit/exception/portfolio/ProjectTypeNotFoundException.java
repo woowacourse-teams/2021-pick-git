@@ -2,8 +2,7 @@ package com.woowacourse.pickgit.exception.portfolio;
 
 import org.springframework.http.HttpStatus;
 
-public class ProjectTypeNotFoundException extends PortfolioException
-{
+public class ProjectTypeNotFoundException extends PortfolioException {
 
     private static final String ERROR_CODE = "R0002";
     private static final HttpStatus HTTP_STATUS = HttpStatus.NOT_FOUND;

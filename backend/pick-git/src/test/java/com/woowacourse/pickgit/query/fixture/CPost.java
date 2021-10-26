@@ -3,7 +3,6 @@ package com.woowacourse.pickgit.query.fixture;
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.query.fixture.TPost.Pair;
 import java.io.File;
-import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
