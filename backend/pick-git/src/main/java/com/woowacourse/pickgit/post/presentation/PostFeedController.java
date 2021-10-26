@@ -1,7 +1,5 @@
 package com.woowacourse.pickgit.post.presentation;
 
-import static java.util.stream.Collectors.toList;
-
 import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.config.auth_interceptor_register.ForLoginAndGuestUser;
@@ -15,7 +13,6 @@ import com.woowacourse.pickgit.post.presentation.dto.PostAssembler;
 import com.woowacourse.pickgit.post.presentation.dto.request.SearchPostsRequest;
 import com.woowacourse.pickgit.post.presentation.dto.response.PostResponse;
 import java.util.List;
-import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -96,29 +93,6 @@ public class PostFeedController {
         return ResponseEntity.ok(postResponses);
     }
 
-    private List<PostResponse> createPostResponses(List<PostResponseDto> postResponseDtos) {
-        return postResponseDtos.stream()
-            .map(toPostResponseDtoPostResponse())
-            .collect(toList());
-    }
-
-    private Function<PostResponseDto, PostResponse> toPostResponseDtoPostResponse() {
-        return postResponseDto -> PostResponse.builder()
-            .id(postResponseDto.getId())
-            .imageUrls(postResponseDto.getImageUrls())
-            .githubRepoUrl(postResponseDto.getGithubRepoUrl())
-            .content(postResponseDto.getContent())
-            .authorName(postResponseDto.getAuthorName())
-            .profileImageUrl(postResponseDto.getProfileImageUrl())
-            .likesCount(postResponseDto.getLikesCount())
-            .tags(postResponseDto.getTags())
-            .createdAt(postResponseDto.getCreatedAt())
-            .updatedAt(postResponseDto.getUpdatedAt())
-            .comments(postResponseDto.getComments())
-            .liked(postResponseDto.getLiked())
-            .build();
-    }
-
     @ForLoginAndGuestUser
     @GetMapping(value = "/posts", params = "id")
     public ResponseEntity<PostResponse> findPostById(
@@ -128,7 +102,7 @@ public class PostFeedController {
         PostResponseDto postResponseDto = postFeedService
             .searchById(new SearchPostRequestDto(postId, appUser));
 
-        PostResponse postResponse = toPostResponseDtoPostResponse().apply(postResponseDto);
+        PostResponse postResponse = PostAssembler.postResponse(postResponseDto);
 
         return ResponseEntity.ok(postResponse);
     }
