@@ -58,12 +58,10 @@ public class PostFeedService {
         return PostDtoAssembler.postResponseDtos(requestUser, result);
     }
 
-    public List<PostResponseDto> search(SearchPostsRequestDto searchPostsRequestDto) {
-        PageRequest pageable = PageRequest.of(
-            searchPostsRequestDto.getPage(),
-            searchPostsRequestDto.getLimit()
-        );
-
+    public List<PostResponseDto> search(
+        SearchPostsRequestDto searchPostsRequestDto,
+        Pageable pageable
+    ) {
         List<Post> search = searchTypes
             .findByTypeName(searchPostsRequestDto.getType())
             .search(searchPostsRequestDto.getKeyword(), pageable);

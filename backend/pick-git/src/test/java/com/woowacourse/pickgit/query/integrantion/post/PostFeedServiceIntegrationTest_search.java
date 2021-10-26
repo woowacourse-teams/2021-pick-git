@@ -27,6 +27,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 
 public class PostFeedServiceIntegrationTest_search extends IntegrationTest {
 
@@ -91,7 +92,8 @@ public class PostFeedServiceIntegrationTest_search extends IntegrationTest {
             createSearchPostsRequestDto("tags", keyword, "testUser", false);
 
         // when
-        List<PostResponseDto> actual = postFeedService.search(searchPostsRequestDto);
+        List<PostResponseDto> actual = postFeedService
+            .search(searchPostsRequestDto, PageRequest.of(0, 5));
         actual.sort(comparing(PostResponseDto::getId));
 
         // then
@@ -114,7 +116,8 @@ public class PostFeedServiceIntegrationTest_search extends IntegrationTest {
             createSearchPostsRequestDto("tags", keyword, null, true);
 
         // when
-        List<PostResponseDto> actual = postFeedService.search(searchPostsRequestDto);
+        List<PostResponseDto> actual = postFeedService
+            .search(searchPostsRequestDto, PageRequest.of(0, 5));
         actual.sort(comparing(PostResponseDto::getId));
 
         // then
@@ -164,7 +167,8 @@ public class PostFeedServiceIntegrationTest_search extends IntegrationTest {
             createSearchPostsRequestDto(type, "keyword", userName, isGuest);
 
         // when then
-        assertThatThrownBy(() -> postFeedService.search(searchPostsRequestDto))
+        assertThatThrownBy(
+            () -> postFeedService.search(searchPostsRequestDto, PageRequest.of(0, 5)))
             .isInstanceOf(IllegalSearchTypeException.class)
             .extracting("errorCode")
             .isEqualTo("P0006");
@@ -179,8 +183,6 @@ public class PostFeedServiceIntegrationTest_search extends IntegrationTest {
         return SearchPostsRequestDto.builder()
             .type(type)
             .keyword(keyword)
-            .page(0)
-            .limit(5)
             .userName(userName)
             .isGuest(isGuest)
             .build();

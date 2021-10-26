@@ -135,6 +135,18 @@ public class UserAssembler {
             .build();
     }
 
+    public static FollowSearchRequestDto followSearchRequestDto(
+        String username,
+        Long page,
+        Long limit
+    ) {
+        return FollowSearchRequestDto.builder()
+            .username(username)
+            .page(page)
+            .limit(limit)
+            .build();
+    }
+
     private static UserSearchResponse createUserSearchResponse(
         UserSearchResponseDto userSearchResponseDto
     ) {

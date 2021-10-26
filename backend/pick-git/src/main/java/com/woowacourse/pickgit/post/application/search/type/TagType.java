@@ -4,6 +4,7 @@ import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -23,7 +24,7 @@ public class TagType implements SearchType {
     }
 
     @Override
-    public List<Post> search(String keywords, PageRequest pageRequest) {
-        return postRepository.findAllPostsByTagNames(List.of(keywords.split(" ")), pageRequest);
+    public List<Post> search(String keywords, Pageable pageable) {
+        return postRepository.findAllPostsByTagNames(List.of(keywords.split(" ")), pageable);
     }
 }
