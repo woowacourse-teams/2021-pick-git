@@ -152,7 +152,7 @@ export type PortfolioIntro = {
 };
 
 export type PortfolioProject = {
-  id: number | null;
+  id: string | number;
   name: string;
   startDate: string;
   endDate: string;
@@ -163,16 +163,16 @@ export type PortfolioProject = {
 };
 
 export type PortfolioSectionItem = {
-  id: number | null;
+  id: string | number;
   category: string;
   descriptions: {
-    id: number | null;
+    id: string | number;
     value: string;
   }[];
 };
 
 export type PortfolioSection = {
-  id: number | null;
+  id: string | number;
   name: string;
   items: PortfolioSectionItem[];
 };

@@ -66,3 +66,5 @@ export const CONTACT_ICON: {
   [CONTACTS[6].category]: "CompanyLineIcon",
   [CONTACTS[7].category]: "LocationLineIcon",
 };
+
+export const TEMP_ID_INDICATOR = "temp-";

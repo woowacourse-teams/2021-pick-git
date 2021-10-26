@@ -57,11 +57,12 @@ import usePortfolioContacts from "../../hooks/service/usePortfolioContacts";
 import { CONTACT_ICON } from "../../constants/portfolio";
 import useSnackbar from "../../hooks/common/useSnackbar";
 import Fab from "../../components/@shared/Fab/Fab";
+import { getTemporaryId } from "../../utils/portfolio";
 
 const MyPortfolioPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [deletingSectionType, setDeletingSectionType] = useState<PortfolioSectionType>();
-  const [deletingSectionName, setDeletingSectionName] = useState("");
+  const [deletingSectionId, setDeletingSectionId] = useState<string | number>("");
 
   const { currentUsername, isLoggedIn } = useAuth();
   const {
@@ -117,8 +118,8 @@ const MyPortfolioPage = () => {
   const paginationCount = portfolioProjects.length + portfolioSections.length + 1;
   const { paginate } = useScrollPagination(containerRef, paginationCount);
 
-  const handleSetProject = (prevProjectName: string) => (newProject: PortfolioProject) => {
-    updatePortfolioProject(prevProjectName, newProject);
+  const handleSetProject = (prevProjectId: string | number) => (newProject: PortfolioProject) => {
+    updatePortfolioProject(prevProjectId, newProject);
   };
 
   const handleAddSection = () => {
@@ -129,9 +130,10 @@ const MyPortfolioPage = () => {
     showProjectAddModal();
   };
 
-  const handleSectionNameUpdate = (prevSectionName: string) => (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    updatePortfolioSectionName(prevSectionName, event.currentTarget.value);
-  };
+  const handleSectionNameUpdate =
+    (prevSectionId: string | number) => (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+      updatePortfolioSectionName(prevSectionId, event.currentTarget.value);
+    };
 
   const handleIntroNameUpdate: React.ChangeEventHandler<HTMLTextAreaElement> = (event) => {
     updateIntroName(event.currentTarget.value);
@@ -150,7 +152,7 @@ const MyPortfolioPage = () => {
     const [firstImageUrl] = post.imageUrls;
 
     addPortfolioProject({
-      id: null,
+      id: getTemporaryId(),
       content: post.content,
       imageUrl: firstImageUrl,
       name: `프로젝트 ${portfolioProjects.length + 1}`,
@@ -165,26 +167,26 @@ const MyPortfolioPage = () => {
     hideProjectAddModal();
   };
 
-  const handleDeleteProjectSection = (sectionName: string) => {
+  const handleDeleteProjectSection = (sectionId: string | number) => {
     showConfirm("정말 삭제하시겠습니까?");
     setDeletingSectionType("project");
-    setDeletingSectionName(sectionName);
+    setDeletingSectionId(sectionId);
   };
 
-  const handleDeleteCustomSection = (sectionName: string) => {
+  const handleDeleteCustomSection = (sectionId: string | number) => {
     showConfirm("정말 삭제하시겠습니까?");
     setDeletingSectionType("custom");
-    setDeletingSectionName(sectionName);
+    setDeletingSectionId(sectionId);
   };
 
   const handleDeleteSectionConfirm = () => {
     if (deletingSectionType === "project") {
-      deletePortfolioProject(deletingSectionName);
+      deletePortfolioProject(deletingSectionId);
       hideConfirm();
       return;
     }
 
-    deletePortfolioSection(deletingSectionName);
+    deletePortfolioSection(deletingSectionId);
     hideConfirm();
   };
 
@@ -356,25 +358,25 @@ const MyPortfolioPage = () => {
             <PortfolioProjectSection
               isEditable={true}
               project={portfolioProject}
-              setProject={handleSetProject(portfolioProject.name)}
+              setProject={handleSetProject(portfolioProject.id)}
             />
             <CloseButtonWrapper>
               <Button
                 kind="roundedInline"
                 padding="0.5rem"
-                onClick={() => handleDeleteProjectSection(portfolioProject.name)}
+                onClick={() => handleDeleteProjectSection(portfolioProject.id)}
               >
                 <SVGIcon icon="CancelNoCircleIcon" />
               </Button>
             </CloseButtonWrapper>
           </FullPage>
         ))}
-        {portfolioSections.map((portfolioSection, index) => (
-          <FullPage key={portfolioSection.id ?? index}>
+        {portfolioSections.map((portfolioSection) => (
+          <FullPage key={portfolioSection.id}>
             <PortfolioTextEditor
               cssProp={SectionNameCSS}
               value={portfolioSection.name}
-              onChange={handleSectionNameUpdate(portfolioSection.name)}
+              onChange={handleSectionNameUpdate(portfolioSection.id)}
               placeholder={PLACE_HOLDER.SECTION_NAME}
               autoGrow
             />
@@ -383,7 +385,7 @@ const MyPortfolioPage = () => {
               <Button
                 kind="roundedInline"
                 padding="0.5rem"
-                onClick={() => handleDeleteCustomSection(portfolioSection.name)}
+                onClick={() => handleDeleteCustomSection(portfolioSection.id)}
               >
                 <SVGIcon icon="CancelNoCircleIcon" />
               </Button>
