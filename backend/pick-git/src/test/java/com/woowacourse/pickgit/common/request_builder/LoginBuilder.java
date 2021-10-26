@@ -50,7 +50,7 @@ public class LoginBuilder<T extends Parameters> {
     }
 
     public T withUser(TUser user) {
-        return setOauth2ToSpec(user.은로그인을한다());
+        return setOauth2ToSpec(user.은로그인을한다().getToken());
     }
 
     private T setOauth2ToSpec(String token) {

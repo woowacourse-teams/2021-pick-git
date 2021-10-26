@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.unit.tag.infrastructure;
 
+import static com.woowacourse.pickgit.query.fixture.TRepository.PICK_GIT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
@@ -18,7 +19,7 @@ class GithubTagExtractorTest {
 
     private static final String TESTER_ACCESS_TOKEN = "oauth.access.token";
     private static final String USER_NAME = "jipark3";
-    private static final String REPOSITORY_NAME = "doms-react";
+    private static final String REPOSITORY_NAME = PICK_GIT.name();
 
     private PlatformTagExtractor platformTagExtractor;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -39,7 +40,7 @@ class GithubTagExtractorTest {
         List<String> tags = platformTagExtractor
             .extractTags(TESTER_ACCESS_TOKEN, USER_NAME, REPOSITORY_NAME);
 
-        assertThat(tags).contains("JavaScript", "HTML", "CSS");
+        assertThat(tags).containsExactlyInAnyOrderElementsOf(PICK_GIT.getTags());
     }
 
     @DisplayName("토큰이 유효하지 않은 경우 권한 예외가 발생한다.")
@@ -56,7 +57,7 @@ class GithubTagExtractorTest {
     @Test
     void extractTags_InvalidUrl_ExceptionThrown() {
         assertThatCode(() -> {
-            platformTagExtractor.extractTags(TESTER_ACCESS_TOKEN, "invalidpath", REPOSITORY_NAME);
+            platformTagExtractor.extractTags(TESTER_ACCESS_TOKEN, "invalidpath", "invalid");
         }).isInstanceOf(PlatformHttpErrorException.class)
             .extracting("errorCode")
             .isEqualTo("V0001");

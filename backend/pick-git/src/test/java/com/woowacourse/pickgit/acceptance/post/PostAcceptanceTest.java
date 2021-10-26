@@ -1,90 +1,59 @@
 package com.woowacourse.pickgit.acceptance.post;
 
+import static com.woowacourse.pickgit.query.fixture.TPost.KEVINPOST;
+import static com.woowacourse.pickgit.query.fixture.TPost.NEOZALPOST;
+import static com.woowacourse.pickgit.query.fixture.TUser.GUEST;
+import static com.woowacourse.pickgit.query.fixture.TUser.MARK;
+import static com.woowacourse.pickgit.query.fixture.TUser.NEOZAL;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;
-import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
-import com.woowacourse.pickgit.authentication.domain.OAuthClient;
-import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
 import com.woowacourse.pickgit.exception.post.CannotUnlikeException;
 import com.woowacourse.pickgit.exception.post.DuplicatedLikeException;
-import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
 import com.woowacourse.pickgit.post.presentation.dto.response.LikeResponse;
 import com.woowacourse.pickgit.post.presentation.dto.response.PostUpdateResponse;
+import com.woowacourse.pickgit.query.fixture.CPost;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.hibernate.validator.internal.engine.messageinterpolation.el.NoOpElResolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 class PostAcceptanceTest extends AcceptanceTest {
 
-    private static final String ANOTHER_USERNAME = "pick-git-login";
-    private static final String USERNAME = "jipark3";
-
-    private String githubRepoUrl;
-    private String content;
-    private Map<String, Object> request;
-
-    @BeforeEach
-    void setUp() {
-        githubRepoUrl = "https://github.com/woowacourse-teams/2021-pick-git";
-        List<String> tags = List.of("java", "spring");
-        content = "this is content";
-
-        Map<String, Object> body = new HashMap<>();
-        body.put("githubRepoUrl", githubRepoUrl);
-        body.put("tags", tags);
-        body.put("content", content);
-        request = body;
-    }
-
     @DisplayName("사용자는 게시글을 등록한다.")
     @Test
     void write_LoginUser_Success() {
-        // given
-        String token = 로그인_되어있음(ANOTHER_USERNAME).getToken();
+        int statusCode = NEOZAL.은로그인을하고().포스트를등록한다(NEOZALPOST).statusCode();
 
-        // when
-        requestWrite(token);
+        assertThat(statusCode).isEqualTo(HttpStatus.CREATED.value());
     }
 
     @DisplayName("사용자는 태그 없이 게시글을 작성할 수 있다.")
     @Test
     void write_LoginUserWithNoneTags_Success() {
-        // given
-        String token = 로그인_되어있음(USERNAME).getToken();
+        CPost post = CPost.builder()
+            .tags(List.of())
+            .build();
 
-        // when, then
-        given().log().all()
-            .auth().oauth2(token)
-            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-            .formParams("githubRepoUrl", githubRepoUrl)
-            .formParams("content", content)
-            .multiPart("images", FileFactory.getTestImage1File())
-            .multiPart("images", FileFactory.getTestImage2File())
-            .when()
-            .post("/api/posts")
-            .then().log().all()
-            .statusCode(HttpStatus.CREATED.value())
-            .extract();
+        int statusCode = NEOZAL.은로그인을하고().포스트를등록한다(post).statusCode();
+        assertThat(statusCode).isEqualTo(HttpStatus.CREATED.value());
     }
 
     @DisplayName("잘못된 태그 이름을 가진 게시글을 작성할 수 없다.")
@@ -92,470 +61,212 @@ class PostAcceptanceTest extends AcceptanceTest {
     @EmptySource
     @ValueSource(strings = {" ", "  ", "abcdeabcdeabcdeabcdea"})
     void write_LoginUserWithInvalidTags_Fail(String tagName) {
-        // given
-        String token = 로그인_되어있음(USERNAME).getToken();
-        List<String> invalidTags = List.of("Java", "JavaScript", tagName);
+        CPost post = CPost.builder()
+            .tags(List.of("Java", "JavaScript", tagName))
+            .build();
 
-        // when
-        ApiErrorResponse response = given().log().all()
-            .auth().oauth2(token)
-            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-            .formParams("githubRepoUrl", githubRepoUrl)
-            .formParams("content", content)
-            .formParams("tags", invalidTags)
-            .multiPart("images", FileFactory.getTestImage1File())
-            .multiPart("images", FileFactory.getTestImage2File())
-            .when()
-            .post("/api/posts")
-            .then().log().all()
-            .statusCode(HttpStatus.BAD_REQUEST.value())
-            .extract()
-            .as(ApiErrorResponse.class);
+        ExtractableResponse<Response> extractableResponse = NEOZAL.은로그인을하고().포스트를등록한다(post);
 
-        // then
+        assertThat(extractableResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+
+        ApiErrorResponse response = extractableResponse.as(ApiErrorResponse.class);
         assertThat(response.getErrorCode()).isEqualTo("F0003");
     }
 
     @DisplayName("사용자는 중복된 태그를 가진 게시글을 작성할 수 없다.")
     @Test
     void write_LoginUserWithDuplicatedTags_Fail() {
-        // given
-        String token = 로그인_되어있음(USERNAME).getToken();
-        List<String> duplicatedTags = List.of("Java", "JavaScript", "Java");
 
-        // when
-        ApiErrorResponse response = given().log().all()
-            .auth().oauth2(token)
-            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-            .formParams("githubRepoUrl", githubRepoUrl)
-            .formParams("content", content)
-            .formParams("tags", duplicatedTags)
-            .multiPart("images", FileFactory.getTestImage1File())
-            .multiPart("images", FileFactory.getTestImage2File())
-            .when()
-            .post("/api/posts")
-            .then().log().all()
-            .statusCode(HttpStatus.BAD_REQUEST.value())
-            .extract()
-            .as(ApiErrorResponse.class);
+        CPost post = CPost.builder()
+            .tags(List.of("Java", "JavaScript", "Java"))
+            .build();
 
-        // then
+        ExtractableResponse<Response> extractableResponse = NEOZAL.은로그인을하고().포스트를등록한다(post);
+
+        assertThat(extractableResponse.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+
+        ApiErrorResponse response = extractableResponse.as(ApiErrorResponse.class);
         assertThat(response.getErrorCode()).isEqualTo("P0001");
     }
 
     @DisplayName("게스트는 게시글을 등록할 수 없다. - 유효하지 않은 토큰이 있는 경우 (Authorization header O)")
     @Test
     void write_GuestUserWithToken_Fail() {
-        // given
-        String token = "Bearer guest";
-
-        // when
-        requestToWritePostApi(token, HttpStatus.UNAUTHORIZED);
+        int statusCode = GUEST.는().유효하지_않은_토큰으로_포스트를등록한다(NEOZALPOST).statusCode();
+        assertThat(statusCode).isEqualTo(HttpStatus.UNAUTHORIZED.value());
     }
 
     @DisplayName("게스트는 게시글을 등록할 수 없다. - 토큰이 없는 경우 (Authorization header X)")
     @Test
     void write_GuestUserWithoutToken_Fail() {
-        // when
-        given().log().all()
-            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-            .formParams(request)
-            .multiPart("images", FileFactory.getTestImage1File())
-            .multiPart("images", FileFactory.getTestImage2File())
-            .when()
-            .post("/api/posts")
-            .then().log().all()
-            .statusCode(HttpStatus.UNAUTHORIZED.value())
-            .extract();
-    }
-
-    private void requestToWritePostApi(String token, HttpStatus httpStatus) {
-        given().log().all()
-            .auth().oauth2(token)
-            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-            .formParams(request)
-            .multiPart("images", FileFactory.getTestImage1File())
-            .multiPart("images", FileFactory.getTestImage2File())
-            .when()
-            .post("/api/posts")
-            .then().log().all()
-            .statusCode(httpStatus.value())
-            .extract();
+        int statusCode = GUEST.는().포스트를등록한다(NEOZALPOST).statusCode();
+        assertThat(statusCode).isEqualTo(HttpStatus.UNAUTHORIZED.value());
     }
 
     @DisplayName("사용자는 Repository 목록을 가져올 수 있다.")
     @Test
     void userRepositories_LoginUser_Success() {
         // given
-        String token = 로그인_되어있음(USERNAME).getToken();
+        List<RepositoryResponseDto> response =
+            NEOZAL.은로그인을하고().레포지토리_목록을_가져온다().as(new TypeRef<>() {
+        });
 
-        // when
-        List<RepositoryResponseDto> response = requestUserRepositories(token, HttpStatus.OK.value())
-            .as(new TypeRef<>() {
-            });
-
-        // then
         assertThat(response).hasSize(2);
     }
 
-    @DisplayName("토큰이 유효하지 않은 경우 예외가 발생한다. - 500 예외")
+    @DisplayName("토큰이 유효하지 않은 경우 Repository 목록을 가져오는데 예외가 발생한다. - 500 예외")
     @Test
     void userRepositories_InvalidAccessToken_500Exception() {
-        // given
-        String token = 로그인_되어있음(USERNAME).getToken();
-
-        // when
-        requestUserRepositories(token + "hi", HttpStatus.UNAUTHORIZED.value());
-    }
-
-    private ExtractableResponse<Response> requestUserRepositories(String token, int statusCode) {
-        return given().log().all()
-            .auth().oauth2(token)
-            .when()
-            .get("/api/github/repositories?page=" + 0L + "&limit=" + 50L)
-            .then().log().all()
-            .statusCode(statusCode)
-            .extract();
+        int statusCode = GUEST.는().비정상토큰으로_레포지토리목록을_가져온다().statusCode();
+        assertThat(statusCode).isEqualTo(HttpStatus.UNAUTHORIZED.value());
     }
 
     @DisplayName("로그인 사용자는 게시물을 좋아요 할 수 있다. - 성공")
     @Test
     void likePost_LoginUser_Success() {
-        // given
-        String loginUserToken = 로그인_되어있음(USERNAME).getToken();
-        String targetUserToken = 로그인_되어있음(ANOTHER_USERNAME).getToken();
-        Long postId = 1L;
+        NEOZAL.은로그인을하고().포스트를등록한다(NEOZALPOST);
+        LikeResponse likeResponse =
+            MARK.은로그인을하고().포스트에좋아요를누른다(NEOZALPOST).as(LikeResponse.class);
 
-        requestToWritePostApi(targetUserToken, HttpStatus.CREATED);
-
-        // when
-        LikeResponse response = given().log().all()
-            .auth().oauth2(loginUserToken)
-            .when()
-            .put("/api/posts/{postId}/likes", postId)
-            .then().log().all()
-            .statusCode(HttpStatus.OK.value())
-            .extract()
-            .as(new TypeRef<>() {
-            });
-
-        // then
-        assertThat(response.getLikesCount()).isEqualTo(1);
-        assertThat(response.getLiked()).isTrue();
+        assertThat(likeResponse.getLikesCount()).isOne();
+        assertThat(likeResponse.getLiked()).isTrue();
     }
 
     @DisplayName("로그인 사용자는 게시물을 좋아요 취소 할 수 있다. - 성공")
     @Test
     void unlikePost_LoginUser_Success() {
-        // given
-        String loginUserToken = 로그인_되어있음(USERNAME).getToken();
-        String targetUserToken = 로그인_되어있음(ANOTHER_USERNAME).getToken();
-        Long postId = 1L;
+        NEOZAL.은로그인을하고().포스트를등록한다(NEOZALPOST);
+        MARK.은로그인을하고().포스트에좋아요를누른다(NEOZALPOST);
+        LikeResponse response =
+            MARK.은로그인을하고().포스트에좋아요_취소를_한다(NEOZALPOST).as(LikeResponse.class);
 
-        requestToWritePostApi(targetUserToken, HttpStatus.CREATED);
-
-        LikeResponse likePostResponse = given().log().all()
-            .auth().oauth2(loginUserToken)
-            .when()
-            .put("/api/posts/{postId}/likes", postId)
-            .then().log().all()
-            .statusCode(HttpStatus.OK.value())
-            .extract()
-            .as(new TypeRef<>() {
-            });
-
-        assertThat(likePostResponse.getLikesCount()).isEqualTo(1);
-        assertThat(likePostResponse.getLiked()).isTrue();
-
-        // when
-        LikeResponse unlikePostResponse = given().log().all()
-            .auth().oauth2(loginUserToken)
-            .when()
-            .delete("/api/posts/{postId}/likes", postId)
-            .then().log().all()
-            .statusCode(HttpStatus.OK.value())
-            .extract()
-            .as(new TypeRef<>() {
-            });
-
-        // then
-        assertThat(unlikePostResponse.getLikesCount()).isZero();
-        assertThat(unlikePostResponse.getLiked()).isFalse();
+        assertThat(response.getLikesCount()).isZero();
+        assertThat(response.getLiked()).isFalse();
     }
 
     @DisplayName("게스트는 게시물을 좋아요 할 수 없다. - 실패")
     @Test
     void likePost_GuestUser_401ExceptionThrown() {
-        // given
-        String targetUserToken = 로그인_되어있음(ANOTHER_USERNAME).getToken();
-        Long postId = 1L;
+        NEOZAL.은로그인을하고().포스트를등록한다(NEOZALPOST);
+        ExtractableResponse<Response> extractableResponse = GUEST.는().포스트에좋아요를누른다(NEOZALPOST);
 
-        requestToWritePostApi(targetUserToken, HttpStatus.CREATED);
+        int statusCode = extractableResponse.statusCode();
+        assertThat(statusCode).isEqualTo(HttpStatus.UNAUTHORIZED.value());
 
-        // when
-        UnauthorizedException response = given().log().all()
-            .when()
-            .put("/api/posts/{postId}/likes", postId)
-            .then().log().all()
-            .statusCode(HttpStatus.UNAUTHORIZED.value())
-            .extract()
-            .as(new TypeRef<>() {
-            });
-
-        // then
+        ApiErrorResponse response = extractableResponse.as(ApiErrorResponse.class);
         assertThat(response.getErrorCode()).isEqualTo("A0001");
     }
 
     @DisplayName("게스트는 게시물을 좋아요 취소 할 수 없다. - 실패")
     @Test
     void unlikePost_GuestUser_401ExceptionThrown() {
-        // given
-        String targetUserToken = 로그인_되어있음(ANOTHER_USERNAME).getToken();
-        Long postId = 1L;
+        NEOZAL.은로그인을하고().포스트를등록한다(NEOZALPOST);
+        ExtractableResponse<Response> extractableResponse = GUEST.는().포스트에좋아요_취소를_한다(NEOZALPOST);
 
-        requestToWritePostApi(targetUserToken, HttpStatus.CREATED);
+        int statusCode = extractableResponse.statusCode();
+        assertThat(statusCode).isEqualTo(HttpStatus.UNAUTHORIZED.value());
 
-        // when
-        UnauthorizedException response = given().log().all()
-            .when()
-            .delete("/api/posts/{postId}/likes", postId)
-            .then().log().all()
-            .statusCode(HttpStatus.UNAUTHORIZED.value())
-            .extract()
-            .as(new TypeRef<>() {
-            });
-
-        // then
+        ApiErrorResponse response = extractableResponse.as(ApiErrorResponse.class);
         assertThat(response.getErrorCode()).isEqualTo("A0001");
     }
 
     @DisplayName("로그인 사용자는 이미 좋아요한 게시물을 좋아요 할 수 없다. - 실패")
     @Test
     void likePost_DuplicatedLike_400ExceptionThrown() {
-        // given
-        String loginUserToken = 로그인_되어있음(USERNAME).getToken();
-        String targetUserToken = 로그인_되어있음(ANOTHER_USERNAME).getToken();
-        Long postId = 1L;
+        NEOZAL.은로그인을하고().포스트를등록한다(NEOZALPOST);
+        MARK.은로그인을하고().포스트에좋아요를누른다(NEOZALPOST);
+        ExtractableResponse<Response> extractableResponse =
+            MARK.은로그인을하고().포스트에좋아요를누른다(NEOZALPOST);
 
-        requestToWritePostApi(targetUserToken, HttpStatus.CREATED);
+        int statusCode = extractableResponse.statusCode();
+        assertThat(statusCode).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
-        LikeResponse likePostResponse = given().log().all()
-            .auth().oauth2(loginUserToken)
-            .when()
-            .put("/api/posts/{postId}/likes", postId)
-            .then().log().all()
-            .statusCode(HttpStatus.OK.value())
-            .extract()
-            .as(new TypeRef<>() {
-            });
-
-        assertThat(likePostResponse.getLikesCount()).isEqualTo(1);
-        assertThat(likePostResponse.getLiked()).isTrue();
-
-        // when
-        DuplicatedLikeException secondLikeResponse = given().log().all()
-            .auth().oauth2(loginUserToken)
-            .when()
-            .put("/api/posts/{postId}/likes", postId)
-            .then().log().all()
-            .statusCode(HttpStatus.BAD_REQUEST.value())
-            .extract()
-            .as(new TypeRef<>() {
-            });
-
-        // then
-        assertThat(secondLikeResponse.getErrorCode()).isEqualTo("P0003");
+        ApiErrorResponse response = extractableResponse.as(ApiErrorResponse.class);
+        assertThat(response.getErrorCode()).isEqualTo("P0003");
     }
 
     @DisplayName("로그인 사용자는 좋아요 하지 않은 게시물을 좋아요 취소 할 수 없다. - 실패")
     @Test
     void unlikePost_cannotUnlike_400ExceptionThrown() {
-        // given
-        String loginUserToken = 로그인_되어있음(USERNAME).getToken();
-        String targetUserToken = 로그인_되어있음(ANOTHER_USERNAME).getToken();
-        Long postId = 1L;
+        NEOZAL.은로그인을하고().포스트를등록한다(NEOZALPOST);
+        ExtractableResponse<Response> extractableResponse = MARK.은로그인을하고().포스트에좋아요_취소를_한다(NEOZALPOST);
 
-        requestToWritePostApi(targetUserToken, HttpStatus.CREATED);
+        int statusCode = extractableResponse.statusCode();
+        assertThat(statusCode).isEqualTo(HttpStatus.BAD_REQUEST.value());
 
-        // when
-        CannotUnlikeException unlikeResponse = given().log().all()
-            .auth().oauth2(loginUserToken)
-            .when()
-            .delete("/api/posts/{postId}/likes", postId)
-            .then().log().all()
-            .statusCode(HttpStatus.BAD_REQUEST.value())
-            .extract()
-            .as(new TypeRef<>() {
-            });
-
-        // then
-        assertThat(unlikeResponse.getErrorCode()).isEqualTo("P0004");
+        ApiErrorResponse response = extractableResponse.as(ApiErrorResponse.class);
+        assertThat(response.getErrorCode()).isEqualTo("P0004");
     }
 
     @DisplayName("사용자는 게시물을 수정한다.")
     @Test
     void update_LoginUser_Success() {
-        // given
-        String token = 로그인_되어있음(USERNAME).getToken();
+        NEOZAL.은로그인을하고().포스트를등록한다(NEOZALPOST);
+        PostUpdateResponse response = NEOZAL.은로그인을하고().포스트를수정한다(NEOZALPOST, KEVINPOST)
+            .as(PostUpdateResponse.class);
 
-        requestWrite(token);
-
-        PostUpdateRequest updateRequest = PostUpdateRequest.builder()
-            .tags(List.of("java", "spring"))
-            .content("hello")
-            .build();
-
-        PostUpdateResponse response = PostUpdateResponse.builder()
-            .tags(List.of("java", "spring"))
-            .content("hello")
-            .build();
-
-        // when
-        PostUpdateResponse updateResponse =
-            putApiForUpdate(token, updateRequest, HttpStatus.CREATED)
-                .as(PostUpdateResponse.class);
-
-        // then
-        assertThat(updateResponse)
-            .usingRecursiveComparison()
-            .isEqualTo(response);
+        assertThat(response.getContent()).isEqualTo(KEVINPOST.getContent());
+        assertThat(response.getTags()).containsExactlyInAnyOrderElementsOf(KEVINPOST.getTags());
     }
 
     @DisplayName("유효하지 않은 내용(null)의 게시물은 수정할 수 없다. - 400 예외")
     @Test
     void update_NullContent_400Exception() {
-        // given
-        String token = 로그인_되어있음(USERNAME).getToken();
-
-        requestWrite(token);
-
-        PostUpdateRequest updateRequest = PostUpdateRequest.builder()
-            .tags(List.of("java", "spring"))
+        CPost post = CPost.builder()
             .content(null)
             .build();
 
-        // when
-        ApiErrorResponse response =
-            putApiForUpdate(token, updateRequest, HttpStatus.BAD_REQUEST)
-                .as(ApiErrorResponse.class);
+        NEOZAL.은로그인을하고().포스트를등록한다(NEOZALPOST);
+        ApiErrorResponse response = NEOZAL.은로그인을하고().포스트를수정한다(NEOZALPOST, post)
+            .as(ApiErrorResponse.class);
 
-        // then
         assertThat(response.getErrorCode()).isEqualTo("F0001");
     }
 
     @DisplayName("유효하지 않은 내용(500자 초과)의 게시물은 수정할 수 없다. - 400 예외")
     @Test
     void update_Over500Content_400Exception() {
-        // given
-        String token = 로그인_되어있음(USERNAME).getToken();
-
-        requestWrite(token);
-
-        PostUpdateRequest updateRequest = PostUpdateRequest.builder()
-            .tags(List.of("java", "spring"))
+        CPost post = CPost.builder()
             .content("a".repeat(501))
             .build();
 
-        // when
-        ApiErrorResponse response =
-            putApiForUpdate(token, updateRequest, HttpStatus.BAD_REQUEST)
-                .as(ApiErrorResponse.class);
+        NEOZAL.은로그인을하고().포스트를등록한다(NEOZALPOST);
+        ApiErrorResponse response = NEOZAL.은로그인을하고().포스트를수정한다(NEOZALPOST, post)
+            .as(ApiErrorResponse.class);
 
-        // then
         assertThat(response.getErrorCode()).isEqualTo("F0004");
     }
 
     @DisplayName("유효하지 않은 토큰으로 게시물을 수정할 수 없다. - 401 예외")
     @Test
     void update_InvalidToken_401Exception() {
-        // given
-        String token = 로그인_되어있음(USERNAME).getToken();
+        NEOZAL.은로그인을하고().포스트를등록한다(NEOZALPOST);
+        ApiErrorResponse response = GUEST.는().비정상토큰으로_게시물을_수정한다(NEOZALPOST, KEVINPOST)
+            .as(ApiErrorResponse.class);
 
-        requestWrite(token);
-
-        PostUpdateRequest updateRequest = PostUpdateRequest.builder()
-            .tags(List.of("java", "spring"))
-            .content("hello")
-            .build();
-
-        // when
-        ApiErrorResponse response =
-            putApiForUpdate("invalidToken", updateRequest, HttpStatus.UNAUTHORIZED)
-                .as(ApiErrorResponse.class);
-
-        // then
         assertThat(response.getErrorCode()).isEqualTo("A0001");
-    }
-
-    private ExtractableResponse<Response> putApiForUpdate(
-        String token,
-        PostUpdateRequest updateRequest,
-        HttpStatus httpStatus
-    ) {
-        return given().log().all()
-            .auth().oauth2(token)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(updateRequest)
-            .when()
-            .put("/api/posts/{postId}", 1L)
-            .then().log().all()
-            .statusCode(httpStatus.value())
-            .extract();
     }
 
     @DisplayName("사용자는 게시물을 삭제한다.")
     @Test
     void delete_LoginUser_Success() {
-        // given
-        String token = 로그인_되어있음(USERNAME).getToken();
+        NEOZAL.은로그인을하고().포스트를등록한다(NEOZALPOST);
+        int statusCode = NEOZAL.은로그인을하고().포스트를삭제한다(NEOZALPOST).statusCode();
 
-        requestWrite(token);
-
-        // when
-        deleteApiForUpdate(token, HttpStatus.NO_CONTENT);
+        assertThat(statusCode).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
     @DisplayName("유효하지 않은 토큰으로 게시물을 삭제할 수 없다. - 401 예외")
     @Test
     void delete_invalidToken_401Exception() {
-        // given
-        String token = 로그인_되어있음(USERNAME).getToken();
+        NEOZAL.은로그인을하고().포스트를등록한다(NEOZALPOST);
+        ExtractableResponse<Response> extractableResponse =
+            GUEST.는().비정상토큰으로_게시물을_삭제한다(NEOZALPOST);
 
-        requestWrite(token);
+        int statusCode = extractableResponse.statusCode();
+        assertThat(statusCode).isEqualTo(HttpStatus.UNAUTHORIZED.value());
 
-        // when
-        ApiErrorResponse response =
-            deleteApiForUpdate("invalidToken", HttpStatus.UNAUTHORIZED)
-                .as(ApiErrorResponse.class);
-
-        // then
+        ApiErrorResponse response = extractableResponse.as(ApiErrorResponse.class);
         assertThat(response.getErrorCode()).isEqualTo("A0001");
-    }
-
-    private ExtractableResponse<Response> deleteApiForUpdate(
-        String token,
-        HttpStatus httpStatus) {
-        return given().log().all()
-            .auth().oauth2(token)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .when()
-            .delete("/api/posts/{postId}", 1L)
-            .then().log().all()
-            .statusCode(httpStatus.value())
-            .extract();
-    }
-
-    private void requestWrite(String token) {
-        given().log().all()
-            .auth().oauth2(token)
-            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-            .formParams(request)
-            .multiPart("images", FileFactory.getTestImage1File())
-            .multiPart("images", FileFactory.getTestImage2File())
-            .when()
-            .post("/api/posts")
-            .then().log().all()
-            .statusCode(HttpStatus.CREATED.value())
-            .extract();
     }
 }

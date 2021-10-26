@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.integration.tag;
 
+import static com.woowacourse.pickgit.query.fixture.TRepository.PICK_GIT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
@@ -39,7 +40,7 @@ class TagServiceIntegrationTest extends IntegrationTest {
 
     private final String accessToken = "oauth.access.token";
     private final String userName = "jipark3";
-    private final String repositoryName = "doms-react";
+    private final String repositoryName = PICK_GIT.name();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
@@ -68,7 +69,7 @@ class TagServiceIntegrationTest extends IntegrationTest {
         TagsDto tagsDto = tagService.extractTags(extractionRequestDto);
 
         // then
-        assertThat(tagsDto.getTagNames()).containsAll(List.of("javascript", "html", "css"));
+        assertThat(tagsDto.getTagNames()).containsAll(PICK_GIT.getTags());
     }
 
     @DisplayName("잘못된 경로로 태그 추출 요청시 예외가 발생한다.")

@@ -69,21 +69,10 @@ class PostAcceptanceTest_searchPost extends AcceptanceTest {
             .containsExactly(contents.toArray(String[]::new));
     }
 
-    private static Stream<Arguments> getPostSearchArguments() {
-        return Stream.of(
-            Arguments.of("java"),
-            Arguments.of("java post", 0, 5),
-            Arguments.of("", 0, 5),
-            Arguments.of("c++", 0, 5),
-            Arguments.of("html", 0, 5),
-            Arguments.of("java c++ spring", 0, 5)
-        );
-    }
-
     @DisplayName("존재하지 않는 type을 요청하면 예외가 발생한다.")
     @Test
     void userCanFindPostViaTags() {
-        ApiErrorResponse response = GUEST.은로그인을하고().포스트를검색한다(
+        ApiErrorResponse response = NEOZAL.은로그인을하고().포스트를검색한다(
             "invalid", "java", BAD_REQUEST)
             .as(ApiErrorResponse.class);
 

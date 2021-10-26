@@ -13,7 +13,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.PageRequest;
 
 public class GithubRepositorySearchExtractorTest {
 
@@ -30,10 +29,10 @@ public class GithubRepositorySearchExtractorTest {
     @BeforeEach
     void setUp() {
         this.platformRepositorySearchExtractor = new GithubRepositorySearchExtractor(
-            objectMapper,
-            new MockRepositoryApiRequester(),
+                objectMapper,
+                new MockRepositoryApiRequester(),
             "https://api.github.com"
-        );
+            );
     }
 
     @DisplayName("Github 레포지토리를 검색 키워드와 함께 요청하면 해당 레포지토리 리스트를 반환한다. - 성공")
@@ -42,10 +41,8 @@ public class GithubRepositorySearchExtractorTest {
         // given
         List<RepositoryNameAndUrl> expectedResponse =
             List.of(
-                new RepositoryNameAndUrl("woowa-binghe-hi",
-                    "https://github.com/jipark3/woowa-binghe-hi"),
-                new RepositoryNameAndUrl("woowa-doms-react",
-                    "https://github.com/jipark3/woowa-doms-react")
+                new RepositoryNameAndUrl("woowa-binghe-hi", "https://github.com/jipark3/woowa-binghe-hi"),
+                new RepositoryNameAndUrl("woowa-doms-react", "https://github.com/jipark3/woowa-doms-react")
             );
 
         // when
@@ -53,7 +50,8 @@ public class GithubRepositorySearchExtractorTest {
             ACCESS_TOKEN,
             USERNAME,
             KEYWORD,
-            PageRequest.of(PAGE, LIMIT)
+            PAGE,
+            LIMIT
         );
 
         // then
@@ -70,8 +68,9 @@ public class GithubRepositorySearchExtractorTest {
 
         // then
         assertThatThrownBy(() ->
-            platformRepositorySearchExtractor
-                .extract(invalidToken, USERNAME, KEYWORD, PageRequest.of(PAGE, LIMIT))
+            platformRepositorySearchExtractor.extract(
+                invalidToken, USERNAME, KEYWORD, PAGE, LIMIT
+            )
         ).isInstanceOf(PlatformHttpErrorException.class)
             .hasFieldOrPropertyWithValue(
                 "errorCode", "V0001"
@@ -82,13 +81,11 @@ public class GithubRepositorySearchExtractorTest {
     @DisplayName("유효하지 않은 유저 일 경우 예외가 발생한다. - 500 예외")
     @Test
     void extract_InvalidUser_500Exception() {
-        // given when
-        String invalidUser = "Invalid User";
-
         // then
         assertThatThrownBy(() ->
-            platformRepositorySearchExtractor
-                .extract(ACCESS_TOKEN, invalidUser, KEYWORD, PageRequest.of(PAGE, LIMIT))
+            platformRepositorySearchExtractor.extract(
+                ACCESS_TOKEN, "invalid", KEYWORD, PAGE, LIMIT
+            )
         ).isInstanceOf(PlatformHttpErrorException.class)
             .hasFieldOrPropertyWithValue(
                 "errorCode", "V0001"
