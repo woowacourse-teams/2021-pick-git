@@ -252,7 +252,7 @@ const MyPortfolioPage = () => {
 
     const syncRemoteWithLocal = () => {
       const intro = {
-        name: currentUsername,
+        name: remotePortfolio.name,
         description: remotePortfolio.introduction,
         profileImageUrl: remotePortfolio.profileImageUrl,
         isProfileShown: remotePortfolio.profileImageShown,
