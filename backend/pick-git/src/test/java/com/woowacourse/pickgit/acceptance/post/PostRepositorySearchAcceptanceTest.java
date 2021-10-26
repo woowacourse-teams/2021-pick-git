@@ -2,26 +2,15 @@ package com.woowacourse.pickgit.acceptance.post;
 
 import static com.woowacourse.pickgit.query.fixture.TUser.GUEST;
 import static com.woowacourse.pickgit.query.fixture.TUser.NEOZAL;
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;
-import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
-import com.woowacourse.pickgit.authentication.domain.OAuthClient;
-import com.woowacourse.pickgit.authentication.presentation.dto.OAuthTokenResponse;
-import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
 import io.restassured.common.mapper.TypeRef;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.BDDMockito;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 class PostRepositorySearchAcceptanceTest extends AcceptanceTest {
 

@@ -2,7 +2,6 @@ package com.woowacourse.pickgit.query.fixture;
 
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.DescriptionRequest;
 import com.woowacourse.pickgit.portfolio.presentation.dto.response.DescriptionResponse;
-import com.woowacourse.pickgit.query.fixture.TProject.Modifier;
 import java.util.UUID;
 
 public class TDescription {

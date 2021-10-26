@@ -1,9 +1,8 @@
 package com.woowacourse.pickgit.exception.portfolio;
 
-import com.woowacourse.pickgit.exception.ApplicationException;
 import org.springframework.http.HttpStatus;
 
-public class NoSuchPortfolioException extends ApplicationException {
+public class NoSuchPortfolioException extends PortfolioException {
 
     private static final String ERROR_CODE = "R0001";
     private static final HttpStatus HTTP_STATUS = HttpStatus.BAD_REQUEST;

@@ -5,35 +5,24 @@ import static com.woowacourse.pickgit.query.fixture.TPost.NEOZALPOST;
 import static com.woowacourse.pickgit.query.fixture.TUser.GUEST;
 import static com.woowacourse.pickgit.query.fixture.TUser.MARK;
 import static com.woowacourse.pickgit.query.fixture.TUser.NEOZAL;
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;
-import com.woowacourse.pickgit.common.factory.FileFactory;
-import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
-import com.woowacourse.pickgit.exception.post.CannotUnlikeException;
-import com.woowacourse.pickgit.exception.post.DuplicatedLikeException;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
-import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
 import com.woowacourse.pickgit.post.presentation.dto.response.LikeResponse;
 import com.woowacourse.pickgit.post.presentation.dto.response.PostUpdateResponse;
 import com.woowacourse.pickgit.query.fixture.CPost;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import org.hibernate.validator.internal.engine.messageinterpolation.el.NoOpElResolver;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 class PostAcceptanceTest extends AcceptanceTest {
 

@@ -5,24 +5,17 @@ import static com.woowacourse.pickgit.query.fixture.TUser.KEVIN;
 import static com.woowacourse.pickgit.query.fixture.TUser.KODA;
 import static com.woowacourse.pickgit.query.fixture.TUser.MARK;
 import static com.woowacourse.pickgit.query.fixture.TUser.NEOZAL;
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.OK;
 
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
 import com.woowacourse.pickgit.portfolio.application.dto.PortfolioDtoAssembler;
 import com.woowacourse.pickgit.portfolio.domain.Portfolio;
 import com.woowacourse.pickgit.portfolio.presentation.dto.response.PortfolioResponse;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
-import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 
 class PortfolioAcceptanceTest_Query extends AcceptanceTest {
 

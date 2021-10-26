@@ -11,7 +11,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;
 import com.woowacourse.pickgit.comment.presentation.dto.response.CommentResponse;
-import com.woowacourse.pickgit.common.request_builder.PickGitRequest;
 import io.restassured.common.mapper.TypeRef;
 import java.util.List;
 import java.util.stream.Stream;

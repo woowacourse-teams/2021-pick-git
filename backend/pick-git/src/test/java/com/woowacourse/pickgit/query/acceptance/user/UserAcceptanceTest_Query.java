@@ -12,7 +12,6 @@ import static org.assertj.core.api.Assertions.tuple;
 
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
-import com.woowacourse.pickgit.query.fixture.TUser;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import com.woowacourse.pickgit.user.presentation.dto.response.UserProfileResponse;

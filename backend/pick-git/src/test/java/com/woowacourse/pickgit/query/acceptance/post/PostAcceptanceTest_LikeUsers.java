@@ -9,12 +9,10 @@ import static com.woowacourse.pickgit.query.fixture.TUser.KEVIN;
 import static com.woowacourse.pickgit.query.fixture.TUser.KODA;
 import static com.woowacourse.pickgit.query.fixture.TUser.MARK;
 import static com.woowacourse.pickgit.query.fixture.TUser.NEOZAL;
-import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;
 import com.woowacourse.pickgit.post.presentation.dto.response.LikeUsersResponse;
-import com.woowacourse.pickgit.query.fixture.TUser;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
