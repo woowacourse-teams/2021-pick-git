@@ -4,15 +4,8 @@ import { ThemeContext } from "styled-components";
 // import { PDFDownloadLink } from "@react-pdf/renderer";
 
 import Button from "../../@shared/Button/Button";
-import DropDown, { DropDownItem } from "../../@shared/DropDown/DropDown";
 import SVGIcon from "../../@shared/SVGIcon/SVGIcon";
-import {
-  Container,
-  HeaderContentWrapper,
-  HeaderButtonsWrapper,
-  GoBackLinkButton,
-  DropDownCSS,
-} from "./PortfolioHeader.style";
+import { Container, HeaderContentWrapper, HeaderButtonsWrapper, GoBackLinkButton } from "./PortfolioHeader.style";
 // import PortfolioDocument from "../../PortfolioDocument/PortfolioDocument";
 import { Portfolio, ProfileData } from "../../../@types";
 
