@@ -136,7 +136,7 @@ public class UserService {
         String keyword,
         Pageable pageable
     ) {
-        List<User> users = userRepository.searchByUsernameLike(keyword, pageable);
+        List<User> users = userSearchEngine.searchByUsernameLike(keyword, pageable);
 
         if (authUserRequestDto.isGuest()) {
             return UserDtoAssembler.userSearchResponseDto(users);
