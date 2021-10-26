@@ -34,10 +34,14 @@ public class FileFactory {
     private static MockMultipartFile createImageFile(String fileName) {
         File file = createFile(fileName);
 
+        return fileToMultipart(file);
+    }
+
+    public static MockMultipartFile fileToMultipart(File file) {
         try {
             return new MockMultipartFile(
                 FILE_KEY,
-                fileName,
+                file.getName(),
                 ContentType.IMAGE_JPEG.getMimeType(),
                 Files.readAllBytes(file.toPath())
             );
