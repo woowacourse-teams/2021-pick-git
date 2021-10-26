@@ -54,7 +54,7 @@ import {
 import type { ChildFabItem, PortfolioData, PortfolioProject, PortfolioSectionType, Post } from "../../@types";
 import useScrollPagination from "../../hooks/common/useScrollPagination";
 import usePortfolioContacts from "../../hooks/service/usePortfolioContacts";
-import { CONTACT_ICON } from "../../constants/portfolio";
+import { CONTACT_ICON, PORTFOLIO_CONTACTS } from "../../constants/portfolio";
 import useSnackbar from "../../hooks/common/useSnackbar";
 import Fab from "../../components/@shared/Fab/Fab";
 import { getTemporaryId } from "../../utils/portfolio";
@@ -253,18 +253,20 @@ const MyPortfolioPage = () => {
     }
 
     const syncRemoteWithLocal = () => {
+      console.log("remotePortfolio.contacts", remotePortfolio.contacts);
       const intro = {
         name: remotePortfolio.name,
         description: remotePortfolio.introduction,
         profileImageUrl: remotePortfolio.profileImageUrl,
         isProfileShown: remotePortfolio.profileImageShown,
-        contacts: [...remotePortfolio.contacts],
       };
+
+      const contacts = remotePortfolio.contacts.length !== 0 ? [...remotePortfolio.contacts] : PORTFOLIO_CONTACTS;
 
       setPortfolioIntro(intro, false);
       setPortfolioProjects(remotePortfolio.projects, false);
       setPortfolioSections(remotePortfolio.sections, false);
-      setPortfolioContacts(remotePortfolio.contacts, false);
+      setPortfolioContacts(contacts, false);
     };
 
     const localUpdateTime = getPortfolioLocalUpdateTime();

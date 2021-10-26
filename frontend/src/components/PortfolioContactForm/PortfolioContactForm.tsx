@@ -1,5 +1,5 @@
 import { PortfolioContact } from "../../@types";
-import { CONTACT_CATEGORY_TEXT } from "../../constants/portfolio";
+import { CONTACT_CATEGORY_TEXT, PORTFOLIO_CONTACTS } from "../../constants/portfolio";
 import Button from "../@shared/Button/Button";
 import Input from "../@shared/Input/Input";
 import {

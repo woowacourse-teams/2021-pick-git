@@ -148,7 +148,6 @@ export type PortfolioIntro = {
   description: string;
   profileImageUrl: string;
   isProfileShown: boolean;
-  contacts: PortfolioContact[];
 };
 
 export type PortfolioProject = {
