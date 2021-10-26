@@ -5,9 +5,13 @@ import static java.util.stream.Collectors.toList;
 
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
 import com.woowacourse.pickgit.authentication.application.dto.TokenDto;
+import com.woowacourse.pickgit.user.domain.User;
+import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
+import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +30,7 @@ public enum TUser {
     private final List<TUser> following;
     private final List<TUser> follower;
     private final Map<TPost, ExtractableResponse<Response>> posts;
+    private final OAuthProfileResponse oAuthProfileResponse;
     protected final Map<String, Object> cache;
 
     private static boolean isRead = false;
@@ -35,6 +40,16 @@ public enum TUser {
         this.following = new ArrayList<>();
         this.posts = new HashMap<>();
         this.cache = new HashMap<>();
+        this.oAuthProfileResponse = new OAuthProfileResponse(
+            name(),
+            "https://github.com/testImage.jpg",
+            "testDescription",
+            "https://github.com/" + name(),
+            "testCompany",
+            "testLocation",
+            "testWebsite",
+            "testTwitter"
+        );
     }
 
     public static void toWrite() {
@@ -45,21 +60,42 @@ public enum TUser {
         isRead = true;
     }
 
+    public User toEntity() {
+        return new User(
+            new BasicProfile(
+                name(),
+                oAuthProfileResponse.getImage(),
+                oAuthProfileResponse.getDescription()
+            ),
+            new GithubProfile(
+                oAuthProfileResponse.getGithubUrl(),
+                oAuthProfileResponse.getCompany(),
+                oAuthProfileResponse.getLocation(),
+                oAuthProfileResponse.getWebsite(),
+                oAuthProfileResponse.getTwitter()
+            )
+        );
+    }
+
     public String accessToken() {
         return token.getToken();
     }
 
     public static OAuthProfileResponse oAuthProfileResponse(String name) {
-        return new OAuthProfileResponse(
-            name,
-            "https://github.com/testImage.jpg",
-            "testDescription",
-            "https://github.com/" + name,
-            "testCompany",
-            "testLocation",
-            "testWebsite",
-            "testTwitter"
-        );
+        return Arrays.stream(values())
+            .filter(user -> user.name().equals(name))
+            .findAny()
+            .map(user -> user.oAuthProfileResponse)
+            .orElseGet(() -> new OAuthProfileResponse(
+                name,
+                "https://github.com/testImage.jpg",
+                "testDescription",
+                "https://github.com/" + name,
+                "testCompany",
+                "testLocation",
+                "testWebsite",
+                "testTwitter"
+            ));
     }
 
     void addFollowing(TUser tUser) {
