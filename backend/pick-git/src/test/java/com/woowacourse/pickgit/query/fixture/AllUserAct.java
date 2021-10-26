@@ -25,6 +25,7 @@ public class AllUserAct extends Act{
     public List<String> 로그인을한다() {
         return users.stream()
             .filter(user -> !except.contains(user))
+            .filter(user -> user != TUser.GUEST)
             .map(TUser::은로그인을한다)
             .map(TokenDto::getToken)
             .collect(toList());

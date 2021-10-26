@@ -1,19 +1,20 @@
 package com.woowacourse.pickgit.query.fixture;
 
-import static com.woowacourse.pickgit.config.db.DataSourceSelector.READ;
 import static io.restassured.RestAssured.given;
 import static java.util.stream.Collectors.toList;
 
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
 import com.woowacourse.pickgit.authentication.application.dto.TokenDto;
-import com.woowacourse.pickgit.config.DatabaseConfigurator;
+import com.woowacourse.pickgit.user.domain.User;
+import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
+import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -29,6 +30,7 @@ public enum TUser {
     private final List<TUser> following;
     private final List<TUser> follower;
     private final Map<TPost, ExtractableResponse<Response>> posts;
+    private final OAuthProfileResponse oAuthProfileResponse;
     protected final Map<String, Object> cache;
 
     private static boolean isRead = false;
@@ -38,6 +40,16 @@ public enum TUser {
         this.following = new ArrayList<>();
         this.posts = new HashMap<>();
         this.cache = new HashMap<>();
+        this.oAuthProfileResponse = new OAuthProfileResponse(
+            name(),
+            "https://github.com/testImage.jpg",
+            "testDescription",
+            "https://github.com/" + name(),
+            "testCompany",
+            "testLocation",
+            "testWebsite",
+            "testTwitter"
+        );
     }
 
     public static void toWrite() {
@@ -48,35 +60,42 @@ public enum TUser {
         isRead = true;
     }
 
+    public User toEntity() {
+        return new User(
+            new BasicProfile(
+                name(),
+                oAuthProfileResponse.getImage(),
+                oAuthProfileResponse.getDescription()
+            ),
+            new GithubProfile(
+                oAuthProfileResponse.getGithubUrl(),
+                oAuthProfileResponse.getCompany(),
+                oAuthProfileResponse.getLocation(),
+                oAuthProfileResponse.getWebsite(),
+                oAuthProfileResponse.getTwitter()
+            )
+        );
+    }
+
     public String accessToken() {
         return token.getToken();
     }
 
     public static OAuthProfileResponse oAuthProfileResponse(String name) {
-        return new OAuthProfileResponse(
-            name,
-            "https://github.com/testImage.jpg",
-            "testDescription",
-            "https://github.com/" + name,
-            "testCompany",
-            "testLocation",
-            "testWebsite",
-            "testTwitter"
-        );
-    }
-
-    public static void clear() {
-        for (TUser value : values()) {
-            value.clearValues();
-        }
-    }
-
-    private void clearValues() {
-        token = null;
-        following.clear();
-        follower.clear();
-        posts.clear();
-        cache.clear();
+        return Arrays.stream(values())
+            .filter(user -> user.name().equals(name))
+            .findAny()
+            .map(user -> user.oAuthProfileResponse)
+            .orElseGet(() -> new OAuthProfileResponse(
+                name,
+                "https://github.com/testImage.jpg",
+                "testDescription",
+                "https://github.com/" + name,
+                "testCompany",
+                "testLocation",
+                "testWebsite",
+                "testTwitter"
+            ));
     }
 
     void addFollowing(TUser tUser) {
@@ -92,12 +111,13 @@ public enum TUser {
     }
 
     public TokenDto 은로그인을한다() {
-        if (this.token != null && isRead) {
-            return this.token;
+        if(isRead) {
+            if (this.token != null) {
+                return this.token;
+            }
+            this.token = requestLogin(name());
         }
-
-        this.token = requestLogin(name());
-        return this.token;
+        return requestLogin(name());
     }
 
     public LoginAndThenAct 은로그인을하고() {

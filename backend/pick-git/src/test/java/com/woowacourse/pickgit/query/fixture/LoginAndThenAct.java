@@ -1,22 +1,24 @@
 package com.woowacourse.pickgit.query.fixture;
 
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
+import com.woowacourse.pickgit.common.factory.FileFactory;
+import com.woowacourse.pickgit.portfolio.presentation.dto.request.PortfolioRequest;
 import com.woowacourse.pickgit.post.presentation.dto.response.LikeUsersResponse;
 import com.woowacourse.pickgit.query.fixture.TPost.Pair;
+import com.woowacourse.pickgit.user.presentation.dto.request.ProfileDescriptionRequest;
 import com.woowacourse.pickgit.user.presentation.dto.response.UserSearchResponse;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.Method;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 
 public class LoginAndThenAct extends Act {
@@ -31,25 +33,30 @@ public class LoginAndThenAct extends Act {
         this.isRead = isRead;
     }
 
-    public void 팔로우를한다(TUser... tUsers) {
-        List.of(tUsers).forEach(this::팔로우를한다);
+    public List<ExtractableResponse<Response>> 팔로우를한다(TUser... tUsers) {
+        return List.of(tUsers).stream()
+            .map(this::팔로우를한다)
+            .collect(toList());
     }
 
-    public void 팔로우를한다(TUser tUser) {
-        if (this.tUser.getFollowing().contains(tUser)) {
-            return;
+    public ExtractableResponse<Response> 팔로우를한다(TUser tUser) {
+        if (this.tUser.getFollowing().contains(tUser) && isRead) {
+            return null;
         }
 
-        int statusCode = request(
+        ExtractableResponse<Response> response = request(
             token,
             String.format("/api/profiles/%s/followings?githubFollowing=false", tUser),
             Method.POST
-        ).statusCode();
+        );
 
-        assertThat(statusCode).isEqualTo(HttpStatus.OK.value());
+        if (isRead) {
+            assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+            this.tUser.addFollowing(tUser);
+            tUser.addFollower(this.tUser);
+        }
 
-        this.tUser.addFollowing(tUser);
-        tUser.addFollower(this.tUser);
+        return response;
     }
 
     public List<UserSearchResponse> 팔로우를확인한다(TUser tUser) {
@@ -89,7 +96,9 @@ public class LoginAndThenAct extends Act {
         );
 
         if (response.statusCode() == HttpStatus.CREATED.value()) {
-            this.tUser.addPost(tPost, response);
+            if (isRead) {
+                this.tUser.addPost(tPost, response);
+            }
             String location = response.headers().getValue(HttpHeaders.LOCATION);
             String[] split = location.split("/");
             tPost.setId(Long.parseLong(split[split.length - 1]));
@@ -183,7 +192,7 @@ public class LoginAndThenAct extends Act {
     public ExtractableResponse<Response> 댓글을등록한다(TPost tPost, String comment) {
         String key = tPost.name() + comment;
 
-        if (tPost.getComment().contains(new Pair(tUser, comment))) {
+        if (tPost.getComment().contains(new Pair(tUser, comment)) && isRead) {
             return (ExtractableResponse<Response>) tUser.cache.get(key);
         }
 
@@ -259,6 +268,100 @@ public class LoginAndThenAct extends Act {
             token,
             String.format("/api/posts/%s?page=0&limit=3", tUser.name()),
             Method.GET
+        );
+    }
+
+    public ExtractableResponse<Response> 언팔로우를한다(TUser tUser) {
+        return request(
+            token,
+            String.format("/api/profiles/%s/followings?githubUnfollowing=false", tUser),
+            Method.DELETE
+        );
+    }
+
+    public ExtractableResponse<Response> 프로필을_이미지를_수정한다() throws IOException {
+        return request(
+            token,
+            "/api/profiles/me/image",
+            Method.PUT,
+            new FileInputStream(FileFactory.getTestImage1File()).readAllBytes()
+        );
+    }
+
+    public ExtractableResponse<Response> 프로필_한줄소개를_수정한다(String description) {
+        return request(
+            token,
+            "/api/profiles/me/description",
+            Method.PUT,
+            new ProfileDescriptionRequest(description)
+        );
+    }
+
+    public ExtractableResponse<Response> 유저를_검색한다(String keyword) {
+        return request(
+            token,
+            String.format("/api/search/users?keyword=%s&page=0&limit=5", keyword),
+            Method.GET
+        );
+    }
+
+    public ExtractableResponse<Response> 활동_통계를_조회한다(TUser tUser) {
+        return request(
+            token,
+            String.format("/api/profiles/%s/contributions", tUser),
+            Method.GET
+        );
+    }
+
+    public ExtractableResponse<Response> 자신의_프로필을_조회한다() {
+        return request(
+            token,
+            "/api/profiles/me",
+            Method.GET
+        );
+    }
+
+    public ExtractableResponse<Response> 프로필을_조회한다(TUser tUser) {
+        return request(
+            token,
+            String.format("/api/profiles/%s", tUser),
+            Method.GET
+        );
+    }
+
+    public ExtractableResponse<Response> 레포지토리의_태그를_추출한다(TRepository tRepository) {
+        return request(
+            token,
+            String.format("/api/github/repositories/%s/tags/languages", tRepository),
+            Method.GET
+        );
+    }
+
+    public ExtractableResponse<Response> 포트폴리오를_조회한다(TUser tUser) {
+        String key = "portfolio" + tUser;
+        if (isRead && tUser.cache.containsKey(key)) {
+            return (ExtractableResponse<Response>) tUser.cache.get(key);
+        }
+
+        ExtractableResponse<Response> response = request(
+            token,
+            String.format("/api/portfolios/%s", tUser),
+            Method.GET
+        );
+
+        if(isRead) {
+            tUser.cache.put(key, response);
+        }
+
+        return response;
+    }
+
+    public ExtractableResponse<Response> 포트폴리오를_수정한다(PortfolioRequest portfolioRequest) {
+        return request(
+            token,
+            "/api/portfolios",
+            Method.PUT,
+            portfolioRequest
         );
     }
 }
