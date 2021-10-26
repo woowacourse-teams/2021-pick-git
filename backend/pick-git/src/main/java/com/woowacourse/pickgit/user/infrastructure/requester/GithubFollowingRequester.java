@@ -2,18 +2,21 @@ package com.woowacourse.pickgit.user.infrastructure.requester;
 
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.user.domain.follow.PlatformFollowingRequester;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.RequestEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 @Profile("!test")
 @Component
 public class GithubFollowingRequester implements PlatformFollowingRequester {
+
+    @Autowired
+    private WebClient webClient;
 
     private final String apiBaseUrl;
 
@@ -38,21 +41,18 @@ public class GithubFollowingRequester implements PlatformFollowingRequester {
         String targetName,
         String accessToken
     ) {
-        try {
-            String format = apiBaseUrl + "/user/following/%s";
-            String url = String.format(format, targetName);
-            HttpHeaders httpHeaders = new HttpHeaders();
-            httpHeaders.setBearerAuth(accessToken);
-            httpHeaders.set("Accept", "application/vnd.github.v3+json");
+        String format = apiBaseUrl + "/user/following/%s";
+        String url = String.format(format, targetName);
 
-            RequestEntity<Void> requestEntity = RequestEntity
-                .method(method, url)
-                .headers(httpHeaders)
-                .build();
-
-            new RestTemplate().exchange(requestEntity, Void.class);
-        } catch (HttpClientErrorException e) {
-            throw new PlatformHttpErrorException(e.getMessage());
-        }
+        webClient.method(method)
+            .uri(url)
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(accessToken);
+                httpHeaders.set("Accept", "application/vnd.github.v3+json");
+            })
+            .retrieve()
+            .onStatus(HttpStatus::isError, clientResponse -> Mono.error(PlatformHttpErrorException::new))
+            .bodyToMono(Void.class)
+            .block();
     }
 }

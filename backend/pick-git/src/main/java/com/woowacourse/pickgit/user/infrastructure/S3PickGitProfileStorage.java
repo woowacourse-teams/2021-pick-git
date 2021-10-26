@@ -1,21 +1,22 @@
 package com.woowacourse.pickgit.user.infrastructure;
 
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
-import com.woowacourse.pickgit.post.domain.util.RestClient;
 import com.woowacourse.pickgit.post.infrastructure.S3Storage.StorageDto;
 import com.woowacourse.pickgit.user.domain.profile.PickGitProfileStorage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 @Profile("!test")
 @Component
@@ -23,26 +24,30 @@ public class S3PickGitProfileStorage implements PickGitProfileStorage {
 
     private static final String MULTIPART_KEY = "files";
 
-    private final RestClient restClient;
+    private final WebClient webClient;
     private final String s3ProxyUrl;
 
     public S3PickGitProfileStorage(
-        RestClient restClient,
+        WebClient webClient,
         @Value("${storage.pickgit.s3proxy}") String s3ProxyUrl
     ) {
-        this.restClient = restClient;
+        this.webClient = webClient;
         this.s3ProxyUrl = s3ProxyUrl;
     }
 
     @Override
     public Optional<String> store(File file, String userName) {
-        StorageDto response = restClient
-            .postForEntity(s3ProxyUrl, createBody(List.of(file), userName), StorageDto.class)
-            .getBody();
-        if (Objects.isNull(response)) {
-            throw new PlatformHttpErrorException();
-        }
-        List<String> imageUrls = response.getUrls();
+        List<String> imageUrls = webClient.post()
+            .uri(s3ProxyUrl)
+            .bodyValue(createBody(List.of(file), userName))
+            .retrieve()
+            .onStatus(HttpStatus::isError, response -> response.bodyToMono(String.class)
+                .flatMap(errorMessage -> Mono.error(new PlatformHttpErrorException(errorMessage))))
+            .bodyToMono(StorageDto.class)
+            .blockOptional()
+            .orElseThrow(PlatformHttpErrorException::new)
+            .getUrls();
+
         return Optional.ofNullable(imageUrls.get(0));
     }
 

@@ -1,53 +1,87 @@
 package com.woowacourse.pickgit.post.infrastructure.extractor;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.post.RepositoryParseException;
-import com.woowacourse.pickgit.post.domain.util.PlatformRepositoryApiRequester;
 import com.woowacourse.pickgit.post.domain.util.PlatformRepositoryExtractor;
 import com.woowacourse.pickgit.post.domain.util.dto.RepositoryNameAndUrl;
+import com.woowacourse.pickgit.post.infrastructure.dto.RepositoryItemDto;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClient.ResponseSpec;
+import reactor.core.publisher.Mono;
 
 @Component
 public class GithubRepositoryExtractor implements PlatformRepositoryExtractor {
 
-    private final ObjectMapper objectMapper;
-    private final PlatformRepositoryApiRequester platformRepositoryApiRequester;
     private final String apiBaseUrl;
 
+    @Autowired
+    private WebClient webClient;
+
     public GithubRepositoryExtractor(
-        ObjectMapper objectMapper,
-        PlatformRepositoryApiRequester platformRepositoryApiRequester,
         @Value("${security.github.url.api}") String apiBaseUrl
     ) {
-        this.objectMapper = objectMapper;
-        this.platformRepositoryApiRequester = platformRepositoryApiRequester;
         this.apiBaseUrl = apiBaseUrl;
     }
 
     @Override
     public List<RepositoryNameAndUrl> extract(String token, String username, Pageable pageable) {
-        String apiUrl = generateApiUrl(username, pageable);
-        String response = platformRepositoryApiRequester.request(token, apiUrl);
+        String apiUrl = generateExtractApiUrl(username, pageable);
 
-        return parseToRepositories(response);
+        return sendGithubApi(token, apiUrl)
+            .bodyToMono(new ParameterizedTypeReference<List<RepositoryNameAndUrl>>() {})
+            .blockOptional()
+            .orElseThrow(RepositoryParseException::new);
     }
 
-    private String generateApiUrl(String username, Pageable pageable) {
+    private String generateExtractApiUrl(String username, Pageable pageable) {
         String format = apiBaseUrl + "/users/%s/repos?page=%d&per_page=%d";
         return String.format(format, username, pageable.getPageNumber() + 1, pageable.getPageSize());
     }
 
-    private List<RepositoryNameAndUrl> parseToRepositories(String response) {
-        try {
-            return objectMapper.readValue(response, new TypeReference<>() {
-            });
-        } catch (JsonProcessingException e) {
-            throw new RepositoryParseException();
-        }
+    private ResponseSpec sendGithubApi(String token, String apiUrl) {
+        return webClient.get()
+            .uri(apiUrl)
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+                httpHeaders.set("Accept", "application/vnd.github.v3+json");
+            })
+            .retrieve()
+            .onStatus(HttpStatus::isError, response -> response.bodyToMono(String.class)
+                .flatMap(errorMessage -> Mono.error(new PlatformHttpErrorException(errorMessage))));
+    }
+
+    @Override
+    public List<RepositoryNameAndUrl> search(
+        String token,
+        String username,
+        String keyword,
+        Pageable pageable
+    ) {
+        String url = generateSearchApiUrl(username, keyword, pageable);
+
+        return sendGithubApi(token, url)
+            .bodyToMono(RepositoryItemDto.class)
+            .blockOptional()
+            .orElseThrow(RepositoryParseException::new)
+            .getItems();
+    }
+
+    private String generateSearchApiUrl(
+        String username,
+        String keyword,
+        Pageable pageable
+    ) {
+        String format = apiBaseUrl +
+            "/search/repositories?q=user:%s %s in:name fork:true&page=%d&per_page=%d";
+        return String.format(
+            format, username, keyword, pageable.getPageNumber() + 1, pageable.getPageSize()
+        );
     }
 }
