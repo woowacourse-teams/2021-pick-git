@@ -10,7 +10,6 @@ import PortfolioHeader from "../../components/@layout/PortfolioHeader/PortfolioH
 import ScrollActiveHeader from "../../components/@layout/ScrollActiveHeader/ScrollActiveHeader";
 import Avatar from "../../components/@shared/Avatar/Avatar";
 import Button from "../../components/@shared/Button/Button";
-import DotPaginator from "../../components/@shared/DotPaginator/DotPaginator";
 import SVGIcon from "../../components/@shared/SVGIcon/SVGIcon";
 import ToggleButton from "../../components/@shared/ToggleButton/ToggleButton";
 import PageError from "../../components/@shared/PageError/PageError";
