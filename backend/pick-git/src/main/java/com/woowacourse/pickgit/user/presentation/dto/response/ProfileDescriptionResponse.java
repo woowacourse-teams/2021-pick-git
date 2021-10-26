@@ -1,5 +1,8 @@
 package com.woowacourse.pickgit.user.presentation.dto.response;
 
+import lombok.Builder;
+
+@Builder
 public class ProfileDescriptionResponse {
 
     private String description;

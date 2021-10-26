@@ -2,18 +2,31 @@ import axios from "axios";
 import { useContext, useEffect } from "react";
 import { useQueryClient } from "react-query";
 
-import { Post } from "../../@types";
 import { QUERY } from "../../constants/queries";
+
 import UserContext from "../../contexts/UserContext";
+
+import { useHomeFeedPostsQuery } from "../../services/queries";
+
 import { removeDuplicatedData } from "../../utils/data";
 import { handleHTTPError } from "../../utils/error";
 import { isHttpErrorStatus } from "../../utils/typeGuard";
-import { useHomeFeedPostsQuery } from "../../services/queries";
+
 import useFeedMutation from "./useFeedMutation";
 
-const useHomeFeed = () => {
+import type { Post, FeedFilterOption } from "../../@types";
+
+const useHomeFeed = (feedFilterOption: FeedFilterOption) => {
   const { logout } = useContext(UserContext);
-  const { data: infinitePostsData, isLoading, error, isError, isFetching, fetchNextPage } = useHomeFeedPostsQuery();
+  const {
+    data: infinitePostsData,
+    isLoading,
+    error,
+    isError,
+    isFetching,
+    fetchNextPage,
+    refetch,
+  } = useHomeFeedPostsQuery(feedFilterOption);
 
   // TODO : 그냥 QUERY 만 보내도 되는지 알아보기
   const { setPostsPages } = useFeedMutation([QUERY]);
@@ -58,7 +71,7 @@ const useHomeFeed = () => {
     handleError();
   }, [error]);
 
-  return { infinitePostsData, isLoading, isFetching, isError, handlePostsEndIntersect };
+  return { infinitePostsData, isLoading, isFetching, isError, handlePostsEndIntersect, refetch };
 };
 
 export default useHomeFeed;

@@ -1,10 +1,16 @@
 import styled, { css } from "styled-components";
+import { setLaptopAboveMediaQuery } from "../@styled/mediaQueries";
 
 export const Container = styled.div`
-  width: 20.5rem;
-  height: 39rem;
+  width: 20rem;
+  height: 30rem;
   padding: 1rem 0;
   overflow-y: auto;
+
+  ${setLaptopAboveMediaQuery`
+    width: 33.75rem;
+    height: 45rem;
+  `}
 `;
 
 export const Grid = styled.div`

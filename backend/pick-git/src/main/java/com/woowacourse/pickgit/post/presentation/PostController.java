@@ -1,25 +1,18 @@
 package com.woowacourse.pickgit.post.presentation;
 
-import static java.util.stream.Collectors.toList;
-
 import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.config.auth_interceptor_register.ForLoginAndGuestUser;
 import com.woowacourse.pickgit.config.auth_interceptor_register.ForOnlyLoginUser;
-import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.request.AuthUserForPostRequestDto;
-import com.woowacourse.pickgit.post.application.dto.request.PostDeleteRequestDto;
-import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
-import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.SearchRepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeUsersResponseDto;
-import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
-import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponsesDto;
+import com.woowacourse.pickgit.post.presentation.dto.PostAssembler;
 import com.woowacourse.pickgit.post.presentation.dto.request.PostRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
 import com.woowacourse.pickgit.post.presentation.dto.response.LikeResponse;
@@ -28,9 +21,10 @@ import com.woowacourse.pickgit.post.presentation.dto.response.PostUpdateResponse
 import com.woowacourse.pickgit.post.presentation.dto.response.RepositoryResponse;
 import java.net.URI;
 import java.util.List;
-import java.util.function.Function;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -56,52 +50,28 @@ public class PostController {
     @ForOnlyLoginUser
     @PostMapping("/posts")
     public ResponseEntity<Void> write(@Authenticated AppUser user, PostRequest request) {
-        PostImageUrlResponseDto postImageUrlResponseDto =
-            postService.write(createPostRequestDto(user, request));
-        String url =
-            String.format("/api/posts/%s/%d", user.getUsername(), postImageUrlResponseDto.getId());
-        return ResponseEntity
-            .created(URI.create(url))
-            .build();
-    }
+        Long postId = postService.write(PostAssembler.postRequestDto(user, request));
+        String redirectUrl = String.format(REDIRECT_URL, user.getUsername(), postId);
 
-    private PostRequestDto createPostRequestDto(AppUser user, PostRequest request) {
-        return new PostRequestDto(
-            user.getAccessToken(),
-            user.getUsername(),
-            request.getImages(),
-            request.getGithubRepoUrl(),
-            request.getTags(),
-            request.getContent()
-        );
+        return ResponseEntity.created(URI.create(redirectUrl)).build();
     }
 
     @ForOnlyLoginUser
     @GetMapping("/github/repositories")
     public ResponseEntity<List<RepositoryResponse>> userRepositories(
         @Authenticated AppUser user,
-        @RequestParam Long page,
-        @RequestParam Long limit
+        @PageableDefault Pageable pageable
     ) {
-        RepositoryRequestDto repositoryRequestDto = toRepositoryRequestDto(user, page, limit);
+        RepositoryRequestDto repositoryRequestDto =
+            PostAssembler.repositoryRequestDto(user, pageable);
 
-        RepositoryResponsesDto repositoryResponsesDto = postService
+        List<RepositoryResponseDto> repositoryResponseDtos = postService
             .userRepositories(repositoryRequestDto);
 
-        List<RepositoryResponse> repositoryResponses = toRepositoryResponses(
-            repositoryResponsesDto.getRepositoryResponsesDto()
-        );
+        List<RepositoryResponse> repositoryResponses =
+            PostAssembler.repositoryResponses(repositoryResponseDtos);
 
         return ResponseEntity.ok(repositoryResponses);
-    }
-
-    private RepositoryRequestDto toRepositoryRequestDto(AppUser user, Long page, Long limit) {
-        return RepositoryRequestDto.builder()
-            .token(user.getAccessToken())
-            .username(user.getUsername())
-            .page(page)
-            .limit(limit)
-            .build();
     }
 
     @ForOnlyLoginUser
@@ -109,39 +79,18 @@ public class PostController {
     public ResponseEntity<List<RepositoryResponse>> userSearchedRepositories(
         @Authenticated AppUser user,
         @RequestParam String keyword,
-        @RequestParam int page,
-        @RequestParam int limit
+        @PageableDefault Pageable pageable
     ) {
-        SearchRepositoryRequestDto searchRepositoryRequestDto = new SearchRepositoryRequestDto(
-            user.getAccessToken(),
-            user.getUsername(),
-            keyword,
-            page,
-            limit
-        );
+        SearchRepositoryRequestDto searchRepositoryRequestDto =
+            PostAssembler.searchRepositoryRequestDto(user, keyword, pageable);
 
-        RepositoryResponsesDto repositoryResponsesDtos =
-            postService.searchUserRepositories(searchRepositoryRequestDto);
-        List<RepositoryResponse> repositoryResponses = toRepositoryResponses(
-            repositoryResponsesDtos.getRepositoryResponsesDto()
-        );
+        List<RepositoryResponseDto> repositoryResponseDtos = postService
+            .searchUserRepositories(searchRepositoryRequestDto);
+
+        List<RepositoryResponse> repositoryResponses =
+            PostAssembler.repositoryResponses(repositoryResponseDtos);
 
         return ResponseEntity.ok(repositoryResponses);
-    }
-
-    private List<RepositoryResponse> toRepositoryResponses(
-        List<RepositoryResponseDto> repositoryResponseDos
-    ) {
-        return repositoryResponseDos.stream()
-            .map(toRepositoryResponse())
-            .collect(toList());
-    }
-
-    private Function<RepositoryResponseDto, RepositoryResponse> toRepositoryResponse() {
-        return repositoryResponseDto -> RepositoryResponse.builder()
-            .url(repositoryResponseDto.getUrl())
-            .name(repositoryResponseDto.getName())
-            .build();
     }
 
     @ForOnlyLoginUser
@@ -150,11 +99,8 @@ public class PostController {
         @Authenticated AppUser user,
         @PathVariable Long postId
     ) {
-        validateIsGuest(user);
         LikeResponseDto likeResponseDto = postService.like(user, postId);
-
-        LikeResponse likeResponse =
-            new LikeResponse(likeResponseDto.getLikesCount(), likeResponseDto.getLiked());
+        LikeResponse likeResponse =PostAssembler.likeResponse(likeResponseDto);
 
         return ResponseEntity.ok(likeResponse);
     }
@@ -165,19 +111,10 @@ public class PostController {
         @Authenticated AppUser user,
         @PathVariable Long postId
     ) {
-        validateIsGuest(user);
         LikeResponseDto likeResponseDto = postService.unlike(user, postId);
-
-        LikeResponse likeResponse =
-            new LikeResponse(likeResponseDto.getLikesCount(), likeResponseDto.getLiked());
+        LikeResponse likeResponse = PostAssembler.likeResponse(likeResponseDto);
 
         return ResponseEntity.ok(likeResponse);
-    }
-
-    private void validateIsGuest(AppUser user) {
-        if (user.isGuest()) {
-            throw new UnauthorizedException();
-        }
     }
 
     @ForOnlyLoginUser
@@ -187,31 +124,14 @@ public class PostController {
         @PathVariable Long postId,
         @Valid @RequestBody PostUpdateRequest updateRequest
     ) {
-        PostUpdateResponseDto updateResponseDto = postService
-            .update(createPostUpdateRequestDto(user, postId, updateRequest));
-        URI uri = URI.create(String.format(REDIRECT_URL, user.getUsername(), postId));
-        return ResponseEntity
-            .created(uri)
-            .body(createPostUpdateResponse(updateResponseDto));
-    }
+        PostUpdateResponseDto updateResponseDto =
+            postService.update(PostAssembler.postUpdateRequestDto(user, postId, updateRequest));
 
-    private PostUpdateRequestDto createPostUpdateRequestDto(
-        AppUser user,
-        Long postId,
-        PostUpdateRequest updateRequest) {
-        return new PostUpdateRequestDto(
-            user,
-            postId,
-            updateRequest.getTags(),
-            updateRequest.getContent()
-        );
-    }
+        PostUpdateResponse postUpdateResponse = PostAssembler.postUpdateResponse(updateResponseDto);
 
-    private PostUpdateResponse createPostUpdateResponse(PostUpdateResponseDto updateResponseDto) {
-        return PostUpdateResponse.builder()
-            .tags(updateResponseDto.getTags())
-            .content(updateResponseDto.getContent())
-            .build();
+        URI redirectUrl = URI.create(String.format(REDIRECT_URL, user.getUsername(), postId));
+
+        return ResponseEntity.created(redirectUrl).body(postUpdateResponse);
     }
 
     @ForOnlyLoginUser
@@ -220,16 +140,12 @@ public class PostController {
         @Authenticated AppUser user,
         @PathVariable Long postId
     ) {
-        postService.delete(createPostDeleteRequestDto(user, postId));
+        postService.delete(PostAssembler.postDeleteRequestDto(user, postId));
 
-        return ResponseEntity
-            .noContent()
-            .build();
+        return ResponseEntity.noContent().build();
     }
 
-    private PostDeleteRequestDto createPostDeleteRequestDto(AppUser user, Long postId) {
-        return new PostDeleteRequestDto(user, postId);
-    }
+
 
     @ForLoginAndGuestUser
     @GetMapping("/posts/{postId}/likes")
@@ -237,24 +153,11 @@ public class PostController {
         @Authenticated AppUser appUser,
         @PathVariable Long postId
     ) {
-        AuthUserForPostRequestDto authUserRequestDto =
-            new AuthUserForPostRequestDto(appUser);
+        AuthUserForPostRequestDto authUserRequestDto = new AuthUserForPostRequestDto(appUser);
 
-        List<LikeUsersResponseDto> likeUsersResponseDtos = postService
-            .likeUsers(authUserRequestDto, postId);
+        List<LikeUsersResponseDto> likeUsersResponseDtos =
+            postService.likeUsers(authUserRequestDto, postId);
 
-        return ResponseEntity.ok(createLikeUsersResponse(likeUsersResponseDtos));
-    }
-
-    private List<LikeUsersResponse> createLikeUsersResponse(
-        List<LikeUsersResponseDto> likeUsersResponseDtos
-    ) {
-        return likeUsersResponseDtos.stream()
-            .map(dto -> LikeUsersResponse.builder()
-                .username(dto.getUsername())
-                .imageUrl(dto.getImageUrl())
-                .following(dto.getFollowing())
-                .build()
-            ).collect(toList());
+        return ResponseEntity.ok(PostAssembler.likeUsersResponses(likeUsersResponseDtos));
     }
 }

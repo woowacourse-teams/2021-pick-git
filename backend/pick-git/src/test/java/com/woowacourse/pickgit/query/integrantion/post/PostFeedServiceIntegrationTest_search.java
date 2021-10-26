@@ -5,12 +5,11 @@ import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.woowacourse.pickgit.acceptance.AcceptanceTest;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.exception.post.IllegalSearchTypeException;
 import com.woowacourse.pickgit.integration.IntegrationTest;
-import com.woowacourse.pickgit.post.application.PostDtoAssembler;
 import com.woowacourse.pickgit.post.application.PostFeedService;
+import com.woowacourse.pickgit.post.application.dto.PostDtoAssembler;
 import com.woowacourse.pickgit.post.application.dto.request.SearchPostsRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.domain.Post;
@@ -28,7 +27,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.PageRequest;
 
 public class PostFeedServiceIntegrationTest_search extends IntegrationTest {
 
@@ -93,13 +92,14 @@ public class PostFeedServiceIntegrationTest_search extends IntegrationTest {
             createSearchPostsRequestDto("tags", keyword, "testUser", false);
 
         // when
-        List<PostResponseDto> actual = postFeedService.search(searchPostsRequestDto);
+        List<PostResponseDto> actual = postFeedService
+            .search(searchPostsRequestDto, PageRequest.of(0, 5));
         actual.sort(comparing(PostResponseDto::getId));
 
         // then
         List<Post> allPosts = postRepository.findAll();
         List<PostResponseDto> allPostResponseDtos = PostDtoAssembler
-            .assembleFrom(user, allPosts);
+            .postResponseDtos(user, allPosts);
         List<PostResponseDto> expected = findPostResponseByTags(allPostResponseDtos, keyword);
 
         assertThat(actual)
@@ -116,13 +116,14 @@ public class PostFeedServiceIntegrationTest_search extends IntegrationTest {
             createSearchPostsRequestDto("tags", keyword, null, true);
 
         // when
-        List<PostResponseDto> actual = postFeedService.search(searchPostsRequestDto);
+        List<PostResponseDto> actual = postFeedService
+            .search(searchPostsRequestDto, PageRequest.of(0, 5));
         actual.sort(comparing(PostResponseDto::getId));
 
         // then
         List<Post> allPosts = postRepository.findAll();
         List<PostResponseDto> allPostResponseDtos = PostDtoAssembler
-            .assembleFrom(null, allPosts);
+            .postResponseDtos(null, allPosts);
         List<PostResponseDto> expected = findPostResponseByTags(allPostResponseDtos, keyword);
 
         assertThat(actual)
@@ -166,7 +167,8 @@ public class PostFeedServiceIntegrationTest_search extends IntegrationTest {
             createSearchPostsRequestDto(type, "keyword", userName, isGuest);
 
         // when then
-        assertThatThrownBy(() -> postFeedService.search(searchPostsRequestDto))
+        assertThatThrownBy(
+            () -> postFeedService.search(searchPostsRequestDto, PageRequest.of(0, 5)))
             .isInstanceOf(IllegalSearchTypeException.class)
             .extracting("errorCode")
             .isEqualTo("P0006");
@@ -181,8 +183,6 @@ public class PostFeedServiceIntegrationTest_search extends IntegrationTest {
         return SearchPostsRequestDto.builder()
             .type(type)
             .keyword(keyword)
-            .page(0)
-            .limit(5)
             .userName(userName)
             .isGuest(isGuest)
             .build();

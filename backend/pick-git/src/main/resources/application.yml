@@ -1,5 +1,13 @@
 spring:
+  data:
+    web:
+      pageable:
+        size-parameter: limit
   profiles:
-    include: security, db
+    include: security
   flyway:
     enabled: false
+server:
+  compression:
+    enabled: true
+    mime-types: application/json

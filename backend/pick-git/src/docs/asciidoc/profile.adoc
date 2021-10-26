@@ -32,17 +32,11 @@ include::{snippets}/profiles-unLoggedIn/http-request.adoc[]
 ==== Response
 include::{snippets}/profiles-unLoggedIn/http-response.adoc[]
 
-=== 내 프로필 수정 - 로그인
+=== 내 프로필 한줄 소개 수정
 ==== Request
-include::{snippets}/profiles-edit/http-request.adoc[]
+include::{snippets}/profiles-edit-description/http-request.adoc[]
 ==== Response
-include::{snippets}/profiles-edit/http-response.adoc[]
-
-=== 내 프로필 수정 - 비 로그인
-==== Request
-include::{snippets}/profiles-edit-unLoggedIn/http-request.adoc[]
-==== Response
-include::{snippets}/profiles-edit-unLoggedIn/http-response.adoc[]
+include::{snippets}/profiles-edit-description/http-response.adoc[]
 
 === Github 통계 조회 - 로그인
 ==== Request

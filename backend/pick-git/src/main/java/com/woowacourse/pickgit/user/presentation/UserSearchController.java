@@ -5,10 +5,13 @@ import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.config.auth_interceptor_register.ForLoginAndGuestUser;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserRequestDto;
-import com.woowacourse.pickgit.user.application.dto.request.UserSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
+import com.woowacourse.pickgit.user.presentation.dto.UserAssembler;
+import com.woowacourse.pickgit.user.presentation.dto.response.UserSearchResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,19 +29,20 @@ public class UserSearchController {
 
     @ForLoginAndGuestUser
     @GetMapping("/search/users")
-    public ResponseEntity<List<UserSearchResponseDto>> searchUser(
+    public ResponseEntity<List<UserSearchResponse>> searchUser(
         @Authenticated AppUser appUser,
         @RequestParam String keyword,
-        @RequestParam Long page,
-        @RequestParam Long limit
+        @PageableDefault Pageable pageable
     ) {
-        AuthUserForUserRequestDto authUserRequestDto = AuthUserForUserRequestDto.from(appUser);
-        UserSearchRequestDto userSearchRequestDto = UserSearchRequestDto.builder()
-            .keyword(keyword)
-            .page(page)
-            .limit(limit)
-            .build();
-        return ResponseEntity
-            .ok(userService.searchUser(authUserRequestDto, userSearchRequestDto));
+        AuthUserForUserRequestDto authUserRequestDto =
+            UserAssembler.authUserForUserRequestDto(appUser);
+
+        List<UserSearchResponseDto> userSearchResponseDtos = userService
+            .searchUser(authUserRequestDto, keyword, pageable);
+
+        List<UserSearchResponse> userSearchResponses = UserAssembler
+            .userSearchResponses(userSearchResponseDtos);
+
+        return ResponseEntity.ok(userSearchResponses);
     }
 }

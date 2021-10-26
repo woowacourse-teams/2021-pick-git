@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 30.333 27.5">
+  <g id="company-line" transform="translate(2.302 -1.355)">
+    <rect id="Rect" width="28.333" height="19.833" rx="2" transform="translate(-1.302 8.021)" fill="none" stroke="#5a5a5a" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+    <path id="Path" d="M22.667,29.75V7.083A2.834,2.834,0,0,0,19.833,4.25H14.167a2.834,2.834,0,0,0-2.834,2.833V29.75" transform="translate(-4.135 -1.895)" fill="none" stroke="#5a5a5a" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+  </g>
+</svg>

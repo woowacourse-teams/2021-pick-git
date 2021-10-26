@@ -3,16 +3,19 @@ package com.woowacourse.pickgit.unit.user.infrastructure;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.woowacourse.pickgit.common.mockapi.MockContributionApiRequester;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
-import com.woowacourse.pickgit.exception.user.ContributionParseException;
-import com.woowacourse.pickgit.user.domain.Contribution;
-import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
-import com.woowacourse.pickgit.user.infrastructure.calculator.GithubContributionCalculator;
-import com.woowacourse.pickgit.user.infrastructure.extractor.GithubContributionExtractor;
-import com.woowacourse.pickgit.user.infrastructure.extractor.PlatformContributionExtractor;
-import com.woowacourse.pickgit.user.infrastructure.requester.PlatformContributionApiRequester;
+import com.woowacourse.pickgit.user.domain.contribution.Contribution;
+import com.woowacourse.pickgit.user.domain.contribution.ContributionCategory;
+import com.woowacourse.pickgit.user.domain.contribution.PlatformContributionCalculator;
+import com.woowacourse.pickgit.user.infrastructure.contribution.GithubContributionCalculator;
+import com.woowacourse.pickgit.user.infrastructure.contribution.PlatformContributionExtractor;
+import com.woowacourse.pickgit.user.infrastructure.dto.CountDto;
+import com.woowacourse.pickgit.user.infrastructure.dto.ItemDto;
+import com.woowacourse.pickgit.user.infrastructure.dto.StarsDto;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,20 +27,12 @@ class GithubContributionCalculatorTest {
     private static final String INVALID_ACCESS_TOKEN = "invalid" + ACCESS_TOKEN;
     private static final String USERNAME = "testUser";
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    private final String apiUrlFormatForStar = "https://api.github.com/search/repositories?q=user:%s stars:>=1";
-    private final String apiUrlFormatForCount = "https://api.github.com/search/";
-
     private PlatformContributionExtractor platformContributionExtractor;
     private PlatformContributionCalculator platformContributionCalculator;
 
     @BeforeEach
     void setUp() {
-        platformContributionExtractor = new GithubContributionExtractor(
-            objectMapper,
-            new MockContributionApiRequester(),
-            "https://api.github.com"
-        );
+        platformContributionExtractor = new MockContributionExtractor();
         platformContributionCalculator = new GithubContributionCalculator(
             platformContributionExtractor
         );
@@ -47,91 +42,25 @@ class GithubContributionCalculatorTest {
     @Test
     void calculate_ValidCalculation_Success() {
         // given
-        Contribution contribution = new Contribution(11, 48, 48, 48, 48);
+        Map<ContributionCategory, Integer> contributionMap = new EnumMap<>(ContributionCategory.class);
+        contributionMap.put(ContributionCategory.STAR, 11);
+        for (int i = 1; i < ContributionCategory.values().length; i++) {
+            contributionMap.put(ContributionCategory.values()[i], 48);
+        }
+        Contribution contribution = new Contribution(contributionMap);
 
         // when
         Contribution result = platformContributionCalculator.calculate(ACCESS_TOKEN, USERNAME);
 
         // then
-        assertThat(result)
-            .usingRecursiveComparison()
-            .isEqualTo(contribution);
-    }
-
-    @DisplayName("유효하지 않은 OAuth 토큰인 경우 스타 개수를 조회할 수 없다. - 500 예외")
-    @Test
-    void calculate_InvalidTokenInCaseOfStars_500Exception() {
-        // given
-        platformContributionExtractor = new GithubContributionExtractor(
-            objectMapper,
-            new MockStarsContributionApiErrorRequester(),
-            "https://api.github.com"
-        );
-        platformContributionCalculator = new GithubContributionCalculator(
-            platformContributionExtractor
-        );
-
-        // when
-        assertThatThrownBy(() -> {
-            platformContributionCalculator.calculate(INVALID_ACCESS_TOKEN, USERNAME);
-        }).isInstanceOf(PlatformHttpErrorException.class)
-            .hasFieldOrPropertyWithValue("errorCode", "V0001")
-            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
-            .hasMessage("외부 플랫폼 연동에 실패");
-    }
-
-    @DisplayName("JSON key 값이 다른 경우 스타 개수를 조회할 수 없다. - 500 예외")
-    @Test
-    void calculate_InvalidCalculationInCaseOfStars_500Exception() {
-        // given
-        platformContributionExtractor = new GithubContributionExtractor(
-            objectMapper,
-            new MockStarsContributionApiErrorRequester(),
-            "https://api.github.com"
-        );
-        platformContributionCalculator = new GithubContributionCalculator(
-            platformContributionExtractor
-        );
-
-        // when
-        assertThatThrownBy(() -> {
-            platformContributionCalculator.calculate(ACCESS_TOKEN, USERNAME);
-        }).isInstanceOf(ContributionParseException.class)
-            .hasFieldOrPropertyWithValue("errorCode", "V0001")
-            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
-            .hasMessage("활동 통계를 조회할 수 없습니다.");
-    }
-
-    private static class MockStarsContributionApiErrorRequester
-        implements PlatformContributionApiRequester {
-
-        @Override
-        public String request(String url, String accessToken) {
-            if (!ACCESS_TOKEN.equals(accessToken)) {
-                throw new PlatformHttpErrorException();
-            }
-
-            if (url.contains("stars")) {
-                return "{\"items\": [{\"stargazers\": \"5\"}, {\"stargazers\": \"6\"}]}";
-            }
-            return "{\"total_count\": \"48\"}";
-        }
+        assertThat(contribution).usingRecursiveComparison()
+            .isEqualTo(result);
     }
 
     @DisplayName("유효하지 않은 OAuth 토큰인 경우 커밋, PR, 이슈, 퍼블릭 레포지토리 개수를 조회할 수 없다. - 500 예외")
     @Test
     void calculate_InvalidTokenInCaseOfCount_500Exception() {
-        // given
-        platformContributionExtractor = new GithubContributionExtractor(
-            objectMapper,
-            new MockCountContributionApiErrorRequester(),
-            "https://api.github.com"
-        );
-        platformContributionCalculator = new GithubContributionCalculator(
-            platformContributionExtractor
-        );
-
-        // when
+        // given, when, then
         assertThatThrownBy(() -> {
             platformContributionCalculator.calculate(INVALID_ACCESS_TOKEN, USERNAME);
         }).isInstanceOf(PlatformHttpErrorException.class)
@@ -140,41 +69,39 @@ class GithubContributionCalculatorTest {
             .hasMessage("외부 플랫폼 연동에 실패");
     }
 
-    @DisplayName("JSON key 값이 다른 경우 커밋, PR, 이슈, 퍼블릭 레포지토리 개수를 조회할 수 없다. - 500 예외")
-    @Test
-    void calculate_InvalidCalculationInCaseOfCount_500Exception() {
-        // given
-        platformContributionExtractor = new GithubContributionExtractor(
-            objectMapper,
-            new MockCountContributionApiErrorRequester(),
-            "https://api.github.com"
-        );
-        platformContributionCalculator = new GithubContributionCalculator(
-            platformContributionExtractor
-        );
-
-        // when
-        assertThatThrownBy(() -> {
-            platformContributionCalculator.calculate(ACCESS_TOKEN, USERNAME);
-        }).isInstanceOf(ContributionParseException.class)
-            .hasFieldOrPropertyWithValue("errorCode", "V0001")
-            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
-            .hasMessage("활동 통계를 조회할 수 없습니다.");
-    }
-
-    private static class MockCountContributionApiErrorRequester
-        implements PlatformContributionApiRequester {
+    private static class MockContributionExtractor implements PlatformContributionExtractor {
 
         @Override
-        public String request(String url, String accessToken) {
+        public void extractStars(
+            String accessToken,
+            String username,
+            Map<ContributionCategory, Integer> bucket,
+            CountDownLatch countDownLatch
+        ) {
             if (!ACCESS_TOKEN.equals(accessToken)) {
                 throw new PlatformHttpErrorException();
             }
+            List<StarsDto> starsDtos = List.of(new StarsDto(5), new StarsDto(6));
+            ItemDto itemDto = new ItemDto(starsDtos);
+            bucket.put(ContributionCategory.STAR, itemDto.sum());
+            countDownLatch.countDown();
+        }
 
-            if (url.contains("stars")) {
-                return "{\"items\": [{\"stargazers_count\": \"5\"}, {\"stargazers_count\": \"6\"}]}";
+        @Override
+        public void extractCount(
+            ContributionCategory category,
+            String restUrl,
+            String accessToken,
+            String username,
+            Map<ContributionCategory, Integer> bucket,
+            CountDownLatch latch
+        ) {
+            if (!ACCESS_TOKEN.equals(accessToken)) {
+                throw new PlatformHttpErrorException();
             }
-            return "{\"total\": \"48\"}";
+            CountDto countDto = new CountDto(48);
+            bucket.put(category, countDto.getCount());
+            latch.countDown();
         }
     }
 }

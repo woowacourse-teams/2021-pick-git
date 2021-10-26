@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.integration.tag;
 
+import static com.woowacourse.pickgit.query.fixture.TRepository.PICK_GIT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
@@ -9,9 +10,9 @@ import com.woowacourse.pickgit.config.JpaTestConfiguration;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.post.TagFormatException;
 import com.woowacourse.pickgit.integration.IntegrationTest;
-import com.woowacourse.pickgit.tag.application.ExtractionRequestDto;
 import com.woowacourse.pickgit.tag.application.TagService;
-import com.woowacourse.pickgit.tag.application.TagsDto;
+import com.woowacourse.pickgit.tag.application.dto.ExtractionRequestDto;
+import com.woowacourse.pickgit.tag.application.dto.TagsDto;
 import com.woowacourse.pickgit.tag.domain.PlatformTagExtractor;
 import com.woowacourse.pickgit.tag.domain.Tag;
 import com.woowacourse.pickgit.tag.domain.TagRepository;
@@ -27,8 +28,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.context.annotation.Import;
 
 class TagServiceIntegrationTest extends IntegrationTest {
 
@@ -42,7 +41,7 @@ class TagServiceIntegrationTest extends IntegrationTest {
 
     private final String accessToken = "oauth.access.token";
     private final String userName = "jipark3";
-    private final String repositoryName = "doms-react";
+    private final String repositoryName = PICK_GIT.name();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
@@ -71,7 +70,7 @@ class TagServiceIntegrationTest extends IntegrationTest {
         TagsDto tagsDto = tagService.extractTags(extractionRequestDto);
 
         // then
-        assertThat(tagsDto.getTagNames()).containsAll(List.of("javascript", "html", "css"));
+        assertThat(tagsDto.getTagNames()).containsAll(PICK_GIT.getTags());
     }
 
     @DisplayName("잘못된 경로로 태그 추출 요청시 예외가 발생한다.")

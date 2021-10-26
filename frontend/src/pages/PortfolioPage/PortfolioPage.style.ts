@@ -1,18 +1,24 @@
 import styled, { css } from "styled-components";
+import { fadeIn } from "../../components/@styled/keyframes";
 import {
   setDesktopMediaQuery,
   setLaptopMediaQuery,
   setLaptopAboveMediaQuery,
   setTabletMediaQuery,
 } from "../../components/@styled/mediaQueries";
+import { customScrollbarCSS } from "../../components/@styled/scrollbar";
 
 export const Container = styled.main(
   ({ theme }) => css`
-    height: 100%;
     background-color: ${theme.color.white};
     scroll-snap-type: y mandatory;
     overflow-x: hidden;
     overflow-y: scroll;
+    height: 100%;
+
+    animation: ${fadeIn} 1s forwards;
+
+    ${customScrollbarCSS(theme.color.tagItemColor)}
   `
 );
 
@@ -26,7 +32,7 @@ export const FullPage = styled.section<{ isVerticalCenter?: boolean }>`
   width: 100vw;
   height: 100vh;
   overflow-y: scroll;
-  padding: 4.375rem 0;
+  padding-top: 4.375rem;
 
   ::-webkit-scrollbar {
     display: none;
@@ -41,9 +47,11 @@ export const UserAvatarCSS = css`
 export const UserNameCSS = css`
   height: 1.2rem;
   text-align: center;
+  min-height: 1.5rem;
 
   ${setLaptopAboveMediaQuery`
     font-size: 1.5rem;
+    min-height: 1.8rem;
   `}
 `;
 
@@ -63,27 +71,40 @@ export const ToggleButtonCSS = css`
   `}
 `;
 
-export const AvatarWrapper = styled.div``;
+export const AvatarWrapper = styled.div(
+  ({ theme }) => css`
+    background-color: ${theme.color.white};
+
+    ${setTabletMediaQuery`
+    margin-top: 3rem;
+  `}
+
+    ${setLaptopAboveMediaQuery`
+    margin-top: 5rem;
+  `}
+  `
+);
 
 export const DescriptionCSS = css`
   ${({ theme }) => `
     color: ${theme.color.textColor};
+    background-color: ${theme.color.white};
   `}
 
   width: 100%;
+  min-height: 5rem;
   text-align: left;
   font-size: 0.75rem;
   margin: 1rem 0;
   line-height: 1.2rem;
   padding: 0 3rem;
-  height: 100px;
 
   ${setLaptopMediaQuery`
     margin: 1.5rem 0;
     text-align: center;
     font-size: 0.8rem;
     border: none;
-    padding: 0 12rem;
+    width: 70%;
   `}
 
   ${setDesktopMediaQuery`
@@ -91,24 +112,29 @@ export const DescriptionCSS = css`
     text-align: center;
     font-size: 0.9rem;
     border: none;
-    padding: 0 24rem;
+    width: 50%;
   `}
 `;
 
-export const ContactWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: 0 3rem;
-  width: 100%;
+export const ContactWrapper = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    padding: 0 3rem;
+    width: 100%;
+    overflow-y: scroll;
 
-  ${setLaptopMediaQuery`
-    padding: 0 12rem;
+    ${customScrollbarCSS(theme.color.textColor)}
+
+    ${setLaptopMediaQuery`
+    width: 70%;
   `}
 
   ${setDesktopMediaQuery`
-    padding: 0 24rem;
+    width: 50%;
   `}
-`;
+  `
+);
 
 export const DetailInfo = styled.div`
   display: flex;
@@ -152,6 +178,8 @@ export const CategoryAddIconWrapper = styled.div`
 
 export const ContactIconCSS = css`
   margin-right: 0.75rem;
+  width: 20px;
+  height: 20px;
 `;
 
 export const SectionNameCSS = css`
@@ -197,4 +225,15 @@ export const CloseButtonWrapper = styled.div`
   ${setDesktopMediaQuery`
     left: 6rem;
   `}
+`;
+
+export const PostSelectorModalCSS = css`
+  width: 50rem;
+  height: 70rem;
+`;
+
+export const FabCSS = css`
+  * {
+    stroke: white;
+  }
 `;

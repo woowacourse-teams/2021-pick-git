@@ -11,7 +11,7 @@ export default {
 };
 
 const Template: Story = (args) => {
-  const { data: infinitePostsData, isLoading } = useHomeFeedPostsQuery();
+  const { data: infinitePostsData, isLoading } = useHomeFeedPostsQuery("all");
 
   if (isLoading || !infinitePostsData) {
     return <PageLoading />;

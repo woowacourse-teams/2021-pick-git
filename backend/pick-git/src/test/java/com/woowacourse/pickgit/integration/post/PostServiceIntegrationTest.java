@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.woowacourse.pickgit.acceptance.AcceptanceTest;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
@@ -13,7 +12,6 @@ import com.woowacourse.pickgit.comment.application.dto.request.CommentRequestDto
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.PostFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
-import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.post.CannotAddTagException;
@@ -28,24 +26,18 @@ import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.SearchRepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
-import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
-import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponsesDto;
+import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.repository.UserRepository;
 import java.util.List;
-import javax.persistence.criteria.CriteriaBuilder.In;
-import javax.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
 
 
 class PostServiceIntegrationTest extends IntegrationTest {
@@ -85,10 +77,10 @@ class PostServiceIntegrationTest extends IntegrationTest {
             .build();
 
         // when
-        PostImageUrlResponseDto responseDto = postService.write(postRequestDto);
+        Long postId = postService.write(postRequestDto);
 
         // then
-        assertThat(responseDto.getId()).isNotNull();
+        assertThat(postId).isNotNull();
     }
 
     @DisplayName("사용자는 게시글 등록시 중복된 태그를 작성할 수 없다.")
@@ -124,10 +116,11 @@ class PostServiceIntegrationTest extends IntegrationTest {
         RepositoryRequestDto requestDto = createRepositoryRequestDto(ACCESS_TOKEN, USERNAME);
 
         // when
-        RepositoryResponsesDto responseDto = postService.userRepositories(requestDto);
+        List<RepositoryResponseDto> repositoryResponseDtos = postService
+            .userRepositories(requestDto);
 
         // then
-        assertThat(responseDto.getRepositoryResponsesDto()).hasSize(2);
+        assertThat(repositoryResponseDtos).hasSize(2);
     }
 
     @DisplayName("토큰이 유효하지 않은 경우 예외가 발생한다. - 500 예외")
@@ -162,8 +155,7 @@ class PostServiceIntegrationTest extends IntegrationTest {
         return RepositoryRequestDto.builder()
             .token(token)
             .username(username)
-            .page(0L)
-            .limit(50L)
+            .pageable(PageRequest.of(0, 50))
             .build();
     }
 
@@ -173,16 +165,17 @@ class PostServiceIntegrationTest extends IntegrationTest {
         // given
         SearchRepositoryRequestDto requestDto =
             new SearchRepositoryRequestDto(
-                ACCESS_TOKEN, USERNAME, "woowa", 0, 2
-            );
+                ACCESS_TOKEN,
+                USERNAME,
+                "woowa",
+                PageRequest.of(0, 2));
 
         // when
-        RepositoryResponsesDto repositoryResponsesDto = postService
+        List<RepositoryResponseDto> repositoryResponseDtos = postService
             .searchUserRepositories(requestDto);
 
         // then
-        assertThat(repositoryResponsesDto.getRepositoryResponsesDto())
-            .hasSize(2);
+        assertThat(repositoryResponseDtos).hasSize(2);
     }
 
     @DisplayName("레포지토리 검색 시 토큰이 유효하지 않은 경우 예외가 발생한다. - 500 예외")
@@ -192,7 +185,10 @@ class PostServiceIntegrationTest extends IntegrationTest {
         String invalidToken = "invalidToken";
 
         SearchRepositoryRequestDto requestDto = new SearchRepositoryRequestDto(
-            invalidToken, USERNAME, "woowa", 0, 2
+            invalidToken,
+            USERNAME,
+            "woowa",
+            PageRequest.of(0, 2)
         );
 
         // then
@@ -212,10 +208,10 @@ class PostServiceIntegrationTest extends IntegrationTest {
 
         AppUser appUser = new LoginUser(loginUser.getName(), "token");
 
-        PostImageUrlResponseDto writtenPost = postService.write(postRequestDtos);
+        Long postId = postService.write(postRequestDtos);
 
         // when
-        LikeResponseDto likeResponseDto = postService.like(appUser, writtenPost.getId());
+        LikeResponseDto likeResponseDto = postService.like(appUser, postId);
 
         // then
         assertThat(likeResponseDto.getLikesCount()).isEqualTo(1);
@@ -231,11 +227,11 @@ class PostServiceIntegrationTest extends IntegrationTest {
 
         AppUser appUser = new LoginUser(loginUser.getName(), "token");
 
-        PostImageUrlResponseDto writtenPost = postService.write(postRequestDtos);
-        postService.like(appUser, writtenPost.getId());
+        Long postId = postService.write(postRequestDtos);
+        postService.like(appUser, postId);
 
         // when
-        LikeResponseDto likeResponseDto = postService.unlike(appUser, writtenPost.getId());
+        LikeResponseDto likeResponseDto = postService.unlike(appUser, postId);
 
         // then
         assertThat(likeResponseDto.getLikesCount()).isEqualTo(0);
@@ -251,11 +247,11 @@ class PostServiceIntegrationTest extends IntegrationTest {
 
         AppUser appUser = new LoginUser(loginUser.getName(), "token");
 
-        PostImageUrlResponseDto writtenPost = postService.write(postRequestDtos);
-        postService.like(appUser, writtenPost.getId());
+        Long postId = postService.write(postRequestDtos);
+        postService.like(appUser, postId);
 
         // when then
-        assertThatThrownBy(() -> postService.like(appUser, writtenPost.getId()))
+        assertThatThrownBy(() -> postService.like(appUser, postId))
             .isInstanceOf(DuplicatedLikeException.class)
             .hasFieldOrPropertyWithValue("errorCode", "P0003")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
@@ -271,10 +267,10 @@ class PostServiceIntegrationTest extends IntegrationTest {
 
         AppUser appUser = new GuestUser();
 
-        PostImageUrlResponseDto writtenPost = postService.write(postRequestDtos);
+        Long postId = postService.write(postRequestDtos);
 
         // when then
-        assertThatThrownBy(() -> postService.like(appUser, writtenPost.getId()))
+        assertThatThrownBy(() -> postService.like(appUser, postId))
             .isInstanceOf(UnauthorizedException.class)
             .hasFieldOrPropertyWithValue("errorCode", "A0002")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)
@@ -290,10 +286,10 @@ class PostServiceIntegrationTest extends IntegrationTest {
 
         AppUser appUser = new LoginUser(loginUser.getName(), "token");
 
-        PostImageUrlResponseDto writtenPost = postService.write(postRequestDtos);
+        Long postId = postService.write(postRequestDtos);
 
         // when then
-        assertThatThrownBy(() -> postService.unlike(appUser, writtenPost.getId()))
+        assertThatThrownBy(() -> postService.unlike(appUser, postId))
             .isInstanceOf(CannotUnlikeException.class)
             .hasFieldOrPropertyWithValue("errorCode", "P0004")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST)
@@ -311,11 +307,11 @@ class PostServiceIntegrationTest extends IntegrationTest {
         AppUser loginUser = new LoginUser(likeUser.getName(), "token");
         AppUser guestUser = new GuestUser();
 
-        PostImageUrlResponseDto writtenPost = postService.write(postRequestDtos);
-        postService.like(loginUser, writtenPost.getId());
+        Long postId = postService.write(postRequestDtos);
+        postService.like(loginUser, postId);
 
         // when then
-        assertThatThrownBy(() -> postService.unlike(guestUser, writtenPost.getId()))
+        assertThatThrownBy(() -> postService.unlike(guestUser, postId))
             .isInstanceOf(UnauthorizedException.class)
             .hasFieldOrPropertyWithValue("errorCode", "A0002")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)

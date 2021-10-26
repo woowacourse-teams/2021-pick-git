@@ -1,6 +1,8 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { LAYOUT, PAGE_WIDTH, Z_INDEX } from "../../constants/layout";
+import { fadeIn } from "./keyframes";
 import { setDesktopMediaQuery, setLaptopMediaQuery, setTabletMediaQuery, setMobileMediaQuery } from "./mediaQueries";
+import { customScrollbarCSS } from "./scrollbar";
 
 export const Header = styled.header`
   position: fixed;
@@ -16,29 +18,44 @@ export const Header = styled.header`
   `}
 `;
 
-export const Page = styled.main`
-  width: 100%;
-  height: 100%;
-  padding-top: ${LAYOUT.HEADER_HEIGHT};
+export const Page = styled.main(
+  () => css`
+    width: 100%;
+    min-height: 100%;
+    padding-top: ${LAYOUT.HEADER_HEIGHT};
+    overflow-x: hidden;
 
-  ${setTabletMediaQuery`
-    padding-top: ${LAYOUT.PAGE_MARGIN_TOP};
-    width: ${PAGE_WIDTH.TABLET};
-    margin: 0 auto;
-  `}
+    animation: ${fadeIn} 1s forwards;
 
-  ${setLaptopMediaQuery`
-    padding-top: ${LAYOUT.PAGE_MARGIN_TOP};
-    width: ${PAGE_WIDTH.LAPTOP};
-    margin: 0 auto;
-  `}
+    ${setTabletMediaQuery`
+      padding: ${LAYOUT.PAGE_MARGIN_TOP} 0.3125rem 0;
+      width: ${PAGE_WIDTH.TABLET};
+      margin: 0 auto;
+    `}
 
-  ${setDesktopMediaQuery`
-    padding-top: ${LAYOUT.PAGE_MARGIN_TOP};
-    width: ${PAGE_WIDTH.DESKTOP};
-    margin: 0 auto;
-  `}
-`;
+    ${setLaptopMediaQuery`
+      padding: ${LAYOUT.PAGE_MARGIN_TOP} 0.3125rem 0;
+      width: ${PAGE_WIDTH.LAPTOP};
+      margin: 0 auto;
+    `}
+
+    ${setDesktopMediaQuery`
+      padding: ${LAYOUT.PAGE_MARGIN_TOP} 0.3125rem 0;
+      width: ${PAGE_WIDTH.DESKTOP};
+      margin: 0 auto;
+    `}
+  `
+);
+
+export const ScrollPageWrapper = styled.div(
+  ({ theme }) => css`
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+
+    ${customScrollbarCSS(theme.color.tagItemColor)}
+  `
+);
 
 export const NoneStyledTextarea = styled.textarea`
   background: none;

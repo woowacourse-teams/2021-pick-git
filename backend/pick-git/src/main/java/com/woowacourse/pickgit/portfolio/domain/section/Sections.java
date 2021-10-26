@@ -1,5 +1,8 @@
 package com.woowacourse.pickgit.portfolio.domain.section;
 
+import static java.util.stream.Collectors.toSet;
+
+import com.woowacourse.pickgit.exception.portfolio.DuplicateSectionException;
 import com.woowacourse.pickgit.portfolio.domain.Portfolio;
 import com.woowacourse.pickgit.portfolio.domain.common.UpdateUtil;
 import java.util.ArrayList;
@@ -45,9 +48,22 @@ public class Sections {
     }
 
     public void update(Sections sources, Portfolio portfolio) {
-        sources.getValues().forEach(source -> source.appendTo(portfolio));
+        List<Section> sourceValues = sources.getValues();
 
-        UpdateUtil.execute(this.getValues(), sources.getValues());
+        if (isDuplicate(sourceValues)) {
+            throw new DuplicateSectionException();
+        }
+
+        sourceValues.forEach(source -> source.appendTo(portfolio));
+
+        UpdateUtil.execute(this.getValues(), sourceValues);
+    }
+
+    private boolean isDuplicate(List<Section> sourceValues) {
+        return sourceValues.size() != sourceValues.stream()
+            .map(Section::getName)
+            .collect(toSet())
+            .size();
     }
 
     public List<Section> getValues() {

@@ -1,17 +1,27 @@
+import { useEffect, useState } from "react";
+import { FeedFilterOption } from "../../@types";
+
 import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
 import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
 import PageError from "../../components/@shared/PageError/PageError";
+import Tabs from "../../components/@shared/Tabs/Tabs";
+import { ScrollPageWrapper } from "../../components/@styled/layout";
 import Feed from "../../components/Feed/Feed";
 
 import { QUERY } from "../../constants/queries";
+import useAuth from "../../hooks/common/useAuth";
 
 import useInfiniteImagePreloader from "../../hooks/common/useInfiniteImagePreloader";
 import useHomeFeed from "../../hooks/service/useHomeFeed";
 
-import { Container } from "./HomeFeedPage.style";
+import { Container, postTabCSS, PostTabWrapper } from "./HomeFeedPage.style";
 
 const HomeFeedPage = () => {
-  const { infinitePostsData, isLoading, isFetching, isError, handlePostsEndIntersect } = useHomeFeed();
+  const { isLoggedIn } = useAuth();
+  const [feedFilterOption, setFeedFilterOption] = useState<FeedFilterOption>(isLoggedIn ? "followings" : "all");
+  const { infinitePostsData, isLoading, isFetching, isError, handlePostsEndIntersect, refetch } =
+    useHomeFeed(feedFilterOption);
+
   const infiniteImageUrls =
     infinitePostsData?.pages.map<string[]>((posts) =>
       posts.reduce<string[]>((acc, post) => [...acc, ...post.imageUrls], [])
@@ -19,10 +29,23 @@ const HomeFeedPage = () => {
   const { isFirstImagesLoading, isImagesFetching, activateImageFetchingState } =
     useInfiniteImagePreloader(infiniteImageUrls);
 
+  const tabList = [
+    { name: "Followings", onTabChange: () => setFeedFilterOption("followings") },
+    { name: "All", onTabChange: () => setFeedFilterOption("all") },
+  ];
+
   const handleIntersect = () => {
     handlePostsEndIntersect();
     activateImageFetchingState();
   };
+
+  useEffect(() => {
+    setFeedFilterOption(isLoggedIn ? "followings" : "all");
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    refetch();
+  }, [feedFilterOption, refetch]);
 
   if (isLoading || isFirstImagesLoading) {
     return <PageLoadingWithLogo />;
@@ -33,15 +56,22 @@ const HomeFeedPage = () => {
   }
 
   return (
-    <Container>
-      <InfiniteScrollContainer isLoaderShown={isFetching || isImagesFetching} onIntersect={handleIntersect}>
-        <Feed
-          infinitePostsData={infinitePostsData}
-          queryKey={[QUERY.GET_HOME_FEED_POSTS]}
-          isFetching={isFetching || isImagesFetching}
-        />
-      </InfiniteScrollContainer>
-    </Container>
+    <ScrollPageWrapper>
+      <Container>
+        {isLoggedIn && (
+          <PostTabWrapper>
+            <Tabs tabItems={tabList} tabIndicatorKind="line" cssProp={postTabCSS} />
+          </PostTabWrapper>
+        )}
+        <InfiniteScrollContainer isLoaderShown={isFetching || isImagesFetching} onIntersect={handleIntersect}>
+          <Feed
+            infinitePostsData={infinitePostsData}
+            queryKey={[QUERY.GET_HOME_FEED_POSTS]}
+            isFetching={isFetching || isImagesFetching}
+          />
+        </InfiniteScrollContainer>
+      </Container>
+    </ScrollPageWrapper>
   );
 };
 

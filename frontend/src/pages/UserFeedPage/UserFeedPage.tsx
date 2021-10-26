@@ -1,45 +1,50 @@
-import { useContext, useEffect, useState } from "react";
-import { InfiniteData } from "react-query";
+import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 
-import Feed from "../../components/Feed/Feed";
+import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
 import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
-import useUserFeed from "../../hooks/service/useUserFeed";
-import { Container } from "./UserFeedPage.style";
-import { Post } from "../../@types";
+import { ScrollPageWrapper } from "../../components/@styled/layout";
+import PageError from "../../components/@shared/PageError/PageError";
+import Feed from "../../components/Feed/Feed";
 
-import UserContext from "../../contexts/UserContext";
 import { LayoutInPx } from "../../constants/layout";
 import { QUERY } from "../../constants/queries";
+
 import useInfiniteImagePreloader from "../../hooks/common/useInfiniteImagePreloader";
-import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
+import useAuth from "../../hooks/common/useAuth";
+import useUserFeed from "../../hooks/service/useUserFeed";
+
+import { Container } from "./UserFeedPage.style";
 
 interface LocationState {
-  prevData?: InfiniteData<Post[]>;
   postId?: string;
 }
 
 const UserFeedPage = () => {
   const [isMountedOnce, setIsMountedOnce] = useState(false);
-  const { currentUsername } = useContext(UserContext);
+  const [mountCounter, setMountCounter] = useState(0);
+  const scrollWrapperRef = useRef<HTMLDivElement>(null);
+  const { currentUsername } = useAuth();
   const username = new URLSearchParams(location.search).get("username");
   const isMyFeed = currentUsername === username;
 
   const {
-    state: { prevData, postId },
+    state: { postId },
   } = useLocation<LocationState>();
 
+  // TODO : username 이 null 혹은 빈 문자열일 경우에 대한 예외처리
   const {
     infinitePostsData,
     isLoading,
     isError,
     isFetchingNextPage,
     handleIntersect: handlePostsEndIntersect,
-  } = useUserFeed(isMyFeed, username, prevData);
+  } = useUserFeed(isMyFeed, username);
 
   const infiniteImageUrls =
     infinitePostsData?.pages.map((posts) => posts.reduce<string[]>((acc, post) => [...acc, ...post.imageUrls], [])) ??
     [];
+
   const { isFirstImagesLoading, isImagesFetching, activateImageFetchingState } =
     useInfiniteImagePreloader(infiniteImageUrls);
 
@@ -49,35 +54,44 @@ const UserFeedPage = () => {
   };
 
   useEffect(() => {
+    if (!postId) {
+      return;
+    }
+
     if (!isMountedOnce) {
-      setIsMountedOnce(true);
+      setMountCounter((prev) => prev + 1);
+      setIsMountedOnce(scrollWrapperRef.current !== null);
+
+      return;
     }
 
     const $targetPost = document.querySelector(`#post${postId}`);
 
     if ($targetPost && $targetPost instanceof HTMLElement) {
-      window.scrollTo(0, $targetPost.offsetTop - LayoutInPx.HEADER_HEIGHT);
+      scrollWrapperRef.current?.scrollTo(0, $targetPost.offsetTop - LayoutInPx.HEADER_HEIGHT);
     }
-  }, [postId, isMountedOnce]);
+  }, [postId, isMountedOnce, mountCounter]);
 
   if (isLoading || isFirstImagesLoading) {
     return <PageLoadingWithLogo />;
   }
 
   if (isError || !infinitePostsData) {
-    return <div>피드를 가져올 수 없습니다.</div>;
+    return <PageError errorMessage="피드를 가져올 수 없습니다." />;
   }
 
   return (
-    <Container>
-      <InfiniteScrollContainer isLoaderShown={isFetchingNextPage || isImagesFetching} onIntersect={handleIntersect}>
-        <Feed
-          infinitePostsData={infinitePostsData}
-          queryKey={[QUERY.GET_USER_FEED_POSTS, { username, isMyFeed }]}
-          isFetching={isFetchingNextPage || isImagesFetching}
-        />
-      </InfiniteScrollContainer>
-    </Container>
+    <ScrollPageWrapper ref={scrollWrapperRef}>
+      <Container>
+        <InfiniteScrollContainer isLoaderShown={isFetchingNextPage || isImagesFetching} onIntersect={handleIntersect}>
+          <Feed
+            infinitePostsData={infinitePostsData}
+            queryKey={[QUERY.GET_USER_FEED_POSTS, { username, isMyFeed }]}
+            isFetching={isFetchingNextPage || isImagesFetching}
+          />
+        </InfiniteScrollContainer>
+      </Container>
+    </ScrollPageWrapper>
   );
 };
 

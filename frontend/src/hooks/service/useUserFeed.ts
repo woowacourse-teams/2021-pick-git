@@ -1,19 +1,25 @@
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
-import { InfiniteData, useQueryClient } from "react-query";
 import { useHistory } from "react-router-dom";
 
-import { HTTPErrorHandler, Post } from "../../@types";
-import { QUERY } from "../../constants/queries";
 import { PAGE_URL } from "../../constants/urls";
+
 import SnackBarContext from "../../contexts/SnackbarContext";
 import UserContext from "../../contexts/UserContext";
+import UserFeedContext from "../../contexts/UserFeedContext";
+
 import { handleHTTPError } from "../../utils/error";
 import { isHttpErrorStatus } from "../../utils/typeGuard";
-import { useUserPostsQuery } from "../../services/queries";
 
-const useUserFeed = (isMyFeed: boolean, username: string | null, prevData?: InfiniteData<Post[]>) => {
+import type { HTTPErrorHandler } from "../../@types";
+
+const useUserFeed = (isMyFeed: boolean, username: string | null) => {
   const [isAllPostsFetched, setIsAllPostsFetched] = useState(false);
+  const history = useHistory();
+  const { pushSnackbarMessage } = useContext(SnackBarContext);
+  const { logout } = useContext(UserContext);
+  const { queryResult, initialized, initUserFeed } = useContext(UserFeedContext);
+
   const {
     data: infinitePostsData,
     isLoading,
@@ -22,12 +28,7 @@ const useUserFeed = (isMyFeed: boolean, username: string | null, prevData?: Infi
     refetch,
     fetchNextPage,
     isFetchingNextPage,
-  } = useUserPostsQuery(isMyFeed, username);
-
-  const queryClient = useQueryClient();
-  const { pushSnackbarMessage } = useContext(SnackBarContext);
-  const { logout } = useContext(UserContext);
-  const history = useHistory();
+  } = queryResult;
 
   const handleIntersect = () => {
     if (isAllPostsFetched) return;
@@ -36,7 +37,7 @@ const useUserFeed = (isMyFeed: boolean, username: string | null, prevData?: Infi
   };
 
   const handleDataFetch = () => {
-    if (!infinitePostsData) return;
+    if (!infinitePostsData || !initialized) return;
 
     const pages = infinitePostsData.pages;
 
@@ -74,9 +75,7 @@ const useUserFeed = (isMyFeed: boolean, username: string | null, prevData?: Infi
   };
 
   useEffect(() => {
-    if (prevData) {
-      queryClient.setQueryData([QUERY.GET_USER_FEED_POSTS, { isMyFeed, username }], prevData);
-    }
+    initUserFeed(isMyFeed, username);
   }, []);
 
   useEffect(() => {

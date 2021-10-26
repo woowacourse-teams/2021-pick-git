@@ -1,7 +1,7 @@
 import { AxiosError } from "axios";
 import { QueryFunction, useInfiniteQuery, useMutation } from "react-query";
 
-import { ErrorResponse, Post } from "../../@types";
+import { ErrorResponse, FeedFilterOption, Post } from "../../@types";
 import { QUERY } from "../../constants/queries";
 import { getAccessToken } from "../../storage/storage";
 import { customError } from "../../utils/error";
@@ -31,17 +31,17 @@ const userPostsQueryFunction: QueryFunction<Post[]> = async ({ queryKey, pagePar
 
     return await requestGetMyFeedPosts(pageParam, accessToken);
   } else {
-    if (!username) throw Error("no username");
+    if (!username) return Promise.resolve([]);
 
     return await requestGetUserFeedPosts(username, pageParam, accessToken);
   }
 };
 
-export const useHomeFeedPostsQuery = () => {
+export const useHomeFeedPostsQuery = (feedFilterOption: FeedFilterOption) => {
   return useInfiniteQuery<Post[], AxiosError<ErrorResponse>>(
     [QUERY.GET_HOME_FEED_POSTS],
     async ({ pageParam = 0 }) => {
-      return await requestGetHomeFeedPosts(pageParam, getAccessToken());
+      return await requestGetHomeFeedPosts(pageParam, feedFilterOption === "all" ? null : getAccessToken());
     },
     {
       getNextPageParam: (_, pages) => {

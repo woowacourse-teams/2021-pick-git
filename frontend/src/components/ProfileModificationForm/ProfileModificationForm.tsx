@@ -4,9 +4,9 @@ import { ThemeContext } from "styled-components";
 import { CameraIcon } from "../../assets/icons";
 import { LIMIT } from "../../constants/limits";
 import SnackBarContext from "../../contexts/SnackbarContext";
-import useMessageModal from "../../hooks/common/useMessageModal";
+import useModal from "../../hooks/common/useModal";
 import useProfileModificationForm from "../../hooks/service/useProfileModificationForm";
-import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
+import AlertPortal from "../@layout/AlertPortal/AlertPortal";
 import PageLoadingWithCover from "../@layout/PageLoadingWithCover/PageLoadingWithCover";
 import Avatar from "../@shared/Avatar/Avatar";
 import Button from "../@shared/Button/Button";
@@ -22,11 +22,16 @@ export interface Props {
 
 const ProfileModificationForm = ({ username, profileImageUrl, prevDescription, onTerminate }: Props) => {
   const theme = useContext(ThemeContext);
-  const { modalMessage, isModalShown, hideMessageModal, showAlertModal } = useMessageModal();
+  const {
+    modalMessage: alertMessage,
+    isModalShown: isAlertShown,
+    hideModal: hideAlert,
+    showModal: showAlert,
+  } = useModal();
   const { values, handlers, isLoading } = useProfileModificationForm(
     username,
     { imageUrl: profileImageUrl, description: prevDescription },
-    showAlertModal,
+    showAlert,
     onTerminate
   );
   const { imageUrl, description } = values;
@@ -56,12 +61,8 @@ const ProfileModificationForm = ({ username, profileImageUrl, prevDescription, o
           autoGrow={false}
         />
       </TextEditorWrapper>
-      <Button kind="roundedBlock" padding="0.875rem">
-        수정 완료
-      </Button>
-      {isModalShown && (
-        <MessageModalPortal heading={modalMessage} onConfirm={hideMessageModal} onClose={hideMessageModal} />
-      )}
+      <Button kind="roundedBlock">수정 완료</Button>
+      {isAlertShown && <AlertPortal heading={alertMessage} onOkay={hideAlert} />}
       {isLoading && <PageLoadingWithCover description="수정중" />}
     </Container>
   );

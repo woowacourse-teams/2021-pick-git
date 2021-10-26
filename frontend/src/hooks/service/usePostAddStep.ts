@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { Step } from "../../@types";
 import PostAddStepContext from "../../contexts/PostAddStepContext";
@@ -13,6 +13,16 @@ const usePostAddStep = (steps: Step[], stepCompleteLink?: string) => {
     setStepIndex(0);
     stepCompleteLink && history.push(stepCompleteLink);
   };
+
+  useEffect(() => {
+    const hash = new URL(location.href).hash.substr(1);
+    const currentStepIndex = steps.findIndex((step) => step.hash === hash);
+    if (currentStepIndex === -1) {
+      return;
+    }
+
+    setStepIndex(currentStepIndex);
+  }, []);
 
   return {
     ...useStep({ steps, stepIndex, setStepIndex }),

@@ -3,7 +3,6 @@ package com.woowacourse.pickgit.common.mockapi;
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.query.fixture.TUser;
-import java.util.concurrent.TimeUnit;
 
 public class MockGithubOAuthClient implements OAuthClient {
 

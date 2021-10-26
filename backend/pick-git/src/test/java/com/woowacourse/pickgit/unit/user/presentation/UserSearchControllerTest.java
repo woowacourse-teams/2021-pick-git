@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInRelativeOrder;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -22,26 +23,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.unit.ControllerTest;
-import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserRequestDto;
-import com.woowacourse.pickgit.user.application.dto.request.UserSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
-import com.woowacourse.pickgit.user.presentation.UserSearchController;
 import java.util.List;
 import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 class UserSearchControllerTest extends ControllerTest {
@@ -63,7 +55,8 @@ class UserSearchControllerTest extends ControllerTest {
             .willReturn(new LoginUser("pick-git", "token"));
         given(userService.searchUser(
             any(AuthUserForUserRequestDto.class),
-            any(UserSearchRequestDto.class))
+            anyString(),
+            any(Pageable.class))
         ).willReturn(userSearchRespons);
 
         // when
@@ -92,7 +85,7 @@ class UserSearchControllerTest extends ControllerTest {
         verify(oAuthService, times(1))
             .findRequestUserByToken("token");
         verify(userService, times(1))
-            .searchUser(any(AuthUserForUserRequestDto.class), any(UserSearchRequestDto.class));
+            .searchUser(any(AuthUserForUserRequestDto.class), anyString(), any(Pageable.class));
 
         // restdocs
         perform.andDo(document("search-user-LoggedIn",
@@ -126,7 +119,7 @@ class UserSearchControllerTest extends ControllerTest {
         given(oAuthService.findRequestUserByToken(any()))
             .willReturn(new GuestUser());
         given(userService
-            .searchUser(any(AuthUserForUserRequestDto.class), any(UserSearchRequestDto.class)))
+            .searchUser(any(AuthUserForUserRequestDto.class), anyString(), any(Pageable.class)))
             .willReturn(userSearchRespons);
 
         // when
@@ -153,7 +146,7 @@ class UserSearchControllerTest extends ControllerTest {
         verify(oAuthService, times(1))
             .findRequestUserByToken(any());
         verify(userService, times(1))
-            .searchUser(any(AuthUserForUserRequestDto.class), any(UserSearchRequestDto.class));
+            .searchUser(any(AuthUserForUserRequestDto.class), anyString(), any(Pageable.class));
 
         // restdocs
         perform.andDo(document("search-user-unLoggedIn",

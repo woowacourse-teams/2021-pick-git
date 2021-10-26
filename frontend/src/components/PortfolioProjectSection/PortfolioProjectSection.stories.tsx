@@ -3,7 +3,7 @@ import { Story } from "@storybook/react";
 import PortfolioProjectSection, { Props } from "./PortfolioProjectSection";
 
 export default {
-  title: "Components/Shared/PortfolioProjectSection",
+  title: "Components/PortfolioProjectSection",
   component: PortfolioProjectSection,
 };
 

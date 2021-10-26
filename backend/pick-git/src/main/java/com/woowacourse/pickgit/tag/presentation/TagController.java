@@ -3,9 +3,10 @@ package com.woowacourse.pickgit.tag.presentation;
 import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.config.auth_interceptor_register.ForOnlyLoginUser;
-import com.woowacourse.pickgit.tag.application.ExtractionRequestDto;
 import com.woowacourse.pickgit.tag.application.TagService;
-import com.woowacourse.pickgit.tag.application.TagsDto;
+import com.woowacourse.pickgit.tag.application.dto.ExtractionRequestDto;
+import com.woowacourse.pickgit.tag.application.dto.TagsDto;
+import com.woowacourse.pickgit.tag.presentation.dto.TagAssembler;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,13 +30,11 @@ public class TagController {
         @Authenticated AppUser appUser,
         @PathVariable String repositoryName
     ) {
-        String accessToken = appUser.getAccessToken();
-        ExtractionRequestDto extractionRequestDto = ExtractionRequestDto.builder()
-            .accessToken(accessToken)
-            .userName(appUser.getUsername())
-            .repositoryName(repositoryName)
-            .build();
+        ExtractionRequestDto extractionRequestDto =
+            TagAssembler.extractionRequestDto(appUser,repositoryName);
+
         TagsDto tagsDto = tagService.extractTags(extractionRequestDto);
+
         return ResponseEntity.ok(tagsDto.getTagNames());
     }
 }

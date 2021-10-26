@@ -37,3 +37,14 @@ export { ReactComponent as AddCircleLargeIcon } from "./add-circle-large.svg";
 export { ReactComponent as AddCircleIcon } from "./add-circle.svg";
 export { ReactComponent as DeleteCircleIcon } from "./delete-circle.svg";
 export { ReactComponent as ArrowDownIcon } from "./arrow-down.svg";
+export { ReactComponent as BlogIcon } from "./blog.svg";
+export { ReactComponent as WebsiteIcon } from "./website.svg";
+export { ReactComponent as PhoneIcon } from "./phone.svg";
+export { ReactComponent as LinkIcon } from "./link.svg";
+export { ReactComponent as EmailIcon } from "./email.svg";
+export { ReactComponent as GithubLineIcon } from "./github-line.svg";
+export { ReactComponent as LocationLineIcon } from "./location-line.svg";
+export { ReactComponent as CompanyLineIcon } from "./company-line.svg";
+export { ReactComponent as UploadIcon } from "./upload.svg";
+
+

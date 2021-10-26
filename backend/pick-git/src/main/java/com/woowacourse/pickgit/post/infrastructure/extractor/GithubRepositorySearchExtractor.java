@@ -10,6 +10,7 @@ import com.woowacourse.pickgit.post.domain.util.dto.RepositoryNameAndUrl;
 import com.woowacourse.pickgit.post.infrastructure.dto.RepositoryItemDto;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -34,12 +35,11 @@ public class GithubRepositorySearchExtractor implements PlatformRepositorySearch
         String token,
         String username,
         String keyword,
-        int page,
-        int limit
+        Pageable pageable
     ) {
         String response = platformRepositoryApiRequester.request(
             token,
-            generateApiUrl(username, keyword, page + 1, limit)
+            generateApiUrl(username, keyword, pageable)
         );
 
         return parseToRepositories(response).getItems();
@@ -48,12 +48,13 @@ public class GithubRepositorySearchExtractor implements PlatformRepositorySearch
     private String generateApiUrl(
         String username,
         String keyword,
-        int page,
-        int limit
+        Pageable pageable
     ) {
         String format = apiBaseUrl +
             "/search/repositories?q=user:%s %s in:name fork:true&page=%d&per_page=%d";
-        return String.format(format, username, keyword, page, limit);
+        return String.format(
+            format, username, keyword, pageable.getPageNumber() + 1, pageable.getPageSize()
+        );
     }
 
     private RepositoryItemDto parseToRepositories(String response) {

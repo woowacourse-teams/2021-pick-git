@@ -3,8 +3,8 @@ import { PORTFOLIO } from "../../constants/localStorageKey";
 import { setPortfolioLocalUpdateTime } from "../../storage/storage";
 import useLocalStorage from "../common/useLocalStorage";
 
-const usePortfolioIntro = (name?: string, description?: string, profileImageUrl?: string) => {
-  const { itemState: portfolioIntro, setItem } = useLocalStorage<PortfolioIntro>(PORTFOLIO.INTRO, {
+const usePortfolioIntro = (username: string, name?: string, description?: string, profileImageUrl?: string) => {
+  const { itemState: portfolioIntro, setItem } = useLocalStorage<PortfolioIntro>(PORTFOLIO.INTRO(username), {
     name: name ?? "",
     isProfileShown: true,
     profileImageUrl: profileImageUrl ?? "",
@@ -12,12 +12,12 @@ const usePortfolioIntro = (name?: string, description?: string, profileImageUrl?
     contacts: [],
   });
 
-  const setPortfolioIntro = (intro: PortfolioIntro) => {
+  const setPortfolioIntro = (intro: PortfolioIntro, shouldRenewUpdateTime: boolean = true) => {
     const newIntro = {
       ...intro,
       contacts: intro.contacts.map((contact) => ({ ...contact })),
     };
-    setPortfolioLocalUpdateTime(new Date());
+    shouldRenewUpdateTime && setPortfolioLocalUpdateTime(new Date());
     setItem(newIntro);
   };
 

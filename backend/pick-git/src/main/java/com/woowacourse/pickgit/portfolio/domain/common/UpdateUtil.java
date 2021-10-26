@@ -16,8 +16,8 @@ public class UpdateUtil {
         List<UpdatableProxy<T>> originProxies = toProxy(origins);
         List<UpdatableProxy<T>> sourceProxies = toProxy(sources);
 
-        update(originProxies, sourceProxies);
         delete(originProxies, sourceProxies);
+        update(originProxies, sourceProxies);
         create(originProxies, sourceProxies);
 
         reset(origins, originProxies);
@@ -29,18 +29,6 @@ public class UpdateUtil {
             .collect(toList());
     }
 
-    private static <T extends Updatable<T>> void update(
-        List<UpdatableProxy<T>> originProxies,
-        List<UpdatableProxy<T>> sourceProxies
-    ) {
-        Map<UpdatableProxy<T>, UpdatableProxy<T>> originsWithProxy = originProxies.stream()
-            .collect(toMap(Function.identity(), Function.identity()));
-
-        sourceProxies.stream()
-            .filter(originsWithProxy::containsKey)
-            .forEach(sourceProxy -> originsWithProxy.get(sourceProxy).update(sourceProxy));
-    }
-
     private static <T extends Updatable<T>> void delete(
         List<UpdatableProxy<T>> originProxies,
         List<UpdatableProxy<T>> sourceProxies
@@ -48,13 +36,26 @@ public class UpdateUtil {
         originProxies.removeIf(origin -> !sourceProxies.contains(origin));
     }
 
+    private static <T extends Updatable<T>> void update(
+        List<UpdatableProxy<T>> originProxies,
+        List<UpdatableProxy<T>> sourceProxies
+    ) {
+        Map<UpdatableProxy<T>, UpdatableProxy<T>> originsWithProxy = originProxies.stream()
+            .collect(toMap(Function.identity(), Function.identity()));
+
+        List<UpdatableProxy<T>> updatableSources = sourceProxies.stream()
+            .filter(originsWithProxy::containsKey)
+            .collect(toList());
+        updatableSources.forEach(sourceProxy -> originsWithProxy.get(sourceProxy).update(sourceProxy));
+
+        sourceProxies.removeAll(updatableSources);
+    }
+
     private static <T extends Updatable<T>> void create(
         List<UpdatableProxy<T>> originProxies,
         List<UpdatableProxy<T>> sourceProxies
     ) {
-        sourceProxies.stream()
-            .filter(source -> !originProxies.contains(source))
-            .forEach(originProxies::add);
+       originProxies.addAll(sourceProxies);
     }
 
     private static <T extends Updatable<T>> void reset(

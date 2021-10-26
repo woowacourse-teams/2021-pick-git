@@ -6,7 +6,6 @@ import static com.woowacourse.pickgit.query.fixture.TUser.KEVIN;
 import static com.woowacourse.pickgit.query.fixture.TUser.KODA;
 import static com.woowacourse.pickgit.query.fixture.TUser.MARK;
 import static com.woowacourse.pickgit.query.fixture.TUser.NEOZAL;
-import static com.woowacourse.pickgit.query.fixture.TUser.모든유저;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
@@ -19,15 +18,9 @@ import org.junit.jupiter.api.Test;
 
 class UserAcceptance_GetFollowingsAndFollowers extends AcceptanceTest {
 
-    private static final String FOLLOWINGS_API_URL =
-        "/api/profiles/{username}/followings?page={page}&limit={limit}";
-    private static final String FOLLOWERS_API_URL =
-        "/api/profiles/{username}/followers?page={page}&limit={limit}";
-
     @BeforeEach
     void setUp() {
         toRead();
-        모든유저().로그인을한다();
 
         NEOZAL.은로그인을하고().팔로우를한다(KODA, DANI);
         KODA.은로그인을하고().팔로우를한다(NEOZAL, MARK, DANI);

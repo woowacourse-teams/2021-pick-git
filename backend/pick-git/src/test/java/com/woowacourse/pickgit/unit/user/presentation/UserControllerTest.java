@@ -30,25 +30,20 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.unit.ControllerTest;
-import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowRequestDto;
-import com.woowacourse.pickgit.user.application.dto.request.FollowSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileImageEditRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.ProfileImageEditResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
-import com.woowacourse.pickgit.user.presentation.UserController;
 import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
 import com.woowacourse.pickgit.user.presentation.dto.request.ProfileDescriptionRequest;
 import java.io.File;
@@ -59,14 +54,9 @@ import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 class UserControllerTest extends ControllerTest {
@@ -210,10 +200,12 @@ class UserControllerTest extends ControllerTest {
 
             // when
             ResultActions perform = mockMvc
-                .perform(post("/api/profiles/{userName}/followings?githubFollowing={githubFollowing}", "testUser", false)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer testToken")
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .accept(MediaType.ALL));
+                .perform(
+                    post("/api/profiles/{userName}/followings?githubFollowing={githubFollowing}",
+                        "testUser", false)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer testToken")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .accept(MediaType.ALL));
 
             // then
             String body = perform
@@ -266,7 +258,9 @@ class UserControllerTest extends ControllerTest {
             // when
             ResultActions perform = mockMvc
                 .perform(RestDocumentationRequestBuilders
-                    .delete("/api/profiles/{userName}/followings?githubUnfollowing={githubUnfollowing}", "testUser", false)
+                    .delete(
+                        "/api/profiles/{userName}/followings?githubUnfollowing={githubUnfollowing}",
+                        "testUser", false)
                     .header(HttpHeaders.AUTHORIZATION, "Bearer testToken")
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .accept(MediaType.ALL));
@@ -376,7 +370,8 @@ class UserControllerTest extends ControllerTest {
             given(oAuthService.findRequestUserByToken("token"))
                 .willReturn(loginUser);
             given(userService
-                .editProfileImage(any(AuthUserForUserRequestDto.class), any(ProfileImageEditRequestDto.class)))
+                .editProfileImage(any(AuthUserForUserRequestDto.class),
+                    any(ProfileImageEditRequestDto.class)))
                 .willReturn(new ProfileImageEditResponseDto(file.getName()));
 
             // when
@@ -385,7 +380,6 @@ class UserControllerTest extends ControllerTest {
                     .header(HttpHeaders.AUTHORIZATION, "Bearer token")
                     .content(new FileInputStream(file).readAllBytes())
             );
-
             // then
             perform
                 .andExpect(status().isOk())
@@ -394,12 +388,13 @@ class UserControllerTest extends ControllerTest {
             verify(oAuthService, times(1)).validateToken("token");
             verify(oAuthService, times(1)).findRequestUserByToken("token");
             verify(userService, times(1))
-                .editProfileImage(any(AuthUserForUserRequestDto.class), any(ProfileImageEditRequestDto.class));
+                .editProfileImage(any(AuthUserForUserRequestDto.class),
+                    any(ProfileImageEditRequestDto.class));
         }
 
         @DisplayName("자신의 프로필 한 줄 소개를 수정할 수 있다.")
         @Test
-        void editUserProfileDescrption_LoginUserWithDescrption_Success()
+        void editUserProfileDescription_LoginUserWithDescription_Success()
             throws Exception {
             // given
             AppUser loginUser = new LoginUser("testUser", "token");
@@ -410,7 +405,8 @@ class UserControllerTest extends ControllerTest {
                 .willReturn(true);
             given(oAuthService.findRequestUserByToken("token"))
                 .willReturn(loginUser);
-            given(userService.editProfileDescription(any(AuthUserForUserRequestDto.class), anyString()))
+            given(userService
+                .editProfileDescription(any(AuthUserForUserRequestDto.class), anyString()))
                 .willReturn(description);
 
             // when
@@ -418,7 +414,8 @@ class UserControllerTest extends ControllerTest {
                 put("/api/profiles/me/description")
                     .header(HttpHeaders.AUTHORIZATION, "Bearer token")
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .content(objectMapper.writeValueAsString(new ProfileDescriptionRequest(description)))
+                    .content(
+                        objectMapper.writeValueAsString(new ProfileDescriptionRequest(description)))
             );
 
             // then
@@ -432,7 +429,7 @@ class UserControllerTest extends ControllerTest {
                 .editProfileDescription(any(AuthUserForUserRequestDto.class), anyString());
 
             // restdocs
-            perform.andDo(document("edit-profile-description",
+            perform.andDo(document("profiles-edit-description",
                 getDocumentRequest(),
                 getDocumentResponse(),
                 requestHeaders(
@@ -661,7 +658,8 @@ class UserControllerTest extends ControllerTest {
             .willReturn(new LoginUser("source", "token"));
         given(userService.searchFollowings(
             any(AuthUserForUserRequestDto.class),
-            any(FollowSearchRequestDto.class)
+            anyString(),
+            any(Pageable.class)
         )).willReturn(userSearchResponseDtos);
 
         // when
@@ -681,7 +679,11 @@ class UserControllerTest extends ControllerTest {
         verify(oAuthService, times(1)).validateToken("token");
         verify(oAuthService, times(1)).findRequestUserByToken("token");
         verify(userService, times(1))
-            .searchFollowings(any(AuthUserForUserRequestDto.class), any(FollowSearchRequestDto.class));
+            .searchFollowings(
+                any(AuthUserForUserRequestDto.class),
+                anyString(),
+                any(Pageable.class)
+            );
 
         // restdocs
         resultActions.andDo(document("search-followings-LoggedIn",
@@ -697,7 +699,8 @@ class UserControllerTest extends ControllerTest {
             responseFields(
                 fieldWithPath("[].imageUrl").type(STRING).description("팔로잉 유저 이미지 url"),
                 fieldWithPath("[].username").type(STRING).description("팔로잉 유저 이름"),
-                fieldWithPath("[].following").type(BOOLEAN).optional().description("로그인시 검색된 유저 팔로잉 여부")
+                fieldWithPath("[].following").type(BOOLEAN).optional()
+                    .description("로그인시 검색된 유저 팔로잉 여부")
             )
         ));
     }
@@ -715,7 +718,8 @@ class UserControllerTest extends ControllerTest {
             .willReturn(new GuestUser());
         given(userService.searchFollowings(
             any(AuthUserForUserRequestDto.class),
-            any(FollowSearchRequestDto.class)
+            anyString(),
+            any(Pageable.class)
         )).willReturn(userSearchResponseDtos);
 
         // when
@@ -733,7 +737,11 @@ class UserControllerTest extends ControllerTest {
 
         verify(oAuthService, times(1)).findRequestUserByToken(null);
         verify(userService, times(1))
-            .searchFollowings(any(AuthUserForUserRequestDto.class), any(FollowSearchRequestDto.class));
+            .searchFollowings(
+                any(AuthUserForUserRequestDto.class),
+                anyString(),
+                any(Pageable.class)
+            );
 
         // restdocs
         resultActions.andDo(document("search-followings-unLoggedIn",
@@ -769,7 +777,8 @@ class UserControllerTest extends ControllerTest {
             .willReturn(new LoginUser("source", "token"));
         given(userService.searchFollowers(
             any(AuthUserForUserRequestDto.class),
-            any(FollowSearchRequestDto.class)
+            anyString(),
+            any(Pageable.class)
         )).willReturn(userSearchResponseDtos);
 
         // when
@@ -789,7 +798,11 @@ class UserControllerTest extends ControllerTest {
         verify(oAuthService, times(1)).validateToken("token");
         verify(oAuthService, times(1)).findRequestUserByToken("token");
         verify(userService, times(1))
-            .searchFollowers(any(AuthUserForUserRequestDto.class), any(FollowSearchRequestDto.class));
+            .searchFollowers(
+                any(AuthUserForUserRequestDto.class),
+                anyString(),
+                any(Pageable.class)
+            );
 
         // restdocs
         resultActions.andDo(document("search-followers-LoggedIn",
@@ -805,7 +818,8 @@ class UserControllerTest extends ControllerTest {
             responseFields(
                 fieldWithPath("[].imageUrl").type(STRING).description("팔로워 유저 이미지 url"),
                 fieldWithPath("[].username").type(STRING).description("팔로워 유저 이름"),
-                fieldWithPath("[].following").type(BOOLEAN).optional().description("로그인시 검색된 유저 팔로잉 여부")
+                fieldWithPath("[].following").type(BOOLEAN).optional()
+                    .description("로그인시 검색된 유저 팔로잉 여부")
             )
         ));
     }
@@ -823,7 +837,8 @@ class UserControllerTest extends ControllerTest {
             .willReturn(new GuestUser());
         given(userService.searchFollowers(
             any(AuthUserForUserRequestDto.class),
-            any(FollowSearchRequestDto.class)
+            anyString(),
+            any(Pageable.class)
         )).willReturn(userSearchResponseDtos);
 
         // when
@@ -841,7 +856,11 @@ class UserControllerTest extends ControllerTest {
 
         verify(oAuthService, times(1)).findRequestUserByToken(null);
         verify(userService, times(1))
-            .searchFollowers(any(AuthUserForUserRequestDto.class), any(FollowSearchRequestDto.class));
+            .searchFollowers(
+                any(AuthUserForUserRequestDto.class),
+                anyString(),
+                any(Pageable.class)
+            );
 
         // restdocs
         resultActions.andDo(document("search-followers-unLoggedIn",

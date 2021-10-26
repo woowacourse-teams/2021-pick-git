@@ -12,7 +12,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.woowacourse.pickgit.common.factory.UserFactory;
-import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
 import com.woowacourse.pickgit.post.application.PostFeedService;
 import com.woowacourse.pickgit.post.application.dto.request.HomeFeedRequestDto;
@@ -29,6 +28,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
@@ -55,8 +55,7 @@ class PostFeedServiceTest {
 
         HomeFeedRequestDto homeFeedRequestDto = HomeFeedRequestDto.builder()
             .isGuest(true)
-            .page(1L)
-            .limit(3L)
+            .pageable(PageRequest.of(1, 3))
             .build();
 
         given(postRepository.findAllPosts(any(Pageable.class)))
@@ -90,8 +89,7 @@ class PostFeedServiceTest {
         HomeFeedRequestDto homeFeedRequestDto = HomeFeedRequestDto.builder()
             .isGuest(false)
             .requestUserName("tester")
-            .page(1L)
-            .limit(3L)
+            .pageable(PageRequest.of(1, 3))
             .build();
 
         User tester = UserFactory.user(1L, "tester");
@@ -139,8 +137,7 @@ class PostFeedServiceTest {
         HomeFeedRequestDto homeFeedRequestDto = HomeFeedRequestDto.builder()
             .requestUserName("testUser")
             .isGuest(false)
-            .page(1L)
-            .limit(3L)
+            .pageable(PageRequest.of(1, 3))
             .build();
 
         given(userRepository.findByBasicProfile_Name(anyString()))
@@ -149,7 +146,7 @@ class PostFeedServiceTest {
             .willReturn(posts);
 
         //when
-        List<PostResponseDto> postResponseDtos = postFeedService.myFeed(homeFeedRequestDto);
+        List<PostResponseDto> postResponseDtos = postFeedService.userFeed(homeFeedRequestDto, "testUser");
 
         //then
         List<Long> expected = posts.stream()
@@ -170,35 +167,17 @@ class PostFeedServiceTest {
         HomeFeedRequestDto homeFeedRequestDto = HomeFeedRequestDto.builder()
             .requestUserName("testUser")
             .isGuest(false)
-            .page(1L)
-            .limit(3L)
+            .pageable(PageRequest.of(1, 3))
             .build();
 
         //when
-        assertThatCode(() -> postFeedService.myFeed(homeFeedRequestDto))
+        assertThatCode(() -> postFeedService.userFeed(homeFeedRequestDto, "testUser"))
             .isInstanceOf(UserNotFoundException.class)
             .extracting("errorCode")
             .isEqualTo("U0001");
 
         verify(userRepository, times(1))
             .findByBasicProfile_Name(anyString());
-    }
-
-    @DisplayName("게스트 유저는 나의 홈 피드를 가져오지 못한다.")
-    @Test
-    void readMyFeed_guestUser_ExceptionOccur() {
-        //given
-        HomeFeedRequestDto homeFeedRequestDto = HomeFeedRequestDto.builder()
-            .isGuest(true)
-            .page(1L)
-            .limit(3L)
-            .build();
-
-        //when
-        assertThatCode(() -> postFeedService.myFeed(homeFeedRequestDto))
-            .isInstanceOf(UnauthorizedException.class)
-            .extracting("errorCode")
-            .isEqualTo("A0002");
     }
 
     @DisplayName("다른 유저의 홈 피드를 가져온다")
@@ -214,8 +193,7 @@ class PostFeedServiceTest {
         HomeFeedRequestDto homeFeedRequestDto = HomeFeedRequestDto.builder()
             .requestUserName("loginUser")
             .isGuest(false)
-            .page(1L)
-            .limit(3L)
+            .pageable(PageRequest.of(1, 3))
             .build();
 
         given(userRepository.findByBasicProfile_Name(anyString()))
@@ -253,8 +231,7 @@ class PostFeedServiceTest {
 
         HomeFeedRequestDto homeFeedRequestDto = HomeFeedRequestDto.builder()
             .isGuest(true)
-            .page(1L)
-            .limit(3L)
+            .pageable(PageRequest.of(1, 3))
             .build();
 
         given(userRepository.findByBasicProfile_Name(anyString()))
@@ -293,8 +270,7 @@ class PostFeedServiceTest {
         HomeFeedRequestDto homeFeedRequestDto = HomeFeedRequestDto.builder()
             .requestUserName("invalidUser")
             .isGuest(false)
-            .page(1L)
-            .limit(3L)
+            .pageable(PageRequest.of(1, 3))
             .build();
 
         given(userRepository.findByBasicProfile_Name("testUser"))

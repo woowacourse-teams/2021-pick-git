@@ -38,17 +38,22 @@ interface Stats {
 export interface Props {
   username: string | null;
   githubStatisticQueryResult: ReturnType<typeof useGithubStatistics>;
+  isFocused: boolean;
 }
 
-const GithubStatistics = ({ username, githubStatisticQueryResult }: Props) => {
+const GithubStatistics = ({ username, githubStatisticQueryResult, isFocused }: Props) => {
   const [isContributionGraphLoading, setIsContributionGraphLoading] = useState(true);
   const { color } = useContext(ThemeContext);
   const { isLoggedIn } = useContext(UserContext);
-  const { data, isError } = githubStatisticQueryResult;
-  const contributionGraphUrl = `https://ghchart.rshah.org/${color.primaryColor.slice(1)}/${username}`;
+  const { data, isError, isLoading, isFetching } = githubStatisticQueryResult;
+  const contributionGraphUrl = isFocused ? `https://ghchart.rshah.org/${color.primaryColor.slice(1)}/${username}` : "";
 
   const GithubStats = () => {
     const Content = () => {
+      if (isLoading || isFetching) {
+        return <PageLoading />;
+      }
+
       if (isError) {
         return <div>Github Stats을 표시할 수 없습니다.</div>;
       }

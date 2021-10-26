@@ -1,13 +1,16 @@
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { fadeIn } from "../@styled/keyframes";
 
-export const List = styled.li`
+export const ListItem = styled.li`
   display: flex;
   justify-content: space-between;
   align-items: center;
 
   height: 3rem;
   border-bottom: 1px solid ${({ theme }) => theme.color.borderColor};
+
+  animation: ${fadeIn} 1s forwards;
 `;
 
 export const Empty = styled.div`

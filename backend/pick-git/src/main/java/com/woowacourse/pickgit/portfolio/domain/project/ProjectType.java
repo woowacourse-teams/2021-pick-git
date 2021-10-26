@@ -20,7 +20,8 @@ public enum ProjectType {
             .orElseThrow(ProjectTypeNotFoundException::new);
     }
 
-    public String getValue() {
+    public String
+    getValue() {
         return value;
     }
 }

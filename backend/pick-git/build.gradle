@@ -26,10 +26,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-log4j2'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.apache.httpcomponents:httpclient:4.5'
     implementation 'net.rakugakibox.spring.boot:logback-access-spring-boot-starter:2.7.1'
     implementation 'org.reflections:reflections:0.9.10'
     implementation 'org.flywaydb:flyway-core:6.4.2'
+    implementation 'org.springframework.boot:spring-boot-starter-cache:2.5.4'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis:2.5.4'
     implementation ('it.ozimov:embedded-redis:0.7.3') {
         exclude group: 'org.slf4j', module: 'slf4j-simple'
@@ -118,7 +120,9 @@ jacocoTestReport {
                             '**/*S3*',
                             '**/*DataSource*',
                             '**/*Slave*',
-                            '**/*Elastic*'
+                            '**/*Elastic*',
+                            '**/*GithubContributionExtractor*',
+                            '**/*Configuration*'
                     ])
         }))
     }
@@ -153,7 +157,9 @@ jacocoTestCoverageVerification {
                     '**.*Storage*',
                     '**.*DataSource*',
                     '**.*Slave*',
-                    '**.*Elastic*'
+                    '**.*Elastic*',
+                    '**.*GithubContributionExtractor*',
+                    '**.*Configuration*'
             ]
         }
     }

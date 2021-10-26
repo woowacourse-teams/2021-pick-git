@@ -123,15 +123,24 @@ public class UriParser {
 
     private List<MergedInterceptorParameterByMethod> createMergedInterceptorParameterByMethods(
         String prefix,
-        HttpMethod httpMethod, RegisterType registerType, List<String> urls
+        HttpMethod httpMethod,
+        RegisterType registerType,
+        List<String> urls
     ) {
+        if (urls.isEmpty()) {
+            urls = new ArrayList<>(urls);
+            urls.add("");
+        }
+
         return urls.stream()
             .map(url -> createUri(prefix, url))
-            .map(completeUrl ->
-                new MergedInterceptorParameterByMethod(completeUrl, httpMethod, registerType))
+            .map(completeUrl -> new MergedInterceptorParameterByMethod(
+                completeUrl,
+                httpMethod,
+                registerType
+            ))
             .collect(toList());
     }
-
 
     private List<String> parseUrlsFromMethod(Method method) {
         return HttpMethodMapper.extractMappingValues(method);

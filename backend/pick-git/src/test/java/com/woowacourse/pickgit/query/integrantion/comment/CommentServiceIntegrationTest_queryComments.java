@@ -9,7 +9,6 @@ import com.woowacourse.pickgit.comment.application.dto.request.QueryCommentReque
 import com.woowacourse.pickgit.comment.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.comment.domain.Comment;
 import com.woowacourse.pickgit.common.factory.UserFactory;
-import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.integration.IntegrationTest;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
@@ -25,10 +24,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.util.DigestUtils;
 
 public class CommentServiceIntegrationTest_queryComments extends IntegrationTest {
@@ -86,7 +83,7 @@ public class CommentServiceIntegrationTest_queryComments extends IntegrationTest
         Long postId = preparingTestFixtures(comments, commentAuthor);
 
         QueryCommentRequestDto queryCommentRequestDto =
-            createQueryCommentRequestDto(postId, page, limit);
+            createQueryCommentRequestDto(postId, PageRequest.of(page, limit));
 
         // when
         List<CommentResponseDto> commentResponsesDto = commentService
@@ -121,12 +118,11 @@ public class CommentServiceIntegrationTest_queryComments extends IntegrationTest
         return savedPost.getId();
     }
 
-    private QueryCommentRequestDto createQueryCommentRequestDto(Long postId, int page, int limit) {
+    private QueryCommentRequestDto createQueryCommentRequestDto(Long postId, Pageable pageable) {
         return QueryCommentRequestDto.builder()
             .postId(postId)
             .isGuest(false)
-            .page(page)
-            .limit(limit)
+            .pageable(pageable)
             .build();
     }
 

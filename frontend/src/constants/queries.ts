@@ -1,3 +1,5 @@
+import { FeedFilterOption } from "../@types";
+
 export const QUERY = {
   GET_PROFILE: "GET_SELF_PROFILE",
   GET_PROFILE_FOLLOWING: "GET_PROFILE_FOLLOWING",

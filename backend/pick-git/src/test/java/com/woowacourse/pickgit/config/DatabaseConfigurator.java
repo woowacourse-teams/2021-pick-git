@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.sql.DataSource;
 import org.hibernate.Session;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,14 +30,10 @@ public class DatabaseConfigurator implements InitializingBean {
     private DataSourceSelector dataSourceSelector;
 
     @PersistenceContext
+
     private EntityManager entityManager;
 
-    @Autowired
-    private DataSource dataSource;
-
     private List<String> tableNames;
-
-    private String ddl;
 
     @Override
     public void afterPropertiesSet() {
@@ -64,6 +59,7 @@ public class DatabaseConfigurator implements InitializingBean {
         });
 
         entityManager.unwrap(Session.class).doWork(this::extractTableNames);
+        dataSourceSelector.toWrite();
     }
 
     private void extractTableNames(Connection conn) throws SQLException {
@@ -112,5 +108,9 @@ public class DatabaseConfigurator implements InitializingBean {
 
     public void toWrite() {
         dataSourceSelector.toWrite();
+    }
+
+    public String getSelectedDataSourceName() {
+        return dataSourceSelector.getSelected();
     }
 }
