@@ -13,6 +13,7 @@ import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.Method;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import io.restassured.response.ResponseBodyExtractionOptions;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
@@ -142,6 +143,17 @@ public class LoginAndThenAct extends Act {
             String.format(
                 "/api/search/posts?type=%s&keyword=%s&page=%s&limit=%s", type, keyword, "0", "10"),
             Method.GET
+        );
+
+        assertThat(response.statusCode()).isEqualTo(status.value());
+        return response;
+    }
+
+    public ExtractableResponse<Response> 포스트를검색한다(TPost tpost, HttpStatus status) {
+        ExtractableResponse<Response> response = request(
+            String.format("/api/posts?id=%d", tpost.getId()),
+            Method.GET,
+            status
         );
 
         assertThat(response.statusCode()).isEqualTo(status.value());
