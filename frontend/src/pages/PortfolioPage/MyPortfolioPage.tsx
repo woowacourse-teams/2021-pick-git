@@ -3,7 +3,7 @@ import { Redirect } from "react-router-dom";
 
 import AlertPortal from "../../components/@layout/AlertPortal/AlertPortal";
 import ConfirmPortal from "../../components/@layout/ConfirmPortal/ConfirmPortal";
-import ModalPortal from "../../components/@layout/Modal/ModalPortal";
+import ModalPortal from "../../components/@layout/ModalPortal/ModalPortal";
 import BottomSliderPortal from "../../components/@layout/BottomSliderPortal/BottomSliderPortal";
 import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import PortfolioHeader from "../../components/@layout/PortfolioHeader/PortfolioHeader";
@@ -43,20 +43,20 @@ import {
   Container,
   DescriptionCSS,
   DetailInfo,
+  FabCSS,
   FullPage,
-  PaginatorWrapper,
-  PostSelectorModalCSS,
   SectionNameCSS,
   ToggleButtonCSS,
   UserAvatarCSS,
   UserNameCSS,
 } from "./PortfolioPage.style";
 
-import type { PortfolioData, PortfolioProject, PortfolioSectionType, Post } from "../../@types";
+import type { ChildFabItem, PortfolioData, PortfolioProject, PortfolioSectionType, Post } from "../../@types";
 import useScrollPagination from "../../hooks/common/useScrollPagination";
 import usePortfolioContacts from "../../hooks/service/usePortfolioContacts";
 import { CONTACT_ICON } from "../../constants/portfolio";
 import useSnackbar from "../../hooks/common/useSnackbar";
+import Fab from "../../components/@shared/Fab/Fab";
 
 const MyPortfolioPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -222,6 +222,29 @@ const MyPortfolioPage = () => {
     showBottomSlider();
   };
 
+  const childFabs: ChildFabItem[] = [
+    {
+      icon: "AddCircleIcon",
+      text: "프로젝트 추가",
+      onClick: handleAddProject,
+    },
+    {
+      icon: "AddCircleIcon",
+      text: "섹션 추가",
+      onClick: handleAddSection,
+    },
+    {
+      icon: "PersonIcon",
+      text: "연락처 업데이트",
+      onClick: handleSetContacts,
+    },
+    {
+      icon: "UploadIcon",
+      text: "포트폴리오 업로드",
+      onClick: handleUploadPortfolio,
+    },
+  ];
+
   useEffect(() => {
     if (!remotePortfolio || !remotePortfolio.updatedAt) {
       return;
@@ -268,18 +291,10 @@ const MyPortfolioPage = () => {
   }, [profile]);
 
   useEffect(() => {
-    paginate(paginationCount - 1);
-  }, [portfolioSections.length]);
-
-  useEffect(() => {
     setSlideEventHandler();
 
     return () => removeSlideEventHandler();
   }, []);
-
-  if (!isLoggedIn) {
-    return <Redirect to={PAGE_URL.HOME} />;
-  }
 
   if (isError) {
     return <PageError errorMessage="포트폴리오를 불러올 수 없습니다." />;
@@ -289,16 +304,14 @@ const MyPortfolioPage = () => {
     return <PageLoading />;
   }
 
+  if (!isLoggedIn) {
+    return <Redirect to={PAGE_URL.HOME} />;
+  }
+
   return (
     <>
       <ScrollActiveHeader containerRef={containerRef}>
-        <PortfolioHeader
-          isButtonsShown={true}
-          onSetPortfolioContacts={handleSetContacts}
-          onAddPortfolioSection={handleAddSection}
-          onAddPortfolioProject={handleAddProject}
-          onUploadPortfolio={handleUploadPortfolio}
-        />
+        <PortfolioHeader isButtonsShown={true} />
       </ScrollActiveHeader>
       <Container ref={containerRef}>
         <FullPage isVerticalCenter={false}>
@@ -399,9 +412,7 @@ const MyPortfolioPage = () => {
           />
         </BottomSliderPortal>
       </Container>
-      {/* <PaginatorWrapper>
-        <DotPaginator activePageIndex={activePageIndex} paginationCount={paginationCount} onPaginate={paginate} />
-      </PaginatorWrapper> */}
+      <Fab icon="AddBoxIcon" childFabs={childFabs} childFabCssProp={FabCSS} fabCssProp={FabCSS} />
     </>
   );
 };

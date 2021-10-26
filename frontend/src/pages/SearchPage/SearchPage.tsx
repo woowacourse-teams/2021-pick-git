@@ -68,6 +68,8 @@ const SearchPage = () => {
   }, [tabIndex]);
 
   const SearchUserResult = () => {
+    // TODO: 로딩 먼저하기
+
     if (isUserSearchError) {
       return <NotFound type="user" message="검색결과를 표시할 수 없습니다." cssProp={NotFoundCSS} />;
     }

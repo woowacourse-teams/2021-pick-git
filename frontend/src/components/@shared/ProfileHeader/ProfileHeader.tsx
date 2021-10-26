@@ -10,7 +10,7 @@ import UserContext from "../../../contexts/UserContext";
 import useModal from "../../../hooks/common/useModal";
 import useFollow from "../../../hooks/service/useFollow";
 import ChoiceModalPortal from "../../@layout/ChoiceModalPortal/ChoiceModalPortal";
-import ModalPortal from "../../@layout/Modal/ModalPortal";
+import ModalPortal from "../../@layout/ModalPortal/ModalPortal";
 import ProfileModificationForm from "../../ProfileModificationForm/ProfileModificationForm";
 import Avatar from "../Avatar/Avatar";
 import Button from "../Button/Button";

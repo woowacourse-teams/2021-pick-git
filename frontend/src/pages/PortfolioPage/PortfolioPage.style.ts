@@ -10,11 +10,11 @@ import { customScrollbarCSS } from "../../components/@styled/scrollbar";
 
 export const Container = styled.main(
   ({ theme }) => css`
-    height: 100%;
     background-color: ${theme.color.white};
     scroll-snap-type: y mandatory;
     overflow-x: hidden;
     overflow-y: scroll;
+    height: 100%;
 
     animation: ${fadeIn} 1s forwards;
 
@@ -71,17 +71,19 @@ export const ToggleButtonCSS = css`
   `}
 `;
 
-export const AvatarWrapper = styled.div(({theme}) => css`
-  background-color: ${theme.color.white};
+export const AvatarWrapper = styled.div(
+  ({ theme }) => css`
+    background-color: ${theme.color.white};
 
-  ${setTabletMediaQuery`
+    ${setTabletMediaQuery`
     margin-top: 3rem;
   `}
 
-  ${setLaptopAboveMediaQuery`
+    ${setLaptopAboveMediaQuery`
     margin-top: 5rem;
   `}
-`);
+  `
+);
 
 export const DescriptionCSS = css`
   ${({ theme }) => `
@@ -114,23 +116,25 @@ export const DescriptionCSS = css`
   `}
 `;
 
-export const ContactWrapper = styled.div(({theme}) => css`
-  display: flex;
-  flex-direction: column;
-  padding: 0 3rem;
-  width: 100%;
-  overflow-y: scroll;
+export const ContactWrapper = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    padding: 0 3rem;
+    width: 100%;
+    overflow-y: scroll;
 
-  ${customScrollbarCSS(theme.color.textColor)}
+    ${customScrollbarCSS(theme.color.textColor)}
 
-  ${setLaptopMediaQuery`
+    ${setLaptopMediaQuery`
     width: 70%;
   `}
 
   ${setDesktopMediaQuery`
     width: 50%;
   `}
-`);
+  `
+);
 
 export const DetailInfo = styled.div`
   display: flex;
@@ -226,4 +230,10 @@ export const CloseButtonWrapper = styled.div`
 export const PostSelectorModalCSS = css`
   width: 50rem;
   height: 70rem;
-`
+`;
+
+export const FabCSS = css`
+  * {
+    stroke: white;
+  }
+`;
