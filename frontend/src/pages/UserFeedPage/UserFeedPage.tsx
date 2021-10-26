@@ -15,15 +15,13 @@ import useAuth from "../../hooks/common/useAuth";
 import useUserFeed from "../../hooks/service/useUserFeed";
 
 import { Container } from "./UserFeedPage.style";
+import useAutoAnchor from "../../hooks/common/useAutoAnchor";
 
 interface LocationState {
   postId?: string;
 }
 
 const UserFeedPage = () => {
-  const [isMountedOnce, setIsMountedOnce] = useState(false);
-  const [mountCounter, setMountCounter] = useState(0);
-  const scrollWrapperRef = useRef<HTMLDivElement>(null);
   const { currentUsername } = useAuth();
   const username = new URLSearchParams(location.search).get("username");
   const isMyFeed = currentUsername === username;
@@ -40,6 +38,7 @@ const UserFeedPage = () => {
     isFetchingNextPage,
     handleIntersect: handlePostsEndIntersect,
   } = useUserFeed(isMyFeed, username);
+  const { scrollWrapperRef } = useAutoAnchor(postId);
 
   const infiniteImageUrls =
     infinitePostsData?.pages.map((posts) => posts.reduce<string[]>((acc, post) => [...acc, ...post.imageUrls], [])) ??
@@ -52,25 +51,6 @@ const UserFeedPage = () => {
     handlePostsEndIntersect();
     activateImageFetchingState();
   };
-
-  useEffect(() => {
-    if (!postId) {
-      return;
-    }
-
-    if (!isMountedOnce) {
-      setMountCounter((prev) => prev + 1);
-      setIsMountedOnce(scrollWrapperRef.current !== null);
-
-      return;
-    }
-
-    const $targetPost = document.querySelector(`#post${postId}`);
-
-    if ($targetPost && $targetPost instanceof HTMLElement) {
-      scrollWrapperRef.current?.scrollTo(0, $targetPost.offsetTop - LayoutInPx.HEADER_HEIGHT);
-    }
-  }, [postId, isMountedOnce, mountCounter]);
 
   if (isLoading || isFirstImagesLoading) {
     return <PageLoadingWithLogo />;
