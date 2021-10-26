@@ -4,9 +4,9 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build": "cross-env NODE_ENV=production DEPLOY=main webpack",
-    "build-dev": "cross-env NODE_ENV=development DEPLOY=develop webpack",
-    "start": "cross-env NODE_ENV=development webpack serve",
+    "build": "NODE_ENV=production DEPLOY=main webpack",
+    "build-dev": "NODE_ENV=development DEPLOY=develop webpack",
+    "start": "NODE_ENV=development webpack serve",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "mock-serve": "json-server ./src/mocks/db.json --routes ./src/mocks/routes.json --port 3001",
