@@ -80,7 +80,8 @@ public class PostFeedService {
         Long id = searchPostRequestDto.getId();
         String userName = searchPostRequestDto.getUserName();
 
-        Post post = postRepository.findById(id).orElseThrow(PostNotFoundException::new);
+        Post post = postRepository.findById(id)
+            .orElseThrow(PostNotFoundException::new);
         if (searchPostRequestDto.isGuest()) {
             return PostDtoAssembler.assembleFrom(null, post);
         }

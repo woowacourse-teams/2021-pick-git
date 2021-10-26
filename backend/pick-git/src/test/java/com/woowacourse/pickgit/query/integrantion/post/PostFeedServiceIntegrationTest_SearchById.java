@@ -49,6 +49,7 @@ public class PostFeedServiceIntegrationTest_SearchById extends IntegrationTest {
 
         // then
         PostResponseDto actual = PostDtoAssembler.assembleFrom(savedUser, savedPost);
+
         assertThat(postResponseDto)
             .usingRecursiveComparison()
             .isEqualTo(actual);
@@ -69,6 +70,7 @@ public class PostFeedServiceIntegrationTest_SearchById extends IntegrationTest {
 
         // then
         PostResponseDto actual = PostDtoAssembler.assembleFrom(savedUser, savedPost);
+
         assertThat(postResponseDto)
             .usingRecursiveComparison()
             .isEqualTo(actual);
@@ -88,6 +90,7 @@ public class PostFeedServiceIntegrationTest_SearchById extends IntegrationTest {
 
         // then
         PostResponseDto actual = PostDtoAssembler.assembleFrom(null, savedPost);
+
         assertThat(postResponseDto)
             .usingRecursiveComparison()
             .isEqualTo(actual);
@@ -95,7 +98,6 @@ public class PostFeedServiceIntegrationTest_SearchById extends IntegrationTest {
 
     private Post createMockPost() {
         User savedUser = userRepository.save(UserFactory.user("mark"));
-
         Post post = PostFactory.mockPostBy(savedUser);
 
         return postRepository.save(post);
