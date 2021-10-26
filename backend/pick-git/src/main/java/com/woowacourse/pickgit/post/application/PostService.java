@@ -1,7 +1,5 @@
 package com.woowacourse.pickgit.post.application;
 
-import static java.util.stream.Collectors.toList;
-
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.exception.post.PostNotBelongToUserException;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
@@ -17,28 +15,24 @@ import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeUsersResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
-import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponsesDto;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.repository.PickGitStorage;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.post.domain.util.PlatformRepositoryExtractor;
 import com.woowacourse.pickgit.post.domain.util.PlatformRepositorySearchExtractor;
 import com.woowacourse.pickgit.post.domain.util.dto.RepositoryNameAndUrl;
-import com.woowacourse.pickgit.post.presentation.dto.PostAssembler;
 import com.woowacourse.pickgit.tag.application.TagService;
 import com.woowacourse.pickgit.tag.application.dto.TagsDto;
 import com.woowacourse.pickgit.tag.domain.Tag;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.UserRepository;
 import java.util.List;
-import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -80,10 +74,7 @@ public class PostService {
         String token = repositoryRequestDto.getToken();
         String username = repositoryRequestDto.getUsername();
 
-        Pageable pageable = PageRequest.of(
-            Math.toIntExact(repositoryRequestDto.getPage()),
-            Math.toIntExact(repositoryRequestDto.getLimit())
-        );
+        Pageable pageable = repositoryRequestDto.getPageable();
 
         List<RepositoryNameAndUrl> repositoryNameAndUrls =
             platformRepositoryExtractor.extract(token, username, pageable);
@@ -97,11 +88,10 @@ public class PostService {
         String token = searchRepositoryRequestDto.getToken();
         String username = searchRepositoryRequestDto.getUsername();
         String keyword = searchRepositoryRequestDto.getKeyword();
-        int page = searchRepositoryRequestDto.getPage();
-        int limit = searchRepositoryRequestDto.getLimit();
+
 
         List<RepositoryNameAndUrl> repositoryNameAndUrls =
-            platformRepositorySearchExtractor.extract(token, username, keyword, page, limit);
+            platformRepositorySearchExtractor.extract(token, username, keyword, searchRepositoryRequestDto.getPageable());
 
         return PostDtoAssembler.repositoryResponsesDtos(repositoryNameAndUrls);
     }

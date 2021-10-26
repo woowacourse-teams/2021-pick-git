@@ -12,7 +12,6 @@ import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeUsersResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
-import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponsesDto;
 import com.woowacourse.pickgit.post.presentation.dto.PostAssembler;
 import com.woowacourse.pickgit.post.presentation.dto.request.PostRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
@@ -24,6 +23,8 @@ import java.net.URI;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -59,11 +60,10 @@ public class PostController {
     @GetMapping("/github/repositories")
     public ResponseEntity<List<RepositoryResponse>> userRepositories(
         @Authenticated AppUser user,
-        @RequestParam Long page,
-        @RequestParam Long limit
+        @PageableDefault Pageable pageable
     ) {
         RepositoryRequestDto repositoryRequestDto =
-            PostAssembler.repositoryRequestDto(user, page, limit);
+            PostAssembler.repositoryRequestDto(user, pageable);
 
         List<RepositoryResponseDto> repositoryResponseDtos = postService
             .userRepositories(repositoryRequestDto);
@@ -79,11 +79,10 @@ public class PostController {
     public ResponseEntity<List<RepositoryResponse>> userSearchedRepositories(
         @Authenticated AppUser user,
         @RequestParam String keyword,
-        @RequestParam int page,
-        @RequestParam int limit
+        @PageableDefault Pageable pageable
     ) {
         SearchRepositoryRequestDto searchRepositoryRequestDto =
-            PostAssembler.searchRepositoryRequestDto(user, keyword, page, limit);
+            PostAssembler.searchRepositoryRequestDto(user, keyword, pageable);
 
         List<RepositoryResponseDto> repositoryResponseDtos = postService
             .searchUserRepositories(searchRepositoryRequestDto);

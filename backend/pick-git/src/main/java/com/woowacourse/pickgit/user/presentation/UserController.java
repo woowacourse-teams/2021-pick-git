@@ -7,7 +7,6 @@ import com.woowacourse.pickgit.config.auth_interceptor_register.ForOnlyLoginUser
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowRequestDto;
-import com.woowacourse.pickgit.user.application.dto.request.FollowSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileImageEditRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
@@ -26,6 +25,8 @@ import com.woowacourse.pickgit.user.presentation.dto.response.UserSearchResponse
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -163,17 +164,13 @@ public class UserController {
     public ResponseEntity<List<UserSearchResponse>> searchFollowings(
         @Authenticated AppUser appUser,
         @PathVariable String username,
-        @RequestParam Long page,
-        @RequestParam Long limit
+        @PageableDefault Pageable pageable
     ) {
         AuthUserForUserRequestDto authUserRequestDto =
             UserAssembler.authUserForUserRequestDto(appUser);
 
-        FollowSearchRequestDto followSearchRequestDto =
-            UserAssembler.followSearchRequestDto(username, page, limit);
-
         List<UserSearchResponseDto> userSearchResponseDtos =
-            userService.searchFollowings(authUserRequestDto, followSearchRequestDto);
+            userService.searchFollowings(authUserRequestDto, username, pageable);
 
         List<UserSearchResponse> userSearchResponses = UserAssembler
             .userSearchResponses(userSearchResponseDtos);
@@ -186,17 +183,13 @@ public class UserController {
     public ResponseEntity<List<UserSearchResponse>> searchFollowers(
         @Authenticated AppUser appUser,
         @PathVariable String username,
-        @RequestParam Long page,
-        @RequestParam Long limit
+        @PageableDefault Pageable pageable
     ) {
         AuthUserForUserRequestDto authUserRequestDto =
             UserAssembler.authUserForUserRequestDto(appUser);
 
-        FollowSearchRequestDto followSearchRequestDto =
-            UserAssembler.followSearchRequestDto(username, page, limit);
-
         List<UserSearchResponseDto> userSearchResponseDtos =
-            userService.searchFollowers(authUserRequestDto, followSearchRequestDto);
+            userService.searchFollowers(authUserRequestDto, username, pageable);
 
         List<UserSearchResponse> userSearchResponses =
             UserAssembler.userSearchResponses(userSearchResponseDtos);

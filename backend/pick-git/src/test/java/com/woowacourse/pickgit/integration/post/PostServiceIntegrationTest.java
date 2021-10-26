@@ -45,6 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -164,8 +165,7 @@ class PostServiceIntegrationTest extends IntegrationTest {
         return RepositoryRequestDto.builder()
             .token(token)
             .username(username)
-            .page(0L)
-            .limit(50L)
+            .pageable(PageRequest.of(0, 50))
             .build();
     }
 
@@ -175,8 +175,10 @@ class PostServiceIntegrationTest extends IntegrationTest {
         // given
         SearchRepositoryRequestDto requestDto =
             new SearchRepositoryRequestDto(
-                ACCESS_TOKEN, USERNAME, "woowa", 0, 2
-            );
+                ACCESS_TOKEN,
+                USERNAME,
+                "woowa",
+                PageRequest.of(0, 2));
 
         // when
         List<RepositoryResponseDto> repositoryResponseDtos = postService
@@ -193,7 +195,10 @@ class PostServiceIntegrationTest extends IntegrationTest {
         String invalidToken = "invalidToken";
 
         SearchRepositoryRequestDto requestDto = new SearchRepositoryRequestDto(
-            invalidToken, USERNAME, "woowa", 0, 2
+            invalidToken,
+            USERNAME,
+            "woowa",
+            PageRequest.of(0, 2)
         );
 
         // then

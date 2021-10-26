@@ -134,17 +134,10 @@ public class UserService {
 
     public List<UserSearchResponseDto> searchUser(
         AuthUserForUserRequestDto authUserRequestDto,
-        UserSearchRequestDto userSearchRequestDto
+        String keyword,
+        Pageable pageable
     ) {
-        Pageable pageable = PageRequest.of(
-            userSearchRequestDto.getPage(),
-            userSearchRequestDto.getLimit()
-        );
-
-        List<User> users = userRepository.searchByUsernameLike(
-            userSearchRequestDto.getKeyword(),
-            pageable
-        );
+        List<User> users = userRepository.searchByUsernameLike(keyword, pageable);
 
         if (authUserRequestDto.isGuest()) {
             return UserDtoAssembler.userSearchResponseDto(users);
@@ -156,14 +149,10 @@ public class UserService {
 
     public List<UserSearchResponseDto> searchFollowings(
         AuthUserForUserRequestDto authUserRequestDto,
-        FollowSearchRequestDto followSearchRequestDto
+        String username,
+        Pageable pageable
     ) {
-        User target = findUserByName(followSearchRequestDto.getUsername());
-
-        Pageable pageable = PageRequest.of(
-            Math.toIntExact(followSearchRequestDto.getPage()),
-            Math.toIntExact(followSearchRequestDto.getLimit())
-        );
+        User target = findUserByName(username);
         List<User> followings = userRepository.searchFollowingsOf(target, pageable);
 
         return generateUserSearchResponseDtosByLoginExistence(authUserRequestDto, followings);
@@ -171,13 +160,10 @@ public class UserService {
 
     public List<UserSearchResponseDto> searchFollowers(
         AuthUserForUserRequestDto authUserRequestDto,
-        FollowSearchRequestDto followSearchRequestDto
+        String username,
+        Pageable pageable
     ) {
-        User target = findUserByName(followSearchRequestDto.getUsername());
-        Pageable pageable = PageRequest.of(
-            Math.toIntExact(followSearchRequestDto.getPage()),
-            Math.toIntExact(followSearchRequestDto.getLimit())
-        );
+        User target = findUserByName(username);
         List<User> followers = userRepository.searchFollowersOf(target, pageable);
 
         return generateUserSearchResponseDtosByLoginExistence(authUserRequestDto, followers);

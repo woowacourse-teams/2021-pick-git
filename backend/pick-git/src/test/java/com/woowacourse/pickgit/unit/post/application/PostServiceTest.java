@@ -304,8 +304,7 @@ class PostServiceTest {
         return RepositoryRequestDto.builder()
             .token(token)
             .username(username)
-            .page(page)
-            .limit(limit)
+            .pageable(PageRequest.of(page.intValue(), limit.intValue()))
             .build();
     }
 
@@ -316,11 +315,10 @@ class PostServiceTest {
         String accessToken = "bearer token";
         String userName = "testUserName";
         String keyword = "pick";
-        int page = 1;
-        int limit = 2;
+        PageRequest pageable = PageRequest.of(1, 2);
 
         SearchRepositoryRequestDto searchRepositoryRequestDto = new SearchRepositoryRequestDto(
-            accessToken, userName, keyword, page, limit
+            accessToken, userName, keyword, pageable
         );
 
         List<RepositoryNameAndUrl> repositories = List.of(
@@ -333,8 +331,7 @@ class PostServiceTest {
                 searchRepositoryRequestDto.getToken(),
                 searchRepositoryRequestDto.getUsername(),
                 searchRepositoryRequestDto.getKeyword(),
-                searchRepositoryRequestDto.getPage(),
-                searchRepositoryRequestDto.getLimit()
+                pageable
             )
         ).willReturn(repositories);
 
@@ -351,8 +348,7 @@ class PostServiceTest {
                 searchRepositoryRequestDto.getToken(),
                 searchRepositoryRequestDto.getUsername(),
                 searchRepositoryRequestDto.getKeyword(),
-                searchRepositoryRequestDto.getPage(),
-                searchRepositoryRequestDto.getLimit()
+                pageable
             );
     }
 
@@ -363,12 +359,11 @@ class PostServiceTest {
         String accessToken = "bearer invalid token";
         String userName = "testUserName";
         String keyword = "pick";
-        int page = 1;
-        int limit = 2;
+        PageRequest pageable = PageRequest.of(1, 2);
 
         SearchRepositoryRequestDto searchRepositoryRequestDto =
             new SearchRepositoryRequestDto(
-                accessToken, userName, keyword, page, limit
+                accessToken, userName, keyword, pageable
             );
 
         given(platformRepositorySearchExtractor
@@ -376,8 +371,7 @@ class PostServiceTest {
                 searchRepositoryRequestDto.getToken(),
                 searchRepositoryRequestDto.getUsername(),
                 searchRepositoryRequestDto.getKeyword(),
-                searchRepositoryRequestDto.getPage(),
-                searchRepositoryRequestDto.getLimit()
+                pageable
             )
         ).willThrow(new RepositoryParseException());
 
@@ -391,8 +385,7 @@ class PostServiceTest {
                 searchRepositoryRequestDto.getToken(),
                 searchRepositoryRequestDto.getUsername(),
                 searchRepositoryRequestDto.getKeyword(),
-                searchRepositoryRequestDto.getPage(),
-                searchRepositoryRequestDto.getLimit()
+                pageable
             );
     }
 
@@ -403,11 +396,10 @@ class PostServiceTest {
         String accessToken = "bearer test token";
         String userName = "invalidName";
         String keyword = "pick";
-        int page = 1;
-        int limit = 2;
+        PageRequest pageable = PageRequest.of(1, 2);
 
         SearchRepositoryRequestDto searchRepositoryRequestDto = new SearchRepositoryRequestDto(
-            accessToken, userName, keyword, page, limit
+            accessToken, userName, keyword, pageable
         );
 
         given(platformRepositorySearchExtractor
@@ -415,8 +407,7 @@ class PostServiceTest {
                 searchRepositoryRequestDto.getToken(),
                 searchRepositoryRequestDto.getUsername(),
                 searchRepositoryRequestDto.getKeyword(),
-                searchRepositoryRequestDto.getPage(),
-                searchRepositoryRequestDto.getLimit()
+                pageable
             )
         ).willThrow(new RepositoryParseException());
 
@@ -430,8 +421,7 @@ class PostServiceTest {
                 searchRepositoryRequestDto.getToken(),
                 searchRepositoryRequestDto.getUsername(),
                 searchRepositoryRequestDto.getKeyword(),
-                searchRepositoryRequestDto.getPage(),
-                searchRepositoryRequestDto.getLimit()
+                pageable
             );
     }
 

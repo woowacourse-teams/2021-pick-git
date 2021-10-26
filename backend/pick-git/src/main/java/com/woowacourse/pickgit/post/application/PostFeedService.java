@@ -27,13 +27,13 @@ public class PostFeedService {
     private final UserRepository userRepository;
     private final SearchTypes searchTypes;
 
-    @Cacheable(key = "#homeFeedRequestDto.page",
+    @Cacheable(key = "#homeFeedRequestDto.pageable.pageNumber",
         value = "homeFeed",
         condition = "#homeFeedRequestDto.guest == true",
         unless = "#result == null || #result.empty"
     )
     public List<PostResponseDto> homeFeed(HomeFeedRequestDto homeFeedRequestDto) {
-        Pageable pageable = getPagination(homeFeedRequestDto);
+        Pageable pageable = homeFeedRequestDto.getPageable();
 
         if (homeFeedRequestDto.isGuest()) {
             return PostDtoAssembler.postResponseDtos(null, postRepository.findAllPosts(pageable));
@@ -46,7 +46,7 @@ public class PostFeedService {
     }
 
     public List<PostResponseDto> userFeed(HomeFeedRequestDto homeFeedRequestDto, String userName) {
-        Pageable pageable = getPagination(homeFeedRequestDto);
+        Pageable pageable = homeFeedRequestDto.getPageable();
         User target = findUserByName(userName);
         List<Post> result = postRepository.findAllPostsByUser(target, pageable);
 
@@ -74,13 +74,6 @@ public class PostFeedService {
 
         User user = findUserByName(searchPostsRequestDto.getUserName());
         return PostDtoAssembler.postResponseDtos(user, search);
-    }
-
-    private PageRequest getPagination(HomeFeedRequestDto homeFeedRequestDto) {
-        return PageRequest.of(
-            homeFeedRequestDto.getPage().intValue(),
-            homeFeedRequestDto.getLimit().intValue()
-        );
     }
 
     private User findUserByName(String userName) {

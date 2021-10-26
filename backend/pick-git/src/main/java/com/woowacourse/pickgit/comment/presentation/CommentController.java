@@ -1,14 +1,12 @@
 package com.woowacourse.pickgit.comment.presentation;
 
-import static java.util.stream.Collectors.toList;
-
 import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.comment.application.CommentService;
-import com.woowacourse.pickgit.comment.application.dto.request.CommentDeleteRequestDto;
 import com.woowacourse.pickgit.comment.application.dto.request.CommentRequestDto;
 import com.woowacourse.pickgit.comment.application.dto.request.QueryCommentRequestDto;
 import com.woowacourse.pickgit.comment.application.dto.response.CommentResponseDto;
+import com.woowacourse.pickgit.comment.presentation.dto.CommentAssembler;
 import com.woowacourse.pickgit.comment.presentation.dto.request.ContentRequest;
 import com.woowacourse.pickgit.comment.presentation.dto.response.CommentResponse;
 import com.woowacourse.pickgit.config.auth_interceptor_register.ForLoginAndGuestUser;
@@ -16,6 +14,8 @@ import com.woowacourse.pickgit.config.auth_interceptor_register.ForOnlyLoginUser
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -40,38 +39,15 @@ public class CommentController {
     public ResponseEntity<List<CommentResponse>> comment(
         @Authenticated AppUser appUser,
         @PathVariable Long postId,
-        @RequestParam int page,
-        @RequestParam int limit
+        @PageableDefault Pageable pageable
     ) {
         QueryCommentRequestDto queryCommentRequestDto =
-            createQueryCommentRequestDto(appUser, postId, page, limit);
+            CommentAssembler.queryCommentRequestDto(appUser, postId, pageable);
 
         List<CommentResponseDto> commentResponseDtos =
             commentService.queryComments(queryCommentRequestDto);
 
-        return ResponseEntity.ok(createCommentRequestDtos(commentResponseDtos));
-    }
-
-    private QueryCommentRequestDto createQueryCommentRequestDto(
-        AppUser appUser,
-        Long postId,
-        int page,
-        int limit
-    ) {
-        return QueryCommentRequestDto.builder()
-            .postId(postId)
-            .isGuest(appUser.isGuest())
-            .page(page)
-            .limit(limit)
-            .build();
-    }
-
-    private List<CommentResponse> createCommentRequestDtos(
-        List<CommentResponseDto> commentResponseDtos
-    ) {
-        return commentResponseDtos.stream()
-            .map(this::createCommentResponse)
-            .collect(toList());
+        return ResponseEntity.ok(CommentAssembler.commentRequests(commentResponseDtos));
     }
 
     @ForOnlyLoginUser
@@ -81,33 +57,11 @@ public class CommentController {
         @PathVariable Long postId,
         @Valid @RequestBody ContentRequest request
     ) {
-        CommentRequestDto commentRequestDto = createCommentRequest(user, postId, request);
+        CommentRequestDto commentRequestDto = CommentAssembler.commentRequestDto(user, postId, request);
         CommentResponseDto commentResponseDto = commentService.addComment(commentRequestDto);
-        CommentResponse commentResponse = createCommentResponse(commentResponseDto);
+        CommentResponse commentResponse = CommentAssembler.commentResponse(commentResponseDto);
 
         return ResponseEntity.ok(commentResponse);
-    }
-
-    private CommentRequestDto createCommentRequest(
-        AppUser user,
-        Long postId,
-        ContentRequest request
-    ) {
-        return CommentRequestDto.builder()
-            .userName(user.getUsername())
-            .content(request.getContent())
-            .postId(postId)
-            .build();
-    }
-
-    private CommentResponse createCommentResponse(CommentResponseDto commentResponseDto) {
-        return CommentResponse.builder()
-            .id(commentResponseDto.getId())
-            .profileImageUrl(commentResponseDto.getProfileImageUrl())
-            .content(commentResponseDto.getContent())
-            .authorName(commentResponseDto.getAuthorName())
-            .liked(commentResponseDto.getLiked())
-            .build();
     }
 
     @ForOnlyLoginUser
@@ -117,20 +71,8 @@ public class CommentController {
         @PathVariable Long postId,
         @PathVariable Long commentId
     ) {
-        commentService.delete(createCommentDeleteRequestDto(user, postId, commentId));
+        commentService.delete(CommentAssembler.commentDeleteRequestDto(user, postId, commentId));
 
         return ResponseEntity.noContent().build();
-    }
-
-    private CommentDeleteRequestDto createCommentDeleteRequestDto(
-        AppUser user,
-        Long postId,
-        Long commentId
-    ) {
-        return CommentDeleteRequestDto.builder()
-            .username(user.getUsername())
-            .postId(postId)
-            .commentId(commentId)
-            .build();
     }
 }
