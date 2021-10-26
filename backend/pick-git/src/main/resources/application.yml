@@ -1,4 +1,8 @@
 spring:
+  data:
+    web:
+      pageable:
+        size-parameter: limit
   profiles:
     include: security
   flyway:

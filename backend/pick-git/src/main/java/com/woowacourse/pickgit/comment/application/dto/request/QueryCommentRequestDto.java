@@ -1,24 +1,23 @@
 package com.woowacourse.pickgit.comment.application.dto.request;
 
 import lombok.Builder;
+import org.springframework.data.domain.Pageable;
 
 @Builder
 public class QueryCommentRequestDto {
 
     private Long postId;
     private boolean isGuest;
-    private int page;
-    private int limit;
+    private Pageable pageable;
 
     private QueryCommentRequestDto() {
 
     }
 
-    public QueryCommentRequestDto(Long postId, boolean isGuest, int page, int limit) {
+    public QueryCommentRequestDto(Long postId, boolean isGuest, Pageable pageable) {
         this.postId = postId;
         this.isGuest = isGuest;
-        this.page = page;
-        this.limit = limit;
+        this.pageable = pageable;
     }
 
     public Long getPostId() {
@@ -29,11 +28,7 @@ public class QueryCommentRequestDto {
         return isGuest;
     }
 
-    public int getPage() {
-        return page;
-    }
-
-    public int getLimit() {
-        return limit;
+    public Pageable getPageable() {
+        return pageable;
     }
 }

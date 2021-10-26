@@ -13,12 +13,13 @@ import com.woowacourse.pickgit.post.presentation.dto.request.SearchPostsRequest;
 import com.woowacourse.pickgit.post.presentation.dto.response.PostResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -33,10 +34,9 @@ public class PostFeedController {
     @GetMapping("/posts")
     public ResponseEntity<List<PostResponse>> readHomeFeed(
         @Authenticated AppUser appUser,
-        @RequestParam Long page,
-        @RequestParam Long limit
+        @PageableDefault Pageable pageable
     ) {
-        HomeFeedRequestDto homeFeedRequestDto = new HomeFeedRequestDto(appUser, page, limit);
+        HomeFeedRequestDto homeFeedRequestDto = new HomeFeedRequestDto(appUser, pageable);
         List<PostResponseDto> postResponseDtos = postFeedService.homeFeed(homeFeedRequestDto);
         List<PostResponse> postResponses = PostAssembler.postResponses((postResponseDtos));
 
@@ -47,10 +47,9 @@ public class PostFeedController {
     @GetMapping("/posts/me")
     public ResponseEntity<List<PostResponse>> readMyFeed(
         @Authenticated AppUser appUser,
-        @RequestParam Long page,
-        @RequestParam Long limit
+        @PageableDefault Pageable pageable
     ) {
-        HomeFeedRequestDto homeFeedRequestDto = new HomeFeedRequestDto(appUser, page, limit);
+        HomeFeedRequestDto homeFeedRequestDto = new HomeFeedRequestDto(appUser, pageable);
         List<PostResponseDto> postResponseDtos =
             postFeedService.userFeed(homeFeedRequestDto, appUser.getUsername());
         List<PostResponse> postResponses = PostAssembler.postResponses((postResponseDtos));
@@ -63,10 +62,9 @@ public class PostFeedController {
     public ResponseEntity<List<PostResponse>> readUserFeed(
         @Authenticated AppUser appUser,
         @PathVariable String username,
-        @RequestParam Long page,
-        @RequestParam Long limit
+        @PageableDefault Pageable pageable
     ) {
-        HomeFeedRequestDto homeFeedRequestDto = new HomeFeedRequestDto(appUser, page, limit);
+        HomeFeedRequestDto homeFeedRequestDto = new HomeFeedRequestDto(appUser, pageable);
         List<PostResponseDto> postResponseDtos =
             postFeedService.userFeed(homeFeedRequestDto, username);
         List<PostResponse> postResponses = PostAssembler.postResponses(postResponseDtos);

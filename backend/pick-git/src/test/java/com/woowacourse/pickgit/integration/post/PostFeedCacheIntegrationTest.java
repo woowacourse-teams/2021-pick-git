@@ -27,6 +27,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.data.domain.PageRequest;
 
 @Transactional
 @EnableCaching
@@ -139,8 +140,7 @@ public class PostFeedCacheIntegrationTest extends AcceptanceTest {
         return HomeFeedRequestDto.builder()
             .requestUserName(null)
             .isGuest(true)
-            .page(1L)
-            .limit(2L)
+            .pageable(PageRequest.of(1, 2))
             .build();
     }
 }
