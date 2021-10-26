@@ -2,7 +2,7 @@ package com.woowacourse.pickgit.portfolio.domain.project;
 
 import static java.util.stream.Collectors.toSet;
 
-import com.woowacourse.pickgit.exception.portfolio.DuplicateNameException;
+import com.woowacourse.pickgit.exception.portfolio.DuplicateProjectException;
 import com.woowacourse.pickgit.portfolio.domain.Portfolio;
 import com.woowacourse.pickgit.portfolio.domain.common.UpdateUtil;
 import java.util.ArrayList;
@@ -51,7 +51,7 @@ public class Projects {
         List<Project> sourceValues = sources.getValues();
 
         if (isDuplicate(sourceValues)) {
-            throw new DuplicateNameException();
+            throw new DuplicateProjectException();
         }
 
         sourceValues.forEach(source -> source.appendTo(portfolio));

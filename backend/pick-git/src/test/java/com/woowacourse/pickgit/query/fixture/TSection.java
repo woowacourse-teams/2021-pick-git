@@ -25,6 +25,14 @@ public class TSection {
         );
     }
 
+    public static SectionRequest of() {
+        return new SectionRequest(
+            null,
+            "test name",
+            List.of(TItem.createRandom())
+        );
+    }
+
     public Modifier modifier() {
         return new Modifier(sectionResponse);
     }
