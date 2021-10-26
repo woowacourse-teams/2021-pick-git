@@ -2,9 +2,11 @@ package com.woowacourse.pickgit.portfolio.domain.project;
 
 import static java.util.stream.Collectors.toSet;
 
-import com.woowacourse.pickgit.exception.portfolio.DuplicateProjectException;
+import com.woowacourse.pickgit.exception.portfolio.DuplicateProjectNameException;
+import com.woowacourse.pickgit.exception.portfolio.InvalidProjectDateException;
 import com.woowacourse.pickgit.portfolio.domain.Portfolio;
 import com.woowacourse.pickgit.portfolio.domain.common.UpdateUtil;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
@@ -50,8 +52,11 @@ public class Projects {
     public void update(Projects sources, Portfolio portfolio) {
         List<Project> sourceValues = sources.getValues();
 
-        if (isDuplicate(sourceValues)) {
-            throw new DuplicateProjectException();
+        if (isDuplicateName(sourceValues)) {
+            throw new DuplicateProjectNameException();
+        }
+        if (isInvalidDate(sourceValues)) {
+            throw new InvalidProjectDateException();
         }
 
         sourceValues.forEach(source -> source.appendTo(portfolio));
@@ -59,11 +64,23 @@ public class Projects {
         UpdateUtil.execute(this.getValues(), sourceValues);
     }
 
-    private boolean isDuplicate(List<Project> sourceValues) {
+    private boolean isDuplicateName(List<Project> sourceValues) {
         return sourceValues.size() != sourceValues.stream()
             .map(Project::getName)
             .collect(toSet())
             .size();
+    }
+
+    private boolean isInvalidDate(List<Project> sourceValues) {
+        return sourceValues.stream()
+            .anyMatch(this::isAfter);
+    }
+
+    private boolean isAfter(Project project) {
+        LocalDateTime startDate = project.getStartDate();
+        LocalDateTime endDate = project.getEndDate();
+
+        return startDate.isAfter(endDate);
     }
 
     public List<Project> getValues() {
