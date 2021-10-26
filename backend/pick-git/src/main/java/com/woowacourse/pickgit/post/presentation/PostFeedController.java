@@ -119,10 +119,10 @@ public class PostFeedController {
     }
 
     @ForLoginAndGuestUser
-    @GetMapping("/posts/{postId}/details")
+    @GetMapping(value = "/posts", params = "id")
     public ResponseEntity<PostResponse> findPostById(
         @Authenticated AppUser appUser,
-        @PathVariable Long postId
+        @RequestParam(value = "id") Long postId
     ) {
         PostResponseDto postResponseDto = postFeedService
             .searchById(new SearchPostRequestDto(postId, appUser));

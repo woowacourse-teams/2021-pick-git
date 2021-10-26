@@ -55,7 +55,7 @@ public class UnLoginAndThenAct extends Act {
 
     public ExtractableResponse<Response> 포스트를검색한다(TPost tpost, HttpStatus status) {
         ExtractableResponse<Response> response = request(
-            String.format("/api/posts/%d/details", tpost.getId()),
+            String.format("/api/posts?id=%d", tpost.getId()),
             Method.GET,
             status
         );

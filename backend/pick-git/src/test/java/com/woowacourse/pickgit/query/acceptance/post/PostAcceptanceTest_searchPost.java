@@ -77,13 +77,15 @@ class PostAcceptanceTest_searchPost extends AcceptanceTest {
     @Test
     void userSearchPostById() {
         PostResponse response = NEOZAL.은로그인을하고().포스트를검색한다(NEOZALPOST, OK).as(PostResponse.class);
-        System.out.println(response);
+
+        assertThat(response.getId()).isEqualTo(NEOZALPOST.getId());
     }
 
     @DisplayName("게스트는 postId로 단일 포스트 검색을 할 수 있다.")
     @Test
     void guestSearchPostById() {
         PostResponse response = GUEST.는().포스트를검색한다(NEOZALPOST, OK).as(PostResponse.class);
-        System.out.println(response);
+
+        assertThat(response.getId()).isEqualTo(NEOZALPOST.getId());
     }
 }
