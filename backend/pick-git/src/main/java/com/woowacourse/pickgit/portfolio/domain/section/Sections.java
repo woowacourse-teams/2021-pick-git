@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toSet;
 
 import com.woowacourse.pickgit.exception.portfolio.DuplicateSectionException;
 import com.woowacourse.pickgit.portfolio.domain.Portfolio;
+import com.woowacourse.pickgit.portfolio.domain.PortfolioValidator;
 import com.woowacourse.pickgit.portfolio.domain.common.UpdateUtil;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,8 @@ public class Sections {
 
     public Sections(List<Section> values) {
         this.values = values;
+
+        PortfolioValidator.sectionSize(values);
     }
 
     public static Sections empty() {

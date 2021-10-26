@@ -1,6 +1,7 @@
 package com.woowacourse.pickgit.portfolio.domain.project;
 
 import com.woowacourse.pickgit.portfolio.domain.Portfolio;
+import com.woowacourse.pickgit.portfolio.domain.PortfolioValidator;
 import com.woowacourse.pickgit.portfolio.domain.common.Updatable;
 import com.woowacourse.pickgit.portfolio.domain.common.UpdateUtil;
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
@@ -38,6 +40,7 @@ public class Project implements Updatable<Project> {
     @Column(nullable = false)
     private String imageUrl;
 
+    @Lob
     private String content;
 
     @OneToMany(
@@ -98,6 +101,8 @@ public class Project implements Updatable<Project> {
         this.content = content;
         this.tags = tags;
         this.portfolio = portfolio;
+
+        PortfolioValidator.projectContent(content);
 
         this.tags.forEach(tag -> tag.appendTo(this));
     }

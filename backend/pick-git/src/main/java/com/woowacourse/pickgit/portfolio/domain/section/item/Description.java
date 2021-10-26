@@ -1,5 +1,6 @@
 package com.woowacourse.pickgit.portfolio.domain.section.item;
 
+import com.woowacourse.pickgit.portfolio.domain.PortfolioValidator;
 import com.woowacourse.pickgit.portfolio.domain.common.Updatable;
 import java.util.Objects;
 import javax.persistence.Entity;
@@ -8,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 
 @Entity
@@ -16,6 +18,7 @@ public class Description implements Updatable<Description> {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Lob
     private String value;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -33,6 +36,8 @@ public class Description implements Updatable<Description> {
         this.id = id;
         this.value = value;
         this.item = item;
+
+        PortfolioValidator.sectionDescription(value);
     }
 
     public void appendTo(Item item) {

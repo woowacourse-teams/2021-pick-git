@@ -14,6 +14,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 
 @Entity
@@ -32,6 +33,7 @@ public class Portfolio {
     @Column(nullable = false)
     private String profileImageUrl;
 
+    @Lob
     private String introduction;
 
     @Column(nullable = false)
@@ -107,6 +109,9 @@ public class Portfolio {
         this.projects = projects;
         this.sections = sections;
         this.user = user;
+
+        PortfolioValidator.username(name);
+        PortfolioValidator.introduction(introduction);
 
         this.contacts.appendTo(this);
         this.projects.appendTo(this);
