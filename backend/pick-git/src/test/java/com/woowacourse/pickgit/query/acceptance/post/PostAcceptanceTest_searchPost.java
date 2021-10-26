@@ -71,6 +71,19 @@ class PostAcceptanceTest_searchPost extends AcceptanceTest {
             .as(ApiErrorResponse.class);
 
         assertThat(response.getErrorCode()).isEqualTo("P0006");
+    }
 
+    @DisplayName("유저는 postId로 단일 포스트 검색을 할 수 있다.")
+    @Test
+    void userSearchPostById() {
+        PostResponse response = NEOZAL.은로그인을하고().포스트를검색한다(NEOZALPOST, OK).as(PostResponse.class);
+        System.out.println(response);
+    }
+
+    @DisplayName("게스트는 postId로 단일 포스트 검색을 할 수 있다.")
+    @Test
+    void guestSearchPostById() {
+        PostResponse response = GUEST.는().포스트를검색한다(NEOZALPOST, OK).as(PostResponse.class);
+        System.out.println(response);
     }
 }

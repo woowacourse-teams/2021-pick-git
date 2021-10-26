@@ -30,6 +30,13 @@ public class PostDtoAssembler {
             .collect(toList());
     }
 
+    public static PostResponseDto assembleFrom(
+        User requestUser,
+        Post post
+    ) {
+        return convertFrom(requestUser, post);
+    }
+
     private static PostResponseDto convertFrom(User requestUser, Post post) {
         List<String> tags = createTagsFrom(post);
         List<CommentResponseDto> comments = createCommentResponsesFrom(post);
