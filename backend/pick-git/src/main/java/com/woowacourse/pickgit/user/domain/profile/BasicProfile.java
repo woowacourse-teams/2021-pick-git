@@ -6,7 +6,7 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class BasicProfile {
 
-    @Column(nullable = false, updatable = false)
+    @Column(unique = true, nullable = false, updatable = false)
     private String name;
 
     private String image;
