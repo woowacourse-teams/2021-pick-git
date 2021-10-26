@@ -18,34 +18,17 @@ import { Portfolio, ProfileData } from "../../../@types";
 
 export interface Props {
   isButtonsShown?: boolean;
-  onSetPortfolioContacts?: () => void;
-  onAddPortfolioSection?: () => void;
-  onAddPortfolioProject?: () => void;
-  onUploadPortfolio?: () => void;
   profile?: ProfileData | null;
   portfolio?: Portfolio;
 }
 
-const PortfolioHeader = ({
-  isButtonsShown = true,
-  onSetPortfolioContacts,
-  onUploadPortfolio,
-  onAddPortfolioSection,
-  onAddPortfolioProject,
-}: Props) => {
+const PortfolioHeader = ({ isButtonsShown = true }: Props) => {
   const { color } = useContext(ThemeContext);
   const history = useHistory();
 
   const handleGoBack = () => {
     history.goBack();
   };
-
-  const dropdownListItems: DropDownItem[] = [
-    { text: "연착처 업데이트", onClick: onSetPortfolioContacts },
-    { text: "프로젝트 추가", onClick: onAddPortfolioProject },
-    { text: "섹션 추가", onClick: onAddPortfolioSection },
-    { text: "전체 업로드", onClick: onUploadPortfolio },
-  ];
 
   return (
     <Container>
@@ -55,9 +38,6 @@ const PortfolioHeader = ({
         </GoBackLinkButton>
         {isButtonsShown && (
           <HeaderButtonsWrapper>
-            <DropDown items={dropdownListItems} cssProp={DropDownCSS}>
-              작성란 추가
-            </DropDown>
             <Button kind="roundedInline" backgroundColor={color.primaryColor} color={color.white}>
               PDF로 인쇄
               {/* <PDFDownloadLink

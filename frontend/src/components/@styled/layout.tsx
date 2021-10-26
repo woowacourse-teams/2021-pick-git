@@ -21,6 +21,7 @@ export const Header = styled.header`
 export const Page = styled.main(
   () => css`
     width: 100%;
+    min-height: 100%;
     padding-top: ${LAYOUT.HEADER_HEIGHT};
     overflow-x: hidden;
 

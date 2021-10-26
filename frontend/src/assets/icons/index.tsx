@@ -45,6 +45,6 @@ export { ReactComponent as EmailIcon } from "./email.svg";
 export { ReactComponent as GithubLineIcon } from "./github-line.svg";
 export { ReactComponent as LocationLineIcon } from "./location-line.svg";
 export { ReactComponent as CompanyLineIcon } from "./company-line.svg";
-
+export { ReactComponent as UploadIcon } from "./upload.svg";
 
 

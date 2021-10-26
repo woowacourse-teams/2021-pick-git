@@ -200,3 +200,11 @@ export type PortfolioData = {
 export type PortfolioSectionType = "project" | "custom";
 
 export type PortfolioSectionList = string[];
+
+export interface ChildFabItem {
+  color?: string;
+  backgroundColor?: string;
+  icon: IconType;
+  text?: string;
+  onClick: () => void;
+}
