@@ -1,7 +1,6 @@
 import { useLocation } from "react-router-dom";
 
 import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
-import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
 import { ScrollPageWrapper } from "../../components/@styled/layout";
 import PageError from "../../components/@shared/PageError/PageError";
 import Feed from "../../components/Feed/Feed";
@@ -14,19 +13,22 @@ import useUserFeed from "../../hooks/service/useUserFeed";
 
 import { Container } from "./UserFeedPage.style";
 import useAutoAnchor from "../../hooks/common/useAutoAnchor";
+import { useState } from "react";
+import { Post } from "../../@types";
 
 interface LocationState {
   postId?: string;
 }
 
 const UserFeedPage = () => {
-  const { currentUsername } = useAuth();
-  const username = new URLSearchParams(location.search).get("username");
-  const isMyFeed = currentUsername === username;
-
   const {
     state: { postId },
   } = useLocation<LocationState>();
+  const username = new URLSearchParams(location.search).get("username");
+
+  const [currentPostId, setCurrentPostId] = useState<Post["id"]>(Number(postId) ?? -1);
+  const { currentUsername } = useAuth();
+  const isMyFeed = currentUsername === username;
 
   // TODO : username 이 null 혹은 빈 문자열일 경우에 대한 예외처리
   const {
@@ -36,7 +38,7 @@ const UserFeedPage = () => {
     isFetchingNextPage,
     handleIntersect: handlePostsEndIntersect,
   } = useUserFeed(isMyFeed, username);
-  const { scrollWrapperRef } = useAutoAnchor(postId);
+  const { scrollWrapperRef } = useAutoAnchor(`#post${currentPostId}`);
 
   const infiniteImageUrls =
     infinitePostsData?.pages.map((posts) => posts.reduce<string[]>((acc, post) => [...acc, ...post.imageUrls], [])) ??
@@ -66,6 +68,7 @@ const UserFeedPage = () => {
           onIntersect={handleIntersect}
           queryKey={[QUERY.GET_USER_FEED_POSTS, { username, isMyFeed }]}
           isFetching={isFetchingNextPage || isImagesFetching}
+          setCurrentPostId={setCurrentPostId}
         />
       </Container>
     </ScrollPageWrapper>

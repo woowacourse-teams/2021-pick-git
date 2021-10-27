@@ -3,7 +3,6 @@ import { useLocation } from "react-router-dom";
 
 import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
 import PageError from "../../components/@shared/PageError/PageError";
-import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
 import { ScrollPageWrapper } from "../../components/@styled/layout";
 import Feed from "../../components/Feed/Feed";
 
@@ -16,6 +15,7 @@ import { Container } from "./SearchPostResultPage.style";
 
 import type { Post } from "../../@types";
 import useAutoAnchor from "../../hooks/common/useAutoAnchor";
+import { useState } from "react";
 
 interface LocationState {
   prevData?: InfiniteData<Post[]>;
@@ -32,6 +32,8 @@ const SearchPostResultPage = () => {
   const type = params.get("type") ?? "tags";
   const keyword = params.get("keyword") ?? "";
 
+  const [currentPostId, setCurrentPostId] = useState<Post["id"]>(Number(postId) ?? -1);
+
   const {
     infinitePostsData,
     isError,
@@ -43,7 +45,7 @@ const SearchPostResultPage = () => {
     type,
     activated: true,
   });
-  const { scrollWrapperRef } = useAutoAnchor(postId);
+  const { scrollWrapperRef } = useAutoAnchor(`#post${currentPostId}`);
 
   const infiniteImageUrls =
     infinitePostsData?.pages.map(
@@ -73,6 +75,7 @@ const SearchPostResultPage = () => {
           onIntersect={handleIntersect}
           queryKey={[QUERY.GET_SEARCH_POST_RESULT, { type, keyword }]}
           isFetching={isFetchingNextPage || isImagesFetching}
+          setCurrentPostId={setCurrentPostId}
         />
       </Container>
     </ScrollPageWrapper>

@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { LayoutInPx } from "../../constants/layout";
 
-const useAutoAnchor = (htmlId?: string) => {
+const useAutoAnchor = (selector?: string) => {
   const [isMountedOnce, setIsMountedOnce] = useState(false);
   const [mountCounter, setMountCounter] = useState(0);
   const scrollWrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!htmlId) {
+    if (!selector) {
       return;
     }
 
@@ -18,12 +18,12 @@ const useAutoAnchor = (htmlId?: string) => {
       return;
     }
 
-    const $targetPost = document.querySelector(`#post${htmlId}`);
+    const $targetPost = document.querySelector(selector);
 
     if ($targetPost && $targetPost instanceof HTMLElement) {
       scrollWrapperRef.current?.scrollTo(0, $targetPost.offsetTop - LayoutInPx.HEADER_HEIGHT);
     }
-  }, [htmlId, mountCounter, isMountedOnce]);
+  }, [selector, mountCounter, isMountedOnce]);
 
   return { scrollWrapperRef };
 };

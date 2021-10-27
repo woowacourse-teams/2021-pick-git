@@ -1,8 +1,5 @@
-import { useEffect, useState } from "react";
-import { FeedFilterOption } from "../../@types";
-
+import { useLocation } from "react-router";
 import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
-import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
 import NotFound from "../../components/@shared/NotFound/NotFound";
 import PageError from "../../components/@shared/PageError/PageError";
 import Tabs from "../../components/@shared/Tabs/Tabs";
@@ -11,6 +8,7 @@ import Feed from "../../components/Feed/Feed";
 
 import { QUERY } from "../../constants/queries";
 import useAuth from "../../hooks/common/useAuth";
+import useAutoAnchor from "../../hooks/common/useAutoAnchor";
 
 import useInfiniteImagePreloader from "../../hooks/common/useInfiniteImagePreloader";
 import useHomeFeed from "../../hooks/service/useHomeFeed";
@@ -26,16 +24,16 @@ const HomeFeedPage = () => {
     isFetching,
     isError,
     handlePostsEndIntersect,
-    refetch,
     feedFilterOption,
     currentPostId,
     setFeedFilterOption,
     setCurrentPostId,
   } = useHomeFeed();
+  const { scrollWrapperRef } = useAutoAnchor(`#post${currentPostId}`);
 
   const infiniteImageUrls =
-    infinitePostsData?.pages.map<string[]>((posts) =>
-      posts.reduce<string[]>((acc, post) => [...acc, ...post.imageUrls], [])
+    infinitePostsData?.pages.map<string[]>(
+      (posts) => posts?.reduce<string[]>((acc, post) => [...acc, ...post.imageUrls], []) ?? []
     ) ?? [];
   const { isFirstImagesLoading, isImagesFetching, activateImageFetchingState } =
     useInfiniteImagePreloader(infiniteImageUrls);
@@ -50,10 +48,6 @@ const HomeFeedPage = () => {
     activateImageFetchingState();
   };
 
-  useEffect(() => {
-    refetch();
-  }, [feedFilterOption, refetch]);
-
   if (isLoading || isFirstImagesLoading) {
     return <PageLoadingWithLogo />;
   }
@@ -65,7 +59,7 @@ const HomeFeedPage = () => {
   const isPostsEmpty = getItemsFromPages(infinitePostsData.pages)?.length === 0;
 
   return (
-    <ScrollPageWrapper>
+    <ScrollPageWrapper ref={scrollWrapperRef}>
       <Container>
         {isLoggedIn && (
           <PostTabWrapper>
@@ -85,6 +79,7 @@ const HomeFeedPage = () => {
             onIntersect={handleIntersect}
             queryKey={[QUERY.GET_HOME_FEED_POSTS]}
             isFetching={isFetching || isImagesFetching}
+            setCurrentPostId={setCurrentPostId}
           />
         )}
       </Container>

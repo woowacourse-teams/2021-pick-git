@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
 
 import { Post } from "../../@types";
 import SnackBarContext from "../../contexts/SnackbarContext";
@@ -22,11 +22,12 @@ import InfiniteScrollContainer from "../@shared/InfiniteScrollContainer/Infinite
 interface Props {
   infinitePostsData: InfiniteData<Post[] | null>;
   onIntersect: () => void;
+  setCurrentPostId?: Dispatch<SetStateAction<number>>;
   queryKey: QueryKey;
   isFetching: boolean;
 }
 
-const Feed = ({ infinitePostsData, onIntersect, queryKey, isFetching }: Props) => {
+const Feed = ({ infinitePostsData, onIntersect, setCurrentPostId, queryKey, isFetching }: Props) => {
   const [selectedPostId, setSelectedPostId] = useState<Post["id"]>();
   const { pushSnackbarMessage } = useContext(SnackBarContext);
   const { addPostLike, deletePost, deletePostLike, isDeletePostLoading } = useFeedMutation(queryKey);
@@ -91,6 +92,7 @@ const Feed = ({ infinitePostsData, onIntersect, queryKey, isFetching }: Props) =
       return;
     }
 
+    setCurrentPostId?.(selectedPost.id);
     history.push({
       pathname: PAGE_URL.POST_COMMENTS,
       state: selectedPost,

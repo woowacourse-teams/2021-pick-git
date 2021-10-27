@@ -1,42 +1,53 @@
 import { AxiosError } from "axios";
-import { createContext, Dispatch, SetStateAction, useState } from "react";
+import { createContext, Dispatch, SetStateAction, useEffect, useState } from "react";
 import { UseInfiniteQueryResult } from "react-query";
 
 import { ErrorResponse, FeedFilterOption, Post } from "../@types";
-import { useHomeFeedPostsQuery } from "../services/queries";
+import useAuth from "../hooks/common/useAuth";
+import { useHomeFeedAllPostsQuery, useHomeFeedFollowingsPostsQuery } from "../services/queries";
 
 interface Props {
   children: React.ReactNode;
 }
 
 interface Value {
-  queryResult: UseInfiniteQueryResult<Post[], AxiosError<ErrorResponse>>;
+  queryResults: {
+    [K in FeedFilterOption]: UseInfiniteQueryResult<Post[] | null, AxiosError<ErrorResponse>>;
+  };
   feedFilterOption: FeedFilterOption;
-  currentPostId: string;
+  currentPostId: number;
   initialized: boolean;
-  initHomeFeed: (feedFilterOption: FeedFilterOption, postId?: string) => void;
+  initHomeFeed: (feedFilterOption: FeedFilterOption) => void;
   setFeedFilterOption: Dispatch<SetStateAction<FeedFilterOption>>;
-  setCurrentPostId: Dispatch<SetStateAction<string>>;
+  setCurrentPostId: Dispatch<SetStateAction<number>>;
 }
 
 const HomeFeedContext = createContext<Value>({} as Value);
 
 export const HomeFeedContextProvider = ({ children }: Props) => {
   const [feedFilterOption, setFeedFilterOption] = useState<FeedFilterOption>("all");
-  const [currentPostId, setCurrentPostId] = useState("");
+  const [currentPostId, setCurrentPostId] = useState(-1);
   const [initialized, setInitialized] = useState(false);
-  const queryResult = useHomeFeedPostsQuery(feedFilterOption);
+  const { isLoggedIn } = useAuth();
 
-  const initHomeFeed = (feedFilterOption: FeedFilterOption, postId?: string) => {
+  const queryResults = {
+    all: useHomeFeedAllPostsQuery(),
+    followings: useHomeFeedFollowingsPostsQuery(),
+  };
+
+  const initHomeFeed = (feedFilterOption: FeedFilterOption) => {
     setFeedFilterOption(feedFilterOption);
-    setCurrentPostId(postId ?? "");
     setInitialized(true);
   };
+
+  useEffect(() => {
+    initHomeFeed(isLoggedIn ? "followings" : "all");
+  }, [isLoggedIn]);
 
   return (
     <HomeFeedContext.Provider
       value={{
-        queryResult,
+        queryResults,
         feedFilterOption,
         currentPostId,
         initialized,
