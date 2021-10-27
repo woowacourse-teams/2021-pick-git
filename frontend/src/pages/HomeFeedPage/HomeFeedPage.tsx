@@ -83,7 +83,7 @@ const HomeFeedPage = () => {
           <Feed
             infinitePostsData={infinitePostsData}
             onIntersect={handleIntersect}
-            queryKey={[QUERY.GET_HOME_FEED_POSTS]}
+            queryKey={[QUERY.GET_HOME_FEED_POSTS(feedFilterOption)]}
             isFetching={isFetching || isImagesFetching}
             setCurrentPostId={setCurrentPostId}
           />
