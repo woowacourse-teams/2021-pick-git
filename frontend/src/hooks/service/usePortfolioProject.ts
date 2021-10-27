@@ -12,6 +12,7 @@ const usePortfolioProject = (
   };
 
   const updateStartDate = (newStartDate: string) => {
+    console.log("newStartDate", newStartDate);
     const newPortfolioProject = { ...portfolioProject };
     newPortfolioProject.startDate = newStartDate;
 

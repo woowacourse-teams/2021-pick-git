@@ -99,6 +99,7 @@ const MyPortfolioPage = () => {
     isLoading: isPortfolioLoading,
     isError,
     isFetching,
+    refetch,
     mutateSetPortfolio,
   } = usePortfolio(currentUsername, true);
   const { data: profile, isLoading: isProfileLoading } = useProfile(true, currentUsername);
@@ -126,7 +127,7 @@ const MyPortfolioPage = () => {
   const paginationCount = portfolioProjects.length + portfolioSections.length + 1;
   const { paginate } = useScrollPagination(containerRef, paginationCount);
 
-  const handleSetProject = (prevProjectId: number) => (newProject: PortfolioProject) => {
+  const handleSetProject = (prevProjectId: number | string) => (newProject: PortfolioProject) => {
     updatePortfolioProject(prevProjectId, newProject);
   };
 
@@ -198,9 +199,34 @@ const MyPortfolioPage = () => {
     hideConfirm();
   };
 
+  const syncRemoteWithLocal = () => {
+    if (!remotePortfolio || !remotePortfolio.updatedAt) {
+      return;
+    }
+
+    const intro = {
+      name: remotePortfolio.name,
+      description: remotePortfolio.introduction,
+      profileImageUrl: remotePortfolio.profileImageUrl,
+      isProfileShown: remotePortfolio.profileImageShown,
+    };
+
+    const contacts = remotePortfolio.contacts.length !== 0 ? [...remotePortfolio.contacts] : PORTFOLIO_CONTACTS;
+
+    setPortfolioIntro(intro, false);
+    setPortfolioProjects(remotePortfolio.projects, false);
+    setPortfolioSections(remotePortfolio.sections, false);
+    setPortfolioContacts(contacts, false);
+  };
+
   const handleUploadPortfolio = async () => {
     try {
       const localUpdateTimeString = getPortfolioLocalUpdateTimeString();
+
+      const projects = portfolioProjects.map((project) => ({
+        ...project,
+        id: isTempId(project.id) ? null : project.id,
+      }));
 
       const sections = portfolioSections.map<IdProcessedPortfolioSection>((section) => ({
         ...section,
@@ -224,12 +250,12 @@ const MyPortfolioPage = () => {
         contacts: portfolioContacts,
         createdAt: remotePortfolio?.createdAt,
         updatedAt: localUpdateTimeString,
-        projects: portfolioProjects,
+        projects: projects,
         sections: sections,
       };
 
       await mutateSetPortfolio(portfolio);
-
+      refetch();
       pushSnackbarMessage("포트폴리오 업로드 성공");
     } catch (error) {
       console.error(error);
@@ -249,22 +275,6 @@ const MyPortfolioPage = () => {
     if (!remotePortfolio || !remotePortfolio.updatedAt) {
       return;
     }
-
-    const syncRemoteWithLocal = () => {
-      const intro = {
-        name: remotePortfolio.name,
-        description: remotePortfolio.introduction,
-        profileImageUrl: remotePortfolio.profileImageUrl,
-        isProfileShown: remotePortfolio.profileImageShown,
-      };
-
-      const contacts = remotePortfolio.contacts.length !== 0 ? [...remotePortfolio.contacts] : PORTFOLIO_CONTACTS;
-
-      setPortfolioIntro(intro, false);
-      setPortfolioProjects(remotePortfolio.projects, false);
-      setPortfolioSections(remotePortfolio.sections, false);
-      setPortfolioContacts(contacts, false);
-    };
 
     const localUpdateTime = getPortfolioLocalUpdateTime();
 
@@ -301,7 +311,7 @@ const MyPortfolioPage = () => {
     return <PageError errorMessage="포트폴리오를 불러올 수 없습니다." />;
   }
 
-  if (isProfileLoading || isPortfolioLoading || isFetching) {
+  if (isProfileLoading || isPortfolioLoading) {
     return <PageLoading />;
   }
 

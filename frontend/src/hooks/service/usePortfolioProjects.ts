@@ -1,6 +1,7 @@
 import { PortfolioProject } from "../../@types";
 import { PORTFOLIO } from "../../constants/localStorageKey";
 import { setPortfolioLocalUpdateTime } from "../../storage/storage";
+import { getTemporaryId } from "../../utils/portfolio";
 import useLocalStorage from "../common/useLocalStorage";
 
 const usePortfolioProjects = (username: string) => {
@@ -16,7 +17,10 @@ const usePortfolioProjects = (username: string) => {
 
   const addPortfolioProject = (project: PortfolioProject) => {
     const newPortfolioProjects = [...portfolioProjects];
-    newPortfolioProjects.push(project);
+    newPortfolioProjects.push({
+      ...project,
+      id: getTemporaryId(),
+    });
 
     setPortfolioProjects(newPortfolioProjects);
   };
