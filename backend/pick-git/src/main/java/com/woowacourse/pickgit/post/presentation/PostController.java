@@ -17,6 +17,7 @@ import com.woowacourse.pickgit.post.presentation.dto.request.PostRequest;
 import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
 import com.woowacourse.pickgit.post.presentation.dto.response.LikeResponse;
 import com.woowacourse.pickgit.post.presentation.dto.response.LikeUsersResponse;
+import com.woowacourse.pickgit.post.presentation.dto.response.PostResponse;
 import com.woowacourse.pickgit.post.presentation.dto.response.PostUpdateResponse;
 import com.woowacourse.pickgit.post.presentation.dto.response.RepositoryResponse;
 import java.net.URI;

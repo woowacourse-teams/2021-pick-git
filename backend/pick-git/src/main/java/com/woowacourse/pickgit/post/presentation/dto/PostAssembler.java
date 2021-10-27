@@ -120,6 +120,10 @@ public class PostAssembler {
             .build();
     }
 
+    public static PostResponse postResponse(PostResponseDto postResponseDto) {
+        return postResponseDtoPostResponse().apply(postResponseDto);
+    }
+
     public static List<PostResponse> postResponses(List<PostResponseDto> postResponseDtos) {
         return postResponseDtos.stream()
             .map(postResponseDtoPostResponse())
