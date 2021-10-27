@@ -151,7 +151,29 @@ export type PortfolioIntro = {
 };
 
 export type PortfolioProject = {
-  id: number;
+  id: number | string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  type: "team" | "personal";
+  imageUrl: string;
+  content: string;
+  tags: string[];
+};
+
+export type IdProcessedPortfolioProject = {
+  id: number | null;
+  name: string;
+  startDate: string;
+  endDate: string;
+  type: "team" | "personal";
+  imageUrl: string;
+  content: string;
+  tags: string[];
+};
+
+export type PortfolioProjectUploadData = {
+  id: number | null;
   name: string;
   startDate: string;
   endDate: string;
@@ -220,7 +242,7 @@ export type PortfolioUploadData = {
   updatedAt?: string;
   createdAt?: string;
   contacts: PortfolioContact[];
-  projects: PortfolioProject[];
+  projects: IdProcessedPortfolioProject[];
   sections: IdProcessedPortfolioSection[];
 };
 
