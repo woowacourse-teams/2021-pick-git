@@ -41,7 +41,7 @@ class AuthenticationInterceptorIntegrationTest {
     @BeforeEach
     void setUp() {
         jwtTokenProvider = new JwtTokenProviderImpl("pick-git", 3600000);
-        oAuthService = new OAuthService(null, jwtTokenProvider, null, null);
+        oAuthService = new OAuthService(null, jwtTokenProvider, null, null, null);
         authenticationInterceptor = new AuthenticationInterceptor(oAuthService);
     }
 
@@ -103,7 +103,7 @@ class AuthenticationInterceptorIntegrationTest {
     @Test
     void preHandle_ExpiredToken_ThrowException() {
         // given
-        jwtTokenProvider.changeExpirationTime(0);
+        JwtTokenProvider jwtTokenProvider = new JwtTokenProviderImpl("pick-git", 1);
         String bearerToken = "Bearer " + jwtTokenProvider.createToken("pick-git");
 
         // mock

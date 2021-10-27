@@ -1,37 +1,46 @@
-import { useContext, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
+
 import { Post } from "../../@types";
 import SnackBarContext from "../../contexts/SnackbarContext";
 import UserContext from "../../contexts/UserContext";
 import PostItem from "../@shared/PostItem/PostItem";
-import { Container, PostItemWrapper } from "./Feed.style";
-import useBottomSlider from "../../services/hooks/@common/useBottomSlider";
-import CommentSlider from "../CommentSlider/CommentSlider";
-import useFeedMutation from "../../services/hooks/useFeedMutation";
-import { FAILURE_MESSAGE, SUCCESS_MESSAGE, WARNING_MESSAGE } from "../../constants/messages";
+import { PostItemWrapper } from "./Feed.style";
+import useFeedMutation from "../../hooks/service/useFeedMutation";
+import { SUCCESS_MESSAGE, WARNING_MESSAGE } from "../../constants/messages";
 import { getAPIErrorMessage } from "../../utils/error";
 import { useHistory } from "react-router-dom";
 import { PAGE_URL } from "../../constants/urls";
-import usePostEdit from "../../services/hooks/usePostEdit";
+import usePostEdit from "../../hooks/service/usePostEdit";
 import { InfiniteData, QueryKey } from "react-query";
 import { getItemsFromPages } from "../../utils/infiniteData";
-import useMessageModal from "../../services/hooks/@common/useMessageModal";
-import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
+import ConfirmPortal from "../@layout/ConfirmPortal/ConfirmPortal";
+import PageLoadingWithCover from "../@layout/PageLoadingWithCover/PageLoadingWithCover";
+import useModal from "../../hooks/common/useModal";
+import axios from "axios";
+import InfiniteScrollContainer from "../@shared/InfiniteScrollContainer/InfiniteScrollContainer";
 
 interface Props {
   infinitePostsData: InfiniteData<Post[] | null>;
+  onIntersect: () => void;
+  setCurrentPostId?: Dispatch<SetStateAction<number>>;
   queryKey: QueryKey;
+  isFetching: boolean;
 }
 
-const Feed = ({ infinitePostsData, queryKey }: Props) => {
+const Feed = ({ infinitePostsData, onIntersect, setCurrentPostId, queryKey, isFetching }: Props) => {
   const [selectedPostId, setSelectedPostId] = useState<Post["id"]>();
   const { pushSnackbarMessage } = useContext(SnackBarContext);
-  const { addPostComment, addPostLike, deletePost, deletePostLike } = useFeedMutation(queryKey);
+  const { addPostLike, deletePost, deletePostLike, isDeletePostLoading } = useFeedMutation(queryKey);
+  const [posts, setPosts] = useState<Post[]>([]);
   const { setPostEditData } = usePostEdit();
-  const { modalMessage, isModalShown, isCancelButtonShown, showConfirmModal, hideMessageModal } = useMessageModal();
+  const {
+    isModalShown: isConfirmShown,
+    modalMessage: confirmMessage,
+    showModal: showConfirm,
+    hideModal: hideConfirm,
+  } = useModal();
   const { isLoggedIn, currentUsername } = useContext(UserContext);
   const history = useHistory();
-
-  const posts = getItemsFromPages<Post>(infinitePostsData.pages);
 
   const handlePostEdit = async (post: Post) => {
     setPostEditData({ content: post.content, postId: post.id, tags: post.tags });
@@ -40,7 +49,7 @@ const Feed = ({ infinitePostsData, queryKey }: Props) => {
 
   const handlePostDeleteButtonClick = (postId: Post["id"]) => {
     setSelectedPostId(postId);
-    showConfirmModal(WARNING_MESSAGE.POST_DELETE);
+    showConfirm(WARNING_MESSAGE.POST_DELETE);
   };
 
   const handlePostDelete = async () => {
@@ -48,12 +57,16 @@ const Feed = ({ infinitePostsData, queryKey }: Props) => {
       return;
     }
 
-    hideMessageModal();
+    hideConfirm();
 
     try {
       await deletePost(selectedPostId);
       pushSnackbarMessage(SUCCESS_MESSAGE.POST_DELETED);
     } catch (error) {
+      if (!axios.isAxiosError(error)) {
+        return;
+      }
+
       pushSnackbarMessage(getAPIErrorMessage(error.response?.data.errorCode));
     }
   };
@@ -79,8 +92,10 @@ const Feed = ({ infinitePostsData, queryKey }: Props) => {
       return;
     }
 
+    setCurrentPostId?.(selectedPost.id);
     history.push({
-      pathname: PAGE_URL.POST_COMMENTS,
+      pathname: PAGE_URL.POST_DETAIL,
+      search: `id=${postId}`,
       state: selectedPost,
     });
   };
@@ -102,12 +117,16 @@ const Feed = ({ infinitePostsData, queryKey }: Props) => {
     });
   };
 
-  if (!infinitePostsData.pages) {
-    return <div>게시물이 존재하지 않습니다.</div>;
-  }
+  useEffect(() => {
+    if (isFetching) {
+      return;
+    }
+
+    setPosts(getItemsFromPages<Post>(infinitePostsData.pages) ?? []);
+  }, [infinitePostsData, isFetching]);
 
   return (
-    <Container>
+    <InfiniteScrollContainer isLoaderShown={isFetching} onIntersect={onIntersect}>
       {posts?.map((post) => (
         <PostItemWrapper id={`post${post.id}`} key={post.id}>
           <PostItem
@@ -134,17 +153,11 @@ const Feed = ({ infinitePostsData, queryKey }: Props) => {
             onMoreCommentClick={() => handleCommentsClick(post.id)}
             onCommentInputClick={() => handleCommentsClick(post.id)}
           />
+          {isDeletePostLoading && <PageLoadingWithCover description="삭제중" />}
         </PostItemWrapper>
       ))}
-      {isModalShown && isCancelButtonShown && (
-        <MessageModalPortal
-          heading={modalMessage}
-          onConfirm={handlePostDelete}
-          onClose={hideMessageModal}
-          onCancel={hideMessageModal}
-        />
-      )}
-    </Container>
+      {isConfirmShown && <ConfirmPortal heading={confirmMessage} onConfirm={handlePostDelete} onCancel={hideConfirm} />}
+    </InfiniteScrollContainer>
   );
 };
 

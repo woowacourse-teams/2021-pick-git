@@ -1,5 +1,7 @@
 package com.woowacourse.pickgit.user.domain;
 
+import com.woowacourse.pickgit.exception.post.PostNotBelongToUserException;
+import com.woowacourse.pickgit.portfolio.domain.Portfolio;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.Posts;
 import com.woowacourse.pickgit.user.domain.follow.Follow;
@@ -10,16 +12,23 @@ import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import javax.persistence.CascadeType;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import org.springframework.data.annotation.PersistenceConstructor;
+import org.springframework.data.elasticsearch.annotations.Document;
 
+@Document(indexName = "users")
 @Entity
 public class User {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Embedded
@@ -37,6 +46,9 @@ public class User {
     @Embedded
     private Posts posts;
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    private List<Portfolio> portfolios;
+
     protected User() {
     }
 
@@ -44,6 +56,7 @@ public class User {
         this(null, basicProfile, githubProfile);
     }
 
+    @PersistenceConstructor
     public User(Long id, BasicProfile basicProfile, GithubProfile githubProfile) {
         this(
             id,
@@ -104,8 +117,11 @@ public class User {
     }
 
     public void delete(Post post) {
-        List<Post> posts = this.posts.getPosts();
-        posts.remove(post);
+        if (post.isNotWrittenBy(this)) {
+            throw new PostNotBelongToUserException();
+        }
+
+        this.posts.getPosts().remove(post);
     }
 
     public Long getId() {

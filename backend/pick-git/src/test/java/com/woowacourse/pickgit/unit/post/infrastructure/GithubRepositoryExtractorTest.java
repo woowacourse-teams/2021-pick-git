@@ -29,8 +29,11 @@ class GithubRepositoryExtractorTest {
 
     @BeforeEach
     void setUp() {
-        platformRepositoryExtractor =
-            new GithubRepositoryExtractor(objectMapper, new MockRepositoryApiRequester());
+        platformRepositoryExtractor = new GithubRepositoryExtractor(
+            objectMapper,
+            new MockRepositoryApiRequester(),
+            "https://api.github.com"
+        );
     }
 
     @DisplayName("요청 페이지에 퍼블릭 레포지토리가 있는 경우 퍼블릭 레포지토리 목록을 반환한다.")
@@ -55,8 +58,11 @@ class GithubRepositoryExtractorTest {
         // given
         Pageable pageable = PageRequest.of(59, 50);
 
-        platformRepositoryExtractor =
-            new GithubRepositoryExtractor(objectMapper, new MockEmptyRepositoryApiRequester());
+        platformRepositoryExtractor = new GithubRepositoryExtractor(
+            objectMapper,
+            new MockEmptyRepositoryApiRequester(),
+            "https://api.github.com"
+        );
 
         // when
         List<RepositoryNameAndUrl> repositories = platformRepositoryExtractor
@@ -74,7 +80,7 @@ class GithubRepositoryExtractorTest {
 
         // then
         assertThatThrownBy(() -> {
-            platformRepositoryExtractor.extract(ACCESS_TOKEN + "hi", USERNAME, pageable);
+            platformRepositoryExtractor.extract("invalid token", USERNAME, pageable);
         }).isInstanceOf(PlatformHttpErrorException.class)
             .hasFieldOrPropertyWithValue("errorCode", "V0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)
@@ -89,7 +95,7 @@ class GithubRepositoryExtractorTest {
 
         // then
         assertThatThrownBy(() -> {
-            platformRepositoryExtractor.extract(ACCESS_TOKEN, USERNAME + "hi", pageable);
+            platformRepositoryExtractor.extract(ACCESS_TOKEN, "invalid", pageable);
         }).isInstanceOf(PlatformHttpErrorException.class)
             .hasFieldOrPropertyWithValue("errorCode", "V0001")
             .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR)

@@ -9,24 +9,25 @@ import com.woowacourse.pickgit.post.domain.util.PlatformRepositorySearchExtracto
 import com.woowacourse.pickgit.post.domain.util.dto.RepositoryNameAndUrl;
 import com.woowacourse.pickgit.post.infrastructure.dto.RepositoryItemDto;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 @Component
 public class GithubRepositorySearchExtractor implements PlatformRepositorySearchExtractor {
 
-    private static final String API_URL_FORMAT =
-        "https://api.github.com/search/repositories?"
-            + "q=user:%s %s in:name fork:true&page=%d&per_page=%d";
-
     private final ObjectMapper objectMapper;
     private final PlatformRepositoryApiRequester platformRepositoryApiRequester;
+    private final String apiBaseUrl;
 
     public GithubRepositorySearchExtractor(
         ObjectMapper objectMapper,
-        PlatformRepositoryApiRequester platformRepositoryApiRequester
+        PlatformRepositoryApiRequester platformRepositoryApiRequester,
+        @Value("${security.github.url.api}") String apiBaseUrl
     ) {
         this.objectMapper = objectMapper;
         this.platformRepositoryApiRequester = platformRepositoryApiRequester;
+        this.apiBaseUrl = apiBaseUrl;
     }
 
     @Override
@@ -34,13 +35,11 @@ public class GithubRepositorySearchExtractor implements PlatformRepositorySearch
         String token,
         String username,
         String keyword,
-        int page,
-        int limit
+        Pageable pageable
     ) {
-        String response =
-            platformRepositoryApiRequester.request(
-                token,
-                generateApiUrl(username, keyword, page + 1, limit)
+        String response = platformRepositoryApiRequester.request(
+            token,
+            generateApiUrl(username, keyword, pageable)
         );
 
         return parseToRepositories(response).getItems();
@@ -49,16 +48,12 @@ public class GithubRepositorySearchExtractor implements PlatformRepositorySearch
     private String generateApiUrl(
         String username,
         String keyword,
-        int page,
-        int limit
+        Pageable pageable
     ) {
-
+        String format = apiBaseUrl +
+            "/search/repositories?q=user:%s %s in:name fork:true&page=%d&per_page=%d";
         return String.format(
-            API_URL_FORMAT,
-            username,
-            keyword,
-            page,
-            limit
+            format, username, keyword, pageable.getPageNumber() + 1, pageable.getPageSize()
         );
     }
 

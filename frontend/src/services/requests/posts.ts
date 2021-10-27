@@ -14,8 +14,6 @@ export const requestGetHomeFeedPosts = async (pageParam: number, accessToken: st
       }
     : {};
 
-  // const response = await axios.get<Post[]>("http://localhost:3001/posts", config);
-
   const response = await axios.get<Post[]>(API_URL.POSTS(pageParam, LIMIT.FEED_COUNT_PER_FETCH), config);
 
   return response.data;
@@ -121,3 +119,10 @@ export const requestEditPost = async ({ postId, tags, content }: PostEditData, a
     }
   );
 };
+
+export const requestGetPost = async (postId: number) => {
+  const response = await axios.get<Post>(API_URL.POST(postId));
+
+  return response.data;
+};
+

@@ -1,28 +1,27 @@
 import { useContext } from "react";
-import { Link } from "react-router-dom";
+import { useQueryClient } from "react-query";
+import { Link, useHistory } from "react-router-dom";
 import { ThemeContext } from "styled-components";
 import { ProfileData } from "../../../@types";
 import { WARNING_MESSAGE } from "../../../constants/messages";
+import { QUERY } from "../../../constants/queries";
 import { PAGE_URL } from "../../../constants/urls";
-
 import UserContext from "../../../contexts/UserContext";
-import useMessageModal from "../../../services/hooks/@common/useMessageModal";
-import useModal from "../../../services/hooks/@common/useModal";
-import useFollow from "../../../services/hooks/useFollow";
-import MessageModalPortal from "../../@layout/MessageModalPortal/MessageModalPortal";
-import ModalPortal from "../../@layout/Modal/ModalPortal";
+import useModal from "../../../hooks/common/useModal";
+import useFollow from "../../../hooks/service/useFollow";
+import ChoiceModalPortal from "../../@layout/ChoiceModalPortal/ChoiceModalPortal";
+import ModalPortal from "../../@layout/ModalPortal/ModalPortal";
 import ProfileModificationForm from "../../ProfileModificationForm/ProfileModificationForm";
 import Avatar from "../Avatar/Avatar";
 import Button from "../Button/Button";
 import CountIndicator from "../CountIndicator/CountIndicator";
 import {
   AvatarWrapper,
-  ButtonLoader,
-  ButtonSpinnerWrapper,
-  ButtonSpinner,
+  ButtonsWrapper,
   Container,
   Indicators,
   IndicatorsWrapper,
+  PortfolioButtonCSS,
 } from "./ProfileHeader.style";
 
 export interface Props {
@@ -33,23 +32,65 @@ export interface Props {
 
 const ProfileHeader = ({ isMyProfile, profile, username }: Props) => {
   const theme = useContext(ThemeContext);
-  const { isLoggedIn } = useContext(UserContext);
-  const { isModalShown, showModal, hideModal } = useModal(false);
-  const { modalMessage, isModalShown: isMessageModalShown, hideMessageModal, showConfirmModal } = useMessageModal();
-  const { toggleFollow, isFollowLoading, isUnfollowLoading } = useFollow();
+  const { isLoggedIn, currentUsername } = useContext(UserContext);
+  const queryClient = useQueryClient();
+  const history = useHistory();
+
+  const {
+    isModalShown: isProfileEditModalShown,
+    showModal: showProfileEditModal,
+    hideModal: hideProfileEditModal,
+  } = useModal(false);
+  const {
+    isModalShown: isChoiceModalShown,
+    modalMessage: choiceModalMessage,
+    showModal: showChoiceModal,
+    hideModal: hideChoiceModal,
+  } = useModal();
+
+  const setProfileQueryData = (following: boolean) => {
+    const currentProfileQueryKey = [QUERY.GET_PROFILE, { isMyProfile: false, username }];
+    const currentProfileQueryData = queryClient.getQueryData<ProfileData>(currentProfileQueryKey);
+
+    if (currentProfileQueryData) {
+      const { followerCount: currentFollowerCount } = currentProfileQueryData;
+      const followerCount = following ? currentFollowerCount + 1 : currentFollowerCount - 1;
+
+      queryClient.setQueryData<ProfileData>(currentProfileQueryKey, {
+        ...currentProfileQueryData,
+        followerCount,
+        following,
+      });
+    }
+  };
+
+  const { toggleFollow } = useFollow(setProfileQueryData);
 
   const toggleFollowWithGithubFollowing = (applyGithub: boolean) => () => {
-    if (profile && profile.following !== null) {
-      toggleFollow(username, profile.following, applyGithub);
+    if (!profile || profile.following === null) {
+      return;
     }
 
-    hideMessageModal();
+    hideChoiceModal();
+    toggleFollow(username, profile.following, applyGithub);
   };
 
   const handleFollowButtonClick = () => {
     if (profile && profile.following !== null) {
-      showConfirmModal(profile.following ? WARNING_MESSAGE.GITHUB_UNFOLLOWING : WARNING_MESSAGE.GITHUB_FOLLOWING);
+      showChoiceModal(profile.following ? WARNING_MESSAGE.GITHUB_UNFOLLOWING : WARNING_MESSAGE.GITHUB_FOLLOWING);
     }
+  };
+
+  const handleMoveToPortfolio = () => {
+    if (currentUsername === username) {
+      history.push(PAGE_URL.MY_PORTFOLIO);
+      return;
+    }
+
+    history.push({
+      pathname: PAGE_URL.PORTFOLIO,
+      search: `username=${username}`,
+    });
   };
 
   const ProfileButton = () => {
@@ -57,20 +98,9 @@ const ProfileHeader = ({ isMyProfile, profile, username }: Props) => {
       return <></>;
     }
 
-    if (isFollowLoading || isUnfollowLoading) {
-      return (
-        <ButtonLoader type="button" kind="squaredBlock" backgroundColor={theme.color.tertiaryColor}>
-          {isFollowLoading ? "팔로우" : "팔로우 취소"}
-          <ButtonSpinnerWrapper>
-            <ButtonSpinner size="1rem" />
-          </ButtonSpinnerWrapper>
-        </ButtonLoader>
-      );
-    }
-
     if (isMyProfile) {
       return (
-        <Button type="button" kind="squaredBlock" onClick={showModal}>
+        <Button type="button" kind="squaredBlock" onClick={() => showProfileEditModal()}>
           프로필 수정
         </Button>
       );
@@ -111,26 +141,31 @@ const ProfileHeader = ({ isMyProfile, profile, username }: Props) => {
             <CountIndicator name="팔로잉" count={profile?.followingCount ?? 0} />
           </Link>
         </Indicators>
-        <ProfileButton />
+        <ButtonsWrapper>
+          <ProfileButton />
+          <Button cssProp={PortfolioButtonCSS} onClick={handleMoveToPortfolio} kind="squaredBlock">
+            포트폴리오
+          </Button>
+        </ButtonsWrapper>
       </IndicatorsWrapper>
-      {isModalShown && isLoggedIn && (
-        <ModalPortal onClose={hideModal} isCloseButtonShown={true}>
+      {isProfileEditModalShown && isLoggedIn && (
+        <ModalPortal onClose={hideProfileEditModal} isCloseButtonShown={true}>
           <ProfileModificationForm
             username={username}
             profileImageUrl={profile?.imageUrl}
             prevDescription={profile?.description}
-            onTerminate={hideModal}
+            onTerminate={hideProfileEditModal}
           />
         </ModalPortal>
       )}
-      {isMessageModalShown && (
-        <MessageModalPortal
-          heading={modalMessage}
-          onConfirm={toggleFollowWithGithubFollowing(true)}
-          onCancel={toggleFollowWithGithubFollowing(false)}
-          onClose={hideMessageModal}
-          confirmText="예"
-          cancelText="아니오"
+      {isChoiceModalShown && (
+        <ChoiceModalPortal
+          heading={choiceModalMessage}
+          onPositiveChoose={toggleFollowWithGithubFollowing(true)}
+          onNagativeChoose={toggleFollowWithGithubFollowing(false)}
+          onClose={hideChoiceModal}
+          positiveChoiceText="예"
+          nagativeChoiceText="아니오"
         />
       )}
     </Container>

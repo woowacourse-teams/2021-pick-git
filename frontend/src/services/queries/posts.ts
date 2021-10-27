@@ -1,5 +1,5 @@
 import { AxiosError } from "axios";
-import { QueryFunction, useInfiniteQuery, useMutation } from "react-query";
+import { QueryFunction, useInfiniteQuery, useMutation, useQuery } from "react-query";
 
 import { ErrorResponse, Post } from "../../@types";
 import { QUERY } from "../../constants/queries";
@@ -12,6 +12,7 @@ import {
   requestGetMyFeedPosts,
   requestGetUserFeedPosts,
   requestDeletePost,
+  requestGetPost,
 } from "../requests";
 
 type UserPostsQueryKey = readonly [
@@ -22,6 +23,8 @@ type UserPostsQueryKey = readonly [
   }
 ];
 
+type PostQuery = readonly [typeof QUERY.GET_POST, number];
+
 const userPostsQueryFunction: QueryFunction<Post[]> = async ({ queryKey, pageParam = 0 }) => {
   const [, { isMyFeed, username }] = queryKey as UserPostsQueryKey;
   const accessToken = getAccessToken();
@@ -31,17 +34,38 @@ const userPostsQueryFunction: QueryFunction<Post[]> = async ({ queryKey, pagePar
 
     return await requestGetMyFeedPosts(pageParam, accessToken);
   } else {
-    if (!username) throw Error("no username");
+    if (!username) return Promise.resolve([]);
 
     return await requestGetUserFeedPosts(username, pageParam, accessToken);
   }
 };
 
-export const useHomeFeedPostsQuery = () => {
-  return useInfiniteQuery<Post[], AxiosError<ErrorResponse>>(
-    [QUERY.GET_HOME_FEED_POSTS],
+const postQueryFunction: QueryFunction<Post> = async ({ queryKey }) => {
+  const [, postId] = queryKey as PostQuery;
+
+  return await requestGetPost(postId);
+};
+
+export const useHomeFeedFollowingsPostsQuery = () => {
+  return useInfiniteQuery<Post[] | null, AxiosError<ErrorResponse>>(
+    [QUERY.GET_HOME_FEED_POSTS("followings")],
     async ({ pageParam = 0 }) => {
       return await requestGetHomeFeedPosts(pageParam, getAccessToken());
+    },
+    {
+      getNextPageParam: (_, pages) => {
+        return pages.length;
+      },
+      cacheTime: 0,
+    }
+  );
+};
+
+export const useHomeFeedAllPostsQuery = () => {
+  return useInfiniteQuery<Post[] | null, AxiosError<ErrorResponse>>(
+    [QUERY.GET_HOME_FEED_POSTS("all")],
+    async ({ pageParam = 0 }) => {
+      return await requestGetHomeFeedPosts(pageParam, null);
     },
     {
       getNextPageParam: (_, pages) => {
@@ -60,6 +84,7 @@ export const useUserPostsQuery = (isMyFeed: boolean, username: string | null) =>
       getNextPageParam: (_, pages) => {
         return pages.length;
       },
+      suspense: true,
     }
   );
 };
@@ -76,4 +101,10 @@ export const useDeletePostMutation = () => {
 
 export const useDeletePostLikeMutation = () => {
   return useMutation((postId: Post["id"]) => requestDeletePostLike(postId, getAccessToken()));
+};
+
+export const useGetPostQuery = (postId: number, activated: boolean) => {
+  return useQuery<Post>(["post", postId], postQueryFunction, {
+    enabled: activated
+  });
 };

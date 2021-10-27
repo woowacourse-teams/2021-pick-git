@@ -2,12 +2,13 @@ export const LAYOUT = {
   HEADER_HEIGHT: "3.625rem",
   PAGE_MARGIN_TOP: "4.625rem",
   COMMENT_INPUT_HEIGHT: "3.625rem",
+  CUSTOM_SCROLLBAR_WIDTH: "0.625rem",
 };
 
 export const PAGE_WIDTH = {
   TABLET: "425px",
   LAPTOP: "640px",
-  DESKTOP: "860px",
+  DESKTOP: "720px",
 };
 
 export const LayoutInPx = {
@@ -24,4 +25,5 @@ export const Z_INDEX = {
   LOWER: 150,
   ROOT: 0,
   UNDER_ROOT: -1,
+  BACKGROUND: -10,
 };

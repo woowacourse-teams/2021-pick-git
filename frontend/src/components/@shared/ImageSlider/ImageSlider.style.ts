@@ -1,32 +1,52 @@
-import styled from "styled-components";
+import styled, { css, CSSProp } from "styled-components";
+import { setLaptopAboveMediaQuery } from "../../@styled/mediaQueries";
 
-export const Container = styled.div<React.CSSProperties>`
-  ${({ width }) => `
+export const Container = styled.div<React.CSSProperties & { cssProp?: CSSProp }>(
+  ({ cssProp }) => css`
+    overflow-x: hidden;
+    position: relative;
+    background-color: white;
+
+    ::-webkit-scrollbar {
+      width: 0;
+    }
+
+    ${cssProp};
+  `
+);
+
+export const ImageListSlider = styled.ul<React.CSSProperties>(
+  ({ theme, width }) => css`
     width: ${width};
-  `}
+    height: 100%;
+    background-color: ${theme.color.postBackgroundColor};
 
-  overflow: hidden;
-  position: relative;
-`;
+    display: flex;
+    align-items: center;
+    transition: transform 0.5s ease-in-out;
+  `
+);
 
-export const ImageListSlider = styled.ul<React.CSSProperties>`
-  ${({ width }) => `
-    width: ${width};
-  `}
-  height: fit-content;
-  background-color: #000000;
-
-  display: flex;
-  align-items: center;
-  transition: transform 0.5s ease-in-out;
-`;
-
-export const ImageList = styled.li<React.CSSProperties>`
+export const ImageListItem = styled.li<React.CSSProperties>`
   width: 100%;
+  height: 100%;
+  line-height: 0;
+`;
 
-  img {
+export const Image = styled.img(
+  () => css`
     width: 100%;
-  }
+    height: 100%;
+    object-fit: contain;
+  `
+);
+
+export const ImageView = styled.div<{ imageUrl: string }>`
+  width: 100%;
+  background-image: url(${({ imageUrl }) => imageUrl});
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
 `;
 
 export const SlideButton = styled.button<{

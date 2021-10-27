@@ -9,8 +9,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.woowacourse.pickgit.common.factory.UserFactory;
-import com.woowacourse.pickgit.post.application.PostDtoAssembler;
 import com.woowacourse.pickgit.post.application.PostFeedService;
+import com.woowacourse.pickgit.post.application.dto.PostDtoAssembler;
 import com.woowacourse.pickgit.post.application.dto.request.SearchPostsRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.search.SearchTypes;
@@ -19,7 +19,7 @@ import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.tag.domain.Tag;
 import com.woowacourse.pickgit.user.domain.User;
-import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.domain.repository.UserRepository;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +29,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
@@ -67,11 +68,11 @@ public class PostFeedService_search {
         SearchPostsRequestDto searchPostsRequestDto =
             createSearchPostsRequestDto(type, requestUser.getName(), false);
         List<PostResponseDto> actual =
-            postFeedService.search(searchPostsRequestDto);
+            postFeedService.search(searchPostsRequestDto, PageRequest.of(0, 5));
 
         assertThat(actual)
             .usingRecursiveComparison()
-            .isEqualTo(PostDtoAssembler.assembleFrom(requestUser, List.of(post)));
+            .isEqualTo(PostDtoAssembler.postResponseDtos(requestUser, List.of(post)));
 
         verify(searchTypes, times(1))
             .findByTypeName(type);
@@ -99,12 +100,12 @@ public class PostFeedService_search {
         SearchPostsRequestDto searchPostsRequestDto =
             createSearchPostsRequestDto(type, null, true);
         List<PostResponseDto> actual =
-            postFeedService.search(searchPostsRequestDto);
+            postFeedService.search(searchPostsRequestDto, PageRequest.of(0, 5));
 
         // then
         assertThat(actual)
             .usingRecursiveComparison()
-            .isEqualTo(PostDtoAssembler.assembleFrom(null, List.of(post)));
+            .isEqualTo(PostDtoAssembler.postResponseDtos(null, List.of(post)));
 
         verify(searchTypes, times(1))
             .findByTypeName(type);
@@ -131,8 +132,6 @@ public class PostFeedService_search {
         return SearchPostsRequestDto.builder()
             .type(type)
             .keyword("keyword")
-            .page(0)
-            .limit(3)
             .userName(userName)
             .isGuest(isGuest)
             .build();

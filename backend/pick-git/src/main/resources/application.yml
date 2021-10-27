@@ -1,8 +1,13 @@
 spring:
+  data:
+    web:
+      pageable:
+        size-parameter: limit
   profiles:
     include: security
-
-github:
-  contribution:
-    star-url: https://api.github.com/search/repositories?q=user:%s stars:>=1
-    count-url: https://api.github.com/search/
+  flyway:
+    enabled: false
+server:
+  compression:
+    enabled: true
+    mime-types: application/json

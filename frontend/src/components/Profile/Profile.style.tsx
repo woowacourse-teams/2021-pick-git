@@ -15,6 +15,13 @@ export const Container = styled.section`
 
 export const Description = styled.p`
   text-align: left;
+  font-size: 0.7rem;
+  margin: 1.25rem 0;
+  padding: 0.2rem 0.5rem;
+  line-height: 1.2rem;
+  width: 100%;
+  line-break: auto;
+
   ${({ theme }) => `
     color: ${theme.color.textColor};
     border-left: 3px solid ${theme.color.primaryColor};
@@ -33,11 +40,6 @@ export const Description = styled.p`
     font-size: 0.9rem;
     border: none;
   `}
-
-  font-size: 0.7rem;
-  margin: 1.25rem 0;
-  padding: 0.2rem 0.5rem;
-  line-height: 1;
 `;
 
 export const DetailInfo = styled.div`

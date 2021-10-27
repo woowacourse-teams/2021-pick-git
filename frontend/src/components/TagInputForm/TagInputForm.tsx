@@ -1,19 +1,28 @@
 import { AxiosError } from "axios";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { UseQueryResult } from "react-query";
 import { useHistory } from "react-router-dom";
 import { ErrorResponse, Tags } from "../../@types";
 import { LIMIT } from "../../constants/limits";
 import { FAILURE_MESSAGE } from "../../constants/messages";
 import { PAGE_URL } from "../../constants/urls";
-import useMessageModal from "../../services/hooks/@common/useMessageModal";
+import useModal from "../../hooks/common/useModal";
 import { getAPIErrorMessage } from "../../utils/error";
 import { hasDuplicatedTag, isGithubRepositoryEmpty, isValidTagFormat, isValidTagLength } from "../../utils/postUpload";
-import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
+import AlertPortal from "../@layout/AlertPortal/AlertPortal";
 import PageLoading from "../@layout/PageLoading/PageLoading";
 import Chip from "../@shared/Chip/Chip";
 import Input from "../@shared/Input/Input";
-import { Container, Form, TagList, TagListItem, TextLengthIndicator } from "./TagInputForm.style";
+import SVGIcon from "../@shared/SVGIcon/SVGIcon";
+import {
+  Container,
+  Form,
+  TagInputWrapper,
+  TagList,
+  TagListItem,
+  TextLengthIndicator,
+  TagAddButton,
+} from "./TagInputForm.style";
 
 interface Props {
   githubRepositoryName: string;
@@ -23,8 +32,14 @@ interface Props {
 }
 
 const TagInputForm = ({ githubRepositoryName, tags, tagsQueryResult, setTags }: Props) => {
+  const formRef = useRef<HTMLFormElement>(null);
   const [tagInputLength, setTagInputLength] = useState(0);
-  const { modalMessage, isModalShown, hideMessageModal, showAlertModal } = useMessageModal();
+  const {
+    modalMessage: alertMessage,
+    isModalShown: isAlertShown,
+    showModal: showAlert,
+    hideModal: hideAlert,
+  } = useModal();
   const history = useHistory();
 
   useEffect(() => {
@@ -48,24 +63,25 @@ const TagInputForm = ({ githubRepositoryName, tags, tagsQueryResult, setTags }: 
 
     if (!isValidTagLength(newTag)) {
       event.currentTarget["tag-input"].blur();
-      showAlertModal(FAILURE_MESSAGE.POST_TAG_LENGTH_LIMIT_EXCEEDED);
+      showAlert(FAILURE_MESSAGE.POST_TAG_LENGTH_LIMIT_EXCEEDED);
       return;
     }
 
     if (!isValidTagFormat(newTag)) {
       event.currentTarget["tag-input"].blur();
-      showAlertModal(FAILURE_MESSAGE.POST_TAG_SPECIAL_SYMBOL_EXIST);
+      showAlert(FAILURE_MESSAGE.POST_TAG_SPECIAL_SYMBOL_EXIST);
       return;
     }
 
     if (hasDuplicatedTag([...tags, newTag])) {
       event.currentTarget["tag-input"].blur();
-      showAlertModal(FAILURE_MESSAGE.POST_DUPLICATED_TAG_EXIST);
+      showAlert(FAILURE_MESSAGE.POST_DUPLICATED_TAG_EXIST);
       return;
     }
 
     setTags([...tags, newTag]);
     setTagInputLength(0);
+
     event.currentTarget["tag-input"].value = "";
   };
 
@@ -93,11 +109,9 @@ const TagInputForm = ({ githubRepositoryName, tags, tagsQueryResult, setTags }: 
   };
 
   if (tagsQueryResult && tagsQueryResult.error) {
-    tagsQueryResult.error.response &&
-      showAlertModal(getAPIErrorMessage(tagsQueryResult.error.response?.data.errorCode));
+    tagsQueryResult.error.response && showAlert(getAPIErrorMessage(tagsQueryResult.error.response?.data.errorCode));
 
-    // TODO : MessageModal 이 confirmText 와 cancelText 모두 받을 수 있게 되어야 함
-    return <MessageModalPortal heading={modalMessage} onConfirm={handleErrorConfirm} onClose={hideMessageModal} />;
+    return <AlertPortal heading={alertMessage} onOkay={handleErrorConfirm} />;
   }
 
   if (tagsQueryResult?.isLoading) {
@@ -106,20 +120,23 @@ const TagInputForm = ({ githubRepositoryName, tags, tagsQueryResult, setTags }: 
 
   return (
     <Container>
-      <Form onSubmit={handleTagSubmit}>
-        <Input
-          kind="borderBottom"
-          textAlign="center"
-          placeholder="태그 입력..."
-          name="tag-input"
-          onChange={handleTagInputChange}
-        />
+      <Form onSubmit={handleTagSubmit} ref={formRef}>
+        <TagInputWrapper>
+          <Input
+            kind="borderBottom"
+            textAlign="center"
+            placeholder="태그 입력..."
+            name="tag-input"
+            onChange={handleTagInputChange}
+          />
+          <TagAddButton type="submit">
+            <SVGIcon icon="AddBoxIcon" />
+          </TagAddButton>
+        </TagInputWrapper>
         <TextLengthIndicator>{`${tagInputLength} / ${LIMIT.POST_TAG_LENGTH}`}</TextLengthIndicator>
       </Form>
       <TagList>{tagListItems}</TagList>
-      {isModalShown && (
-        <MessageModalPortal heading={modalMessage} onConfirm={hideMessageModal} onClose={hideMessageModal} />
-      )}
+      {isAlertShown && <AlertPortal heading={alertMessage} onOkay={hideAlert} />}
     </Container>
   );
 };

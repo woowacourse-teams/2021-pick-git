@@ -2,7 +2,7 @@ package com.woowacourse.pickgit.post.domain.util;
 
 import com.woowacourse.pickgit.post.domain.util.dto.RepositoryNameAndUrl;
 import java.util.List;
-
+import org.springframework.data.domain.Pageable;
 
 public interface PlatformRepositorySearchExtractor {
 
@@ -10,7 +10,6 @@ public interface PlatformRepositorySearchExtractor {
         String token,
         String username,
         String keyword,
-        int page,
-        int limit
+        Pageable pageable
     );
 }

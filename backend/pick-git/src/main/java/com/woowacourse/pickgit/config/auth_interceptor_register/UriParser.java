@@ -8,8 +8,8 @@ import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.Controll
 import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.ForGuestScanner;
 import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.ForLoginUserScanner;
 import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.HttpMethodMapper;
-import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.data_structure.MergedInterceptorParameterByMethod;
 import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.data_structure.InterceptorParameter;
+import com.woowacourse.pickgit.config.auth_interceptor_register.scanner.data_structure.MergedInterceptorParameterByMethod;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -123,15 +123,24 @@ public class UriParser {
 
     private List<MergedInterceptorParameterByMethod> createMergedInterceptorParameterByMethods(
         String prefix,
-        HttpMethod httpMethod, RegisterType registerType, List<String> urls
+        HttpMethod httpMethod,
+        RegisterType registerType,
+        List<String> urls
     ) {
+        if (urls.isEmpty()) {
+            urls = new ArrayList<>(urls);
+            urls.add("");
+        }
+
         return urls.stream()
             .map(url -> createUri(prefix, url))
-            .map(completeUrl ->
-                new MergedInterceptorParameterByMethod(completeUrl, httpMethod, registerType))
+            .map(completeUrl -> new MergedInterceptorParameterByMethod(
+                completeUrl,
+                httpMethod,
+                registerType
+            ))
             .collect(toList());
     }
-
 
     private List<String> parseUrlsFromMethod(Method method) {
         return HttpMethodMapper.extractMappingValues(method);

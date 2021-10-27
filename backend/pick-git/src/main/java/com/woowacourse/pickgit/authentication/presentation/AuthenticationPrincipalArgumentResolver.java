@@ -14,8 +14,7 @@ public class AuthenticationPrincipalArgumentResolver implements HandlerMethodArg
 
     private final OAuthService oAuthService;
 
-    public AuthenticationPrincipalArgumentResolver(
-        OAuthService oAuthService) {
+    public AuthenticationPrincipalArgumentResolver(OAuthService oAuthService) {
         this.oAuthService = oAuthService;
     }
 
@@ -33,7 +32,6 @@ public class AuthenticationPrincipalArgumentResolver implements HandlerMethodArg
     ) {
         HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
         String authentication = (String) request.getAttribute(AuthHeader.AUTHENTICATION);
-
         return oAuthService.findRequestUserByToken(authentication);
     }
 }

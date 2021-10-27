@@ -2,7 +2,8 @@
   "compilerOptions": {
     "jsx": "react",
     "target": "ES2015",
-    "module": "commonjs",
+    "module": "esnext",
+    "moduleResolution": "node",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,

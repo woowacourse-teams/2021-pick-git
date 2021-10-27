@@ -11,8 +11,10 @@ include::authorization.adoc[]
 include::comment.adoc[]
 include::following.adoc[]
 include::post.adoc[]
+include::postfeed.adoc[]
 include::profile.adoc[]
 include::tag.adoc[]
 include::search.adoc[]
+include::portfolio.adoc[]
 
 PickGit API

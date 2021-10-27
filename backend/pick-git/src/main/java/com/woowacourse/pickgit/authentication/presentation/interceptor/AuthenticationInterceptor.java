@@ -14,8 +14,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
     private final OAuthService oAuthService;
 
-    public AuthenticationInterceptor(
-        OAuthService oAuthService) {
+    public AuthenticationInterceptor(OAuthService oAuthService) {
         this.oAuthService = oAuthService;
     }
 
@@ -23,7 +22,8 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
     public boolean preHandle(
         HttpServletRequest request,
         HttpServletResponse response,
-        Object handler) throws Exception {
+        Object handler
+    ) throws Exception {
         if (isPreflightRequest(request)) {
             return true;
         }

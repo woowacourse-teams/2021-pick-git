@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { setDesktopMediaQuery, setLaptopMediaQuery } from "../../@styled/mediaQueries";
 
 export const Container = styled.div`
@@ -44,12 +44,7 @@ export const GridItem = styled.div<{ imageUrl: string }>`
   }
 `;
 
-export const Empty = styled.div`
+export const NotFoundCSS = css`
+  margin: 3rem auto;
   width: 100%;
-  height: 100vh;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
 `;

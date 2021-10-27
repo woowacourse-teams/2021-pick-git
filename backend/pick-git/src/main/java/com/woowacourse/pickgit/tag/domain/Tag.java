@@ -49,7 +49,7 @@ public class Tag {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!(o instanceof Tag)) {
             return false;
         }
         Tag tag = (Tag) o;

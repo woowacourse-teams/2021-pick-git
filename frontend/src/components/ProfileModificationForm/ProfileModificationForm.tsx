@@ -4,14 +4,14 @@ import { ThemeContext } from "styled-components";
 import { CameraIcon } from "../../assets/icons";
 import { LIMIT } from "../../constants/limits";
 import SnackBarContext from "../../contexts/SnackbarContext";
-import useMessageModal from "../../services/hooks/@common/useMessageModal";
-import useProfileModificationForm from "../../services/hooks/useProfileModificationForm";
-import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
-import PageLoading from "../@layout/PageLoading/PageLoading";
+import useModal from "../../hooks/common/useModal";
+import useProfileModificationForm from "../../hooks/service/useProfileModificationForm";
+import AlertPortal from "../@layout/AlertPortal/AlertPortal";
+import PageLoadingWithCover from "../@layout/PageLoadingWithCover/PageLoadingWithCover";
 import Avatar from "../@shared/Avatar/Avatar";
 import Button from "../@shared/Button/Button";
-import TextEditor from "../@shared/TextEditor/TextEditor";
-import { Container, Heading, Label, TextEditorWrapper } from "./ProfileModificationForm.style";
+import PostTextEditor from "../PostTextEditor/PostTextEditor";
+import { Container, Heading, Label, TextEditorCSS, TextEditorWrapper } from "./ProfileModificationForm.style";
 
 export interface Props {
   username: string;
@@ -22,24 +22,20 @@ export interface Props {
 
 const ProfileModificationForm = ({ username, profileImageUrl, prevDescription, onTerminate }: Props) => {
   const theme = useContext(ThemeContext);
-  const { pushSnackbarMessage } = useContext(SnackBarContext);
-  const { modalMessage, isModalShown, hideMessageModal, showAlertModal } = useMessageModal();
+  const {
+    modalMessage: alertMessage,
+    isModalShown: isAlertShown,
+    hideModal: hideAlert,
+    showModal: showAlert,
+  } = useModal();
   const { values, handlers, isLoading } = useProfileModificationForm(
     username,
     { imageUrl: profileImageUrl, description: prevDescription },
-    showAlertModal,
+    showAlert,
     onTerminate
   );
   const { imageUrl, description } = values;
   const { handleImageChange, handleDescriptionChange, handleModificationSubmit } = handlers;
-
-  if (isLoading) {
-    return (
-      <Container>
-        <PageLoading />
-      </Container>
-    );
-  }
 
   return (
     <Container onSubmit={handleModificationSubmit}>
@@ -56,21 +52,18 @@ const ProfileModificationForm = ({ username, profileImageUrl, prevDescription, o
         />
       </Label>
       <TextEditorWrapper>
-        <TextEditor
-          height="100%"
-          fontSize="1rem"
+        <PostTextEditor
+          cssProp={TextEditorCSS}
           placeholder="한 줄 소개"
           maxLength={LIMIT.PROFILE_DESCRIPTION_LENGTH}
           value={description}
           onChange={handleDescriptionChange}
+          autoGrow={false}
         />
       </TextEditorWrapper>
-      <Button kind="roundedBlock" padding="0.875rem">
-        수정 완료
-      </Button>
-      {isModalShown && (
-        <MessageModalPortal heading={modalMessage} onConfirm={hideMessageModal} onClose={hideMessageModal} />
-      )}
+      <Button kind="roundedBlock">수정 완료</Button>
+      {isAlertShown && <AlertPortal heading={alertMessage} onOkay={hideAlert} />}
+      {isLoading && <PageLoadingWithCover description="수정중" />}
     </Container>
   );
 };

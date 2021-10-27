@@ -1,69 +1,49 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { CSSProp } from "styled-components";
 
-import { Container, TextArea, TextLengthIndicator } from "./TextEditor.style";
+import { TextArea } from "./TextEditor.style";
 
-export interface Props {
-  width?: string;
-  height?: string;
-  fontSize?: string;
-  autoGrow?: boolean;
-  lineHeight?: string;
-  placeholder?: string;
-  maxLength?: number;
+export interface TextEditorProps extends React.HTMLAttributes<HTMLTextAreaElement> {
   value: string;
-  onChange: React.ChangeEventHandler<HTMLTextAreaElement>;
+  autoGrow: boolean;
+  cssProp?: CSSProp;
+  disabled?: boolean;
 }
 
-const TEXT_EDITOR_LINE_HEIGHT = 1.2;
+const TextEditor = ({ value, cssProp, autoGrow, ...props }: TextEditorProps) => {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-const TextEditor = ({
-  width,
-  height,
-  lineHeight,
-  fontSize = "1rem",
-  autoGrow = false,
-  placeholder,
-  maxLength,
-  value,
-  onChange,
-}: Props) => {
-  const [currentHeight, setCurrentHeight] = useState("");
-
-  const handleKeyUp: React.KeyboardEventHandler<HTMLTextAreaElement> = ({ key }) => {
-    if (!autoGrow) return;
-
-    if (key === "Enter" || key === "Backspace" || key === "Delete") {
-      const lineCount = (value ?? "").split("\n").length + 1;
-      const fontSizeNumber = fontSize.replace(/[^0-9]/g, "");
-      const fontSizeMeasure = fontSize.replace(/[0-9]/g, "");
-
-      setCurrentHeight(`${lineCount * Number(fontSizeNumber) * TEXT_EDITOR_LINE_HEIGHT}${fontSizeMeasure}`);
-    }
-  };
-
-  const handleChange: React.ChangeEventHandler<HTMLTextAreaElement> = (event) => {
-    if (maxLength && event.target.value.length > maxLength) {
+  const handleInput: React.KeyboardEventHandler<HTMLTextAreaElement> = (event) => {
+    if (!textareaRef.current) {
       return;
     }
 
-    onChange(event);
+    textareaRef.current.style.height = `auto`;
+    const { scrollHeight } = event.currentTarget;
+    textareaRef.current.style.height = `${scrollHeight}px`;
   };
 
+  useEffect(() => {
+    if (!textareaRef.current) {
+      return;
+    }
+
+    textareaRef.current.dispatchEvent(
+      new Event("input", {
+        bubbles: true,
+      })
+    );
+  }, []);
+
   return (
-    <Container height={currentHeight} minHeight={height}>
-      <TextArea
-        width={width}
-        minHeight={height}
-        height={currentHeight}
-        lineHeight={lineHeight}
-        placeholder={placeholder}
-        value={value}
-        onChange={handleChange}
-        onKeyUp={handleKeyUp}
-        fontSize={fontSize}
-      />
-      {maxLength && <TextLengthIndicator>{`${value.length} / ${maxLength}`}</TextLengthIndicator>}
-    </Container>
+    <TextArea
+      value={value}
+      cssProp={cssProp}
+      ref={textareaRef}
+      onInput={autoGrow ? handleInput : undefined}
+      autoGrow={autoGrow}
+      {...props}
+    />
   );
 };
 

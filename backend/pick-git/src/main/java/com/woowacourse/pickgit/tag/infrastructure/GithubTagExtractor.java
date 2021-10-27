@@ -9,21 +9,26 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class GithubTagExtractor implements PlatformTagExtractor {
 
-    private static final String GITHUB_TAG_API_FORMAT
-        = "https://api.github.com/repos/%s/%s/languages";
+    private static final String OTHER_TAG = "Other";
 
     private final PlatformTagApiRequester platformTagApiRequester;
     private final ObjectMapper objectMapper;
+    private final String apiBaseUrl;
 
-    public GithubTagExtractor(PlatformTagApiRequester platformTagApiRequester,
-        ObjectMapper objectMapper) {
+    public GithubTagExtractor(
+        PlatformTagApiRequester platformTagApiRequester,
+        ObjectMapper objectMapper,
+        @Value("${security.github.url.api}") String apiBaseUrl
+    ) {
         this.platformTagApiRequester = platformTagApiRequester;
         this.objectMapper = objectMapper;
+        this.apiBaseUrl = apiBaseUrl;
     }
 
     public List<String> extractTags(String accessToken, String userName, String repositoryName) {
@@ -33,7 +38,8 @@ public class GithubTagExtractor implements PlatformTagExtractor {
     }
 
     private String generateApiUrl(String userName, String repositoryName) {
-        return String.format(GITHUB_TAG_API_FORMAT, userName, repositoryName);
+        String url = apiBaseUrl + "/repos/%s/%s/languages";
+        return String.format(url, userName, repositoryName);
     }
 
     private List<String> parseResponseIntoLanguageTags(String response) {
@@ -42,6 +48,7 @@ public class GithubTagExtractor implements PlatformTagExtractor {
                 .readValue(response, new TypeReference<LinkedHashMap<String, String>>() {
                 })
                 .keySet();
+            tags.remove(OTHER_TAG);
             return new ArrayList<>(tags);
         } catch (JsonProcessingException e) {
             throw new PlatformHttpErrorException();

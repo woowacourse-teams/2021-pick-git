@@ -1,58 +1,84 @@
-import { useEffect, useState } from "react";
-import { InfiniteData } from "react-query";
+import { InfiniteData, QueryKey } from "react-query";
 import { useLocation } from "react-router-dom";
 
-import { Post } from "../../@types";
-import useSearchPostData from "../../services/hooks/useSearchPostData";
-import { LayoutInPx } from "../../constants/layout";
-import PageLoading from "../../components/@layout/PageLoading/PageLoading";
-import { Container } from "./SearchPostResultPage.style";
-import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
+import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
+import PageError from "../../components/@shared/PageError/PageError";
+import { ScrollPageWrapper } from "../../components/@styled/layout";
 import Feed from "../../components/Feed/Feed";
+
+import { QUERY } from "../../constants/queries";
+
+import useInfiniteImagePreloader from "../../hooks/common/useInfiniteImagePreloader";
+import useSearchPostData from "../../hooks/service/useSearchPostData";
+
+import { Container } from "./SearchPostResultPage.style";
+
+import type { Post } from "../../@types";
+import useAutoAnchor from "../../hooks/common/useAutoAnchor";
+import { useState } from "react";
 
 interface LocationState {
   prevData?: InfiniteData<Post[]>;
   postId?: string;
+  queryKey?: QueryKey;
 }
 
 const SearchPostResultPage = () => {
-  const [isMountedOnce, setIsMountedOnce] = useState(false);
-  const type = new URLSearchParams(location.search).get("type");
   const {
-    state: { prevData, postId },
+    state: { postId },
   } = useLocation<LocationState>();
 
-  const { infinitePostsData, isError, isLoading, isFetchingNextPage, handleIntersect, queryKey } = useSearchPostData(
+  const params = new URLSearchParams(location.search);
+  const type = params.get("type") ?? "tags";
+  const keyword = params.get("keyword") ?? "";
+
+  const [currentPostId, setCurrentPostId] = useState<Post["id"]>(Number(postId) ?? -1);
+
+  const {
+    infinitePostsData,
+    isError,
+    isLoading,
+    isFetchingNextPage,
+    handleIntersect: handlePostsEndIntersect,
+  } = useSearchPostData({
+    keyword,
     type,
-    prevData
-  );
+    activated: true,
+  });
+  const { scrollWrapperRef } = useAutoAnchor(`#post${currentPostId}`);
 
-  useEffect(() => {
-    if (!isMountedOnce) {
-      setIsMountedOnce(true);
-    }
+  const infiniteImageUrls =
+    infinitePostsData?.pages.map(
+      (posts) => posts?.reduce<string[]>((acc, post) => [...acc, ...post.imageUrls], []) ?? []
+    ) ?? [];
+  const { isFirstImagesLoading, isImagesFetching, activateImageFetchingState } =
+    useInfiniteImagePreloader(infiniteImageUrls);
 
-    const $targetPost = document.querySelector(`#post${postId}`);
+  const handleIntersect = () => {
+    handlePostsEndIntersect();
+    activateImageFetchingState();
+  };
 
-    if ($targetPost && $targetPost instanceof HTMLElement) {
-      window.scrollTo(0, $targetPost.offsetTop - LayoutInPx.HEADER_HEIGHT);
-    }
-  }, [postId, isMountedOnce]);
-
-  if (isLoading) {
-    return <PageLoading />;
+  if (isLoading || isFirstImagesLoading) {
+    return <PageLoadingWithLogo />;
   }
 
   if (isError || !infinitePostsData) {
-    return <div>피드를 가져올 수 없습니다.</div>;
+    return <PageError errorMessage="피드를 가져올 수 없습니다." />;
   }
 
   return (
-    <Container>
-      <InfiniteScrollContainer isLoaderShown={isFetchingNextPage} onIntersect={handleIntersect}>
-        <Feed infinitePostsData={infinitePostsData} queryKey={queryKey} />
-      </InfiniteScrollContainer>
-    </Container>
+    <ScrollPageWrapper ref={scrollWrapperRef}>
+      <Container>
+        <Feed
+          infinitePostsData={infinitePostsData}
+          onIntersect={handleIntersect}
+          queryKey={[QUERY.GET_SEARCH_POST_RESULT, { type, keyword }]}
+          isFetching={isFetchingNextPage || isImagesFetching}
+          setCurrentPostId={setCurrentPostId}
+        />
+      </Container>
+    </ScrollPageWrapper>
   );
 };
 

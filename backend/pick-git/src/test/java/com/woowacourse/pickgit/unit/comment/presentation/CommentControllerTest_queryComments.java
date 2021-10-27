@@ -20,40 +20,19 @@ import static org.springframework.restdocs.request.RequestDocumentation.requestP
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
-import com.woowacourse.pickgit.comment.application.CommentService;
 import com.woowacourse.pickgit.comment.application.dto.request.QueryCommentRequestDto;
 import com.woowacourse.pickgit.comment.application.dto.response.CommentResponseDto;
 import com.woowacourse.pickgit.comment.domain.Comment;
-import com.woowacourse.pickgit.comment.presentation.CommentController;
 import com.woowacourse.pickgit.common.factory.UserFactory;
+import com.woowacourse.pickgit.unit.ControllerTest;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-@AutoConfigureRestDocs
-@WebMvcTest(CommentController.class)
-public class CommentControllerTest_queryComments {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private CommentService commentService;
-
-    @MockBean
-    private OAuthService oAuthService;
-
-    private ObjectMapper objectMapper = new ObjectMapper();
+public class CommentControllerTest_queryComments extends ControllerTest { ;
 
     @DisplayName("사용자는 특정 Post의 Comment를 요청할 수 있다.")
     @Test
@@ -76,7 +55,7 @@ public class CommentControllerTest_queryComments {
         verify(commentService, times(1))
             .queryComments(any(QueryCommentRequestDto.class));
 
-        createDocument("comment-queryComments-loginMember", true, perform);
+        createDocument("comment-queryComments-user", true, perform);
     }
 
     @DisplayName("게스트는 특정 Post의 Comment를 요청할 수 있다.")

@@ -1,32 +1,36 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, lazy } from "react";
 import { BrowserRouter, Route, Redirect, Switch } from "react-router-dom";
 
 import { PAGE_URL } from "./constants/urls";
-import LoginPage from "./pages/LoginPage/LoginPage";
-import NavigationHeader from "./components/@layout/NavigationHeader/NavigationHeader";
-import HomeFeedPage from "./pages/HomeFeedPage/HomeFeedPage";
-import ProfilePage from "./pages/ProfilePage/ProfilePage";
-import AuthLoginProcessingPage from "./pages/AuthLoginProcessingPage/AuthLoginProcessingPage";
-import PostAddStepHeader from "./components/PostAddStepHeader/PostAddStepHeader";
-import AddPostPage from "./pages/AddPostPage/AddPostPage";
-import { PostAddDataContextProvider } from "./contexts/PostAddDataContext";
-import UserFeedPage from "./pages/UserFeedPage/UserFeedPage";
-import TagFeedPage from "./pages/TagFeedPage/TagFeedPage";
-import SearchPage from "./pages/SearchPage/SearchPage";
-import SearchHeader from "./components/@layout/SearchHeader/SearchHeader";
-import UserContext from "./contexts/UserContext";
+import { SUCCESS_MESSAGE } from "./constants/messages";
 import { getAccessToken } from "./storage/storage";
 import { requestGetSelfProfile } from "./services/requests";
+
+import { PostAddDataContextProvider } from "./contexts/PostAddDataContext";
+import UserContext from "./contexts/UserContext";
 import SnackBarContext from "./contexts/SnackbarContext";
-import { SUCCESS_MESSAGE } from "./constants/messages";
-import EditPostPage from "./pages/EditPostPage/EditPostPage";
 import { PostEditStepContextProvider } from "./contexts/PostEditStepContext";
-import SearchPostResultPage from "./pages/SearchPostResultPage/SearchPostResultPage";
-import FollowingList from "./pages/FollowingUserListPage/FollowingList";
-import FollowerList from "./pages/FollowerList/FollowerList";
-import OneDepthStepHeader from "./components/OneDepthStepHeader/OneDepthStepHeader";
-import CommentsPage from "./pages/CommentsPage/CommentsPage";
-import PostLikePeoplePage from "./pages/PostLikePeoplePage/PostLikePeoplePage";
+import MyPortfolioPage from "./pages/PortfolioPage/MyPortfolioPage";
+
+const NavigationHeader = lazy(() => import("./components/@layout/NavigationHeader/NavigationHeader"));
+const OneDepthStepHeader = lazy(() => import("./components/OneDepthStepHeader/OneDepthStepHeader"));
+const PostAddStepHeader = lazy(() => import("./components/PostAddStepHeader/PostAddStepHeader"));
+const SearchHeader = lazy(() => import("./components/@layout/SearchHeader/SearchHeader"));
+
+const HomeFeedPage = lazy(() => import("./pages/HomeFeedPage/HomeFeedPage"));
+const UserFeedPage = lazy(() => import("./pages/UserFeedPage/UserFeedPage"));
+const SearchPage = lazy(() => import("./pages/SearchPage/SearchPage"));
+const SearchPostResultPage = lazy(() => import("./pages/SearchPostResultPage/SearchPostResultPage"));
+const LoginPage = lazy(() => import("./pages/LoginPage/LoginPage"));
+const AuthLoginProcessingPage = lazy(() => import("./pages/AuthLoginProcessingPage/AuthLoginProcessingPage"));
+const ProfilePage = lazy(() => import("./pages/ProfilePage/ProfilePage"));
+const FollowingListPage = lazy(() => import("./pages/FollowingListPage/FollowingListPage"));
+const FollowerListPage = lazy(() => import("./pages/FollowerListPage/FollowerListPage"));
+const AddPostPage = lazy(() => import("./pages/AddPostPage/AddPostPage"));
+const EditPostPage = lazy(() => import("./pages/EditPostPage/EditPostPage"));
+const CommentsPage = lazy(() => import("./pages/CommentsPage/CommentsPage"));
+const PostLikePeoplePage = lazy(() => import("./pages/PostLikePeoplePage/PostLikePeoplePage"));
+const PortfolioPage = lazy(() => import("./pages/PortfolioPage/PortfolioPage"));
 
 const App = () => {
   const { currentUsername, login, logout } = useContext(UserContext);
@@ -76,12 +80,6 @@ const App = () => {
         <Route exact path={[PAGE_URL.HOME, PAGE_URL.HOME_FEED]}>
           <HomeFeedPage />
         </Route>
-        <Route exact path={PAGE_URL.USER_FEED_BASE}>
-          <UserFeedPage />
-        </Route>
-        <Route exact path={PAGE_URL.TAG_FEED_BASE}>
-          <TagFeedPage />
-        </Route>
         <Route exact path={PAGE_URL.SEARCH}>
           <SearchPage />
         </Route>
@@ -100,11 +98,14 @@ const App = () => {
         <Route path={PAGE_URL.PROFILE}>
           <ProfilePage isMyProfile={false} />
         </Route>
+        <Route exact path={PAGE_URL.USER_FEED_BASE}>
+          <UserFeedPage />
+        </Route>
         <Route path={PAGE_URL.FOLLOWINGS_BASE}>
-          <FollowingList />
+          <FollowingListPage />
         </Route>
         <Route path={PAGE_URL.FOLLOWERS_BASE}>
-          <FollowerList />
+          <FollowerListPage />
         </Route>
         <Route path={PAGE_URL.ADD_POST}>
           <PostAddDataContextProvider>
@@ -116,11 +117,17 @@ const App = () => {
             <EditPostPage />
           </PostEditStepContextProvider>
         </Route>
-        <Route path={PAGE_URL.POST_COMMENTS}>
+        <Route path={PAGE_URL.POST_DETAIL}>
           <CommentsPage />
         </Route>
         <Route path={PAGE_URL.POST_LIKE_PEOPLE}>
           <PostLikePeoplePage />
+        </Route>
+        <Route path={PAGE_URL.PORTFOLIO}>
+          <PortfolioPage />
+        </Route>
+        <Route path={PAGE_URL.MY_PORTFOLIO}>
+          <MyPortfolioPage />
         </Route>
         <Redirect to="/" />
       </Switch>

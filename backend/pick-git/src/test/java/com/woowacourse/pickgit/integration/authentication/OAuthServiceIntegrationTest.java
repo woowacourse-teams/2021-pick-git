@@ -2,7 +2,6 @@ package com.woowacourse.pickgit.integration.authentication;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.given;
 
 import com.woowacourse.pickgit.authentication.application.JwtTokenProvider;
 import com.woowacourse.pickgit.authentication.application.OAuthService;
@@ -14,34 +13,45 @@ import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.authentication.infrastructure.JwtTokenProviderImpl;
-import com.woowacourse.pickgit.authentication.infrastructure.dao.CollectionOAuthAccessTokenDao;
+import com.woowacourse.pickgit.authentication.infrastructure.dao.RedisOAuthAccessTokenDao;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
+import com.woowacourse.pickgit.integration.IntegrationTest;
 import com.woowacourse.pickgit.user.domain.User;
-import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.domain.repository.UserRepository;
+import com.woowacourse.pickgit.user.domain.search.UserSearchEngine;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 @Import(InfrastructureTestConfiguration.class)
-@DataJpaTest
+@Transactional
+@SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @ActiveProfiles("test")
-class OAuthServiceIntegrationTest {
+class OAuthServiceIntegrationTest extends IntegrationTest {
 
     private static final String SECRET_KEY = "secret-key";
     private static final Long EXPIRATION_TIME_IN_MILLISECONDS = 3600000L;
 
-    @Mock
-    private OAuthClient oAuthClient;
-
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserSearchEngine userSearchEngine;
+
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+
+    @Autowired
+    private OAuthClient oAuthClient;
 
     private JwtTokenProvider jwtTokenProvider;
 
@@ -55,12 +65,13 @@ class OAuthServiceIntegrationTest {
             SECRET_KEY,
             EXPIRATION_TIME_IN_MILLISECONDS
         );
-        this.oAuthAccessTokenDao = new CollectionOAuthAccessTokenDao();
+        this.oAuthAccessTokenDao = new RedisOAuthAccessTokenDao(redisTemplate);
         this.oAuthService = new OAuthService(
             oAuthClient,
             jwtTokenProvider,
             oAuthAccessTokenDao,
-            userRepository
+            userRepository,
+            userSearchEngine
         );
     }
 
@@ -68,8 +79,6 @@ class OAuthServiceIntegrationTest {
     @Test
     void getGithubAuthorizationUrl_Anonymous_ReturnGithubAuthorizationUrl() {
         // mock
-        given(oAuthClient.getLoginUrl())
-            .willReturn("https://github.com/login/oauth/authorize?");
 
         // when
         String githubAuthorizationUrl =
@@ -84,19 +93,13 @@ class OAuthServiceIntegrationTest {
     @Test
     void createToken_Signup_SaveUserProfile() {
         // given
-        String code = "oauth authorization code";
+        String code = "binghe";
         String oauthAccessToken = "oauth access token";
         OAuthProfileResponse oAuthProfileResponse = OAuthProfileResponse.builder()
             .name("binghe")
             .image("image")
             .githubUrl("github.com/")
             .build();
-
-        // mock
-        given(oAuthClient.getAccessToken(code))
-            .willReturn(oauthAccessToken);
-        given(oAuthClient.getGithubProfile(oauthAccessToken))
-            .willReturn(oAuthProfileResponse);
 
         // when
         TokenDto token = oAuthService.createToken(code);
@@ -108,15 +111,15 @@ class OAuthServiceIntegrationTest {
         User user = userRepository.findByBasicProfile_Name(token.getUsername()).orElse(null);
         assertThat(user).isNotNull();
         assertThat(user.getName()).isEqualTo("binghe");
-        assertThat(user.getImage()).isEqualTo("image");
-        assertThat(user.getGithubUrl()).isEqualTo("github.com/");
+        assertThat(user.getImage()).isEqualTo("https://github.com/testImage.jpg");
+        assertThat(user.getGithubUrl()).isEqualTo("https://github.com/binghe");
     }
 
     @DisplayName("로그인(첫 로그인이 아닌경우)시 Github Profile을 가져와서 DB에 저장된 기존 정보를 update한다.")
     @Test
     void createToken_Signup_UpdateUserProfile() {
         // given
-        String code = "oauth authorization code";
+        String code = "binghe";
         String oauthAccessToken = "oauth access token";
         OAuthProfileResponse previousOAuthProfileResponse = OAuthProfileResponse.builder()
             .name("binghe")
@@ -135,11 +138,6 @@ class OAuthServiceIntegrationTest {
             .company("@woowabros")
             .build();
 
-        // mock
-        given(oAuthClient.getAccessToken(code)).willReturn(oauthAccessToken);
-        given(oAuthClient.getGithubProfile(oauthAccessToken))
-            .willReturn(changedOAuthProfileResponse);
-
         // when
         TokenDto token = oAuthService.createToken(code);
 
@@ -151,8 +149,8 @@ class OAuthServiceIntegrationTest {
         assertThat(user).isNotNull();
         assertThat(user.getName()).isEqualTo("binghe");
         assertThat(user.getImage()).isEqualTo("image");
-        assertThat(user.getGithubUrl()).isEqualTo("github.com/");
-        assertThat(user.getCompany()).isEqualTo("@woowabros");
+        assertThat(user.getGithubUrl()).isEqualTo("https://github.com/binghe");
+        assertThat(user.getCompany()).isEqualTo("testCompany");
     }
 
     @DisplayName("JWT 토큰을 통해 AccessTokenDB에서 LoginUser에 대한 정보를 가져온다.")
@@ -195,9 +193,7 @@ class OAuthServiceIntegrationTest {
 
         // then
         assertThat(appUser).isInstanceOf(GuestUser.class);
-        assertThatThrownBy(() -> appUser.getUsername())
-            .isInstanceOf(UnauthorizedException.class);
-        assertThatThrownBy(() -> appUser.getAccessToken())
-            .isInstanceOf(UnauthorizedException.class);
+        assertThatThrownBy(appUser::getUsername).isInstanceOf(UnauthorizedException.class);
+        assertThatThrownBy(appUser::getAccessToken).isInstanceOf(UnauthorizedException.class);
     }
 }

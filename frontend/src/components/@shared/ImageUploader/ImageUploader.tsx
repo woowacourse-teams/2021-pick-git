@@ -1,16 +1,29 @@
-import { useRef } from "react";
+import { RefObject, useRef } from "react";
+import { CSSProp } from "styled-components";
 import defaultImage from "../../../assets/images/default-image.png";
 import { Container, Image } from "./ImageUploader.style";
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   defaultImageSrc?: string;
+  imageUploaderRef?: RefObject<HTMLImageElement>;
   onFileListSave: (fileList: FileList) => void;
+  cssProp?: CSSProp;
 }
 
-const ImageUploader = ({ defaultImageSrc = defaultImage, onFileListSave, ...props }: Props) => {
+const ImageUploader = ({
+  defaultImageSrc = defaultImage,
+  imageUploaderRef,
+  onFileListSave,
+  cssProp,
+  ...props
+}: Props) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageUpload = () => {
+    if (!fileInputRef.current) {
+      alert("hey!!!");
+    }
+
     fileInputRef.current?.click();
   };
 
@@ -23,12 +36,12 @@ const ImageUploader = ({ defaultImageSrc = defaultImage, onFileListSave, ...prop
   };
 
   return (
-    <Container {...props}>
-      <Image src={defaultImageSrc} onClick={handleImageUpload} />
+    <Container {...props} cssProp={cssProp}>
+      <Image src={defaultImageSrc} onClick={handleImageUpload} ref={imageUploaderRef} />
       <input
         type="file"
         multiple
-        accept=".jpg, .png, .jpeg, tiff"
+        accept=".jpg, .png, .jpeg, tiff, .gif"
         style={{ display: "none" }}
         ref={fileInputRef}
         onChange={handleFileSave}

@@ -10,7 +10,7 @@ import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.like.Like;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.user.domain.User;
-import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.domain.repository.UserRepository;
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnitUtil;
@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Import;
 
 @Import(JpaTestConfiguration.class)
 @DataJpaTest
-public class PostRepositoryTest_likeUsers {
+class PostRepositoryTest_likeUsers {
 
     @Autowired
     private PostRepository postRepository;

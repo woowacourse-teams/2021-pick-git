@@ -12,7 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 class SearchTypesTest {
 
@@ -63,7 +63,7 @@ class SearchTypesTest {
             }
 
             @Override
-            public List<Post> search(String[] keywords, PageRequest pageRequest) {
+            public List<Post> search(String keywords, Pageable pageRequest) {
                 return List.of(post);
             }
         };

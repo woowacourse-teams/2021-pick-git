@@ -6,16 +6,23 @@ public class OAuthAccessTokenResponse {
 
     @JsonProperty("access_token")
     private String accessToken;
+
     @JsonProperty("token_type")
     private String tokenType;
+
     private String scope;
+
     private String bearer;
 
-    public OAuthAccessTokenResponse() {
+    private OAuthAccessTokenResponse() {
     }
 
-    public OAuthAccessTokenResponse(String accessToken, String tokenType, String scope,
-        String bearer) {
+    public OAuthAccessTokenResponse(
+        String accessToken,
+        String tokenType,
+        String scope,
+        String bearer
+    ) {
         this.accessToken = accessToken;
         this.tokenType = tokenType;
         this.scope = scope;

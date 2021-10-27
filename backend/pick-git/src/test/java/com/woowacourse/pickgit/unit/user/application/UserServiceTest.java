@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -16,7 +15,6 @@ import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
-import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.user.DuplicateFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidFollowException;
 import com.woowacourse.pickgit.exception.user.InvalidUserException;
@@ -24,27 +22,28 @@ import com.woowacourse.pickgit.exception.user.SameSourceTargetUserException;
 import com.woowacourse.pickgit.user.application.UserService;
 import com.woowacourse.pickgit.user.application.dto.request.AuthUserForUserRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.FollowRequestDto;
-import com.woowacourse.pickgit.user.application.dto.request.FollowSearchRequestDto;
-import com.woowacourse.pickgit.user.application.dto.request.ProfileEditRequestDto;
 import com.woowacourse.pickgit.user.application.dto.request.ProfileImageEditRequestDto;
-import com.woowacourse.pickgit.user.application.dto.request.UserSearchRequestDto;
 import com.woowacourse.pickgit.user.application.dto.response.ContributionResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.FollowResponseDto;
-import com.woowacourse.pickgit.user.application.dto.response.ProfileEditResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.ProfileImageEditResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
-import com.woowacourse.pickgit.user.domain.Contribution;
-import com.woowacourse.pickgit.user.domain.PlatformContributionCalculator;
 import com.woowacourse.pickgit.user.domain.User;
-import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.domain.repository.UserRepository;
 import com.woowacourse.pickgit.user.domain.follow.PlatformFollowingRequester;
 import com.woowacourse.pickgit.user.domain.profile.PickGitProfileStorage;
+import com.woowacourse.pickgit.user.domain.search.UserSearchEngine;
+import com.woowacourse.pickgit.user.domain.contribution.Contribution;
+import com.woowacourse.pickgit.user.domain.contribution.ContributionCategory;
+import com.woowacourse.pickgit.user.domain.contribution.PlatformContributionCalculator;
+import com.woowacourse.pickgit.user.presentation.dto.UserAssembler;
 import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -55,7 +54,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -65,6 +63,9 @@ class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private UserSearchEngine userSearchEngine;
 
     @Mock
     private PickGitProfileStorage pickGitProfileStorage;
@@ -121,7 +122,7 @@ class UserServiceTest {
 
                 // when, then
                 assertThatCode(() -> userService.getMyUserProfile(requestDto))
-                    .isInstanceOf(UnauthorizedException.class);
+                    .isInstanceOf(InvalidUserException.class);
             }
         }
     }
@@ -314,7 +315,7 @@ class UserServiceTest {
 
                 // when, then
                 assertThatCode(() -> userService.followUser(requestDto))
-                    .isInstanceOf(UnauthorizedException.class);
+                    .isInstanceOf(InvalidUserException.class);
             }
         }
 
@@ -579,7 +580,7 @@ class UserServiceTest {
 
                 // when, then
                 assertThatCode(() -> userService.unfollowUser(requestDto))
-                    .isInstanceOf(UnauthorizedException.class);
+                    .isInstanceOf(InvalidUserException.class);
             }
         }
 
@@ -839,7 +840,8 @@ class UserServiceTest {
         @Test
         void editProfileImage_WithImage_Success() throws IOException {
             // given
-            AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
+            AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto(
+                "testUser");
             File imageFile = FileFactory.getTestImage1File();
             byte[] imageSource = new FileInputStream(imageFile).readAllBytes();
 
@@ -875,7 +877,8 @@ class UserServiceTest {
         @Test
         void editProfileDescription_WithDescription_SuccesS() {
             // given
-            AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
+            AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto(
+                "testUser");
             String description = "updated description";
 
             // mock
@@ -893,67 +896,6 @@ class UserServiceTest {
         }
     }
 
-
-    @DisplayName("자신의 프로필(이미지, 한 줄 소개 포함)을 수정할 수 있다.")
-    @Test
-    void editUserProfile_WithImageAndDescription_Success() {
-        // given
-        MultipartFile image = FileFactory.getTestImage1();
-        String updatedDescription = "updated description";
-        AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
-
-        // mock
-        given(userRepository.findByBasicProfile_Name("testUser"))
-            .willReturn(Optional.of(UserFactory.user(1L, "testUser")));
-        given(pickGitProfileStorage.store(any(File.class), anyString()))
-            .willReturn(Optional.ofNullable(image.getName()));
-
-        // when
-        ProfileEditRequestDto profileEditRequestDto = ProfileEditRequestDto
-            .builder()
-            .image(image)
-            .decription(updatedDescription)
-            .build();
-        ProfileEditResponseDto responseDto =
-            userService.editProfile(authUserRequestDto, profileEditRequestDto);
-
-        // then
-        assertThat(responseDto.getImageUrl()).isEqualTo(image.getName());
-        assertThat(responseDto.getDescription()).isEqualTo(updatedDescription);
-        verify(userRepository, times(1))
-            .findByBasicProfile_Name("testUser");
-        verify(pickGitProfileStorage, times(1))
-            .store(any(File.class), anyString());
-    }
-
-    @DisplayName("자신의 프로필(한 줄 소개만 포함)을 수정할 수 있다.")
-    @Test
-    void editUserProfile_WithDescription_Success() {
-        // given
-        User user = UserFactory.user(1L, "testUser");
-        String updatedDescription = "updated descrption";
-        AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("testUser");
-
-        // mock
-        given(userRepository.findByBasicProfile_Name("testUser"))
-            .willReturn(Optional.of(user));
-
-        // when
-        ProfileEditRequestDto profileEditRequestDto = ProfileEditRequestDto
-            .builder()
-            .image(FileFactory.getEmptyTestFile())
-            .decription(updatedDescription)
-            .build();
-        ProfileEditResponseDto responseDto =
-            userService.editProfile(authUserRequestDto, profileEditRequestDto);
-
-        // then
-        assertThat(responseDto.getImageUrl()).isEqualTo(user.getImage());
-        assertThat(responseDto.getDescription()).isEqualTo(updatedDescription);
-        verify(userRepository, times(1))
-            .findByBasicProfile_Name(user.getName());
-    }
-
     @DisplayName("로그인 - 저장된 유저중 유사한 이름을 가진 유저를 검색한다. (팔로잉한 여부 boolean)")
     @Test
     void searchUser_LoginUser_Success() {
@@ -964,16 +906,11 @@ class UserServiceTest {
         List<User> usersInDb = UserFactory.mockSearchUsersWithId();
         User loginUser = usersInDb.get(0);
         List<User> searchedUser = usersInDb.subList(1, usersInDb.size());
-        UserSearchRequestDto userSearchRequestDto = UserSearchRequestDto
-            .builder()
-            .keyword(searchKeyword)
-            .page(0L)
-            .limit(5L)
-            .build();
-        AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto(loginUser.getName());
+        AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto(
+            loginUser.getName());
 
         // mock
-        given(userRepository.searchByUsernameLike(searchKeyword, PageRequest.of(page, limit)))
+        given(userSearchEngine.searchByUsernameLike(searchKeyword, PageRequest.of(page, limit)))
             .willReturn(searchedUser);
         given(userRepository.findByBasicProfile_Name(loginUser.getName()))
             .willReturn(Optional.ofNullable(loginUser));
@@ -981,7 +918,7 @@ class UserServiceTest {
         // when
         loginUser.follow(searchedUser.get(0));
         List<UserSearchResponseDto> searchResponses = userService
-            .searchUser(authUserRequestDto, userSearchRequestDto);
+            .searchUser(authUserRequestDto, searchKeyword, PageRequest.of(0, 5));
 
         // then
         assertThat(searchResponses).hasSize(4);
@@ -991,7 +928,7 @@ class UserServiceTest {
         assertThat(searchResponses)
             .extracting("following")
             .containsExactly(true, false, false, false);
-        verify(userRepository, times(1))
+        verify(userSearchEngine, times(1))
             .searchByUsernameLike(searchKeyword, PageRequest.of(page, limit));
         verify(userRepository, times(1)).findByBasicProfile_Name(loginUser.getName());
     }
@@ -1004,21 +941,15 @@ class UserServiceTest {
         int page = 0;
         int limit = 5;
         List<User> usersInDb = UserFactory.mockSearchUsersWithId();
-        UserSearchRequestDto userSearchRequestDto = UserSearchRequestDto
-            .builder()
-            .keyword(searchKeyword)
-            .page(0L)
-            .limit(5L)
-            .build();
         AuthUserForUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
 
         // mock
-        given(userRepository.searchByUsernameLike(searchKeyword, PageRequest.of(page, limit)))
+        given(userSearchEngine.searchByUsernameLike(searchKeyword, PageRequest.of(page, limit)))
             .willReturn(usersInDb);
 
         // when
         List<UserSearchResponseDto> searchResult =
-            userService.searchUser(authUserRequestDto, userSearchRequestDto);
+            userService.searchUser(authUserRequestDto, searchKeyword, PageRequest.of(0, 5));
 
         // then
         assertThat(searchResult).hasSize(5);
@@ -1028,7 +959,7 @@ class UserServiceTest {
         assertThat(searchResult)
             .extracting("following")
             .containsExactly(null, null, null, null, null);
-        verify(userRepository, times(1))
+        verify(userSearchEngine, times(1))
             .searchByUsernameLike(searchKeyword, PageRequest.of(page, limit));
         verify(userRepository, times(0)).findByBasicProfile_Name(anyString());
     }
@@ -1048,7 +979,12 @@ class UserServiceTest {
                 User user = UserFactory.user();
                 ContributionRequestDto requestDto = UserFactory.mockContributionRequestDto();
 
-                Contribution contribution = new Contribution(11, 48, 48, 48, 48);
+                Map<ContributionCategory, Integer> contributionMap = new EnumMap<>(ContributionCategory.class);
+                contributionMap.put(ContributionCategory.STAR, 11);
+                for (int i = 1; i < ContributionCategory.values().length; i++) {
+                    contributionMap.put(ContributionCategory.values()[i], 48);
+                }
+                Contribution contribution = new Contribution(contributionMap);
 
                 given(userRepository.findByBasicProfile_Name("testUser"))
                     .willReturn(Optional.of(user));
@@ -1106,12 +1042,6 @@ class UserServiceTest {
             void searchFollowings_Guest_FollowingNull() {
                 // given
                 AuthUserForUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
-                FollowSearchRequestDto followSearchRequestDto =
-                    FollowSearchRequestDto.builder()
-                        .username("target")
-                        .page(0L)
-                        .limit(3L)
-                        .build();
                 User target = UserFactory.user(1L, "target");
                 List<User> followings = List.of(
                     UserFactory.user(2L, "ala"),
@@ -1125,7 +1055,8 @@ class UserServiceTest {
 
                 // when
                 List<UserSearchResponseDto> response =
-                    userService.searchFollowings(authUserRequestDto, followSearchRequestDto);
+                    userService
+                        .searchFollowings(authUserRequestDto, "target", PageRequest.of(0, 3));
 
                 // then
                 assertThat(response)
@@ -1145,19 +1076,13 @@ class UserServiceTest {
             void searchFollowings_TargetNotExists_ExceptionThrown() {
                 // given
                 AuthUserForUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
-                FollowSearchRequestDto followSearchRequestDto =
-                    FollowSearchRequestDto.builder()
-                        .username("target")
-                        .page(0L)
-                        .limit(3L)
-                        .build();
-
                 given(userRepository.findByBasicProfile_Name("target"))
                     .willReturn(Optional.empty());
 
                 // when, then
                 assertThatCode(() ->
-                    userService.searchFollowings(authUserRequestDto, followSearchRequestDto)
+                    userService
+                        .searchFollowings(authUserRequestDto, "target", PageRequest.of(0, 10))
                 ).isInstanceOf(InvalidUserException.class);
 
                 // then
@@ -1173,13 +1098,8 @@ class UserServiceTest {
             @Test
             void searchFollowings_LoginUser_FollowingVarious() {
                 // given
-                AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("source");
-                FollowSearchRequestDto followSearchRequestDto =
-                    FollowSearchRequestDto.builder()
-                        .username("target")
-                        .page(0L)
-                        .limit(3L)
-                        .build();
+                AuthUserForUserRequestDto authUserRequestDto =
+                    createLoginAuthUserRequestDto("source");
                 User loginUser = UserFactory.user(4L, "source");
                 User target = UserFactory.user(1L, "target");
                 List<User> followings = List.of(
@@ -1198,7 +1118,8 @@ class UserServiceTest {
 
                 // when
                 List<UserSearchResponseDto> response =
-                    userService.searchFollowings(authUserRequestDto, followSearchRequestDto);
+                    userService
+                        .searchFollowings(authUserRequestDto, "target", PageRequest.of(0, 3));
 
                 // then
                 assertThat(response)
@@ -1219,20 +1140,15 @@ class UserServiceTest {
             @Test
             void searchFollowings_TargetNotExists_ExceptionThrown() {
                 // given
-                AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("source");
-                FollowSearchRequestDto followSearchRequestDto =
-                    FollowSearchRequestDto.builder()
-                        .username("target")
-                        .page(0L)
-                        .limit(3L)
-                        .build();
-
+                AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto(
+                    "source");
                 given(userRepository.findByBasicProfile_Name("target"))
                     .willReturn(Optional.empty());
 
                 // when, then
                 assertThatCode(() ->
-                    userService.searchFollowings(authUserRequestDto, followSearchRequestDto)
+                    userService
+                        .searchFollowings(authUserRequestDto, "target", PageRequest.of(0, 10))
                 ).isInstanceOf(InvalidUserException.class);
 
                 // then
@@ -1254,12 +1170,6 @@ class UserServiceTest {
             void searchFollowers_Guest_FollowingNull() {
                 // given
                 AuthUserForUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
-                FollowSearchRequestDto followSearchRequestDto =
-                    FollowSearchRequestDto.builder()
-                        .username("target")
-                        .page(0L)
-                        .limit(3L)
-                        .build();
                 User target = UserFactory.user(1L, "target");
                 List<User> followers = List.of(
                     UserFactory.user(2L, "ala"),
@@ -1273,7 +1183,8 @@ class UserServiceTest {
 
                 // when
                 List<UserSearchResponseDto> response =
-                    userService.searchFollowers(authUserRequestDto, followSearchRequestDto);
+                    userService
+                        .searchFollowers(authUserRequestDto, "target", PageRequest.of(0, 3));
 
                 // then
                 assertThat(response)
@@ -1293,19 +1204,12 @@ class UserServiceTest {
             void searchFollowers_TargetNotExists_ExceptionThrown() {
                 // given
                 AuthUserForUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
-                FollowSearchRequestDto followSearchRequestDto =
-                    FollowSearchRequestDto.builder()
-                        .username("target")
-                        .page(0L)
-                        .limit(3L)
-                        .build();
-
                 given(userRepository.findByBasicProfile_Name("target"))
                     .willReturn(Optional.empty());
 
                 // when, then
                 assertThatCode(() ->
-                    userService.searchFollowers(authUserRequestDto, followSearchRequestDto)
+                    userService.searchFollowers(authUserRequestDto, "target", PageRequest.of(0, 10))
                 ).isInstanceOf(InvalidUserException.class);
 
                 // then
@@ -1321,13 +1225,8 @@ class UserServiceTest {
             @Test
             void searchFollowers_LoginUser_FollowingVarious() {
                 // given
-                AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("source");
-                FollowSearchRequestDto followSearchRequestDto =
-                    FollowSearchRequestDto.builder()
-                        .username("target")
-                        .page(0L)
-                        .limit(3L)
-                        .build();
+                AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto(
+                    "source");
                 User loginUser = UserFactory.user(4L, "source");
                 User target = UserFactory.user(1L, "target");
                 List<User> followers = List.of(
@@ -1346,7 +1245,8 @@ class UserServiceTest {
 
                 // when
                 List<UserSearchResponseDto> response =
-                    userService.searchFollowers(authUserRequestDto, followSearchRequestDto);
+                    userService
+                        .searchFollowers(authUserRequestDto, "target", PageRequest.of(0, 3));
 
                 // then
                 assertThat(response)
@@ -1367,20 +1267,15 @@ class UserServiceTest {
             @Test
             void searchFollowers_TargetNotExists_ExceptionThrown() {
                 // given
-                AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto("source");
-                FollowSearchRequestDto followSearchRequestDto =
-                    FollowSearchRequestDto.builder()
-                        .username("target")
-                        .page(0L)
-                        .limit(3L)
-                        .build();
+                AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto(
+                    "source");
 
                 given(userRepository.findByBasicProfile_Name("target"))
                     .willReturn(Optional.empty());
 
                 // when, then
                 assertThatCode(() ->
-                    userService.searchFollowers(authUserRequestDto, followSearchRequestDto)
+                    userService.searchFollowers(authUserRequestDto, "target", PageRequest.of(0, 10))
                 ).isInstanceOf(InvalidUserException.class);
 
                 // then
@@ -1391,10 +1286,10 @@ class UserServiceTest {
 
     private AuthUserForUserRequestDto createLoginAuthUserRequestDto(String username) {
         AppUser appUser = new LoginUser(username, "Bearer testToken");
-        return AuthUserForUserRequestDto.from(appUser);
+        return UserAssembler.authUserForUserRequestDto(appUser);
     }
 
     private AuthUserForUserRequestDto createGuestAuthUserRequestDto() {
-        return AuthUserForUserRequestDto.from(new GuestUser());
+        return UserAssembler.authUserForUserRequestDto(new GuestUser());
     }
 }

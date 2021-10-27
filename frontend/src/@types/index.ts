@@ -1,3 +1,4 @@
+import { IconType } from "../components/@shared/SVGIcon/SVGIcon";
 import { clientErrorCodeName, httpErrorStatus, httpErrorStatusName } from "../constants/error";
 import { API_ERROR_MESSAGE, CLIENT_ERROR_MESSAGE } from "../constants/messages";
 
@@ -55,7 +56,7 @@ export interface Post {
   authorName: string;
   profileImageUrl: string;
   likesCount: number;
-  tags: [];
+  tags: string[];
   createdAt: string;
   updatedAt: string;
   comments: CommentData[];
@@ -74,6 +75,8 @@ export interface PostEditData {
   tags: string[];
   content: string;
 }
+
+export type FeedFilterOption = "followings" | "all";
 
 export interface GithubStats {
   starsCount: number;
@@ -97,7 +100,7 @@ export type Tags = string[];
 
 export type Step = {
   title: string;
-  path: string;
+  hash: string;
 };
 
 export type TabIndicatorKind = "line" | "pill";
@@ -122,4 +125,140 @@ export type ClientErrorCodeName = typeof clientErrorCodeName[number];
 
 export type ClientErrorHandler = {
   [V in ClientErrorCodeName]?: () => void;
+};
+
+export type PortfolioContact = {
+  id: number | null;
+  category: string;
+  value: string;
+};
+
+export type PortfolioIcon =
+  | "GithubLineIcon"
+  | "EmailIcon"
+  | "BlogIcon"
+  | "WebsiteIcon"
+  | "PhoneIcon"
+  | "LocationLineIcon"
+  | "CompanyLineIcon"
+  | "LinkIcon";
+
+export type PortfolioIntro = {
+  name: string;
+  description: string;
+  profileImageUrl: string;
+  isProfileShown: boolean;
+};
+
+export type PortfolioProject = {
+  id: number | string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  type: "team" | "personal";
+  imageUrl: string;
+  content: string;
+  tags: string[];
+};
+
+export type IdProcessedPortfolioProject = {
+  id: number | null;
+  name: string;
+  startDate: string;
+  endDate: string;
+  type: "team" | "personal";
+  imageUrl: string;
+  content: string;
+  tags: string[];
+};
+
+export type PortfolioProjectUploadData = {
+  id: number | null;
+  name: string;
+  startDate: string;
+  endDate: string;
+  type: "team" | "personal";
+  imageUrl: string;
+  content: string;
+  tags: string[];
+};
+
+export type PortfolioSectionItem = {
+  id: string | number;
+  category: string;
+  descriptions: {
+    id: string | number;
+    value: string;
+  }[];
+};
+
+export type IdProcessedPortfolioSectionItem = {
+  id: number | null;
+  category: string;
+  descriptions: {
+    id: number | null;
+    value: string;
+  }[];
+};
+
+export type PortfolioSection = {
+  id: string | number;
+  name: string;
+  items: PortfolioSectionItem[];
+};
+
+export type IdProcessedPortfolioSection = {
+  id: number | null;
+  name: string;
+  items: IdProcessedPortfolioSectionItem[];
+};
+
+export type Portfolio = {
+  id: number | null;
+  intro: PortfolioIntro;
+  projects: PortfolioProject[];
+  sections: PortfolioSection[];
+};
+
+export type PortfolioData = {
+  id: number | null;
+  name: string;
+  profileImageShown: boolean;
+  profileImageUrl: string;
+  introduction: string;
+  updatedAt?: string;
+  createdAt?: string;
+  contacts: PortfolioContact[];
+  projects: PortfolioProject[];
+  sections: PortfolioSection[];
+};
+
+export type PortfolioUploadData = {
+  id: number | null;
+  name: string;
+  profileImageShown: boolean;
+  profileImageUrl: string;
+  introduction: string;
+  updatedAt?: string;
+  createdAt?: string;
+  contacts: PortfolioContact[];
+  projects: IdProcessedPortfolioProject[];
+  sections: IdProcessedPortfolioSection[];
+};
+
+export type PortfolioSectionType = "project" | "custom";
+
+export type PortfolioSectionList = string[];
+
+export interface ChildFabItem {
+  color?: string;
+  backgroundColor?: string;
+  icon: IconType;
+  text?: string;
+  onClick: () => void;
+}
+
+export type CircleButtonItem = {
+  icon: IconType;
+  onClick: () => void;
 };

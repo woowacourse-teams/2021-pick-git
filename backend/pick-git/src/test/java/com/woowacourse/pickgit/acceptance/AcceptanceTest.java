@@ -1,11 +1,18 @@
 package com.woowacourse.pickgit.acceptance;
 
-import com.woowacourse.pickgit.common.request_builder.PickGitRequest;
-import com.woowacourse.pickgit.config.DatabaseCleaner;
+import static com.woowacourse.pickgit.query.fixture.TPost.NEOZALPOST;
+
+import com.woowacourse.pickgit.config.DatabaseConfigurator;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
+import com.woowacourse.pickgit.query.fixture.TContact;
+import com.woowacourse.pickgit.query.fixture.TProject;
+import com.woowacourse.pickgit.query.fixture.TSection;
 import io.restassured.RestAssured;
+import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -14,30 +21,102 @@ import org.springframework.test.context.ActiveProfiles;
 
 @Import(InfrastructureTestConfiguration.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
+@ActiveProfiles({"test"})
 public abstract class AcceptanceTest {
 
     @LocalServerPort
     int port;
 
     @Autowired
-    private DatabaseCleaner databaseCleaner;
+    private DatabaseConfigurator databaseConfigurator;
 
     @BeforeEach
     void init() {
-        setPort();
+        RestAssured.port = port;
     }
 
     @AfterEach
     void tearDown() {
         clearDataBase();
-    }
-
-    private void setPort() {
-        RestAssured.port = port;
+        databaseConfigurator.toWrite();
     }
 
     private void clearDataBase() {
-        databaseCleaner.execute();
+        databaseConfigurator.clear();
+    }
+
+    protected void toRead() {
+        databaseConfigurator.toRead();
+    }
+
+    protected static Stream<Arguments> getPostSearchArguments() {
+        return Stream.of(
+            Arguments.of("java"),
+            Arguments.of("java post", 0, 5),
+            Arguments.of("", 0, 5),
+            Arguments.of("c++", 0, 5),
+            Arguments.of("html", 0, 5),
+            Arguments.of("java c++ spring", 0, 5)
+        );
+    }
+
+    protected static Stream<Arguments> getPortfolioUpdateArguments() {
+        return Stream.of(
+            Arguments.of(
+                List.of(TContact.createRandom()),
+                List.of(TProject.of(NEOZALPOST)),
+                List.of(TSection.createRandom())
+            ),
+            Arguments.of(
+                List.of(TContact.createRandom(), TContact.createRandom()),
+                List.of(TProject.of(NEOZALPOST)),
+                List.of(TSection.createRandom())
+            ),
+            Arguments.of(
+                List.of(TContact.createRandom(), TContact.createRandom(), TContact.createRandom()),
+                List.of(TProject.of(NEOZALPOST)),
+                List.of(TSection.createRandom(), TSection.createRandom())
+            )
+        );
+    }
+
+    protected static Stream<Arguments> getPortfolioUpdateDuplicateProjectsArguments() {
+        return Stream.of(
+            Arguments.of(
+                List.of(TContact.createRandom()),
+                List.of(TProject.of(NEOZALPOST), TProject.of(NEOZALPOST)),
+                List.of(TSection.createRandom())
+            ),
+            Arguments.of(
+                List.of(TContact.createRandom()),
+                List.of(TProject.of(NEOZALPOST), TProject.of(NEOZALPOST), TProject.of(NEOZALPOST)),
+                List.of(TSection.createRandom())
+            )
+        );
+    }
+
+    protected static Stream<Arguments> getPortfolioUpdateInvalidDateProjectsArguments() {
+        return Stream.of(
+            Arguments.of(
+                List.of(TContact.createRandom()),
+                List.of(TProject.invalidDateOf(NEOZALPOST)),
+                List.of(TSection.createRandom())
+            )
+        );
+    }
+
+    protected static Stream<Arguments> getPortfolioUpdateDuplicateSectionsArguments() {
+        return Stream.of(
+            Arguments.of(
+                List.of(TContact.createRandom()),
+                List.of(TProject.of(NEOZALPOST)),
+                List.of(TSection.of(), TSection.of())
+            ),
+            Arguments.of(
+                List.of(TContact.createRandom()),
+                List.of(TProject.of(NEOZALPOST)),
+                List.of(TSection.of(), TSection.of(), TSection.of())
+            )
+        );
     }
 }

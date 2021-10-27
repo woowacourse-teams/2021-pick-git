@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { CSSProp } from "styled-components";
 
 import { TabIndicatorKind, TabItem } from "../../../@types";
 import { getTabTextColor } from "../../../utils/tabs";
@@ -9,6 +10,7 @@ export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   defaultTabIndex?: number;
   tabIndicatorColor?: string;
   tabIndicatorKind: TabIndicatorKind;
+  cssProp?: CSSProp;
 }
 
 const Tabs = ({ tabIndicatorKind, defaultTabIndex = 0, tabItems, tabIndicatorColor, ...props }: Props) => {
@@ -29,6 +31,10 @@ const Tabs = ({ tabIndicatorKind, defaultTabIndex = 0, tabItems, tabIndicatorCol
       {tabItem.name}
     </TabButton>
   ));
+
+  useEffect(() => {
+    setTabIndex(defaultTabIndex);
+  }, [defaultTabIndex]);
 
   return (
     <Container {...props}>

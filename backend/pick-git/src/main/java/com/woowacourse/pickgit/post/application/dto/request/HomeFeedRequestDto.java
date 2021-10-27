@@ -2,16 +2,19 @@ package com.woowacourse.pickgit.post.application.dto.request;
 
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import lombok.Builder;
+import org.springframework.data.domain.Pageable;
 
 @Builder
 public class HomeFeedRequestDto {
 
     private String requestUserName;
     private boolean isGuest;
-    private Long page;
-    private Long limit;
+    Pageable pageable;
 
-    public HomeFeedRequestDto(AppUser appUser, Long page, Long limit) {
+    private HomeFeedRequestDto() {
+    }
+
+    public HomeFeedRequestDto(AppUser appUser, Pageable pageable) {
         if(appUser.isGuest()) {
             requestUserName = null;
         } else {
@@ -19,15 +22,13 @@ public class HomeFeedRequestDto {
         }
 
         this.isGuest = appUser.isGuest();
-        this.page = page;
-        this.limit = limit;
+        this.pageable = pageable;
     }
 
-    public HomeFeedRequestDto(String requestUserName, boolean isGuest, Long page, Long limit) {
+    public HomeFeedRequestDto(String requestUserName, boolean isGuest, Pageable pageable) {
         this.requestUserName = requestUserName;
         this.isGuest = isGuest;
-        this.page = page;
-        this.limit = limit;
+        this.pageable = pageable;
     }
 
     public String getRequestUserName() {
@@ -38,11 +39,7 @@ public class HomeFeedRequestDto {
         return isGuest;
     }
 
-    public Long getPage() {
-        return page;
-    }
-
-    public Long getLimit() {
-        return limit;
+    public Pageable getPageable() {
+        return pageable;
     }
 }

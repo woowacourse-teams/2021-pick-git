@@ -33,10 +33,8 @@ import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.SearchRepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
-import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
-import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponsesDto;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.content.Image;
 import com.woowacourse.pickgit.post.domain.content.Images;
@@ -47,10 +45,10 @@ import com.woowacourse.pickgit.post.domain.util.PlatformRepositorySearchExtracto
 import com.woowacourse.pickgit.post.domain.util.dto.RepositoryNameAndUrl;
 import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
 import com.woowacourse.pickgit.tag.application.TagService;
-import com.woowacourse.pickgit.tag.application.TagsDto;
+import com.woowacourse.pickgit.tag.application.dto.TagsDto;
 import com.woowacourse.pickgit.tag.domain.Tag;
 import com.woowacourse.pickgit.user.domain.User;
-import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.domain.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -111,11 +109,10 @@ class PostServiceTest {
             .willReturn(extractTagsFrom(requestDto));
 
         // when
-        PostImageUrlResponseDto responseDto = postService.write(requestDto);
+        Long postId = postService.write(requestDto);
 
         // then
-        assertThat(responseDto.getId()).isNotNull();
-        assertThat(responseDto.getImageUrls()).containsAll(extractImageUrlsFrom(requestDto));
+        assertThat(postId).isNotNull();
 
         verify(userRepository, times(1))
             .findByBasicProfile_Name(requestDto.getUsername());
@@ -205,14 +202,12 @@ class PostServiceTest {
             .willReturn(repositories);
 
         // when
-        RepositoryResponsesDto repositoryResponsesDto = postService.userRepositories(requestDto);
-
-        List<RepositoryResponseDto> responsesDto =
-            repositoryResponsesDto.getRepositoryResponsesDto();
+        List<RepositoryResponseDto> repositoryResponseDtos = postService
+            .userRepositories(requestDto);
 
         // then
-        assertThat(responsesDto).hasSize(2);
-        assertThat(responsesDto)
+        assertThat(repositoryResponseDtos).hasSize(2);
+        assertThat(repositoryResponseDtos)
             .usingRecursiveComparison()
             .isEqualTo(repositories);
 
@@ -237,14 +232,12 @@ class PostServiceTest {
             .willReturn(repositories);
 
         // when
-        RepositoryResponsesDto repositoryResponsesDto = postService.userRepositories(requestDto);
-
-        List<RepositoryResponseDto> responsesDto = repositoryResponsesDto
-            .getRepositoryResponsesDto();
+        List<RepositoryResponseDto> repositoryResponseDtos = postService
+            .userRepositories(requestDto);
 
         // then
-        assertThat(responsesDto).hasSize(0);
-        assertThat(responsesDto)
+        assertThat(repositoryResponseDtos).isEmpty();
+        assertThat(repositoryResponseDtos)
             .usingRecursiveComparison()
             .isEqualTo(repositories);
 
@@ -309,8 +302,7 @@ class PostServiceTest {
         return RepositoryRequestDto.builder()
             .token(token)
             .username(username)
-            .page(page)
-            .limit(limit)
+            .pageable(PageRequest.of(page.intValue(), limit.intValue()))
             .build();
     }
 
@@ -321,11 +313,10 @@ class PostServiceTest {
         String accessToken = "bearer token";
         String userName = "testUserName";
         String keyword = "pick";
-        int page = 1;
-        int limit = 2;
+        PageRequest pageable = PageRequest.of(1, 2);
 
         SearchRepositoryRequestDto searchRepositoryRequestDto = new SearchRepositoryRequestDto(
-            accessToken, userName, keyword, page, limit
+            accessToken, userName, keyword, pageable
         );
 
         List<RepositoryNameAndUrl> repositories = List.of(
@@ -338,20 +329,16 @@ class PostServiceTest {
                 searchRepositoryRequestDto.getToken(),
                 searchRepositoryRequestDto.getUsername(),
                 searchRepositoryRequestDto.getKeyword(),
-                searchRepositoryRequestDto.getPage(),
-                searchRepositoryRequestDto.getLimit()
+                pageable
             )
         ).willReturn(repositories);
 
         // when
-
-        RepositoryResponsesDto repositoryResponsesDto =
-            postService.searchUserRepositories(searchRepositoryRequestDto);
-        List<RepositoryResponseDto> responseDtos =
-            repositoryResponsesDto.getRepositoryResponsesDto();
+        List<RepositoryResponseDto> repositoryResponseDtos = postService
+            .searchUserRepositories(searchRepositoryRequestDto);
 
         // then
-        assertThat(responseDtos)
+        assertThat(repositoryResponseDtos)
             .usingRecursiveComparison()
             .isEqualTo(repositories);
         verify(platformRepositorySearchExtractor, times(1))
@@ -359,8 +346,7 @@ class PostServiceTest {
                 searchRepositoryRequestDto.getToken(),
                 searchRepositoryRequestDto.getUsername(),
                 searchRepositoryRequestDto.getKeyword(),
-                searchRepositoryRequestDto.getPage(),
-                searchRepositoryRequestDto.getLimit()
+                pageable
             );
     }
 
@@ -371,12 +357,11 @@ class PostServiceTest {
         String accessToken = "bearer invalid token";
         String userName = "testUserName";
         String keyword = "pick";
-        int page = 1;
-        int limit = 2;
+        PageRequest pageable = PageRequest.of(1, 2);
 
         SearchRepositoryRequestDto searchRepositoryRequestDto =
             new SearchRepositoryRequestDto(
-                accessToken, userName, keyword, page, limit
+                accessToken, userName, keyword, pageable
             );
 
         given(platformRepositorySearchExtractor
@@ -384,8 +369,7 @@ class PostServiceTest {
                 searchRepositoryRequestDto.getToken(),
                 searchRepositoryRequestDto.getUsername(),
                 searchRepositoryRequestDto.getKeyword(),
-                searchRepositoryRequestDto.getPage(),
-                searchRepositoryRequestDto.getLimit()
+                pageable
             )
         ).willThrow(new RepositoryParseException());
 
@@ -399,8 +383,7 @@ class PostServiceTest {
                 searchRepositoryRequestDto.getToken(),
                 searchRepositoryRequestDto.getUsername(),
                 searchRepositoryRequestDto.getKeyword(),
-                searchRepositoryRequestDto.getPage(),
-                searchRepositoryRequestDto.getLimit()
+                pageable
             );
     }
 
@@ -411,11 +394,10 @@ class PostServiceTest {
         String accessToken = "bearer test token";
         String userName = "invalidName";
         String keyword = "pick";
-        int page = 1;
-        int limit = 2;
+        PageRequest pageable = PageRequest.of(1, 2);
 
         SearchRepositoryRequestDto searchRepositoryRequestDto = new SearchRepositoryRequestDto(
-            accessToken, userName, keyword, page, limit
+            accessToken, userName, keyword, pageable
         );
 
         given(platformRepositorySearchExtractor
@@ -423,8 +405,7 @@ class PostServiceTest {
                 searchRepositoryRequestDto.getToken(),
                 searchRepositoryRequestDto.getUsername(),
                 searchRepositoryRequestDto.getKeyword(),
-                searchRepositoryRequestDto.getPage(),
-                searchRepositoryRequestDto.getLimit()
+                pageable
             )
         ).willThrow(new RepositoryParseException());
 
@@ -438,8 +419,7 @@ class PostServiceTest {
                 searchRepositoryRequestDto.getToken(),
                 searchRepositoryRequestDto.getUsername(),
                 searchRepositoryRequestDto.getKeyword(),
-                searchRepositoryRequestDto.getPage(),
-                searchRepositoryRequestDto.getLimit()
+                pageable
             );
     }
 

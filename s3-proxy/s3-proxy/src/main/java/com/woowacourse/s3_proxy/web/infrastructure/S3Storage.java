@@ -53,6 +53,13 @@ public class S3Storage implements PickGitStorage {
         }
     }
 
+    private ObjectMetadata createObjectMetadata(MultipartFile multipartFile) {
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentLength(multipartFile.getSize());
+        objectMetadata.setContentType(multipartFile.getContentType());
+        return objectMetadata;
+    }
+
     private void putObjectToS3(MultipartFile multipartFile, String originalFileName, ObjectMetadata objectMetadata)
         throws IOException {
         s3Client.putObject(
@@ -61,12 +68,5 @@ public class S3Storage implements PickGitStorage {
             multipartFile.getInputStream(),
             objectMetadata
         );
-    }
-
-    private ObjectMetadata createObjectMetadata(MultipartFile multipartFile) {
-        ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentLength(multipartFile.getSize());
-        objectMetadata.setContentType(multipartFile.getContentType());
-        return objectMetadata;
     }
 }

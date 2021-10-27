@@ -24,7 +24,7 @@ import CircleIcon from "../CircleIcon/CircleIcon";
 import Comment from "../Comment/Comment";
 import ImageSlider from "../ImageSlider/ImageSlider";
 import Chip from "../Chip/Chip";
-import { CommentData } from "../../../@types";
+import { CircleButtonItem, CommentData } from "../../../@types";
 import {
   EditIcon,
   PostHeartIcon,
@@ -105,9 +105,9 @@ const PostItem = ({
     ? timeDiffTextTable.min(min)
     : timeDiffTextTable.sec();
 
-  const circleButtons = [
-    { node: <EditIcon />, onClick: onPostEdit },
-    { node: <TrashIcon />, onClick: onPostDelete },
+  const circleButtons: CircleButtonItem[] = [
+    { icon: "EditIcon", onClick: onPostEdit },
+    { icon: "TrashIcon", onClick: onPostDelete },
   ];
 
   const commentList = comments.map((comment) => (
@@ -126,6 +126,14 @@ const PostItem = ({
     </TagItemLinkButton>
   ));
 
+  const LikeButton = () => {
+    return isLoggedIn ? (
+      <IconLink onClick={onPostLike}>{liked ? <PostHeartIcon /> : <PostHeartLineIcon />}</IconLink>
+    ) : (
+      <></>
+    );
+  };
+
   const handleMoreContentShow = () => {
     setShouldHideContent(false);
   };
@@ -141,16 +149,13 @@ const PostItem = ({
           <Avatar diameter="1.9375rem" imageUrl={authorImageUrl} />
           <PostAuthorName>{authorName}</PostAuthorName>
         </PostAuthorInfoLink>
+        {/* {isEditable && <ButtonDrawer icon="ShareIcon" circleButtons={circleButtons} />} */}
         {isEditable && <ButtonDrawer circleButtons={circleButtons} />}
       </PostHeader>
       <ImageSlider imageUrls={imageUrls.length !== 0 ? imageUrls : [EmptyPostImage]} slideButtonKind="in-box" />
       <PostBody>
         <IconLinkButtonsWrapper>
-          {isLoggedIn ? (
-            <IconLink onClick={onPostLike}>{liked ? <PostHeartIcon /> : <PostHeartLineIcon />}</IconLink>
-          ) : (
-            <div></div>
-          )}
+          <LikeButton />
           <IconLink href={authorGithubUrl} target="_blank">
             <CircleIcon diameter="1.625rem" backgroundColor={color.tertiaryColor}>
               <GithubIcon />
@@ -165,18 +170,21 @@ const PostItem = ({
                 .slice(0, LIMIT.POST_CONTENT_HIDE_LENGTH)
                 .concat(<span>...</span>)
             : getTextElementsWithWithBr(content)}
-          {shouldHideContent ? (
-            <MoreContentLinkButton onClick={handleMoreContentShow}>더보기</MoreContentLinkButton>
-          ) : (
-            <MoreContentLinkButton onClick={handleMoreContentHide}>간략히</MoreContentLinkButton>
-          )}
         </PostContent>
-        <TagListWrapper>{shouldHideContent || tagList}</TagListWrapper>
+        <TagListWrapper>{shouldHideContent ? tagList.slice(0, LIMIT.POST_TAG_HIDE_LENGTH) : tagList}</TagListWrapper>
+        {shouldHideContent ? (
+          <MoreContentLinkButton onClick={handleMoreContentShow}>더보기</MoreContentLinkButton>
+        ) : (
+          <MoreContentLinkButton onClick={handleMoreContentHide}>간략히</MoreContentLinkButton>
+        )}
+
         <CommentsWrapper>
           {commentList.length > 10
-            ? commentList
-                .slice(0, 10)
-                .concat(<MoreCommentExistIndicator onClick={onMoreCommentClick}>...</MoreCommentExistIndicator>)
+            ? commentList.slice(0, 10).concat(
+                <MoreCommentExistIndicator key="more-contents-exist" onClick={onMoreCommentClick}>
+                  ...
+                </MoreCommentExistIndicator>
+              )
             : commentList}
         </CommentsWrapper>
       </PostBody>

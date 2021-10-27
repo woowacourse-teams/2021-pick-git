@@ -1,20 +1,17 @@
 package com.woowacourse.pickgit.unit.comment.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.woowacourse.pickgit.comment.domain.Comment;
 import com.woowacourse.pickgit.common.factory.UserFactory;
-import com.woowacourse.pickgit.exception.comment.CannotDeleteCommentException;
 import com.woowacourse.pickgit.exception.post.CommentFormatException;
-import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.user.domain.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.http.HttpStatus;
 
 class CommentTest {
 
@@ -54,80 +51,25 @@ class CommentTest {
             .isEqualTo("F0002");
     }
 
-    @DisplayName("내 게시물, 내 댓글을 삭제한다.")
+    @DisplayName("자신이 작성한 댓글인 아닌지 확인한다.")
     @Test
-    void delete_isWrittenByMeAndIsCommentedByMe_Success() {
+    void isNotCommentedBy_isNotCommentedByMe_Success() {
         // given
-        User me = UserFactory.user(1L, "dani");
+        User me = UserFactory.user(2L, "neozal");
+        Comment comment = new Comment(1L, "comment1", me, null);
 
-        Post postByMe = Post.builder()
-            .content("hi")
-            .author(me)
-            .build();
-
-        Comment comment = new Comment(1L, "comment1", me, postByMe);
-
-        // when
-        comment.validateDeletion(postByMe, me);
+        assertThat(comment.isNotCommentedBy(me)).isFalse();
     }
 
-    @DisplayName("내 게시물, 남 댓글을 삭제한다.")
+    @DisplayName("자신이 작성한 댓글인지 확인한다.")
     @Test
-    void delete_isWrittenByMeAndIsCommentedByOther_Success() {
+    void delete_isCommentedByMe_Success() {
         // given
         User me = UserFactory.user(1L, "dani");
-        User other = UserFactory.user(2L, "dada");
+        Comment comment = new Comment(1L, "comment1", me, null);
 
-        Post postByMe = Post.builder()
-            .id(1L)
-            .content("hi")
-            .author(me)
-            .build();
-
-        Comment comment = new Comment(1L, "comment1", other, postByMe);
-
-        // when
-        comment.validateDeletion(postByMe, me);
+        assertThat(comment.isNotCommentedBy(me)).isFalse();
     }
 
-    @DisplayName("남 게시물, 내 댓글을 삭제한다.")
-    @Test
-    void delete_isWrittenByOtherAndIsCommentedByMe_Success() {
-        // given
-        User me = UserFactory.user(1L, "dani");
-        User other = UserFactory.user(2L, "dada");
 
-        Post postByOther = Post.builder()
-            .content("hi")
-            .author(other)
-            .build();
-
-        Comment comment = new Comment(1L, "comment1", me, postByOther);
-
-        // when
-        comment.validateDeletion(postByOther, me);
-    }
-
-    @DisplayName("남 게시물, 남 댓글은 삭제할 수 없다. - 401 예외")
-    @Test
-    void delete_isWrittenByOtherAndIsCommentedByOther_401Exception() {
-        // given
-        User me = UserFactory.user(1L, "dani");
-        User other = UserFactory.user(2L, "dada");
-
-        Post postByOther = Post.builder()
-            .content("hi")
-            .author(other)
-            .build();
-
-        Comment comment = new Comment(1L, "comment2", other, postByOther);
-
-        // when
-        assertThatThrownBy(() -> {
-            comment.validateDeletion(postByOther, me);
-        }).isInstanceOf(CannotDeleteCommentException.class)
-            .hasFieldOrPropertyWithValue("errorCode", "P0007")
-            .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.UNAUTHORIZED)
-            .hasMessage("남 게시물, 남 댓글은 삭제할 수 없습니다.");
-    }
 }

@@ -6,14 +6,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.woowacourse.pickgit.common.factory.UserFactory;
 import com.woowacourse.pickgit.config.JpaTestConfiguration;
-import com.woowacourse.pickgit.post.application.PostDtoAssembler;
+import com.woowacourse.pickgit.post.application.dto.PostDtoAssembler;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.tag.domain.Tag;
 import com.woowacourse.pickgit.tag.domain.TagRepository;
 import com.woowacourse.pickgit.user.domain.User;
-import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.domain.repository.UserRepository;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -66,7 +66,7 @@ public class PostRepositoryTest_search {
         List<Post> savedPosts = postRepository.findAllPostsByTagNames(keywords, pageRequest);
 
         List<PostResponseDto> actual =
-            PostDtoAssembler.assembleFrom(user, savedPosts);
+            PostDtoAssembler.postResponseDtos(user, savedPosts);
 
         actual.sort(comparing(PostResponseDto::getAuthorName));
         expected.sort(comparing(PostResponseDto::getAuthorName));
@@ -125,7 +125,7 @@ public class PostRepositoryTest_search {
             user,
             List.of(tags),
             keyword,
-            PostDtoAssembler.assembleFrom(user, expected)
+            PostDtoAssembler.postResponseDtos(user, expected)
         );
     }
 

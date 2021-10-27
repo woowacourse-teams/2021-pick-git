@@ -1,12 +1,15 @@
-import styled from "styled-components";
+import styled, { css, CSSProp } from "styled-components";
 import { TabIndicatorKind } from "../../../@types";
 import { Z_INDEX } from "../../../constants/layout";
 
-export const Container = styled.section`
-  width: 100%;
-  height: fit-content;
-  overflow-x: hidden;
-`;
+export const Container = styled.section<{ cssProp?: CSSProp }>(
+  ({ cssProp }) => css`
+    width: 100%;
+    height: fit-content;
+    overflow-x: hidden;
+    ${cssProp}
+  `
+);
 
 export const TabButtonWrapper = styled.div`
   display: flex;

@@ -1,18 +1,19 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import { ThemeContext } from "styled-components";
+import { CSSProp, ThemeContext } from "styled-components";
 
 import { GoBackIcon, GoForwardIcon } from "../../../assets/icons/index";
-import useThrottle from "../../../services/hooks/@common/useThrottle";
-import { Container, ImageList, ImageListSlider, Indicator, SlideButton } from "./ImageSlider.style";
+import useThrottle from "../../../hooks/common/useThrottle";
+import { Container, Image, ImageListItem, ImageListSlider, Indicator, SlideButton } from "./ImageSlider.style";
 
 export interface Props extends React.CSSProperties {
   imageUrls: string[];
   slideButtonKind: "in-box" | "stick-out";
+  cssProp?: CSSProp;
 }
 
 const SLIDE_THROTTLE_DELAY = 800;
 
-const ImageSlider = ({ imageUrls, width, slideButtonKind }: Props) => {
+const ImageSlider = ({ imageUrls, cssProp }: Props) => {
   const [imageIndex, setImageIndex] = useState(0);
   const [isFirstImage, setIsFirstImage] = useState(true);
   const [isLastImage, setIsLastImage] = useState(false);
@@ -51,16 +52,12 @@ const ImageSlider = ({ imageUrls, width, slideButtonKind }: Props) => {
   }, [imageIndex, imageUrls.length]);
 
   return (
-    <Container width={width}>
-      <ImageListSlider
-        ref={imageListSliderRef}
-        width={`${imageCount.current * 100}%`}
-        onWheel={onImageListSliderScroll}
-      >
+    <Container cssProp={cssProp}>
+      <ImageListSlider ref={imageListSliderRef} width={`${imageUrls.length * 100}%`} onWheel={onImageListSliderScroll}>
         {imageUrls.map((imageUrl, index) => (
-          <ImageList key={imageUrl}>
-            <img src={imageUrl} alt={`${index}번째 사진`} width="100%" />
-          </ImageList>
+          <ImageListItem key={imageUrl}>
+            <Image src={imageUrl} alt={`${index + 1}번째 사진`} />
+          </ImageListItem>
         ))}
       </ImageListSlider>
       {!isFirstImage && (

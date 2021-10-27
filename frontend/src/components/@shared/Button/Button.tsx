@@ -1,3 +1,4 @@
+import { CSSProp } from "styled-components";
 import { SquaredInlineButton, SquaredBlockButton, RoundedInlineButton, RoundedBlockButton } from "./Button.style";
 
 export interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -5,14 +6,15 @@ export interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   backgroundColor?: string;
   color?: string;
   padding?: string;
+  cssProp?: CSSProp;
 }
 
-const Button = ({ kind = "squaredInline", ...props }: Props) => {
+const Button = ({ kind = "squaredInline", cssProp, ...props }: Props) => {
   const button = {
-    squaredInline: <SquaredInlineButton {...props} />,
-    squaredBlock: <SquaredBlockButton {...props} />,
-    roundedInline: <RoundedInlineButton {...props} />,
-    roundedBlock: <RoundedBlockButton {...props} />,
+    squaredInline: <SquaredInlineButton cssProp={cssProp} {...props} />,
+    squaredBlock: <SquaredBlockButton cssProp={cssProp} {...props} />,
+    roundedInline: <RoundedInlineButton cssProp={cssProp} {...props} />,
+    roundedBlock: <RoundedBlockButton cssProp={cssProp} {...props} />,
   };
 
   return button[kind];

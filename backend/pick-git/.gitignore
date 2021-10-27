@@ -38,7 +38,11 @@ out/
 
 ### Submodule ###
 src/main/resources/application-security.yml
+src/main/resources/application-dev.yml
 src/main/resources/application-prod.yml
+src/main/resources/application-db.yml
+src/main/resources/application-local.yml
+src/main/resources/application-staging.yml
 
 ### REST Docs ###
 src/main/resources/static/docs/

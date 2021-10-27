@@ -34,62 +34,32 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.woowacourse.pickgit.authentication.application.OAuthService;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
-import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.exception.post.CannotUnlikeException;
 import com.woowacourse.pickgit.exception.post.DuplicatedLikeException;
-import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.application.dto.request.PostDeleteRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostUpdateRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.RepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.SearchRepositoryRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.LikeResponseDto;
-import com.woowacourse.pickgit.post.application.dto.response.PostImageUrlResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostUpdateResponseDto;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
-import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponsesDto;
-import com.woowacourse.pickgit.post.presentation.PostController;
 import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
 import com.woowacourse.pickgit.post.presentation.dto.response.LikeResponse;
 import com.woowacourse.pickgit.post.presentation.dto.response.PostUpdateResponse;
+import com.woowacourse.pickgit.unit.ControllerTest;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-@AutoConfigureRestDocs
-@Import(InfrastructureTestConfiguration.class)
-@WebMvcTest(PostController.class)
-@ActiveProfiles("test")
-class PostControllerTest {
+class PostControllerTest extends ControllerTest {
 
     private static final String ACCESS_TOKEN = "testToken";
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @MockBean
-    private PostService postService;
-
-    @MockBean
-    private OAuthService oAuthService;
-
 
     @DisplayName("게시물을 작성할 수 있다. - 사용자")
     @Test
@@ -102,7 +72,7 @@ class PostControllerTest {
         given(oAuthService.findRequestUserByToken(any()))
             .willReturn(loginUser);
         given(postService.write(any(PostRequestDto.class)))
-            .willReturn(new PostImageUrlResponseDto(1L));
+            .willReturn(1L);
 
         // when
         ResultActions perform = mockMvc.perform(multipart("/api/posts")
@@ -168,20 +138,20 @@ class PostControllerTest {
     @Test
     void userRepositories_LoginUser_Success() throws Exception {
         // given
-        RepositoryResponsesDto responseDto = new RepositoryResponsesDto(List.of(
+        List<RepositoryResponseDto> repositoryResponseDtos = List.of(
             new RepositoryResponseDto("https://github.com/jipark3/pick", "pick"),
             new RepositoryResponseDto("https://github.com/jipark3/git", "git")
-        ));
+        );
 
         given(oAuthService.validateToken(any()))
             .willReturn(true);
         given(oAuthService.findRequestUserByToken(any()))
             .willReturn(new LoginUser("testUser", ACCESS_TOKEN));
         given(postService.userRepositories(any(RepositoryRequestDto.class)))
-            .willReturn(responseDto);
+            .willReturn(repositoryResponseDtos);
 
         String repositories = objectMapper
-            .writeValueAsString(responseDto.getRepositoryResponsesDto());
+            .writeValueAsString(repositoryResponseDtos);
 
         // when
         ResultActions perform = mockMvc.perform(get("/api/github/repositories")
@@ -222,14 +192,14 @@ class PostControllerTest {
         given(oAuthService.findRequestUserByToken(any()))
             .willReturn(loginUser);
 
-        RepositoryResponsesDto responseDto = new RepositoryResponsesDto(List.of(
+        List<RepositoryResponseDto> repositoryResponseDtos = List.of(
             new RepositoryResponseDto("pick", "https://github.com/jipark3/pick"),
             new RepositoryResponseDto("pick-git", "https://github.com/jipark3/pick-git")
-        ));
-        String repositories = objectMapper.writeValueAsString(responseDto.getRepositoryResponsesDto());
+        );
+        String repositories = objectMapper.writeValueAsString(repositoryResponseDtos);
 
         given(postService.searchUserRepositories(any(SearchRepositoryRequestDto.class)))
-            .willReturn(responseDto);
+            .willReturn(repositoryResponseDtos);
 
         // then
         ResultActions perform = mockMvc

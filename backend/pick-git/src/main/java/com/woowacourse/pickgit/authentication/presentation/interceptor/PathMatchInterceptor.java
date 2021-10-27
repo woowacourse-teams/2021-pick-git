@@ -13,10 +13,10 @@ import org.springframework.web.servlet.ModelAndView;
 
 public class PathMatchInterceptor implements HandlerInterceptor {
 
-    private HandlerInterceptor handlerInterceptor;
-    private HashMap<String, List<HttpMethod>> includeRegistry;
-    private HashMap<String, List<HttpMethod>> excludeRegistry;
-    private PathMatcher pathMatcher;
+    private final HandlerInterceptor handlerInterceptor;
+    private final HashMap<String, List<HttpMethod>> includeRegistry;
+    private final HashMap<String, List<HttpMethod>> excludeRegistry;
+    private final PathMatcher pathMatcher;
 
     public PathMatchInterceptor(HandlerInterceptor handlerInterceptor) {
         this.handlerInterceptor = handlerInterceptor;
@@ -44,8 +44,11 @@ public class PathMatchInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
-        Object handler) throws Exception {
+    public boolean preHandle(
+        HttpServletRequest request,
+        HttpServletResponse response,
+        Object handler
+    ) throws Exception {
         String requestUrl = request.getRequestURI();
         String requestMethod = request.getMethod();
 
@@ -73,14 +76,21 @@ public class PathMatchInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
-        ModelAndView modelAndView) throws Exception {
+    public void postHandle(
+        HttpServletRequest request,
+        HttpServletResponse response,
+        Object handler,
+        ModelAndView modelAndView
+    ) throws Exception {
         HandlerInterceptor.super.postHandle(request, response, handler, modelAndView);
     }
 
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response,
-        Object handler, Exception ex) throws Exception {
+    public void afterCompletion(
+        HttpServletRequest request,
+        HttpServletResponse response,
+        Object handler, Exception ex
+    ) throws Exception {
         HandlerInterceptor.super.afterCompletion(request, response, handler, ex);
     }
 }

@@ -1,15 +1,15 @@
 import { Dispatch, SetStateAction, useContext, useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { ThemeContext } from "styled-components";
+import { ThemeContext, useTheme } from "styled-components";
 import { RepositoryIcon, SearchIcon } from "../../assets/icons";
 import { FAILURE_MESSAGE, REDIRECT_MESSAGE } from "../../constants/messages";
 import { PAGE_URL } from "../../constants/urls";
-import useDebounce from "../../services/hooks/@common/useDebounce";
-import useMessageModal from "../../services/hooks/@common/useMessageModal";
+import useDebounce from "../../hooks/common/useDebounce";
+import useModal from "../../hooks/common/useModal";
 import { useGithubRepositoriesQuery } from "../../services/queries";
 import { getAPIErrorMessage } from "../../utils/error";
 import { getRepositoriesFromPages } from "../../utils/infiniteData";
-import MessageModalPortal from "../@layout/MessageModalPortal/MessageModalPortal";
+import AlertPortal from "../@layout/AlertPortal/AlertPortal";
 import PageLoading from "../@layout/PageLoading/PageLoading";
 import CircleIcon from "../@shared/CircleIcon/CircleIcon";
 import InfiniteScrollContainer from "../@shared/InfiniteScrollContainer/InfiniteScrollContainer";
@@ -33,6 +33,10 @@ interface Props {
 const RepositorySelector = ({ setGithubRepositoryName, goNextStep }: Props) => {
   const [temporarySearchKeyword, setTemporarySearchKeyword] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
+  const history = useHistory();
+
+  const { color } = useTheme();
+
   const {
     data: infiniteRepositoriesData,
     isLoading,
@@ -40,18 +44,30 @@ const RepositorySelector = ({ setGithubRepositoryName, goNextStep }: Props) => {
     isFetching,
     fetchNextPage,
   } = useGithubRepositoriesQuery(searchKeyword);
-  const { modalMessage, isModalShown, showAlertModal, hideMessageModal } = useMessageModal();
+  const {
+    modalMessage: alertMessage,
+    isModalShown: isAlertShown,
+    showModal: showAlert,
+    hideModal: hideAlert,
+  } = useModal();
 
-  const { color } = useContext(ThemeContext);
-  const history = useHistory();
+  const repositories = getRepositoriesFromPages(infiniteRepositoriesData?.pages);
+
+  const searchedRepositoryListItems =
+    repositories?.map((repository) => (
+      <RepositoryListItem key={repository.name} onClick={() => handleRepositorySelect(repository.name)}>
+        <RepositoryCircle>
+          <CircleIcon diameter="1.875rem" backgroundColor={color.tertiaryColor}>
+            <RepositoryIcon />
+          </CircleIcon>
+        </RepositoryCircle>
+        <RepositoryName>{repository.name}</RepositoryName>
+      </RepositoryListItem>
+    )) ?? [];
 
   const changeSearchKeyword = useDebounce(() => {
     setSearchKeyword(temporarySearchKeyword);
   }, 150);
-
-  useEffect(() => {
-    changeSearchKeyword();
-  }, [temporarySearchKeyword]);
 
   const handleRepositorySelect = (repositoryName: string) => {
     setGithubRepositoryName(repositoryName);
@@ -72,10 +88,14 @@ const RepositorySelector = ({ setGithubRepositoryName, goNextStep }: Props) => {
     setTemporarySearchKeyword(value);
   };
 
-  if (error) {
-    error.response && showAlertModal(getAPIErrorMessage(error.response?.data.errorCode));
+  useEffect(() => {
+    changeSearchKeyword();
+  }, [temporarySearchKeyword]);
 
-    return <MessageModalPortal heading={modalMessage} onConfirm={handleErrorConfirm} onClose={hideMessageModal} />;
+  if (error) {
+    error.response && showAlert(getAPIErrorMessage(error.response?.data.errorCode));
+
+    return <AlertPortal heading={alertMessage} onOkay={handleErrorConfirm} />;
   }
 
   if (isLoading) {
@@ -89,31 +109,14 @@ const RepositorySelector = ({ setGithubRepositoryName, goNextStep }: Props) => {
     );
   }
 
-  if (!infiniteRepositoriesData) {
-    showAlertModal(FAILURE_MESSAGE.POST_REPOSITORY_NOT_LOADABLE);
+  if (!repositories) {
+    showAlert(FAILURE_MESSAGE.POST_REPOSITORY_NOT_LOADABLE);
 
-    return <MessageModalPortal heading={modalMessage} onConfirm={handleErrorConfirm} onClose={hideMessageModal} />;
+    return <AlertPortal heading={alertMessage} onOkay={handleErrorConfirm} />;
   }
 
-  const repositories = getRepositoriesFromPages(infiniteRepositoriesData.pages);
-
-  const searchedRepositoryListItems = isLoading ? (
-    <PageLoading />
-  ) : (
-    repositories.map((repository) => (
-      <RepositoryListItem key={repository.name} onClick={() => handleRepositorySelect(repository.name)}>
-        <RepositoryCircle>
-          <CircleIcon diameter="1.875rem" backgroundColor={color.tertiaryColor}>
-            <RepositoryIcon />
-          </CircleIcon>
-        </RepositoryCircle>
-        <RepositoryName>{repository.name}</RepositoryName>
-      </RepositoryListItem>
-    ))
-  );
-
   if (repositories?.length === 0 && searchKeyword === "") {
-    showAlertModal(REDIRECT_MESSAGE.NO_REPOSITORY_EXIST);
+    showAlert(REDIRECT_MESSAGE.NO_REPOSITORY_EXIST);
   }
 
   return (
@@ -134,7 +137,7 @@ const RepositorySelector = ({ setGithubRepositoryName, goNextStep }: Props) => {
         </SearchResultNotFound>
       )}
 
-      {isModalShown && <MessageModalPortal heading={modalMessage} onConfirm={goBackToHome} onClose={goBackToHome} />}
+      {isAlertShown && <AlertPortal heading={alertMessage} onOkay={goBackToHome} />}
     </Container>
   );
 };

@@ -14,68 +14,78 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    snippetsDir = file('build/generated-snippets')
+}
+
 dependencies {
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.data:spring-data-elasticsearch:4.2.2'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-log4j2'
+    implementation 'com.lmax:disruptor:3.4.2'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.apache.httpcomponents:httpclient:4.5'
     implementation 'net.rakugakibox.spring.boot:logback-access-spring-boot-starter:2.7.1'
     implementation 'org.reflections:reflections:0.9.10'
+    implementation 'org.flywaydb:flyway-core:6.4.2'
+    implementation 'org.springframework.boot:spring-boot-starter-cache:2.5.4'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis:2.5.4'
+    implementation ('it.ozimov:embedded-redis:0.7.3') {
+        exclude group: 'org.slf4j', module: 'slf4j-simple'
+    }
 
     compileOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.4'
+    compileOnly 'org.projectlombok:lombok:1.18.20'
 
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 
     asciidoctor 'org.springframework.restdocs:spring-restdocs-asciidoctor:1.2.6.RELEASE'
 
-    compileOnly 'org.projectlombok:lombok:1.18.20'
     annotationProcessor 'org.projectlombok:lombok:1.18.20'
-
-    testCompileOnly 'org.projectlombok:lombok:1.18.20'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.rest-assured:rest-assured:4.4.0'
-}
 
-processResources.dependsOn('copySecurity')
-processResources.dependsOn('copyProd')
+    testCompileOnly 'org.projectlombok:lombok:1.18.20'
 
-task copySecurity(type: Copy) {
-    from './security/application-security.yml'
-    into './src/main/resources'
-}
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
 
-task copyProd(type: Copy) {
-    from './security/application-prod.yml'
-    into './src/main/resources'
+    modules {
+        module("org.springframework.boot:spring-boot-starter-logging") {
+            replacedBy("org.springframework.boot:spring-boot-starter-log4j2", "Use Log4j2 instead of Logback")
+        }
+    }
 }
 
 test {
     useJUnitPlatform()
 }
 
-ext {
-    snippetsDir = file('build/generated-snippets')
+processResources.dependsOn('copySubmodule')
+
+task copySubmodule(type: Copy) {
+    from './security'
+    include '*.yml'
+    into './src/main/resources'
 }
 
 asciidoctor {
-    dependsOn test
-
     inputs.dir snippetsDir
+    finalizedBy 'copyRestDocs'
 }
 
-bootJar {
-    dependsOn asciidoctor
-
-    copy {
-        from 'build/asciidoc/html5'
-        into 'src/main/resources/static/docs'
-        include '*.html'
-    }
+task copyRestDocs(type: Copy) {
+    dependsOn('asciidoctor')
+    from 'build/asciidoc/html5'
+    include '*.html'
+    into 'src/main/resources/static/docs'
 }
 
 jacoco {
@@ -83,8 +93,6 @@ jacoco {
 }
 
 jacocoTestReport {
-    dependsOn bootJar
-
     reports {
         html.enabled true
         xml.enabled true
@@ -107,7 +115,15 @@ jacocoTestReport {
                             '**/*OAuthClient*',
                             '**/common*',
                             '**/format*',
-                            '**/*S3*'
+                            '**/*Exception*',
+                            '**/*Content*',
+                            '**/content*',
+                            '**/*S3*',
+                            '**/*DataSource*',
+                            '**/*Slave*',
+                            '**/*Elastic*',
+                            '**/*GithubContributionExtractor*',
+                            '**/*Configuration*'
                     ])
         }))
     }
@@ -122,9 +138,9 @@ jacocoTestCoverageVerification {
             element = 'CLASS'
 
             limit {
-                counter = 'METHOD'
+                counter = 'CLASS'
                 value = 'COVEREDRATIO'
-                minimum = 0.65
+                minimum = 0.70
             }
 
             excludes = [
@@ -138,8 +154,18 @@ jacocoTestCoverageVerification {
                     '**.*OAuthClient*',
                     '**.*Interceptor*',
                     '**.*Exception*',
-                    '**.*Storage*'
+                    '**.*Content*',
+                    '**.*Storage*',
+                    '**.*DataSource*',
+                    '**.*Slave*',
+                    '**.*Elastic*',
+                    '**.*GithubContributionExtractor*',
+                    '**.*Configuration*'
             ]
         }
     }
+}
+
+bootRun {
+    args = ["--spring.profiles.active=local"]
 }

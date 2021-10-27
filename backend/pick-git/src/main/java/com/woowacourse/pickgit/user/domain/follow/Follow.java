@@ -13,12 +13,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
-@Entity
 @Table(
     uniqueConstraints = {
         @UniqueConstraint(columnNames = {"source_id", "target_id"})
     }
 )
+@Entity
 public class Follow {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -4,7 +4,7 @@ public class OAuthLoginUrlResponse {
 
     private String url;
 
-    public OAuthLoginUrlResponse() {
+    private OAuthLoginUrlResponse() {
     }
 
     public OAuthLoginUrlResponse(String url) {
