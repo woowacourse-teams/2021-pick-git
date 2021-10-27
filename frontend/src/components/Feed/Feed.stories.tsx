@@ -1,9 +1,9 @@
 import { Story } from "@storybook/react";
 
 import Feed from "./Feed";
-import { useHomeFeedPostsQuery } from "../../services/queries";
 import PageLoading from "../@layout/PageLoading/PageLoading";
 import { QUERY } from "../../constants/queries";
+import { useHomeFeedAllPostsQuery } from "../../services/queries";
 
 export default {
   title: "Components/Feed",
@@ -11,14 +11,20 @@ export default {
 };
 
 const Template: Story = (args) => {
-  const { data: infinitePostsData, isLoading } = useHomeFeedPostsQuery("all");
+  const { data: infinitePostsData, isLoading } = useHomeFeedAllPostsQuery();
 
   if (isLoading || !infinitePostsData) {
     return <PageLoading />;
   }
 
   return (
-    <Feed {...args} infinitePostsData={infinitePostsData} queryKey={QUERY.GET_HOME_FEED_POSTS} isFetching={false} />
+    <Feed
+      {...args}
+      infinitePostsData={infinitePostsData}
+      onIntersect={() => {}}
+      queryKey={QUERY.GET_HOME_FEED_POSTS("all")}
+      isFetching={false}
+    />
   );
 };
 

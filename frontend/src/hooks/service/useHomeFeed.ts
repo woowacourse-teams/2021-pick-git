@@ -4,20 +4,22 @@ import { useQueryClient } from "react-query";
 
 import { QUERY } from "../../constants/queries";
 
-import UserContext from "../../contexts/UserContext";
-
-import { useHomeFeedPostsQuery } from "../../services/queries";
-
 import { removeDuplicatedData } from "../../utils/data";
 import { handleHTTPError } from "../../utils/error";
 import { isHttpErrorStatus } from "../../utils/typeGuard";
 
 import useFeedMutation from "./useFeedMutation";
 
-import type { Post, FeedFilterOption } from "../../@types";
+import { FeedFilterOption, Post } from "../../@types";
+import HomeFeedContext from "../../contexts/HomeFeedContext";
+import useAuth from "../common/useAuth";
 
-const useHomeFeed = (feedFilterOption: FeedFilterOption) => {
-  const { logout } = useContext(UserContext);
+const tmp: { current: FeedFilterOption | null } = { current: null };
+
+const useHomeFeed = () => {
+  const { queryResults, feedFilterOption, currentPostId, initialized, setFeedFilterOption, setCurrentPostId } =
+    useContext(HomeFeedContext);
+
   const {
     data: infinitePostsData,
     isLoading,
@@ -26,14 +28,17 @@ const useHomeFeed = (feedFilterOption: FeedFilterOption) => {
     isFetching,
     fetchNextPage,
     refetch,
-  } = useHomeFeedPostsQuery(feedFilterOption);
+  } = queryResults[feedFilterOption];
 
   // TODO : 그냥 QUERY 만 보내도 되는지 알아보기
   const { setPostsPages } = useFeedMutation([QUERY]);
+  const { logout } = useAuth();
   const queryClient = useQueryClient();
 
+  tmp.current = feedFilterOption;
+
   const handlePostsEndIntersect = () => {
-    fetchNextPage();
+    queryResults[tmp.current ?? "all"].fetchNextPage();
   };
 
   const handleError = () => {
@@ -46,7 +51,7 @@ const useHomeFeed = (feedFilterOption: FeedFilterOption) => {
         handleHTTPError(status, {
           unauthorized: () => {
             logout();
-            queryClient.refetchQueries(QUERY.GET_HOME_FEED_POSTS, { active: true });
+            queryClient.refetchQueries(QUERY.GET_HOME_FEED_POSTS(feedFilterOption), { active: true });
           },
         });
       }
@@ -54,7 +59,7 @@ const useHomeFeed = (feedFilterOption: FeedFilterOption) => {
   };
 
   const handleDataFetch = () => {
-    if (!infinitePostsData) {
+    if (!infinitePostsData || !initialized) {
       return;
     }
 
@@ -71,7 +76,18 @@ const useHomeFeed = (feedFilterOption: FeedFilterOption) => {
     handleError();
   }, [error]);
 
-  return { infinitePostsData, isLoading, isFetching, isError, handlePostsEndIntersect, refetch };
+  return {
+    infinitePostsData,
+    isLoading,
+    isFetching,
+    isError,
+    handlePostsEndIntersect,
+    refetch,
+    feedFilterOption,
+    currentPostId,
+    setFeedFilterOption,
+    setCurrentPostId,
+  };
 };
 
 export default useHomeFeed;

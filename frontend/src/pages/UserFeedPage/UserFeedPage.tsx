@@ -1,13 +1,10 @@
-import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
-import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
 import { ScrollPageWrapper } from "../../components/@styled/layout";
 import PageError from "../../components/@shared/PageError/PageError";
 import Feed from "../../components/Feed/Feed";
 
-import { LayoutInPx } from "../../constants/layout";
 import { QUERY } from "../../constants/queries";
 
 import useInfiniteImagePreloader from "../../hooks/common/useInfiniteImagePreloader";
@@ -15,22 +12,23 @@ import useAuth from "../../hooks/common/useAuth";
 import useUserFeed from "../../hooks/service/useUserFeed";
 
 import { Container } from "./UserFeedPage.style";
+import useAutoAnchor from "../../hooks/common/useAutoAnchor";
+import { useState } from "react";
+import { Post } from "../../@types";
 
 interface LocationState {
   postId?: string;
 }
 
 const UserFeedPage = () => {
-  const [isMountedOnce, setIsMountedOnce] = useState(false);
-  const [mountCounter, setMountCounter] = useState(0);
-  const scrollWrapperRef = useRef<HTMLDivElement>(null);
-  const { currentUsername } = useAuth();
-  const username = new URLSearchParams(location.search).get("username");
-  const isMyFeed = currentUsername === username;
-
   const {
     state: { postId },
   } = useLocation<LocationState>();
+  const username = new URLSearchParams(location.search).get("username");
+
+  const [currentPostId, setCurrentPostId] = useState<Post["id"]>(Number(postId) ?? -1);
+  const { currentUsername } = useAuth();
+  const isMyFeed = currentUsername === username;
 
   // TODO : username 이 null 혹은 빈 문자열일 경우에 대한 예외처리
   const {
@@ -40,6 +38,7 @@ const UserFeedPage = () => {
     isFetchingNextPage,
     handleIntersect: handlePostsEndIntersect,
   } = useUserFeed(isMyFeed, username);
+  const { scrollWrapperRef } = useAutoAnchor(`#post${currentPostId}`);
 
   const infiniteImageUrls =
     infinitePostsData?.pages.map((posts) => posts.reduce<string[]>((acc, post) => [...acc, ...post.imageUrls], [])) ??
@@ -53,25 +52,6 @@ const UserFeedPage = () => {
     activateImageFetchingState();
   };
 
-  useEffect(() => {
-    if (!postId) {
-      return;
-    }
-
-    if (!isMountedOnce) {
-      setMountCounter((prev) => prev + 1);
-      setIsMountedOnce(scrollWrapperRef.current !== null);
-
-      return;
-    }
-
-    const $targetPost = document.querySelector(`#post${postId}`);
-
-    if ($targetPost && $targetPost instanceof HTMLElement) {
-      scrollWrapperRef.current?.scrollTo(0, $targetPost.offsetTop - LayoutInPx.HEADER_HEIGHT);
-    }
-  }, [postId, isMountedOnce, mountCounter]);
-
   if (isLoading || isFirstImagesLoading) {
     return <PageLoadingWithLogo />;
   }
@@ -83,13 +63,13 @@ const UserFeedPage = () => {
   return (
     <ScrollPageWrapper ref={scrollWrapperRef}>
       <Container>
-        <InfiniteScrollContainer isLoaderShown={isFetchingNextPage || isImagesFetching} onIntersect={handleIntersect}>
-          <Feed
-            infinitePostsData={infinitePostsData}
-            queryKey={[QUERY.GET_USER_FEED_POSTS, { username, isMyFeed }]}
-            isFetching={isFetchingNextPage || isImagesFetching}
-          />
-        </InfiniteScrollContainer>
+        <Feed
+          infinitePostsData={infinitePostsData}
+          onIntersect={handleIntersect}
+          queryKey={[QUERY.GET_USER_FEED_POSTS, { username, isMyFeed }]}
+          isFetching={isFetchingNextPage || isImagesFetching}
+          setCurrentPostId={setCurrentPostId}
+        />
       </Container>
     </ScrollPageWrapper>
   );
