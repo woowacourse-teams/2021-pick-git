@@ -29,20 +29,19 @@ const PortfolioHeader = ({ isButtonsShown = true }: Props) => {
         <GoBackLinkButton onClick={handleGoBack}>
           <SVGIcon icon="GoBackIcon" />
         </GoBackLinkButton>
-        {isButtonsShown && (
+        {/* {isButtonsShown && (
           <HeaderButtonsWrapper>
             <Button kind="roundedInline" backgroundColor={color.primaryColor} color={color.white}>
-              PDF로 인쇄
-              {/* <PDFDownloadLink
+              <PDFDownloadLink
                 document={<PortfolioDocument profile={profile} portfolio={portfolio} />}
                 fileName="포트폴리오.pdf"
                 style={{ color: "inherit", fontSize: "inherit" }}
               >
                 PDF로 인쇄
-              </PDFDownloadLink> */}
+              </PDFDownloadLink>
             </Button>
           </HeaderButtonsWrapper>
-        )}
+        )} */}
       </HeaderContentWrapper>
     </Container>
   );
