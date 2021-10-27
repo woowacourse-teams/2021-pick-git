@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { PAGE_WIDTH } from "../../../constants/layout";
 import { Header } from "../../@styled/layout";
 import {
@@ -60,14 +60,12 @@ export const FlexWrapper = styled.div`
   }
 `;
 
-export const Navigation = styled.nav`
-  display: flex;
-  align-items: center;
-
-  ${setLaptopMediaQuery`
-    justify-self: center;
-  `}
-`;
+export const Navigation = styled.nav<{ isLoggedIn?: boolean }>(
+  ({ isLoggedIn }) => css`
+    display: flex;
+    align-items: center;
+  `
+);
 
 export const NavigationItem = styled(Link)`
   transition: opacity 0.5s;
@@ -90,7 +88,8 @@ export const NavigationItem = styled(Link)`
 `;
 
 export const AuthNavigationWrapper = styled.div`
-  transition: opacity 0.5s;
+  display: flex;
+  align-items: center;
   margin-left: auto;
 
   ${setMobileMediaQuery`
@@ -100,9 +99,4 @@ export const AuthNavigationWrapper = styled.div`
   ${setTabletMediaQuery`
     margin-left: 1rem;
   `}
-
-
-  :hover {
-    opacity: 0.5;
-  }
 `;
