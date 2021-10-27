@@ -50,7 +50,7 @@ export const useHomeFeedFollowingsPostsQuery = () => {
   return useInfiniteQuery<Post[] | null, AxiosError<ErrorResponse>>(
     [QUERY.GET_HOME_FEED_POSTS("followings")],
     async ({ pageParam = 0 }) => {
-      return await requestGetHomeFeedPosts(pageParam, getAccessToken());
+      return await requestGetHomeFeedPosts(pageParam, getAccessToken(), "followings");
     },
     {
       getNextPageParam: (_, pages) => {
@@ -65,7 +65,7 @@ export const useHomeFeedAllPostsQuery = () => {
   return useInfiniteQuery<Post[] | null, AxiosError<ErrorResponse>>(
     [QUERY.GET_HOME_FEED_POSTS("all")],
     async ({ pageParam = 0 }) => {
-      return await requestGetHomeFeedPosts(pageParam, null);
+      return await requestGetHomeFeedPosts(pageParam, getAccessToken(), "all");
     },
     {
       getNextPageParam: (_, pages) => {
@@ -105,6 +105,6 @@ export const useDeletePostLikeMutation = () => {
 
 export const useGetPostQuery = (postId: number, activated: boolean) => {
   return useQuery<Post>(["post", postId], postQueryFunction, {
-    enabled: activated
+    enabled: activated,
   });
 };
