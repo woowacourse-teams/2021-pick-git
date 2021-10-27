@@ -3,7 +3,6 @@ package com.woowacourse.pickgit.acceptance.portfolio;
 import static com.woowacourse.pickgit.query.fixture.TPost.KEVINPOST;
 import static com.woowacourse.pickgit.query.fixture.TPost.NEOZALPOST;
 import static com.woowacourse.pickgit.query.fixture.TUser.GUEST;
-import static com.woowacourse.pickgit.query.fixture.TUser.KODA;
 import static com.woowacourse.pickgit.query.fixture.TUser.MARK;
 import static com.woowacourse.pickgit.query.fixture.TUser.NEOZAL;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,14 +15,11 @@ import com.woowacourse.pickgit.portfolio.presentation.dto.request.ProjectRequest
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.SectionRequest;
 import com.woowacourse.pickgit.portfolio.presentation.dto.response.PortfolioResponse;
 import com.woowacourse.pickgit.query.fixture.TPortfolio;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.http.HttpStatus;
 
 class PortfolioAcceptanceTest extends AcceptanceTest {
 
