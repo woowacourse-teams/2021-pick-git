@@ -4,6 +4,7 @@ import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.config.auth_interceptor_register.ForLoginAndGuestUser;
 import com.woowacourse.pickgit.config.auth_interceptor_register.ForOnlyLoginUser;
+import com.woowacourse.pickgit.exception.post.PostSearchTypeException;
 import com.woowacourse.pickgit.post.application.PostFeedService;
 import com.woowacourse.pickgit.post.application.dto.request.HomeFeedRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.SearchPostRequestDto;
@@ -12,6 +13,7 @@ import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.presentation.dto.PostAssembler;
 import com.woowacourse.pickgit.post.presentation.dto.request.SearchPostsRequest;
 import com.woowacourse.pickgit.post.presentation.dto.response.PostResponse;
+import com.woowacourse.pickgit.post.presentation.postfeed.FeedType;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -31,15 +33,23 @@ import org.springframework.web.bind.annotation.RestController;
 public class PostFeedController {
 
     private final PostFeedService postFeedService;
+    private final List<FeedType> feedTypes;
 
     @ForLoginAndGuestUser
     @GetMapping("/posts")
     public ResponseEntity<List<PostResponse>> readHomeFeed(
         @Authenticated AppUser appUser,
-        @PageableDefault Pageable pageable
+        @PageableDefault Pageable pageable,
+        @RequestParam(required = false, defaultValue = "all") String type
     ) {
+        FeedType selectedFeedType = feedTypes.stream()
+            .filter(feedType -> feedType.isSatisfiedBy(type))
+            .findAny()
+            .orElseThrow(PostSearchTypeException::new);
+
         HomeFeedRequestDto homeFeedRequestDto = new HomeFeedRequestDto(appUser, pageable);
-        List<PostResponseDto> postResponseDtos = postFeedService.homeFeed(homeFeedRequestDto);
+        List<PostResponseDto> postResponseDtos = selectedFeedType.find(homeFeedRequestDto);
+
         List<PostResponse> postResponses = PostAssembler.postResponses((postResponseDtos));
 
         return ResponseEntity.ok(postResponses);

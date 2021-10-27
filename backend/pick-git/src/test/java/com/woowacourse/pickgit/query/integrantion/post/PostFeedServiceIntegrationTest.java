@@ -63,7 +63,7 @@ class PostFeedServiceIntegrationTest extends IntegrationTest {
             .build();
 
         // when
-        List<PostResponseDto> postResponseDtos = postFeedService.homeFeed(homeFeedRequestDto);
+        List<PostResponseDto> postResponseDtos = postFeedService.allHomeFeed(homeFeedRequestDto);
 
         // then
         assertThat(postResponseDtos)
@@ -101,7 +101,7 @@ class PostFeedServiceIntegrationTest extends IntegrationTest {
         }
 
         // when
-        List<PostResponseDto> postResponseDtos = postFeedService.homeFeed(homeFeedRequestDto);
+        List<PostResponseDto> postResponseDtos = postFeedService.allHomeFeed(homeFeedRequestDto);
 
         // then
         assertThat(postResponseDtos)
