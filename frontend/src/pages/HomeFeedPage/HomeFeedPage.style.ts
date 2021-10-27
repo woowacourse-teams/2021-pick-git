@@ -22,3 +22,8 @@ export const postTabCSS = css`
     font-size:0.8rem;
   `};
 `;
+
+export const NotFoundCSS = css`
+  margin-top: 3rem;
+  width: 100%;
+`;
