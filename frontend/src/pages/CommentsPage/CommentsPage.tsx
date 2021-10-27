@@ -118,7 +118,7 @@ const CommentsPage = () => {
   ];
 
   const handleGoBack = () => {
-    if (history.length === 1) {
+    if (history.length < 3) {
       history.push(PAGE_URL.HOME);
       return;
     }
