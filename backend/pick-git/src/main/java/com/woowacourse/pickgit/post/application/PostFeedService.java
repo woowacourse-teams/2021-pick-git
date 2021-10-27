@@ -1,8 +1,11 @@
 package com.woowacourse.pickgit.post.application;
 
+
+import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
 import com.woowacourse.pickgit.post.application.dto.PostDtoAssembler;
 import com.woowacourse.pickgit.post.application.dto.request.HomeFeedRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.SearchPostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.SearchPostsRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.application.search.SearchTypes;
@@ -71,6 +74,20 @@ public class PostFeedService {
 
         User user = findUserByName(searchPostsRequestDto.getUserName());
         return PostDtoAssembler.postResponseDtos(user, search);
+    }
+
+    public PostResponseDto searchById(SearchPostRequestDto searchPostRequestDto) {
+        Long id = searchPostRequestDto.getId();
+        String userName = searchPostRequestDto.getUserName();
+
+        Post post = postRepository.findById(id)
+            .orElseThrow(PostNotFoundException::new);
+        if (searchPostRequestDto.isGuest()) {
+            return PostDtoAssembler.assembleFrom(null, post);
+        }
+
+        User user = findUserByName(userName);
+        return PostDtoAssembler.assembleFrom(user, post);
     }
 
     private User findUserByName(String userName) {

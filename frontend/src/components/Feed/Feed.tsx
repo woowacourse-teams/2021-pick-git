@@ -120,10 +120,6 @@ const Feed = ({ infinitePostsData, queryKey, isFetching }: Props) => {
     setPosts(getItemsFromPages<Post>(infinitePostsData.pages) ?? []);
   }, [infinitePostsData, isFetching]);
 
-  if (!infinitePostsData.pages) {
-    return <div>게시물이 존재하지 않습니다.</div>;
-  }
-
   return (
     <Container>
       {posts?.map((post) => (

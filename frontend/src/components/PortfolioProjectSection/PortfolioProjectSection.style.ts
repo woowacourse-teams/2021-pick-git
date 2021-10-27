@@ -1,5 +1,11 @@
 import styled, { css } from "styled-components";
-import { setDesktopMediaQuery, setLaptopAboveMediaQuery, setLaptopMediaQuery } from "../@styled/mediaQueries";
+import {
+  setDesktopMediaQuery,
+  setLaptopAboveMediaQuery,
+  setLaptopMediaQuery,
+  setMobileMediaQuery,
+} from "../@styled/mediaQueries";
+import { customScrollbarCSS } from "../@styled/scrollbar";
 
 export const Container = styled.div`
   display: flex;
@@ -85,11 +91,11 @@ export const ProjectNameCSS = css`
 
   ${setLaptopMediaQuery`
     padding-left: 65px;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
   `}
   ${setDesktopMediaQuery`
     padding-left: 100px;
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
   `}
 `;
 
@@ -117,6 +123,7 @@ export const ProjectImage = styled.img`
   width: 100%;
   aspect-ratio: 4 / 3;
   align-self: flex-start;
+  margin: auto 0;
 
   ${setLaptopAboveMediaQuery`
     order: 2;
@@ -141,22 +148,28 @@ export const ProjectInfo = styled.div`
 
 export const ProjectContentCSS = css`
   font-size: 0.7rem;
-  margin: 0 1.5rem 0 0;
+  width: 100%;
   height: 100%;
   line-height: 1.5rem;
   margin-bottom: 1rem;
-  min-height: 10rem;
+  overflow-y: scroll;
 
-  color: ${({ theme }) => theme.color.textColor};
+  ${({ theme }) => customScrollbarCSS(theme.color.textColor)};
+
+  ${setMobileMediaQuery`
+    overflow-y: hidden;
+  `}
 
   ${setLaptopMediaQuery`
     font-size: 0.8rem;
-    margin-right: 2rem;
-
+    max-height: 20rem;
+    padding-right: 2rem;
   `}
+
   ${setDesktopMediaQuery`
     font-size: 0.9rem;
-    margin-right: 3rem;
+    max-height: 40rem;
+    padding-right: 3rem;
   `}
 `;
 

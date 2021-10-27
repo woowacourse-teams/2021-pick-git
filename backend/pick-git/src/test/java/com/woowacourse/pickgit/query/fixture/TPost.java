@@ -62,7 +62,7 @@ public enum TPost {
         this.comment = new ArrayList<>();
     }
 
-    protected static TPost of(CPost cPost) {
+    public static TPost of(CPost cPost) {
         CUSTOM_DO_NOT_USE.id = cPost.getId();
         CUSTOM_DO_NOT_USE.githubRepoUrl = cPost.getGithubRepoUrl();
         CUSTOM_DO_NOT_USE.content = cPost.getContent();

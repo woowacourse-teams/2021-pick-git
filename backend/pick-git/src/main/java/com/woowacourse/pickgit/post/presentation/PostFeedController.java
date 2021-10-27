@@ -6,6 +6,7 @@ import com.woowacourse.pickgit.config.auth_interceptor_register.ForLoginAndGuest
 import com.woowacourse.pickgit.config.auth_interceptor_register.ForOnlyLoginUser;
 import com.woowacourse.pickgit.post.application.PostFeedService;
 import com.woowacourse.pickgit.post.application.dto.request.HomeFeedRequestDto;
+import com.woowacourse.pickgit.post.application.dto.request.SearchPostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.SearchPostsRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.post.presentation.dto.PostAssembler;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -89,5 +91,19 @@ public class PostFeedController {
         List<PostResponse> postResponses = PostAssembler.postResponses((postResponseDtos));
 
         return ResponseEntity.ok(postResponses);
+    }
+
+    @ForLoginAndGuestUser
+    @GetMapping(value = "/posts", params = "id")
+    public ResponseEntity<PostResponse> findPostById(
+        @Authenticated AppUser appUser,
+        @RequestParam(value = "id") Long postId
+    ) {
+        PostResponseDto postResponseDto = postFeedService
+            .searchById(new SearchPostRequestDto(postId, appUser));
+
+        PostResponse postResponse = PostAssembler.postResponse(postResponseDto);
+
+        return ResponseEntity.ok(postResponse);
     }
 }

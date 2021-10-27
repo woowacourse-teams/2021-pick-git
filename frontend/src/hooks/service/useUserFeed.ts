@@ -76,7 +76,7 @@ const useUserFeed = (isMyFeed: boolean, username: string | null) => {
 
   useEffect(() => {
     initUserFeed(isMyFeed, username);
-  }, []);
+  }, [isMyFeed, username]);
 
   useEffect(() => {
     handleDataFetch();

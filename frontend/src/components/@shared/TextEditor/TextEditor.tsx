@@ -13,7 +13,7 @@ export interface TextEditorProps extends React.HTMLAttributes<HTMLTextAreaElemen
 const TextEditor = ({ value, cssProp, autoGrow, ...props }: TextEditorProps) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleKeyUp: React.KeyboardEventHandler<HTMLTextAreaElement> = (event) => {
+  const handleInput: React.KeyboardEventHandler<HTMLTextAreaElement> = (event) => {
     if (!textareaRef.current) {
       return;
     }
@@ -29,7 +29,7 @@ const TextEditor = ({ value, cssProp, autoGrow, ...props }: TextEditorProps) => 
     }
 
     textareaRef.current.dispatchEvent(
-      new Event("keyup", {
+      new Event("input", {
         bubbles: true,
       })
     );
@@ -40,7 +40,7 @@ const TextEditor = ({ value, cssProp, autoGrow, ...props }: TextEditorProps) => 
       value={value}
       cssProp={cssProp}
       ref={textareaRef}
-      onKeyUp={autoGrow ? handleKeyUp : undefined}
+      onInput={autoGrow ? handleInput : undefined}
       autoGrow={autoGrow}
       {...props}
     />

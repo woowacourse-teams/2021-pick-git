@@ -82,6 +82,33 @@ class PortfolioAcceptanceTest extends AcceptanceTest {
         assertThat(errorResponse.getErrorCode()).isEqualTo("R0004");
     }
 
+    @DisplayName("사용자는 나의 포트폴리오를 수정한다. - 유효하지 않은 날짜 프로젝트, 실패")
+    @ParameterizedTest
+    @MethodSource("getPortfolioUpdateInvalidDateProjectsArguments")
+    void update_LoginUserWithMineWithInvalidDateProjects_Success(
+        List<ContactRequest> contactRequests,
+        List<ProjectRequest> projectRequests,
+        List<SectionRequest> sectionRequests
+    ) {
+        PortfolioResponse response = NEOZAL.은로그인을하고().포트폴리오를_조회한다(NEOZAL)
+            .as(PortfolioResponse.class);
+
+        NEOZAL.은로그인을하고().포스트를등록한다(NEOZALPOST);
+        NEOZAL.은로그인을하고().포스트를등록한다(KEVINPOST);
+
+        PortfolioRequest 변경된_포트폴리오 = modifyPortfolio(
+            contactRequests,
+            projectRequests,
+            sectionRequests,
+            response
+        );
+
+        ApiErrorResponse errorResponse = NEOZAL.은로그인을하고().포트폴리오를_수정한다(변경된_포트폴리오)
+            .as(ApiErrorResponse.class);
+
+        assertThat(errorResponse.getErrorCode()).isEqualTo("R0003");
+    }
+
     @DisplayName("사용자는 나의 포트폴리오를 수정한다. - 중복 섹션, 실패")
     @ParameterizedTest
     @MethodSource("getPortfolioUpdateDuplicateSectionsArguments")

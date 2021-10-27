@@ -1,26 +1,29 @@
 import { PortfolioSection } from "../../@types";
 import { PORTFOLIO } from "../../constants/localStorageKey";
 import { setPortfolioLocalUpdateTime } from "../../storage/storage";
+import { getTemporaryId } from "../../utils/portfolio";
 import useLocalStorage from "../common/useLocalStorage";
 
 const usePortfolioSections = (username: string) => {
+  const getBlackPortfolioSection = () => ({
+    id: getTemporaryId(),
+    name: "",
+    items: [
+      {
+        id: getTemporaryId(10),
+        category: "",
+        descriptions: [
+          {
+            id: getTemporaryId(20),
+            value: "",
+          },
+        ],
+      },
+    ],
+  });
+
   const { itemState: portfolioSections, setItem } = useLocalStorage<PortfolioSection[]>(PORTFOLIO.SECTIONS(username), [
-    {
-      id: null,
-      name: "",
-      items: [
-        {
-          id: null,
-          category: "",
-          descriptions: [
-            {
-              id: null,
-              value: "",
-            },
-          ],
-        },
-      ],
-    },
+    getBlackPortfolioSection(),
   ]);
 
   const setPortfolioSections = (sections: PortfolioSection[], shouldRenewUpdateTime: boolean = true) => {
@@ -31,30 +34,12 @@ const usePortfolioSections = (username: string) => {
   const addBlankPortfolioSection = () => {
     const newPortfolioSections = [...portfolioSections];
 
-    setPortfolioSections([
-      ...newPortfolioSections,
-      {
-        id: null,
-        name: "",
-        items: [
-          {
-            id: null,
-            category: "",
-            descriptions: [
-              {
-                id: null,
-                value: "",
-              },
-            ],
-          },
-        ],
-      },
-    ]);
+    setPortfolioSections([...newPortfolioSections, getBlackPortfolioSection()]);
   };
 
   const setPortfolioSection = (newSection: PortfolioSection) => {
     const newPortfolioSections = [...portfolioSections];
-    const targetSectionIndex = newPortfolioSections.findIndex((section) => section.name === newSection.name);
+    const targetSectionIndex = newPortfolioSections.findIndex((section) => section.id === newSection.id);
     if (targetSectionIndex === -1) {
       return;
     }
@@ -63,12 +48,9 @@ const usePortfolioSections = (username: string) => {
     setPortfolioSections(newPortfolioSections);
   };
 
-  const updatePortfolioSectionName = (
-    prevSectionName: PortfolioSection["name"],
-    sectionName: PortfolioSection["name"]
-  ) => {
+  const updatePortfolioSectionName = (prevSectionId: PortfolioSection["id"], sectionName: PortfolioSection["name"]) => {
     const newPortfolioSections = [...portfolioSections];
-    const targetSection = newPortfolioSections.find((section) => section.name === prevSectionName);
+    const targetSection = newPortfolioSections.find((section) => section.id === prevSectionId);
     if (!targetSection) {
       return;
     }
@@ -77,9 +59,9 @@ const usePortfolioSections = (username: string) => {
     setPortfolioSections(newPortfolioSections);
   };
 
-  const deletePortfolioSection = (sectionName: PortfolioSection["name"]) => {
+  const deletePortfolioSection = (sectionId: PortfolioSection["id"]) => {
     const newPortfolioSections = [...portfolioSections];
-    const targetSectionIndex = newPortfolioSections.findIndex((section) => section.name === sectionName);
+    const targetSectionIndex = newPortfolioSections.findIndex((section) => section.id === sectionId);
     if (targetSectionIndex === -1) {
       return;
     }

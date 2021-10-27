@@ -53,6 +53,17 @@ public class UnLoginAndThenAct extends Act {
         return response;
     }
 
+    public ExtractableResponse<Response> 포스트를검색한다(TPost tpost, HttpStatus status) {
+        ExtractableResponse<Response> response = request(
+            String.format("/api/posts?id=%d", tpost.getId()),
+            Method.GET,
+            status
+        );
+
+        assertThat(response.statusCode()).isEqualTo(status.value());
+        return response;
+    }
+
     public List<LikeUsersResponse> 포스트에좋아요한사용자를조회한다(TPost tPost) {
         return request(
             String.format("/api/posts/%d/likes", tPost.getId()),

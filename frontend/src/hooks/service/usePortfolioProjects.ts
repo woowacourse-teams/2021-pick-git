@@ -21,9 +21,9 @@ const usePortfolioProjects = (username: string) => {
     setPortfolioProjects(newPortfolioProjects);
   };
 
-  const updatePortfolioProject = (prevProjectName: PortfolioProject["name"], newProject: PortfolioProject) => {
+  const updatePortfolioProject = (prevProjectId: PortfolioProject["id"], newProject: PortfolioProject) => {
     const newPortfolioProjects = [...portfolioProjects];
-    const targetProjectIndex = newPortfolioProjects.findIndex((project) => project.name === prevProjectName);
+    const targetProjectIndex = newPortfolioProjects.findIndex((project) => project.id === prevProjectId);
     if (targetProjectIndex === -1) {
       return;
     }
@@ -32,9 +32,9 @@ const usePortfolioProjects = (username: string) => {
     setPortfolioProjects(newPortfolioProjects);
   };
 
-  const deletePortfolioProject = (projectName: string) => {
+  const deletePortfolioProject = (prevProjectId: PortfolioProject["id"]) => {
     const newPortfolioProjects = [...portfolioProjects];
-    const targetProjectIndex = newPortfolioProjects.findIndex((project) => project.name === projectName);
+    const targetProjectIndex = newPortfolioProjects.findIndex((project) => project.id === prevProjectId);
     if (targetProjectIndex === -1) {
       return;
     }

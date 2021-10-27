@@ -1,42 +1,56 @@
 import { PortfolioSection } from "../../@types";
+import { getTemporaryId } from "../../utils/portfolio";
 
 const usePortfolioSectionItem = (
   portfolioSection: PortfolioSection,
   setPortfolioSection?: (portfolioSection: PortfolioSection) => void
 ) => {
+  const getBlankSectionItem = () => ({
+    id: getTemporaryId(),
+    category: "",
+    descriptions: [
+      {
+        id: getTemporaryId(10),
+        value: "",
+      },
+    ],
+  });
+
   const addBlankSectionItem = () => {
     const newPortfolioSection = { ...portfolioSection };
-    newPortfolioSection.items.push({
-      id: null,
-      category: "",
-      descriptions: [
-        {
-          id: null,
-          value: "",
-        },
-      ],
-    });
+    newPortfolioSection.items.push(getBlankSectionItem());
 
     setPortfolioSection && setPortfolioSection(newPortfolioSection);
   };
 
-  const addBlankDescription = (sectionItemIndex: number) => {
+  const addBlankDescription = (sectionItemId: number | string) => {
     const newPortfolioSection = { ...portfolioSection };
-    newPortfolioSection.items[sectionItemIndex].descriptions.push({ id: null, value: "" });
+    const targetSectionItem = newPortfolioSection.items.find((item) => item.id === sectionItemId);
+
+    if (!targetSectionItem) {
+      return;
+    }
+
+    targetSectionItem.descriptions.push({ id: getTemporaryId(), value: "" });
     setPortfolioSection && setPortfolioSection(newPortfolioSection);
   };
 
-  const deleteSectionItem = (sectionItemIndex: number) => {
+  const deleteSectionItem = (sectionItemId: number | string) => {
     const newPortfolioSection = { ...portfolioSection };
-    newPortfolioSection.items.splice(sectionItemIndex, 1);
+    const targetSectionItemIndex = newPortfolioSection.items.findIndex((item) => item.id === sectionItemId);
 
+    if (targetSectionItemIndex === -1) {
+      return;
+    }
+
+    newPortfolioSection.items.splice(targetSectionItemIndex, 1);
     setPortfolioSection && setPortfolioSection(newPortfolioSection);
   };
 
-  const updateCategory = (prevCategory: string, currentCategory: string) => {
+  const updateCategory = (sectionItemId: number | string, currentCategory: string) => {
     const newPortfolioSection = { ...portfolioSection };
 
-    const targetSectionItem = newPortfolioSection.items.find((sectionItem) => sectionItem.category === prevCategory);
+    const targetSectionItem = newPortfolioSection.items.find((sectionItem) => sectionItem.id === sectionItemId);
     if (!targetSectionItem) {
       return;
     }
@@ -45,21 +59,45 @@ const usePortfolioSectionItem = (
     setPortfolioSection && setPortfolioSection(newPortfolioSection);
   };
 
-  const updateDescription = (category: string, descriptionIndex: number, newDescription: string) => {
+  const updateDescription = (
+    sectionItemId: number | string,
+    descriptionId: number | string,
+    newDescription: string
+  ) => {
     const newPortfolioSection = { ...portfolioSection };
 
-    const targetSectionItem = newPortfolioSection.items.find((sectionItem) => sectionItem.category === category);
+    const targetSectionItem = newPortfolioSection.items.find((sectionItem) => sectionItem.id === sectionItemId);
     if (!targetSectionItem) {
       return;
     }
 
-    targetSectionItem.descriptions[descriptionIndex].value = newDescription;
+    const targetDescription = targetSectionItem.descriptions.find((description) => description.id === descriptionId);
+
+    if (!targetDescription) {
+      return;
+    }
+
+    targetDescription.value = newDescription;
     setPortfolioSection && setPortfolioSection(newPortfolioSection);
   };
 
-  const deleteDescription = (sectionItemIndex: number, descriptionIndex: number) => {
+  const deleteDescription = (sectionItemId: number | string, descriptionId: number | string) => {
     const newPortfolioSection = { ...portfolioSection };
-    newPortfolioSection.items[sectionItemIndex].descriptions.splice(descriptionIndex, 1);
+
+    const targetSectionItem = newPortfolioSection.items.find((sectionItem) => sectionItem.id === sectionItemId);
+    if (!targetSectionItem) {
+      return;
+    }
+
+    const targetDescriptionIndex = targetSectionItem.descriptions.findIndex(
+      (description) => description.id === descriptionId
+    );
+
+    if (targetDescriptionIndex === -1) {
+      return;
+    }
+
+    targetSectionItem.descriptions.splice(targetDescriptionIndex, 1);
     setPortfolioSection && setPortfolioSection(newPortfolioSection);
   };
 

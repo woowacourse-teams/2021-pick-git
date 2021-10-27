@@ -10,7 +10,7 @@
   </Properties>
 
   <Appenders>
-    <RollingFile name="InfoFileAppender" fileName="${info-log}.log" filePattern="${info-log}-${file-pattern}">
+    <RollingFile name="InfoFileAppender" fileName="${info-log}.log" filePattern="${info-log}-${file-pattern}" immediateFlush="false">
       <Filters>
         <ThresholdFilter level="FATAL" onMatch="DENY" onMismatch="NEUTRAL"/>
         <ThresholdFilter level="ERROR" onMatch="DENY" onMismatch="NEUTRAL"/>
@@ -29,7 +29,7 @@
       </DefaultRolloverStrategy>
     </RollingFile>
 
-    <RollingFile name="WarnFileAppender" fileName="${warn-log}.log" filePattern="${warn-log}-${file-pattern}">
+    <RollingFile name="WarnFileAppender" fileName="${warn-log}.log" filePattern="${warn-log}-${file-pattern}" immediateFlush="false">
       <Filters>
         <ThresholdFilter level="FATAL" onMatch="DENY" onMismatch="NEUTRAL"/>
         <ThresholdFilter level="ERROR" onMatch="DENY" onMismatch="NEUTRAL"/>
@@ -47,7 +47,7 @@
       </DefaultRolloverStrategy>
     </RollingFile>
 
-    <RollingFile name="ErrorFileAppender" fileName="${error-log}.log" filePattern="${error-log}-${file-pattern}">
+    <RollingFile name="ErrorFileAppender" fileName="${error-log}.log" filePattern="${error-log}-${file-pattern}" immediateFlush="false">
       <Filters>
         <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
       </Filters>
@@ -63,7 +63,7 @@
       </DefaultRolloverStrategy>
     </RollingFile>
 
-    <RollingFile name="DbFileAppender" fileName="${db-log}.log" filePattern="${db-log}-${file-pattern}">
+    <RollingFile name="DbFileAppender" fileName="${db-log}.log" filePattern="${db-log}-${file-pattern}" immediateFlush="false">
       <PatternLayout pattern="${log-pattern}"/>
       <Policies>
         <SizeBasedTriggeringPolicy size="15MB"/>
@@ -78,19 +78,19 @@
   </Appenders>
 
   <Loggers>
-    <Logger name="com.woowacourse.pickgit" level="info" additivity="false">
+    <AsyncLogger name="com.woowacourse.pickgit" level="info" additivity="false" includeLocation="true">
       <AppenderRef ref="InfoFileAppender"/>
       <AppenderRef ref="WarnFileAppender"/>
       <AppenderRef ref="ErrorFileAppender"/>
-    </Logger>
-    <Logger name="org.springframework" level="info" additivity="false">
+    </AsyncLogger>
+    <AsyncLogger name="org.springframework" level="info" additivity="false" includeLocation="true">
       <AppenderRef ref="InfoFileAppender"/>
       <AppenderRef ref="WarnFileAppender"/>
       <AppenderRef ref="ErrorFileAppender"/>
-    </Logger>
-    <Logger name="org.hibernate.tool.hbm2ddl" level="debug" additivity="false">
+    </AsyncLogger>
+    <AsyncLogger name="org.hibernate.tool.hbm2ddl" level="debug" additivity="false" includeLocation="true">
       <appender-ref ref="DbFileAppender"/>
-    </Logger>
+    </AsyncLogger>
     <Root level="error">
       <AppenderRef ref="ErrorFileAppender"/>
     </Root>
