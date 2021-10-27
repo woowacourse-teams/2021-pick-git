@@ -1,17 +1,14 @@
 import { useState } from "react";
-import { VerticalDotsIcon } from "../../../assets/icons";
-import { Container, CircleButton, VerticalDotsWrapper } from "./ButtonDrawer.style";
-
-type CircleButton = {
-  node: React.ReactNode;
-  onClick: () => void;
-};
+import { CircleButtonItem } from "../../../@types";
+import SVGIcon, { IconType } from "../SVGIcon/SVGIcon";
+import { Container, CircleButton, IconWrapper } from "./ButtonDrawer.style";
 
 export interface Props extends React.HTMLAttributes<HTMLSpanElement> {
-  circleButtons: CircleButton[];
+  icon?: IconType;
+  circleButtons: CircleButtonItem[];
 }
 
-const ButtonDrawer = ({ circleButtons }: Props) => {
+const ButtonDrawer = ({ icon = "VerticalDotsIcon", circleButtons }: Props) => {
   const [isButtonsShown, setIsButtonsShown] = useState(false);
 
   const circleButtonItems = circleButtons.map((circleButton, index) => (
@@ -22,7 +19,7 @@ const ButtonDrawer = ({ circleButtons }: Props) => {
       buttonsCount={circleButtons.length}
       onClick={circleButton.onClick}
     >
-      {circleButton.node}
+      <SVGIcon icon={circleButton.icon} />
     </CircleButton>
   ));
 
@@ -32,9 +29,9 @@ const ButtonDrawer = ({ circleButtons }: Props) => {
 
   return (
     <Container>
-      <VerticalDotsWrapper onClick={handleVerticalDotsClick}>
-        <VerticalDotsIcon />
-      </VerticalDotsWrapper>
+      <IconWrapper onClick={handleVerticalDotsClick}>
+        <SVGIcon icon={icon} />
+      </IconWrapper>
       {circleButtonItems}
     </Container>
   );

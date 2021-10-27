@@ -20,6 +20,10 @@ const ImageUploader = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageUpload = () => {
+    if (!fileInputRef.current) {
+      alert("hey!!!");
+    }
+
     fileInputRef.current?.click();
   };
 

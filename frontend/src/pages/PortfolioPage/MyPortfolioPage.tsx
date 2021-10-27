@@ -50,13 +50,22 @@ import {
   UserNameCSS,
 } from "./PortfolioPage.style";
 
-import type { ChildFabItem, PortfolioData, PortfolioProject, PortfolioSectionType, Post } from "../../@types";
+import type {
+  ChildFabItem,
+  IdProcessedPortfolioSection,
+  Portfolio,
+  PortfolioData,
+  PortfolioProject,
+  PortfolioSectionType,
+  PortfolioUploadData,
+  Post,
+} from "../../@types";
 import useScrollPagination from "../../hooks/common/useScrollPagination";
 import usePortfolioContacts from "../../hooks/service/usePortfolioContacts";
-import { CONTACT_ICON, PORTFOLIO_CONTACTS } from "../../constants/portfolio";
+import { CONTACT_ICON, PORTFOLIO_CONTACTS, TEMP_ID_INDICATOR } from "../../constants/portfolio";
 import useSnackbar from "../../hooks/common/useSnackbar";
 import Fab from "../../components/@shared/Fab/Fab";
-import { getTemporaryId } from "../../utils/portfolio";
+import { getTemporaryId, isTempId } from "../../utils/portfolio";
 
 const MyPortfolioPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -117,7 +126,7 @@ const MyPortfolioPage = () => {
   const paginationCount = portfolioProjects.length + portfolioSections.length + 1;
   const { paginate } = useScrollPagination(containerRef, paginationCount);
 
-  const handleSetProject = (prevProjectId: string | number) => (newProject: PortfolioProject) => {
+  const handleSetProject = (prevProjectId: number) => (newProject: PortfolioProject) => {
     updatePortfolioProject(prevProjectId, newProject);
   };
 
@@ -151,7 +160,7 @@ const MyPortfolioPage = () => {
     const [firstImageUrl] = post.imageUrls;
 
     addPortfolioProject({
-      id: getTemporaryId(),
+      id: post.id,
       content: post.content,
       imageUrl: firstImageUrl,
       name: `프로젝트 ${portfolioProjects.length + 1}`,
@@ -179,7 +188,7 @@ const MyPortfolioPage = () => {
   };
 
   const handleDeleteSectionConfirm = () => {
-    if (deletingSectionType === "project") {
+    if (deletingSectionType === "project" && typeof deletingSectionId === "number") {
       deletePortfolioProject(deletingSectionId);
       hideConfirm();
       return;
@@ -193,7 +202,20 @@ const MyPortfolioPage = () => {
     try {
       const localUpdateTimeString = getPortfolioLocalUpdateTimeString();
 
-      const portfolio: PortfolioData = {
+      const sections = portfolioSections.map<IdProcessedPortfolioSection>((section) => ({
+        ...section,
+        id: isTempId(section.id) ? null : section.id,
+        items: section.items.map((item) => ({
+          ...item,
+          id: isTempId(item.id) ? null : item.id,
+          descriptions: item.descriptions.map((description) => ({
+            ...description,
+            id: isTempId(description.id) ? null : description.id,
+          })),
+        })),
+      }));
+
+      const portfolio: PortfolioUploadData = {
         id: remotePortfolio?.id ?? null,
         name: portfolioIntro.name,
         profileImageShown: portfolioIntro.isProfileShown,
@@ -203,7 +225,7 @@ const MyPortfolioPage = () => {
         createdAt: remotePortfolio?.createdAt,
         updatedAt: localUpdateTimeString,
         projects: portfolioProjects,
-        sections: portfolioSections,
+        sections: sections,
       };
 
       await mutateSetPortfolio(portfolio);
@@ -222,29 +244,6 @@ const MyPortfolioPage = () => {
   const handleSetContacts = () => {
     showBottomSlider();
   };
-
-  const childFabs: ChildFabItem[] = [
-    {
-      icon: "AddCircleIcon",
-      text: "프로젝트 추가",
-      onClick: handleAddProject,
-    },
-    {
-      icon: "AddCircleIcon",
-      text: "섹션 추가",
-      onClick: handleAddSection,
-    },
-    {
-      icon: "PersonIcon",
-      text: "연락처 업데이트",
-      onClick: handleSetContacts,
-    },
-    {
-      icon: "UploadIcon",
-      text: "포트폴리오 업로드",
-      onClick: handleUploadPortfolio,
-    },
-  ];
 
   useEffect(() => {
     if (!remotePortfolio || !remotePortfolio.updatedAt) {
@@ -311,10 +310,40 @@ const MyPortfolioPage = () => {
     return <Redirect to={PAGE_URL.HOME} />;
   }
 
+  const childFabs: ChildFabItem[] = [
+    {
+      icon: "AddCircleIcon",
+      text: "프로젝트 추가",
+      onClick: handleAddProject,
+    },
+    {
+      icon: "AddCircleIcon",
+      text: "섹션 추가",
+      onClick: handleAddSection,
+    },
+    {
+      icon: "PersonIcon",
+      text: "연락처 업데이트",
+      onClick: handleSetContacts,
+    },
+    {
+      icon: "UploadIcon",
+      text: "포트폴리오 업로드",
+      onClick: handleUploadPortfolio,
+    },
+  ];
+
+  const portfolio: Portfolio = {
+    id: remotePortfolio?.id ?? null,
+    intro: portfolioIntro,
+    projects: portfolioProjects,
+    sections: portfolioSections,
+  };
+
   return (
     <>
       <ScrollActiveHeader containerRef={containerRef}>
-        <PortfolioHeader isButtonsShown={true} />
+        <PortfolioHeader isButtonsShown={true} portfolio={portfolio} username={profile?.name ?? ""} />
       </ScrollActiveHeader>
       <Container ref={containerRef}>
         <FullPage isVerticalCenter={false}>

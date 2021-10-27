@@ -117,7 +117,7 @@ const App = () => {
             <EditPostPage />
           </PostEditStepContextProvider>
         </Route>
-        <Route path={PAGE_URL.POST_COMMENTS}>
+        <Route path={PAGE_URL.POST_DETAIL}>
           <CommentsPage />
         </Route>
         <Route path={PAGE_URL.POST_LIKE_PEOPLE}>

@@ -7,21 +7,26 @@ import Button from "../../@shared/Button/Button";
 import SVGIcon from "../../@shared/SVGIcon/SVGIcon";
 import { Container, HeaderContentWrapper, HeaderButtonsWrapper, GoBackLinkButton } from "./PortfolioHeader.style";
 // import PortfolioDocument from "../../PortfolioDocument/PortfolioDocument";
-import { Portfolio, ProfileData } from "../../../@types";
+import { Portfolio, ProfileData, PortfolioData } from "../../../@types";
+// import ShareLink from "../../@shared/ShareLink/ShareLink";
+// import useAuth from "../../../hooks/common/useAuth";
 
 export interface Props {
   isButtonsShown?: boolean;
   profile?: ProfileData | null;
-  portfolio?: Portfolio;
+  portfolio: Portfolio | PortfolioData | null;
+  username: string;
 }
 
-const PortfolioHeader = ({ isButtonsShown = true }: Props) => {
+const PortfolioHeader = ({ isButtonsShown = true, portfolio, username }: Props) => {
   const { color } = useContext(ThemeContext);
   const history = useHistory();
 
   const handleGoBack = () => {
     history.goBack();
   };
+
+  console.log("portfolio", portfolio);
 
   return (
     <Container>

@@ -1,6 +1,6 @@
 import { AxiosError } from "axios";
 import { useMutation, useQuery } from "react-query";
-import { ErrorResponse, PortfolioData } from "../../@types";
+import { ErrorResponse, PortfolioData, PortfolioUploadData } from "../../@types";
 import { QUERY } from "../../constants/queries";
 import { getAccessToken } from "../../storage/storage";
 import { customError } from "../../utils/error";
@@ -25,5 +25,5 @@ export const usePortfolioQuery = (username: string, isMyPortfolio: boolean) => {
 };
 
 export const useSetPortfolioMutation = () => {
-  return useMutation((portfolio: PortfolioData) => requestSetPortfolio(portfolio, getAccessToken()));
+  return useMutation((portfolio: PortfolioUploadData) => requestSetPortfolio(portfolio, getAccessToken()));
 };

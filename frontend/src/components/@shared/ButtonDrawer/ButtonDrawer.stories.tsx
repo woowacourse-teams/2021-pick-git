@@ -17,7 +17,7 @@ const Template: Story<Props> = (args) => (
 export const Default = Template.bind({});
 Default.args = {
   circleButtons: [
-    { node: <EditIcon />, onClick: () => alert("click!") },
-    { node: <TrashIcon />, onClick: () => alert("click!") },
+    { icon: "EditIcon", onClick: () => alert("click!") },
+    { icon: "TrashIcon", onClick: () => alert("click!") },
   ],
 };

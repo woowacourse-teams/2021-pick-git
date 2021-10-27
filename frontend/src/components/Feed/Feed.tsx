@@ -94,7 +94,8 @@ const Feed = ({ infinitePostsData, onIntersect, setCurrentPostId, queryKey, isFe
 
     setCurrentPostId?.(selectedPost.id);
     history.push({
-      pathname: PAGE_URL.POST_COMMENTS,
+      pathname: PAGE_URL.POST_DETAIL,
+      search: `id=${postId}`,
       state: selectedPost,
     });
   };
