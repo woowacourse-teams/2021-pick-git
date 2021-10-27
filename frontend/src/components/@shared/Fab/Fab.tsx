@@ -43,7 +43,7 @@ const Fab = ({ icon, childFabs, color, backgroundColor, fabCssProp, childFabCssP
 
   return (
     <>
-      <BackDrop isShown={isChildFabsShown} />
+      <BackDrop isShown={isChildFabsShown} onClick={handleShowChildFabs} />
       <StyledFab onClick={handleShowChildFabs} color={color} backgroundColor={backgroundColor}>
         <SVGIcon icon={icon} cssProp={fabCssProp} />
       </StyledFab>

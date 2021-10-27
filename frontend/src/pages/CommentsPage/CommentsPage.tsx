@@ -58,7 +58,7 @@ import NotFound from "../../components/@shared/NotFound/NotFound";
 import usePostDetail from "../../hooks/service/usePostDetail";
 
 const CommentsPage = () => {
-  const postId = new URLSearchParams(location.search).get("id") ?? "";
+  const postIdSearchParam = new URLSearchParams(location.search).get("id");
   const commentTextAreaRef = useRef<HTMLTextAreaElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [selectedCommentId, setSelectedCommentId] = useState<CommentData["id"]>(0);
@@ -67,8 +67,6 @@ const CommentsPage = () => {
   const { state: selectedPost } = useLocation<Post>();
   const history = useHistory();
 
-  const { post } = usePostDetail(Number(postId), true);
-  // const { post } = usePostDetail(Number(postId), !selectedPost);
   const { pushSnackbarMessage } = useSnackbar();
   const { currentUsername, isLoggedIn } = useAuth();
   const {
@@ -78,19 +76,23 @@ const CommentsPage = () => {
     hideModal: hideConfirm,
   } = useModal();
 
-  const targetPost = selectedPost;
+  const { post, isLoading: isPostLoading } = usePostDetail(Number(postIdSearchParam), !selectedPost);
+
+  const postId = post?.id ?? selectedPost?.id;
 
   const {
     infiniteCommentsData,
     isFetching,
     isError,
-    isLoading,
+    isLoading: isCommentsLoading,
     isAddCommentLoading,
     isDeleteCommentLoading,
     getNextComments,
     addPostComment,
     deletePostComment,
-  } = useComments(targetPost.id);
+  } = useComments(postId);
+
+  const targetPost = selectedPost ? selectedPost : post;
 
   const comments = getItemsFromPages<CommentData>(infiniteCommentsData?.pages) ?? [];
 
@@ -116,6 +118,11 @@ const CommentsPage = () => {
   ];
 
   const handleGoBack = () => {
+    if (history.length === 1) {
+      history.push(PAGE_URL.HOME);
+      return;
+    }
+
     history.goBack();
   };
 
@@ -130,7 +137,7 @@ const CommentsPage = () => {
 
   const handleCommentDelete = async () => {
     hideConfirm();
-    await deletePostComment(targetPost.id, selectedCommentId);
+    await deletePostComment(postId, selectedCommentId);
   };
 
   const handleCommentSave = async () => {
@@ -147,7 +154,7 @@ const CommentsPage = () => {
     commentTextAreaRef.current.value = "";
 
     try {
-      await addPostComment(targetPost.id, newComment);
+      await addPostComment(postId, newComment);
     } catch (error) {
       pushSnackbarMessage(FAILURE_MESSAGE.COMMENT_SAVE_FAILED);
     }
@@ -177,6 +184,22 @@ const CommentsPage = () => {
       behavior: "smooth",
     });
   }, [comments.length]);
+
+  if (isPostLoading || isCommentsLoading) {
+    return (
+      <Container>
+        <PageLoading />
+      </Container>
+    );
+  }
+
+  if (!targetPost) {
+    return <PageError errorMessage="게시글을 찾을 수가 없습니다" />;
+  }
+
+  if (isError || !comments) {
+    return <PageError errorMessage="댓글 정보를 불러오는데 실패했습니다" />;
+  }
 
   const commentListItems =
     comments.length === 0 ? (
@@ -224,18 +247,6 @@ const CommentsPage = () => {
       {component}
     </HorizontalSliderItemWrapper>
   ));
-
-  if (isLoading) {
-    return (
-      <Container>
-        <PageLoading />
-      </Container>
-    );
-  }
-
-  if (isError || !comments) {
-    return <PageError errorMessage="댓글 정보를 불러오는데 실패했습니다" />;
-  }
 
   return (
     <ContentWrapper ref={containerRef}>

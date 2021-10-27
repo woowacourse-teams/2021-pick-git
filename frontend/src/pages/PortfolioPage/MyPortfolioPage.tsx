@@ -354,7 +354,7 @@ const MyPortfolioPage = () => {
   return (
     <>
       <ScrollActiveHeader containerRef={containerRef}>
-        <PortfolioHeader isButtonsShown={true} portfolio={portfolio} username={profile?.name ?? ""} />
+        <PortfolioHeader portfolio={portfolio} username={profile?.name ?? ""} />
       </ScrollActiveHeader>
       <Container ref={containerRef}>
         <FullPage isVerticalCenter={false}>

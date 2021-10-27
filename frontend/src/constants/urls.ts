@@ -9,7 +9,9 @@ export const PAGE_URL = {
   HOME: "/",
   HOME_FEED: "/posts",
   USER_FEED_BASE: "/posts-user",
-  POST: (postId: number) => `/posts?id=${postId}`,
+  POST_DETAIL: "/post",
+  POST: (postId: number) => `/post?id=${postId}`,
+  POST_SHARE: (postId: number) => `http://dev.pickgit.p-e.kr/post?id=${postId}`,
   USER_FEED: (username: string) => `/posts-user?username=${username}`,
   SEARCH_RESULT_FEED_BASE: "/search-posts",
   SEARCH_RESULT_FEED: (type: string, keyword: string) => `/search-posts?type=${type}&keyword=${keyword}`,
@@ -23,7 +25,6 @@ export const PAGE_URL = {
   SEARCH_POST_BY_TAG: (tag: string) => `/search?type=tags&keyword=${tag}`,
   PROFILE: "/profile",
   MY_PROFILE: "/my-profile",
-  POST_DETAIL: "/detail",
   POST_LIKE_PEOPLE: "/post-like-people",
   TAG_FEED: (tag: string) => `/posts/tag?tag=${tag}`,
   USER_PROFILE: (username: string) => `/profile?username=${username}`,
@@ -32,7 +33,7 @@ export const PAGE_URL = {
   FOLLOWINGS: (username: string) => `/followings?username=${username}`,
   FOLLOWERS: (username: string) => `/followers?username=${username}`,
   PORTFOLIO: "/portfolio",
-  USER_PORTFOLIO: (username: string) => `/portfolio?username=${username}`,
+  USER_PORTFOLIO_SHARE: (username: string) => `http://dev.pickgit.p-e.kr/portfolio?username=${username}`,
   MY_PORTFOLIO: "/my-portfolio",
 };
 
@@ -66,7 +67,7 @@ export const API_URL = {
   SEARCH_POST: (type: string, keyword: string, page: number, limit: number) =>
     `/search/posts?type=${type}&keyword=${keyword}&page=${page}&limit=${limit}`,
   AFTER_LOGIN: (code: string) => `afterlogin?code=${code}`,
-  POST: (postId: number) => `/posts/${postId}`,
+  POST: (postId: number) => `/posts?id=${postId}`,
   POSTS: (page: number, limit: number) => `/posts?page=${page}&limit=${limit}`,
   POST_LIKE_PEOPLE: (postId: number) => `/posts/${postId}/likes`,
   POST_LIKES: (postId: number) => `/posts/${postId}/likes`,

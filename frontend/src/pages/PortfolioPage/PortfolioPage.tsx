@@ -48,7 +48,7 @@ const PortfolioPage = () => {
     if (error?.response?.status === 400) {
       return (
         <>
-          <PortfolioHeader isButtonsShown={false} portfolio={remotePortfolio} username={profile?.name ?? ""} />
+          <PortfolioHeader username={profile?.name ?? ""} />
           <PageError errorMessage="아직 포트폴리오가 만들어지지 않았습니다" />
         </>
       );
@@ -60,7 +60,7 @@ const PortfolioPage = () => {
   return (
     <>
       <ScrollActiveHeader containerRef={containerRef}>
-        <PortfolioHeader isButtonsShown={false} portfolio={remotePortfolio} username={profile?.name ?? ""} />
+        <PortfolioHeader portfolio={remotePortfolio} username={profile?.name ?? ""} />
       </ScrollActiveHeader>
       <Container ref={containerRef}>
         <FullPage isVerticalCenter={true}>
