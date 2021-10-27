@@ -13,6 +13,7 @@ import { PostAddStepContextProvider } from "./contexts/PostAddStepContext";
 import { SearchPostContextProvider } from "./contexts/SearchPostContext";
 import { UserFeedContextProvider } from "./contexts/UserFeedContext";
 import PageLoadingWithLogo from "./components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
+import { HomeFeedContextProvider } from "./contexts/HomeFeedContext";
 
 const queryClient = new QueryClient();
 
@@ -25,12 +26,14 @@ ReactDOM.render(
             <SearchContextProvider>
               <PostEditDataContextProvider>
                 <SearchPostContextProvider>
-                  <UserFeedContextProvider>
-                    <SnackBarContextProvider>
-                      <GlobalStyle />
-                      <App />
-                    </SnackBarContextProvider>
-                  </UserFeedContextProvider>
+                  <HomeFeedContextProvider>
+                    <UserFeedContextProvider>
+                      <SnackBarContextProvider>
+                        <GlobalStyle />
+                        <App />
+                      </SnackBarContextProvider>
+                    </UserFeedContextProvider>
+                  </HomeFeedContextProvider>
                 </SearchPostContextProvider>
               </PostEditDataContextProvider>
             </SearchContextProvider>

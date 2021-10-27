@@ -14,22 +14,26 @@ import { isHttpErrorStatus } from "../../utils/typeGuard";
 
 import useFeedMutation from "./useFeedMutation";
 
-import type { Post, FeedFilterOption } from "../../@types";
+import type { Post } from "../../@types";
+import HomeFeedContext from "../../contexts/HomeFeedContext";
+import useAuth from "../common/useAuth";
 
-const useHomeFeed = (feedFilterOption: FeedFilterOption) => {
-  const { logout } = useContext(UserContext);
+const useHomeFeed = () => {
   const {
-    data: infinitePostsData,
-    isLoading,
-    error,
-    isError,
-    isFetching,
-    fetchNextPage,
-    refetch,
-  } = useHomeFeedPostsQuery(feedFilterOption);
+    queryResult,
+    feedFilterOption,
+    currentPostId,
+    initialized,
+    initHomeFeed,
+    setFeedFilterOption,
+    setCurrentPostId,
+  } = useContext(HomeFeedContext);
+
+  const { data: infinitePostsData, isLoading, error, isError, isFetching, fetchNextPage, refetch } = queryResult;
 
   // TODO : 그냥 QUERY 만 보내도 되는지 알아보기
   const { setPostsPages } = useFeedMutation([QUERY]);
+  const { isLoggedIn, logout } = useAuth();
   const queryClient = useQueryClient();
 
   const handlePostsEndIntersect = () => {
@@ -54,7 +58,7 @@ const useHomeFeed = (feedFilterOption: FeedFilterOption) => {
   };
 
   const handleDataFetch = () => {
-    if (!infinitePostsData) {
+    if (!infinitePostsData || !initialized) {
       return;
     }
 
@@ -64,6 +68,12 @@ const useHomeFeed = (feedFilterOption: FeedFilterOption) => {
   };
 
   useEffect(() => {
+    if (!initialized) {
+      initHomeFeed(isLoggedIn ? "followings" : "all");
+    }
+  }, [isLoggedIn, initialized]);
+
+  useEffect(() => {
     handleDataFetch();
   }, [infinitePostsData]);
 
@@ -71,7 +81,18 @@ const useHomeFeed = (feedFilterOption: FeedFilterOption) => {
     handleError();
   }, [error]);
 
-  return { infinitePostsData, isLoading, isFetching, isError, handlePostsEndIntersect, refetch };
+  return {
+    infinitePostsData,
+    isLoading,
+    isFetching,
+    isError,
+    handlePostsEndIntersect,
+    refetch,
+    feedFilterOption,
+    currentPostId,
+    setFeedFilterOption,
+    setCurrentPostId,
+  };
 };
 
 export default useHomeFeed;

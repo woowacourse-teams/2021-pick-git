@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
@@ -7,7 +6,6 @@ import { ScrollPageWrapper } from "../../components/@styled/layout";
 import PageError from "../../components/@shared/PageError/PageError";
 import Feed from "../../components/Feed/Feed";
 
-import { LayoutInPx } from "../../constants/layout";
 import { QUERY } from "../../constants/queries";
 
 import useInfiniteImagePreloader from "../../hooks/common/useInfiniteImagePreloader";

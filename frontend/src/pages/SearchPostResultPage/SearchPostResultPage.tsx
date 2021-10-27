@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from "react";
 import { InfiniteData, QueryKey } from "react-query";
 import { useLocation } from "react-router-dom";
 
@@ -8,7 +7,6 @@ import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollCont
 import { ScrollPageWrapper } from "../../components/@styled/layout";
 import Feed from "../../components/Feed/Feed";
 
-import { LayoutInPx } from "../../constants/layout";
 import { QUERY } from "../../constants/queries";
 
 import useInfiniteImagePreloader from "../../hooks/common/useInfiniteImagePreloader";

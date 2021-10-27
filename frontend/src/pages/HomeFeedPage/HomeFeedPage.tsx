@@ -20,9 +20,18 @@ import { Container, NotFoundCSS, postTabCSS, PostTabWrapper } from "./HomeFeedPa
 
 const HomeFeedPage = () => {
   const { isLoggedIn } = useAuth();
-  const [feedFilterOption, setFeedFilterOption] = useState<FeedFilterOption>(isLoggedIn ? "followings" : "all");
-  const { infinitePostsData, isLoading, isFetching, isError, handlePostsEndIntersect, refetch } =
-    useHomeFeed(feedFilterOption);
+  const {
+    infinitePostsData,
+    isLoading,
+    isFetching,
+    isError,
+    handlePostsEndIntersect,
+    refetch,
+    feedFilterOption,
+    currentPostId,
+    setFeedFilterOption,
+    setCurrentPostId,
+  } = useHomeFeed();
 
   const infiniteImageUrls =
     infinitePostsData?.pages.map<string[]>((posts) =>
@@ -40,10 +49,6 @@ const HomeFeedPage = () => {
     handlePostsEndIntersect();
     activateImageFetchingState();
   };
-
-  useEffect(() => {
-    setFeedFilterOption(isLoggedIn ? "followings" : "all");
-  }, [isLoggedIn]);
 
   useEffect(() => {
     refetch();
@@ -64,7 +69,12 @@ const HomeFeedPage = () => {
       <Container>
         {isLoggedIn && (
           <PostTabWrapper>
-            <Tabs tabItems={tabList} tabIndicatorKind="line" cssProp={postTabCSS} />
+            <Tabs
+              tabItems={tabList}
+              tabIndicatorKind="line"
+              defaultTabIndex={feedFilterOption === "followings" ? 0 : 1}
+              cssProp={postTabCSS}
+            />
           </PostTabWrapper>
         )}
         {isPostsEmpty ? (
