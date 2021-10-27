@@ -2,6 +2,7 @@ package com.woowacourse.pickgit.portfolio.application;
 
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.portfolio.NoSuchPortfolioException;
+import com.woowacourse.pickgit.exception.portfolio.NotYetCreatedPortfolioException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
 import com.woowacourse.pickgit.portfolio.application.dto.PortfolioDtoAssembler;
 import com.woowacourse.pickgit.portfolio.application.dto.request.PortfolioRequestDto;
@@ -36,12 +37,12 @@ public class PortfolioService {
 
     private Portfolio generateEmptyPortfolio(String username, UserDto userDto) {
         if (userDto.isGuest()) {
-            throw new NoSuchPortfolioException();
+            throw new NotYetCreatedPortfolioException();
         }
         User targetUser = getUser(username);
         User requestUser = getUser(userDto.getUsername());
         if (!targetUser.equals(requestUser)) {
-            throw new NoSuchPortfolioException();
+            throw new NotYetCreatedPortfolioException();
         }
         return portfolioRepository.save(Portfolio.empty(targetUser));
     }
