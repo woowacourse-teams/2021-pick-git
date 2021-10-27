@@ -45,7 +45,9 @@ export const WARNING_MESSAGE = {
 export const NOT_FOUND_MESSAGE = {
   POSTS: {
     DEFAULT: "게시물이 존재하지 않습니다.",
+    NETWORK: "게시물 정보를 가져올 수 없습니다.",
     FOLLOWINGS: "게시물이 존재하지 않습니다. 다른 사람을 팔로우해보세요",
+    PROJECT: "프로젝트가 존재하지 않습니다. 게시물을 추가해보세요.",
   },
 };
 

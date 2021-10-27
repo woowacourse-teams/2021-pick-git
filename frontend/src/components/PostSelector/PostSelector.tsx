@@ -1,8 +1,10 @@
 import { InfiniteData } from "react-query";
 import { PortfolioProject, Post } from "../../@types";
 import { getItemsFromPages } from "../../utils/infiniteData";
-import { Container, Grid, GridItem } from "./PostSelector.style";
+import { Container, Grid, GridItem, NotFoundCSS } from "./PostSelector.style";
 import InfiniteScrollContainer from "../@shared/InfiniteScrollContainer/InfiniteScrollContainer";
+import NotFound from "../@shared/NotFound/NotFound";
+import { NOT_FOUND_MESSAGE } from "../../constants/messages";
 
 export interface Props {
   infinitePostsData: InfiniteData<Post[]> | undefined;
@@ -13,10 +15,14 @@ export interface Props {
 
 const PostSelector = ({ infinitePostsData, isFetchingNextPage, onPostSelect, onIntersect }: Props) => {
   if (!infinitePostsData) {
-    return <div>게시물 정보를 가져올 수 없습니다.</div>;
+    return <NotFound type="post" message={NOT_FOUND_MESSAGE.POSTS.NETWORK} cssProp={NotFoundCSS} />;
   }
 
   const posts = getItemsFromPages(infinitePostsData.pages);
+
+  if (!posts || posts.length === 0) {
+    return <NotFound type="post" message={NOT_FOUND_MESSAGE.POSTS.PROJECT} cssProp={NotFoundCSS} />;
+  }
 
   return (
     <Container>

@@ -48,3 +48,8 @@ export const GridItem = styled.div<{ imageUrl: string }>(
     }
   `
 );
+
+export const NotFoundCSS = css`
+  margin: 3rem 0;
+  width: 100%;
+`;
