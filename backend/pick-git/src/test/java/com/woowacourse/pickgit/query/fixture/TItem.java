@@ -17,6 +17,14 @@ public class TItem {
         this.itemResponse = itemResponse;
     }
 
+    public static ItemRequest create(String category) {
+        return new ItemRequest(
+            null,
+            category,
+            List.of(TDescription.createRandom())
+        );
+    }
+
     public static ItemRequest createRandom() {
         return new ItemRequest(
             null,

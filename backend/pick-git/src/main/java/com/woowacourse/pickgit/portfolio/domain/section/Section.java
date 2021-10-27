@@ -1,6 +1,7 @@
 package com.woowacourse.pickgit.portfolio.domain.section;
 
 import com.woowacourse.pickgit.portfolio.domain.Portfolio;
+import com.woowacourse.pickgit.portfolio.domain.PortfolioValidator;
 import com.woowacourse.pickgit.portfolio.domain.common.Updatable;
 import com.woowacourse.pickgit.portfolio.domain.common.UpdateUtil;
 import com.woowacourse.pickgit.portfolio.domain.section.item.Item;
@@ -14,6 +15,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
@@ -56,6 +58,8 @@ public class Section implements Updatable<Section> {
         this.name = name;
         this.items = items;
         this.portfolio = portfolio;
+
+        PortfolioValidator.sectionCategorySize(items);
 
         this.items.forEach(item -> item.appendTo(this));
     }
