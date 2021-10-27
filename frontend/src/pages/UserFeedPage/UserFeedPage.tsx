@@ -61,13 +61,12 @@ const UserFeedPage = () => {
   return (
     <ScrollPageWrapper ref={scrollWrapperRef}>
       <Container>
-        <InfiniteScrollContainer isLoaderShown={isFetchingNextPage || isImagesFetching} onIntersect={handleIntersect}>
-          <Feed
-            infinitePostsData={infinitePostsData}
-            queryKey={[QUERY.GET_USER_FEED_POSTS, { username, isMyFeed }]}
-            isFetching={isFetchingNextPage || isImagesFetching}
-          />
-        </InfiniteScrollContainer>
+        <Feed
+          infinitePostsData={infinitePostsData}
+          onIntersect={handleIntersect}
+          queryKey={[QUERY.GET_USER_FEED_POSTS, { username, isMyFeed }]}
+          isFetching={isFetchingNextPage || isImagesFetching}
+        />
       </Container>
     </ScrollPageWrapper>
   );

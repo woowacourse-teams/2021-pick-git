@@ -80,13 +80,12 @@ const HomeFeedPage = () => {
         {isPostsEmpty ? (
           <NotFound type="post" message="게시글을 올리거나 다른 사람을 팔로우 해보세요" cssProp={NotFoundCSS} />
         ) : (
-          <InfiniteScrollContainer isLoaderShown={isFetching || isImagesFetching} onIntersect={handleIntersect}>
-            <Feed
-              infinitePostsData={infinitePostsData}
-              queryKey={[QUERY.GET_HOME_FEED_POSTS]}
-              isFetching={isFetching || isImagesFetching}
-            />
-          </InfiniteScrollContainer>
+          <Feed
+            infinitePostsData={infinitePostsData}
+            onIntersect={handleIntersect}
+            queryKey={[QUERY.GET_HOME_FEED_POSTS]}
+            isFetching={isFetching || isImagesFetching}
+          />
         )}
       </Container>
     </ScrollPageWrapper>

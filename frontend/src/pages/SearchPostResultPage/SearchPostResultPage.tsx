@@ -68,13 +68,12 @@ const SearchPostResultPage = () => {
   return (
     <ScrollPageWrapper ref={scrollWrapperRef}>
       <Container>
-        <InfiniteScrollContainer isLoaderShown={isFetchingNextPage || isImagesFetching} onIntersect={handleIntersect}>
-          <Feed
-            infinitePostsData={infinitePostsData}
-            queryKey={[QUERY.GET_SEARCH_POST_RESULT, { type, keyword }]}
-            isFetching={isFetchingNextPage || isImagesFetching}
-          />
-        </InfiniteScrollContainer>
+        <Feed
+          infinitePostsData={infinitePostsData}
+          onIntersect={handleIntersect}
+          queryKey={[QUERY.GET_SEARCH_POST_RESULT, { type, keyword }]}
+          isFetching={isFetchingNextPage || isImagesFetching}
+        />
       </Container>
     </ScrollPageWrapper>
   );

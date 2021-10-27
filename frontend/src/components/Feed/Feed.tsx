@@ -4,7 +4,7 @@ import { Post } from "../../@types";
 import SnackBarContext from "../../contexts/SnackbarContext";
 import UserContext from "../../contexts/UserContext";
 import PostItem from "../@shared/PostItem/PostItem";
-import { Container, PostItemWrapper } from "./Feed.style";
+import { PostItemWrapper } from "./Feed.style";
 import useFeedMutation from "../../hooks/service/useFeedMutation";
 import { SUCCESS_MESSAGE, WARNING_MESSAGE } from "../../constants/messages";
 import { getAPIErrorMessage } from "../../utils/error";
@@ -17,14 +17,16 @@ import ConfirmPortal from "../@layout/ConfirmPortal/ConfirmPortal";
 import PageLoadingWithCover from "../@layout/PageLoadingWithCover/PageLoadingWithCover";
 import useModal from "../../hooks/common/useModal";
 import axios from "axios";
+import InfiniteScrollContainer from "../@shared/InfiniteScrollContainer/InfiniteScrollContainer";
 
 interface Props {
   infinitePostsData: InfiniteData<Post[] | null>;
+  onIntersect: () => void;
   queryKey: QueryKey;
   isFetching: boolean;
 }
 
-const Feed = ({ infinitePostsData, queryKey, isFetching }: Props) => {
+const Feed = ({ infinitePostsData, onIntersect, queryKey, isFetching }: Props) => {
   const [selectedPostId, setSelectedPostId] = useState<Post["id"]>();
   const { pushSnackbarMessage } = useContext(SnackBarContext);
   const { addPostLike, deletePost, deletePostLike, isDeletePostLoading } = useFeedMutation(queryKey);
@@ -121,7 +123,7 @@ const Feed = ({ infinitePostsData, queryKey, isFetching }: Props) => {
   }, [infinitePostsData, isFetching]);
 
   return (
-    <Container>
+    <InfiniteScrollContainer isLoaderShown={isFetching} onIntersect={onIntersect}>
       {posts?.map((post) => (
         <PostItemWrapper id={`post${post.id}`} key={post.id}>
           <PostItem
@@ -152,7 +154,7 @@ const Feed = ({ infinitePostsData, queryKey, isFetching }: Props) => {
         </PostItemWrapper>
       ))}
       {isConfirmShown && <ConfirmPortal heading={confirmMessage} onConfirm={handlePostDelete} onCancel={hideConfirm} />}
-    </Container>
+    </InfiniteScrollContainer>
   );
 };
 
