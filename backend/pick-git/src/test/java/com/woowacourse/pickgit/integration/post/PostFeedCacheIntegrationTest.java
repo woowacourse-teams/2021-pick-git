@@ -17,7 +17,7 @@ import com.woowacourse.pickgit.post.application.dto.request.HomeFeedRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.PostRequestDto;
 import com.woowacourse.pickgit.post.application.dto.response.PostResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
-import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.domain.repository.UserRepository;
 import java.util.List;
 import java.util.stream.IntStream;
 import javax.persistence.EntityManager;

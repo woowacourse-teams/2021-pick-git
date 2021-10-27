@@ -20,7 +20,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import org.springframework.data.annotation.PersistenceConstructor;
+import org.springframework.data.elasticsearch.annotations.Document;
 
+@Document(indexName = "users")
 @Entity
 public class User {
 
@@ -53,6 +56,7 @@ public class User {
         this(null, basicProfile, githubProfile);
     }
 
+    @PersistenceConstructor
     public User(Long id, BasicProfile basicProfile, GithubProfile githubProfile) {
         this(
             id,

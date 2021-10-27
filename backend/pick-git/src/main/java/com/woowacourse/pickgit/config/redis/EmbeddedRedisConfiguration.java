@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Objects;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -42,9 +43,8 @@ public class EmbeddedRedisConfiguration {
     }
 
     @PostConstruct
-    public void redisServer() throws IOException, URISyntaxException {
+    public void redisServer() throws IOException {
         int redisPort = isRedisRunning() ? findAvailablePort() : port;
-
         if (isArmMac()) {
             redisServer = new RedisServer(Objects.requireNonNull(getRedisFileForArcMac()),
                 redisPort);
@@ -52,7 +52,6 @@ public class EmbeddedRedisConfiguration {
         if (!isArmMac()) {
             redisServer = new RedisServer(redisPort);
         }
-
         redisServer.start();
     }
 
