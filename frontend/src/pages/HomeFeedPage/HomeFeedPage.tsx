@@ -57,7 +57,6 @@ const HomeFeedPage = () => {
   }
 
   const isPostsEmpty = getItemsFromPages(infinitePostsData.pages)?.length === 0;
-  console.log(feedFilterOption);
 
   return (
     <ScrollPageWrapper ref={scrollWrapperRef}>

@@ -14,9 +14,7 @@ export interface Props extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const Tabs = ({ tabIndicatorKind, defaultTabIndex = 0, tabItems, tabIndicatorColor, ...props }: Props) => {
-  console.log(defaultTabIndex);
   const [tabIndex, setTabIndex] = useState(defaultTabIndex);
-  console.log("index", tabIndex);
 
   const handleTabIndexChange = (index: number, onTabChange: () => void) => {
     setTabIndex(index);

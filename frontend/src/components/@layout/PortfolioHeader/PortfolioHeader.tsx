@@ -26,8 +26,6 @@ const PortfolioHeader = ({ isButtonsShown = true, portfolio, username }: Props) 
     history.goBack();
   };
 
-  console.log("portfolio", portfolio);
-
   return (
     <Container>
       <HeaderContentWrapper>

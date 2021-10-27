@@ -251,7 +251,6 @@ const MyPortfolioPage = () => {
     }
 
     const syncRemoteWithLocal = () => {
-      console.log("remotePortfolio.contacts", remotePortfolio.contacts);
       const intro = {
         name: remotePortfolio.name,
         description: remotePortfolio.introduction,
