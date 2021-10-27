@@ -151,7 +151,7 @@ export type PortfolioIntro = {
 };
 
 export type PortfolioProject = {
-  id: string | number;
+  id: number;
   name: string;
   startDate: string;
   endDate: string;
@@ -170,10 +170,25 @@ export type PortfolioSectionItem = {
   }[];
 };
 
+export type IdProcessedPortfolioSectionItem = {
+  id: number | null;
+  category: string;
+  descriptions: {
+    id: number | null;
+    value: string;
+  }[];
+};
+
 export type PortfolioSection = {
   id: string | number;
   name: string;
   items: PortfolioSectionItem[];
+};
+
+export type IdProcessedPortfolioSection = {
+  id: number | null;
+  name: string;
+  items: IdProcessedPortfolioSectionItem[];
 };
 
 export type Portfolio = {
@@ -196,6 +211,19 @@ export type PortfolioData = {
   sections: PortfolioSection[];
 };
 
+export type PortfolioUploadData = {
+  id: number | null;
+  name: string;
+  profileImageShown: boolean;
+  profileImageUrl: string;
+  introduction: string;
+  updatedAt?: string;
+  createdAt?: string;
+  contacts: PortfolioContact[];
+  projects: PortfolioProject[];
+  sections: IdProcessedPortfolioSection[];
+};
+
 export type PortfolioSectionType = "project" | "custom";
 
 export type PortfolioSectionList = string[];
@@ -207,3 +235,8 @@ export interface ChildFabItem {
   text?: string;
   onClick: () => void;
 }
+
+export type CircleButtonItem = {
+  icon: IconType;
+  onClick: () => void;
+};

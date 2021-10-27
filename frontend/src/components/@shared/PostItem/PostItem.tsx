@@ -24,7 +24,7 @@ import CircleIcon from "../CircleIcon/CircleIcon";
 import Comment from "../Comment/Comment";
 import ImageSlider from "../ImageSlider/ImageSlider";
 import Chip from "../Chip/Chip";
-import { CommentData } from "../../../@types";
+import { CircleButtonItem, CommentData } from "../../../@types";
 import {
   EditIcon,
   PostHeartIcon,
@@ -105,9 +105,9 @@ const PostItem = ({
     ? timeDiffTextTable.min(min)
     : timeDiffTextTable.sec();
 
-  const circleButtons = [
-    { node: <EditIcon />, onClick: onPostEdit },
-    { node: <TrashIcon />, onClick: onPostDelete },
+  const circleButtons: CircleButtonItem[] = [
+    { icon: "EditIcon", onClick: onPostEdit },
+    { icon: "TrashIcon", onClick: onPostDelete },
   ];
 
   const commentList = comments.map((comment) => (
@@ -149,6 +149,7 @@ const PostItem = ({
           <Avatar diameter="1.9375rem" imageUrl={authorImageUrl} />
           <PostAuthorName>{authorName}</PostAuthorName>
         </PostAuthorInfoLink>
+        {/* {isEditable && <ButtonDrawer icon="ShareIcon" circleButtons={circleButtons} />} */}
         {isEditable && <ButtonDrawer circleButtons={circleButtons} />}
       </PostHeader>
       <ImageSlider imageUrls={imageUrls.length !== 0 ? imageUrls : [EmptyPostImage]} slideButtonKind="in-box" />

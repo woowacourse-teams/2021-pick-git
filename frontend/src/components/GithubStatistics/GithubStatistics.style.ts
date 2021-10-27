@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { setDesktopMediaQuery, setLaptopMediaQuery } from "../@styled/mediaQueries";
 
 export const Container = styled.div`
@@ -32,20 +32,21 @@ export const StatsWrapper = styled.div`
   `}
 `;
 
-export const Stat = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-size: 0.625rem;
-
-  ${setLaptopMediaQuery`
-    font-size: 0.75rem;
-  `}
-
-  ${setDesktopMediaQuery`
-    font-size: 0.9rem;
-  `}
-`;
+export const Stat = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.625rem;
+    color: ${theme.color.textColor};
+    ${setLaptopMediaQuery`
+      font-size: 0.75rem;
+    `}
+    ${setDesktopMediaQuery`
+      font-size: 0.9rem;
+    `};
+  `
+);
 
 export const Heading = styled.h2`
   ${setLaptopMediaQuery`

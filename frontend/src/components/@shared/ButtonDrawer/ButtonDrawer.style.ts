@@ -8,7 +8,7 @@ export const Container = styled.span<React.CSSProperties>`
   align-items: center;
 `;
 
-export const VerticalDotsWrapper = styled.div`
+export const IconWrapper = styled.div`
   cursor: pointer;
 `;
 

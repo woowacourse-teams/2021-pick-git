@@ -55,8 +55,10 @@ import type { CommentData, Post, TabItem } from "../../@types";
 import useModal from "../../hooks/common/useModal";
 import Loader from "../../components/@shared/Loader/Loader";
 import NotFound from "../../components/@shared/NotFound/NotFound";
+import usePostDetail from "../../hooks/service/usePostDetail";
 
 const CommentsPage = () => {
+  const postId = new URLSearchParams(location.search).get("id") ?? "";
   const commentTextAreaRef = useRef<HTMLTextAreaElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [selectedCommentId, setSelectedCommentId] = useState<CommentData["id"]>(0);
@@ -65,6 +67,8 @@ const CommentsPage = () => {
   const { state: selectedPost } = useLocation<Post>();
   const history = useHistory();
 
+  const { post } = usePostDetail(Number(postId), true);
+  // const { post } = usePostDetail(Number(postId), !selectedPost);
   const { pushSnackbarMessage } = useSnackbar();
   const { currentUsername, isLoggedIn } = useAuth();
   const {
@@ -73,6 +77,10 @@ const CommentsPage = () => {
     showModal: showConfirm,
     hideModal: hideConfirm,
   } = useModal();
+
+  const targetPost = selectedPost;
+
+  console.log("post", post);
 
   const {
     infiniteCommentsData,
@@ -84,7 +92,7 @@ const CommentsPage = () => {
     getNextComments,
     addPostComment,
     deletePostComment,
-  } = useComments(selectedPost.id);
+  } = useComments(targetPost.id);
 
   const comments = getItemsFromPages<CommentData>(infiniteCommentsData?.pages) ?? [];
 
@@ -124,7 +132,7 @@ const CommentsPage = () => {
 
   const handleCommentDelete = async () => {
     hideConfirm();
-    await deletePostComment(selectedPost.id, selectedCommentId);
+    await deletePostComment(targetPost.id, selectedCommentId);
   };
 
   const handleCommentSave = async () => {
@@ -141,16 +149,16 @@ const CommentsPage = () => {
     commentTextAreaRef.current.value = "";
 
     try {
-      await addPostComment(selectedPost.id, newComment);
+      await addPostComment(targetPost.id, newComment);
     } catch (error) {
       pushSnackbarMessage(FAILURE_MESSAGE.COMMENT_SAVE_FAILED);
     }
   };
 
-  const handleCommentTextInput: React.KeyboardEventHandler<HTMLTextAreaElement> = (event) => {    
+  const handleCommentTextInput: React.KeyboardEventHandler<HTMLTextAreaElement> = (event) => {
     if (event.ctrlKey && event.code === "Enter") {
       event.preventDefault();
-      event.currentTarget.value += '\n';
+      event.currentTarget.value += "\n";
       return;
     }
 
@@ -159,7 +167,7 @@ const CommentsPage = () => {
       handleCommentSave();
       return;
     }
-  }
+  };
 
   useEffect(() => {
     if (!containerRef.current) {
@@ -172,41 +180,43 @@ const CommentsPage = () => {
     });
   }, [comments.length]);
 
-  const commentListItems = comments.length === 0 ? 
-    <NotFound type="comment" message="작성된 댓글이 없습니다" cssProp={NotFoundCSS} /> : comments.map((comment) => (
-      <CommentListItem key={comment.id}>
-        <CommentContentWrapper>
-          <Avatar diameter="2.5rem" imageUrl={comment.profileImageUrl} />
-          <CommentText>
-            <PostContentAuthorLink to={PAGE_URL.USER_PROFILE(comment.authorName)}>
-              {comment.authorName}
-            </PostContentAuthorLink>
-            <span>
-              {comment.content}
-            </span>
-          </CommentText>
-        </CommentContentWrapper>
-        {(currentUsername === comment.authorName || selectedPost.authorName === currentUsername) && (
-          <DeleteIconWrapper onClick={() => handleCommentDeleteClick(comment.id)}>
-            <SVGIcon icon="DeleteIcon" />
-          </DeleteIconWrapper>
-        )}
-      </CommentListItem>
-    ));
+  const commentListItems =
+    comments.length === 0 ? (
+      <NotFound type="comment" message="작성된 댓글이 없습니다" cssProp={NotFoundCSS} />
+    ) : (
+      comments.map((comment) => (
+        <CommentListItem key={comment.id}>
+          <CommentContentWrapper>
+            <Avatar diameter="2.5rem" imageUrl={comment.profileImageUrl} />
+            <CommentText>
+              <PostContentAuthorLink to={PAGE_URL.USER_PROFILE(comment.authorName)}>
+                {comment.authorName}
+              </PostContentAuthorLink>
+              <span>{comment.content}</span>
+            </CommentText>
+          </CommentContentWrapper>
+          {(currentUsername === comment.authorName || targetPost.authorName === currentUsername) && (
+            <DeleteIconWrapper onClick={() => handleCommentDeleteClick(comment.id)}>
+              <SVGIcon icon="DeleteIcon" />
+            </DeleteIconWrapper>
+          )}
+        </CommentListItem>
+      ))
+    );
 
-  const tagListItems = selectedPost.tags.map((tag: string) => (
+  const tagListItems = targetPost.tags.map((tag: string) => (
     <TagItemLinkButton key={tag} to={PAGE_URL.SEARCH_POST_BY_TAG(tag)}>
       <Chip>{tag}</Chip>
     </TagItemLinkButton>
   ));
 
   const horizontalSliderComponents = [
-    <ImageSlider key="images" slideButtonKind="in-box" imageUrls={selectedPost.imageUrls} />,
+    <ImageSlider key="images" slideButtonKind="in-box" imageUrls={targetPost.imageUrls} />,
     <PostContent key="contents">
-      <PostContentAuthorLink to={PAGE_URL.USER_PROFILE(selectedPost.authorName)}>
-        {selectedPost.authorName}
+      <PostContentAuthorLink to={PAGE_URL.USER_PROFILE(targetPost.authorName)}>
+        {targetPost.authorName}
       </PostContentAuthorLink>
-      {getTextElementsWithWithBr(selectedPost.content)}
+      {getTextElementsWithWithBr(targetPost.content)}
     </PostContent>,
     <TagListWrapper key="tags">{tagListItems}</TagListWrapper>,
   ];

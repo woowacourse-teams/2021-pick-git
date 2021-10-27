@@ -12,6 +12,7 @@ import PortfolioTextEditor from "../../components/PortfolioTextEditor/PortfolioT
 import { CONTACT_ICON } from "../../constants/portfolio";
 
 import usePortfolio from "../../hooks/service/usePortfolio";
+import useProfile from "../../hooks/service/useProfile";
 
 import {
   AvatarWrapper,
@@ -29,6 +30,7 @@ import {
 const PortfolioPage = () => {
   const username = new URLSearchParams(location.search).get("username") ?? "";
   const containerRef = useRef<HTMLDivElement>(null);
+  const { data: profile } = useProfile(false, username);
 
   const {
     portfolio: remotePortfolio,
@@ -46,7 +48,7 @@ const PortfolioPage = () => {
     if (error?.response?.status === 400) {
       return (
         <>
-          <PortfolioHeader isButtonsShown={false} />
+          <PortfolioHeader isButtonsShown={false} portfolio={remotePortfolio} username={profile?.name ?? ""} />
           <PageError errorMessage="아직 포트폴리오가 만들어지지 않았습니다" />
         </>
       );
@@ -58,7 +60,7 @@ const PortfolioPage = () => {
   return (
     <>
       <ScrollActiveHeader containerRef={containerRef}>
-        <PortfolioHeader isButtonsShown={false} />
+        <PortfolioHeader isButtonsShown={false} portfolio={remotePortfolio} username={profile?.name ?? ""} />
       </ScrollActiveHeader>
       <Container ref={containerRef}>
         <FullPage isVerticalCenter={true}>

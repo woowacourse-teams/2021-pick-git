@@ -1,5 +1,5 @@
 import { AxiosError } from "axios";
-import { QueryFunction, useInfiniteQuery, useMutation } from "react-query";
+import { QueryFunction, useInfiniteQuery, useMutation, useQuery } from "react-query";
 
 import { ErrorResponse, Post } from "../../@types";
 import { QUERY } from "../../constants/queries";
@@ -12,6 +12,7 @@ import {
   requestGetMyFeedPosts,
   requestGetUserFeedPosts,
   requestDeletePost,
+  requestGetPost,
 } from "../requests";
 
 type UserPostsQueryKey = readonly [
@@ -21,6 +22,8 @@ type UserPostsQueryKey = readonly [
     username: string | null;
   }
 ];
+
+type PostQuery = readonly [typeof QUERY.GET_POST, number];
 
 const userPostsQueryFunction: QueryFunction<Post[]> = async ({ queryKey, pageParam = 0 }) => {
   const [, { isMyFeed, username }] = queryKey as UserPostsQueryKey;
@@ -35,6 +38,12 @@ const userPostsQueryFunction: QueryFunction<Post[]> = async ({ queryKey, pagePar
 
     return await requestGetUserFeedPosts(username, pageParam, accessToken);
   }
+};
+
+const postQueryFunction: QueryFunction<Post> = async ({ queryKey }) => {
+  const [, postId] = queryKey as PostQuery;
+
+  return await requestGetPost(postId);
 };
 
 export const useHomeFeedFollowingsPostsQuery = () => {
@@ -92,4 +101,10 @@ export const useDeletePostMutation = () => {
 
 export const useDeletePostLikeMutation = () => {
   return useMutation((postId: Post["id"]) => requestDeletePostLike(postId, getAccessToken()));
+};
+
+export const useGetPostQuery = (postId: number, activated: boolean) => {
+  return useQuery<Post>(["post", postId], postQueryFunction, {
+    enabled: activated
+  });
 };

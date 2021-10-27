@@ -24,8 +24,6 @@ export const useGithubRepositoriesQuery = (keyword: string) => {
 };
 
 export const useGithubTagsQuery = (repositoryName: string) => {
-  const isRepositoryNameNotEmpty = repositoryName !== "";
-
   const githubTagsQueryFunction: QueryFunction<string[]> = async ({ queryKey }) => {
     const [, repositoryName] = queryKey as GithubTagsQueryKey;
 
@@ -33,7 +31,6 @@ export const useGithubTagsQuery = (repositoryName: string) => {
   };
 
   return useQuery<Tags, AxiosError<ErrorResponse>>([QUERY.GET_GITHUB_TAGS, repositoryName], githubTagsQueryFunction, {
-    enabled: isRepositoryNameNotEmpty,
     cacheTime: 0,
   });
 };
