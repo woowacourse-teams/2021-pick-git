@@ -32,6 +32,10 @@ const Tabs = ({ tabIndicatorKind, defaultTabIndex = 0, tabItems, tabIndicatorCol
     </TabButton>
   ));
 
+  useEffect(() => {
+    setTabIndex(defaultTabIndex);
+  }, [defaultTabIndex]);
+
   return (
     <Container {...props}>
       <TabButtonWrapper>

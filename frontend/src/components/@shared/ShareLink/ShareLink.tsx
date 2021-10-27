@@ -34,8 +34,6 @@ const ShareLink = ({ target, username, children, cssProp }: Props) => {
 
   if (isMyPortfolio(target)) {
     const template = MY_KAKAO_PORTFOLIO_SHARE_LINK_TEMPLATE(target, username);
-    console.log("target", target);
-    console.log("template", template);
     return (
       <KakaoLinkDefault cssProp={cssProp} template={template} jsKey={process.env.KAKAO_API_KEY}>
         {children}
@@ -44,8 +42,6 @@ const ShareLink = ({ target, username, children, cssProp }: Props) => {
   }
 
   const template = KAKAO_PORTFOLIO_SHARE_LINK_TEMPLATE(target, username);
-  console.log("target", target);
-  console.log("template", template);
 
   return (
     <KakaoLinkDefault cssProp={cssProp} template={template} jsKey={process.env.KAKAO_API_KEY}>

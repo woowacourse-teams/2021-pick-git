@@ -48,7 +48,7 @@ const NavigationHeader = () => {
         <HomeLink
           to={PAGE_URL.HOME}
           onClick={() => {
-            initHomeFeed(isLoggedIn ? "followings" : "all");
+            initHomeFeed();
             setCurrentPostId(-1);
           }}
         >

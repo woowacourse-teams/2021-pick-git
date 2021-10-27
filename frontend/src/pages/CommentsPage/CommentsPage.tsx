@@ -80,8 +80,6 @@ const CommentsPage = () => {
 
   const targetPost = selectedPost;
 
-  console.log("post", post);
-
   const {
     infiniteCommentsData,
     isFetching,

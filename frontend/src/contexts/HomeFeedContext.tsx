@@ -17,7 +17,7 @@ interface Value {
   feedFilterOption: FeedFilterOption;
   currentPostId: number;
   initialized: boolean;
-  initHomeFeed: (feedFilterOption: FeedFilterOption) => void;
+  initHomeFeed: () => void;
   setFeedFilterOption: Dispatch<SetStateAction<FeedFilterOption>>;
   setCurrentPostId: Dispatch<SetStateAction<number>>;
 }
@@ -28,21 +28,16 @@ export const HomeFeedContextProvider = ({ children }: Props) => {
   const [feedFilterOption, setFeedFilterOption] = useState<FeedFilterOption>("all");
   const [currentPostId, setCurrentPostId] = useState(-1);
   const [initialized, setInitialized] = useState(false);
-  const { isLoggedIn } = useAuth();
 
   const queryResults = {
     all: useHomeFeedAllPostsQuery(),
     followings: useHomeFeedFollowingsPostsQuery(),
   };
 
-  const initHomeFeed = (feedFilterOption: FeedFilterOption) => {
-    setFeedFilterOption(feedFilterOption);
+  const initHomeFeed = () => {
+    setFeedFilterOption("all");
     setInitialized(true);
   };
-
-  useEffect(() => {
-    initHomeFeed(isLoggedIn ? "followings" : "all");
-  }, [isLoggedIn]);
 
   return (
     <HomeFeedContext.Provider

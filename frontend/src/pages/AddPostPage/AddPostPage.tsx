@@ -66,7 +66,6 @@ const AddPostPage = () => {
     activateUploadingState,
     deactivateUploadingState,
   } = usePostUpload();
-  console.log("githubRepositoryName", githubRepositoryName);
 
   const tagsQueryResult = useGithubTags(githubRepositoryName);
 

@@ -39,8 +39,8 @@ const HomeFeedPage = () => {
     useInfiniteImagePreloader(infiniteImageUrls);
 
   const tabList = [
-    { name: "Followings", onTabChange: () => setFeedFilterOption("followings") },
     { name: "All", onTabChange: () => setFeedFilterOption("all") },
+    { name: "Followings", onTabChange: () => setFeedFilterOption("followings") },
   ];
 
   const handleIntersect = () => {
@@ -66,7 +66,7 @@ const HomeFeedPage = () => {
             <Tabs
               tabItems={tabList}
               tabIndicatorKind="line"
-              defaultTabIndex={feedFilterOption === "followings" ? 0 : 1}
+              defaultTabIndex={feedFilterOption === "all" ? 0 : 1}
               cssProp={postTabCSS}
             />
           </PostTabWrapper>
