@@ -22,7 +22,8 @@ export const getPortfolioLocalUpdateTimeString = () => {
   const updateTime = new Date(
     localStorage.getItem(STORAGE_KEY.PORTFOLIO_LOCAL_UPDATE_TIME(getUsername() ?? "")) ?? "0"
   );
-  const ISOString = updateTime.toISOString();
+  const hoursAddedTime = new Date(updateTime.getTime() + 9 * 60 * 60 * 1000);
+  const ISOString = hoursAddedTime.toISOString();
   const closeIndex = ISOString.indexOf(".");
   return ISOString.substring(0, closeIndex);
 };

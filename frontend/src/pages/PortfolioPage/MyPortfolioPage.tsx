@@ -179,6 +179,8 @@ const MyPortfolioPage = () => {
   const handleDeleteProjectSection = (sectionId: string | number) => {
     showConfirm("정말 삭제하시겠습니까?");
     setDeletingSectionType("project");
+
+    console.log("sectionId", sectionId);
     setDeletingSectionId(sectionId);
   };
 
@@ -222,7 +224,7 @@ const MyPortfolioPage = () => {
   const handleUploadPortfolio = async () => {
     try {
       const localUpdateTimeString = getPortfolioLocalUpdateTimeString();
-
+      console.log("localUpdateTimeString", localUpdateTimeString);
       const projects = portfolioProjects.map((project) => ({
         ...project,
         id: isTempId(project.id) ? null : project.id,
