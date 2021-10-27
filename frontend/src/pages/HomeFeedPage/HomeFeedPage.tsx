@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useLocation } from "react-router";
 import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
 import NotFound from "../../components/@shared/NotFound/NotFound";
@@ -23,6 +24,7 @@ const HomeFeedPage = () => {
     isLoading,
     isFetching,
     isError,
+    refetch,
     handlePostsEndIntersect,
     feedFilterOption,
     currentPostId,
@@ -47,6 +49,10 @@ const HomeFeedPage = () => {
     handlePostsEndIntersect();
     activateImageFetchingState();
   };
+
+  useEffect(() => {
+    refetch();
+  }, [isLoggedIn]);
 
   if (isLoading || isFirstImagesLoading) {
     return <PageLoadingWithLogo />;
