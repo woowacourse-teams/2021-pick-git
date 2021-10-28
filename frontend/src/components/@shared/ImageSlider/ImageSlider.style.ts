@@ -20,6 +20,7 @@ export const ImageListSlider = styled.ul<React.CSSProperties>(
     width: ${width};
     height: 100%;
     background-color: ${theme.color.postBackgroundColor};
+    pointer-events: none;
 
     display: flex;
     align-items: center;
