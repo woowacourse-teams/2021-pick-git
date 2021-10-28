@@ -101,7 +101,7 @@ public class LoginAndThenAct extends Act {
             }
             String location = response.headers().getValue(HttpHeaders.LOCATION);
             String[] split = location.split("/");
-            tPost.setId(Long.parseLong(split[split.length - 1]));
+            tPost.setId(Long.parseLong(split[split.length - 1]), isRead);
         }
 
         return response;
@@ -110,7 +110,7 @@ public class LoginAndThenAct extends Act {
     public ExtractableResponse<Response> 포스트를삭제한다(TPost tPost) {
         return request(
             token,
-            String.format("/api/posts/%d", tPost.getId()),
+            String.format("/api/posts/%d", tPost.getId(isRead)),
             Method.DELETE
         );
     }
@@ -126,7 +126,7 @@ public class LoginAndThenAct extends Act {
 
         return request(
             token,
-            String.format("api/posts/%d", source.getId()),
+            String.format("api/posts/%d", source.getId(isRead)),
             Method.PUT,
             values
         );
@@ -148,9 +148,9 @@ public class LoginAndThenAct extends Act {
         return response;
     }
 
-    public ExtractableResponse<Response> 포스트를검색한다(TPost tpost, HttpStatus status) {
+    public ExtractableResponse<Response> 포스트를검색한다(TPost tPost, HttpStatus status) {
         ExtractableResponse<Response> response = request(
-            String.format("/api/posts?id=%d", tpost.getId()),
+            String.format("/api/posts?id=%d", tPost.getId(isRead)),
             Method.GET,
             status
         );
@@ -159,34 +159,34 @@ public class LoginAndThenAct extends Act {
         return response;
     }
 
-    public ExtractableResponse<Response> 포스트에좋아요를누른다(TPost tpost) {
+    public ExtractableResponse<Response> 포스트에좋아요를누른다(TPost tPost) {
         if (isRead) {
-            if (tpost.getLikes().contains(tUser)) {
+            if (tPost.getLikes().contains(tUser)) {
                 return null;
             }
 
-            tpost.addLike(tUser);
+            tPost.addLike(tUser);
         }
 
         return request(
             token,
-            String.format("/api/posts/%d/likes", tpost.getId()),
+            String.format("/api/posts/%d/likes", tPost.getId(isRead)),
             Method.PUT
         );
     }
 
-    public ExtractableResponse<Response> 포스트에좋아요_취소를_한다(TPost tpost) {
+    public ExtractableResponse<Response> 포스트에좋아요_취소를_한다(TPost tPost) {
         if (isRead) {
-            if (!tpost.getLikes().contains(tUser)) {
+            if (!tPost.getLikes().contains(tUser)) {
                 return null;
             }
 
-            tpost.removeLike(tUser);
+            tPost.removeLike(tUser);
         }
 
         return request(
             token,
-            String.format("/api/posts/%d/likes", tpost.getId()),
+            String.format("/api/posts/%d/likes", tPost.getId(isRead)),
             Method.DELETE
         );
     }
@@ -194,7 +194,7 @@ public class LoginAndThenAct extends Act {
     public List<LikeUsersResponse> 포스트에좋아요한사용자를조회한다(TPost tPost) {
         return request(
             token,
-            String.format("/api/posts/%d/likes", tPost.getId()),
+            String.format("/api/posts/%d/likes", tPost.getId(isRead)),
             Method.GET
         ).as(new TypeRef<>() {
         });
@@ -215,19 +215,21 @@ public class LoginAndThenAct extends Act {
 
         ExtractableResponse<Response> response = request(
             token,
-            String.format("/api/posts/%s/comments", tPost.getId()),
+            String.format("/api/posts/%s/comments", tPost.getId(isRead)),
             Method.POST,
             params
         );
 
-        tUser.cache.put(key, response);
+        if(isRead) {
+            tUser.cache.put(key, response);
+        }
         return response;
     }
 
     public ExtractableResponse<Response> 댓글을삭제한다(TPost tPost, Long id) {
         return request(
             token,
-            String.format("/api/posts/%d/comments/%d", tPost.getId(), id),
+            String.format("/api/posts/%d/comments/%d", tPost.getId(isRead), id),
             Method.DELETE
         );
     }
@@ -235,7 +237,7 @@ public class LoginAndThenAct extends Act {
     public ExtractableResponse<Response> 댓글을조회한다(TPost tPost, int page, int limit) {
         return request(
             token,
-            String.format("/api/posts/%d/comments?page=%d&limit=%d", tPost.getId(), page, limit),
+            String.format("/api/posts/%d/comments?page=%d&limit=%d", tPost.getId(isRead), page, limit),
             Method.GET
         );
     }

@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.query.integrantion.post;
+package com.woowacourse.pickgit.integration.post;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

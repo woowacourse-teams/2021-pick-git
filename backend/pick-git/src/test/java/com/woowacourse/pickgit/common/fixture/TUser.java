@@ -128,7 +128,7 @@ public enum TUser {
     }
 
     public UnLoginAndThenAct 는() {
-        return new UnLoginAndThenAct();
+        return new UnLoginAndThenAct(isRead);
     }
 
     public static AllUserAct 모든유저() {

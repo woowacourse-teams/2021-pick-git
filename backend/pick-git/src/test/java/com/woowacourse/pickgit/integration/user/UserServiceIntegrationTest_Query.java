@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.query.integrantion.user;
+package com.woowacourse.pickgit.integration.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;

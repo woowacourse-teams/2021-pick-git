@@ -16,11 +16,18 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 public class UnLoginAndThenAct extends Act {
 
     private static final String INVALID_TOKEN = "invalid token";
+    
+    private final boolean isRead;
+
+    public UnLoginAndThenAct(boolean isRead) {
+        this.isRead = isRead;
+    }
 
     public List<UserSearchResponse> 팔로잉를확인한다(TUser tUser) {
         return request(
@@ -53,9 +60,9 @@ public class UnLoginAndThenAct extends Act {
         return response;
     }
 
-    public ExtractableResponse<Response> 포스트를검색한다(TPost tpost, HttpStatus status) {
+    public ExtractableResponse<Response> 포스트를검색한다(TPost tPost, HttpStatus status) {
         ExtractableResponse<Response> response = request(
-            String.format("/api/posts?id=%d", tpost.getId()),
+            String.format("/api/posts?id=%d", tPost.getId(isRead)),
             Method.GET,
             status
         );
@@ -66,7 +73,7 @@ public class UnLoginAndThenAct extends Act {
 
     public List<LikeUsersResponse> 포스트에좋아요한사용자를조회한다(TPost tPost) {
         return request(
-            String.format("/api/posts/%d/likes", tPost.getId()),
+            String.format("/api/posts/%d/likes", tPost.getId(isRead)),
             Method.GET
         ).as(new TypeRef<>() {
         });
@@ -86,7 +93,7 @@ public class UnLoginAndThenAct extends Act {
         params.put("content", comment);
 
         return request(
-            String.format("/api/posts/%s/comments", tPost.getId()),
+            String.format("/api/posts/%s/comments", tPost.getId(isRead)),
             Method.POST,
             params
         );
@@ -95,14 +102,14 @@ public class UnLoginAndThenAct extends Act {
     public ExtractableResponse<Response> 댓글을삭제한다(TPost tPost, Long id) {
 
         return request(
-            String.format("/api/posts/%d/comments/%d", tPost.getId(), id),
+            String.format("/api/posts/%d/comments/%d", tPost.getId(isRead), id),
             Method.DELETE
         );
     }
 
     public ExtractableResponse<Response> 댓글을조회한다(TPost tPost, int page, int limit) {
         return request(
-            String.format("/api/posts/%d/comments?page=%d&limit=%d", tPost.getId(), page, limit),
+            String.format("/api/posts/%d/comments?page=%d&limit=%d", tPost.getId(isRead), page, limit),
             Method.GET
         );
     }
@@ -136,16 +143,16 @@ public class UnLoginAndThenAct extends Act {
         );
     }
 
-    public ExtractableResponse<Response> 포스트에좋아요를누른다(TPost tpost) {
+    public ExtractableResponse<Response> 포스트에좋아요를누른다(TPost tPost) {
         return request(
-            String.format("/api/posts/%d/likes", tpost.getId()),
+            String.format("/api/posts/%d/likes", tPost.getId(isRead)),
             Method.PUT
         );
     }
 
-    public ExtractableResponse<Response> 포스트에좋아요_취소를_한다(TPost tpost) {
+    public ExtractableResponse<Response> 포스트에좋아요_취소를_한다(TPost tPost) {
         return request(
-            String.format("/api/posts/%d/likes", tpost.getId()),
+            String.format("/api/posts/%d/likes", tPost.getId(isRead)),
             Method.DELETE
         );
     }
@@ -161,7 +168,7 @@ public class UnLoginAndThenAct extends Act {
 
         return request(
             INVALID_TOKEN,
-            String.format("api/posts/%d", source.getId()),
+            String.format("api/posts/%d", source.getId(isRead)),
             Method.PUT,
             values
         );
@@ -170,7 +177,7 @@ public class UnLoginAndThenAct extends Act {
     public ExtractableResponse<Response> 비정상토큰으로_게시물을_삭제한다(TPost tPost) {
         return request(
             INVALID_TOKEN,
-            String.format("/api/posts/%d", tPost.getId()),
+            String.format("/api/posts/%d", tPost.getId(isRead)),
             Method.DELETE
         );
     }

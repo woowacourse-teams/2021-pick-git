@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.query.acceptance.post;
+package com.woowacourse.pickgit.acceptance.post;
 
 import static com.woowacourse.pickgit.common.fixture.TPost.KEVINPOST;
 import static com.woowacourse.pickgit.common.fixture.TPost.MARKPOST;

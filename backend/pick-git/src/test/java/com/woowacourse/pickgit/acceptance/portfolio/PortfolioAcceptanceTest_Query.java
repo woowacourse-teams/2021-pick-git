@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.query.acceptance.portfolio;
+package com.woowacourse.pickgit.acceptance.portfolio;
 
 import static com.woowacourse.pickgit.common.fixture.TUser.GUEST;
 import static com.woowacourse.pickgit.common.fixture.TUser.KEVIN;

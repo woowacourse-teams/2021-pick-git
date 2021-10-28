@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.query.acceptance.user;
+package com.woowacourse.pickgit.acceptance.user;
 
 import static com.woowacourse.pickgit.common.fixture.TUser.DANI;
 import static com.woowacourse.pickgit.common.fixture.TUser.GUEST;

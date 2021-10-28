@@ -42,6 +42,7 @@ public enum TPost {
     );
 
     private Long id;
+    private Long readId;
     private String githubRepoUrl = "https://github.com/woowacourse-teams/2021-pick-git";
     private String content;
     private List<String> tags;
@@ -90,11 +91,18 @@ public enum TPost {
             .collect(toList());
     }
 
-    public Long getId() {
-        if (id == null) {
+    public Long getId(boolean isRead) {
+        if (readId == null && isRead) {
             throw new IllegalStateException("아직 Post 생성이 안됨");
         }
 
+        if (id == null && !isRead) {
+            throw new IllegalStateException("아직 Post 생성이 안됨");
+        }
+
+        if (isRead) {
+            return readId;
+        }
         return id;
     }
 
@@ -130,7 +138,11 @@ public enum TPost {
         return githubRepoUrl;
     }
 
-    protected void setId(Long id) {
+    protected void setId(Long id, boolean isRead) {
+        if(isRead) {
+            this.readId = id;
+            return;
+        }
         this.id = id;
     }
 

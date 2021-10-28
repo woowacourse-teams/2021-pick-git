@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.query.acceptance.post;
+package com.woowacourse.pickgit.acceptance.post;
 
 import static com.woowacourse.pickgit.common.fixture.TPost.KEVINPOST;
 import static com.woowacourse.pickgit.common.fixture.TPost.MARKPOST;
@@ -78,7 +78,7 @@ class PostAcceptanceTest_searchPost extends AcceptanceTest {
     void userSearchPostById() {
         PostResponse response = NEOZAL.은로그인을하고().포스트를검색한다(NEOZALPOST, OK).as(PostResponse.class);
 
-        assertThat(response.getId()).isEqualTo(NEOZALPOST.getId());
+        assertThat(response.getId()).isEqualTo(NEOZALPOST.getId(true));
         assertThat(response.getContent()).isEqualTo(NEOZALPOST.getContent());
     }
 
@@ -87,7 +87,7 @@ class PostAcceptanceTest_searchPost extends AcceptanceTest {
     void guestSearchPostById() {
         PostResponse response = GUEST.는().포스트를검색한다(NEOZALPOST, OK).as(PostResponse.class);
 
-        assertThat(response.getId()).isEqualTo(NEOZALPOST.getId());
+        assertThat(response.getId()).isEqualTo(NEOZALPOST.getId(true));
         assertThat(response.getContent()).isEqualTo(NEOZALPOST.getContent());
     }
 }
