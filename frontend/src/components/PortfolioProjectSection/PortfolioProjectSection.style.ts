@@ -56,19 +56,12 @@ export const ProjectTypeCSS = css`
 
 export const ProjectType = styled.span(() => ProjectTypeCSS);
 
+export const ProjectDateText = styled.span(() => css``);
+
 export const ProjectDateCSS = css`
-  width: 7rem;
-  text-align: center;
+  text-align: right;
   background: none;
   border: none;
-
-  ${setLaptopMediaQuery`
-    width: 10rem;
-  `}
-
-  ${setDesktopMediaQuery`
-    width: 12rem;
-  `}
 `;
 
 export const ProjectDateSeparator = styled.span`

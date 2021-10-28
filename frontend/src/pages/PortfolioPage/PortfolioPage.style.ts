@@ -30,7 +30,7 @@ export const FullPage = styled.section<{ isVerticalCenter?: boolean }>`
   justify-content: ${({ isVerticalCenter }) => (isVerticalCenter ? "center" : "flex-start")};
   align-items: center;
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
   overflow-y: scroll;
   padding-top: 4.375rem;
 
@@ -122,15 +122,12 @@ export const ContactWrapper = styled.div(
     flex-direction: column;
     padding: 0 3rem;
     width: 100%;
-    overflow-y: scroll;
-
-    ${customScrollbarCSS(theme.color.textColor)}
 
     ${setLaptopMediaQuery`
     width: 70%;
   `}
 
-  ${setDesktopMediaQuery`
+    ${setDesktopMediaQuery`
     width: 50%;
   `}
   `

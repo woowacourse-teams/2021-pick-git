@@ -70,7 +70,7 @@ export const ButtonsWrapper = styled.div`
 `;
 
 export const PortfolioButtonCSS = css`
-  background-color: ${({ theme }) => theme.color.tagItemColor};
+  background-color: ${({ theme }) => theme.color.tertiaryColor};
   margin-left: 0.75rem;
 `;
 

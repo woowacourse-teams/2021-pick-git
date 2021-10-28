@@ -59,6 +59,8 @@ export const HorizontalSliderItemWrapper = styled.div<{ stepCount: number }>`
 `;
 
 export const PostContentAuthorLink = styled(Link)`
+  display: flex;
+  align-items: center;
   margin-right: 0.4375rem;
   height: 2.5rem;
   font-size: 0.75rem;
@@ -68,6 +70,13 @@ export const PostContentAuthorLink = styled(Link)`
     font-size: 1rem;
   `}
 `;
+
+export const CommentContent = styled.span(
+  () => css`
+    padding-top: 0.875rem;
+    white-space: pre-wrap;
+  `
+);
 
 export const PostContent = styled.p`
   font-size: 0.625rem;
@@ -129,7 +138,7 @@ export const TabsWrapper = styled.div`
 export const NotFoundCSS = css`
   width: 70%;
   margin: 2rem auto 0;
-`
+`;
 
 export const CommentList = styled.ul`
   padding-top: 1.125rem;
@@ -139,6 +148,7 @@ export const CommentList = styled.ul`
 export const CommentListItem = styled.li`
   padding: 0 1.125rem;
   display: flex;
+  width: 100%;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.4375rem;
@@ -148,13 +158,13 @@ export const CommentListItem = styled.li`
 
 export const CommentContentWrapper = styled.div`
   display: flex;
+  width: 100%;
   align-items: flex-start;
 `;
 
-export const CommentText = styled.span`
-  padding-top: 1.25rem;
+export const CommentTextWrapper = styled.div`
   display: flex;
-  white-space: pre;
+  width: 100%;
   margin-left: 0.5rem;
   font-size: 0.75rem;
 `;
@@ -165,6 +175,7 @@ export const DeleteIconWrapper = styled.a`
   align-items: center;
   width: 23px;
   height: 23px;
+  margin-left: 0.5rem;
   border-radius: 50%;
   background-color: ${({ theme }) => theme.color.lighterTextColor};
   transition: background-color 0.5s;

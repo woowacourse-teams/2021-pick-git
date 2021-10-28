@@ -27,7 +27,7 @@ import CircleIcon from "../CircleIcon/CircleIcon";
 import Comment from "../Comment/Comment";
 import ImageSlider from "../ImageSlider/ImageSlider";
 import Chip from "../Chip/Chip";
-import { CircleButtonItem, CommentData, Post } from "../../../@types";
+import { CircleButtonItem, Post } from "../../../@types";
 import { PostHeartIcon, PostHeartLineIcon, GithubIcon, ArrowRightIcon } from "../../../assets/icons";
 import { useContext, useRef, useState } from "react";
 import { ThemeContext } from "styled-components";
@@ -36,7 +36,7 @@ import { LIMIT } from "../../../constants/limits";
 import { getTimeDiffFromCurrent } from "../../../utils/date";
 import EmptyPostImage from "../../../assets/images/empty-post-image.png";
 import ButtonDrawer from "../ButtonDrawer/ButtonDrawer";
-import { getTextElementsWithWithBr } from "../../../utils/text";
+import { getTextElementsWithBr } from "../../../utils/text";
 import ShareLink from "../ShareLink/ShareLink";
 import useSnackbar from "../../../hooks/common/useSnackbar";
 
@@ -96,7 +96,7 @@ const PostItem = ({
 
   const handleShareLinkCopy = () => {
     navigator.clipboard.writeText(PAGE_URL.POST_SHARE(post.id));
-    pushSnackbarMessage(`${post.authorName}님의 게시글 링크가 복사되었습니다`);
+    pushSnackbarMessage(`게시글 링크가 복사되었습니다`);
   };
 
   const circleButtons: CircleButtonItem[] = [
@@ -148,6 +148,15 @@ const PostItem = ({
     setShouldHideContent(true);
   };
 
+  const shouldShowContentHideToggleButton =
+    post.content.length > LIMIT.POST_CONTENT_HIDE_LENGTH || tagList.length > LIMIT.POST_TAG_HIDE_LENGTH;
+
+  const shouldHideDots = post.content.length > LIMIT.POST_CONTENT_HIDE_LENGTH && shouldHideContent;
+
+  const postContent = shouldHideContent
+    ? getTextElementsWithBr(post.content.substring(0, LIMIT.POST_CONTENT_HIDE_LENGTH))
+    : getTextElementsWithBr(post.content);
+
   return (
     <Container>
       <ShareLink target={post} cssProp={ShareLinkCSS} username={post.authorName}>
@@ -179,17 +188,19 @@ const PostItem = ({
         <LikeCountText onClick={handlePostLikeCountClick}>좋아요 {post.likesCount}개</LikeCountText>
         <PostContent>
           <PostContentAuthorLink to={PAGE_URL.USER_PROFILE(post.authorName)}>{post.authorName}</PostContentAuthorLink>
-          {shouldHideContent
-            ? getTextElementsWithWithBr(post.content)
-                .slice(0, LIMIT.POST_CONTENT_HIDE_LENGTH)
-                .concat(<span>...</span>)
-            : getTextElementsWithWithBr(post.content)}
+          {postContent}
+          {shouldHideDots && <span>...</span>}
         </PostContent>
         <TagListWrapper>{shouldHideContent ? tagList.slice(0, LIMIT.POST_TAG_HIDE_LENGTH) : tagList}</TagListWrapper>
-        {shouldHideContent ? (
-          <MoreContentLinkButton onClick={handleMoreContentShow}>더보기</MoreContentLinkButton>
-        ) : (
-          <MoreContentLinkButton onClick={handleMoreContentHide}>간략히</MoreContentLinkButton>
+
+        {shouldShowContentHideToggleButton && (
+          <>
+            {shouldHideContent ? (
+              <MoreContentLinkButton onClick={handleMoreContentShow}>더보기</MoreContentLinkButton>
+            ) : (
+              <MoreContentLinkButton onClick={handleMoreContentHide}>간략히</MoreContentLinkButton>
+            )}
+          </>
         )}
 
         <CommentsWrapper>
