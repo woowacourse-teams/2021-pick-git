@@ -194,7 +194,7 @@ public class UnLoginAndThenAct extends Act {
 
     public ExtractableResponse<Response> 팔로잉_홈피드를_조회한다() {
         return request(
-            "/api/posts?page=0&limit=3&type=following",
+            "/api/posts?page=0&limit=3&type=followings",
             Method.GET
         );
     }
