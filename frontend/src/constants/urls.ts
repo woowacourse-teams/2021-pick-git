@@ -1,3 +1,4 @@
+import { FeedFilterOption } from "../@types";
 import { POST_ADD_STEPS, POST_EDIT_STEPS } from "./steps";
 
 export const URL_PARAMS = {
@@ -68,7 +69,8 @@ export const API_URL = {
     `/search/posts?type=${type}&keyword=${keyword}&page=${page}&limit=${limit}`,
   AFTER_LOGIN: (code: string) => `afterlogin?code=${code}`,
   POST: (postId: number) => `/posts?id=${postId}`,
-  POSTS: (page: number, limit: number) => `/posts?page=${page}&limit=${limit}`,
+  POSTS: (page: number, limit: number, type?: FeedFilterOption) =>
+    `/posts?page=${page}&limit=${limit}` + (type !== undefined ? `&type=${type}` : ""),
   POST_LIKE_PEOPLE: (postId: number) => `/posts/${postId}/likes`,
   POST_LIKES: (postId: number) => `/posts/${postId}/likes`,
   POST_COMMENT: (postId: number, commentId?: number) => `/posts/${postId}/comments${commentId ? `/${commentId}` : ""}`,

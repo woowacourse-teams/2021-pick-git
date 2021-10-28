@@ -1,11 +1,15 @@
 import axios from "axios";
 
-import { Post, PostEditData, PostUploadData } from "../../@types";
+import { FeedFilterOption, Post, PostEditData, PostUploadData } from "../../@types";
 import { LIMIT } from "../../constants/limits";
 import { API_URL } from "../../constants/urls";
 import { customError } from "../../utils/error";
 
-export const requestGetHomeFeedPosts = async (pageParam: number, accessToken: string | null) => {
+export const requestGetHomeFeedPosts = async (
+  pageParam: number,
+  accessToken: string | null,
+  type?: FeedFilterOption
+) => {
   const config = accessToken
     ? {
         headers: {
@@ -14,7 +18,7 @@ export const requestGetHomeFeedPosts = async (pageParam: number, accessToken: st
       }
     : {};
 
-  const response = await axios.get<Post[]>(API_URL.POSTS(pageParam, LIMIT.FEED_COUNT_PER_FETCH), config);
+  const response = await axios.get<Post[]>(API_URL.POSTS(pageParam, LIMIT.FEED_COUNT_PER_FETCH, type), config);
 
   return response.data;
 };
@@ -125,4 +129,3 @@ export const requestGetPost = async (postId: number) => {
 
   return response.data;
 };
-
