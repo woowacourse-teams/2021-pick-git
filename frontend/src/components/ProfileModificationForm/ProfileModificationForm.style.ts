@@ -10,6 +10,7 @@ export const Container = styled.form`
   width: 20.5rem;
   height: 32rem;
   padding: 2rem 1rem;
+  overflow-y: hidden;
 
   display: flex;
   flex-direction: column;
@@ -54,9 +55,9 @@ export const Label = styled.label<AvatarWrapperProps>`
 
 export const TextEditorWrapper = styled.div`
   width: 100%;
+  flex-grow: 1;
   padding: 0.75rem;
   background-color: ${({ theme }) => theme.color.secondaryColor};
-  height: 100%;
   margin-bottom: 2rem;
 
   ${setTabletAboveMediaQuery`
