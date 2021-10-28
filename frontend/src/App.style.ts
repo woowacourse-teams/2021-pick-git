@@ -16,6 +16,7 @@ export const theme = {
     darkBorderColor: "#9f9f9f",
     tagItemColor: "#ffc1c1",
     separatorColor: "#a4a4a45b",
+    yellow: "#ffe812",
     white: "#ffffff",
   },
 };

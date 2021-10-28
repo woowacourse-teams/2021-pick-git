@@ -47,3 +47,5 @@ export { ReactComponent as LocationLineIcon } from "./location-line.svg";
 export { ReactComponent as CompanyLineIcon } from "./company-line.svg";
 export { ReactComponent as UploadIcon } from "./upload.svg";
 export { ReactComponent as ShareIcon } from "./share.svg";
+export { ReactComponent as KakaoIcon } from "./kakao.svg";
+export { ReactComponent as CopyIcon } from "./copy.svg";

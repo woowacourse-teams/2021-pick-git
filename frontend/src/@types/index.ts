@@ -260,5 +260,6 @@ export interface ChildFabItem {
 
 export type CircleButtonItem = {
   icon: IconType;
-  onClick: () => void;
+  backgroundColor?: string;
+  onClick?: () => void;
 };

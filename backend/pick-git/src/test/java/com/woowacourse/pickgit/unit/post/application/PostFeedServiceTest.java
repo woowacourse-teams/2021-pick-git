@@ -62,7 +62,7 @@ class PostFeedServiceTest {
             .willReturn(posts);
 
         //when
-        List<PostResponseDto> postResponseDtos = postFeedService.homeFeed(homeFeedRequestDto);
+        List<PostResponseDto> postResponseDtos = postFeedService.allHomeFeed(homeFeedRequestDto);
 
         //then
         assertThat(postResponseDtos)
@@ -78,7 +78,7 @@ class PostFeedServiceTest {
 
     @DisplayName("로그인 유저 - 팔로잉한 사람들의 최신 게시글 피드를 가져온다. (좋아요 여부 true/false)")
     @Test
-    void readHomeFeed_FollowingsWhenLogin_success() {
+    void followingHomeFeed_FollowingsWhenLogin_success() {
         //given
         List<Post> posts = List.of(
             createPostOfId(1L),
@@ -101,7 +101,7 @@ class PostFeedServiceTest {
             .willReturn(posts);
 
         //when
-        List<PostResponseDto> postResponseDtos = postFeedService.homeFeed(homeFeedRequestDto);
+        List<PostResponseDto> postResponseDtos = postFeedService.followingHomeFeed(homeFeedRequestDto);
 
         //then
         assertThat(postResponseDtos)
@@ -114,6 +114,45 @@ class PostFeedServiceTest {
 
         verify(postRepository, times(1))
             .findAllAssociatedPostsByUser(eq(tester), any(Pageable.class));
+    }
+
+    @DisplayName("로그인 유저 - 최신 게시글 피드를 가져온다. (좋아요 여부 true/false)")
+    @Test
+    void allHomeFeed_allWhenLogin_success() {
+        //given
+        List<Post> posts = List.of(
+            createPostOfId(1L),
+            createPostOfId(2L),
+            createPostOfId(3L)
+        );
+
+        HomeFeedRequestDto homeFeedRequestDto = HomeFeedRequestDto.builder()
+            .isGuest(false)
+            .requestUserName("tester")
+            .pageable(PageRequest.of(1, 3))
+            .build();
+
+        User tester = UserFactory.user(1L, "tester");
+
+        given(userRepository.findByBasicProfile_Name(homeFeedRequestDto.getRequestUserName()))
+            .willReturn(Optional.of(tester));
+        given(postRepository.findAllPosts(any(Pageable.class)))
+            .willReturn(posts);
+
+        //when
+        List<PostResponseDto> postResponseDtos = postFeedService.allHomeFeed(homeFeedRequestDto);
+
+        //then
+        assertThat(postResponseDtos)
+            .extracting("id", "liked")
+            .containsExactly(
+                tuple(1L, false),
+                tuple(2L, false),
+                tuple(3L, false)
+            );
+
+        verify(postRepository, times(1))
+            .findAllPosts(any(Pageable.class));
     }
 
     private Post createPostOfId(long id) {

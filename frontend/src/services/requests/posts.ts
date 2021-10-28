@@ -1,11 +1,15 @@
 import axios from "axios";
 
-import { Post, PostEditData, PostUploadData } from "../../@types";
+import { FeedFilterOption, Post, PostEditData, PostUploadData } from "../../@types";
 import { LIMIT } from "../../constants/limits";
 import { API_URL } from "../../constants/urls";
 import { customError } from "../../utils/error";
 
-export const requestGetHomeFeedPosts = async (pageParam: number, accessToken: string | null) => {
+export const requestGetHomeFeedPosts = async (
+  pageParam: number,
+  accessToken: string | null,
+  type?: FeedFilterOption
+) => {
   const config = accessToken
     ? {
         headers: {
@@ -14,7 +18,7 @@ export const requestGetHomeFeedPosts = async (pageParam: number, accessToken: st
       }
     : {};
 
-  const response = await axios.get<Post[]>(API_URL.POSTS(pageParam, LIMIT.FEED_COUNT_PER_FETCH), config);
+  const response = await axios.get<Post[]>(API_URL.POSTS(pageParam, LIMIT.FEED_COUNT_PER_FETCH, type), config);
 
   return response.data;
 };
@@ -61,7 +65,7 @@ export const requestDeletePost = async (postId: Post["id"], accessToken: string 
     throw customError.noAccessToken;
   }
 
-  await axios.delete(API_URL.POST(postId), {
+  await axios.delete(API_URL.DELETE_POST(postId), {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -97,7 +101,7 @@ export const requestAddPost = async (
   formData.append("content", content);
   formData.append("tags", tags.join(","));
 
-  await axios.post(API_URL.ADD_POSTS, formData, {
+  await axios.post(API_URL.ADD_POST, formData, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -110,7 +114,7 @@ export const requestEditPost = async ({ postId, tags, content }: PostEditData, a
   }
 
   await axios.put(
-    API_URL.POST(postId),
+    API_URL.EDIT_POST(postId),
     { tags, content },
     {
       headers: {
@@ -125,4 +129,3 @@ export const requestGetPost = async (postId: number) => {
 
   return response.data;
 };
-
