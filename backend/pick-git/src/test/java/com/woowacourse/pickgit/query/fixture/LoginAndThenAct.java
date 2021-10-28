@@ -270,7 +270,7 @@ public class LoginAndThenAct extends Act {
     public ExtractableResponse<Response> 팔로잉_홈피드를_조회한다() {
         return request(
             token,
-            "/api/posts?page=0&limit=3&type=following",
+            "/api/posts?page=0&limit=3&type=followings",
             Method.GET
         );
     }

@@ -7,13 +7,13 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 @Component
-public class FollowingFeedType implements FeedType {
+public class FollowingsFeedType implements FeedType {
 
-    private static final String TYPE = "following";
+    private static final String TYPE = "followings";
 
     private final PostFeedService postFeedService;
 
-    public FollowingFeedType(PostFeedService postFeedService) {
+    public FollowingsFeedType(PostFeedService postFeedService) {
         this.postFeedService = postFeedService;
     }
 

@@ -20,7 +20,7 @@ public class FeedTypeAuthorizator {
         AppUser appUser = findAppUser(args);
         String type = findType(args);
 
-        if("following".equalsIgnoreCase(type) && appUser.isGuest()) {
+        if("followings".equalsIgnoreCase(type) && appUser.isGuest()) {
             throw new UnauthorizedException();
         }
     }
