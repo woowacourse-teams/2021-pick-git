@@ -1,11 +1,11 @@
 package com.woowacourse.pickgit.query.acceptance.user;
 
-import static com.woowacourse.pickgit.query.fixture.TUser.DANI;
-import static com.woowacourse.pickgit.query.fixture.TUser.GUEST;
-import static com.woowacourse.pickgit.query.fixture.TUser.KEVIN;
-import static com.woowacourse.pickgit.query.fixture.TUser.KODA;
-import static com.woowacourse.pickgit.query.fixture.TUser.MARK;
-import static com.woowacourse.pickgit.query.fixture.TUser.NEOZAL;
+import static com.woowacourse.pickgit.common.fixture.TUser.DANI;
+import static com.woowacourse.pickgit.common.fixture.TUser.GUEST;
+import static com.woowacourse.pickgit.common.fixture.TUser.KEVIN;
+import static com.woowacourse.pickgit.common.fixture.TUser.KODA;
+import static com.woowacourse.pickgit.common.fixture.TUser.MARK;
+import static com.woowacourse.pickgit.common.fixture.TUser.NEOZAL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 

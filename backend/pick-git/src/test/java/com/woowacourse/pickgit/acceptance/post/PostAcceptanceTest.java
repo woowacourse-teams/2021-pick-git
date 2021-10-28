@@ -1,10 +1,10 @@
 package com.woowacourse.pickgit.acceptance.post;
 
-import static com.woowacourse.pickgit.query.fixture.TPost.KEVINPOST;
-import static com.woowacourse.pickgit.query.fixture.TPost.NEOZALPOST;
-import static com.woowacourse.pickgit.query.fixture.TUser.GUEST;
-import static com.woowacourse.pickgit.query.fixture.TUser.MARK;
-import static com.woowacourse.pickgit.query.fixture.TUser.NEOZAL;
+import static com.woowacourse.pickgit.common.fixture.TPost.KEVINPOST;
+import static com.woowacourse.pickgit.common.fixture.TPost.NEOZALPOST;
+import static com.woowacourse.pickgit.common.fixture.TUser.GUEST;
+import static com.woowacourse.pickgit.common.fixture.TUser.MARK;
+import static com.woowacourse.pickgit.common.fixture.TUser.NEOZAL;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;
@@ -12,7 +12,7 @@ import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
 import com.woowacourse.pickgit.post.presentation.dto.response.LikeResponse;
 import com.woowacourse.pickgit.post.presentation.dto.response.PostUpdateResponse;
-import com.woowacourse.pickgit.query.fixture.CPost;
+import com.woowacourse.pickgit.common.fixture.CPost;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;

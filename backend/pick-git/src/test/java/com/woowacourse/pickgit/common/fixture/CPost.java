@@ -1,7 +1,7 @@
-package com.woowacourse.pickgit.query.fixture;
+package com.woowacourse.pickgit.common.fixture;
 
 import com.woowacourse.pickgit.common.factory.FileFactory;
-import com.woowacourse.pickgit.query.fixture.TPost.Pair;
+import com.woowacourse.pickgit.common.fixture.TPost.Pair;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;

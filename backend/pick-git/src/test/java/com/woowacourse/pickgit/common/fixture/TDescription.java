@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.query.fixture;
+package com.woowacourse.pickgit.common.fixture;
 
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.DescriptionRequest;
 import com.woowacourse.pickgit.portfolio.presentation.dto.response.DescriptionResponse;

@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.query.fixture;
+package com.woowacourse.pickgit.common.fixture;
 
 import static io.restassured.RestAssured.given;
 

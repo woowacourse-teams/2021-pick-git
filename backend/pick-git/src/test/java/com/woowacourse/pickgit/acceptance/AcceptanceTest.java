@@ -1,12 +1,12 @@
 package com.woowacourse.pickgit.acceptance;
 
-import static com.woowacourse.pickgit.query.fixture.TPost.NEOZALPOST;
+import static com.woowacourse.pickgit.common.fixture.TPost.NEOZALPOST;
 
 import com.woowacourse.pickgit.config.DatabaseConfigurator;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
-import com.woowacourse.pickgit.query.fixture.TContact;
-import com.woowacourse.pickgit.query.fixture.TProject;
-import com.woowacourse.pickgit.query.fixture.TSection;
+import com.woowacourse.pickgit.common.fixture.TContact;
+import com.woowacourse.pickgit.common.fixture.TProject;
+import com.woowacourse.pickgit.common.fixture.TSection;
 import io.restassured.RestAssured;
 import java.util.List;
 import java.util.stream.Stream;

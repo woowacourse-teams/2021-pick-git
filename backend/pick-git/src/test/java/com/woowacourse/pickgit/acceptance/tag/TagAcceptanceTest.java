@@ -1,9 +1,9 @@
 package com.woowacourse.pickgit.acceptance.tag;
 
-import static com.woowacourse.pickgit.query.fixture.TRepository.PICK_GIT;
-import static com.woowacourse.pickgit.query.fixture.TRepository.UNKNOWN;
-import static com.woowacourse.pickgit.query.fixture.TUser.GUEST;
-import static com.woowacourse.pickgit.query.fixture.TUser.NEOZAL;
+import static com.woowacourse.pickgit.common.fixture.TRepository.PICK_GIT;
+import static com.woowacourse.pickgit.common.fixture.TRepository.UNKNOWN;
+import static com.woowacourse.pickgit.common.fixture.TUser.GUEST;
+import static com.woowacourse.pickgit.common.fixture.TUser.NEOZAL;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;

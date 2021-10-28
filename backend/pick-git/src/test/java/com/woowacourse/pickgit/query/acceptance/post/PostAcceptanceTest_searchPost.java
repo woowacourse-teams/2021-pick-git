@@ -1,12 +1,12 @@
 package com.woowacourse.pickgit.query.acceptance.post;
 
-import static com.woowacourse.pickgit.query.fixture.TPost.KEVINPOST;
-import static com.woowacourse.pickgit.query.fixture.TPost.MARKPOST;
-import static com.woowacourse.pickgit.query.fixture.TPost.NEOZALPOST;
-import static com.woowacourse.pickgit.query.fixture.TUser.GUEST;
-import static com.woowacourse.pickgit.query.fixture.TUser.KEVIN;
-import static com.woowacourse.pickgit.query.fixture.TUser.MARK;
-import static com.woowacourse.pickgit.query.fixture.TUser.NEOZAL;
+import static com.woowacourse.pickgit.common.fixture.TPost.KEVINPOST;
+import static com.woowacourse.pickgit.common.fixture.TPost.MARKPOST;
+import static com.woowacourse.pickgit.common.fixture.TPost.NEOZALPOST;
+import static com.woowacourse.pickgit.common.fixture.TUser.GUEST;
+import static com.woowacourse.pickgit.common.fixture.TUser.KEVIN;
+import static com.woowacourse.pickgit.common.fixture.TUser.MARK;
+import static com.woowacourse.pickgit.common.fixture.TUser.NEOZAL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.OK;
@@ -14,7 +14,7 @@ import static org.springframework.http.HttpStatus.OK;
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
 import com.woowacourse.pickgit.post.presentation.dto.response.PostResponse;
-import com.woowacourse.pickgit.query.fixture.TPost;
+import com.woowacourse.pickgit.common.fixture.TPost;
 import io.restassured.common.mapper.TypeRef;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;

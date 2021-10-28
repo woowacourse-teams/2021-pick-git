@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.query.fixture;
+package com.woowacourse.pickgit.common.fixture;
 
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -6,14 +6,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.PortfolioRequest;
 import com.woowacourse.pickgit.post.presentation.dto.response.LikeUsersResponse;
-import com.woowacourse.pickgit.query.fixture.TPost.Pair;
+import com.woowacourse.pickgit.common.fixture.TPost.Pair;
 import com.woowacourse.pickgit.user.presentation.dto.request.ProfileDescriptionRequest;
 import com.woowacourse.pickgit.user.presentation.dto.response.UserSearchResponse;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.Method;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import io.restassured.response.ResponseBodyExtractionOptions;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;

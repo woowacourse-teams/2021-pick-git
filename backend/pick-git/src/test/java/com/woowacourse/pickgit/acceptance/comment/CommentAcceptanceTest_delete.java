@@ -1,10 +1,10 @@
 package com.woowacourse.pickgit.acceptance.comment;
 
-import static com.woowacourse.pickgit.query.fixture.TPost.NEOZALPOST;
-import static com.woowacourse.pickgit.query.fixture.TUser.GUEST;
-import static com.woowacourse.pickgit.query.fixture.TUser.KEVIN;
-import static com.woowacourse.pickgit.query.fixture.TUser.MARK;
-import static com.woowacourse.pickgit.query.fixture.TUser.NEOZAL;
+import static com.woowacourse.pickgit.common.fixture.TPost.NEOZALPOST;
+import static com.woowacourse.pickgit.common.fixture.TUser.GUEST;
+import static com.woowacourse.pickgit.common.fixture.TUser.KEVIN;
+import static com.woowacourse.pickgit.common.fixture.TUser.MARK;
+import static com.woowacourse.pickgit.common.fixture.TUser.NEOZAL;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;

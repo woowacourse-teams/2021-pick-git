@@ -2,7 +2,7 @@ package com.woowacourse.pickgit.common.mockapi;
 
 import com.woowacourse.pickgit.authentication.application.dto.OAuthProfileResponse;
 import com.woowacourse.pickgit.authentication.domain.OAuthClient;
-import com.woowacourse.pickgit.query.fixture.TUser;
+import com.woowacourse.pickgit.common.fixture.TUser;
 
 public class MockGithubOAuthClient implements OAuthClient {
 

@@ -1,10 +1,10 @@
 package com.woowacourse.pickgit.acceptance.portfolio;
 
-import static com.woowacourse.pickgit.query.fixture.TPost.KEVINPOST;
-import static com.woowacourse.pickgit.query.fixture.TPost.NEOZALPOST;
-import static com.woowacourse.pickgit.query.fixture.TUser.GUEST;
-import static com.woowacourse.pickgit.query.fixture.TUser.MARK;
-import static com.woowacourse.pickgit.query.fixture.TUser.NEOZAL;
+import static com.woowacourse.pickgit.common.fixture.TPost.KEVINPOST;
+import static com.woowacourse.pickgit.common.fixture.TPost.NEOZALPOST;
+import static com.woowacourse.pickgit.common.fixture.TUser.GUEST;
+import static com.woowacourse.pickgit.common.fixture.TUser.MARK;
+import static com.woowacourse.pickgit.common.fixture.TUser.NEOZAL;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;
@@ -14,7 +14,7 @@ import com.woowacourse.pickgit.portfolio.presentation.dto.request.PortfolioReque
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.ProjectRequest;
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.SectionRequest;
 import com.woowacourse.pickgit.portfolio.presentation.dto.response.PortfolioResponse;
-import com.woowacourse.pickgit.query.fixture.TPortfolio;
+import com.woowacourse.pickgit.common.fixture.TPortfolio;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
