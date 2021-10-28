@@ -7,5 +7,6 @@ import java.util.List;
 public interface FeedType {
 
     boolean isSatisfiedBy(String type);
+
     List<PostResponseDto> find(HomeFeedRequestDto homeFeedRequestDto);
 }
