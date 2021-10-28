@@ -69,9 +69,9 @@ public class PostFeedCacheIntegrationTest extends AcceptanceTest {
 
         // when
         queryCounter.startCount();
-        postFeedService.homeFeed(homeFeedRequestDto);
+        postFeedService.allHomeFeed(homeFeedRequestDto);
 
-        List<PostResponseDto> postResponseDtos = postFeedService.homeFeed(homeFeedRequestDto);
+        List<PostResponseDto> postResponseDtos = postFeedService.allHomeFeed(homeFeedRequestDto);
 
         // then
         assertThat(postResponseDtos)
@@ -88,7 +88,7 @@ public class PostFeedCacheIntegrationTest extends AcceptanceTest {
     void writePost_LoginUser_DeleteAllCache() {
         // given
         createMockPosts();
-        postFeedService.homeFeed(createMockGuestHomeFeedRequest());
+        postFeedService.allHomeFeed(createMockGuestHomeFeedRequest());
 
         // when
         User user = UserFactory.user(USERNAME);
@@ -111,7 +111,7 @@ public class PostFeedCacheIntegrationTest extends AcceptanceTest {
 
         // then
         queryCounter.startCount();
-        postFeedService.homeFeed(createMockGuestHomeFeedRequest());
+        postFeedService.allHomeFeed(createMockGuestHomeFeedRequest());
         assertThat(queryCounter.getCount().getValue()).isEqualTo(6L);
     }
 
