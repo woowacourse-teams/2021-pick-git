@@ -85,6 +85,8 @@ public class Item implements Updatable<Item> {
     public void update(Item item) {
         item.getDescriptions().forEach(description -> description.appendTo(this));
 
+        this.category = item.getCategory();
+
         UpdateUtil.execute(this.getDescriptions(), item.getDescriptions());
     }
 
