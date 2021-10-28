@@ -6,6 +6,7 @@ const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const CompressionPlugin = require("compression-webpack-plugin");
 const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
+const Dotenv = require("dotenv-webpack");
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -93,6 +94,7 @@ module.exports = {
     new CompressionPlugin({
       test: /\.(js|js\.map)?$/i,
     }),
+    new Dotenv(),
   ],
   optimization: {
     minimize: true,
