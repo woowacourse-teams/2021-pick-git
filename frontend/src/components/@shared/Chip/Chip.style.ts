@@ -12,12 +12,15 @@ export const Container = styled.span<{ cssProp?: CSSProp; backgroundColor?: stri
   `
 );
 
-export const Text = styled.span`
-  display: inline-flex;
-  align-items: center;
-  font-size: 0.875rem;
-  font-weight: bold;
-`;
+export const Text = styled.span(
+  ({ theme }) => css`
+    display: inline-flex;
+    color: ${theme.color.white};
+    align-items: center;
+    font-size: 0.875rem;
+    font-weight: bold;
+  `
+);
 
 export const DeleteButton = styled.button`
   margin-left: 0.625rem;

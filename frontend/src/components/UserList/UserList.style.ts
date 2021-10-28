@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { fadeIn } from "../@styled/keyframes";
 
 export const ListItem = styled.li`
@@ -29,18 +29,21 @@ export const Button = styled.button<{ follow: boolean }>`
   font-weight: bold;
 `;
 
-export const NameTag = styled(Link)`
-  display: flex;
-  align-items: center;
+export const NameTag = styled(Link)(
+  ({ theme }) => css`
+    display: flex;
+    align-items: center;
 
-  span {
-    font-size: 1rem;
-    font-weight: bold;
-    line-height: 0.9;
-    display: inline-block;
-    margin-left: 1rem;
-  }
-`;
+    span {
+      font-size: 1rem;
+      font-weight: bold;
+      line-height: 0.9;
+      display: inline-block;
+      margin-left: 1rem;
+      color: ${theme.color.textColor};
+    }
+  `
+);
 
 export const ButtonLoader = styled(Button)`
   height: 2rem;
