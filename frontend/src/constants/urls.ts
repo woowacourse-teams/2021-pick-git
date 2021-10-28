@@ -49,7 +49,9 @@ export const API_URL = {
   SELF_PROFILE: "/profiles/me",
   SELF_PROFILE_IMAGE: "/profiles/me/image",
   SELF_PROFILE_DESCRIPTION: "/profiles/me/description",
-  ADD_POSTS: "/posts",
+  ADD_POST: "/posts",
+  EDIT_POST: (postId: number) => `/posts/${postId}`,
+  DELETE_POST: (postId: number) => `/posts/${postId}`,
   PORTFOLIO: "/portfolios",
   USER_PORTFOLIO: (username: string) => `/portfolios/${username}`,
   GITHUB_REPOSITORIES: (keyword: string, page: number, limit: number) =>
