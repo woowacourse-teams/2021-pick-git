@@ -33,5 +33,4 @@ export const getClientErrorMessage = (errorCode: ClientErrorCode) => {
 export const customError = {
   noAccessToken: Error("C0001"),
   fileReader: Error("C0002"),
-  emptyRepositoryName: Error("P0002"),
 };
