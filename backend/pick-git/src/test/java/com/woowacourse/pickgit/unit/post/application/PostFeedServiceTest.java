@@ -134,7 +134,6 @@ class PostFeedServiceTest {
 
         User tester = UserFactory.user(1L, "tester");
 
-
         given(userRepository.findByBasicProfile_Name(homeFeedRequestDto.getRequestUserName()))
             .willReturn(Optional.of(tester));
         given(postRepository.findAllPosts(any(Pageable.class)))

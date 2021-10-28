@@ -48,7 +48,6 @@ class PostAcceptanceTest_Query extends AcceptanceTest {
             .hasSize(3)
             .extracting("liked")
             .containsExactly(false, false, false);
-
     }
 
     @DisplayName("로그인일때 팔로잉 홈 피드를 조회한다. - 게시글 좋아요 여부 true/false")
