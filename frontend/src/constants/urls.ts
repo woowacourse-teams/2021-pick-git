@@ -3,6 +3,8 @@ import { POST_ADD_STEPS, POST_EDIT_STEPS } from "./steps";
 
 const isProduction = process.env.NODE_ENV === "production";
 
+export const BASE_URL = isProduction ? "https://api.pick-git.com/api" : "http://devapi.pick-git.com:8080/api";
+
 export const URL_PARAMS = {
   ME: "me",
   USER: "user",

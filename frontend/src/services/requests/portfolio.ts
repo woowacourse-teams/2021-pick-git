@@ -1,6 +1,6 @@
 import axios from "axios";
 import { PortfolioData, PortfolioUploadData } from "../../@types";
-import { API_URL } from "../../constants/urls";
+import { API_URL, BASE_URL } from "../../constants/urls";
 import { customError } from "../../utils/error";
 
 export const requestSetPortfolio = async (portfolio: PortfolioUploadData, accessToken: string | null) => {
@@ -8,13 +8,18 @@ export const requestSetPortfolio = async (portfolio: PortfolioUploadData, access
     throw customError.noAccessToken;
   }
 
-  const response = await axios.put<PortfolioData>(API_URL.PORTFOLIO, portfolio, {
+  const response = await fetch(`${BASE_URL}${API_URL.PORTFOLIO}`, {
+    method: "PUT",
     headers: {
       Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
     },
+    body: JSON.stringify(portfolio),
   });
 
-  return response.data;
+  const data = await response.json();
+
+  return data;
 };
 
 export const requestGetPortfolio = async (username: string) => {
