@@ -15,7 +15,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-class PostLikeDeleteAcceptance extends AcceptanceTest {
+class PostLikeDeleteAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("로그인 사용자는 게시물을 좋아요 취소 할 수 있다. - 성공")
     @Test

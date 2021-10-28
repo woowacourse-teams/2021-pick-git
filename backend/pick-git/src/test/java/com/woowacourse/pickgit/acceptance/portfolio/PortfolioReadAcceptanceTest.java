@@ -1,7 +1,6 @@
 package com.woowacourse.pickgit.acceptance.portfolio;
 
 import static com.woowacourse.pickgit.common.fixture.TUser.GUEST;
-import static com.woowacourse.pickgit.common.fixture.TUser.KEVIN;
 import static com.woowacourse.pickgit.common.fixture.TUser.KODA;
 import static com.woowacourse.pickgit.common.fixture.TUser.MARK;
 import static com.woowacourse.pickgit.common.fixture.TUser.NEOZAL;

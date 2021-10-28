@@ -12,9 +12,9 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.OK;
 
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;
+import com.woowacourse.pickgit.common.fixture.TPost;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
 import com.woowacourse.pickgit.post.presentation.dto.response.PostResponse;
-import com.woowacourse.pickgit.common.fixture.TPost;
 import io.restassured.common.mapper.TypeRef;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;

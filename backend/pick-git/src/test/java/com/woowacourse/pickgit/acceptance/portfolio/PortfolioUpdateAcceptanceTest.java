@@ -8,13 +8,13 @@ import static com.woowacourse.pickgit.common.fixture.TUser.NEOZAL;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;
+import com.woowacourse.pickgit.common.fixture.TPortfolio;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.ContactRequest;
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.PortfolioRequest;
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.ProjectRequest;
 import com.woowacourse.pickgit.portfolio.presentation.dto.request.SectionRequest;
 import com.woowacourse.pickgit.portfolio.presentation.dto.response.PortfolioResponse;
-import com.woowacourse.pickgit.common.fixture.TPortfolio;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

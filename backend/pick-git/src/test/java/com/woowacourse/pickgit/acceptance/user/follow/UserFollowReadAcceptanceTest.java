@@ -11,16 +11,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;
-import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
-import com.woowacourse.pickgit.user.presentation.dto.response.UserProfileResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.UserSearchResponse;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
 class UserFollowReadAcceptanceTest extends AcceptanceTest {
 

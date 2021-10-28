@@ -1,12 +1,11 @@
 package com.woowacourse.pickgit.acceptance.user;
 
 import static com.woowacourse.pickgit.common.fixture.TUser.GUEST;
-import static com.woowacourse.pickgit.common.fixture.TUser.MARK;
 import static com.woowacourse.pickgit.common.fixture.TUser.NEOZAL;
 import static org.assertj.core.api.Assertions.assertThat;
+
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;
 import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
-import com.woowacourse.pickgit.user.presentation.dto.response.FollowResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.ProfileDescriptionResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.ProfileImageEditResponse;
 import io.restassured.response.ExtractableResponse;

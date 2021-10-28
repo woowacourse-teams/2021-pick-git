@@ -12,11 +12,17 @@ import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 class TagExtractionAcceptanceTest extends AcceptanceTest {
+
+    @BeforeEach
+    void setUp() {
+        toRead();
+    }
 
     @DisplayName("특정 User의 Repository에 기술된 언어 태그들을 추출한다.")
     @Test

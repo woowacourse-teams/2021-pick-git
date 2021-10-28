@@ -9,11 +9,17 @@ import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
 import com.woowacourse.pickgit.post.application.dto.response.RepositoryResponseDto;
 import io.restassured.common.mapper.TypeRef;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 class PostRepositorySearchAcceptanceTest extends AcceptanceTest {
+
+    @BeforeEach
+    void setUp() {
+        toRead();
+    }
 
     @DisplayName("사용자는 Repository 목록을 키워드 검색으로 가져올 수 있다.")
     @Test
