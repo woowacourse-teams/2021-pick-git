@@ -14,8 +14,8 @@ const NotFound = ({ type, message, cssProp }: Props) => {
   const notFoundImage = {
     post: postNotFoundPNG,
     user: userNotFoundPNG,
-    comment: commentNotFoundJPG
-  }
+    comment: commentNotFoundJPG,
+  };
 
   return (
     <Container cssProp={cssProp}>

@@ -42,6 +42,15 @@ export const WARNING_MESSAGE = {
   NO_ONE_LIKE_POST: "해당 포스트에 좋아요를 누른 사람이 없습니다.",
 };
 
+export const NOT_FOUND_MESSAGE = {
+  POSTS: {
+    DEFAULT: "게시물이 존재하지 않습니다.",
+    NETWORK: "게시물 정보를 가져올 수 없습니다.",
+    FOLLOWINGS: "게시물이 존재하지 않습니다. 다른 사람을 팔로우해보세요",
+    PROJECT: "프로젝트가 존재하지 않습니다. 게시물을 추가해보세요.",
+  },
+};
+
 export const REDIRECT_MESSAGE = {
   NO_REPOSITORY_EXIST: "공개된 깃허브 Repository가 존재하지 않습니다. 이전 페이지로 돌아갑니다.",
 };

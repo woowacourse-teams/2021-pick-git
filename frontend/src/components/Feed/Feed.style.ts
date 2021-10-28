@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { setMobileMediaQuery } from "../@styled/mediaQueries";
 
 export const Container = styled.div<React.CSSProperties>``;
@@ -12,4 +12,9 @@ export const PostItemWrapper = styled.div`
   ${setMobileMediaQuery`
     box-shadow: none;
   `};
+`;
+
+export const NotFoundCSS = css`
+  margin-top: 3rem;
+  width: 100%;
 `;
