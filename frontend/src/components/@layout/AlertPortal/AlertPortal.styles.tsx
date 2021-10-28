@@ -37,6 +37,7 @@ export const Text = styled.span`
   font-size: 1.1rem;
   line-height: 1.75rem;
   text-align: center;
+  white-space: pre-wrap;
   justify-content: center;
   align-items: center;
   letter-spacing: 0.7px;

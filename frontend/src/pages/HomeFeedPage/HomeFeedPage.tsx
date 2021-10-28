@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import Bowser from "bowser";
 import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
 import PageError from "../../components/@shared/PageError/PageError";
 import Tabs from "../../components/@shared/Tabs/Tabs";
@@ -11,8 +12,10 @@ import useAuth from "../../hooks/common/useAuth";
 import useAutoAnchor from "../../hooks/common/useAutoAnchor";
 
 import useInfiniteImagePreloader from "../../hooks/common/useInfiniteImagePreloader";
+import useModal from "../../hooks/common/useModal";
 import useHomeFeed from "../../hooks/service/useHomeFeed";
 
+import AlertPortal from "../../components/@layout/AlertPortal/AlertPortal";
 import { Container, postTabCSS, PostTabWrapper } from "./HomeFeedPage.style";
 
 const HomeFeedPage = () => {
@@ -30,6 +33,12 @@ const HomeFeedPage = () => {
     refetchAll,
   } = useHomeFeed();
   const { scrollWrapperRef } = useAutoAnchor(`#post${currentPostId}`);
+  const {
+    modalMessage: alertMessage,
+    isModalShown: isAlertShown,
+    showModal: showAlert,
+    hideModal: hideAlert,
+  } = useModal();
 
   const infiniteImageUrls =
     infinitePostsData?.pages.map<string[]>(
@@ -49,6 +58,11 @@ const HomeFeedPage = () => {
   };
 
   useEffect(() => {
+    const browserName = Bowser.getParser(window.navigator.userAgent).getBrowserName().toLowerCase();
+    if (browserName === "safari") {
+      showAlert("특정 사파리 버전에선 \n 앱의 기능이 제한될 수 있습니다.");
+    }
+
     refetchAll();
     setTimeout(refetchAll, 300);
   }, []);
@@ -83,6 +97,7 @@ const HomeFeedPage = () => {
           notFoundMessage={feedFilterOption === "followings" ? NOT_FOUND_MESSAGE.POSTS.FOLLOWINGS : null}
         />
       </Container>
+      {isAlertShown && <AlertPortal heading={alertMessage} onOkay={hideAlert} />}
     </ScrollPageWrapper>
   );
 };
