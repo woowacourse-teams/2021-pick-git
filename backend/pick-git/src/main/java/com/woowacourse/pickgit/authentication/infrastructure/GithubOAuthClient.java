@@ -5,7 +5,6 @@ import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.infrastructure.dto.OAuthAccessTokenRequest;
 import com.woowacourse.pickgit.authentication.infrastructure.dto.OAuthAccessTokenResponse;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
@@ -23,22 +22,22 @@ public class GithubOAuthClient implements OAuthClient {
     private static final String ACCESS_TOKEN_URL_SUFFIX =
         "/login/oauth/access_token";
 
+    private final WebClient webClient;
     private final String clientId;
     private final String clientSecret;
     private final String redirectUrl;
     private final String oauthBaseUrl;
     private final String apiBaseUrl;
 
-    @Autowired
-    private WebClient webClient;
-
     public GithubOAuthClient(
+        WebClient webClient,
         @Value("${security.github.client.id}") String clientId,
         @Value("${security.github.client.secret}") String clientSecret,
         @Value("${security.github.url.redirect}") String redirectUrl,
         @Value("${security.github.url.oauth}") String oauthBaseUrl,
         @Value("${security.github.url.api}") String apiBaseUrl
     ) {
+        this.webClient = webClient;
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.redirectUrl = redirectUrl;

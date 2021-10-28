@@ -6,7 +6,6 @@ import com.woowacourse.pickgit.post.domain.util.PlatformRepositoryExtractor;
 import com.woowacourse.pickgit.post.domain.util.dto.RepositoryNameAndUrl;
 import com.woowacourse.pickgit.post.infrastructure.dto.RepositoryItemDto;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Pageable;
@@ -19,14 +18,14 @@ import reactor.core.publisher.Mono;
 @Component
 public class GithubRepositoryExtractor implements PlatformRepositoryExtractor {
 
+    private final WebClient webClient;
     private final String apiBaseUrl;
 
-    @Autowired
-    private WebClient webClient;
-
     public GithubRepositoryExtractor(
+        WebClient webClient,
         @Value("${security.github.url.api}") String apiBaseUrl
     ) {
+        this.webClient = webClient;
         this.apiBaseUrl = apiBaseUrl;
     }
 

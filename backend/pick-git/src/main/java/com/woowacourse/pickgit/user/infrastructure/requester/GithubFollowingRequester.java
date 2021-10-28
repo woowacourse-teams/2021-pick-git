@@ -2,7 +2,6 @@ package com.woowacourse.pickgit.user.infrastructure.requester;
 
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.user.domain.follow.PlatformFollowingRequester;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
@@ -15,14 +14,14 @@ import reactor.core.publisher.Mono;
 @Component
 public class GithubFollowingRequester implements PlatformFollowingRequester {
 
-    @Autowired
-    private WebClient webClient;
-
+    private final WebClient webClient;
     private final String apiBaseUrl;
 
     public GithubFollowingRequester(
+        WebClient webClient,
         @Value("${security.github.url.api}") String apiBaseUrl
     ) {
+        this.webClient = webClient;
         this.apiBaseUrl = apiBaseUrl;
     }
 
