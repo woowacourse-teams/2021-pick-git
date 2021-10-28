@@ -116,6 +116,7 @@ public enum TUser {
                 return this.token;
             }
             this.token = requestLogin(name());
+            return this.token;
         }
         return requestLogin(name());
     }
