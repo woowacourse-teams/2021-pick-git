@@ -30,7 +30,6 @@ const ShareLink = ({ target, username, children, cssProp }: Props) => {
   if (isPost(target)) {
     const template = KAKAO_POST_SHARE_LINK_TEMPLATE(target);
 
-    console.log("template", template);
     return (
       <Container cssProp={cssProp} onClick={() => sendKakaoShareLink(template)}>
         {children}
