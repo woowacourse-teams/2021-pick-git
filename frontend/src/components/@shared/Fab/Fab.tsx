@@ -28,7 +28,7 @@ const Fab = ({ icon, childFabs, color, backgroundColor, fabCssProp, childFabCssP
 
   const childFabComponents = childFabs
     ? childFabs.map((childFab, index) => (
-        <ChildFabWrapper index={index} isShown={isChildFabsShown}>
+        <ChildFabWrapper key={index} index={index} isShown={isChildFabsShown}>
           {childFab.text && <FabText isShown={isChildFabsShown}>{childFab.text}</FabText>}
           <ChildFab
             backgroundColor={childFab.backgroundColor}
