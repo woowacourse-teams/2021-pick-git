@@ -20,7 +20,6 @@ class UserSearchAcceptanceTest extends AcceptanceTest {
 
     @BeforeEach
     void setUp() {
-        toRead();
         모든유저().로그인을한다();
     }
 
