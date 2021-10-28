@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.acceptance.user;
+package com.woowacourse.pickgit.acceptance.user.follow;
 
 import static com.woowacourse.pickgit.common.fixture.TUser.DANI;
 import static com.woowacourse.pickgit.common.fixture.TUser.GUEST;
@@ -6,21 +6,28 @@ import static com.woowacourse.pickgit.common.fixture.TUser.KEVIN;
 import static com.woowacourse.pickgit.common.fixture.TUser.KODA;
 import static com.woowacourse.pickgit.common.fixture.TUser.MARK;
 import static com.woowacourse.pickgit.common.fixture.TUser.NEOZAL;
+import static com.woowacourse.pickgit.common.fixture.TUser.모든유저;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;
+import com.woowacourse.pickgit.exception.dto.ApiErrorResponse;
+import com.woowacourse.pickgit.user.presentation.dto.response.UserProfileResponse;
 import com.woowacourse.pickgit.user.presentation.dto.response.UserSearchResponse;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 
-class UserAcceptance_GetFollowingsAndFollowers extends AcceptanceTest {
+class UserFollowReadAcceptanceTest extends AcceptanceTest {
 
     @BeforeEach
     void setUp() {
         toRead();
+        모든유저().로그인을한다();
 
         NEOZAL.은로그인을하고().팔로우를한다(KODA, DANI);
         KODA.은로그인을하고().팔로우를한다(NEOZAL, MARK, DANI);

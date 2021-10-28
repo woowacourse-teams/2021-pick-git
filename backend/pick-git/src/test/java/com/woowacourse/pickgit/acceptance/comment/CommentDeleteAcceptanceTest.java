@@ -13,7 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-class CommentAcceptanceTest_delete extends AcceptanceTest {
+class CommentDeleteAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("내 게시물의 내 댓글을 삭제한다.")
     @Test

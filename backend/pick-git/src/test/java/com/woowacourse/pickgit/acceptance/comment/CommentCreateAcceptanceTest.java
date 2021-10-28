@@ -17,7 +17,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-class CommentAcceptanceTest extends AcceptanceTest {
+class CommentCreateAcceptanceTest extends AcceptanceTest {
 
     @BeforeEach
     void setUp() {

@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class PortfolioAcceptanceTest extends AcceptanceTest {
+class PortfolioUpdateAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("사용자는 나의 포트폴리오를 수정한다. - 성공")
     @ParameterizedTest

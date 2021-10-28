@@ -22,7 +22,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-class PostAcceptanceTest_Query extends AcceptanceTest {
+class PostReadAcceptanceTest extends AcceptanceTest {
 
     @BeforeEach
     void setUp() {

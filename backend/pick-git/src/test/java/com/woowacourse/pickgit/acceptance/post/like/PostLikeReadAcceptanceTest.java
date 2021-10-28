@@ -1,4 +1,4 @@
-package com.woowacourse.pickgit.acceptance.post;
+package com.woowacourse.pickgit.acceptance.post.like;
 
 import static com.woowacourse.pickgit.common.fixture.TPost.KEVINPOST;
 import static com.woowacourse.pickgit.common.fixture.TPost.MARKPOST;
@@ -19,7 +19,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-class PostAcceptanceTest_LikeUsers extends AcceptanceTest {
+class PostLikeReadAcceptanceTest extends AcceptanceTest {
 
     @BeforeEach
     void setUp() {

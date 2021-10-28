@@ -20,7 +20,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class CommentAcceptanceTest_queryComments extends AcceptanceTest {
+class CommentReadAcceptanceTest extends AcceptanceTest {
 
     @BeforeEach
     void setUp() {
@@ -65,14 +65,4 @@ class CommentAcceptanceTest_queryComments extends AcceptanceTest {
 
         assertThat(actual).hasSize(expected);
     }
-
-    private static Stream<Arguments> getParametersForQueryComments() {
-        return Stream.of(
-            Arguments.of(10, 1, 3, 3),
-            Arguments.of(10, 2, 3, 3),
-            Arguments.of(10, 3, 3, 1),
-            Arguments.of(10, 4, 3, 0)
-        );
-    }
-
 }

@@ -49,6 +49,10 @@ public abstract class AcceptanceTest {
         databaseConfigurator.toRead();
     }
 
+    protected void toWrite() {
+        databaseConfigurator.toWrite();
+    }
+
     protected static Stream<Arguments> getPostSearchArguments() {
         return Stream.of(
             Arguments.of("java"),
@@ -117,6 +121,15 @@ public abstract class AcceptanceTest {
                 List.of(TProject.of(NEOZALPOST)),
                 List.of(TSection.of(), TSection.of(), TSection.of())
             )
+        );
+    }
+
+    protected static Stream<Arguments> getParametersForQueryComments() {
+        return Stream.of(
+            Arguments.of(10, 1, 3, 3),
+            Arguments.of(10, 2, 3, 3),
+            Arguments.of(10, 3, 3, 1),
+            Arguments.of(10, 4, 3, 0)
         );
     }
 }
