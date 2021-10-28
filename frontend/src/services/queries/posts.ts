@@ -48,7 +48,7 @@ const postQueryFunction: QueryFunction<Post> = async ({ queryKey }) => {
 
 export const useHomeFeedFollowingsPostsQuery = () => {
   return useInfiniteQuery<Post[] | null, AxiosError<ErrorResponse>>(
-    [QUERY.GET_HOME_FEED_POSTS("followings")],
+    QUERY.GET_HOME_FEED_POSTS("followings"),
     async ({ pageParam = 0 }) => {
       return await requestGetHomeFeedPosts(pageParam, getAccessToken(), "followings");
     },
@@ -57,13 +57,14 @@ export const useHomeFeedFollowingsPostsQuery = () => {
         return pages.length;
       },
       cacheTime: 0,
+      refetchOnMount: "always",
     }
   );
 };
 
 export const useHomeFeedAllPostsQuery = () => {
   return useInfiniteQuery<Post[] | null, AxiosError<ErrorResponse>>(
-    [QUERY.GET_HOME_FEED_POSTS("all")],
+    QUERY.GET_HOME_FEED_POSTS("all"),
     async ({ pageParam = 0 }) => {
       return await requestGetHomeFeedPosts(pageParam, getAccessToken(), "all");
     },
@@ -72,6 +73,7 @@ export const useHomeFeedAllPostsQuery = () => {
         return pages.length;
       },
       cacheTime: 0,
+      refetchOnMount: "always",
     }
   );
 };

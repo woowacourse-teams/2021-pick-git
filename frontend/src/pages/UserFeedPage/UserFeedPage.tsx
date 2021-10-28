@@ -66,7 +66,7 @@ const UserFeedPage = () => {
         <Feed
           infinitePostsData={infinitePostsData}
           onIntersect={handleIntersect}
-          queryKey={[QUERY.GET_USER_FEED_POSTS, { username, isMyFeed }]}
+          queryKeyList={[[QUERY.GET_USER_FEED_POSTS, { username, isMyFeed }]]}
           isFetching={isFetchingNextPage || isImagesFetching}
           setCurrentPostId={setCurrentPostId}
         />

@@ -73,7 +73,7 @@ const SearchPostResultPage = () => {
         <Feed
           infinitePostsData={infinitePostsData}
           onIntersect={handleIntersect}
-          queryKey={[QUERY.GET_SEARCH_POST_RESULT, { type, keyword }]}
+          queryKeyList={[[QUERY.GET_SEARCH_POST_RESULT, { type, keyword }]]}
           isFetching={isFetchingNextPage || isImagesFetching}
           setCurrentPostId={setCurrentPostId}
         />

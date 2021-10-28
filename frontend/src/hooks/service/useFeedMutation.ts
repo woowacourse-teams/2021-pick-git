@@ -6,16 +6,18 @@ import SnackBarContext from "../../contexts/SnackbarContext";
 
 import { useAddPostLikeMutation, useDeletePostLikeMutation, useDeletePostMutation } from "../../services/queries";
 
-const useFeedMutation = (queryKey: QueryKey) => {
+const useFeedMutation = (queryKeyList: QueryKey[]) => {
   const { mutateAsync: mutateDeletePostLike } = useDeletePostLikeMutation();
   const { mutateAsync: mutateAddPostLike } = useAddPostLikeMutation();
   const { mutateAsync: mutateDeletePost, isLoading: isDeletePostLoading } = useDeletePostMutation();
   const queryClient = useQueryClient();
 
-  const infinitePostsData = queryClient.getQueryData<InfiniteData<Post[]>>(queryKey) as InfiniteData<Post[]>;
+  const infinitePostsDataList = queryKeyList.map((queryKey) =>
+    queryClient.getQueryData<InfiniteData<Post[]>>(queryKey)
+  ) as InfiniteData<Post[]>[];
   const { pushSnackbarMessage } = useContext(SnackBarContext);
 
-  const setPostsPages = (postsPages: Post[][]) => {
+  const setPostsPages = (postsPages: Post[][], queryKey: QueryKey) => {
     queryClient.setQueryData<InfiniteData<Post[]>>(queryKey, (data) => {
       return {
         ...data,
@@ -31,73 +33,81 @@ const useFeedMutation = (queryKey: QueryKey) => {
   };
 
   const setPostLike = (postId: Post["id"], state: { liked: boolean; likesCount: number }) => {
-    const newPostsPages = [...infinitePostsData.pages];
-    const targetPost = getTargetPost(postId, newPostsPages);
+    infinitePostsDataList.forEach((infinitePostsData, index) => {
+      const newPostsPages = [...infinitePostsData.pages];
+      const targetPost = getTargetPost(postId, newPostsPages);
 
-    if (targetPost) {
-      targetPost.liked = state.liked;
-      targetPost.likesCount = state.likesCount;
+      if (targetPost) {
+        targetPost.liked = state.liked;
+        targetPost.likesCount = state.likesCount;
 
-      setPostsPages(newPostsPages);
-    }
+        setPostsPages(newPostsPages, queryKeyList[index]);
+      }
+    });
   };
 
   const addPostLike = async (postId: Post["id"]) => {
-    const targetPost = getTargetPost(postId, [...infinitePostsData.pages]);
+    infinitePostsDataList.forEach(async (infinitePostsData) => {
+      const targetPost = getTargetPost(postId, [...infinitePostsData.pages]);
 
-    if (!targetPost) {
-      return;
-    }
+      if (!targetPost) {
+        return;
+      }
 
-    const prevLiked = targetPost?.liked;
-    const prevLikesCount = targetPost?.likesCount;
+      const prevLiked = targetPost?.liked;
+      const prevLikesCount = targetPost?.likesCount;
 
-    setPostLike(postId, { liked: true, likesCount: prevLikesCount + 1 });
+      setPostLike(postId, { liked: true, likesCount: prevLikesCount + 1 });
 
-    try {
-      const { liked, likesCount } = await mutateAddPostLike(postId);
+      try {
+        const { liked, likesCount } = await mutateAddPostLike(postId);
 
-      if (liked === prevLiked || likesCount === prevLikesCount) {
+        if (liked === prevLiked || likesCount === prevLikesCount) {
+          pushSnackbarMessage(UNKNOWN_ERROR_MESSAGE);
+          setPostLike(postId, { liked: prevLiked, likesCount: prevLikesCount });
+        }
+      } catch (error) {
         pushSnackbarMessage(UNKNOWN_ERROR_MESSAGE);
         setPostLike(postId, { liked: prevLiked, likesCount: prevLikesCount });
       }
-    } catch (error) {
-      pushSnackbarMessage(UNKNOWN_ERROR_MESSAGE);
-      setPostLike(postId, { liked: prevLiked, likesCount: prevLikesCount });
-    }
+    });
   };
 
   const deletePost = async (postId: Post["id"]) => {
     await mutateDeletePost(postId);
 
-    const newPostsPages = infinitePostsData.pages.map((postPage) => postPage.filter((post) => post.id !== postId));
+    infinitePostsDataList.forEach((infinitePostsData, index) => {
+      const newPostsPages = infinitePostsData.pages.map((postPage) => postPage.filter((post) => post.id !== postId));
 
-    setPostsPages(newPostsPages);
+      setPostsPages(newPostsPages, queryKeyList[index]);
+    });
   };
 
   const deletePostLike = async (postId: Post["id"]) => {
-    const targetPost = getTargetPost(postId, [...infinitePostsData.pages]);
+    infinitePostsDataList.forEach(async (infinitePostsData) => {
+      const targetPost = getTargetPost(postId, [...infinitePostsData.pages]);
 
-    if (!targetPost) {
-      return;
-    }
+      if (!targetPost) {
+        return;
+      }
 
-    const prevLiked = targetPost?.liked;
-    const prevLikesCount = targetPost?.likesCount;
+      const prevLiked = targetPost?.liked;
+      const prevLikesCount = targetPost?.likesCount;
 
-    setPostLike(postId, { liked: false, likesCount: prevLikesCount - 1 });
+      setPostLike(postId, { liked: false, likesCount: prevLikesCount - 1 });
 
-    try {
-      const { liked, likesCount } = await mutateDeletePostLike(targetPost.id);
+      try {
+        const { liked, likesCount } = await mutateDeletePostLike(targetPost.id);
 
-      if (liked === prevLiked || likesCount === prevLikesCount) {
+        if (liked === prevLiked || likesCount === prevLikesCount) {
+          pushSnackbarMessage(UNKNOWN_ERROR_MESSAGE);
+          setPostLike(postId, { liked: prevLiked, likesCount: prevLikesCount });
+        }
+      } catch (error) {
         pushSnackbarMessage(UNKNOWN_ERROR_MESSAGE);
         setPostLike(postId, { liked: prevLiked, likesCount: prevLikesCount });
       }
-    } catch (error) {
-      pushSnackbarMessage(UNKNOWN_ERROR_MESSAGE);
-      setPostLike(postId, { liked: prevLiked, likesCount: prevLikesCount });
-    }
+    });
   };
 
   return {

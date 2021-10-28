@@ -2,9 +2,9 @@ import { AxiosError } from "axios";
 import { createContext, Dispatch, SetStateAction, useEffect, useState } from "react";
 import { UseInfiniteQueryResult } from "react-query";
 
-import { ErrorResponse, FeedFilterOption, Post } from "../@types";
-import useAuth from "../hooks/common/useAuth";
 import { useHomeFeedAllPostsQuery, useHomeFeedFollowingsPostsQuery } from "../services/queries";
+
+import { ErrorResponse, FeedFilterOption, Post } from "../@types";
 
 interface Props {
   children: React.ReactNode;
@@ -18,6 +18,7 @@ interface Value {
   currentPostId: number;
   initialized: boolean;
   initHomeFeed: () => void;
+  refetchAll: () => void;
   setFeedFilterOption: Dispatch<SetStateAction<FeedFilterOption>>;
   setCurrentPostId: Dispatch<SetStateAction<number>>;
 }
@@ -39,6 +40,14 @@ export const HomeFeedContextProvider = ({ children }: Props) => {
     setInitialized(true);
   };
 
+  const refetchAll = () => {
+    Object.values(queryResults).forEach((query) => query.refetch());
+  };
+
+  useEffect(() => {
+    refetchAll();
+  }, [feedFilterOption]);
+
   return (
     <HomeFeedContext.Provider
       value={{
@@ -47,6 +56,7 @@ export const HomeFeedContextProvider = ({ children }: Props) => {
         currentPostId,
         initialized,
         initHomeFeed,
+        refetchAll,
         setFeedFilterOption,
         setCurrentPostId,
       }}

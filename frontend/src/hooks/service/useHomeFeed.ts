@@ -15,10 +15,18 @@ import HomeFeedContext from "../../contexts/HomeFeedContext";
 import useAuth from "../common/useAuth";
 
 const tmp: { current: FeedFilterOption | null } = { current: null };
+const queryKeyList = [QUERY.GET_HOME_FEED_POSTS("followings"), QUERY.GET_HOME_FEED_POSTS("all")];
 
 const useHomeFeed = () => {
-  const { queryResults, feedFilterOption, currentPostId, initialized, setFeedFilterOption, setCurrentPostId } =
-    useContext(HomeFeedContext);
+  const {
+    queryResults,
+    feedFilterOption,
+    currentPostId,
+    initialized,
+    setFeedFilterOption,
+    setCurrentPostId,
+    refetchAll,
+  } = useContext(HomeFeedContext);
 
   const {
     data: infinitePostsData,
@@ -31,7 +39,7 @@ const useHomeFeed = () => {
   } = queryResults[feedFilterOption];
 
   // TODO : 그냥 QUERY 만 보내도 되는지 알아보기
-  const { setPostsPages } = useFeedMutation([QUERY]);
+  const { setPostsPages } = useFeedMutation(queryKeyList);
   const { isLoggedIn, logout } = useAuth();
   const queryClient = useQueryClient();
 
@@ -65,7 +73,7 @@ const useHomeFeed = () => {
 
     const filteredPages = infinitePostsData.pages.map((page) => removeDuplicatedData<Post>(page, (page) => page.id));
 
-    setPostsPages(filteredPages);
+    queryKeyList.forEach((queryKey) => setPostsPages(filteredPages, queryKey));
   };
 
   useEffect(() => {
@@ -87,6 +95,7 @@ const useHomeFeed = () => {
     currentPostId,
     setFeedFilterOption,
     setCurrentPostId,
+    refetchAll,
   };
 };
 
