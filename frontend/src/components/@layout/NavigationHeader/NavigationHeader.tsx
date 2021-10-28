@@ -20,16 +20,8 @@ const NavigationHeader = () => {
 
   const handleLogoutButtonClick = () => logout();
 
-  const UnAuthenticatedNavigation = () => (
-    <Navigation>
-      <NavigationItem to={PAGE_URL.SEARCH}>
-        <SearchIcon />
-      </NavigationItem>
-    </Navigation>
-  );
-
   const AuthenticatedNavigation = () => (
-    <Navigation>
+    <Navigation isLoggedIn={true}>
       <NavigationItem to={PAGE_URL.MY_PROFILE}>
         <PersonIcon />
       </NavigationItem>
@@ -68,8 +60,10 @@ const NavigationHeader = () => {
           </>
         ) : (
           <>
-            <UnAuthenticatedNavigation />
             <AuthNavigationWrapper>
+              <NavigationItem to={PAGE_URL.SEARCH}>
+                <SearchIcon />
+              </NavigationItem>
               <NavigationItem to={PAGE_URL.LOGIN}>
                 <LoginIcon />
               </NavigationItem>

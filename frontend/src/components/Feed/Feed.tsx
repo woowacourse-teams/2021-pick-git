@@ -130,22 +130,10 @@ const Feed = ({ infinitePostsData, onIntersect, setCurrentPostId, queryKey, isFe
       {posts?.map((post) => (
         <PostItemWrapper id={`post${post.id}`} key={post.id}>
           <PostItem
+            post={post}
             currentUserName={currentUsername}
             isLoggedIn={isLoggedIn}
-            authorName={post.authorName}
-            authorGithubUrl={post.githubRepoUrl}
-            authorImageUrl={post.profileImageUrl}
-            imageUrls={post.imageUrls}
-            commenterImageUrl={
-              "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80"
-            }
-            createdAt={post.createdAt}
-            comments={post.comments}
-            content={post.content}
             isEditable={currentUsername === post.authorName && isLoggedIn}
-            liked={post.liked}
-            likeCount={post.likesCount}
-            tags={post.tags}
             onPostDelete={() => handlePostDeleteButtonClick(post.id)}
             onPostEdit={() => handlePostEdit(post)}
             onPostLike={() => handlePostLike(post.id)}
