@@ -65,7 +65,7 @@ export const requestDeletePost = async (postId: Post["id"], accessToken: string 
     throw customError.noAccessToken;
   }
 
-  await axios.delete(API_URL.POST(postId), {
+  await axios.delete(API_URL.DELETE_POST(postId), {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -101,7 +101,7 @@ export const requestAddPost = async (
   formData.append("content", content);
   formData.append("tags", tags.join(","));
 
-  await axios.post(API_URL.ADD_POSTS, formData, {
+  await axios.post(API_URL.ADD_POST, formData, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -114,7 +114,7 @@ export const requestEditPost = async ({ postId, tags, content }: PostEditData, a
   }
 
   await axios.put(
-    API_URL.POST(postId),
+    API_URL.EDIT_POST(postId),
     { tags, content },
     {
       headers: {
