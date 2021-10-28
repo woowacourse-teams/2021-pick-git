@@ -1,8 +1,4 @@
-import { RefObject } from "react";
 import { CSSProp } from "styled-components";
-import { KakaoLinkDefault } from "react-kakao-link";
-
-import { Container } from "./ShareLink.style";
 
 import {
   KAKAO_PORTFOLIO_SHARE_LINK_TEMPLATE,
@@ -10,6 +6,9 @@ import {
   KAKAO_POST_SHARE_LINK_TEMPLATE,
 } from "../../../constants/kakao";
 
+import { sendKakaoShareLink } from "../../../utils/kakao";
+
+import { Container } from "./ShareLink.style";
 import { Portfolio, PortfolioData, Post } from "../../../@types";
 
 export interface Props {
@@ -30,11 +29,11 @@ const isMyPortfolio = (target: Props["target"]): target is Portfolio => {
 const ShareLink = ({ target, username, children, cssProp }: Props) => {
   if (isPost(target)) {
     const template = KAKAO_POST_SHARE_LINK_TEMPLATE(target);
+
+    console.log("template", template);
     return (
-      <Container cssProp={cssProp}>
-        <KakaoLinkDefault template={template} jsKey={process.env.KAKAO_API_KEY}>
-          {children}
-        </KakaoLinkDefault>
+      <Container cssProp={cssProp} onClick={() => sendKakaoShareLink(template)}>
+        {children}
       </Container>
     );
   }
@@ -43,10 +42,8 @@ const ShareLink = ({ target, username, children, cssProp }: Props) => {
     const template = MY_KAKAO_PORTFOLIO_SHARE_LINK_TEMPLATE(target, username);
 
     return (
-      <Container cssProp={cssProp}>
-        <KakaoLinkDefault template={template} jsKey={process.env.KAKAO_API_KEY}>
-          {children}
-        </KakaoLinkDefault>
+      <Container cssProp={cssProp} onClick={() => sendKakaoShareLink(template)}>
+        {children}
       </Container>
     );
   }
@@ -54,10 +51,8 @@ const ShareLink = ({ target, username, children, cssProp }: Props) => {
   const template = KAKAO_PORTFOLIO_SHARE_LINK_TEMPLATE(target, username);
 
   return (
-    <Container cssProp={cssProp}>
-      <KakaoLinkDefault template={template} jsKey={process.env.KAKAO_API_KEY}>
-        {children}
-      </KakaoLinkDefault>
+    <Container cssProp={cssProp} onClick={() => sendKakaoShareLink(template)}>
+      {children}
     </Container>
   );
 };

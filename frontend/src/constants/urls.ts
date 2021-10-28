@@ -1,6 +1,8 @@
 import { FeedFilterOption } from "../@types";
 import { POST_ADD_STEPS, POST_EDIT_STEPS } from "./steps";
 
+const isProduction = process.env.NODE_ENV === "production";
+
 export const URL_PARAMS = {
   ME: "me",
   USER: "user",
@@ -12,7 +14,8 @@ export const PAGE_URL = {
   USER_FEED_BASE: "/posts-user",
   POST_DETAIL: "/post",
   POST: (postId: number) => `/post?id=${postId}`,
-  POST_SHARE: (postId: number) => `http://dev.pickgit.p-e.kr/post?id=${postId}`,
+  POST_SHARE: (postId: number) =>
+    `${isProduction ? "https://pick-git.com" : "http://dev.pick-git.com"}/post?id=${postId}`,
   USER_FEED: (username: string) => `/posts-user?username=${username}`,
   SEARCH_RESULT_FEED_BASE: "/search-posts",
   SEARCH_RESULT_FEED: (type: string, keyword: string) => `/search-posts?type=${type}&keyword=${keyword}`,
@@ -34,7 +37,8 @@ export const PAGE_URL = {
   FOLLOWINGS: (username: string) => `/followings?username=${username}`,
   FOLLOWERS: (username: string) => `/followers?username=${username}`,
   PORTFOLIO: "/portfolio",
-  USER_PORTFOLIO_SHARE: (username: string) => `http://dev.pickgit.p-e.kr/portfolio?username=${username}`,
+  USER_PORTFOLIO_SHARE: (username: string) =>
+    `${isProduction ? "https://pick-git.com" : "http://dev.pick-git.com"}/portfolio?username=${username}`,
   MY_PORTFOLIO: "/my-portfolio",
 };
 

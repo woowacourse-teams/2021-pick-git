@@ -12272,11 +12272,6 @@ react-is@^16.6.0, react-is@^16.7.0, react-is@^16.8.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
 
-react-kakao-link@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/react-kakao-link/-/react-kakao-link-0.1.0.tgz#6f06f3daa3f17768e02b0321bc89bb0829f0c1c9"
-  integrity sha512-wgnhIho86AOcGo3Z77mLkjhe4j962i/BSPuO1jZPf0lm314Lw4ybuY2E3n4F0LhBWHEZIyyo63zUIYBCT+2urA==
-
 react-lifecycles-compat@^3.0.4:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
