@@ -23,15 +23,22 @@ interface Props {
   infinitePostsData: InfiniteData<Post[] | null>;
   onIntersect: () => void;
   setCurrentPostId?: Dispatch<SetStateAction<number>>;
-  queryKey: QueryKey;
+  queryKeyList: QueryKey[];
   isFetching: boolean;
   notFoundMessage?: string | null;
 }
 
-const Feed = ({ infinitePostsData, onIntersect, setCurrentPostId, queryKey, isFetching, notFoundMessage }: Props) => {
+const Feed = ({
+  infinitePostsData,
+  onIntersect,
+  setCurrentPostId,
+  queryKeyList,
+  isFetching,
+  notFoundMessage,
+}: Props) => {
   const [selectedPostId, setSelectedPostId] = useState<Post["id"]>();
   const { pushSnackbarMessage } = useContext(SnackBarContext);
-  const { addPostLike, deletePost, deletePostLike, isDeletePostLoading } = useFeedMutation(queryKey);
+  const { addPostLike, deletePost, deletePostLike, isDeletePostLoading } = useFeedMutation(queryKeyList);
   const [posts, setPosts] = useState<Post[]>([]);
   const { setPostEditData } = usePostEdit();
   const {

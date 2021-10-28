@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
 import PageError from "../../components/@shared/PageError/PageError";
 import Tabs from "../../components/@shared/Tabs/Tabs";
@@ -26,6 +27,7 @@ const HomeFeedPage = () => {
     currentPostId,
     setFeedFilterOption,
     setCurrentPostId,
+    refetchAll,
   } = useHomeFeed();
   const { scrollWrapperRef } = useAutoAnchor(`#post${currentPostId}`);
 
@@ -45,6 +47,11 @@ const HomeFeedPage = () => {
     handlePostsEndIntersect();
     activateImageFetchingState();
   };
+
+  useEffect(() => {
+    refetchAll();
+    setTimeout(refetchAll, 300);
+  }, []);
 
   if (isLoading || isFirstImagesLoading) {
     return <PageLoadingWithLogo />;
@@ -70,7 +77,7 @@ const HomeFeedPage = () => {
         <Feed
           infinitePostsData={infinitePostsData}
           onIntersect={handleIntersect}
-          queryKey={[QUERY.GET_HOME_FEED_POSTS(feedFilterOption)]}
+          queryKeyList={[QUERY.GET_HOME_FEED_POSTS("followings"), QUERY.GET_HOME_FEED_POSTS("all")]}
           isFetching={isFetching || isImagesFetching}
           setCurrentPostId={setCurrentPostId}
           notFoundMessage={feedFilterOption === "followings" ? NOT_FOUND_MESSAGE.POSTS.FOLLOWINGS : null}

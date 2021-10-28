@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import axios from "axios";
 import { Container, StepSlider, StepContainer, NextStepButtonWrapper } from "./AddPostPage.style";
 
@@ -30,8 +30,10 @@ import {
 } from "../../utils/postUpload";
 import { getAPIErrorMessage } from "../../utils/error";
 import { ScrollPageWrapper } from "../../components/@styled/layout";
+import HomeFeedContext from "../../contexts/HomeFeedContext";
 
 const AddPostPage = () => {
+  const { refetchAll: refetchHomeFeed } = useContext(HomeFeedContext);
   const { pushSnackbarMessage } = useSnackbar();
   const {
     modalMessage: alertMessage,
