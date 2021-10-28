@@ -4,7 +4,7 @@ import com.woowacourse.pickgit.authentication.domain.Authenticated;
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.config.auth_interceptor_register.ForLoginAndGuestUser;
 import com.woowacourse.pickgit.config.auth_interceptor_register.ForOnlyLoginUser;
-import com.woowacourse.pickgit.exception.post.PostSearchTypeException;
+import com.woowacourse.pickgit.exception.post.HomeFeedTypeException;
 import com.woowacourse.pickgit.post.application.PostFeedService;
 import com.woowacourse.pickgit.post.application.dto.request.HomeFeedRequestDto;
 import com.woowacourse.pickgit.post.application.dto.request.SearchPostRequestDto;
@@ -45,7 +45,7 @@ public class PostFeedController {
         FeedType selectedFeedType = feedTypes.stream()
             .filter(feedType -> feedType.isSatisfiedBy(type))
             .findAny()
-            .orElseThrow(PostSearchTypeException::new);
+            .orElseThrow(HomeFeedTypeException::new);
 
         HomeFeedRequestDto homeFeedRequestDto = new HomeFeedRequestDto(appUser, pageable);
         List<PostResponseDto> postResponseDtos = selectedFeedType.find(homeFeedRequestDto);
