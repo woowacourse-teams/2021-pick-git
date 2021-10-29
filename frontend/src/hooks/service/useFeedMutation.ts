@@ -47,30 +47,29 @@ const useFeedMutation = (queryKeyList: QueryKey[]) => {
   };
 
   const addPostLike = async (postId: Post["id"]) => {
-    infinitePostsDataList.forEach(async (infinitePostsData) => {
-      const targetPost = getTargetPost(postId, [...infinitePostsData.pages]);
+    const infinitePostsData = infinitePostsDataList.filter((data) => data)[0];
+    const targetPost = getTargetPost(postId, [...infinitePostsData.pages]);
 
-      if (!targetPost) {
-        return;
-      }
+    if (!targetPost) {
+      return;
+    }
 
-      const prevLiked = targetPost?.liked;
-      const prevLikesCount = targetPost?.likesCount;
+    const prevLiked = targetPost?.liked;
+    const prevLikesCount = targetPost?.likesCount;
 
-      setPostLike(postId, { liked: true, likesCount: prevLikesCount + 1 });
+    setPostLike(postId, { liked: true, likesCount: prevLikesCount + 1 });
 
-      try {
-        const { liked, likesCount } = await mutateAddPostLike(postId);
+    try {
+      const { liked, likesCount } = await mutateAddPostLike(postId);
 
-        if (liked === prevLiked || likesCount === prevLikesCount) {
-          pushSnackbarMessage(UNKNOWN_ERROR_MESSAGE);
-          setPostLike(postId, { liked: prevLiked, likesCount: prevLikesCount });
-        }
-      } catch (error) {
+      if (liked === prevLiked || likesCount === prevLikesCount) {
         pushSnackbarMessage(UNKNOWN_ERROR_MESSAGE);
         setPostLike(postId, { liked: prevLiked, likesCount: prevLikesCount });
       }
-    });
+    } catch (error) {
+      pushSnackbarMessage(UNKNOWN_ERROR_MESSAGE);
+      setPostLike(postId, { liked: prevLiked, likesCount: prevLikesCount });
+    }
   };
 
   const deletePost = async (postId: Post["id"]) => {
@@ -84,30 +83,30 @@ const useFeedMutation = (queryKeyList: QueryKey[]) => {
   };
 
   const deletePostLike = async (postId: Post["id"]) => {
-    infinitePostsDataList.forEach(async (infinitePostsData) => {
-      const targetPost = getTargetPost(postId, [...infinitePostsData.pages]);
+    const infinitePostsData = infinitePostsDataList.filter((data) => data)[0];
 
-      if (!targetPost) {
-        return;
-      }
+    const targetPost = getTargetPost(postId, [...infinitePostsData.pages]);
 
-      const prevLiked = targetPost?.liked;
-      const prevLikesCount = targetPost?.likesCount;
+    if (!targetPost) {
+      return;
+    }
 
-      setPostLike(postId, { liked: false, likesCount: prevLikesCount - 1 });
+    const prevLiked = targetPost?.liked;
+    const prevLikesCount = targetPost?.likesCount;
 
-      try {
-        const { liked, likesCount } = await mutateDeletePostLike(targetPost.id);
+    setPostLike(postId, { liked: false, likesCount: prevLikesCount - 1 });
 
-        if (liked === prevLiked || likesCount === prevLikesCount) {
-          pushSnackbarMessage(UNKNOWN_ERROR_MESSAGE);
-          setPostLike(postId, { liked: prevLiked, likesCount: prevLikesCount });
-        }
-      } catch (error) {
+    try {
+      const { liked, likesCount } = await mutateDeletePostLike(postId);
+
+      if (liked === prevLiked || likesCount === prevLikesCount) {
         pushSnackbarMessage(UNKNOWN_ERROR_MESSAGE);
         setPostLike(postId, { liked: prevLiked, likesCount: prevLikesCount });
       }
-    });
+    } catch (error) {
+      pushSnackbarMessage(UNKNOWN_ERROR_MESSAGE);
+      setPostLike(postId, { liked: prevLiked, likesCount: prevLikesCount });
+    }
   };
 
   return {
