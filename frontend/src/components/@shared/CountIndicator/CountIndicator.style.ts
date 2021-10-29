@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
 export const Container = styled.div`
   display: inline-flex;
@@ -9,14 +9,19 @@ export const Container = styled.div`
   width: fit-content;
   height: 2.6875rem;
   line-height: 0.9;
-  color: ${({ theme }) => theme.color.textColor};
 `;
 
-export const Count = styled.div`
-  font-size: 1rem;
-  font-weight: bold;
-`;
+export const Count = styled.div(
+  ({ theme }) => css`
+    font-size: 1rem;
+    font-weight: bold;
+    color: ${theme.color.textColor};
+  `
+);
 
-export const Name = styled.div`
-  font-size: 0.875rem;
-`;
+export const Name = styled.div(
+  ({ theme }) => css`
+    font-size: 0.875rem;
+    color: ${theme.color.textColor};
+  `
+);

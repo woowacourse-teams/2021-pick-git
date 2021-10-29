@@ -22,6 +22,7 @@ import {
   TagListItem,
   TextLengthIndicator,
   TagAddButton,
+  TagInputCSS,
 } from "./TagInputForm.style";
 
 interface Props {
@@ -128,6 +129,7 @@ const TagInputForm = ({ githubRepositoryName, tags, tagsQueryResult, setTags }: 
             placeholder="태그 입력..."
             name="tag-input"
             onChange={handleTagInputChange}
+            cssProp={TagInputCSS}
           />
           <TagAddButton type="submit">
             <SVGIcon icon="AddBoxIcon" />

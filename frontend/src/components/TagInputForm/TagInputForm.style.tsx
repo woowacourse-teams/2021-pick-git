@@ -40,6 +40,10 @@ export const TagInputWrapper = styled.div`
   position: relative;
 `;
 
+export const TagInputCSS = css`
+  line-height: 1rem;
+`;
+
 export const TagAddButton = styled.button`
   position: absolute;
   top: 0.625rem;

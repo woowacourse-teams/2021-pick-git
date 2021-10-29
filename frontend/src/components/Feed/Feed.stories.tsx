@@ -22,7 +22,7 @@ const Template: Story = (args) => {
       {...args}
       infinitePostsData={infinitePostsData}
       onIntersect={() => {}}
-      queryKey={QUERY.GET_HOME_FEED_POSTS("all")}
+      queryKeyList={[QUERY.GET_HOME_FEED_POSTS("all")]}
       isFetching={false}
     />
   );

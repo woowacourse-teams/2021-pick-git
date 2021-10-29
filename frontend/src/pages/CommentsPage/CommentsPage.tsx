@@ -20,16 +20,17 @@ import useAuth from "../../hooks/common/useAuth";
 import useComments from "../../hooks/service/useComments";
 
 import { getItemsFromPages } from "../../utils/infiniteData";
-import { getTextElementsWithWithBr } from "../../utils/text";
+import { getTextElementsWithBr } from "../../utils/text";
 
 import {
   CloseLinkButton,
   CloseLinkButtonWrapper,
   CloseLinkText,
+  CommentContent,
   CommentContentWrapper,
   CommentList,
   CommentListItem,
-  CommentText,
+  CommentTextWrapper,
   CommentTextArea,
   CommentTextAreaWrapper,
   Container,
@@ -167,6 +168,12 @@ const CommentsPage = () => {
       return;
     }
 
+    if (event.shiftKey && event.code === "Enter") {
+      event.preventDefault();
+      event.currentTarget.value += "\n";
+      return;
+    }
+
     if (event.code === "Enter") {
       event.preventDefault();
       handleCommentSave();
@@ -186,11 +193,7 @@ const CommentsPage = () => {
   }, [comments.length]);
 
   if (isPostLoading || isCommentsLoading) {
-    return (
-      <Container>
-        <PageLoading />
-      </Container>
-    );
+    return <PageLoading />;
   }
 
   if (!targetPost) {
@@ -209,12 +212,12 @@ const CommentsPage = () => {
         <CommentListItem key={comment.id}>
           <CommentContentWrapper>
             <Avatar diameter="2.5rem" imageUrl={comment.profileImageUrl} />
-            <CommentText>
+            <CommentTextWrapper>
               <PostContentAuthorLink to={PAGE_URL.USER_PROFILE(comment.authorName)}>
                 {comment.authorName}
               </PostContentAuthorLink>
-              <span>{comment.content}</span>
-            </CommentText>
+              <CommentContent>{comment.content}</CommentContent>
+            </CommentTextWrapper>
           </CommentContentWrapper>
           {(currentUsername === comment.authorName || targetPost.authorName === currentUsername) && (
             <DeleteIconWrapper onClick={() => handleCommentDeleteClick(comment.id)}>
@@ -237,7 +240,7 @@ const CommentsPage = () => {
       <PostContentAuthorLink to={PAGE_URL.USER_PROFILE(targetPost.authorName)}>
         {targetPost.authorName}
       </PostContentAuthorLink>
-      {getTextElementsWithWithBr(targetPost.content)}
+      {getTextElementsWithBr(targetPost.content)}
     </PostContent>,
     <TagListWrapper key="tags">{tagListItems}</TagListWrapper>,
   ];

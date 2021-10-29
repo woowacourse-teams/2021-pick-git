@@ -30,7 +30,6 @@ const UserFeedPage = () => {
   const { currentUsername } = useAuth();
   const isMyFeed = currentUsername === username;
 
-  // TODO : username 이 null 혹은 빈 문자열일 경우에 대한 예외처리
   const {
     infinitePostsData,
     isLoading,
@@ -66,7 +65,7 @@ const UserFeedPage = () => {
         <Feed
           infinitePostsData={infinitePostsData}
           onIntersect={handleIntersect}
-          queryKey={[QUERY.GET_USER_FEED_POSTS, { username, isMyFeed }]}
+          queryKeyList={[[QUERY.GET_USER_FEED_POSTS, { username, isMyFeed }]]}
           isFetching={isFetchingNextPage || isImagesFetching}
           setCurrentPostId={setCurrentPostId}
         />
