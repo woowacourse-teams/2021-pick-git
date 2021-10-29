@@ -3,7 +3,6 @@ import { ThemeContext } from "styled-components";
 
 import { CameraIcon } from "../../assets/icons";
 import { LIMIT } from "../../constants/limits";
-import SnackBarContext from "../../contexts/SnackbarContext";
 import useModal from "../../hooks/common/useModal";
 import useProfileModificationForm from "../../hooks/service/useProfileModificationForm";
 import AlertPortal from "../@layout/AlertPortal/AlertPortal";

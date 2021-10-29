@@ -17,6 +17,7 @@ import useSearchUserData from "../../hooks/service/useSearchUserData";
 
 import { Container, ContentWrapper, KeywordsWrapper, NotFoundCSS } from "./SearchPage.style";
 import { getItemsFromPages } from "../../utils/infiniteData";
+import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 
 const tabNames = ["계정", "태그"];
 const searchTypeIndex = {
@@ -68,7 +69,9 @@ const SearchPage = () => {
   }, [tabIndex]);
 
   const SearchUserResult = () => {
-    // TODO: 로딩 먼저하기
+    if (isUserSearchLoading) {
+      return <PageLoading />;
+    }
 
     if (isUserSearchError) {
       return <NotFound type="user" message="검색결과를 표시할 수 없습니다." cssProp={NotFoundCSS} />;
@@ -79,20 +82,20 @@ const SearchPage = () => {
     }
 
     return (
-      <>
-        <Loader kind="spinner" size="1rem" isShown={isUserSearchLoading} />
-        <UserList
-          users={userSearchResults}
-          isFetchingNextPage={isUserSearchFetchingNextPage}
-          onIntersect={handleUserSearchIntersect}
-          queryKey={[QUERY.GET_SEARCH_USER_RESULT, { keyword }]}
-        />
-      </>
+      <UserList
+        users={userSearchResults}
+        isFetchingNextPage={isUserSearchFetchingNextPage}
+        onIntersect={handleUserSearchIntersect}
+        queryKey={[QUERY.GET_SEARCH_USER_RESULT, { keyword }]}
+      />
     );
   };
 
-  // TODO: 조건부 렌더링 없애기
   const SearchPostResult = () => {
+    if (keyword.length !== 0 && isPostSearchLoading) {
+      return <PageLoading />;
+    }
+
     if (isPostSearchError || !postSearchResults) {
       return <NotFound type="post" message="검색결과를 표시할 수 없습니다." cssProp={NotFoundCSS} />;
     }
@@ -105,7 +108,6 @@ const SearchPage = () => {
 
     return (
       <>
-        <Loader kind="spinner" size="1rem" isShown={isPostSearchLoading} />
         <KeywordsWrapper>
           {formattedKeyword.split(" ").map((keyword, index) => keyword && <Chip key={index}>{keyword}</Chip>)}
         </KeywordsWrapper>

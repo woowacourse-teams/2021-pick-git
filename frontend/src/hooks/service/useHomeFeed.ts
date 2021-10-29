@@ -38,7 +38,6 @@ const useHomeFeed = () => {
     refetch,
   } = queryResults[feedFilterOption];
 
-  // TODO : 그냥 QUERY 만 보내도 되는지 알아보기
   const { setPostsPages } = useFeedMutation(queryKeyList);
   const { isLoggedIn, logout } = useAuth();
   const queryClient = useQueryClient();

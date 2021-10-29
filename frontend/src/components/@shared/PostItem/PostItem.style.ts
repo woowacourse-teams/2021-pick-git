@@ -126,6 +126,7 @@ export const PostContent = styled.span`
 export const TagListWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
+  margin-bottom: 0.75rem;
 `;
 
 export const TagItemLinkButton = styled(Link)`

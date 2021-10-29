@@ -38,7 +38,7 @@ const PortfolioHeader = ({ isButtonsShown = true, portfolio, username }: Props) 
 
   const handleShareLinkCopy = () => {
     navigator.clipboard.writeText(PAGE_URL.USER_PORTFOLIO_SHARE(username));
-    pushSnackbarMessage(`${username}님의 포트폴리오 링크가 복사되었습니다`);
+    pushSnackbarMessage(`포트폴리오 링크가 복사되었습니다`);
   };
 
   return (
