@@ -2,6 +2,7 @@ import { useContext } from "react";
 import { InfiniteData, QueryKey, useQueryClient } from "react-query";
 import { Post } from "../../@types";
 import { UNKNOWN_ERROR_MESSAGE } from "../../constants/messages";
+import { QUERY } from "../../constants/queries";
 import SnackBarContext from "../../contexts/SnackbarContext";
 
 import { useAddPostLikeMutation, useDeletePostLikeMutation, useDeletePostMutation } from "../../services/queries";
@@ -47,8 +48,8 @@ const useFeedMutation = (queryKeyList: QueryKey[]) => {
   };
 
   const addPostLike = async (postId: Post["id"]) => {
-    const infinitePostsData = infinitePostsDataList.filter((data) => data)[0];
-    const targetPost = getTargetPost(postId, [...infinitePostsData.pages]);
+    const infinitePostsData = queryClient.getQueryData<InfiniteData<Post[]>>(QUERY.GET_HOME_FEED_POSTS("all"));
+    const targetPost = getTargetPost(postId, [...(infinitePostsData?.pages ?? [])]);
 
     if (!targetPost) {
       return;
@@ -83,9 +84,8 @@ const useFeedMutation = (queryKeyList: QueryKey[]) => {
   };
 
   const deletePostLike = async (postId: Post["id"]) => {
-    const infinitePostsData = infinitePostsDataList.filter((data) => data)[0];
-
-    const targetPost = getTargetPost(postId, [...infinitePostsData.pages]);
+    const infinitePostsData = queryClient.getQueryData<InfiniteData<Post[]>>(QUERY.GET_HOME_FEED_POSTS("all"));
+    const targetPost = getTargetPost(postId, [...(infinitePostsData?.pages ?? [])]);
 
     if (!targetPost) {
       return;
