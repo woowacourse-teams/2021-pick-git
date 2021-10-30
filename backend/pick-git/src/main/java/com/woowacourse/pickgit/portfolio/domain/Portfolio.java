@@ -124,7 +124,7 @@ public class Portfolio {
             user.getName(),
             true,
             user.getImage(),
-            user.getDescription(),
+            Objects.isNull(user.getDescription()) ? "" : user.getDescription(),
             LocalDateTime.now(),
             LocalDateTime.now(),
             Contacts.empty(),
