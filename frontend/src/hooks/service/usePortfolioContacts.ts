@@ -1,13 +1,14 @@
 import { PortfolioContact } from "../../@types";
 import { PORTFOLIO } from "../../constants/localStorageKey";
-import { CONTACTS } from "../../constants/portfolio";
+import { PORTFOLIO_CONTACTS } from "../../constants/portfolio";
 import { setPortfolioLocalUpdateTime } from "../../storage/storage";
 import useLocalStorage from "../common/useLocalStorage";
 
 const usePortfolioContacts = (username: string) => {
+  PORTFOLIO_CONTACTS[0].value = `https://github/${username}`;
   const { itemState: portfolioContacts, setItem } = useLocalStorage<PortfolioContact[]>(
     PORTFOLIO.CONTACTS(username),
-    CONTACTS
+    PORTFOLIO_CONTACTS
   );
 
   const setPortfolioContacts = (contacts: PortfolioContact[], shouldRenewUpdateTime: boolean = true) => {

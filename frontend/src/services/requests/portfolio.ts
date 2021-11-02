@@ -1,9 +1,9 @@
 import axios from "axios";
-import { PortfolioData } from "../../@types";
+import { PortfolioData, PortfolioUploadData } from "../../@types";
 import { API_URL } from "../../constants/urls";
 import { customError } from "../../utils/error";
 
-export const requestSetPortfolio = async (portfolio: PortfolioData, accessToken: string | null) => {
+export const requestSetPortfolio = async (portfolio: PortfolioUploadData, accessToken: string | null) => {
   if (!accessToken) {
     throw customError.noAccessToken;
   }

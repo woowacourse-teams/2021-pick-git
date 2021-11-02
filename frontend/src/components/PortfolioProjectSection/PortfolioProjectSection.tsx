@@ -12,6 +12,7 @@ import {
   TagListWrapper,
   TagItemCSS,
   ProjectDateSeparator,
+  ProjectDateText,
 } from "./PortfolioProjectSection.style";
 import Chip from "../@shared/Chip/Chip";
 import PortfolioTextEditor from "../PortfolioTextEditor/PortfolioTextEditor";
@@ -42,11 +43,17 @@ const PortfolioProjectSection = ({ project, isEditable, setProject }: Props) => 
     },
   ];
 
-  const tagList = project.tags.map((tag) => (
-    <Chip key={tag} cssProp={TagItemCSS} onDelete={() => deleteTag(tag)}>
-      {tag}
-    </Chip>
-  ));
+  const tagList = project.tags.map((tag) =>
+    isEditable ? (
+      <Chip key={tag} cssProp={TagItemCSS} onDelete={() => deleteTag(tag)}>
+        {tag}
+      </Chip>
+    ) : (
+      <Chip key={tag} cssProp={TagItemCSS}>
+        {tag}
+      </Chip>
+    )
+  );
 
   const handleUpdateContent: React.ChangeEventHandler<HTMLTextAreaElement> = (event) => {
     updateContent(event.currentTarget.value);
@@ -67,19 +74,17 @@ const PortfolioProjectSection = ({ project, isEditable, setProject }: Props) => 
   return (
     <Container>
       <ProjectPeriods>
-        <DateInput
-          disabled={!isEditable}
-          cssProp={ProjectDateCSS}
-          value={project.startDate}
-          onChange={handleUpdateStartDate}
-        />
-        <ProjectDateSeparator>~</ProjectDateSeparator>
-        <DateInput
-          disabled={!isEditable}
-          cssProp={ProjectDateCSS}
-          value={project.endDate}
-          onChange={handleUpdateEndDate}
-        />
+        {isEditable ? (
+          <>
+            <DateInput cssProp={ProjectDateCSS} value={project.startDate} onChange={handleUpdateStartDate} />
+            <ProjectDateSeparator>~</ProjectDateSeparator>
+            <DateInput cssProp={ProjectDateCSS} value={project.endDate} onChange={handleUpdateEndDate} />
+          </>
+        ) : (
+          <ProjectDateText>
+            {project.startDate} ~ {project.endDate}
+          </ProjectDateText>
+        )}
       </ProjectPeriods>
       {isEditable ? (
         <DropDown items={dropDownItems} cssProp={ProjectTypeCSS}>
@@ -105,7 +110,7 @@ const PortfolioProjectSection = ({ project, isEditable, setProject }: Props) => 
             onChange={handleUpdateContent}
             disabled={!isEditable}
             placeholder={PLACE_HOLDER.PROJECT_DESCRIPTION}
-            autoGrow={false}
+            autoGrow
           />
           <TagListWrapper>{tagList}</TagListWrapper>
         </ProjectInfo>

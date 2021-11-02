@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { fadeIn } from "../../@styled/keyframes";
 import { setDesktopMediaQuery, setMobileMediaQuery } from "../../@styled/mediaQueries";
 
@@ -13,6 +13,21 @@ export const PostHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem;
+`;
+
+export const PostHeaderButtonsWrapper = styled.div(
+  () => css`
+    display: flex;
+    align-items: center;
+  `
+);
+
+export const ShareLinkCSS = css`
+  display: none;
+`;
+
+export const ShareButtonDrawerCSS = css`
+  margin-right: 1rem;
 `;
 
 export const PostAuthorInfoLink = styled(Link)`
@@ -111,6 +126,7 @@ export const PostContent = styled.span`
 export const TagListWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
+  margin-bottom: 0.75rem;
 `;
 
 export const TagItemLinkButton = styled(Link)`

@@ -1,14 +1,16 @@
-export const removeDuplicatedData = <TData>(data: TData[], uniqueKeyGenerator: (data: TData) => unknown) => {
+export const removeDuplicatedData = <TData>(data: TData[] | null, uniqueKeyGenerator: (data: TData) => unknown) => {
   const uniqueSet = new Set();
 
-  return data.filter((currentData) => {
-    const uniqueKey = uniqueKeyGenerator(currentData);
-    const isNewPost = !uniqueSet.has(uniqueKey);
+  return (
+    data?.filter((currentData) => {
+      const uniqueKey = uniqueKeyGenerator(currentData);
+      const isNewPost = !uniqueSet.has(uniqueKey);
 
-    if (isNewPost) {
-      uniqueSet.add(uniqueKey);
-    }
+      if (isNewPost) {
+        uniqueSet.add(uniqueKey);
+      }
 
-    return isNewPost;
-  });
+      return isNewPost;
+    }) ?? []
+  );
 };

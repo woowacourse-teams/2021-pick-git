@@ -29,12 +29,13 @@ import com.woowacourse.pickgit.user.application.dto.response.ProfileImageEditRes
 import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponseDto;
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
-import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.domain.repository.UserRepository;
+import com.woowacourse.pickgit.user.domain.follow.PlatformFollowingRequester;
+import com.woowacourse.pickgit.user.domain.profile.PickGitProfileStorage;
+import com.woowacourse.pickgit.user.domain.search.UserSearchEngine;
 import com.woowacourse.pickgit.user.domain.contribution.Contribution;
 import com.woowacourse.pickgit.user.domain.contribution.ContributionCategory;
 import com.woowacourse.pickgit.user.domain.contribution.PlatformContributionCalculator;
-import com.woowacourse.pickgit.user.domain.follow.PlatformFollowingRequester;
-import com.woowacourse.pickgit.user.domain.profile.PickGitProfileStorage;
 import com.woowacourse.pickgit.user.presentation.dto.UserAssembler;
 import com.woowacourse.pickgit.user.presentation.dto.request.ContributionRequestDto;
 import java.io.File;
@@ -62,6 +63,9 @@ class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private UserSearchEngine userSearchEngine;
 
     @Mock
     private PickGitProfileStorage pickGitProfileStorage;
@@ -906,7 +910,7 @@ class UserServiceTest {
             loginUser.getName());
 
         // mock
-        given(userRepository.searchByUsernameLike(searchKeyword, PageRequest.of(page, limit)))
+        given(userSearchEngine.searchByUsernameLike(searchKeyword, PageRequest.of(page, limit)))
             .willReturn(searchedUser);
         given(userRepository.findByBasicProfile_Name(loginUser.getName()))
             .willReturn(Optional.ofNullable(loginUser));
@@ -924,7 +928,7 @@ class UserServiceTest {
         assertThat(searchResponses)
             .extracting("following")
             .containsExactly(true, false, false, false);
-        verify(userRepository, times(1))
+        verify(userSearchEngine, times(1))
             .searchByUsernameLike(searchKeyword, PageRequest.of(page, limit));
         verify(userRepository, times(1)).findByBasicProfile_Name(loginUser.getName());
     }
@@ -940,7 +944,7 @@ class UserServiceTest {
         AuthUserForUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
 
         // mock
-        given(userRepository.searchByUsernameLike(searchKeyword, PageRequest.of(page, limit)))
+        given(userSearchEngine.searchByUsernameLike(searchKeyword, PageRequest.of(page, limit)))
             .willReturn(usersInDb);
 
         // when
@@ -955,7 +959,7 @@ class UserServiceTest {
         assertThat(searchResult)
             .extracting("following")
             .containsExactly(null, null, null, null, null);
-        verify(userRepository, times(1))
+        verify(userSearchEngine, times(1))
             .searchByUsernameLike(searchKeyword, PageRequest.of(page, limit));
         verify(userRepository, times(0)).findByBasicProfile_Name(anyString());
     }

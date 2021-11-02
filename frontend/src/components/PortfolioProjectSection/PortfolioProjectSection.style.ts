@@ -1,5 +1,11 @@
 import styled, { css } from "styled-components";
-import { setDesktopMediaQuery, setLaptopAboveMediaQuery, setLaptopMediaQuery } from "../@styled/mediaQueries";
+import {
+  setDesktopMediaQuery,
+  setLaptopAboveMediaQuery,
+  setLaptopMediaQuery,
+  setMobileMediaQuery,
+} from "../@styled/mediaQueries";
+import { customScrollbarCSS } from "../@styled/scrollbar";
 
 export const Container = styled.div`
   display: flex;
@@ -50,19 +56,12 @@ export const ProjectTypeCSS = css`
 
 export const ProjectType = styled.span(() => ProjectTypeCSS);
 
+export const ProjectDateText = styled.span(() => css``);
+
 export const ProjectDateCSS = css`
-  width: 7rem;
-  text-align: center;
+  text-align: right;
   background: none;
   border: none;
-
-  ${setLaptopMediaQuery`
-    width: 10rem;
-  `}
-
-  ${setDesktopMediaQuery`
-    width: 12rem;
-  `}
 `;
 
 export const ProjectDateSeparator = styled.span`
@@ -85,11 +84,11 @@ export const ProjectNameCSS = css`
 
   ${setLaptopMediaQuery`
     padding-left: 65px;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
   `}
   ${setDesktopMediaQuery`
     padding-left: 100px;
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
   `}
 `;
 
@@ -101,14 +100,13 @@ export const ProjectBody = styled.div`
   ${setLaptopAboveMediaQuery`
     flex-direction: row;
     justify-content: center;
-    align-items: center;
   `}
 
   ${setLaptopMediaQuery`
-    padding: 0 65px;
+    padding: 0 4.0625rem;
   `}
   ${setDesktopMediaQuery`
-    padding: 0 100px;
+    padding: 0 6.25rem;
   `}
 `;
 
@@ -117,6 +115,7 @@ export const ProjectImage = styled.img`
   width: 100%;
   aspect-ratio: 4 / 3;
   align-self: flex-start;
+  margin: auto 0;
 
   ${setLaptopAboveMediaQuery`
     order: 2;
@@ -128,7 +127,7 @@ export const ProjectInfo = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100%;
+  min-height: 100%;
   order: 2;
   padding: 1rem 1.2rem;
 
@@ -141,22 +140,29 @@ export const ProjectInfo = styled.div`
 
 export const ProjectContentCSS = css`
   font-size: 0.7rem;
-  margin: 0 1.5rem 0 0;
+  width: 100%;
   height: 100%;
+  flex-grow: 1;
   line-height: 1.5rem;
   margin-bottom: 1rem;
-  min-height: 10rem;
+  overflow-y: scroll;
 
-  color: ${({ theme }) => theme.color.textColor};
+  ${({ theme }) => customScrollbarCSS(theme.color.textColor)};
+
+  ${setMobileMediaQuery`
+    overflow-y: hidden;
+  `}
 
   ${setLaptopMediaQuery`
     font-size: 0.8rem;
-    margin-right: 2rem;
-
+    max-height: 20rem;
+    padding-right: 2rem;
   `}
+
   ${setDesktopMediaQuery`
     font-size: 0.9rem;
-    margin-right: 3rem;
+    max-height: 35rem;
+    padding-right: 3rem;
   `}
 `;
 

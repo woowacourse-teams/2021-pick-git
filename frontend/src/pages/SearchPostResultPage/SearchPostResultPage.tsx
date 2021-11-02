@@ -1,14 +1,11 @@
-import { useEffect, useRef, useState } from "react";
 import { InfiniteData, QueryKey } from "react-query";
 import { useLocation } from "react-router-dom";
 
 import PageLoadingWithLogo from "../../components/@layout/PageLoadingWithLogo/PageLoadingWithLogo";
 import PageError from "../../components/@shared/PageError/PageError";
-import InfiniteScrollContainer from "../../components/@shared/InfiniteScrollContainer/InfiniteScrollContainer";
 import { ScrollPageWrapper } from "../../components/@styled/layout";
 import Feed from "../../components/Feed/Feed";
 
-import { LayoutInPx } from "../../constants/layout";
 import { QUERY } from "../../constants/queries";
 
 import useInfiniteImagePreloader from "../../hooks/common/useInfiniteImagePreloader";
@@ -17,6 +14,8 @@ import useSearchPostData from "../../hooks/service/useSearchPostData";
 import { Container } from "./SearchPostResultPage.style";
 
 import type { Post } from "../../@types";
+import useAutoAnchor from "../../hooks/common/useAutoAnchor";
+import { useState } from "react";
 
 interface LocationState {
   prevData?: InfiniteData<Post[]>;
@@ -25,9 +24,6 @@ interface LocationState {
 }
 
 const SearchPostResultPage = () => {
-  const [isMountedOnce, setIsMountedOnce] = useState(false);
-  const [mountCounter, setMountCounter] = useState(0);
-  const ScrollWrapperRef = useRef<HTMLDivElement>(null);
   const {
     state: { postId },
   } = useLocation<LocationState>();
@@ -35,6 +31,8 @@ const SearchPostResultPage = () => {
   const params = new URLSearchParams(location.search);
   const type = params.get("type") ?? "tags";
   const keyword = params.get("keyword") ?? "";
+
+  const [currentPostId, setCurrentPostId] = useState<Post["id"]>(Number(postId) ?? -1);
 
   const {
     infinitePostsData,
@@ -47,6 +45,7 @@ const SearchPostResultPage = () => {
     type,
     activated: true,
   });
+  const { scrollWrapperRef } = useAutoAnchor(`#post${currentPostId}`);
 
   const infiniteImageUrls =
     infinitePostsData?.pages.map(
@@ -60,25 +59,6 @@ const SearchPostResultPage = () => {
     activateImageFetchingState();
   };
 
-  useEffect(() => {
-    if (!postId) {
-      return;
-    }
-
-    if (!isMountedOnce) {
-      setMountCounter((prev) => prev + 1);
-      setIsMountedOnce(ScrollWrapperRef.current !== null);
-
-      return;
-    }
-
-    const $targetPost = document.querySelector(`#post${postId}`);
-
-    if ($targetPost && $targetPost instanceof HTMLElement) {
-      ScrollWrapperRef.current?.scrollTo(0, $targetPost.offsetTop - LayoutInPx.HEADER_HEIGHT);
-    }
-  }, [postId, mountCounter, isMountedOnce]);
-
   if (isLoading || isFirstImagesLoading) {
     return <PageLoadingWithLogo />;
   }
@@ -88,15 +68,15 @@ const SearchPostResultPage = () => {
   }
 
   return (
-    <ScrollPageWrapper ref={ScrollWrapperRef}>
+    <ScrollPageWrapper ref={scrollWrapperRef}>
       <Container>
-        <InfiniteScrollContainer isLoaderShown={isFetchingNextPage || isImagesFetching} onIntersect={handleIntersect}>
-          <Feed
-            infinitePostsData={infinitePostsData}
-            queryKey={[QUERY.GET_SEARCH_POST_RESULT, { type, keyword }]}
-            isFetching={isFetchingNextPage || isImagesFetching}
-          />
-        </InfiniteScrollContainer>
+        <Feed
+          infinitePostsData={infinitePostsData}
+          onIntersect={handleIntersect}
+          queryKeyList={[[QUERY.GET_SEARCH_POST_RESULT, { type, keyword }]]}
+          isFetching={isFetchingNextPage || isImagesFetching}
+          setCurrentPostId={setCurrentPostId}
+        />
       </Container>
     </ScrollPageWrapper>
   );

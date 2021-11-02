@@ -13,7 +13,7 @@ import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.tag.domain.Tag;
 import com.woowacourse.pickgit.tag.domain.TagRepository;
 import com.woowacourse.pickgit.user.domain.User;
-import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.domain.repository.UserRepository;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;

@@ -21,10 +21,12 @@ ext {
 dependencies {
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.data:spring-data-elasticsearch:4.2.2'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-log4j2'
+    implementation 'com.lmax:disruptor:3.4.2'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.apache.httpcomponents:httpclient:4.5'
     implementation 'net.rakugakibox.spring.boot:logback-access-spring-boot-starter:2.7.1'
@@ -119,6 +121,7 @@ jacocoTestReport {
                             '**/*S3*',
                             '**/*DataSource*',
                             '**/*Slave*',
+                            '**/*Elastic*',
                             '**/*GithubContributionExtractor*',
                             '**/*Configuration*'
                     ])
@@ -155,6 +158,7 @@ jacocoTestCoverageVerification {
                     '**.*Storage*',
                     '**.*DataSource*',
                     '**.*Slave*',
+                    '**.*Elastic*',
                     '**.*GithubContributionExtractor*',
                     '**.*Configuration*'
             ]

@@ -1,6 +1,6 @@
 package com.woowacourse.pickgit.config.db;
 
-import com.woowacourse.pickgit.query.fixture.TUser;
+import com.woowacourse.pickgit.common.fixture.TUser;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 

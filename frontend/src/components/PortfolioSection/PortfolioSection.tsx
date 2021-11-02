@@ -46,53 +46,49 @@ const PortfolioSection = ({ section, isEditable, setSection }: Props) => {
     hideModal: hideAlert,
   } = useModal();
 
-  const handleCategoryChange = (prevCategory: string) => (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    updateCategory(prevCategory, event.currentTarget.value);
+  const handleCategoryChange = (sectionItemId: string | number) => (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    updateCategory(sectionItemId, event.currentTarget.value);
   };
 
   const handleDescriptionChange =
-    (category: string, descriptionIndex: number) => (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-      updateDescription(category, descriptionIndex, event.currentTarget.value);
+    (sectionItemId: string | number, descriptionId: string | number) =>
+    (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+      updateDescription(sectionItemId, descriptionId, event.currentTarget.value);
     };
 
   const handleAddBlankSectionItem = () => {
     addBlankSectionItem();
   };
 
-  const handleAddBlankDescription = (sectionItemIndex: number) => {
-    addBlankDescription(sectionItemIndex);
+  const handleAddBlankDescription = (sectionItemId: string | number) => {
+    addBlankDescription(sectionItemId);
   };
 
-  const handleDeleteSectionItem = (sectionItemIndex: number) => {
+  const handleDeleteSectionItem = (sectionItemId: string | number) => {
     if (portfolioSectionItems.length === 1) {
       showAlert(FAILURE_MESSAGE.SHOULD_HAVE_LEAST_ONE_CATEGORY);
       return;
     }
 
-    deleteSectionItem(sectionItemIndex);
+    deleteSectionItem(sectionItemId);
   };
 
-  const handleDeleteDescription = (
-    sectionItem: PortfolioSectionItem,
-    sectionItemIndex: number,
-    descriptionIndex: number
-  ) => {
+  const handleDeleteDescription = (sectionItem: PortfolioSectionItem, descriptionId: string | number) => {
     if (sectionItem.descriptions.length === 1) {
       showAlert(FAILURE_MESSAGE.SHOULD_HAVE_LEAST_ONE_DESCRIPTION);
       return;
     }
 
-    deleteDescription(sectionItemIndex, descriptionIndex);
+    deleteDescription(sectionItem.id, descriptionId);
   };
 
-  // TODO: remove index from key prop
-  const categoryItems = portfolioSectionItems.map((item, sectionIndex) => (
-    <SectionContentWrapper key={item.id ?? "" + sectionIndex}>
+  const sectionItems = portfolioSectionItems.map((sectionItem, sectionIndex) => (
+    <SectionContentWrapper key={sectionItem.id}>
       <CategoriesWrapper>
         <Category>
           <PortfolioTextEditor
-            value={item.category}
-            onChange={handleCategoryChange(item.category)}
+            value={sectionItem.category}
+            onChange={handleCategoryChange(sectionItem.id)}
             cssProp={CategoryTextareaCSS}
             placeholder={PLACE_HOLDER.CATEGORY}
             disabled={!isEditable}
@@ -100,7 +96,7 @@ const PortfolioSection = ({ section, isEditable, setSection }: Props) => {
           />
           {isEditable && (
             <CategoryDeleteIconWrapper>
-              <SVGIcon icon="DeleteCircleIcon" onClick={() => handleDeleteSectionItem(sectionIndex)} />
+              <SVGIcon icon="DeleteCircleIcon" onClick={() => handleDeleteSectionItem(sectionItem.id)} />
             </CategoryDeleteIconWrapper>
           )}
         </Category>
@@ -111,12 +107,12 @@ const PortfolioSection = ({ section, isEditable, setSection }: Props) => {
         )}
       </CategoriesWrapper>
       <DescriptionsWrapper>
-        {item.descriptions.map((description, descriptionIndex) => (
-          <Fragment key={description.id ?? "" + descriptionIndex}>
+        {sectionItem.descriptions.map((description, descriptionIndex) => (
+          <Fragment key={description.id}>
             <Description>
               <PortfolioTextEditor
                 value={description.value}
-                onChange={handleDescriptionChange(item.category, descriptionIndex)}
+                onChange={handleDescriptionChange(sectionItem.id, description.id)}
                 cssProp={DescriptionItemTextareaCSS}
                 disabled={!isEditable}
                 placeholder={PLACE_HOLDER.DESCRIPTION}
@@ -126,14 +122,14 @@ const PortfolioSection = ({ section, isEditable, setSection }: Props) => {
                 <DescriptionDeleteIconWrapper>
                   <SVGIcon
                     icon="DeleteCircleIcon"
-                    onClick={() => handleDeleteDescription(item, sectionIndex, descriptionIndex)}
+                    onClick={() => handleDeleteDescription(sectionItem, description.id)}
                   />
                 </DescriptionDeleteIconWrapper>
               )}
             </Description>
-            {descriptionIndex === item.descriptions.length - 1 && isEditable && (
+            {descriptionIndex === sectionItem.descriptions.length - 1 && isEditable && (
               <DescriptionAddIconWrapper>
-                <SVGIcon icon="AddCircleIcon" onClick={() => handleAddBlankDescription(sectionIndex)} />
+                <SVGIcon icon="AddCircleIcon" onClick={() => handleAddBlankDescription(sectionItem.id)} />
               </DescriptionAddIconWrapper>
             )}
           </Fragment>
@@ -144,7 +140,7 @@ const PortfolioSection = ({ section, isEditable, setSection }: Props) => {
 
   return (
     <Container>
-      {categoryItems}
+      {sectionItems}
       {isAlertShown && <AlertPortal heading={alertMessage} onOkay={hideAlert} />}
     </Container>
   );

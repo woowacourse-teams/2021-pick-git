@@ -7,27 +7,21 @@ import {
   LogoIconWrapper,
   HeaderContent,
 } from "./NavigationHeader.style";
-import { AddBoxIcon, HomeIcon, LoginIcon, LogoIcon, PersonIcon, SearchIcon } from "../../../assets/icons";
+import { AddBoxIcon, LoginIcon, LogoIcon, PersonIcon, SearchIcon } from "../../../assets/icons";
 import { PAGE_URL } from "../../../constants/urls";
 import { useContext } from "react";
 import UserContext from "../../../contexts/UserContext";
 import Button from "../../@shared/Button/Button";
+import HomeFeedContext from "../../../contexts/HomeFeedContext";
 
 const NavigationHeader = () => {
   const { isLoggedIn, logout } = useContext(UserContext);
+  const { initHomeFeed, setCurrentPostId } = useContext(HomeFeedContext);
 
   const handleLogoutButtonClick = () => logout();
 
-  const UnAuthenticatedNavigation = () => (
-    <Navigation>
-      <NavigationItem to={PAGE_URL.SEARCH}>
-        <SearchIcon />
-      </NavigationItem>
-    </Navigation>
-  );
-
   const AuthenticatedNavigation = () => (
-    <Navigation>
+    <Navigation isLoggedIn={true}>
       <NavigationItem to={PAGE_URL.MY_PROFILE}>
         <PersonIcon />
       </NavigationItem>
@@ -43,7 +37,13 @@ const NavigationHeader = () => {
   return (
     <Container>
       <HeaderContent>
-        <HomeLink to={PAGE_URL.HOME}>
+        <HomeLink
+          to={PAGE_URL.HOME}
+          onClick={() => {
+            initHomeFeed();
+            setCurrentPostId(-1);
+          }}
+        >
           <LogoIconWrapper>
             <LogoIcon />
           </LogoIconWrapper>
@@ -60,8 +60,10 @@ const NavigationHeader = () => {
           </>
         ) : (
           <>
-            <UnAuthenticatedNavigation />
             <AuthNavigationWrapper>
+              <NavigationItem to={PAGE_URL.SEARCH}>
+                <SearchIcon />
+              </NavigationItem>
               <NavigationItem to={PAGE_URL.LOGIN}>
                 <LoginIcon />
               </NavigationItem>

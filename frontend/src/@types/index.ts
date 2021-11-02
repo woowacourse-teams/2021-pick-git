@@ -148,10 +148,31 @@ export type PortfolioIntro = {
   description: string;
   profileImageUrl: string;
   isProfileShown: boolean;
-  contacts: PortfolioContact[];
 };
 
 export type PortfolioProject = {
+  id: number | string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  type: "team" | "personal";
+  imageUrl: string;
+  content: string;
+  tags: string[];
+};
+
+export type IdProcessedPortfolioProject = {
+  id: number | null;
+  name: string;
+  startDate: string;
+  endDate: string;
+  type: "team" | "personal";
+  imageUrl: string;
+  content: string;
+  tags: string[];
+};
+
+export type PortfolioProjectUploadData = {
   id: number | null;
   name: string;
   startDate: string;
@@ -163,6 +184,15 @@ export type PortfolioProject = {
 };
 
 export type PortfolioSectionItem = {
+  id: string | number;
+  category: string;
+  descriptions: {
+    id: string | number;
+    value: string;
+  }[];
+};
+
+export type IdProcessedPortfolioSectionItem = {
   id: number | null;
   category: string;
   descriptions: {
@@ -172,9 +202,15 @@ export type PortfolioSectionItem = {
 };
 
 export type PortfolioSection = {
-  id: number | null;
+  id: string | number;
   name: string;
   items: PortfolioSectionItem[];
+};
+
+export type IdProcessedPortfolioSection = {
+  id: number | null;
+  name: string;
+  items: IdProcessedPortfolioSectionItem[];
 };
 
 export type Portfolio = {
@@ -197,6 +233,19 @@ export type PortfolioData = {
   sections: PortfolioSection[];
 };
 
+export type PortfolioUploadData = {
+  id: number | null;
+  name: string;
+  profileImageShown: boolean;
+  profileImageUrl: string;
+  introduction: string;
+  updatedAt?: string;
+  createdAt?: string;
+  contacts: PortfolioContact[];
+  projects: IdProcessedPortfolioProject[];
+  sections: IdProcessedPortfolioSection[];
+};
+
 export type PortfolioSectionType = "project" | "custom";
 
 export type PortfolioSectionList = string[];
@@ -208,3 +257,9 @@ export interface ChildFabItem {
   text?: string;
   onClick: () => void;
 }
+
+export type CircleButtonItem = {
+  icon: IconType;
+  backgroundColor?: string;
+  onClick?: () => void;
+};

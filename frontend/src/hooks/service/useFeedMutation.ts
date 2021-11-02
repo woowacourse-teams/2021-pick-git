@@ -2,20 +2,23 @@ import { useContext } from "react";
 import { InfiniteData, QueryKey, useQueryClient } from "react-query";
 import { Post } from "../../@types";
 import { UNKNOWN_ERROR_MESSAGE } from "../../constants/messages";
+import { QUERY } from "../../constants/queries";
 import SnackBarContext from "../../contexts/SnackbarContext";
 
 import { useAddPostLikeMutation, useDeletePostLikeMutation, useDeletePostMutation } from "../../services/queries";
 
-const useFeedMutation = (queryKey: QueryKey) => {
+const useFeedMutation = (queryKeyList: QueryKey[]) => {
   const { mutateAsync: mutateDeletePostLike } = useDeletePostLikeMutation();
   const { mutateAsync: mutateAddPostLike } = useAddPostLikeMutation();
   const { mutateAsync: mutateDeletePost, isLoading: isDeletePostLoading } = useDeletePostMutation();
   const queryClient = useQueryClient();
 
-  const infinitePostsData = queryClient.getQueryData<InfiniteData<Post[]>>(queryKey) as InfiniteData<Post[]>;
+  const infinitePostsDataList = queryKeyList.map((queryKey) =>
+    queryClient.getQueryData<InfiniteData<Post[]>>(queryKey)
+  ) as InfiniteData<Post[]>[];
   const { pushSnackbarMessage } = useContext(SnackBarContext);
 
-  const setPostsPages = (postsPages: Post[][]) => {
+  const setPostsPages = (postsPages: Post[][], queryKey: QueryKey) => {
     queryClient.setQueryData<InfiniteData<Post[]>>(queryKey, (data) => {
       return {
         ...data,
@@ -31,19 +34,22 @@ const useFeedMutation = (queryKey: QueryKey) => {
   };
 
   const setPostLike = (postId: Post["id"], state: { liked: boolean; likesCount: number }) => {
-    const newPostsPages = [...infinitePostsData.pages];
-    const targetPost = getTargetPost(postId, newPostsPages);
+    infinitePostsDataList.forEach((infinitePostsData, index) => {
+      const newPostsPages = [...infinitePostsData.pages];
+      const targetPost = getTargetPost(postId, newPostsPages);
 
-    if (targetPost) {
-      targetPost.liked = state.liked;
-      targetPost.likesCount = state.likesCount;
+      if (targetPost) {
+        targetPost.liked = state.liked;
+        targetPost.likesCount = state.likesCount;
 
-      setPostsPages(newPostsPages);
-    }
+        setPostsPages(newPostsPages, queryKeyList[index]);
+      }
+    });
   };
 
   const addPostLike = async (postId: Post["id"]) => {
-    const targetPost = getTargetPost(postId, [...infinitePostsData.pages]);
+    const infinitePostsData = queryClient.getQueryData<InfiniteData<Post[]>>(QUERY.GET_HOME_FEED_POSTS("all"));
+    const targetPost = getTargetPost(postId, [...(infinitePostsData?.pages ?? [])]);
 
     if (!targetPost) {
       return;
@@ -70,13 +76,16 @@ const useFeedMutation = (queryKey: QueryKey) => {
   const deletePost = async (postId: Post["id"]) => {
     await mutateDeletePost(postId);
 
-    const newPostsPages = infinitePostsData.pages.map((postPage) => postPage.filter((post) => post.id !== postId));
+    infinitePostsDataList.forEach((infinitePostsData, index) => {
+      const newPostsPages = infinitePostsData.pages.map((postPage) => postPage.filter((post) => post.id !== postId));
 
-    setPostsPages(newPostsPages);
+      setPostsPages(newPostsPages, queryKeyList[index]);
+    });
   };
 
   const deletePostLike = async (postId: Post["id"]) => {
-    const targetPost = getTargetPost(postId, [...infinitePostsData.pages]);
+    const infinitePostsData = queryClient.getQueryData<InfiniteData<Post[]>>(QUERY.GET_HOME_FEED_POSTS("all"));
+    const targetPost = getTargetPost(postId, [...(infinitePostsData?.pages ?? [])]);
 
     if (!targetPost) {
       return;
@@ -88,7 +97,7 @@ const useFeedMutation = (queryKey: QueryKey) => {
     setPostLike(postId, { liked: false, likesCount: prevLikesCount - 1 });
 
     try {
-      const { liked, likesCount } = await mutateDeletePostLike(targetPost.id);
+      const { liked, likesCount } = await mutateDeletePostLike(postId);
 
       if (liked === prevLiked || likesCount === prevLikesCount) {
         pushSnackbarMessage(UNKNOWN_ERROR_MESSAGE);

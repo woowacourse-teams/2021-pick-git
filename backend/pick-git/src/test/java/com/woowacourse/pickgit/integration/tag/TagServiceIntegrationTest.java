@@ -1,6 +1,6 @@
 package com.woowacourse.pickgit.integration.tag;
 
-import static com.woowacourse.pickgit.query.fixture.TRepository.PICK_GIT;
+import static com.woowacourse.pickgit.common.fixture.TRepository.PICK_GIT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 

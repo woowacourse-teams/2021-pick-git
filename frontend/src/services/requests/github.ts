@@ -26,6 +26,10 @@ export const requestGetTags = async (repositoryName: string, accessToken: string
     throw customError.noAccessToken;
   }
 
+  if (repositoryName === "") {
+    return [];
+  }
+
   const response = await axios.get<Tags>(API_URL.GITHUB_TAGS(repositoryName), {
     headers: {
       Authorization: `Bearer ${accessToken}`,

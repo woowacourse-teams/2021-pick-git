@@ -20,16 +20,17 @@ import useAuth from "../../hooks/common/useAuth";
 import useComments from "../../hooks/service/useComments";
 
 import { getItemsFromPages } from "../../utils/infiniteData";
-import { getTextElementsWithWithBr } from "../../utils/text";
+import { getTextElementsWithBr } from "../../utils/text";
 
 import {
   CloseLinkButton,
   CloseLinkButtonWrapper,
   CloseLinkText,
+  CommentContent,
   CommentContentWrapper,
   CommentList,
   CommentListItem,
-  CommentText,
+  CommentTextWrapper,
   CommentTextArea,
   CommentTextAreaWrapper,
   Container,
@@ -55,8 +56,10 @@ import type { CommentData, Post, TabItem } from "../../@types";
 import useModal from "../../hooks/common/useModal";
 import Loader from "../../components/@shared/Loader/Loader";
 import NotFound from "../../components/@shared/NotFound/NotFound";
+import usePostDetail from "../../hooks/service/usePostDetail";
 
 const CommentsPage = () => {
+  const postIdSearchParam = new URLSearchParams(location.search).get("id");
   const commentTextAreaRef = useRef<HTMLTextAreaElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [selectedCommentId, setSelectedCommentId] = useState<CommentData["id"]>(0);
@@ -74,17 +77,23 @@ const CommentsPage = () => {
     hideModal: hideConfirm,
   } = useModal();
 
+  const { post, isLoading: isPostLoading } = usePostDetail(Number(postIdSearchParam), !selectedPost);
+
+  const postId = post?.id ?? selectedPost?.id;
+
   const {
     infiniteCommentsData,
     isFetching,
     isError,
-    isLoading,
+    isLoading: isCommentsLoading,
     isAddCommentLoading,
     isDeleteCommentLoading,
     getNextComments,
     addPostComment,
     deletePostComment,
-  } = useComments(selectedPost.id);
+  } = useComments(postId);
+
+  const targetPost = selectedPost ? selectedPost : post;
 
   const comments = getItemsFromPages<CommentData>(infiniteCommentsData?.pages) ?? [];
 
@@ -110,6 +119,11 @@ const CommentsPage = () => {
   ];
 
   const handleGoBack = () => {
+    if (history.length < 3) {
+      history.push(PAGE_URL.HOME);
+      return;
+    }
+
     history.goBack();
   };
 
@@ -124,7 +138,7 @@ const CommentsPage = () => {
 
   const handleCommentDelete = async () => {
     hideConfirm();
-    await deletePostComment(selectedPost.id, selectedCommentId);
+    await deletePostComment(postId, selectedCommentId);
   };
 
   const handleCommentSave = async () => {
@@ -141,16 +155,22 @@ const CommentsPage = () => {
     commentTextAreaRef.current.value = "";
 
     try {
-      await addPostComment(selectedPost.id, newComment);
+      await addPostComment(postId, newComment);
     } catch (error) {
       pushSnackbarMessage(FAILURE_MESSAGE.COMMENT_SAVE_FAILED);
     }
   };
 
-  const handleCommentTextInput: React.KeyboardEventHandler<HTMLTextAreaElement> = (event) => {    
+  const handleCommentTextInput: React.KeyboardEventHandler<HTMLTextAreaElement> = (event) => {
     if (event.ctrlKey && event.code === "Enter") {
       event.preventDefault();
-      event.currentTarget.value += '\n';
+      event.currentTarget.value += "\n";
+      return;
+    }
+
+    if (event.shiftKey && event.code === "Enter") {
+      event.preventDefault();
+      event.currentTarget.value += "\n";
       return;
     }
 
@@ -159,7 +179,7 @@ const CommentsPage = () => {
       handleCommentSave();
       return;
     }
-  }
+  };
 
   useEffect(() => {
     if (!containerRef.current) {
@@ -172,41 +192,55 @@ const CommentsPage = () => {
     });
   }, [comments.length]);
 
-  const commentListItems = comments.length === 0 ? 
-    <NotFound type="comment" message="작성된 댓글이 없습니다" cssProp={NotFoundCSS} /> : comments.map((comment) => (
-      <CommentListItem key={comment.id}>
-        <CommentContentWrapper>
-          <Avatar diameter="2.5rem" imageUrl={comment.profileImageUrl} />
-          <CommentText>
-            <PostContentAuthorLink to={PAGE_URL.USER_PROFILE(comment.authorName)}>
-              {comment.authorName}
-            </PostContentAuthorLink>
-            <span>
-              {comment.content}
-            </span>
-          </CommentText>
-        </CommentContentWrapper>
-        {(currentUsername === comment.authorName || selectedPost.authorName === currentUsername) && (
-          <DeleteIconWrapper onClick={() => handleCommentDeleteClick(comment.id)}>
-            <SVGIcon icon="DeleteIcon" />
-          </DeleteIconWrapper>
-        )}
-      </CommentListItem>
-    ));
+  if (isPostLoading || isCommentsLoading) {
+    return <PageLoading />;
+  }
 
-  const tagListItems = selectedPost.tags.map((tag: string) => (
+  if (!targetPost) {
+    return <PageError errorMessage="게시글을 찾을 수가 없습니다" />;
+  }
+
+  if (isError || !comments) {
+    return <PageError errorMessage="댓글 정보를 불러오는데 실패했습니다" />;
+  }
+
+  const commentListItems =
+    comments.length === 0 ? (
+      <NotFound type="comment" message="작성된 댓글이 없습니다" cssProp={NotFoundCSS} />
+    ) : (
+      comments.map((comment) => (
+        <CommentListItem key={comment.id}>
+          <CommentContentWrapper>
+            <Avatar diameter="2.5rem" imageUrl={comment.profileImageUrl} />
+            <CommentTextWrapper>
+              <PostContentAuthorLink to={PAGE_URL.USER_PROFILE(comment.authorName)}>
+                {comment.authorName}
+              </PostContentAuthorLink>
+              <CommentContent>{comment.content}</CommentContent>
+            </CommentTextWrapper>
+          </CommentContentWrapper>
+          {(currentUsername === comment.authorName || targetPost.authorName === currentUsername) && (
+            <DeleteIconWrapper onClick={() => handleCommentDeleteClick(comment.id)}>
+              <SVGIcon icon="DeleteIcon" />
+            </DeleteIconWrapper>
+          )}
+        </CommentListItem>
+      ))
+    );
+
+  const tagListItems = targetPost.tags.map((tag: string) => (
     <TagItemLinkButton key={tag} to={PAGE_URL.SEARCH_POST_BY_TAG(tag)}>
       <Chip>{tag}</Chip>
     </TagItemLinkButton>
   ));
 
   const horizontalSliderComponents = [
-    <ImageSlider key="images" slideButtonKind="in-box" imageUrls={selectedPost.imageUrls} />,
+    <ImageSlider key="images" slideButtonKind="in-box" imageUrls={targetPost.imageUrls} />,
     <PostContent key="contents">
-      <PostContentAuthorLink to={PAGE_URL.USER_PROFILE(selectedPost.authorName)}>
-        {selectedPost.authorName}
+      <PostContentAuthorLink to={PAGE_URL.USER_PROFILE(targetPost.authorName)}>
+        {targetPost.authorName}
       </PostContentAuthorLink>
-      {getTextElementsWithWithBr(selectedPost.content)}
+      {getTextElementsWithBr(targetPost.content)}
     </PostContent>,
     <TagListWrapper key="tags">{tagListItems}</TagListWrapper>,
   ];
@@ -216,18 +250,6 @@ const CommentsPage = () => {
       {component}
     </HorizontalSliderItemWrapper>
   ));
-
-  if (isLoading) {
-    return (
-      <Container>
-        <PageLoading />
-      </Container>
-    );
-  }
-
-  if (isError || !comments) {
-    return <PageError errorMessage="댓글 정보를 불러오는데 실패했습니다" />;
-  }
 
   return (
     <ContentWrapper ref={containerRef}>

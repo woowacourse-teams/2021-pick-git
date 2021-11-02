@@ -66,14 +66,14 @@ const useProfileModificationForm = (
     setImageUrl(URL.createObjectURL(files[0]));
   };
 
-  const handleDescriptionChange: React.ChangeEventHandler<HTMLTextAreaElement> = ({ target: { value } }) => {
-    if (!isValidProfileDescription(value)) {
+  const handleDescriptionChange: React.ChangeEventHandler<HTMLTextAreaElement> = ({ target }) => {
+    if (!isValidProfileDescription(target.value)) {
+      target.blur();
       messageViewer?.(FAILURE_MESSAGE.PROFILE_DESCRIPTION_MAX_LENGTH_EXCEEDED);
-
       return false;
     }
 
-    setDescription(value);
+    setDescription(target.value);
   };
 
   const handleError = (error: unknown) => {

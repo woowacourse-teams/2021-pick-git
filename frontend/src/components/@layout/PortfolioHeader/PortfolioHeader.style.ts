@@ -15,6 +15,7 @@ export const Container = styled(Header)`
 export const HeaderContentWrapper = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
   width: 100%;
 
   ${setLaptopAboveMediaQuery`
@@ -41,3 +42,33 @@ export const GoBackLinkButton = styled.a`
     opacity: 0.5;
   }
 `;
+
+export const KaKaoShareButton = styled.button(
+  ({ theme }) => css`
+    border-radius: 50%;
+    padding: 0.5rem 0.4rem 0.3125rem 0.5rem;
+    overflow: hidden;
+    background-color: ${theme.color.yellow};
+    box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.2);
+    transition: opacity 0.5s;
+
+    :hover {
+      opacity: 0.5;
+    }
+  `
+);
+
+export const LinkShareButton = styled.button(
+  () => css`
+    border-radius: 50%;
+    padding: 0.5rem;
+    overflow: hidden;
+    margin-right: 0.75rem;
+    box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.2);
+    transition: opacity 0.5s;
+
+    :hover {
+      opacity: 0.5;
+    }
+  `
+);

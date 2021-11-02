@@ -88,7 +88,7 @@ export const FabText = styled.span<{ isShown: boolean }>(
     display: ${isShown ? "inline-block" : "none"};
     color: ${theme.color.tertiaryColor};
     font-size: 1rem;
-    margin-right: 0.5rem;
+    margin-right: 1rem;
     transition: opacity 1s ${isShown ? "1s" : "0s"};
 
     opacity: ${isShown ? "1" : "0"};

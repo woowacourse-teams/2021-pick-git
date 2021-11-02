@@ -20,7 +20,8 @@ import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.authentication.infrastructure.dao.CollectionOAuthAccessTokenDao;
 import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import com.woowacourse.pickgit.user.domain.User;
-import com.woowacourse.pickgit.user.domain.UserRepository;
+import com.woowacourse.pickgit.user.domain.repository.UserRepository;
+import com.woowacourse.pickgit.user.domain.search.UserSearchEngine;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,6 +45,9 @@ class OAuthServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private UserSearchEngine userSearchEngine;
 
     @Mock
     private CollectionOAuthAccessTokenDao oAuthAccessTokenDao;
@@ -115,6 +119,8 @@ class OAuthServiceTest {
             .findByBasicProfile_Name(githubProfileResponse.getName());
         verify(userRepository, times(1))
             .save(user);
+        verify(userSearchEngine, times(1))
+            .save(any());
         verify(jwtTokenProvider, times(1))
             .createToken(githubProfileResponse.getName());
         verify(oAuthAccessTokenDao, times(1))

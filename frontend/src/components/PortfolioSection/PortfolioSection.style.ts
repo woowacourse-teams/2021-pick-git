@@ -64,21 +64,25 @@ export const CategoryTextareaCSS = css`
   `}
 `;
 
-export const DescriptionsWrapper = styled.div`
-  width: 100%;
-  padding: 2.5rem 1rem;
+export const DescriptionsWrapper = styled.div(
+  () => css`
+    width: 100%;
+    padding: 2.5rem 0rem 2.5rem 1rem;
 
-  ${setLaptopAboveMediaQuery`
-    font-size: 1.125rem;
-    padding-left: 6.25rem;
+    ${setLaptopAboveMediaQuery`
+      font-size: 1.125rem;
+      padding-left: 6.25rem;
     `}
-`;
+  `
+);
 
-export const Description = styled.div`
-  display: flex;
-  align-items: center;
-  margin-bottom: 0.75rem;
-`;
+export const Description = styled.div(
+  () => css`
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  `
+);
 
 export const DescriptionDeleteIconWrapper = styled.div`
   margin-left: 0.75rem;

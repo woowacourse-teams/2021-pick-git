@@ -1,33 +1,44 @@
-import { useContext, useEffect, useState } from "react";
-
+import axios from "axios";
+import { Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
+import { InfiniteData, QueryKey } from "react-query";
+import { useHistory } from "react-router-dom";
 import { Post } from "../../@types";
+import { NOT_FOUND_MESSAGE, SUCCESS_MESSAGE, WARNING_MESSAGE } from "../../constants/messages";
+import { PAGE_URL } from "../../constants/urls";
 import SnackBarContext from "../../contexts/SnackbarContext";
 import UserContext from "../../contexts/UserContext";
-import PostItem from "../@shared/PostItem/PostItem";
-import { Container, PostItemWrapper } from "./Feed.style";
+import useModal from "../../hooks/common/useModal";
 import useFeedMutation from "../../hooks/service/useFeedMutation";
-import { SUCCESS_MESSAGE, WARNING_MESSAGE } from "../../constants/messages";
-import { getAPIErrorMessage } from "../../utils/error";
-import { useHistory } from "react-router-dom";
-import { PAGE_URL } from "../../constants/urls";
 import usePostEdit from "../../hooks/service/usePostEdit";
-import { InfiniteData, QueryKey } from "react-query";
+import { getAPIErrorMessage } from "../../utils/error";
 import { getItemsFromPages } from "../../utils/infiniteData";
 import ConfirmPortal from "../@layout/ConfirmPortal/ConfirmPortal";
 import PageLoadingWithCover from "../@layout/PageLoadingWithCover/PageLoadingWithCover";
-import useModal from "../../hooks/common/useModal";
-import axios from "axios";
+import InfiniteScrollContainer from "../@shared/InfiniteScrollContainer/InfiniteScrollContainer";
+import NotFound from "../@shared/NotFound/NotFound";
+import PostItem from "../@shared/PostItem/PostItem";
+import { PostItemWrapper, NotFoundCSS } from "./Feed.style";
 
 interface Props {
   infinitePostsData: InfiniteData<Post[] | null>;
-  queryKey: QueryKey;
+  onIntersect: () => void;
+  setCurrentPostId?: Dispatch<SetStateAction<number>>;
+  queryKeyList: QueryKey[];
   isFetching: boolean;
+  notFoundMessage?: string | null;
 }
 
-const Feed = ({ infinitePostsData, queryKey, isFetching }: Props) => {
+const Feed = ({
+  infinitePostsData,
+  onIntersect,
+  setCurrentPostId,
+  queryKeyList,
+  isFetching,
+  notFoundMessage,
+}: Props) => {
   const [selectedPostId, setSelectedPostId] = useState<Post["id"]>();
   const { pushSnackbarMessage } = useContext(SnackBarContext);
-  const { addPostLike, deletePost, deletePostLike, isDeletePostLoading } = useFeedMutation(queryKey);
+  const { addPostLike, deletePost, deletePostLike, isDeletePostLoading } = useFeedMutation(queryKeyList);
   const [posts, setPosts] = useState<Post[]>([]);
   const { setPostEditData } = usePostEdit();
   const {
@@ -89,8 +100,10 @@ const Feed = ({ infinitePostsData, queryKey, isFetching }: Props) => {
       return;
     }
 
+    setCurrentPostId?.(selectedPost.id);
     history.push({
-      pathname: PAGE_URL.POST_COMMENTS,
+      pathname: PAGE_URL.POST_DETAIL,
+      search: `id=${postId}`,
       state: selectedPost,
     });
   };
@@ -120,31 +133,19 @@ const Feed = ({ infinitePostsData, queryKey, isFetching }: Props) => {
     setPosts(getItemsFromPages<Post>(infinitePostsData.pages) ?? []);
   }, [infinitePostsData, isFetching]);
 
-  if (!infinitePostsData.pages) {
-    return <div>게시물이 존재하지 않습니다.</div>;
+  if (infinitePostsData.pages.length === 0 || infinitePostsData.pages[0]?.length === 0) {
+    return <NotFound type="post" message={notFoundMessage ?? NOT_FOUND_MESSAGE.POSTS.DEFAULT} cssProp={NotFoundCSS} />;
   }
 
   return (
-    <Container>
+    <InfiniteScrollContainer isLoaderShown={isFetching} onIntersect={onIntersect}>
       {posts?.map((post) => (
         <PostItemWrapper id={`post${post.id}`} key={post.id}>
           <PostItem
+            post={post}
             currentUserName={currentUsername}
             isLoggedIn={isLoggedIn}
-            authorName={post.authorName}
-            authorGithubUrl={post.githubRepoUrl}
-            authorImageUrl={post.profileImageUrl}
-            imageUrls={post.imageUrls}
-            commenterImageUrl={
-              "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80"
-            }
-            createdAt={post.createdAt}
-            comments={post.comments}
-            content={post.content}
             isEditable={currentUsername === post.authorName && isLoggedIn}
-            liked={post.liked}
-            likeCount={post.likesCount}
-            tags={post.tags}
             onPostDelete={() => handlePostDeleteButtonClick(post.id)}
             onPostEdit={() => handlePostEdit(post)}
             onPostLike={() => handlePostLike(post.id)}
@@ -156,7 +157,7 @@ const Feed = ({ infinitePostsData, queryKey, isFetching }: Props) => {
         </PostItemWrapper>
       ))}
       {isConfirmShown && <ConfirmPortal heading={confirmMessage} onConfirm={handlePostDelete} onCancel={hideConfirm} />}
-    </Container>
+    </InfiniteScrollContainer>
   );
 };
 

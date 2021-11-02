@@ -1,12 +1,12 @@
 package com.woowacourse.pickgit.acceptance;
 
-import static com.woowacourse.pickgit.query.fixture.TPost.NEOZALPOST;
+import static com.woowacourse.pickgit.common.fixture.TPost.NEOZALPOST;
 
+import com.woowacourse.pickgit.common.fixture.TContact;
+import com.woowacourse.pickgit.common.fixture.TProject;
+import com.woowacourse.pickgit.common.fixture.TSection;
 import com.woowacourse.pickgit.config.DatabaseConfigurator;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
-import com.woowacourse.pickgit.query.fixture.TContact;
-import com.woowacourse.pickgit.query.fixture.TProject;
-import com.woowacourse.pickgit.query.fixture.TSection;
 import io.restassured.RestAssured;
 import java.util.List;
 import java.util.stream.Stream;
@@ -47,6 +47,10 @@ public abstract class AcceptanceTest {
 
     protected void toRead() {
         databaseConfigurator.toRead();
+    }
+
+    protected void toWrite() {
+        databaseConfigurator.toWrite();
     }
 
     protected static Stream<Arguments> getPostSearchArguments() {
@@ -95,6 +99,16 @@ public abstract class AcceptanceTest {
         );
     }
 
+    protected static Stream<Arguments> getPortfolioUpdateInvalidDateProjectsArguments() {
+        return Stream.of(
+            Arguments.of(
+                List.of(TContact.createRandom()),
+                List.of(TProject.invalidDateOf(NEOZALPOST)),
+                List.of(TSection.createRandom())
+            )
+        );
+    }
+
     protected static Stream<Arguments> getPortfolioUpdateDuplicateSectionsArguments() {
         return Stream.of(
             Arguments.of(
@@ -107,6 +121,15 @@ public abstract class AcceptanceTest {
                 List.of(TProject.of(NEOZALPOST)),
                 List.of(TSection.of(), TSection.of(), TSection.of())
             )
+        );
+    }
+
+    protected static Stream<Arguments> getParametersForQueryComments() {
+        return Stream.of(
+            Arguments.of(10, 1, 3, 3),
+            Arguments.of(10, 2, 3, 3),
+            Arguments.of(10, 3, 3, 1),
+            Arguments.of(10, 4, 3, 0)
         );
     }
 }

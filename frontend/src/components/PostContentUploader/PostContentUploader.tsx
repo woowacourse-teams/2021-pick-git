@@ -25,7 +25,6 @@ interface Props {
   setContent: Dispatch<SetStateAction<string>>;
 }
 
-// TODO : key 를 넣지 않는 방법 생각해보기
 const PostContentUploader = ({ isImageUploaderShown, content, setFiles, setContent }: Props) => {
   const uploaderRef = useRef<HTMLImageElement>(null);
   const [imageUrls, setImageUrls] = useState<string[]>([]);

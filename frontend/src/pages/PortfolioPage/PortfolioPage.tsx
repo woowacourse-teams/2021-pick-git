@@ -4,13 +4,12 @@ import PageLoading from "../../components/@layout/PageLoading/PageLoading";
 import PortfolioHeader from "../../components/@layout/PortfolioHeader/PortfolioHeader";
 import ScrollActiveHeader from "../../components/@layout/ScrollActiveHeader/ScrollActiveHeader";
 import Avatar from "../../components/@shared/Avatar/Avatar";
-import DotPaginator from "../../components/@shared/DotPaginator/DotPaginator";
 import PageError from "../../components/@shared/PageError/PageError";
 import SVGIcon from "../../components/@shared/SVGIcon/SVGIcon";
 import PortfolioProjectSection from "../../components/PortfolioProjectSection/PortfolioProjectSection";
 import PortfolioSection from "../../components/PortfolioSection/PortfolioSection";
 import PortfolioTextEditor from "../../components/PortfolioTextEditor/PortfolioTextEditor";
-import useScrollPagination from "../../hooks/common/useScrollPagination";
+import { CONTACT_ICON } from "../../constants/portfolio";
 
 import usePortfolio from "../../hooks/service/usePortfolio";
 import useProfile from "../../hooks/service/useProfile";
@@ -23,7 +22,6 @@ import {
   DescriptionCSS,
   DetailInfo,
   FullPage,
-  PaginatorWrapper,
   SectionNameCSS,
   UserAvatarCSS,
   UserNameCSS,
@@ -32,6 +30,7 @@ import {
 const PortfolioPage = () => {
   const username = new URLSearchParams(location.search).get("username") ?? "";
   const containerRef = useRef<HTMLDivElement>(null);
+  const { data: profile } = useProfile(false, username);
 
   const {
     portfolio: remotePortfolio,
@@ -40,16 +39,8 @@ const PortfolioPage = () => {
     error,
     isFetching,
   } = usePortfolio(username);
-  const { data: profile, isLoading: isProfileLoading } = useProfile(false, username);
 
-  const paginationCount = remotePortfolio ? remotePortfolio.projects.length + remotePortfolio.sections.length + 1 : 0;
-  const { activePageIndex, paginate } = useScrollPagination(containerRef, paginationCount);
-
-  const handlePaginate = (index: number) => {
-    paginate(index);
-  };
-
-  if (isProfileLoading || isPortfolioLoading || isFetching) {
+  if (isPortfolioLoading || isFetching) {
     return <PageLoading />;
   }
 
@@ -57,7 +48,7 @@ const PortfolioPage = () => {
     if (error?.response?.status === 400) {
       return (
         <>
-          <PortfolioHeader isButtonsShown={false} />
+          <PortfolioHeader username={profile?.name ?? ""} />
           <PageError errorMessage="아직 포트폴리오가 만들어지지 않았습니다" />
         </>
       );
@@ -69,7 +60,7 @@ const PortfolioPage = () => {
   return (
     <>
       <ScrollActiveHeader containerRef={containerRef}>
-        <PortfolioHeader isButtonsShown={false} />
+        <PortfolioHeader portfolio={remotePortfolio} username={profile?.name ?? ""} />
       </ScrollActiveHeader>
       <Container ref={containerRef}>
         <FullPage isVerticalCenter={true}>
@@ -91,26 +82,14 @@ const PortfolioPage = () => {
             autoGrow={false}
           />
           <ContactWrapper>
-            <DetailInfo>
-              <SVGIcon cssProp={ContactIconCSS} icon="CompanyIcon" />
-              {profile?.company ? profile?.company : "-"}
-            </DetailInfo>
-            <DetailInfo>
-              <SVGIcon cssProp={ContactIconCSS} icon="LocationIcon" />
-              {profile?.location ? profile?.location : "-"}
-            </DetailInfo>
-            <DetailInfo>
-              <SVGIcon cssProp={ContactIconCSS} icon="GithubDarkIcon" />
-              <a href={profile?.githubUrl ?? ""}>{profile?.githubUrl ? profile?.githubUrl : "-"}</a>
-            </DetailInfo>
-            <DetailInfo>
-              <SVGIcon cssProp={ContactIconCSS} icon="WebsiteLinkIcon" />
-              <a href={profile?.website ?? ""}>{profile?.website ? profile?.website : "-"}</a>
-            </DetailInfo>
-            <DetailInfo>
-              <SVGIcon cssProp={ContactIconCSS} icon="TwitterIcon" />
-              {profile?.twitter ? profile?.twitter : "-"}
-            </DetailInfo>
+            {remotePortfolio.contacts
+              .filter((portfolioContact) => portfolioContact.value !== "")
+              .map((portfolioContact) => (
+                <DetailInfo>
+                  <SVGIcon cssProp={ContactIconCSS} icon={CONTACT_ICON[portfolioContact.category]} />
+                  {portfolioContact.value}
+                </DetailInfo>
+              ))}
           </ContactWrapper>
         </FullPage>
         {remotePortfolio.projects.map((portfolioProject) => (
@@ -125,9 +104,6 @@ const PortfolioPage = () => {
           </FullPage>
         ))}
       </Container>
-      <PaginatorWrapper>
-        <DotPaginator activePageIndex={activePageIndex} paginationCount={paginationCount} onPaginate={handlePaginate} />
-      </PaginatorWrapper>
     </>
   );
 };

@@ -11,6 +11,8 @@ import com.woowacourse.pickgit.post.application.PostFeedService;
 import com.woowacourse.pickgit.post.application.PostService;
 import com.woowacourse.pickgit.post.presentation.PostController;
 import com.woowacourse.pickgit.post.presentation.PostFeedController;
+import com.woowacourse.pickgit.post.presentation.postfeed.AllFeedType;
+import com.woowacourse.pickgit.post.presentation.postfeed.FollowingsFeedType;
 import com.woowacourse.pickgit.tag.application.TagService;
 import com.woowacourse.pickgit.tag.presentation.TagController;
 import com.woowacourse.pickgit.user.application.UserService;
@@ -32,7 +34,9 @@ import org.springframework.test.web.servlet.MockMvc;
     PostController.class,
     CommentController.class,
     OAuthController.class,
-    PortfolioController.class
+    PortfolioController.class,
+    AllFeedType.class,
+    FollowingsFeedType.class
 })
 @ActiveProfiles("test")
 public abstract class ControllerTest {
