@@ -123,6 +123,7 @@ jacocoTestReport {
                             '**/*Slave*',
                             '**/*Elastic*',
                             '**/*GithubContributionExtractor*',
+                            '**/*GithubRepositoryExtractor*',
                             '**/*Configuration*'
                     ])
         }))
@@ -160,6 +161,7 @@ jacocoTestCoverageVerification {
                     '**.*Slave*',
                     '**.*Elastic*',
                     '**.*GithubContributionExtractor*',
+                    '**.*GithubRepositoryExtractor*',
                     '**.*Configuration*'
             ]
         }
