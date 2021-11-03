@@ -4,12 +4,10 @@ import static java.util.stream.Collectors.toList;
 
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.post.domain.repository.PickGitStorage;
-import com.woowacourse.pickgit.post.domain.util.RestClient;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -25,27 +23,21 @@ public class S3Storage implements PickGitStorage {
 
     private static final String MULTIPART_KEY = "files";
 
-    private final RestClient restClient;
+    private final S3Requester s3Requester;
     private final String s3ProxyUrl;
 
     public S3Storage(
-        RestClient restClient,
+        S3Requester s3Requester,
         @Value("${storage.pickgit.s3proxy}") String s3ProxyUrl
     ) {
-        this.restClient = restClient;
+        this.s3Requester = s3Requester;
         this.s3ProxyUrl = s3ProxyUrl;
     }
 
     @Override
     public List<String> store(List<File> files, String userName) {
-        StorageDto response = restClient
-            .postForEntity(s3ProxyUrl, createBody(files, userName), StorageDto.class)
-            .getBody();
-
-        if (Objects.isNull(response)) {
-            throw new PlatformHttpErrorException();
-        }
-        return response.getUrls();
+        MultiValueMap<String, Object> body = createBody(files, userName);
+        return s3Requester.storeImages(s3ProxyUrl, body);
     }
 
     private MultiValueMap<String, Object> createBody(

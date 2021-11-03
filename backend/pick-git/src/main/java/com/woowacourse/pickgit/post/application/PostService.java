@@ -19,7 +19,6 @@ import com.woowacourse.pickgit.post.domain.Post;
 import com.woowacourse.pickgit.post.domain.repository.PickGitStorage;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.post.domain.util.PlatformRepositoryExtractor;
-import com.woowacourse.pickgit.post.domain.util.PlatformRepositorySearchExtractor;
 import com.woowacourse.pickgit.post.domain.util.dto.RepositoryNameAndUrl;
 import com.woowacourse.pickgit.tag.application.TagService;
 import com.woowacourse.pickgit.tag.application.dto.TagsDto;
@@ -45,7 +44,6 @@ public class PostService {
     private final PostRepository postRepository;
     private final PickGitStorage pickgitStorage;
     private final PlatformRepositoryExtractor platformRepositoryExtractor;
-    private final PlatformRepositorySearchExtractor platformRepositorySearchExtractor;
 
     @CacheEvict(value = "homeFeed", allEntries = true)
     @Transactional
@@ -90,7 +88,7 @@ public class PostService {
 
 
         List<RepositoryNameAndUrl> repositoryNameAndUrls =
-            platformRepositorySearchExtractor.extract(token, username, keyword, searchRepositoryRequestDto.getPageable());
+            platformRepositoryExtractor.search(token, username, keyword, searchRepositoryRequestDto.getPageable());
 
         return PostDtoAssembler.repositoryResponsesDtos(repositoryNameAndUrls);
     }

@@ -7,4 +7,11 @@ import org.springframework.data.domain.Pageable;
 public interface PlatformRepositoryExtractor {
 
     List<RepositoryNameAndUrl> extract(String token, String username, Pageable pageable);
+
+    List<RepositoryNameAndUrl> search(
+        String token,
+        String username,
+        String keyword,
+        Pageable pageable
+    );
 }

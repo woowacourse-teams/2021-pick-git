@@ -41,7 +41,6 @@ import com.woowacourse.pickgit.post.domain.content.Images;
 import com.woowacourse.pickgit.post.domain.repository.PickGitStorage;
 import com.woowacourse.pickgit.post.domain.repository.PostRepository;
 import com.woowacourse.pickgit.post.domain.util.PlatformRepositoryExtractor;
-import com.woowacourse.pickgit.post.domain.util.PlatformRepositorySearchExtractor;
 import com.woowacourse.pickgit.post.domain.util.dto.RepositoryNameAndUrl;
 import com.woowacourse.pickgit.post.presentation.dto.request.PostUpdateRequest;
 import com.woowacourse.pickgit.tag.application.TagService;
@@ -80,9 +79,6 @@ class PostServiceTest {
 
     @Mock
     private PlatformRepositoryExtractor platformRepositoryExtractor;
-
-    @Mock
-    private PlatformRepositorySearchExtractor platformRepositorySearchExtractor;
 
     @Mock
     private TagService tagService;
@@ -324,8 +320,8 @@ class PostServiceTest {
             new RepositoryNameAndUrl("pick-git", "https://github.com/jipark3/pick-git")
         );
 
-        given(platformRepositorySearchExtractor
-            .extract(
+        given(platformRepositoryExtractor
+            .search(
                 searchRepositoryRequestDto.getToken(),
                 searchRepositoryRequestDto.getUsername(),
                 searchRepositoryRequestDto.getKeyword(),
@@ -341,8 +337,8 @@ class PostServiceTest {
         assertThat(repositoryResponseDtos)
             .usingRecursiveComparison()
             .isEqualTo(repositories);
-        verify(platformRepositorySearchExtractor, times(1))
-            .extract(
+        verify(platformRepositoryExtractor, times(1))
+            .search(
                 searchRepositoryRequestDto.getToken(),
                 searchRepositoryRequestDto.getUsername(),
                 searchRepositoryRequestDto.getKeyword(),
@@ -364,8 +360,8 @@ class PostServiceTest {
                 accessToken, userName, keyword, pageable
             );
 
-        given(platformRepositorySearchExtractor
-            .extract(
+        given(platformRepositoryExtractor
+            .search(
                 searchRepositoryRequestDto.getToken(),
                 searchRepositoryRequestDto.getUsername(),
                 searchRepositoryRequestDto.getKeyword(),
@@ -378,8 +374,8 @@ class PostServiceTest {
             postService.searchUserRepositories(searchRepositoryRequestDto)
         ).isInstanceOf(RepositoryParseException.class);
 
-        verify(platformRepositorySearchExtractor, times(1))
-            .extract(
+        verify(platformRepositoryExtractor, times(1))
+            .search(
                 searchRepositoryRequestDto.getToken(),
                 searchRepositoryRequestDto.getUsername(),
                 searchRepositoryRequestDto.getKeyword(),
@@ -400,8 +396,8 @@ class PostServiceTest {
             accessToken, userName, keyword, pageable
         );
 
-        given(platformRepositorySearchExtractor
-            .extract(
+        given(platformRepositoryExtractor
+            .search(
                 searchRepositoryRequestDto.getToken(),
                 searchRepositoryRequestDto.getUsername(),
                 searchRepositoryRequestDto.getKeyword(),
@@ -414,8 +410,8 @@ class PostServiceTest {
             postService.searchUserRepositories(searchRepositoryRequestDto)
         ).isInstanceOf(RepositoryParseException.class);
 
-        verify(platformRepositorySearchExtractor, times(1))
-            .extract(
+        verify(platformRepositoryExtractor, times(1))
+            .search(
                 searchRepositoryRequestDto.getToken(),
                 searchRepositoryRequestDto.getUsername(),
                 searchRepositoryRequestDto.getKeyword(),

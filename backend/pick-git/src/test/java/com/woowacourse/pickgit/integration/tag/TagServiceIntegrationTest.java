@@ -4,8 +4,7 @@ import static com.woowacourse.pickgit.common.fixture.TRepository.PICK_GIT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.woowacourse.pickgit.common.mockapi.MockTagApiRequester;
+import com.woowacourse.pickgit.common.mockapi.MockGithubTagRequester;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.post.TagFormatException;
 import com.woowacourse.pickgit.integration.IntegrationTest;
@@ -41,16 +40,11 @@ class TagServiceIntegrationTest extends IntegrationTest {
     private final String accessToken = "oauth.access.token";
     private final String userName = "jipark3";
     private final String repositoryName = PICK_GIT.name();
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() {
         PlatformTagExtractor platformTagExtractor =
-            new GithubTagExtractor(
-                new MockTagApiRequester(),
-                objectMapper,
-                "https://api.github.com"
-            );
+            new GithubTagExtractor(new MockGithubTagRequester(null), "https://api.github.com");
         tagService = new TagService(platformTagExtractor, tagRepository);
     }
 
