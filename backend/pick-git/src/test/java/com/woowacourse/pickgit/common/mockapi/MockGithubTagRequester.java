@@ -1,7 +1,7 @@
 package com.woowacourse.pickgit.common.mockapi;
 
+import com.woowacourse.pickgit.common.fixture.TRepository;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
-import com.woowacourse.pickgit.query.fixture.TRepository;
 import com.woowacourse.pickgit.tag.infrastructure.GithubTagRequester;
 import java.util.Map;
 import java.util.Set;

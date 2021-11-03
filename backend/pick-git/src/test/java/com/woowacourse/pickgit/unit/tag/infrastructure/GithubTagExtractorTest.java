@@ -1,8 +1,7 @@
 package com.woowacourse.pickgit.unit.tag.infrastructure;
 
-import static com.woowacourse.pickgit.query.fixture.TRepository.OTHER;
+import static com.woowacourse.pickgit.common.fixture.TRepository.OTHER;
 import static java.util.stream.Collectors.toList;
-import static com.woowacourse.pickgit.common.fixture.TRepository.PICK_GIT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.woowacourse.pickgit.common.mockapi.MockGithubTagRequester;
