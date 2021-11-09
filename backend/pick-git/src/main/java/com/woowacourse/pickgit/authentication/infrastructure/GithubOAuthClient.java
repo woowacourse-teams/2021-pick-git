@@ -5,13 +5,15 @@ import com.woowacourse.pickgit.authentication.domain.OAuthClient;
 import com.woowacourse.pickgit.authentication.infrastructure.dto.OAuthAccessTokenRequest;
 import com.woowacourse.pickgit.authentication.infrastructure.dto.OAuthAccessTokenResponse;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
+import java.util.Objects;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
+import org.springframework.web.client.RestTemplate;
 
 @Profile("!test")
 @Component
@@ -22,7 +24,6 @@ public class GithubOAuthClient implements OAuthClient {
     private static final String ACCESS_TOKEN_URL_SUFFIX =
         "/login/oauth/access_token";
 
-    private final WebClient webClient;
     private final String clientId;
     private final String clientSecret;
     private final String redirectUrl;
@@ -30,14 +31,12 @@ public class GithubOAuthClient implements OAuthClient {
     private final String apiBaseUrl;
 
     public GithubOAuthClient(
-        WebClient webClient,
         @Value("${security.github.client.id}") String clientId,
         @Value("${security.github.client.secret}") String clientSecret,
         @Value("${security.github.url.redirect}") String redirectUrl,
         @Value("${security.github.url.oauth}") String oauthBaseUrl,
         @Value("${security.github.url.api}") String apiBaseUrl
     ) {
-        this.webClient = webClient;
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.redirectUrl = redirectUrl;
@@ -55,36 +54,31 @@ public class GithubOAuthClient implements OAuthClient {
     public String getAccessToken(String code) {
         OAuthAccessTokenRequest githubAccessTokenRequest =
             new OAuthAccessTokenRequest(clientId, clientSecret, code);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Accept", MediaType.APPLICATION_JSON_VALUE);
+
+        HttpEntity<OAuthAccessTokenRequest> httpEntity =
+            new HttpEntity<>(githubAccessTokenRequest, headers);
         String accessTokenUrl = oauthBaseUrl + ACCESS_TOKEN_URL_SUFFIX;
 
-        return webClient.post()
-            .uri(accessTokenUrl)
-            .header("Accept", MediaType.APPLICATION_JSON_VALUE)
-            .bodyValue(githubAccessTokenRequest)
-            .retrieve()
-            .onStatus(HttpStatus::isError, response -> response.bodyToMono(String.class)
-                .flatMap(errorMessage -> Mono.error(new PlatformHttpErrorException(errorMessage))))
-            .bodyToMono(OAuthAccessTokenResponse.class)
-            .blockOptional()
-            .orElseThrow(PlatformHttpErrorException::new)
-            .getAccessToken();
+        OAuthAccessTokenResponse response = new RestTemplate()
+            .exchange(accessTokenUrl, HttpMethod.POST, httpEntity, OAuthAccessTokenResponse.class)
+            .getBody();
+        if (Objects.isNull(response)) {
+            throw new PlatformHttpErrorException();
+        }
+        return response.getAccessToken();
     }
 
     @Override
     public OAuthProfileResponse getGithubProfile(String githubAccessToken) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Accept", MediaType.APPLICATION_JSON_VALUE);
+        headers.add("Authorization", "Bearer " + githubAccessToken);
+        HttpEntity<Void> httpEntity = new HttpEntity<>(headers);
         String url = apiBaseUrl + "/user";
-
-        return webClient.get()
-            .uri(url)
-            .headers(httpHeaders -> {
-                httpHeaders.set("Accept", MediaType.APPLICATION_JSON_VALUE);
-                httpHeaders.setBearerAuth(githubAccessToken);
-            })
-            .retrieve()
-            .onStatus(HttpStatus::isError, response -> response.bodyToMono(String.class)
-                .flatMap(errorMessage -> Mono.error(new PlatformHttpErrorException(errorMessage))))
-            .bodyToMono(OAuthProfileResponse.class)
-            .blockOptional()
-            .orElseThrow(PlatformHttpErrorException::new);
+        return new RestTemplate()
+            .exchange(url, HttpMethod.GET, httpEntity, OAuthProfileResponse.class)
+            .getBody();
     }
 }

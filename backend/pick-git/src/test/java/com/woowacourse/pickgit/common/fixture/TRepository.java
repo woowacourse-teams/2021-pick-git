@@ -18,12 +18,6 @@ public enum TRepository {
         new Pair("spring", "645"),
         new Pair("king", "593499)")
     ),
-    OTHER(
-        new Pair("java", "123"),
-        new Pair("spring", "12313"),
-        new Pair("god", "5335"),
-        new Pair("Other", "4444")
-    ),
     UNKNOWN;
 
     private final List<Pair> tags;

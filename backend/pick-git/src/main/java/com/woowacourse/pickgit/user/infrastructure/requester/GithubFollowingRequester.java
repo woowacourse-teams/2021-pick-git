@@ -4,24 +4,22 @@ import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.user.domain.follow.PlatformFollowingRequester;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 @Profile("!test")
 @Component
 public class GithubFollowingRequester implements PlatformFollowingRequester {
 
-    private final WebClient webClient;
     private final String apiBaseUrl;
 
     public GithubFollowingRequester(
-        WebClient webClient,
         @Value("${security.github.url.api}") String apiBaseUrl
     ) {
-        this.webClient = webClient;
         this.apiBaseUrl = apiBaseUrl;
     }
 
@@ -40,18 +38,21 @@ public class GithubFollowingRequester implements PlatformFollowingRequester {
         String targetName,
         String accessToken
     ) {
-        String format = apiBaseUrl + "/user/following/%s";
-        String url = String.format(format, targetName);
+        try {
+            String format = apiBaseUrl + "/user/following/%s";
+            String url = String.format(format, targetName);
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.setBearerAuth(accessToken);
+            httpHeaders.set("Accept", "application/vnd.github.v3+json");
 
-        webClient.method(method)
-            .uri(url)
-            .headers(httpHeaders -> {
-                httpHeaders.setBearerAuth(accessToken);
-                httpHeaders.set("Accept", "application/vnd.github.v3+json");
-            })
-            .retrieve()
-            .onStatus(HttpStatus::isError, clientResponse -> Mono.error(PlatformHttpErrorException::new))
-            .bodyToMono(Void.class)
-            .block();
+            RequestEntity<Void> requestEntity = RequestEntity
+                .method(method, url)
+                .headers(httpHeaders)
+                .build();
+
+            new RestTemplate().exchange(requestEntity, Void.class);
+        } catch (HttpClientErrorException e) {
+            throw new PlatformHttpErrorException(e.getMessage());
+        }
     }
 }
