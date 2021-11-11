@@ -14,7 +14,7 @@ const useStep = ({ steps, stepIndex, setStepIndex }: Parameters) => {
 
   const setStepMoveEventHandler = () => {
     window.onpopstate = () => {
-      if (getLastHash(history.location.pathname) === steps[stepIndex + 1]?.hash) {
+      if (getLastHash(history.location.hash) === steps[stepIndex + 1]?.hash) {
         setStepIndex(stepIndex + 1);
         return;
       }
