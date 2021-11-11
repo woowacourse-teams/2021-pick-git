@@ -21,6 +21,7 @@ export const usePortfolioQuery = (username: string, isMyPortfolio: boolean) => {
 
   return useQuery<PortfolioData, AxiosError<ErrorResponse>>([QUERY.GET_PORTFOLIO], portfolioQueryFunction, {
     refetchOnWindowFocus: false,
+    cacheTime: 0
   });
 };
 
