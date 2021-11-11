@@ -62,9 +62,6 @@ const HomeFeedPage = () => {
     if (browserName === "safari") {
       showAlert("특정 사파리 버전에선 \n 앱의 기능이 제한될 수 있습니다.");
     }
-
-    refetchAll();
-    setTimeout(refetchAll, 300);
   }, []);
 
   if (isLoading || isFirstImagesLoading) {

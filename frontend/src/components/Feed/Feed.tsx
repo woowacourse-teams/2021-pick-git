@@ -83,6 +83,7 @@ const Feed = ({
     const newPosts = [...posts];
     const targetPost = newPosts.find((post) => post.id === postId);
 
+
     if (!targetPost) {
       return;
     }
