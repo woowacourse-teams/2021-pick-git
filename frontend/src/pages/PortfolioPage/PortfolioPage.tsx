@@ -45,7 +45,7 @@ const PortfolioPage = () => {
   }
 
   if (!remotePortfolio || isError) {
-    if (error?.response?.status === 400) {
+    if (error?.response?.status === 204) {
       return (
         <>
           <PortfolioHeader username={profile?.name ?? ""} />
