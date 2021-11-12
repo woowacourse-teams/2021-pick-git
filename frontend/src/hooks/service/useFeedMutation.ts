@@ -2,7 +2,6 @@ import { useContext } from "react";
 import { InfiniteData, QueryKey, useQueryClient } from "react-query";
 import { Post } from "../../@types";
 import { UNKNOWN_ERROR_MESSAGE } from "../../constants/messages";
-import { QUERY } from "../../constants/queries";
 import SnackBarContext from "../../contexts/SnackbarContext";
 
 import { useAddPostLikeMutation, useDeletePostLikeMutation, useDeletePostMutation } from "../../services/queries";
@@ -48,28 +47,35 @@ const useFeedMutation = (queryKeyList: QueryKey[]) => {
   };
 
   const addPostLike = async (postId: Post["id"]) => {
-    const infinitePostsData = queryClient.getQueryData<InfiniteData<Post[]>>(QUERY.GET_HOME_FEED_POSTS("all"));
-    const targetPost = getTargetPost(postId, [...(infinitePostsData?.pages ?? [])]);
+    let addingLikePost: Post; 
 
-    if (!targetPost) {
-      return;
-    }
+    infinitePostsDataList.forEach(async (infinitePostsData, index) => {
+      const newPostsPages = [...infinitePostsData.pages];
+      const targetPost = getTargetPost(postId, newPostsPages);
 
-    const prevLiked = targetPost?.liked;
-    const prevLikesCount = targetPost?.likesCount;
+      if (targetPost) {
 
-    setPostLike(postId, { liked: true, likesCount: prevLikesCount + 1 });
+        targetPost.liked = true;
+        targetPost.likesCount += 1;
+
+        setPostsPages(newPostsPages, queryKeyList[index]);
+        addingLikePost = targetPost;
+      }
+    });
+
+    const prevPostLiked = false;
+    const prevPostLikesCount = addingLikePost!.likesCount - 1;
 
     try {
       const { liked, likesCount } = await mutateAddPostLike(postId);
 
-      if (liked === prevLiked || likesCount === prevLikesCount) {
+      if (liked === prevPostLiked || likesCount === prevPostLikesCount) {
         pushSnackbarMessage(UNKNOWN_ERROR_MESSAGE);
-        setPostLike(postId, { liked: prevLiked, likesCount: prevLikesCount });
+        setPostLike(postId, { liked: prevPostLiked, likesCount: prevPostLikesCount });
       }
     } catch (error) {
       pushSnackbarMessage(UNKNOWN_ERROR_MESSAGE);
-      setPostLike(postId, { liked: prevLiked, likesCount: prevLikesCount });
+      setPostLike(postId, { liked: prevPostLiked, likesCount: prevPostLikesCount });
     }
   };
 
@@ -84,28 +90,37 @@ const useFeedMutation = (queryKeyList: QueryKey[]) => {
   };
 
   const deletePostLike = async (postId: Post["id"]) => {
-    const infinitePostsData = queryClient.getQueryData<InfiniteData<Post[]>>(QUERY.GET_HOME_FEED_POSTS("all"));
-    const targetPost = getTargetPost(postId, [...(infinitePostsData?.pages ?? [])]);
+    let deletingPost: Post; 
 
-    if (!targetPost) {
-      return;
-    }
+    infinitePostsDataList.forEach(async (infinitePostsData, index) => {
+      const newPostsPages = [...infinitePostsData.pages];
+      const targetPost = getTargetPost(postId, newPostsPages);
 
-    const prevLiked = targetPost?.liked;
-    const prevLikesCount = targetPost?.likesCount;
+      if (targetPost) {
 
-    setPostLike(postId, { liked: false, likesCount: prevLikesCount - 1 });
+        targetPost.liked = false;
+        if (targetPost.likesCount > 0) {
+          targetPost.likesCount -= 1;
+        }
+
+        setPostsPages(newPostsPages, queryKeyList[index]);
+        deletingPost = targetPost;
+      }
+    });
+
+    const prevPostLiked = true;
+    const prevPostLikesCount = deletingPost!.likesCount + 1;
 
     try {
       const { liked, likesCount } = await mutateDeletePostLike(postId);
 
-      if (liked === prevLiked || likesCount === prevLikesCount) {
+      if (liked === prevPostLiked || likesCount === prevPostLikesCount) {
         pushSnackbarMessage(UNKNOWN_ERROR_MESSAGE);
-        setPostLike(postId, { liked: prevLiked, likesCount: prevLikesCount });
+        setPostLike(postId, { liked: prevPostLiked, likesCount: prevPostLikesCount });
       }
     } catch (error) {
       pushSnackbarMessage(UNKNOWN_ERROR_MESSAGE);
-      setPostLike(postId, { liked: prevLiked, likesCount: prevLikesCount });
+      setPostLike(postId, { liked: prevPostLiked, likesCount: prevPostLikesCount });
     }
   };
 
