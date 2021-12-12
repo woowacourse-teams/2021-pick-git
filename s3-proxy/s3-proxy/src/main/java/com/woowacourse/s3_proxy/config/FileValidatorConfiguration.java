@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 public class FileValidatorConfiguration {
 
     @Bean
-    public List<FileValidator> fileValidato 꿀ㄲr() {
+    public List<FileValidator> fileValidator() {
         return List.of(
             new ImageFileValidator()
         );
