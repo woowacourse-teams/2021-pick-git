@@ -13,7 +13,7 @@ import com.woowacourse.pickgit.authentication.domain.user.AppUser;
 import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.authentication.infrastructure.JwtTokenProviderImpl;
-import com.woowacourse.pickgit.authentication.infrastructure.dao.RedisOAuthAccessTokenDao;
+import com.woowacourse.pickgit.authentication.infrastructure.dao.CollectionOAuthAccessTokenDao;
 import com.woowacourse.pickgit.config.InfrastructureTestConfiguration;
 import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
@@ -61,7 +61,7 @@ class OAuthServiceIntegrationTest extends IntegrationTest {
             SECRET_KEY,
             EXPIRATION_TIME_IN_MILLISECONDS
         );
-        this.oAuthAccessTokenDao = new RedisOAuthAccessTokenDao(redisTemplate);
+        this.oAuthAccessTokenDao = new CollectionOAuthAccessTokenDao();
         this.oAuthService = new OAuthService(
             oAuthClient,
             jwtTokenProvider,
