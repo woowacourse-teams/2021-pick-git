@@ -1,6 +1,6 @@
 package com.woowacourse.pickgit.acceptance.authentication;
 
-import static com.woowacourse.pickgit.query.fixture.TUser.NEOZAL;
+import static com.woowacourse.pickgit.common.fixture.TUser.NEOZAL;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.woowacourse.pickgit.acceptance.AcceptanceTest;

@@ -1,12 +1,11 @@
 package com.woowacourse.pickgit.integration.tag;
 
-import static com.woowacourse.pickgit.query.fixture.TRepository.PICK_GIT;
+import static com.woowacourse.pickgit.common.fixture.TRepository.PICK_GIT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.woowacourse.pickgit.common.mockapi.MockTagApiRequester;
-import com.woowacourse.pickgit.config.JpaTestConfiguration;
 import com.woowacourse.pickgit.exception.platform.PlatformHttpErrorException;
 import com.woowacourse.pickgit.exception.post.TagFormatException;
 import com.woowacourse.pickgit.integration.IntegrationTest;

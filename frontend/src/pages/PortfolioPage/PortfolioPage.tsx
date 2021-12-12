@@ -13,6 +13,7 @@ import { CONTACT_ICON } from "../../constants/portfolio";
 
 import usePortfolio from "../../hooks/service/usePortfolio";
 import useProfile from "../../hooks/service/useProfile";
+import { customError } from "../../utils/error";
 
 import {
   AvatarWrapper,
@@ -30,37 +31,35 @@ import {
 const PortfolioPage = () => {
   const username = new URLSearchParams(location.search).get("username") ?? "";
   const containerRef = useRef<HTMLDivElement>(null);
-  const { data: profile } = useProfile(false, username);
 
   const {
     portfolio: remotePortfolio,
     isLoading: isPortfolioLoading,
     isError,
-    error,
     isFetching,
-  } = usePortfolio(username);
+  } = usePortfolio(username, false);
 
   if (isPortfolioLoading || isFetching) {
     return <PageLoading />;
   }
 
-  if (!remotePortfolio || isError) {
-    if (error?.response?.status === 400) {
-      return (
-        <>
-          <PortfolioHeader username={profile?.name ?? ""} />
-          <PageError errorMessage="아직 포트폴리오가 만들어지지 않았습니다" />
-        </>
-      );
-    }
-
+  if (isError) {
     return <PageError errorMessage="포트폴리오 정보를 불러오는데 실패했습니다" />;
+  }
+
+  if (!remotePortfolio) {
+    return (
+      <>
+        <PortfolioHeader username={username} />
+        <PageError errorMessage="아직 포트폴리오가 만들어지지 않았습니다" />
+      </>
+    );
   }
 
   return (
     <>
       <ScrollActiveHeader containerRef={containerRef}>
-        <PortfolioHeader portfolio={remotePortfolio} username={profile?.name ?? ""} />
+        <PortfolioHeader portfolio={remotePortfolio} username={username} />
       </ScrollActiveHeader>
       <Container ref={containerRef}>
         <FullPage isVerticalCenter={true}>
