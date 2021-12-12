@@ -3,7 +3,6 @@ plugins {
     id 'org.springframework.boot' version '2.5.2'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
-    id 'jacoco'
 }
 
 group = 'com.woowacourse'
@@ -89,84 +88,6 @@ task copyRestDocs(type: Copy) {
     from 'build/asciidoc/html5'
     include '*.html'
     into 'src/main/resources/static/docs'
-}
-
-jacoco {
-    toolVersion = "0.8.5"
-}
-
-jacocoTestReport {
-    reports {
-        html.enabled true
-        xml.enabled true
-        csv.enabled false
-
-        html.destination file("src/jacoco/jacoco.html")
-        xml.destination file("src/jacoco/jacoco.xml")
-    }
-
-    afterEvaluate {
-        classDirectories.setFrom(files(classDirectories.files.collect {
-            fileTree(dir: it,
-                    exclude: [
-                            '**/PickGitApplication*',
-                            '**/*Request*',
-                            '**/*Response*',
-                            '**/*Dto*',
-                            '**/*NameAndUrl*',
-                            '**/*Requester*',
-                            '**/*OAuthClient*',
-                            '**/common*',
-                            '**/format*',
-                            '**/*Exception*',
-                            '**/*Content*',
-                            '**/content*',
-                            '**/*S3*',
-                            '**/*DataSource*',
-                            '**/*Slave*',
-                            '**/*Elastic*',
-                            '**/*GithubContributionExtractor*',
-                            '**/*Configuration*'
-                    ])
-        }))
-    }
-
-    finalizedBy 'jacocoTestCoverageVerification'
-}
-
-jacocoTestCoverageVerification {
-    violationRules {
-        rule {
-            enabled = true
-            element = 'CLASS'
-
-            limit {
-                counter = 'CLASS'
-                value = 'COVEREDRATIO'
-                minimum = 0.70
-            }
-
-            excludes = [
-                    '**.*RestTemplate*',
-                    '**.*PickGitApplication*',
-                    '**.*Request*',
-                    '**.*Response*',
-                    '**.*Dto*',
-                    '**.*NameAndUrl',
-                    '**.*Requester*',
-                    '**.*OAuthClient*',
-                    '**.*Interceptor*',
-                    '**.*Exception*',
-                    '**.*Content*',
-                    '**.*Storage*',
-                    '**.*DataSource*',
-                    '**.*Slave*',
-                    '**.*Elastic*',
-                    '**.*GithubContributionExtractor*',
-                    '**.*Configuration*'
-            ]
-        }
-    }
 }
 
 bootRun {
