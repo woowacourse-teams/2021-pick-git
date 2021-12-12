@@ -18,7 +18,6 @@ import com.woowacourse.pickgit.user.application.dto.response.UserProfileResponse
 import com.woowacourse.pickgit.user.application.dto.response.UserSearchResponseDto;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.repository.UserRepository;
-import com.woowacourse.pickgit.user.domain.search.UserSearchEngine;
 import com.woowacourse.pickgit.user.presentation.dto.UserAssembler;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -34,9 +33,6 @@ public class UserServiceIntegrationTest_Query extends IntegrationTest {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private UserSearchEngine userSearchEngine;
 
     @DisplayName("비로그인 유저는 내 프로필을 조회할 수 없다.")
     @Test
@@ -160,8 +156,8 @@ public class UserServiceIntegrationTest_Query extends IntegrationTest {
         AuthUserForUserRequestDto authUserRequestDto = createLoginAuthUserRequestDto(
             loginUser.getName());
 
-        userSearchEngine.save(userRepository.save(loginUser));
-        userSearchEngine.saveAll(userRepository.saveAll(searchedUsers));
+        userRepository.save(loginUser);
+        userRepository.saveAll(searchedUsers);
 
         FollowRequestDto requestDto = FollowRequestDto.builder()
             .authUserRequestDto(authUserRequestDto)
@@ -194,7 +190,7 @@ public class UserServiceIntegrationTest_Query extends IntegrationTest {
         String searchKeyword = "bing";
         AuthUserForUserRequestDto authUserRequestDto = createGuestAuthUserRequestDto();
         List<User> userInDb = UserFactory.mockSearchUsers();
-        userSearchEngine.saveAll(userRepository.saveAll(userInDb));
+       userRepository.saveAll(userInDb);
 
         // when
         List<UserSearchResponseDto> searchResult =
