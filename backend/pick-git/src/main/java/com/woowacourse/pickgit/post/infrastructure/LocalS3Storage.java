@@ -35,10 +35,11 @@ public class LocalS3Storage implements PickGitStorage {
 
     private final AmazonS3 s3Client;
 
-    public LocalS3Storage(@Value("${aws.s3.bucket_name}") String bucket,
-                          @Value("${aws.cloud_front.file_url_format}") String fileUrlFormat,
-                          FileNameGenerator fileNameGenerator,
-                          AmazonS3 s3Client
+    public LocalS3Storage(
+            @Value("${aws.s3.bucket_name}") String bucket,
+            @Value("${aws.cloud_front.file_url_format}") String fileUrlFormat,
+            FileNameGenerator fileNameGenerator,
+            AmazonS3 s3Client
     ) {
         this.bucket = bucket;
         this.fileUrlFormat = fileUrlFormat;
@@ -78,8 +79,11 @@ public class LocalS3Storage implements PickGitStorage {
         return objectMetadata;
     }
 
-    private void putObjectToS3(MultipartFile multipartFile, String originalFileName, ObjectMetadata objectMetadata)
-            throws IOException {
+    private void putObjectToS3(
+            MultipartFile multipartFile,
+            String originalFileName,
+            ObjectMetadata objectMetadata
+    ) throws IOException {
         s3Client.putObject(
                 bucket,
                 originalFileName,

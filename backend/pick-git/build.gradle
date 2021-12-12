@@ -20,7 +20,7 @@ ext {
 dependencies {
     implementation platform('com.amazonaws:aws-java-sdk-bom:1.11.1000')
 
-    implementation group: 'org.apache.tika', name: 'tika-core', version: '1.26'
+    implementation 'org.apache.tika:tika-core:1.26'
     implementation 'com.amazonaws:aws-java-sdk-s3'
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'

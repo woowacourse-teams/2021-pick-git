@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 public class ImageFileValidator implements FileValidator {
+
     private static final String REQUIRE_MIME_TYPE = "image";
     private static final Tika tika = new Tika();
 
