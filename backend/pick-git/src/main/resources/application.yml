@@ -11,3 +11,9 @@ server:
   compression:
     enabled: true
     mime-types: application/json
+
+aws:
+  cloud_front:
+    file_url_format: https://d3sf7n1zm6swrc.cloudfront.net/images/%s
+  s3:
+    bucket_name: pickgit-s3-image/images

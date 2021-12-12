@@ -19,6 +19,7 @@ import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.common.factory.FileFactory;
 import com.woowacourse.pickgit.common.factory.PostFactory;
 import com.woowacourse.pickgit.common.factory.UserFactory;
+import com.woowacourse.pickgit.common.file_validator.FileValidator;
 import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.post.CannotUnlikeException;
 import com.woowacourse.pickgit.exception.post.DuplicatedLikeException;
@@ -86,6 +87,9 @@ class PostServiceTest {
 
     @Mock
     private TagService tagService;
+
+    @Mock
+    private List<FileValidator> fileValidators;
 
     @DisplayName("사용자는 게시물을 등록할 수 있다.")
     @Test

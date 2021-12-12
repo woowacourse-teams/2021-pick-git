@@ -20,7 +20,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 
 @Profile("!test")
-@Repository
 public class S3Storage implements PickGitStorage {
 
     private static final String MULTIPART_KEY = "files";
