@@ -9,10 +9,9 @@ import com.woowacourse.pickgit.authentication.domain.user.GuestUser;
 import com.woowacourse.pickgit.authentication.domain.user.LoginUser;
 import com.woowacourse.pickgit.exception.authentication.InvalidTokenException;
 import com.woowacourse.pickgit.user.domain.User;
-import com.woowacourse.pickgit.user.domain.repository.UserRepository;
 import com.woowacourse.pickgit.user.domain.profile.BasicProfile;
 import com.woowacourse.pickgit.user.domain.profile.GithubProfile;
-import com.woowacourse.pickgit.user.domain.search.UserSearchEngine;
+import com.woowacourse.pickgit.user.domain.repository.UserRepository;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,7 +27,6 @@ public class OAuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final OAuthAccessTokenDao authAccessTokenDao;
     private final UserRepository userRepository;
-    private final UserSearchEngine userSearchEngine;
 
     @Transactional(propagation = Propagation.NEVER)
     public String getGithubAuthorizationUrl() {
@@ -55,8 +53,7 @@ public class OAuthService {
             .ifPresentOrElse(user -> user.changeGithubProfile(latestGithubProfile),
                 () -> {
                     BasicProfile basicProfile = githubProfileResponse.toBasicProfile();
-                    User user = userRepository.save(new User(basicProfile, latestGithubProfile));
-                    userSearchEngine.save(user);
+                    userRepository.save(new User(basicProfile, latestGithubProfile));
                 }
             );
     }
