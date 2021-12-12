@@ -33,9 +33,6 @@ import org.springframework.data.domain.PageRequest;
 @EnableCaching
 public class PostFeedCacheIntegrationTest extends AcceptanceTest {
 
-    private static final String USERNAME = "binghe";
-    private static final String ACCESS_TOKEN = "oauth.access.token";
-
     @Autowired
     private PostService postService;
 
@@ -59,7 +56,7 @@ public class PostFeedCacheIntegrationTest extends AcceptanceTest {
         toRead();
     }
 
-    @DisplayName("캐싱 - 비로그인 홈피드 조회시 두 번째 조회부터는 캐시 저장소에서 가져온다. (현재 페이지당 쿼리는 6번)")
+    @DisplayName("캐싱 - 저예산 환경이므로 캐싱이 동작하지 않는다.")
     @Test
     void readHomeFeed_Guest_LatestPosts() {
         // given
@@ -80,39 +77,7 @@ public class PostFeedCacheIntegrationTest extends AcceptanceTest {
                 tuple("dani", "java-racingcar", null),
                 tuple("ginger", "jwp-chess", null)
             );
-        assertThat(queryCounter.getCount().getValue()).isEqualTo(6L);
-    }
-
-    @DisplayName("캐싱 - 회원이 게시글 작성시 비로그인 홈피드 조회 캐싱이 삭제된다. (현재 페이지당 쿼리는 6번)")
-    @Test
-    void writePost_LoginUser_DeleteAllCache() {
-        // given
-        createMockPosts();
-        postFeedService.allHomeFeed(createMockGuestHomeFeedRequest());
-
-        // when
-        User user = UserFactory.user(USERNAME);
-        userRepository.save(user);
-
-        PostRequestDto postRequestDto = PostRequestDto.builder()
-            .token(ACCESS_TOKEN)
-            .username(USERNAME)
-            .images(List.of(
-                FileFactory.getTestImage1(),
-                FileFactory.getTestImage2()
-            ))
-            .githubRepoUrl("https://github.com/bperhaps")
-            .tags(List.of("java", "c++"))
-            .content("testContent")
-            .build();
-
-        postService.write(postRequestDto);
-        entityManager.clear();
-
-        // then
-        queryCounter.startCount();
-        postFeedService.allHomeFeed(createMockGuestHomeFeedRequest());
-        assertThat(queryCounter.getCount().getValue()).isEqualTo(6L);
+        assertThat(queryCounter.getCount().getValue()).isEqualTo(7L);
     }
 
     private void createMockPosts() {

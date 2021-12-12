@@ -6,7 +6,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
-@Component
 public class RedisOAuthAccessTokenDao implements OAuthAccessTokenDao {
 
     private final ValueOperations<String, String> opsForValue;

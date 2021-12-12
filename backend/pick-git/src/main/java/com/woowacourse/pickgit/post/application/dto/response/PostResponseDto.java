@@ -20,11 +20,7 @@ public class PostResponseDto {
     private String profileImageUrl;
     private Integer likesCount;
     private List<String> tags;
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime createdAt;
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime updatedAt;
     private List<CommentResponseDto> comments;
     private Boolean liked;

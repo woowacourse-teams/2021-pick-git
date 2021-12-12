@@ -47,7 +47,6 @@ public class PostService {
     private final PlatformRepositoryExtractor platformRepositoryExtractor;
     private final PlatformRepositorySearchExtractor platformRepositorySearchExtractor;
 
-    @CacheEvict(value = "homeFeed", allEntries = true)
     @Transactional
     public Long write(PostRequestDto postRequestDto) {
         Post savedPost = postRepository.save(createPost(postRequestDto));
@@ -95,7 +94,6 @@ public class PostService {
         return PostDtoAssembler.repositoryResponsesDtos(repositoryNameAndUrls);
     }
 
-    @CacheEvict(value = "homeFeed", allEntries = true)
     @Transactional
     public LikeResponseDto like(AppUser user, Long postId) {
         User source = findUserByName(user.getUsername());
@@ -105,7 +103,6 @@ public class PostService {
         return new LikeResponseDto(target.getLikeCounts(), true);
     }
 
-    @CacheEvict(value = "homeFeed", allEntries = true)
     @Transactional
     public LikeResponseDto unlike(AppUser user, Long postId) {
         User source = findUserByName(user.getUsername());
@@ -115,7 +112,6 @@ public class PostService {
         return new LikeResponseDto(target.getLikeCounts(), false);
     }
 
-    @CacheEvict(value = "homeFeed", allEntries = true)
     @Transactional
     public PostUpdateResponseDto update(PostUpdateRequestDto updateRequestDto) {
         User user = findUserByName(updateRequestDto.getUsername());
@@ -133,7 +129,6 @@ public class PostService {
         return PostDtoAssembler.postUpdateRequestDto(post);
     }
 
-    @CacheEvict(value = "homeFeed", allEntries = true)
     @Transactional
     public void delete(PostDeleteRequestDto deleteRequestDto) {
         User user = findUserByName(deleteRequestDto.getUsername());

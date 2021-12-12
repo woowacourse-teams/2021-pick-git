@@ -30,11 +30,6 @@ public class PostFeedService {
     private final UserRepository userRepository;
     private final SearchTypes searchTypes;
 
-    @Cacheable(key = "#homeFeedRequestDto.pageable.pageNumber",
-        value = "homeFeed",
-        condition = "#homeFeedRequestDto.guest == true",
-        unless = "#result == null || #result.empty"
-    )
     public List<PostResponseDto> allHomeFeed(HomeFeedRequestDto homeFeedRequestDto) {
         Pageable pageable = homeFeedRequestDto.getPageable();
 

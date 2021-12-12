@@ -16,8 +16,8 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-@Configuration
-@Profile("test")
+//@Configuration
+//@Profile("test")
 public class RedisCachingTestConfiguration {
 
     private final RedisConnectionFactory redisConnectionFactory;
