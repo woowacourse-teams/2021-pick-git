@@ -46,6 +46,3 @@ src/main/resources/application-staging.yml
 
 ### REST Docs ###
 src/main/resources/static/docs/
-
-### JaCoCo ###
-src/jacoco/
