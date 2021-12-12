@@ -1,6 +1,7 @@
 package com.woowacourse.pickgit.post.application;
 
 import com.woowacourse.pickgit.authentication.domain.user.AppUser;
+import com.woowacourse.pickgit.common.file_validator.FileValidator;
 import com.woowacourse.pickgit.exception.post.PostNotBelongToUserException;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
@@ -32,6 +33,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -46,6 +48,7 @@ public class PostService {
     private final PickGitStorage pickgitStorage;
     private final PlatformRepositoryExtractor platformRepositoryExtractor;
     private final PlatformRepositorySearchExtractor platformRepositorySearchExtractor;
+    private final List<FileValidator> fileValidators;
 
     @CacheEvict(value = "homeFeed", allEntries = true)
     @Transactional
@@ -55,6 +58,8 @@ public class PostService {
     }
 
     private Post createPost(PostRequestDto postRequestDto) {
+        postRequestDto.getImages().forEach(this::validateIsRightFile);
+
         List<Tag> tags = tagService.findOrCreateTags(new TagsDto(postRequestDto.getTags()));
 
         User user = findUserByName(postRequestDto.getUsername());
@@ -67,6 +72,10 @@ public class PostService {
         post.addTags(tags);
 
         return post;
+    }
+
+    private void validateIsRightFile(MultipartFile multipartFile) {
+        fileValidators.forEach(fileValidator -> fileValidator.execute(multipartFile));
     }
 
     public List<RepositoryResponseDto> userRepositories(RepositoryRequestDto repositoryRequestDto) {
