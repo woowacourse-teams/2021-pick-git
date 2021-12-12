@@ -21,6 +21,7 @@ import com.woowacourse.pickgit.integration.IntegrationTest;
 import com.woowacourse.pickgit.user.domain.User;
 import com.woowacourse.pickgit.user.domain.repository.UserRepository;
 import com.woowacourse.pickgit.user.domain.search.UserSearchEngine;
+import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -65,7 +66,10 @@ class OAuthServiceIntegrationTest extends IntegrationTest {
             SECRET_KEY,
             EXPIRATION_TIME_IN_MILLISECONDS
         );
-        this.oAuthAccessTokenDao = new RedisOAuthAccessTokenDao(redisTemplate);
+        this.oAuthAccessTokenDao = new RedisOAuthAccessTokenDao(
+            redisTemplate,
+            Duration.ofHours(3).toMillis()
+        );
         this.oAuthService = new OAuthService(
             oAuthClient,
             jwtTokenProvider,
