@@ -9,7 +9,8 @@ public class HomeFeedRequestDto {
 
     private String requestUserName;
     private boolean isGuest;
-    Pageable pageable;
+    private Pageable pageable;
+    private Long lastPostId;
 
     private HomeFeedRequestDto() {
     }
@@ -23,6 +24,18 @@ public class HomeFeedRequestDto {
 
         this.isGuest = appUser.isGuest();
         this.pageable = pageable;
+    }
+
+    public HomeFeedRequestDto(AppUser appUser, Pageable pageable, Long lastPostId) {
+        if(appUser.isGuest()) {
+            requestUserName = null;
+        } else {
+            requestUserName = appUser.getUsername();
+        }
+
+        this.isGuest = appUser.isGuest();
+        this.pageable = pageable;
+        this.lastPostId = lastPostId;
     }
 
     public HomeFeedRequestDto(String requestUserName, boolean isGuest, Pageable pageable) {
@@ -41,5 +54,9 @@ public class HomeFeedRequestDto {
 
     public Pageable getPageable() {
         return pageable;
+    }
+
+    public Long getLastPostId() {
+        return lastPostId;
     }
 }

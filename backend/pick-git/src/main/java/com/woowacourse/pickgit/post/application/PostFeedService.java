@@ -1,7 +1,6 @@
 package com.woowacourse.pickgit.post.application;
 
 
-import com.woowacourse.pickgit.exception.authentication.UnauthorizedException;
 import com.woowacourse.pickgit.exception.post.PostNotFoundException;
 import com.woowacourse.pickgit.exception.user.UserNotFoundException;
 import com.woowacourse.pickgit.post.application.dto.PostDtoAssembler;
@@ -39,7 +38,9 @@ public class PostFeedService {
         Pageable pageable = homeFeedRequestDto.getPageable();
 
         if (homeFeedRequestDto.isGuest()) {
-            return PostDtoAssembler.postResponseDtos(null, postRepository.findAllPosts(pageable));
+            return PostDtoAssembler.postResponseDtos(null,
+                postRepository.findAllPostsToBe(homeFeedRequestDto.getLastPostId(), pageable)
+            );
         }
 
         User requestUser = findUserByName(homeFeedRequestDto.getRequestUserName());

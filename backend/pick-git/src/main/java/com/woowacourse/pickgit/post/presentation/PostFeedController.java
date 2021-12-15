@@ -40,6 +40,7 @@ public class PostFeedController {
     public ResponseEntity<List<PostResponse>> readHomeFeed(
         @Authenticated AppUser appUser,
         @PageableDefault Pageable pageable,
+        @RequestParam(required = false) Long lastPostId,
         @RequestParam(required = false, defaultValue = "all") String type
     ) {
         FeedType selectedFeedType = feedTypes.stream()
@@ -47,7 +48,7 @@ public class PostFeedController {
             .findAny()
             .orElseThrow(HomeFeedTypeException::new);
 
-        HomeFeedRequestDto homeFeedRequestDto = new HomeFeedRequestDto(appUser, pageable);
+        HomeFeedRequestDto homeFeedRequestDto = new HomeFeedRequestDto(appUser, pageable, lastPostId);
         List<PostResponseDto> postResponseDtos = selectedFeedType.find(homeFeedRequestDto);
 
         List<PostResponse> postResponses = PostAssembler.postResponses((postResponseDtos));
